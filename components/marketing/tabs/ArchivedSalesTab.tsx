@@ -1,10 +1,10 @@
 import Button from 'components/core-ui-lib/Button';
-import { ReactNode, forwardRef, useImperativeHandle, useState } from 'react';
+import { forwardRef, useImperativeHandle, useMemo, useState } from 'react';
 import ArchSalesDialog, { ArchSalesDialogVariant } from '../modal/ArchivedSalesDialog';
 import { DataList, VenueDetail } from '../MarketingHome';
 import SalesTable from 'components/global/salesTable';
 import { SalesComparison } from 'types/MarketingTypes';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useRecoilValue } from 'recoil';
 import { townState } from 'state/marketing/townState';
 import { venueState } from 'state/booking/venueState';
 import { bookingJumpState } from 'state/marketing/bookingJumpState';
@@ -12,6 +12,7 @@ import axios from 'axios';
 import { exportExcelReport } from 'components/bookings/modal/request';
 import { notify } from 'components/core-ui-lib/Notifications';
 import { productionJumpState } from 'state/booking/productionJumpState';
+import { isNullOrEmpty } from 'utils';
 
 export interface ArchSalesTabRef {
   resetData: () => void;
@@ -26,35 +27,38 @@ const ArchivedSalesTab = forwardRef<ArchSalesTabRef, ArchSalesProps>((props, ref
   const [archSaleVariant, setArchSaleVariant] = useState<ArchSalesDialogVariant>('venue');
   const [archivedDataAvail, setArchivedDataAvail] = useState<boolean>(false);
   const [archivedData, setArchivedData] = useState<VenueDetail | DataList>();
-  const [archivedSalesTable, setArchivedSalesTable] = useState<ReactNode>();
+  const [tableData, setTableData] = useState(null);
   const [errorMessage, setErrorMessage] = useState<string>('');
   const townList = useRecoilValue(townState);
   const venueDict = useRecoilValue(venueState);
-  const bookings = useRecoilState(bookingJumpState);
+  const bookings = useRecoilValue(bookingJumpState);
   const [bookingsSelection, setBookingsSelection] = useState([]);
   const { selected: productionId, productions } = useRecoilValue(productionJumpState);
   const { selectedBooking } = props;
+  const [showData, setShowData] = useState(false);
+  const venueTownData = useMemo(() => {
+    return {
+      townList: Object.values(townList).map((town) => {
+        return { text: town.Town, value: town.Town };
+      }),
+      venueList: Object.values(venueDict).map((venue) => {
+        return { text: `${venue.Code} ${venue.Name}`, value: venue };
+      }),
+    };
+  }, [townList, venueDict]);
+
   useImperativeHandle(ref, () => ({
     resetData: () => {
-      setArchivedSalesTable(<div />);
+      setShowData(false);
     },
   }));
 
   const showArchSalesComp = (variant: ArchSalesDialogVariant) => {
     setArchSaleVariant(variant);
     if (variant === 'both') {
-      // get venue list
-      const venueTownData = {
-        townList: Object.values(townList).map((town) => {
-          return { text: town.Town, value: town.Town };
-        }),
-        venueList: Object.values(venueDict).map((venue) => {
-          return { text: venue.Code + ' ' + venue.Name, value: venue };
-        }),
-      };
       setArchivedData(venueTownData);
     } else {
-      const selectedBooking = bookings[0].bookings.find((booking) => booking.Id === bookings[0].selected);
+      const selectedBooking = bookings.bookings.find((booking) => booking.Id === bookings.selected);
       // extract the venue name, code and town
       const venue = {
         name: selectedBooking.Venue.Name,
@@ -69,7 +73,8 @@ const ArchivedSalesTab = forwardRef<ArchSalesTabRef, ArchSalesProps>((props, ref
   };
 
   const showArchivedSales = async (selection) => {
-    setArchivedSalesTable(<div />);
+    setTableData(null);
+    setShowData(false);
 
     try {
       const selectedBookings = selection.map((obj) => obj.bookingId);
@@ -79,19 +84,10 @@ const ArchivedSalesTab = forwardRef<ArchSalesTabRef, ArchSalesProps>((props, ref
         const salesComp = data as Array<SalesComparison>;
         const result = { tableData: salesComp, bookingIds: selection };
 
-        setArchivedSalesTable(
-          <div className="w-[1200px] overflow-x-auto pb-5">
-            <SalesTable
-              containerHeight="h-[1000px]"
-              containerWidth="w-auto"
-              module="marketing"
-              variant="salesComparison"
-              data={result}
-              tableHeight={580}
-            />
-          </div>,
-        );
+        setTableData(result);
+
         setArchivedDataAvail(true);
+        setShowData(true);
         setShowArchSalesModal(false);
       } else {
         setErrorMessage('There are no sales data available for this particular selection.');
@@ -102,7 +98,7 @@ const ArchivedSalesTab = forwardRef<ArchSalesTabRef, ArchSalesProps>((props, ref
   };
 
   const onArchivedSalesReport = async () => {
-    const selectedVenue = bookings[0].bookings?.filter((booking) => booking.Id === bookings[0].selected);
+    const selectedVenue = bookings.bookings?.filter((booking) => booking.Id === bookings.selected);
     const venueAndDate = selectedVenue?.[0]?.Venue?.Code + ' ' + selectedVenue?.[0]?.Venue?.Name;
     const selectedProduction = productions?.filter((production) => production.Id === productionId);
     const { ShowName, ShowCode, Code } = selectedProduction[0];
@@ -127,46 +123,78 @@ const ArchivedSalesTab = forwardRef<ArchSalesTabRef, ArchSalesProps>((props, ref
     });
   };
 
-  return (
-    <>
-      {bookings[0].selected !== undefined && bookings[0].selected !== null && (
+  if (!isNullOrEmpty(bookings.selected)) {
+    return (
+      <div>
         <div>
-          <div>
-            <div className="flex flex-row gap-4 mb-5">
-              <Button text="For this Venue" className="w-[132px]" onClick={() => showArchSalesComp('venue')} />
-              <Button text="For this Town" className="w-[132px]" onClick={() => showArchSalesComp('town')} />
-              <Button text="Any Venue / Town" className="w-[132px]" onClick={() => showArchSalesComp('both')} />
-              <Button
-                text="Export Displayed Sales Data"
-                className="w-[232px]"
-                iconProps={{ className: 'h-4 w-3 ml-5' }}
-                sufixIconName="excel"
-                disabled={!archivedDataAvail}
-                onClick={() => onExport()}
-              />
+          <div className="flex flex-row gap-4 mb-5">
+            <Button
+              text="For this Venue"
+              className="w-[132px]"
+              onClick={() => showArchSalesComp('venue')}
+              testId="btnArchByVenue"
+            />
 
-              <ArchSalesDialog
-                show={showArchSalesModal}
-                variant={archSaleVariant}
-                data={archivedData}
-                onCancel={() => setShowArchSalesModal(false)}
-                onSubmit={(bookings) => {
-                  showArchivedSales(bookings);
-                  setBookingsSelection(bookings);
-                }}
-                error={errorMessage}
-                selectedBookingId={selectedBooking}
-              />
-            </div>
+            <Button
+              text="For this Town"
+              className="w-[132px]"
+              onClick={() => showArchSalesComp('town')}
+              testId="btnArchByTown"
+            />
 
-            <div className="flex flex-row">{archivedSalesTable}</div>
+            <Button
+              text="Any Venue / Town"
+              className="w-[132px]"
+              onClick={() => showArchSalesComp('both')}
+              testId="btnArchByBoth"
+            />
 
-            <div className="flex flex-row w-full h-32" />
+            <Button
+              text="Export Displayed Sales Data"
+              className="w-[232px]"
+              iconProps={{ className: 'h-4 w-3 ml-5' }}
+              sufixIconName="excel"
+              disabled={!archivedDataAvail}
+              onClick={() => onExport()}
+              testId="btnExportData"
+            />
+
+            <ArchSalesDialog
+              show={showArchSalesModal}
+              variant={archSaleVariant}
+              data={archivedData}
+              onCancel={() => setShowArchSalesModal(false)}
+              onSubmit={(bookings) => {
+                showArchivedSales(bookings);
+                setBookingsSelection(bookings);
+              }}
+              error={errorMessage}
+              selectedBookingId={selectedBooking}
+            />
           </div>
+
+          {showData && (
+            <div>
+              <div className="flex flex-row">
+                <div className="w-[1200px] overflow-x-auto pb-5">
+                  <SalesTable
+                    containerHeight="h-[1000px]"
+                    containerWidth="w-auto"
+                    module="marketing"
+                    variant="salesComparison"
+                    data={tableData}
+                    tableHeight={580}
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-row w-full h-32" />
+            </div>
+          )}
         </div>
-      )}
-    </>
-  );
+      </div>
+    );
+  }
 });
 
 ArchivedSalesTab.displayName = 'ArchivedSalesTab';

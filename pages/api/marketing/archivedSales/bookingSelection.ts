@@ -1,4 +1,3 @@
-import { Prisma } from '@prisma/client';
 import prisma from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { unique } from 'radash';
@@ -8,7 +7,7 @@ import { BookingSelection } from 'types/MarketingTypes';
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
     if (req.method !== 'POST') {
-      return res.status(404);
+      return res.status(404).end();
     }
     const { venueCode, salesByType } = req.body || {};
     if (!venueCode || !salesByType) {
@@ -19,25 +18,34 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const AccountId = await getAccountId(email);
     const access = await checkAccess(email, { AccountId });
     if (!access) return res.status(401).end();
-    const conditions: Prisma.Sql[] = [];
+
+    let conditions = {};
+
     if (salesByType === 'venue') {
-      conditions.push(Prisma.sql`VenueCode = ${venueCode}`);
+      conditions = { VenueCode: venueCode };
     }
 
     if (salesByType === 'town') {
-      const venue = await prisma.$queryRaw`Select * from VenueView where VenueCode=${venueCode}`;
-      if (venue.length) {
-        conditions.push(Prisma.sql`VenueMainAddressTown = ${venue?.[0]?.VenueMainAddressTown}`);
+      const venue = await prisma.venueView.findFirst({
+        where: { VenueCode: venueCode },
+      });
+
+      if (venue) {
+        conditions = { VenueMainAddressTown: venue.VenueMainAddressTown };
       } else {
         return res.status(404).send({ ok: false, message: 'Invalid venue code' });
       }
     }
-    const where: Prisma.Sql = conditions.length ? Prisma.sql` where ${Prisma.join(conditions, ' and ')}` : Prisma.empty;
-    const data: BookingSelection[] = await prisma.$queryRaw`select * FROM BookingSelectionView ${where};`;
+
+    const data: BookingSelection[] = await prisma.bookingSelectionView.findMany({
+      where: conditions,
+    });
+
     const results = [];
     const uniqueIds = {};
     const bookingIds = unique(data.map((booking) => booking.BookingId));
-    const performances = await prisma.Performance.groupBy({
+
+    const performances = await prisma.performance.groupBy({
       by: ['BookingId'],
       _count: {
         Id: true,
@@ -48,32 +56,39 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         },
       },
     });
-    const venueId = data[0].VenueId;
+
+    const venueId = data[0]?.VenueId;
+
+    if (venueId === undefined) {
+      return res.status(404).send({ ok: false, message: 'No venue data found' });
+    }
+
     try {
-      const bookingsForVenue: number[] = (
-        await prisma.Booking.findMany({
-          where: {
-            VenueId: venueId,
-          },
-          select: {
-            Id: true,
-          },
-        })
-      ).map((booking) => booking.Id);
+      const bookingsForVenue = await prisma.booking.findMany({
+        where: {
+          VenueId: venueId,
+        },
+        select: {
+          Id: true,
+        },
+      });
 
-      const salesSetBookingIds: number[] = (
-        await prisma.SalesSet.findMany({
-          distinct: ['SetBookingId'],
-          select: {
-            SetBookingId: true,
-          },
-        })
-      ).map((saleSet) => saleSet.SetBookingId);
+      const bookingsForVenueIds = bookingsForVenue.map((booking) => booking.Id);
 
-      const performancesNoSales: number[] = bookingsForVenue.filter(
-        (bookingId) => !salesSetBookingIds.includes(bookingId),
+      const salesSetBookingIds = await prisma.salesSet.findMany({
+        distinct: ['SetBookingId'],
+        select: {
+          SetBookingId: true,
+        },
+      });
+
+      const salesSetBookingIdsList = salesSetBookingIds.map((saleSet) => saleSet.SetBookingId);
+
+      const performancesNoSales = bookingsForVenueIds.filter(
+        (bookingId) => !salesSetBookingIdsList.includes(bookingId),
       );
-      const bookingPerformanceCountMap: Record<number, number> = performances.reduce((acc, curr) => {
+
+      const bookingPerformanceCountMap = performances.reduce((acc, curr) => {
         acc[curr.BookingId] = curr._count?.Id;
         return acc;
       }, {});
@@ -85,6 +100,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           results.push(selection); // Push the unique item to the result array
         }
       });
+
       res.send(
         results
           .map((booking) => ({ ...booking, PerformanceCount: bookingPerformanceCountMap[booking.BookingId] }))
@@ -92,6 +108,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       );
     } catch (exception) {
       console.log('Query Failed', exception);
+      res.status(500).send({ ok: false, message: 'Query Failed' });
     }
   } catch (error) {
     console.log('Error:', error);

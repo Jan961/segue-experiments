@@ -2,7 +2,6 @@ import axios from 'axios';
 import Button from 'components/core-ui-lib/Button';
 import Table from 'components/core-ui-lib/Table';
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
-import useAxios from 'hooks/useAxios';
 import { attachmentsColDefs, styleProps } from '../table/tableConfig';
 import UploadModal from 'components/core-ui-lib/UploadModal';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
@@ -19,8 +18,6 @@ export interface AttachmentsTabRef {
 }
 
 const AttachmentsTab = forwardRef<AttachmentsTabRef, AttachmentsTabProps>((props, ref) => {
-  const { fetchData } = useAxios();
-
   const [showUploadModal, setShowUploadModal] = useState<boolean>(false);
   const [venueAttachRows, setVenueAttachRows] = useState([]);
   const [prodAttachRows, setProdAttachRows] = useState([]);
@@ -82,11 +79,7 @@ const AttachmentsTab = forwardRef<AttachmentsTabRef, AttachmentsTabProps>((props
       };
 
       // update in the database
-      await fetchData({
-        url: '/api/marketing/attachments/create',
-        method: 'POST',
-        data: fileRec,
-      });
+      await axios.post('/api/marketing/attachments/create', fileRec);
 
       // append to table to prevent the need for an API call to get new data
       if (attachType === 'Production') {
@@ -102,18 +95,15 @@ const AttachmentsTab = forwardRef<AttachmentsTabRef, AttachmentsTabProps>((props
 
   const getAttachments = async (bookingId) => {
     try {
-      const data = await fetchData({
-        url: '/api/marketing/attachments/' + bookingId,
-        method: 'POST',
-      });
+      const response = await axios.get(`/api/marketing/attachments/${bookingId}`);
 
-      if (Array.isArray(data)) {
-        if ('error' in data) {
+      if (Array.isArray(response.data)) {
+        if ('error' in response.data) {
           return;
         }
 
-        const venueAttach = data.filter((attach) => attach.FileDescription === 'Venue');
-        const prodAttach = data.filter((attach) => attach.FileDescription === 'Production');
+        const venueAttach = response.data.filter((attach) => attach.FileDescription === 'Venue');
+        const prodAttach = response.data.filter((attach) => attach.FileDescription === 'Production');
 
         setVenueAttachRows(venueAttach);
         setProdAttachRows(prodAttach);
@@ -145,35 +135,31 @@ const AttachmentsTab = forwardRef<AttachmentsTabRef, AttachmentsTabProps>((props
   };
 
   const deleteAttachment = async (data, rowIndex) => {
-    await fetchData({
-      url: '/api/marketing/attachments/delete',
-      method: 'POST',
-      data,
-    });
+    try {
+      await axios.post('/api/marketing/attachments/delete', data);
 
-    if (data.FileDescription === 'Venue') {
-      const newRows = [...venueAttachRows];
-      if (rowIndex !== -1) {
-        newRows.splice(rowIndex, 1);
+      if (data.FileDescription === 'Venue') {
+        const newRows = [...venueAttachRows];
+        if (rowIndex !== -1) {
+          newRows.splice(rowIndex, 1);
+        }
+        setVenueAttachRows(newRows);
+      } else if (data.FileDescription === 'Production') {
+        const newRows = [...prodAttachRows];
+        if (rowIndex !== -1) {
+          newRows.splice(rowIndex, 1);
+        }
+        setProdAttachRows(newRows);
       }
-      setVenueAttachRows(newRows);
-    } else if (data.FileDescription === 'Production') {
-      const newRows = [...prodAttachRows];
-      if (rowIndex !== -1) {
-        newRows.splice(rowIndex, 1);
-      }
-      setProdAttachRows(newRows);
+
+      setShowConfirm(false);
+    } catch (error) {
+      console.log(error);
     }
-
-    setShowConfirm(false);
   };
 
   const handleCellValueChange = async (event) => {
-    await fetchData({
-      url: '/api/marketing/attachments/update',
-      method: 'POST',
-      data: event.data,
-    });
+    await axios.post('/api/marketing/attachments/update', event.data);
   };
 
   useEffect(() => {
@@ -184,69 +170,80 @@ const AttachmentsTab = forwardRef<AttachmentsTabRef, AttachmentsTabProps>((props
     }
   }, [props.bookingId]);
 
-  return (
-    <>
-      {dataAvailable && (
-        <div>
-          {isLoading ? (
-            <div className="mt-[150px] text-center">
-              <Spinner size="lg" className="mr-3" />
-            </div>
-          ) : (
-            <div>
-              <div className="flex flex-row justify-between items-center mb-4">
-                <div className="text-xl text-primary-navy font-bold">Venue Attachments</div>
-                <Button text="Upload New File" className="w-[160px]" onClick={() => toggleUploadModal('Venue')} />
-              </div>
-
-              <div className="mb-5">
-                <Table
-                  columnDefs={attachmentsColDefs}
-                  rowData={venueAttachRows}
-                  styleProps={styleProps}
-                  tableHeight={250}
-                  onCellClicked={(e) => handleCellClicked(e)}
-                  onCellValueChange={handleCellValueChange}
-                />
-              </div>
-
-              <div className="flex flex-row justify-between items-center mb-4">
-                <div className="text-xl text-primary-navy font-bold">Production Attachments</div>
-                <Button text="Upload New File" className="w-[160px]" onClick={() => toggleUploadModal('Production')} />
-              </div>
-
-              <Table
-                columnDefs={attachmentsColDefs}
-                rowData={prodAttachRows}
-                styleProps={styleProps}
-                tableHeight={250}
-                onCellClicked={(e) => handleCellClicked(e)}
-                onCellValueChange={handleCellValueChange}
-              />
-
-              <UploadModal
-                visible={showUploadModal}
-                title={attachType + ' Attachment'}
-                info="Please upload your file by dragging it into the grey box below or by clicking the upload cloud."
-                allowedFormats={attachmentMimeTypes.marketing}
-                onClose={() => setShowUploadModal(false)}
-                maxFileSize={5120 * 1024} // 5MB
-                onSave={onSave}
-              />
-
-              <ConfirmationDialog
-                variant="delete"
-                show={showConfirm}
-                onYesClick={() => deleteAttachment(attachRow, attachIndex)}
-                onNoClick={() => setShowConfirm(false)}
-                hasOverlay={false}
-              />
-            </div>
-          )}
+  if (dataAvailable) {
+    if (isLoading) {
+      return (
+        <div className="mt-[150px] text-center">
+          <Spinner size="lg" className="mr-3" />
         </div>
-      )}
-    </>
-  );
+      );
+    } else {
+      return (
+        <div>
+          <div className="flex flex-row justify-between items-center mb-4">
+            <div className="text-xl text-primary-navy font-bold">Venue Attachments</div>
+            <Button
+              text="Upload New File"
+              className="w-[160px]"
+              onClick={() => toggleUploadModal('Venue')}
+              testId="btnUpdFileByVenue"
+            />
+          </div>
+
+          <div className="mb-5">
+            <Table
+              columnDefs={attachmentsColDefs}
+              rowData={venueAttachRows}
+              styleProps={styleProps}
+              tableHeight={250}
+              onCellClicked={(e) => handleCellClicked(e)}
+              onCellValueChange={handleCellValueChange}
+              testId="tableVenueAttach"
+            />
+          </div>
+
+          <div className="flex flex-row justify-between items-center mb-4">
+            <div className="text-xl text-primary-navy font-bold">Production Attachments</div>
+            <Button
+              text="Upload New File"
+              className="w-[160px]"
+              onClick={() => toggleUploadModal('Production')}
+              testId="btnUpdProdAttach"
+            />
+          </div>
+
+          <Table
+            columnDefs={attachmentsColDefs}
+            rowData={prodAttachRows}
+            styleProps={styleProps}
+            tableHeight={250}
+            onCellClicked={(e) => handleCellClicked(e)}
+            onCellValueChange={handleCellValueChange}
+            testId="tableProdAttach"
+          />
+
+          <UploadModal
+            visible={showUploadModal}
+            title={attachType + ' Attachment'}
+            info="Please upload your file by dragging it into the grey box below or by clicking the upload cloud."
+            allowedFormats={attachmentMimeTypes.marketing}
+            onClose={() => setShowUploadModal(false)}
+            maxFileSize={5120 * 1024} // 5MB
+            onSave={onSave}
+          />
+
+          <ConfirmationDialog
+            variant="delete"
+            show={showConfirm}
+            onYesClick={() => deleteAttachment(attachRow, attachIndex)}
+            onNoClick={() => setShowConfirm(false)}
+            hasOverlay={false}
+            testId="confDialog"
+          />
+        </div>
+      );
+    }
+  }
 });
 
 AttachmentsTab.displayName = 'AttachmentsTab';
