@@ -642,9 +642,9 @@ export const EditDealMemoContractModal = ({
               data-testid="dealText"
               className="w-[100px]"
               value={formData.DeMoROTTPercentage}
-              type="number"
+              // type="number"
               onChange={(value) =>
-                editDemoModalData('DeMoROTTPercentage', filterPercentage(parseFloat(value.target.value)), 'dealMemo')
+                editDemoModalData('DeMoROTTPercentage', parseFloat(value.target.value).toFixed(2), 'dealMemo')
               }
             />{' '}
             <div className=" text-primary-input-text font-bold ml-2">%</div>
