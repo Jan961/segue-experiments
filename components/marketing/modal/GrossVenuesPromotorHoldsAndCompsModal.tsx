@@ -96,7 +96,7 @@ const GrossVenuesPromotorHoldsAndCompsModal = ({
 
   const onExport = useCallback(
     (format: string) => {
-      const selectedProduction = productions?.find((prod) => prod.Id === parseInt(production));
+      const selectedProduction = productions?.find((prod) => prod.Id === production);
       const productionCode = selectedProduction ? `${selectedProduction?.ShowCode}${selectedProduction?.Code}` : null;
       setLoading(true);
       let promise;
