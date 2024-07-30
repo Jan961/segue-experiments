@@ -58,7 +58,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const actionedBy = `${FirstName || ''} ${LastName || ''}`;
     const row = worksheet.addRow([
       note.CoContactName,
-      moment(note.ContactDate).format('DD/MM/YYYY'),
+      moment(note.ContactDate).format('DD/MM/YY'),
       moment(note.ContactDate).format('HH:mm'),
       actionedBy || '',
       note.Notes,
