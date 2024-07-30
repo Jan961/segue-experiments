@@ -1,11 +1,9 @@
-import { Prisma } from '@prisma/client';
 import prisma from 'lib/prisma';
 import { SeatsInfo, TSalesView } from 'types/MarketingTypes';
 import numeral from 'numeral';
 import { checkAccess, getEmailFromReq } from 'services/userService';
 import { getCurrencyFromBookingId } from 'services/venueCurrencyService';
 
-// param.VenueCurrencySymbol to be added back in using unicode value
 const getSeatsRelatedInfo = (param: TSalesView, currencySymbol: string): SeatsInfo => ({
   Seats: param.Seats,
   ValueWithCurrencySymbol: param.Value ? `${currencySymbol} ${numeral(param.Value).format('0,0.00')}` : '',
@@ -52,13 +50,22 @@ const rearrangeArray = ({
   return arrangedArray;
 };
 
-export const getArchivedSalesList = async (bookingIds) => {
-  const data: TSalesView[] = await prisma.$queryRaw`select * from SalesView where BookingId in (${Prisma.join(
-    bookingIds,
-  )}) and SaleTypeName = \'General Sales\' order by BookingFirstDate, SetSalesFiguresDate limit 300`;
+export const getArchivedSalesList = async (bookingIds: number[]) => {
+  const data: TSalesView[] = await prisma.salesView.findMany({
+    where: {
+      BookingId: {
+        in: bookingIds,
+      },
+      SaleTypeName: 'General Sales',
+    },
+    orderBy: [{ BookingFirstDate: 'asc' }, { SetSalesFiguresDate: 'asc' }],
+    take: 300,
+  });
+
   const formattedData: TSalesView[] = data.filter(
     (x: TSalesView) => bookingIds.includes(x.BookingId) && x.SaleTypeName === 'General Sales',
   );
+
   const commonData = formattedData
     .filter((x: TSalesView) => x.BookingId === bookingIds[0])
     .map(
@@ -78,12 +85,15 @@ export const getArchivedSalesList = async (bookingIds) => {
         SetSingleSeats,
       }),
     );
+
   commonData.sort((a, b) => {
     const t1 = Number(a.SetBookingWeekNum);
     const t2 = Number(b.SetBookingWeekNum);
     return t1 - t2;
   });
+
   const currencySymbol = (await getCurrencyFromBookingId(bookingIds[0])) || '';
+
   const result: TSalesView[][] = commonData.map(({ SetBookingWeekNum }) =>
     formattedData.reduce((acc, y) => (y.SetBookingWeekNum === SetBookingWeekNum ? [...acc, y] : [...acc]), []),
   );
@@ -103,6 +113,7 @@ export const getArchivedSalesList = async (bookingIds) => {
     ],
     [],
   );
+
   return archivedSalesList;
 };
 

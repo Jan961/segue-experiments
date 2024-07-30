@@ -1,8 +1,7 @@
 import { forwardRef, useEffect, useImperativeHandle, useState, useMemo } from 'react';
 import { SelectOption } from '../MarketingHome';
-import { ActivityDTO, ActivityTypeDTO, GlobalActivityDTO } from 'interfaces';
+import { ActivityDTO, GlobalActivityDTO } from 'interfaces';
 import ActivityModal, { ActivityModalVariant } from '../modal/ActivityModal';
-import useAxios from 'hooks/useAxios';
 import { startOfDay } from 'date-fns';
 import { activityColDefs, globalActivityTabColDefs, styleProps } from '../table/tableConfig';
 import { hasActivityChanged } from '../utils';
@@ -22,6 +21,7 @@ import { currencyState } from 'state/marketing/currencyState';
 import { exportExcelReport } from 'components/bookings/modal/request';
 import { notify } from 'components/core-ui-lib';
 import GlobalActivityModal, { GlobalActivity } from '../modal/GlobalActivityModal';
+import axios from 'axios';
 
 interface ActivitiesTabProps {
   bookingId: string;
@@ -30,15 +30,6 @@ interface ActivitiesTabProps {
 export interface ActivityTabRef {
   resetData: () => void;
 }
-
-type ActivityList = {
-  activities: Array<ActivityDTO>;
-  activityTypes: Array<ActivityTypeDTO>;
-};
-
-type GlobalActivityList = {
-  activities: Array<GlobalActivity>;
-};
 
 const approvalStatusList = [
   { text: 'Pending Approval', value: 'P' },
@@ -76,7 +67,6 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
   const [confVariant, setConfVariant] = useState<ConfDialogVariant>('delete');
   const [bookings, setBookings] = useRecoilState(bookingJumpState);
   const currency = useRecoilValue(currencyState);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const { selected: productionId, productions } = useRecoilValue(productionJumpState);
 
@@ -85,8 +75,6 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
       setDataAvailable(false);
     },
   }));
-
-  const { fetchData } = useAxios();
 
   const venueList = useMemo(() => {
     try {
@@ -108,108 +96,97 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
       setActColDefs(activityColDefs(activityUpdate, currency.symbol));
       setGlobalColDefs(globalActivityTabColDefs(viewGlobalActivity, currency.symbol));
 
-      const data = await fetchData({
-        url: '/api/marketing/activities/' + bookingId,
-        method: 'POST',
-      });
+      const { data } = await axios.get(`/api/marketing/activities/${bookingId}`);
 
-      if (typeof data !== 'object') {
-        return;
+      if (data && Array.isArray(data.activities) && data.activities.length > 0 && Array.isArray(data.activityTypes)) {
+        const actTypes = data.activityTypes.map((type) => ({
+          text: type.Name,
+          value: type.Id,
+        }));
+
+        setActTypeList(actTypes);
+
+        const sortedActivities = data.activities.sort(
+          (a, b) => new Date(a.Date).getTime() - new Date(b.Date).getTime(),
+        );
+
+        const tempRows = sortedActivities.map((act) => ({
+          actName: act.Name,
+          actType: actTypes.find((type) => type.value === act.ActivityTypeId)?.text,
+          actDate: !act.Date ? null : startOfDay(new Date(act.Date)),
+          followUpCheck: act.FollowUpRequired,
+          followUpDt: !act.DueByDate ? null : startOfDay(new Date(act.DueByDate)),
+          companyCost: act.CompanyCost,
+          venueCost: act.VenueCost,
+          notes: act.Notes,
+          bookingId: act.BookingId,
+          id: act.Id,
+        }));
+
+        calculateActivityTotals(tempRows);
+        setActRowData(tempRows);
       }
-
-      const activityData = data as ActivityList;
-      const actTypes = activityData.activityTypes.map((type) => ({
-        text: type.Name,
-        value: type.Id,
-      }));
-
-      setActTypeList(actTypes);
-
-      const sortedActivities = activityData.activities.sort(
-        (a, b) => new Date(a.Date).getTime() - new Date(b.Date).getTime(),
-      );
-
-      const tempRows = sortedActivities.map((act) => ({
-        actName: act.Name,
-        actType: actTypes.find((type) => type.value === act.ActivityTypeId)?.text,
-        actDate: !act.Date ? null : startOfDay(new Date(act.Date)),
-        followUpCheck: act.FollowUpRequired,
-        followUpDt: !act.DueByDate ? null : startOfDay(new Date(act.DueByDate)),
-        companyCost: act.CompanyCost,
-        venueCost: act.VenueCost,
-        notes: act.Notes,
-        bookingId: act.BookingId,
-        id: act.Id,
-      }));
-
-      calculateActivityTotals(tempRows);
-      setActRowData(tempRows);
 
       const venueId = bookings.bookings.find((booking) => booking.Id === bookings.selected)?.Venue?.Id;
 
-      const globResponse = await fetchData({
-        url: '/api/marketing/globalActivities/venue/' + venueId,
-        method: 'POST',
-      });
+      const response = await axios.get(`/api/marketing/globalActivities/venue/${venueId}`);
+      const globalActivities = response.data;
 
-      if (typeof globResponse !== 'object') {
-        return;
+      if (
+        globalActivities &&
+        Array.isArray(globalActivities.activities) &&
+        globalActivities.activities.length > 0 &&
+        Array.isArray(globalActivities.activityTypes)
+      ) {
+        const tempGlobList = globalActivities.activities.map((act) => ({
+          actName: act.Name,
+          actType: globalActivities.activityTypes.find((type) => type.value === act.ActivityTypeId)?.text,
+          actDate: startOfDay(new Date(act.Date)),
+          followUpCheck: act.FollowUpRequired,
+          followUpDt: act.DueByDate === '' ? null : startOfDay(new Date(act.DueByDate)),
+          cost: act.Cost,
+          id: act.Id,
+          notes: act.Notes,
+          venueIds: act.VenueIds,
+        }));
+
+        setGlobalTotalCost(globalActivities.activities.reduce((sum, item) => sum + item.Cost, 0));
+
+        setGlobalRowData(tempGlobList);
       }
 
-      const globalActivities = globResponse as GlobalActivityList;
-
-      const tempGlobList = globalActivities.activities.map((act) => ({
-        actName: act.Name,
-        actType: actTypes.find((type) => type.value === act.ActivityTypeId)?.text,
-        actDate: startOfDay(new Date(act.Date)),
-        followUpCheck: act.FollowUpRequired,
-        followUpDt: act.DueByDate === '' ? null : startOfDay(new Date(act.DueByDate)),
-        cost: act.Cost,
-        id: act.Id,
-        notes: act.Notes,
-        venueIds: act.VenueIds,
-      }));
-
-      setGlobalTotalCost(globalActivities.activities.reduce((sum, item) => sum + item.Cost, 0));
-
-      setGlobalRowData(tempGlobList);
-
-      setIsLoading(false);
+      setDataAvailable(true);
     } catch (error) {
       console.log(error);
     }
   };
 
   const viewGlobalActivity = async (data) => {
-    const accTypeResponse = await fetchData({
-      url: '/api/marketing/activities/' + bookings.selected.toString(),
-      method: 'POST',
-    });
+    const accTypeResponse = await axios.get(`/api/marketing/activities/${bookings.selected.toString()}`);
+    const activityData = accTypeResponse.data;
 
-    if (typeof accTypeResponse !== 'object') {
-      return;
+    if (activityData && Array.isArray(activityData.activityTypes) && activityData.activityTypes.length > 0) {
+      const actTypes = activityData.activityTypes.map((type) => ({
+        text: type.Name,
+        value: type.Id,
+      }));
+
+      const tempGlobAct: GlobalActivity = {
+        ActivityTypeId: actTypes.find((type) => type.text === data.actType).value,
+        Cost: data.cost,
+        Date: data.actDate,
+        FollowUpRequired: data.followUpCheck,
+        Name: data.actName,
+        Notes: data.notes,
+        DueByDate: data.followUpCheck ? new Date(data.followUpDt) : null,
+        Id: data.id,
+        ProductionId: productionId,
+        VenueIds: data.venueIds,
+      };
+
+      setGlobalActRow(tempGlobAct);
     }
 
-    const activityData = accTypeResponse as ActivityList;
-    const actTypes = activityData.activityTypes.map((type) => ({
-      text: type.Name,
-      value: type.Id,
-    }));
-
-    const tempGlobAct: GlobalActivity = {
-      ActivityTypeId: actTypes.find((type) => type.text === data.actType).value,
-      Cost: data.cost,
-      Date: data.actDate,
-      FollowUpRequired: data.followUpCheck,
-      Name: data.actName,
-      Notes: data.notes,
-      DueByDate: data.followUpCheck ? new Date(data.followUpDt) : null,
-      Id: data.id,
-      ProductionId: productionId,
-      VenueIds: data.venueIds,
-    };
-
-    setGlobalActRow(tempGlobAct);
     setShowGlobalActivityModal(true);
   };
 
@@ -243,38 +220,33 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
     setActModalVariant(variant);
 
     try {
-      const actData = await fetchData({
-        url: '/api/marketing/activities/' + props.bookingId.toString(),
-        method: 'POST',
-      });
+      const accTypeResponse = await axios.get(`/api/marketing/activities/${props.bookingId.toString()}`);
+      const activityData = accTypeResponse.data;
 
-      if (typeof actData !== 'object') {
-        return;
-      }
+      if (activityData && Array.isArray(activityData.activityTypes) && activityData.activityTypes.length > 0) {
+        const actTypes = activityData.activityTypes;
 
-      const activityData = actData as ActivityList;
-      const actTypes = activityData.activityTypes;
+        const tempAct: ActivityDTO = {
+          ActivityTypeId: actTypes.find((type) => type.Name === data.actType).Id,
+          BookingId: data.bookingId,
+          CompanyCost: data.companyCost,
+          VenueCost: data.venueCost,
+          Date: data.actDate,
+          FollowUpRequired: data.followUpCheck,
+          Name: data.actName,
+          Notes: data.notes,
+          DueByDate: data.followUpCheck ? (!data.followUpDt ? null : new Date(data.followUpDt)) : null,
+          Id: data.id,
+        };
 
-      const tempAct: ActivityDTO = {
-        ActivityTypeId: actTypes.find((type) => type.Name === data.actType).Id,
-        BookingId: data.bookingId,
-        CompanyCost: data.companyCost,
-        VenueCost: data.venueCost,
-        Date: data.actDate,
-        FollowUpRequired: data.followUpCheck,
-        Name: data.actName,
-        Notes: data.notes,
-        DueByDate: data.followUpCheck ? (!data.followUpDt ? null : new Date(data.followUpDt)) : null,
-        Id: data.id,
-      };
+        setActRow(tempAct);
 
-      setActRow(tempAct);
-
-      if (variant === 'edit') {
-        setShowActivityModal(true);
-      } else if (variant === 'delete') {
-        setConfVariant('delete');
-        setShowConfirm(true);
+        if (variant === 'edit') {
+          setShowActivityModal(true);
+        } else if (variant === 'delete') {
+          setConfVariant('delete');
+          setShowConfirm(true);
+        }
       }
     } catch (error) {
       console.log(error);
@@ -283,11 +255,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
 
   const saveActivity = async (variant: ActivityModalVariant, data: ActivityDTO) => {
     if (variant === 'add') {
-      await fetchData({
-        url: '/api/marketing/activities/create',
-        method: 'POST',
-        data,
-      });
+      await axios.post('/api/marketing/activities/create', data);
 
       const newRow = {
         actName: data.Name,
@@ -313,11 +281,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
       setShowActivityModal(false);
     } else if (variant === 'edit') {
       if (hasActivityChanged(actRow, data)) {
-        await fetchData({
-          url: '/api/marketing/activities/update',
-          method: 'POST',
-          data,
-        });
+        await axios.post('/api/marketing/activities/update', data);
 
         const updatedRow = {
           actName: data.Name,
@@ -347,11 +311,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
         setShowActivityModal(false);
       }
     } else if (variant === 'delete') {
-      await fetchData({
-        url: '/api/marketing/activities/delete',
-        method: 'POST',
-        data,
-      });
+      await axios.post('/api/marketing/activities/delete', data);
 
       const rowIndex = actRowData.findIndex((act) => act.id === data.Id);
       const newRows = [...actRowData];
@@ -424,14 +384,12 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
     setBookings({ bookings: newBookings, selected: bookings.selected });
 
     // Update in the database
-    await fetchData({
-      url: '/api/bookings/update/' + props.bookingId.toString(),
-      method: 'POST',
-      data: { [field]: value },
-    });
+    await axios.post(`/api/bookings/update/${props.bookingId.toString()}`, { [field]: value });
   };
 
   useEffect(() => {
+    setDataAvailable(false);
+
     if (props.bookingId) {
       setBookingIdVal(props.bookingId);
       getActivities(props.bookingId.toString());
@@ -450,8 +408,6 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
       setChangeDate(booking.MarketingCostsApprovalDate);
       setApprovalStatus(booking.MarketingCostsStatus);
       setChangeNotes(booking.MarketingCostsNotes);
-
-      setDataAvailable(true);
     }
   }, [props.bookingId]);
 
@@ -479,219 +435,239 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
     });
   };
 
-  return (
-    <>
-      {dataAvailable && (
-        <div>
-          {isLoading ? (
-            <div className="mt-[150px] text-center">
-              <Spinner size="lg" className="mr-3" />
-            </div>
-          ) : (
-            <div>
-              <div className="flex flex-row mb-5 gap-[45px]">
-                <div className="flex flex-row mt-1">
-                  <Checkbox
-                    id="On Sale"
-                    name="On Sale"
-                    checked={onSaleCheck}
-                    onChange={(e) => editBooking('ticketsOnSale', e.target.checked)}
-                    className="w-[19px] h-[19px] mt-[2px]"
-                  />
-                  <div className="text-base text-primary-input-text font-bold ml-2">On Sale</div>
-                </div>
+  if (!dataAvailable) {
+    return (
+      <div className="mt-[140px]">
+        <Spinner size="lg" className="mr-3" />
+      </div>
+    );
+  } else {
+    return (
+      <div>
+        <div className="flex flex-row mb-5 gap-[45px]">
+          <div className="flex flex-row mt-1">
+            <Checkbox
+              id="On Sale"
+              name="On Sale"
+              checked={onSaleCheck}
+              onChange={(e) => editBooking('ticketsOnSale', e.target.checked)}
+              className="w-[19px] h-[19px] mt-[2px]"
+              testId="checkOnSale"
+            />
+            <div className="text-base text-primary-input-text font-bold ml-2">On Sale</div>
+          </div>
 
-                <div className="flex flex-row">
-                  <div className="text-base text-primary-input-text font-bold mt-1 mr-2">Due to go On Sale</div>
-                  <DateInput onChange={(value) => editBooking('ticketsOnSaleFromDate', value)} value={onSaleFromDt} />
-                </div>
+          <div className="flex flex-row">
+            <div className="text-base text-primary-input-text font-bold mt-1 mr-2">Due to go On Sale</div>
+            <DateInput
+              onChange={(value) => editBooking('ticketsOnSaleFromDate', value)}
+              value={onSaleFromDt}
+              testId="dtInOnSaleDate"
+            />
+          </div>
 
-                <div className="flex flex-row mt-1">
-                  <Checkbox
-                    id="Marketing Plans Received"
-                    name="Marketing Plans Received"
-                    checked={marketingPlansCheck}
-                    onChange={(e) => editBooking('marketingPlanReceived', e.target.checked)}
-                    className="w-[19px] h-[19px] mt-[2px]"
-                  />
-                  <div className="text-base text-primary-input-text font-bold ml-2">Marketing Plans Received</div>
-                </div>
+          <div className="flex flex-row mt-1">
+            <Checkbox
+              id="Marketing Plans Received"
+              name="Marketing Plans Received"
+              checked={marketingPlansCheck}
+              onChange={(e) => editBooking('marketingPlanReceived', e.target.checked)}
+              className="w-[19px] h-[19px] mt-[2px]"
+              testId="checkMarketPlanIn"
+            />
+            <div className="text-base text-primary-input-text font-bold ml-2">Marketing Plans Received</div>
+          </div>
 
-                <div className="flex flex-row mt-1">
-                  <Checkbox
-                    id="Print Requirements Received"
-                    name="Print Requirements Received"
-                    checked={printReqCheck}
-                    onChange={(e) => editBooking('printReqsReceived', e.target.checked)}
-                    className="w-[19px] h-[19px] mt-[2px]"
-                  />
-                  <div className="text-base text-primary-input-text font-bold ml-2">Print Requirements Received</div>
-                </div>
+          <div className="flex flex-row mt-1">
+            <Checkbox
+              id="Print Requirements Received"
+              name="Print Requirements Received"
+              checked={printReqCheck}
+              onChange={(e) => editBooking('printReqsReceived', e.target.checked)}
+              className="w-[19px] h-[19px] mt-[2px]"
+              testId="checkPrintReqIn"
+            />
+            <div className="text-base text-primary-input-text font-bold ml-2">Print Requirements Received</div>
+          </div>
 
-                <div className="flex flex-row mt-1">
-                  <Checkbox
-                    id="Contact Info Received"
-                    name="Contact Info Received"
-                    checked={contactInfoCheck}
-                    onChange={(e) => editBooking('contactInfoReceived', e.target.checked)}
-                    className="w-[19px] h-[19px] mt-[2px]"
-                  />
-                  <div className="text-base text-primary-input-text font-bold ml-2">Contact Info Received</div>
-                </div>
-              </div>
-              <div className="flex flex-row">
-                <div className="flex flex-col w-[906px] h-[75px] bg-primary-green/[0.30] rounded-xl mb-5 mr-5 px-2">
-                  <div className="flex flex-row">
-                    <div className="flex flex-col">
-                      <div className="leading-6 text-xl text-primary-input-text font-bold mt-1 flex-row">
-                        Marketing Costs
-                      </div>
-
-                      <Select
-                        className={classNames('w-72 !border-0 text-primary-navy mt-1')}
-                        options={approvalStatusList}
-                        value={approvalStatus}
-                        onChange={(value) => editBooking('marketingCostsStatus', value.toString())}
-                        placeholder="Select Approval Status"
-                        isClearable={false}
-                      />
-                    </div>
-                    <div className="flex flex-col mt-8 ml-8">
-                      <DateInput
-                        onChange={(value) => editBooking('marketingCostsApprovalDate', value)}
-                        value={changeDate}
-                      />
-                    </div>
-                    <div className="flex flex-col ml-8 mt-1">
-                      <TextArea
-                        className="mt-2 h-[52px] w-[425px]"
-                        value={changeNotes}
-                        placeholder="Notes Field"
-                        onBlur={(e) => editBooking('marketingCostsNotes', e.target.value)}
-                        onChange={(e) => setChangeNotes(e.target.value)}
-                      />
-                    </div>
-                  </div>
-                </div>
-                <div className="flex flex-col">
-                  <Button
-                    text="Activity Report"
-                    className="w-[160px] mb-[12px]"
-                    disabled={!productionId}
-                    iconProps={{ className: 'h-4 w-3' }}
-                    sufixIconName="excel"
-                    onClick={onExport}
-                  />
-                  <Button text="Add New Activity" className="w-[160px]" onClick={addActivity} />
-                </div>
-              </div>
-              <div className="w-[1086px] h-[375px]">
-                <Table columnDefs={actColDefs} rowData={actRowData} styleProps={styleProps} tableHeight={250} />
-
-                <div
-                  className={classNames(
-                    'flex flex-col w-[487px] h-[69px] bg-primary-green/[0.30] rounded-xl mt-5 px-2 float-right',
-                    actRowData.length === 0 ? '-mt-[250px]' : '',
-                  )}
-                >
-                  <div className="flex flex-row gap-4">
-                    <div className="flex flex-col text-center">
-                      <div className="text-base font-bold text-primary-input-text">Total Cost</div>
-                      <div className="bg-primary-white h-7 w-[140px] rounded mt-[2px] ml-2">
-                        <div className="text text-base text-left pl-2 text-primary-input-text">
-                          {currency.symbol + totalCost.toFixed(2)}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex flex-col text-center">
-                      <div className="text-base font-bold text-primary-input-text">Company</div>
-                      <div className="bg-primary-white h-7 w-[140px] rounded mt-[2px]">
-                        <div className="text text-base text-left pl-2 text-primary-input-text">
-                          {currency.symbol + totalCompanyCost.toFixed(2)}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex flex-col text-center">
-                      <div className="text-base font-bold text-primary-input-text">Venue</div>
-                      <div className="bg-primary-white h-7 w-[140px] rounded mt-[2px]">
-                        <div className="text text-base text-left pl-2 text-primary-input-text">
-                          {currency.symbol + totalVenueCost.toFixed(2)}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="leading-6 text-xl text-primary-input-text font-bold mt-1 flex-row">Global Activities</div>
-
-              <div className="w-[1086px] h-[500px]">
-                <Table columnDefs={globalColDefs} rowData={globalRowData} styleProps={styleProps} tableHeight={250} />
-
-                <div
-                  className={classNames(
-                    'flex flex-col w-[331px] h-[69px] bg-primary-green/[0.30] rounded-xl mt-5 px-2 float-right',
-                    globalRowData.length === 0 ? '-mt-[350px]' : '',
-                  )}
-                >
-                  <div className="flex flex-row gap-4">
-                    <div className="flex flex-col text-center">
-                      <div className="text-base font-bold text-primary-input-text">Total Cost</div>
-                      <div className="bg-primary-white h-7 w-[140px] rounded mt-[2px] ml-2">
-                        <div className="text text-base text-left pl-2 text-primary-input-text">
-                          {currency.symbol + globalTotalCost.toFixed(2)}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex flex-col text-center">
-                      <div className="text-base font-bold text-primary-input-text">Venue Share</div>
-                      <div className="bg-primary-white h-7 w-[140px] rounded mt-[2px]">
-                        <div className="text text-base text-left pl-2 text-primary-input-text">
-                          {currency.symbol + globalVenueShareCost.toFixed(2)}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <GlobalActivityModal
-                show={showGlobalActivityModal}
-                onCancel={() => setShowGlobalActivityModal(false)}
-                variant="view"
-                activityTypes={actTypeList}
-                data={globalActRow}
-                productionId={productionId}
-                productionCurrency={currency.symbol}
-                venues={venueList}
-              />
-
-              <ActivityModal
-                show={showActivityModal}
-                onCancel={() => setShowActivityModal(false)}
-                variant={actModalVariant}
-                activityTypes={actTypeList}
-                onSave={(variant, data) => saveActivity(variant, data)}
-                bookingId={bookingIdVal}
-                data={actRow}
-              />
-
-              <ConfirmationDialog
-                variant={confVariant}
-                show={showConfirm}
-                onYesClick={() => saveActivity('delete', actRow)}
-                onNoClick={() => setShowConfirm(false)}
-                hasOverlay={false}
-              />
-            </div>
-          )}
+          <div className="flex flex-row mt-1">
+            <Checkbox
+              id="Contact Info Received"
+              name="Contact Info Received"
+              checked={contactInfoCheck}
+              onChange={(e) => editBooking('contactInfoReceived', e.target.checked)}
+              className="w-[19px] h-[19px] mt-[2px]"
+              testId="checkContactInfoIn"
+            />
+            <div className="text-base text-primary-input-text font-bold ml-2">Contact Info Received</div>
+          </div>
         </div>
-      )}
-    </>
-  );
+        <div className="flex flex-row">
+          <div className="flex flex-col w-[906px] h-[75px] bg-primary-green/[0.30] rounded-xl mb-5 mr-5 px-2">
+            <div className="flex flex-row">
+              <div className="flex flex-col">
+                <div className="leading-6 text-xl text-primary-input-text font-bold mt-1 flex-row">Marketing Costs</div>
+
+                <Select
+                  className={classNames('w-72 !border-0 text-primary-navy mt-1')}
+                  options={approvalStatusList}
+                  value={approvalStatus}
+                  onChange={(value) => editBooking('marketingCostsStatus', value.toString())}
+                  placeholder="Select Approval Status"
+                  isClearable={false}
+                  testId="selectApprStat"
+                />
+              </div>
+              <div className="flex flex-col mt-8 ml-8">
+                <DateInput
+                  onChange={(value) => editBooking('marketingCostsApprovalDate', value)}
+                  value={changeDate}
+                  testId="dtInApprDate"
+                />
+              </div>
+              <div className="flex flex-col ml-8 mt-1">
+                <TextArea
+                  className="mt-2 h-[52px] w-[425px]"
+                  value={changeNotes}
+                  placeholder="Notes Field"
+                  onBlur={(e) => editBooking('marketingCostsNotes', e.target.value)}
+                  onChange={(e) => setChangeNotes(e.target.value)}
+                  testId="textAreaCostNotes"
+                />
+              </div>
+            </div>
+          </div>
+          <div className="flex flex-col">
+            <Button
+              text="Activity Report"
+              className="w-[160px] mb-[12px]"
+              disabled={!productionId}
+              iconProps={{ className: 'h-4 w-3' }}
+              sufixIconName="excel"
+              onClick={onExport}
+              testId="btnActivityRep"
+            />
+
+            <Button text="Add New Activity" className="w-[160px]" onClick={addActivity} testId="btnAddNewAct" />
+          </div>
+        </div>
+        <div className="w-[1086px] h-[375px]">
+          <Table
+            columnDefs={actColDefs}
+            rowData={actRowData}
+            styleProps={styleProps}
+            tableHeight={250}
+            testId="tableActivity"
+          />
+
+          <div
+            className={classNames(
+              'flex flex-col w-[487px] h-[69px] bg-primary-green/[0.30] rounded-xl mt-5 px-2 float-right',
+              actRowData.length === 0 ? '-mt-[250px]' : '',
+            )}
+          >
+            <div className="flex flex-row gap-4">
+              <div className="flex flex-col text-center">
+                <div className="text-base font-bold text-primary-input-text">Total Cost</div>
+                <div className="bg-primary-white h-7 w-[140px] rounded mt-[2px] ml-2">
+                  <div className="text text-base text-left pl-2 text-primary-input-text">
+                    {`${currency.symbol}${totalCost.toFixed(2)}`}
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex flex-col text-center">
+                <div className="text-base font-bold text-primary-input-text">Company</div>
+                <div className="bg-primary-white h-7 w-[140px] rounded mt-[2px]">
+                  <div className="text text-base text-left pl-2 text-primary-input-text">
+                    {`${currency.symbol}${totalCompanyCost.toFixed(2)}`}
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex flex-col text-center">
+                <div className="text-base font-bold text-primary-input-text">Venue</div>
+                <div className="bg-primary-white h-7 w-[140px] rounded mt-[2px]">
+                  <div className="text text-base text-left pl-2 text-primary-input-text">
+                    {`${currency.symbol}${totalVenueCost.toFixed(2)}`}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="leading-6 text-xl text-primary-input-text font-bold mt-1 flex-row">Global Activities</div>
+
+        <div className="w-[1086px] h-[500px]">
+          <Table
+            columnDefs={globalColDefs}
+            rowData={globalRowData}
+            styleProps={styleProps}
+            tableHeight={250}
+            testId="tableGlobActivity"
+          />
+
+          <div
+            className={classNames(
+              'flex flex-col w-[331px] h-[69px] bg-primary-green/[0.30] rounded-xl mt-5 px-2 float-right',
+              globalRowData.length === 0 ? '-mt-[350px]' : '',
+            )}
+          >
+            <div className="flex flex-row gap-4">
+              <div className="flex flex-col text-center">
+                <div className="text-base font-bold text-primary-input-text">Total Cost</div>
+                <div className="bg-primary-white h-7 w-[140px] rounded mt-[2px] ml-2">
+                  <div className="text text-base text-left pl-2 text-primary-input-text">
+                    {`${currency.symbol}${globalTotalCost.toFixed(2)}`}
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex flex-col text-center">
+                <div className="text-base font-bold text-primary-input-text">Venue Share</div>
+                <div className="bg-primary-white h-7 w-[140px] rounded mt-[2px]">
+                  <div className="text text-base text-left pl-2 text-primary-input-text">
+                    {`${currency.symbol}${globalVenueShareCost.toFixed(2)}`}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <GlobalActivityModal
+          show={showGlobalActivityModal}
+          onCancel={() => setShowGlobalActivityModal(false)}
+          variant="view"
+          activityTypes={actTypeList}
+          data={globalActRow}
+          productionId={productionId}
+          productionCurrency={currency.symbol}
+          venues={venueList}
+        />
+
+        <ActivityModal
+          show={showActivityModal}
+          onCancel={() => setShowActivityModal(false)}
+          variant={actModalVariant}
+          activityTypes={actTypeList}
+          onSave={(variant, data) => saveActivity(variant, data)}
+          bookingId={bookingIdVal}
+          data={actRow}
+        />
+
+        <ConfirmationDialog
+          variant={confVariant}
+          show={showConfirm}
+          onYesClick={() => saveActivity('delete', actRow)}
+          onNoClick={() => setShowConfirm(false)}
+          hasOverlay={false}
+          testId="modalConf"
+        />
+      </div>
+    );
+  }
 });
 
 ActivitiesTab.displayName = 'ActivitiesTab';
