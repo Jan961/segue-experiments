@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { UiAccountType, initialUiAccountDetails } from 'config/account';
-import { FormField } from 'components/account/Form/FormField';
+import { FormField } from 'components/account/form/FormField';
 import Tooltip from 'components/core-ui-lib/Tooltip';
 import Icon from 'components/core-ui-lib/Icon';
 import Select from 'components/core-ui-lib/Select';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import { transformToOptions } from 'utils';
-import { Button, UploadModal } from 'components/core-ui-lib';
+import { Button, UploadModal , Label } from 'components/core-ui-lib';
 import schema from './AccountDetailsValidationSchema';
 
 export default function AccountDetailsTab() {
@@ -28,11 +28,15 @@ export default function AccountDetailsTab() {
 
         setCountryOptions(transformToOptions(data.countryList, 'Name', 'Id'));
 
-        setCurrencyOptions(transformToOptions(data.currencyList, 'Code', 'Code'));
+        setCurrencyOptions(
+          data.currencyList.map((currency) => {
+            return { text: currency.Code + ' | ' + currency.Name, value: currency.Code };
+          }),
+        );
+
         const companyDetails = data?.companyDetails;
         const {
-          FirstName,
-          LastName,
+          AccountContact,
           AccountName,
           AccountPhone,
           AccountAddress1,
@@ -50,8 +54,8 @@ export default function AccountDetailsTab() {
           AccountCurrencyCode,
         } = companyDetails;
         setFormData({
-          firstName: FirstName || '',
-          lastName: LastName || '',
+          firstName: AccountContact.AccContFirstName || '',
+          lastName: AccountContact.AccContLastName || '',
           companyName: AccountName || '',
           phoneNumber: AccountPhone || '',
           addressLine1: AccountAddress1 || '',
@@ -119,95 +123,94 @@ export default function AccountDetailsTab() {
       <h2 className="text-2xl text-primary font-bold pt-3 mb-4">Account Holder Details</h2>
       <div className="flex flex-row gap-8 w-full">
         <div className="flex flex-col gap-3 w-1/2">
-          <div className="flex flex-col">
-            <FormField
-              currentValue={formData.firstName}
-              displayText="First Name"
-              fieldName="firstName"
-              handleInputChange={handleInputChange}
-              onBlur={handleBlur}
-            />
-            {validationErrors.firstName && (
-              <small className="text-primary-red flex">{validationErrors.firstName}</small>
-            )}
-          </div>
+          <FormField
+            currentValue={formData.firstName}
+            displayText="First Name"
+            fieldName="firstName"
+            handleInputChange={handleInputChange}
+            onBlur={handleBlur}
+            required={true}
+            validationCheck={validationErrors.firstName}
+          />
           <FormField
             currentValue={formData.lastName}
             displayText="Last Name"
             fieldName="lastName"
             handleInputChange={handleInputChange}
             onBlur={handleBlur}
+            required={true}
+            validationCheck={validationErrors.lastName}
           />
-          {validationErrors.lastName && <small className="text-primary-red flex">{validationErrors.lastName}</small>}
           <FormField
             currentValue={formData.companyName}
             displayText="Company Name"
             fieldName="companyName"
             handleInputChange={handleInputChange}
             onBlur={handleBlur}
+            required={true}
+            validationCheck={validationErrors.companyName}
           />
-          {validationErrors.companyName && (
-            <small className="text-primary-red flex">{validationErrors.companyName}</small>
-          )}
           <FormField
             currentValue={formData.phoneNumber}
             displayText="Phone Number"
             fieldName="phoneNumber"
             handleInputChange={handleInputChange}
             onBlur={handleBlur}
+            validationCheck={validationErrors.phoneNumber}
           />
-          {validationErrors.phoneNumber && (
-            <small className="text-primary-red flex">{validationErrors.phoneNumber}</small>
-          )}
           <FormField
             currentValue={formData.addressLine1}
             displayText="Address Line 1"
             fieldName="addressLine1"
             handleInputChange={handleInputChange}
             onBlur={handleBlur}
+            required={true}
+            validationCheck={validationErrors.addressLine1}
           />
-          {validationErrors.addressLine1 && (
-            <small className="text-primary-red flex">{validationErrors.addressLine1}</small>
-          )}
           <FormField
             currentValue={formData.addressLine2}
             displayText="Address Line 2"
             fieldName="addressLine2"
             handleInputChange={handleInputChange}
             onBlur={handleBlur}
+            validationCheck={validationErrors.addressLine2}
           />
-          {validationErrors.addressLine2 && (
-            <small className="text-primary-red flex">{validationErrors.addressLine2}</small>
-          )}
           <FormField
             currentValue={formData.addressLine3}
             displayText="Address Line 3"
             fieldName="addressLine3"
             handleInputChange={handleInputChange}
             onBlur={handleBlur}
+            validationCheck={validationErrors.addressLine3}
           />
-          {validationErrors.addressLine3 && (
-            <small className="text-primary-red flex">{validationErrors.addressLine3}</small>
-          )}
           <FormField
             currentValue={formData.townName}
             displayText="Town"
             fieldName="townName"
             handleInputChange={handleInputChange}
             onBlur={handleBlur}
+            validationCheck={validationErrors.townName}
           />
-          {validationErrors.townName && <small className="text-primary-red flex">{validationErrors.townName}</small>}
           <FormField
             currentValue={formData.postcode}
             displayText="Postcode"
             fieldName="postcode"
             handleInputChange={handleInputChange}
             onBlur={handleBlur}
+            required={true}
+            validationCheck={validationErrors.postcode}
           />
-          {validationErrors.postcode && <small className="text-primary-red flex">{validationErrors.postcode}</small>}
-          <label className="grid w-full">
+          <div>
             <div className="w-fit flex gap-x-2 items-center">
-              <p className="text-primary-input-text">Country</p>
+              <div className="flex gap-x-1 mr-1">
+                <p className="text-primary-input-text">Country</p>
+                <div>
+                  <Label required={true} text="" className=" absolute" />
+                </div>
+                {validationErrors.country && (
+                  <small className="text-primary-red self-center ml-1">{validationErrors.country}</small>
+                )}
+              </div>
               <Tooltip
                 body="For venues in the United Kingdom: Please select Scotland, England, Wales or Northern Ireland as the Country"
                 width="w-[200px]"
@@ -215,7 +218,6 @@ export default function AccountDetailsTab() {
                 <Icon iconName="info-circle-solid" />
               </Tooltip>
             </div>
-
             <Select
               name="country"
               className="w-full font-bold"
@@ -228,11 +230,10 @@ export default function AccountDetailsTab() {
               isSearchable
               onBlur={handleBlur}
               menuPlacement="top"
+              error={validationErrors.country && true}
             />
-            {validationErrors.country && <small className="text-primary-red flex">{validationErrors.country}</small>}
-          </label>
+          </div>
         </div>
-
         <div className="flex flex-col gap-3 w-1/2">
           <div className="h-[190px] overflow-y-hidden overflow-x-hidden">
             <div className="flex items-center justify-end gap-x-3 mt-[24px]">
@@ -243,7 +244,7 @@ export default function AccountDetailsTab() {
                 }}
                 text="Upload"
                 variant="secondary"
-                className="w-[132px]"
+                className="w-[132px] mr-1"
               />
               <UploadModal
                 title="Upload Company Logo"
@@ -257,90 +258,99 @@ export default function AccountDetailsTab() {
               />
             </div>
           </div>
-
           <FormField
             currentValue={formData.companyEmail}
             displayText="Email Address"
             fieldName="companyEmail"
             handleInputChange={handleInputChange}
             onBlur={handleBlur}
+            required={true}
+            validationCheck={validationErrors.companyEmail}
           />
-          {validationErrors.companyEmail && (
-            <small className="text-primary-red flex">{validationErrors.companyEmail}</small>
-          )}
-          <label className="grid w-full">
-            <p className="text-primary-input-text">Currency for Payment</p>
+          <div>
+            <div className="flex gap-x-1">
+              <p className="text-primary-input-text">Currency for Payment</p>
+              <div>
+                <Label required={true} text="" className=" absolute" />
+              </div>
+              {validationErrors.currencyForPayment && (
+                <small className="text-primary-red self-center ml-1">{validationErrors.currencyForPayment}</small>
+              )}
+            </div>
             <Select
               name="currencyForPayment"
-              className="w-full font-bold"
+              className={`w-full h-[150] font-bold ${validationErrors.currencyForPayment ? 'bg-red-800' : ''}`}
               placeholder="Currency For Payment"
               value={formData.currencyForPayment}
               onChange={(value) => {
-                handleInputChange('currencyForPayment', currencyOptions.find((option) => value === option.value)?.text);
+                handleInputChange(
+                  'currencyForPayment',
+                  currencyOptions.find((option) => value === option.value)?.value,
+                );
               }}
               options={currencyOptions}
               isSearchable
               onBlur={handleBlur}
+              error={validationErrors.currencyForPayment && true}
             />
-            {validationErrors.currencyForPayment && (
-              <small className="text-primary-red flex">{validationErrors.currencyForPayment}</small>
-            )}
-          </label>
+          </div>
           <FormField
             currentValue={formData.vatNumber}
             displayText="VAT Number"
             fieldName="vatNumber"
             handleInputChange={handleInputChange}
             onBlur={handleBlur}
+            validationCheck={validationErrors.vatNumber}
           />
-          {validationErrors.vatNumber && <small className="text-primary-red flex">{validationErrors.vatNumber}</small>}
           <FormField
             currentValue={formData.companyNumber}
             displayText="Company Number"
             fieldName="companyNumber"
             handleInputChange={handleInputChange}
             onBlur={handleBlur}
+            validationCheck={validationErrors.companyNumber}
           />
-          {validationErrors.companyNumber && (
-            <small className="text-primary-red flex">{validationErrors.companyNumber}</small>
-          )}
           <FormField
             currentValue={formData.companyWebsite}
             displayText="Website"
             fieldName="companyWebsite"
             handleInputChange={handleInputChange}
             onBlur={handleBlur}
+            validationCheck={validationErrors.Website}
           />
-          {validationErrors.companyWebsite && (
-            <small className="text-primary-red flex">{validationErrors.companyWebsite}</small>
-          )}
           <FormField
             currentValue={formData.typeOfCompany}
             displayText="Type of Company"
             fieldName="typeOfCompany"
             handleInputChange={handleInputChange}
             onBlur={handleBlur}
+            validationCheck={validationErrors.typeOfCompany}
           />
-          {validationErrors.typeOfCompany && (
-            <small className="text-primary-red flex">{validationErrors.typeOfCompany}</small>
-          )}
-          <label className="grid w-full">
-            <p className="text-primary-input-text">Company Currency</p>
+          <div>
+            <div className="flex gap-x-1">
+              <p className="text-primary-input-text">Company Currency</p>
+              <div>
+                <Label required={true} text="" className=" absolute" />
+              </div>
+              {validationErrors.currency && (
+                <small className="text-primary-red self-center ml-1">{validationErrors.currency}</small>
+              )}
+            </div>
             <Select
               name="currency"
               className="w-full font-bold"
               placeholder="Currency"
               value={formData.currency}
               onChange={(value) => {
-                handleInputChange('currency', currencyOptions.find((option) => value === option.value)?.text);
+                handleInputChange('currency', currencyOptions.find((option) => value === option.value)?.value);
               }}
               options={currencyOptions}
               isSearchable
               onBlur={handleBlur}
               menuPlacement="top"
+              error={validationErrors.currency && true}
             />
-            {validationErrors.currency && <small className="text-primary-red flex">{validationErrors.currency}</small>}
-          </label>
+          </div>
         </div>
       </div>
     </div>
