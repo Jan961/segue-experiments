@@ -6,15 +6,15 @@ import Icon from 'components/core-ui-lib/Icon';
 import Select from 'components/core-ui-lib/Select';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import { transformToOptions } from 'utils';
-import { Button, UploadModal , Label } from 'components/core-ui-lib';
+import { Label } from 'components/core-ui-lib';
 import schema from './AccountDetailsValidationSchema';
+import { ImageUpload } from '../ImageUpload/ImageUpload';
 
 export default function AccountDetailsTab() {
   const [formData, setFormData] = useState<UiAccountType>({ ...initialUiAccountDetails });
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [countryOptions, setCountryOptions] = useState<SelectOption[]>([]);
   const [currencyOptions, setCurrencyOptions] = useState<SelectOption[]>([]);
-  const [uploadVisible, setUploadVisible] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchCompanyInfo = async () => {
@@ -235,29 +235,7 @@ export default function AccountDetailsTab() {
           </div>
         </div>
         <div className="flex flex-col gap-3 w-1/2">
-          <div className="h-[190px] overflow-y-hidden overflow-x-hidden">
-            <div className="flex items-center justify-end gap-x-3 mt-[24px]">
-              <p className="text-primary-input-text">Company Logo</p>
-              <Button
-                onClick={() => {
-                  setUploadVisible(true);
-                }}
-                text="Upload"
-                variant="secondary"
-                className="w-[132px] mr-1"
-              />
-              <UploadModal
-                title="Upload Company Logo"
-                visible={uploadVisible}
-                info="Please upload your company logo here. Image should be no larger than 300px wide x 200px high (Max 500kb). Images in a square or portrait format will be proportionally scaled to fit with the rectangular boundary box. Suitable image formats are jpg, tiff, svg, and png."
-                allowedFormats={['image/jpg', 'image/tiff', 'image/svg', 'image/png']}
-                onClose={() => {
-                  setUploadVisible(false);
-                }}
-                maxFileSize={1024 * 500}
-              />
-            </div>
-          </div>
+          <ImageUpload />
           <FormField
             currentValue={formData.companyEmail}
             displayText="Email Address"
