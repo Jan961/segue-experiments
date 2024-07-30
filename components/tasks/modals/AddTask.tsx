@@ -211,6 +211,8 @@ const AddTask = ({
   };
 
   const getNewTasksNum = (prodStartDate: Date, taskRepeatFromWeekNum, taskRepeatToWeekNum, repeatInterval): number => {
+    if (isNullOrEmpty(repeatInterval)) return 1;
+
     let taskStartDate = addDurationToDate(prodStartDate, taskRepeatFromWeekNum * 7, true);
     const taskEndDate = addDurationToDate(prodStartDate, taskRepeatToWeekNum * 7, true);
 
@@ -683,7 +685,7 @@ const AddTask = ({
           setShowConfirmationDialog(false);
           onClose();
         }}
-       />
+      />
     </PopupModal>
   );
 };

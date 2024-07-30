@@ -8,7 +8,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   if (req.method === 'POST') {
     try {
       const task = req.body as ProductionTaskDTO;
-      const { Id } = task;
+      const { Id, PRTId } = task;
       const email = await getEmailFromReq(req);
       const access = await checkAccess(email, { TaskId: Id });
       if (!access) return res.status(401).end();
@@ -56,9 +56,10 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
               },
             },
           }),
+          ProductionTaskRepeat: { disconnect: true },
         },
       });
-
+      await prisma.ProductionTaskRepeat.delete({ where: { Id: PRTId } });
       return res.status(200).json(updatedTask);
     } catch (err) {
       console.log(err);

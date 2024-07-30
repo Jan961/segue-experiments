@@ -95,7 +95,7 @@ model BookingContactNotes {
   Booking       Booking      @relation(fields: [BookingId], references: [Id], onDelete: Cascade, map: "BookingBookingContactNotes")
 
   @@index([BookingId], map: "BookingBookingContactNotes")
-  @@index([UserId], map: "AccountUserBookingContactNotes")
+  @@index([UserId], map: "AccountUser_BookingContactNotes")
 }
 
 model Contract {
@@ -118,6 +118,7 @@ model Currency {
   Code                                                               String           @id @map("CurrencyCode") @db.VarChar(3)
   Name                                                               String           @map("CurrencyName") @db.VarChar(30)
   SymbolUnicode                                                      String?          @map("CurrencySymbolUnicode") @db.VarChar(30)
+  ACCContract                                                        ACCContract[]
   Account                                                            Account[]
   ConversionRate_ConversionRate_ConversionFromCurrencyCodeToCurrency ConversionRate[] @relation("ConversionRate_ConversionFromCurrencyCodeToCurrency")
   ConversionRate_ConversionRate_ConversionToCurrencyCodeToCurrency   ConversionRate[] @relation("ConversionRate_ConversionToCurrencyCodeToCurrency")
@@ -177,6 +178,7 @@ model Venue {
   FamilyId                                                  Int?                         @map("VenueVenueFamilyId")
   AddressStageDoorW3W                                       String?                      @map("VenueAddressStageDoorW3W") @db.VarChar(70)
   AddressLoadingW3W                                         String?                      @map("VenueAddressLoadingW3W") @db.VarChar(70)
+  ACCContract                                               ACCContract[]
   BookedVenueHistory                                        BookedVenueHistory[]
   Booking                                                   Booking[]
   GetInFitUp                                                GetInFitUp[]
@@ -341,7 +343,7 @@ model Account {
   AccountVATNumber           String?               @map("AccountVATNumber") @db.VarChar(20)
   AccountCurrencyCode        String                @map("AccountCurrencyCode") @db.VarChar(3)
   AccountCompanyNumber       String?               @map("AccountCompanyNumber") @db.VarChar(20)
-  AccountLogo                Bytes?                @map("AccountLogo")
+  AccountLogoFileId          Int?
   AccountMainEmail           String?               @map("AccountMainEmail") @db.VarChar(120)
   AccountNumPeople           Int?                  @map("AccountNumPeople") @db.TinyInt
   AccountOrganisationId      String?               @unique(map: "Account_AccountOrganisationId_Unique") @map("AccountOrganisationId") @db.Char(8)
@@ -352,6 +354,7 @@ model Account {
   AccountPhone               String?               @map("AccountPhone") @db.VarChar(30)
   AccountPaymentCurrencyCode String?               @map("AccountPaymentCurrencyCode") @db.VarChar(3)
   Currency                   Currency?             @relation(fields: [AccountPaymentCurrencyCode], references: [Code], onDelete: NoAction, map: "Currency_Account_Payment")
+  File                       File?                 @relation(fields: [AccountLogoFileId], references: [Id], map: "File_Account")
   AccountContact             AccountContact?
   AccountSubscription        AccountSubscription[]
   AccountUser                AccountUser[]
@@ -360,6 +363,7 @@ model Account {
   Show                       Show[]
 
   @@index([AccountPaymentCurrencyCode], map: "Currency_Account_Payment")
+  @@index([AccountLogoFileId], map: "File_Account")
 }
 
 model AvailableComp {
@@ -400,7 +404,7 @@ model CompAllocation {
   AvailableComp          AvailableComp @relation(fields: [AvailableCompId], references: [Id], onDelete: Cascade, map: "AvailableCompsMayBeAllocated")
 
   @@index([ArrangedById], map: "AccountUser_CompAllocation")
-  @@index([AvailableCompId], map: "AvailableCompsMayBeAllocated")
+  @@index([AvailableCompId], map: "AvailableComp_CompAllocation")
 }
 
 model CompType {
@@ -575,17 +579,19 @@ model User {
 }
 
 model AccountUser {
-  Id                    Int                     @id @unique(map: "AccUserIdUnique") @default(autoincrement()) @map("AccUserId")
-  UserId                Int                     @unique(map: "AccUserUserId_UNIQUE") @map("AccUserUserId")
-  AccountId             Int                     @map("AccUserAccountId")
-  AccUserIsAdmin        Boolean                 @default(dbgenerated("(b'0')")) @db.Bit(1)
-  AccUserPIN            String?                 @db.VarChar(4)
-  Account               Account                 @relation(fields: [AccountId], references: [AccountId], onDelete: Cascade, map: "Account_AccountUser")
-  User                  User                    @relation(fields: [UserId], references: [Id], onDelete: Cascade, map: "User_AccountUser")
-  AccountUserPermission AccountUserPermission[]
-  AccountUserProduction AccountUserProduction[]
-  BookingContactNotes   BookingContactNotes[]
-  CompAllocation        CompAllocation[]
+  Id                                                            Int                     @id @default(autoincrement()) @map("AccUserId")
+  UserId                                                        Int                     @unique(map: "AccUserUserId_UNIQUE") @map("AccUserUserId")
+  AccountId                                                     Int                     @map("AccUserAccountId")
+  AccUserIsAdmin                                                Boolean                 @default(dbgenerated("(b'0')")) @db.Bit(1)
+  AccUserPIN                                                    String?                 @db.VarChar(4)
+  ACCContract_ACCContract_ACCCCheckedByAccUserIdToAccountUser   ACCContract[]           @relation("ACCContract_ACCCCheckedByAccUserIdToAccountUser")
+  ACCContract_ACCContract_ACCCCompletedByAccUserIdToAccountUser ACCContract[]           @relation("ACCContract_ACCCCompletedByAccUserIdToAccountUser")
+  Account                                                       Account                 @relation(fields: [AccountId], references: [AccountId], onDelete: Cascade, map: "Account_AccountUser")
+  User                                                          User                    @relation(fields: [UserId], references: [Id], onDelete: Cascade, map: "User_AccountUser")
+  AccountUserPermission                                         AccountUserPermission[]
+  AccountUserProduction                                         AccountUserProduction[]
+  BookingContactNotes                                           BookingContactNotes[]
+  CompAllocation                                                CompAllocation[]
 
   @@index([AccountId], map: "Account_AccountUser")
 }
@@ -664,9 +670,9 @@ model MasterTask {
   Notes                          String?           @map("TaskNotes") @db.VarChar(500)
   AssignedToUserId               Int?              @map("TaskAssignedToUserId")
   StartByWeekNum                 Int?              @map("TaskStartByWeekNum") @db.SmallInt
-  TaskStartByIsPostProduction    Boolean           @default(false) @db.Bit(1)
+  TaskStartByIsPostProduction    Boolean           @default(dbgenerated("(b'0')")) @db.Bit(1)
   CompleteByWeekNum              Int?              @map("TaskCompleteByWeekNum") @db.SmallInt
-  TaskCompleteByIsPostProduction Boolean           @default(false) @db.Bit(1)
+  TaskCompleteByIsPostProduction Boolean           @default(dbgenerated("(b'0')")) @db.Bit(1)
   MTRId                          Int?              @map("TaskMTRId")
   Account                        Account           @relation(fields: [AccountId], references: [AccountId], onDelete: Cascade, map: "Account_MasterTask")
   MasterTaskRepeat               MasterTaskRepeat? @relation(fields: [MTRId], references: [Id], onDelete: Cascade, map: "MasterTaskRepeat_MasterTask")
@@ -676,7 +682,6 @@ model MasterTask {
   @@index([AssignedToUserId], map: "User_MasterTask_Assigned")
   @@index([MTRId], map: "MasterTaskRepeat_MasterTask")
 }
-
 
 model AccountUserProduction {
   AUPId           Int         @id @default(autoincrement())
@@ -696,28 +701,27 @@ model Production {
   SalesEmail            String?                 @map("ProductionSalesEmail") @db.VarChar(80)
   IsArchived            Boolean                 @default(dbgenerated("(b'0')")) @map("ProductionIsArchived") @db.Bit(1)
   IsDeleted             Boolean                 @default(dbgenerated("(b'0')")) @map("ProductionIsDeleted") @db.Bit(1)
-  Logo                  Bytes?                  @map("ProductionLogo")
   SalesFrequency        String                  @default("W") @map("ProductionSalesFrequency") @db.Char(1)
   RunningTime           DateTime?               @map("ProductionRunningTime") @db.Time(0)
   RunningTimeNote       String?                 @map("ProductionRunningTimeNote") @db.VarChar(80)
-  ImageFileId           Int?                    @map("ProductionImageFileId")
+  ProductionLogoFileId  Int?
   ReportCurrencyCode    String                  @map("ProductionReportCurrencyCode") @db.VarChar(3)
   ProdCoId              Int?                    @map("ProductionProdCoId")
   AccountUserProduction AccountUserProduction[]
   ConversionRate        ConversionRate[]
   DateBlock             DateBlock[]
   Currency              Currency                @relation(fields: [ReportCurrencyCode], references: [Code], onDelete: NoAction, map: "Currency_Production")
+  File                  File?                   @relation(fields: [ProductionLogoFileId], references: [Id], map: "File_Production")
   ProductionCompany     ProductionCompany?      @relation(fields: [ProdCoId], references: [Id], onDelete: NoAction, map: "ProductionCompany_Production")
-  File                  File?                   @relation(fields: [ImageFileId], references: [Id], onDelete: Cascade, map: "FK_Production_File")
   Show                  Show                    @relation(fields: [ShowId], references: [Id], onDelete: NoAction, map: "ShowMayHaveProduction")
   ProductionRegion      ProductionRegion[]
   ProductionTask        ProductionTask[]
 
   @@unique([Code, ShowId], map: "SECONDARY")
-  @@index([ImageFileId], map: "Production_File")
   @@index([ShowId], map: "Show_Production")
   @@index([ReportCurrencyCode], map: "Currency_Production")
   @@index([ProdCoId], map: "ProductionCompany_Production")
+  @@index([ProductionLogoFileId], map: "File_Production")
 }
 
 model ProductionTask {
@@ -915,7 +919,7 @@ model DealMemo {
 
   @@index([DeMoBOMVenueContactId], map: "VenueContactDealMemoBOM")
   @@index([DeMoTechVenueContactId], map: "VenueContactDealMemoTech")
-  @@index([DeMoAccContId], map: "AccountContactDealMemo")
+  @@index([DeMoAccContId], map: "AccountContact_DealMemo")
 }
 
 model DealMemoCall {
@@ -960,11 +964,12 @@ model File {
   Location          String              @map("FileLocation") @db.VarChar(512)
   UploadDateTime    DateTime            @map("FileUploadDateTime") @db.DateTime(0)
   UploadUserId      Int                 @map("FileUploadUserId")
+  Account           Account[]
   User              User                @relation(fields: [UploadUserId], references: [Id], onDelete: NoAction, map: "UserAttachedFile")
   Production        Production[]
   ProductionCompany ProductionCompany[]
 
-  @@index([UploadUserId], map: "UserAttachedFile")
+  @@index([UploadUserId], map: "User_AttachedFile")
 }
 
 model SubscriptionPlan {
@@ -1018,8 +1023,52 @@ model GlobalBookingActivity {
 }
 
 model ACCContract {
-  ACCContractId     Int                 @id @default(autoincrement())
-  ACCContractPerson ACCContractPerson[]
+  ACCContractId                                                 Int                 @id @default(autoincrement())
+  ACCCPersonId                                                  Int
+  ACCCRoleName                                                  String              @db.VarChar(50)
+  ACCCContractStatus                                            String              @db.VarChar(4)
+  ACCCCompletedByAccUserId                                      Int?
+  ACCCCheckedByAccUserId                                        Int?
+  ACCCDateIssued                                                DateTime?           @db.Date
+  ACCCDateReturned                                              DateTime?           @db.Date
+  ACCCNotes                                                     String?             @db.LongText
+  ACCCCurrencyCode                                              String?             @db.VarChar(3)
+  ACCCFirstDay                                                  DateTime?           @db.Date
+  ACCCLastDay                                                   DateTime?           @db.Date
+  ACCCAvailability                                              String?             @db.LongText
+  ACCCRehearsalLocation                                         String?             @db.VarChar(30)
+  ACCCRehearsalVenueId                                          Int?
+  ACCCRehearsalVenueNotes                                       String?             @db.LongText
+  ACCCIsAccomProvided                                           Boolean             @default(dbgenerated("(b'0')")) @db.Bit(1)
+  ACCCAccomNotes                                                String?             @db.LongText
+  ACCCIsTransportProvided                                       Boolean             @default(dbgenerated("(b'0')")) @db.Bit(1)
+  ACCCTransportNotes                                            String?             @db.LongText
+  ACCCIsNominatedDriver                                         Boolean             @default(dbgenerated("(b'0')")) @db.Bit(1)
+  ACCCNominatedDriverNotes                                      String?             @db.LongText
+  ACCCPaymentType                                               String?             @db.VarChar(1)
+  ACCCWeeklyRehFee                                              Decimal?            @db.Decimal(10, 2)
+  ACCCWeeklyRehHolPay                                           Decimal?            @db.Decimal(10, 2)
+  ACCCWeeklyPerfFee                                             Decimal?            @db.Decimal(10, 2)
+  ACCCWeeklyPerfHolPay                                          Decimal?            @db.Decimal(10, 2)
+  ACCCWeeklySubs                                                Decimal?            @db.Decimal(10, 2)
+  ACCCWeeklySubsNotes                                           String?             @db.LongText
+  ACCCTotalFee                                                  Decimal?            @db.Decimal(10, 2)
+  ACCCTotalHolPay                                               Decimal?            @db.Decimal(10, 2)
+  ACCCTotalFeeNotes                                             String?             @db.LongText
+  ACCCCancelFee                                                 Decimal?            @db.Decimal(10, 2)
+  ACCClause                                                     ACCClause[]
+  AccountUser_ACCContract_ACCCCheckedByAccUserIdToAccountUser   AccountUser?        @relation("ACCContract_ACCCCheckedByAccUserIdToAccountUser", fields: [ACCCCheckedByAccUserId], references: [Id], onDelete: Cascade, map: "AccountUser_AccContract_Checker")
+  AccountUser_ACCContract_ACCCCompletedByAccUserIdToAccountUser AccountUser?        @relation("ACCContract_ACCCCompletedByAccUserIdToAccountUser", fields: [ACCCCompletedByAccUserId], references: [Id], onDelete: Cascade, map: "AccountUser_AccContract_Completer")
+  Currency                                                      Currency?           @relation(fields: [ACCCCurrencyCode], references: [Code], onDelete: NoAction, map: "Currency_ACCContract")
+  Venue                                                         Venue?              @relation(fields: [ACCCRehearsalVenueId], references: [Id], onDelete: Cascade, map: "Venue_ACCContract")
+  ACCContractPerson                                             ACCContractPerson[]
+  ACCPayment                                                    ACCPayment[]
+  ACCPubEvent                                                   ACCPubEvent[]
+
+  @@index([ACCCCheckedByAccUserId], map: "AccountUser_AccContract_Checker")
+  @@index([ACCCCompletedByAccUserId], map: "AccountUser_AccContract_Completer")
+  @@index([ACCCCurrencyCode], map: "Currency_ACCContract")
+  @@index([ACCCRehearsalVenueId], map: "Venue_ACCContract")
 }
 
 model ACCContractPerson {
@@ -1113,6 +1162,8 @@ model Person {
   Country_Person_PersonPaymentBankCountryIdToCountry   Country?           @relation("Person_PersonPaymentBankCountryIdToCountry", fields: [PersonPaymentBankCountryId], references: [Id], onDelete: Cascade, map: "Country_Person_PaymentBank")
   Organisation_Person_PersonAgencyOrgIdToOrganisation  Organisation?      @relation("Person_PersonAgencyOrgIdToOrganisation", fields: [PersonAgencyOrgId], references: [OrgId], onDelete: NoAction, map: "Organisation_Person_Agent")
   PersonOtherRole                                      PersonOtherRole[]
+  PersonPerson_PersonPerson_PPPersonIdToPerson         PersonPerson[]     @relation("PersonPerson_PPPersonIdToPerson")
+  PersonPerson_PersonPerson_PPRolePersonIdToPerson     PersonPerson[]     @relation("PersonPerson_PPRolePersonIdToPerson")
   PersonPersonRole                                     PersonPersonRole[]
 
   @@index([PersonAddressId], map: "Address_Person")
@@ -1144,13 +1195,13 @@ model PersonRole {
 }
 
 model MasterTaskRepeat {
-  Id                             Int          @map("MTRId")@id @default(autoincrement())
-  FromWeekNum                    Int          @map("MTRFromWeekNum")@db.SmallInt
-  FromWeekNumIsPostProduction Boolean      @map("MTRFromWeekNumIsPostProduction")@default(dbgenerated("(b'0')")) @db.Bit(1)
-  ToWeekNum                   Int          @map("MTRToWeekNum")@db.SmallInt
-  ToWeekNumIsPostProduction   Boolean      @map("MTRToWeekNumIsPostProduction")@default(dbgenerated("(b'0')")) @db.Bit(1)
-  Interval                    String       @map("MTRInterval")@db.VarChar(20)
-  MasterTask                     MasterTask[]
+  Id                          Int          @id @default(autoincrement()) @map("MTRId")
+  FromWeekNum                 Int          @map("MTRFromWeekNum") @db.SmallInt
+  FromWeekNumIsPostProduction Boolean      @default(dbgenerated("(b'0')")) @map("MTRFromWeekNumIsPostProduction") @db.Bit(1)
+  ToWeekNum                   Int          @map("MTRToWeekNum") @db.SmallInt
+  ToWeekNumIsPostProduction   Boolean      @default(dbgenerated("(b'0')")) @map("MTRToWeekNumIsPostProduction") @db.Bit(1)
+  Interval                    String       @map("MTRInterval") @db.VarChar(20)
+  MasterTask                  MasterTask[]
 }
 
 model ProductionTaskRepeat {
@@ -1172,6 +1223,57 @@ model VenueFile {
   Venue       Venue   @relation(fields: [VenueId], references: [Id], onDelete: Cascade, map: "Venue_VenueFile")
 
   @@index([VenueId], map: "Venue_VenueFile")
+}
+
+model ACCClause {
+  ClauseId            Int                @id @default(autoincrement())
+  ClauseACCContractId Int
+  ClauseStdClauseId   Int?
+  ClauseText          String?            @db.LongText
+  ACCContract         ACCContract        @relation(fields: [ClauseACCContractId], references: [ACCContractId], onDelete: Cascade, map: "ACCContract_ACCClause")
+  ACCStandardClause   ACCStandardClause? @relation(fields: [ClauseStdClauseId], references: [StdClauseId], onDelete: Cascade, map: "ACCStandardClause_ACCClause")
+
+  @@index([ClauseACCContractId], map: "ACCContract_ACCClause")
+  @@index([ClauseStdClauseId], map: "ACCStandardClause_ACCClause")
+}
+
+model ACCPayment {
+  PayId            Int         @id @default(autoincrement())
+  PayACCContractId Int
+  PayDate          DateTime?   @db.Date
+  PayAmount        Decimal?    @db.Decimal(10, 2)
+  PayNotes         String?     @db.LongText
+  ACCContract      ACCContract @relation(fields: [PayACCContractId], references: [ACCContractId], onDelete: Cascade, map: "ACCContract_AACCPayment")
+
+  @@index([PayACCContractId], map: "ACCContract_AACCPayment")
+}
+
+model ACCPubEvent {
+  PEId            Int         @id @default(autoincrement())
+  PEACCContractId Int
+  PEDate          DateTime?   @db.Date
+  PENotes         String?     @db.LongText
+  ACCContract     ACCContract @relation(fields: [PEACCContractId], references: [ACCContractId], onDelete: Cascade, map: "ACCContract_ACCPubEvent")
+
+  @@index([PEACCContractId], map: "ACCContract_ACCPubEvent")
+}
+
+model ACCStandardClause {
+  StdClauseId   Int         @id @default(autoincrement())
+  StdClauseText String?     @db.LongText
+  ACCClause     ACCClause[]
+}
+
+model PersonPerson {
+  PPId                                       Int    @id @default(autoincrement())
+  PPPersonId                                 Int
+  PPRoleType                                 Int
+  PPRolePersonId                             Int
+  Person_PersonPerson_PPPersonIdToPerson     Person @relation("PersonPerson_PPPersonIdToPerson", fields: [PPPersonId], references: [PersonId], onDelete: Cascade, map: "Person_Person")
+  Person_PersonPerson_PPRolePersonIdToPerson Person @relation("PersonPerson_PPRolePersonIdToPerson", fields: [PPRolePersonId], references: [PersonId], onDelete: Cascade, map: "Person_Person_InRole")
+
+  @@index([PPPersonId], map: "Person_Person")
+  @@index([PPRolePersonId], map: "Person_Person_InRole")
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
@@ -1397,7 +1499,7 @@ view ProductionView {
   ShowCode             String    @db.VarChar(10)
   ShowName             String    @db.VarChar(80)
   ShowType             String?   @db.VarChar(1)
-  ProductionLogo       Bytes?
+  ProductionLogoFileId Int?
   RehearsalStartDate   DateTime? @db.Date
   RehearsalEndDate     DateTime? @db.Date
   ProductionStartDate  DateTime? @db.Date
@@ -1561,6 +1663,23 @@ view AccountUserPermissionsView {
   UserLastName   String? @db.VarChar(50)
   UserEmail      String  @db.VarChar(120)
   AllPermissions String? @db.MediumText
+
+  @@ignore
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view ACCContractListView {
+  PersonFirstName          String    @db.VarChar(50)
+  PersonLastName           String?   @db.VarChar(50)
+  RoleName                 String    @db.VarChar(50)
+  StatusCode               String    @db.VarChar(4)
+  CompletedByUserFirstName String    @db.VarChar(50)
+  CompletedByUserLastName  String?   @db.VarChar(50)
+  CheckedByUserFirstName   String?   @db.VarChar(50)
+  CheckedByUserLastName    String?   @db.VarChar(50)
+  DateIssued               DateTime? @db.Date
+  DateReturned             DateTime? @db.Date
+  ACCCNotes                String?   @db.LongText
 
   @@ignore
 }
