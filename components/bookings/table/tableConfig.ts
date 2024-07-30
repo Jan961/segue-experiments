@@ -543,7 +543,7 @@ export const newBookingColumnDefs = (
     cellStyle: {
       display: 'flex',
       justifyContent: 'center',
-      paddingTop: '0.4rem',
+      alignItems: 'center',
     },
   },
 ];
