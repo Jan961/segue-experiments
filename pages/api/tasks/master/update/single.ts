@@ -13,8 +13,8 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const access = await checkAccess(email);
     if (!access) return res.status(401).end();
     const { Id, AssignedToUserId, MTRId } = task;
+    await masterTaskSchema.validate(task);
     if (isNullOrEmpty(MTRId)) {
-      await masterTaskSchema.validate(task);
       task = omit(task, ['Id', 'AccountId', 'AssignedToUserId', 'MTRId', 'MasterTaskRepeat']);
       const createResult = await prisma.MasterTask.update({
         data: {
@@ -43,6 +43,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         'TaskStartByIsPostProduction',
         'TaskEndByIsPostProduction',
       ]);
+
       const updatedTask = await prisma.MasterTask.update({
         data: {
           ...strippedTask,
