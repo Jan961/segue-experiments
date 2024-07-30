@@ -8,11 +8,9 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     try {
       const task = req.body as ProductionTaskDTO;
       const { Id } = task;
-
       const email = await getEmailFromReq(req);
       const access = await checkAccess(email, { TaskId: Id });
       if (!access) return res.status(401).end();
-
       const updatedTask = await prisma.ProductionTask.update({
         where: { Id: task.Id },
         data: {
@@ -25,6 +23,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           CompleteByWeekNum: task.CompleteByWeekNum,
           StartByIsPostProduction: task.StartByIsPostProduction,
           CompleteByIsPostProduction: task.CompleteByIsPostProduction,
+          TaskCompletedDate: new Date(task?.TaskCompletedDate) || null,
           ...(task.ProductionId && {
             Production: {
               connect: {
