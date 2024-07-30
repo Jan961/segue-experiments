@@ -53,13 +53,13 @@ const GrossVenuesPromotorHoldsAndCompsModal = ({
   onClose,
   activeModal,
 }: GrossVenuesPromotorHoldsAndCompsModalProps) => {
-  const productionJump = useRecoilValue(productionJumpState);
-  const [formData, setFormData] = useState(defaultFormData);
+  const { selected, productions } = useRecoilValue(productionJumpState);
+  const [formData, setFormData] = useState({ ...defaultFormData, production: selected });
   const title = useMemo(() => getModalTitle(activeModal), [activeModal]);
   const [loading, setLoading] = useState(false);
   const { production, status, fromDate, toDate, venue, selection } = formData;
   const productionsOptions = useMemo(() => {
-    const options = productionJump.productions.map((production) => ({
+    const options = productions.map((production) => ({
       text: `${production.ShowCode}${production.Code} ${production.ShowName} ${production.IsArchived ? ' (A)' : ''}`,
       value: production.Id,
     }));
@@ -67,7 +67,7 @@ const GrossVenuesPromotorHoldsAndCompsModal = ({
       options.unshift({ text: 'All', value: -1 });
     }
     return options;
-  }, [productionJump]);
+  }, [productions]);
   const { data: venues = [] } = useQuery({
     queryKey: ['productionWeeks' + production],
     queryFn: () => {
@@ -96,7 +96,7 @@ const GrossVenuesPromotorHoldsAndCompsModal = ({
 
   const onExport = useCallback(
     (format: string) => {
-      const selectedProduction = productionJump.productions?.find((prod) => prod.Id === parseInt(production));
+      const selectedProduction = productions?.find((prod) => prod.Id === production);
       const productionCode = selectedProduction ? `${selectedProduction?.ShowCode}${selectedProduction?.Code}` : null;
       setLoading(true);
       let promise;
@@ -129,7 +129,7 @@ const GrossVenuesPromotorHoldsAndCompsModal = ({
         },
       );
     },
-    [activeModal, formData, onClose, production, productionJump.productions, title],
+    [activeModal, formData, onClose, production, productions, title],
   );
 
   return (
@@ -202,7 +202,7 @@ const GrossVenuesPromotorHoldsAndCompsModal = ({
             variant="primary"
             sufixIconName="excel"
             iconProps={{ className: 'h-4 w-3' }}
-            text="Create Report"
+            text="Export to Excel"
             disabled={loading}
             onClick={() => onExport('excel')}
           />
