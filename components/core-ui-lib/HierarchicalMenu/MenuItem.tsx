@@ -11,7 +11,7 @@ export interface MenuItemProps {
 }
 
 export default memo(function MenuItem({ option, onClick, onToggle }: MenuItemProps) {
-  const { label, value, options, groupHeader, icon, expanded, labelClass } = option;
+  const { label, value, options, groupHeader, icon, expanded, labelClass, testId = '' } = option;
   const [isExpanded, setIsExpanded] = useState<boolean>(expanded);
   const isLeafNode = !options || options.length === 0;
   const baseClass = 'cursor-pointer';
@@ -42,7 +42,7 @@ export default memo(function MenuItem({ option, onClick, onToggle }: MenuItemPro
           <Icon iconName={icon.default.iconName} stroke={icon.default.stroke} fill={icon.default.fill} variant="lg" />
         </div>
       )}
-      <span onClick={() => onClick(option)} className={classNames(baseClass, labelClass)}>
+      <span onClick={() => onClick(option)} className={classNames(baseClass, labelClass)} data-testid={testId}>
         {label}
       </span>
     </div>
@@ -63,7 +63,7 @@ export default memo(function MenuItem({ option, onClick, onToggle }: MenuItemPro
                 </div>
               )}
               <div className="flex w-full items-center">
-                <span onClick={handleBtnClick} className={classNames(baseClass, labelClass)}>
+                <span onClick={handleBtnClick} className={classNames(baseClass, labelClass)} data-testid={testId}>
                   {label}
                 </span>
                 <Disclosure.Button onClick={handleMenuToggle}>
@@ -81,7 +81,7 @@ export default memo(function MenuItem({ option, onClick, onToggle }: MenuItemPro
               </div>
             </div>
 
-            <Disclosure.Panel className={``}>
+            <Disclosure.Panel className="">
               {itemOptions.map((option) => (
                 <div key={option.id} className={icon ? 'ml-11' : 'ml-6'}>
                   <MenuItem option={option} onClick={onClick} onToggle={onToggle} />

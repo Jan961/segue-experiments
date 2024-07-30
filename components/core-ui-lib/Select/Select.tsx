@@ -45,6 +45,7 @@ export interface SelectProps extends WithTestId {
   closeMenuOnSelect?: boolean;
   onBlur?: () => void;
   menuPlacement?: MenuPlacement;
+  error?: boolean;
 }
 
 const Option = (props: OptionProps & { testId?: string }) => {
@@ -97,6 +98,7 @@ export default forwardRef(function Select(
     variant = 'colored',
     onBlur,
     menuPlacement = 'bottom',
+    error,
   }: SelectProps,
   ref,
 ) {
@@ -233,6 +235,8 @@ export default forwardRef(function Select(
     MultiValue,
   };
 
+  const inputClass = error ? 'border-primary-red' : 'border-primary-border';
+
   const getGridViewportElement = (): HTMLElement | null => {
     return document.body;
   };
@@ -247,7 +251,8 @@ export default forwardRef(function Select(
   return (
     <div
       className={classNames(
-        'border border-primary-border rounded-md flex items-center text-sm',
+        'border rounded-md flex items-center text-sm',
+        inputClass,
         { 'shadow-sm-shadow': !inline },
         className,
       )}
