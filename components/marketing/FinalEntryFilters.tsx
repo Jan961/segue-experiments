@@ -7,10 +7,10 @@ import { bookingJumpState } from 'state/marketing/bookingJumpState';
 import { ProductionJumpMenu } from 'components/global/nav/ProductionJumpMenu';
 import { getWeekDayShort, DATE_PATTERN } from 'services/dateService';
 import formatInputDate from 'utils/dateInputFormat';
-import { LastPerfDate } from 'pages/api/marketing/sales/tourWeeks/[ProductionId]';
 import { currencyState } from 'state/marketing/currencyState';
 import axios from 'axios';
 import { isNullOrEmpty } from 'utils';
+import { LastPerfDate } from 'types/MarketingTypes';
 
 const FinalEntryFilters = () => {
   const { selected: productionId } = useRecoilValue(productionJumpState);
@@ -21,7 +21,7 @@ const FinalEntryFilters = () => {
 
   const getCurrency = async (bookingId) => {
     try {
-      const response = await axios.get('/api/marketing/currency/' + bookingId);
+      const response = await axios.get(`/api/marketing/currency/${bookingId}`);
 
       if (response.data) {
         const { currency } = response.data;
@@ -48,7 +48,7 @@ const FinalEntryFilters = () => {
 
   const fetchLastDates = async () => {
     try {
-      const data = await axios.get('/api/performances/lastDate/' + productionId);
+      const data = await axios.get(`/api/performances/lastDate/${productionId}`);
 
       if (Array.isArray(data)) {
         const lastDates = data as Array<LastPerfDate>;
@@ -117,6 +117,7 @@ const FinalEntryFilters = () => {
         options={bookingOptions}
         isClearable
         isSearchable
+        testId="selectBooking"
       />
     </div>
   );

@@ -1483,7 +1483,7 @@ view SalesView {
   VenueCurrencySymbolUnicode  String?   @db.VarChar(30)
   ConversionToCurrencyCode    String?   @db.VarChar(3)
   ConversionRate              Decimal?  @db.Decimal(8, 4)
-  SetId                       Int?      @default(0)
+  SetId                       Int       @default(0)
   SetSalesFiguresDate         DateTime? @db.Date
   SetBookingWeekNum           Int?      @db.SmallInt
   SetProductionWeekDate       DateTime? @db.Date
@@ -1495,7 +1495,7 @@ view SalesView {
   SetSingleSeats              Boolean?  @default(dbgenerated("(b'0')")) @db.Bit(1)
   SetBrochureReleased         Boolean?  @default(dbgenerated("(b'0')")) @db.Bit(1)
   SetIsCopy                   Boolean?  @default(dbgenerated("(b'0')")) @db.Bit(1)
-  SaleTypeName                String?   @db.VarChar(45)
+  SaleTypeName                String    @db.VarChar(45)
   Seats                       Decimal?  @db.Decimal(32, 0)
   Value                       Decimal?  @db.Decimal(32, 2)
   TotalCapacity               Float?
@@ -1508,8 +1508,10 @@ view SalesView {
   LastFiguresSeats            Decimal?  @db.Decimal(32, 0)
   LastFiguresValue            Decimal?  @db.Decimal(32, 2)
 
+  @@id([BookingId, SetId, SaleTypeName])
   @@ignore
 }
+
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view BookingSelectionView {

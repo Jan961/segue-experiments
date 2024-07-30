@@ -4,11 +4,6 @@ import { addDurationToDate, getArrayOfDatesBetween, getMonday, getWeeksBetweenDa
 import { getEmailFromReq, checkAccess, getAccountIdFromReq } from 'services/userService';
 import formatInputDate from 'utils/dateInputFormat';
 
-export type LastPerfDate = {
-  BookingId: number;
-  LastPerformanaceDate: string;
-};
-
 export default async function handle(req, res) {
   try {
     const ProductionId = parseInt(req.query.ProductionId, 10);
