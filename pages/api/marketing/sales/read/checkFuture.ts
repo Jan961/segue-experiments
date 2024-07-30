@@ -7,60 +7,58 @@ export default async function handle(req, res) {
 
     if (req.body.type === 'Hold') {
       // get current values across weeks from the entered week
-      data = await prisma.$queryRaw`
-                SELECT
-                    SalesSet.SetSalesFiguresDate,
-                    HoldType.HoldTypeId,
-                    HoldType.HoldTypeCode,
-                    HoldType.HoldTypeName,
-                    SetHold.SetHoldSeats,
-                    SetHold.SetHoldValue,
-                    SetHold.SetHoldId,
-                    SalesSet.SetId
-                FROM
-                    SalesSet
-                LEFT OUTER JOIN
-                    SetHold
-                ON
-                    SalesSet.SetId = SetHold.SetHoldSetId
-                inner join
-                    HoldType on SetHold.SetHoldHoldTypeId = HoldType.HoldTypeId
-                WHERE
-                    SalesSet.SetBookingId = ${req.body.bookingId}
-                    AND SalesSet.SetSalesFiguresDate > ${req.body.saleDate}
-                    AND HoldTypeId = ${req.body.typeId}
-                ORDER BY
-                    HoldTypeName,SetSalesFiguresDate
-            `;
+      data = await prisma.salesSet.findMany({
+        where: {
+          SetBookingId: req.body.bookingId,
+          SetSalesFiguresDate: {
+            gt: new Date(req.body.saleDate), // Use "greater than" for the date comparison
+          },
+          SetHold: {
+            some: {
+              SetHoldHoldTypeId: req.body.typeId, // Directly referencing the foreign key field
+            },
+          },
+        },
+      });
 
       result = data
         .sort((a, b) => new Date(a.SetSalesFiguresDate).getTime() - new Date(b.SetSalesFiguresDate).getTime())
         .filter((element, index, array) => index === 0 || element.SetHoldSeats === array[0].SetHoldSeats);
     } else {
-      data = await prisma.$queryRaw`
-                SELECT
-                    SalesSet.SetSalesFiguresDate,
-                    CompType.CompTypeId,
-                    CompType.CompTypeCode,
-                    CompType.HoldTypeName,
-                    SetComp.SetCompSeats,
-                    SetComp.SetCompId,
-                    SalesSet.SetId
-                FROM
-                    SalesSet
-                LEFT OUTER JOIN
-                    SetComp
-                ON
-                    SalesSet.SetId = SetComp.SetCompSetId
-                inner join
-                    CompType on SetComp.SetCompCompTypeId = CompType.CompTypeId
-                WHERE
-                    SalesSet.SetBookingId = ${req.body.bookingId}
-                    AND SalesSet.SetSalesFiguresDate > ${req.body.saleDate}
-                    AND CompTypeId = ${req.body.typeId}
-                ORDER BY
-                    CompTypeName, SetSalesFiguresDate
-            `;
+      const data = await prisma.salesSet.findMany({
+        where: {
+          SetBookingId: req.body.bookingId,
+          SetSalesFiguresDate: {
+            gt: new Date(req.body.saleDate),
+          },
+          SetComp: {
+            some: {
+              compType: {
+                compTypeId: req.body.typeId,
+              },
+            },
+          },
+        },
+        include: {
+          SetComp: {
+            include: {
+              CompType: true,
+            },
+          },
+        },
+        orderBy: [
+          {
+            SetComp: {
+              compType: {
+                compTypeName: 'asc',
+              },
+            },
+          },
+          {
+            SetSalesFiguresDate: 'asc',
+          },
+        ],
+      });
 
       result = data
         .sort((a, b) => new Date(a.SetSalesFiguresDate).getTime() - new Date(b.SetSalesFiguresDate).getTime())

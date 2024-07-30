@@ -1520,7 +1520,6 @@ view ShowView {
   @@ignore
 }
 
-/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view VenueView {
   VenueId                      Int     @default(0)
   VenueCode                    String  @db.VarChar(6)
@@ -1564,10 +1563,9 @@ view VenueView {
   VenueMainNoteText            String? @db.LongText
   VenueWarningNoteText         String? @db.LongText
 
-  @@ignore
+  @@id([VenueId, VenueCode])
 }
 
-/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view SalesView {
   ShowName                    String    @db.VarChar(80)
   ProductionId                Int       @default(0)
@@ -1585,7 +1583,7 @@ view SalesView {
   VenueCurrencySymbolUnicode  String?   @db.VarChar(30)
   ConversionToCurrencyCode    String?   @db.VarChar(3)
   ConversionRate              Decimal?  @db.Decimal(8, 4)
-  SetId                       Int?      @default(0)
+  SetId                       Int       @default(0)
   SetSalesFiguresDate         DateTime? @db.Date
   SetBookingWeekNum           Int?      @db.SmallInt
   SetProductionWeekDate       DateTime? @db.Date
@@ -1597,7 +1595,7 @@ view SalesView {
   SetSingleSeats              Boolean?  @default(dbgenerated("(b'0')")) @db.Bit(1)
   SetBrochureReleased         Boolean?  @default(dbgenerated("(b'0')")) @db.Bit(1)
   SetIsCopy                   Boolean?  @default(dbgenerated("(b'0')")) @db.Bit(1)
-  SaleTypeName                String?   @db.VarChar(45)
+  SaleTypeName                String    @db.VarChar(45)
   Seats                       Decimal?  @db.Decimal(32, 0)
   Value                       Decimal?  @db.Decimal(32, 2)
   TotalCapacity               Float?
@@ -1610,10 +1608,9 @@ view SalesView {
   LastFiguresSeats            Decimal?  @db.Decimal(32, 0)
   LastFiguresValue            Decimal?  @db.Decimal(32, 2)
 
-  @@ignore
+  @@id([BookingId, SetId, SaleTypeName])
 }
 
-/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view BookingSelectionView {
   BookingId             Int      @default(0)
   BookingStatusCode     String   @default("U") @db.Char(1)
@@ -1625,7 +1622,7 @@ view BookingSelectionView {
   FullProductionCode    String?  @db.VarChar(20)
   ProductionLengthWeeks Int?     @db.SmallInt
 
-  @@ignore
+  @@id([BookingId, VenueId, ProductionId])
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.

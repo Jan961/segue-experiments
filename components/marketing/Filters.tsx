@@ -11,10 +11,10 @@ import { bookingJumpState } from 'state/marketing/bookingJumpState';
 import MarketingButtons from './MarketingButtons';
 import formatInputDate from 'utils/dateInputFormat';
 import { reverseDate } from './utils';
-import { getWeekDayShort } from 'services/dateService';
-import { LastPerfDate } from 'pages/api/marketing/sales/tourWeeks/[ProductionId]';
+import { DATE_PATTERN, getWeekDayShort } from 'services/dateService';
 import { currencyState } from 'state/marketing/currencyState';
 import axios from 'axios';
+import { LastPerfDate } from 'types/MarketingTypes';
 
 type FutureBooking = {
   hasFutureBooking: boolean;
@@ -34,39 +34,34 @@ const Filters = () => {
   const [landingURL, setLandingURL] = useState('');
   const [futureBookings, setFutureBookings] = useState<FutureBooking>({ hasFutureBooking: false, nextBooking: null });
   const [lastDates, setLastDates] = useState([]);
-  const datePattern = /(\d{2}\/\d{2}\/\d{2})/;
 
   const bookingOptions = useMemo(() => {
-    try {
-      const initialOptions = bookings.bookings ? mapBookingsToProductionOptions(bookings.bookings) : [];
-      const optWithRun = initialOptions.map((option) => {
-        const lastDate = lastDates?.find((x) => x.BookingId === parseInt(option.value));
-        if (lastDate !== undefined) {
-          const endDateDay = getWeekDayShort(lastDate.LastPerformanceDate);
-          const endDateStr = formatInputDate(lastDate.LastPerformanceDate);
-          if (option.date === endDateStr) {
-            return option;
-          } else {
-            return {
-              ...option,
-              text: option.text.replace(datePattern, `$1 to ${endDateDay.toUpperCase() + ' ' + endDateStr}`),
-            };
-          }
-        } else {
+    const initialOptions = bookings.bookings ? mapBookingsToProductionOptions(bookings.bookings) : [];
+    const optWithRun = initialOptions.map((option) => {
+      const lastDate = lastDates?.find((x) => x.BookingId === parseInt(option.value));
+      if (lastDate !== undefined) {
+        const endDateDay = getWeekDayShort(lastDate.LastPerformanceDate);
+        const endDateStr = formatInputDate(lastDate.LastPerformanceDate);
+        if (option.date === endDateStr) {
           return option;
+        } else {
+          return {
+            ...option,
+            text: option.text.replace(DATE_PATTERN, `$1 to ${endDateDay.toUpperCase() + ' ' + endDateStr}`),
+          };
         }
-      });
+      } else {
+        return option;
+      }
+    });
 
-      optWithRun.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-      return optWithRun;
-    } catch (error) {
-      console.log(error);
-    }
+    optWithRun.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    return optWithRun;
   }, [bookings.bookings, lastDates]);
 
   const getCurrency = async (bookingId) => {
     try {
-      const response = await axios.post('/api/marketing/currency/' + bookingId, {});
+      const response = await axios.get(`/api/marketing/currency/${bookingId}`);
 
       if (response.data && typeof response.data === 'object') {
         const currencyObject = response.data as { currency: string };
@@ -138,19 +133,16 @@ const Filters = () => {
 
   useEffect(() => {
     const futureBookings = bookingOptions?.filter((booking) => {
-      try {
-        const reversedBookingDate = reverseDate(booking.date);
-        const reversedTodayDate = reverseDate(today);
+      const reversedBookingDate = reverseDate(booking.date);
+      const reversedTodayDate = reverseDate(today);
 
-        if (reversedBookingDate !== '' && reversedTodayDate !== '') {
-          return reversedBookingDate.getTime() >= reversedTodayDate.getTime();
-        } else {
-          return false;
-        }
-      } catch (error) {
+      if (reversedBookingDate !== '' && reversedTodayDate !== '') {
+        return reversedBookingDate.getTime() >= reversedTodayDate.getTime();
+      } else {
         return false;
       }
     });
+
     setFutureBookings({
       hasFutureBooking: futureBookings?.length > 0,
       nextBooking: futureBookings?.length > 0 ? futureBookings[0] : null,
@@ -169,6 +161,7 @@ const Filters = () => {
 
         <div className="flex items-center gap-4 mt-1">
           <Select
+            testId="selectBooking"
             onChange={changeBooking}
             value={selectedValue}
             disabled={!productionId}
@@ -184,23 +177,26 @@ const Filters = () => {
             disabled={!futureBookings.hasFutureBooking || !productionId}
             className="text-sm leading-8 w-[132px]"
             onClick={goToToday}
+            testId="btnGoToToday"
           />
           <Button
             text="Previous Date"
             disabled={selectedIndex === 0 || selectedValue === null || !productionId}
             className="text-sm leading-8 w-[132px]"
             onClick={goToPrevious}
+            testId="btnGoToPrev"
           />
           <Button
             text="Next Date"
             disabled={selectedIndex === bookingOptions?.length - 1 || !productionId}
             className="text-sm leading-8 w-[132px]"
             onClick={goToNext}
+            testId="btnGoToNext"
           />
 
           {/* Iframe placed next to buttons but in the same flex container */}
           <div className="self-end -mt-[60px] cursor-pointer">
-            <Iframe variant="xs" src={landingURL} className="" />
+            <Iframe variant="xs" src={landingURL} />
           </div>
         </div>
       </div>
