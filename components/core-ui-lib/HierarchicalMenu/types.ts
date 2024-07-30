@@ -14,4 +14,5 @@ export type MenuOption = {
   icon?: MenuItemIcon;
   expanded?: boolean;
   labelClass?: string;
+  testId?: string;
 };
