@@ -14,7 +14,7 @@ import { hasGlobalActivityChanged } from '../utils';
 import { ConfDialogVariant } from 'components/core-ui-lib/ConfirmationDialog/ConfirmationDialog';
 import { globalModalVenueColDefs, styleProps } from '../table/tableConfig';
 import { Table } from 'components/core-ui-lib';
-import { isNullOrEmpty } from 'utils';
+import { isValidDate } from 'services/dateService';
 
 export type ActivityModalVariant = 'add' | 'edit' | 'delete' | 'view';
 
@@ -129,9 +129,9 @@ export default function GlobalActivityModal({
     } else if (variant === 'edit' || variant === 'view') {
       setActName(data.Name);
       setActType(data.ActivityTypeId);
-      setActDate(isNullOrEmpty(data.Date) ? null : startOfDay(new Date(data.Date)));
+      setActDate(isValidDate(data.Date) ? startOfDay(new Date(data.Date)) : null);
       setActFollowUp(data.FollowUpRequired);
-      setFollowUpDt(isNullOrEmpty(data.DueByDate) ? null : startOfDay(new Date(data.DueByDate)));
+      setFollowUpDt(isValidDate(data.DueByDate) ? startOfDay(new Date(data.DueByDate)) : null);
       setCost(data.Cost.toString());
       setActNotes(data.Notes);
       setActId(data.Id);
