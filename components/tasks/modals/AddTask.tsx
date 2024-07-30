@@ -301,9 +301,6 @@ const AddTask = ({
         const endpoint = `/api/tasks/master/create/${inputs?.RepeatInterval ? 'recurring' : 'single'}/`;
         await axios.post(endpoint, inputs);
         setLoading(false);
-        if (isChecked) {
-          await handleMasterTask();
-        }
         onClose();
       } catch (error) {
         setLoading(false);
@@ -332,10 +329,8 @@ const AddTask = ({
         try {
           const endpoint = `/api/tasks/create/${inputs?.RepeatInterval ? 'recurring' : 'single'}/`;
           await axios.post(endpoint, inputs);
+          if (isChecked) await handleMasterTask();
           setLoading(false);
-          if (isChecked) {
-            await handleMasterTask();
-          }
           onClose();
           await updateTableData(inputs, true);
         } catch (error) {
