@@ -161,20 +161,4 @@ describe('isValidDate', () => {
   test('returns true for date object as a string', () => {
     expect(isValidDate(new Date().toString())).toBe(true);
   });
-
-  test('returns false for non-date-convertible objects', () => {
-    expect(isValidDate({})).toBe(false);
-  });
-
-  test('returns false for array', () => {
-    expect(isValidDate([])).toBe(false);
-  });
-
-  test('returns false for boolean true', () => {
-    expect(isValidDate(true)).toBe(false);
-  });
-
-  test('returns false for boolean false', () => {
-    expect(isValidDate(false)).toBe(false);
-  });
 });

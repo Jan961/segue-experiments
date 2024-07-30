@@ -288,7 +288,7 @@ export function formatDuration(
   }
 }
 
-export const isValidDate = (date: any) => {
+export const isValidDate = (date?: Date | string | number | null) => {
   if (date === null || typeof date === 'boolean') return false;
   const d = new Date(date);
   return d instanceof Date && !isNaN(d.getTime());
