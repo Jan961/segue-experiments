@@ -25,7 +25,6 @@ import { productionJumpState } from 'state/booking/productionJumpState';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const { filteredProductions } = useTasksFilter();
-
   const { users } = useRecoilValue(userState);
 
   const filter = useRecoilValue(tasksfilterState);
@@ -56,7 +55,7 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
   const { selected: ProductionId } = useRecoilValue(productionJumpState);
 
   const handleShowTask = () => {
-    setShowAddTask(!showAddTask);
+    setShowAddTask(false);
     router.replace(router.asPath);
   };
 
@@ -117,6 +116,7 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
       router.replace(router.asPath);
     }
   };
+  const currentProductionObj = useRecoilValue(productionJumpState).productions.find((item) => item.Id === ProductionId);
 
   return (
     <Layout title="Tasks | Segue" flush>
@@ -127,7 +127,7 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
         <TasksTable rowData={[]} />
       ) : (
         filteredProductions.map((production) => {
-          const columnDefs = getColumnDefs(usersList, production);
+          const columnDefs = getColumnDefs(usersList, currentProductionObj);
           return (
             <div key={production.Id} className="mb-10">
               <TasksTable
@@ -168,7 +168,6 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const AccountId = await getAccountIdFromReq(ctx.req);
   const productionJump = await getProductionJumpState(ctx, 'tasks', AccountId);
   const ProductionId = productionJump.selected;
-  // ProductionJumpState is checking if it's valid to access by accountId
   if (!ProductionId) return { notFound: true };
   const users = await getUsers(AccountId);
   const productionsWithTasks = await getProductionsAndTasks(AccountId, ProductionId);

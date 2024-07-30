@@ -39,7 +39,6 @@ export default function TasksTable({
   const [currentTask, setCurrentTask] = useState(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isEdit, setIsEdit] = useState<boolean>(false);
-
   const router = useRouter();
 
   const handleCellClick = (e) => {
@@ -99,6 +98,7 @@ export default function TasksTable({
   };
 
   const handleClose = () => {
+    setIsLoading(false);
     if (isEdit) setIsEdit(false);
     else handleShowTask();
     router.replace(router.asPath);
@@ -118,6 +118,7 @@ export default function TasksTable({
           onCellClicked={handleCellClick}
           onRowDoubleClicked={onRowDoubleClicked}
           ref={tableRef}
+          testId="table-tasks"
         />
       </div>
       <NotesPopup
@@ -131,7 +132,7 @@ export default function TasksTable({
           <Loader variant="lg" iconProps={{ stroke: '#FFF' }} />
         </div>
       )}
-      <AddTask visible={isEdit || showAddTask} onClose={handleClose} task={modalData} />
+      <AddTask visible={isEdit || showAddTask} onClose={handleClose} task={modalData} productionId={productionId} />
     </>
   );
 }

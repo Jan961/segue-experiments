@@ -45,6 +45,7 @@ export interface SelectProps extends WithTestId {
   closeMenuOnSelect?: boolean;
   onBlur?: () => void;
   menuPlacement?: MenuPlacement;
+  error?: boolean;
 }
 
 const Option = (props: OptionProps & { testId?: string }) => {
@@ -97,6 +98,7 @@ export default forwardRef(function Select(
     variant = 'colored',
     onBlur,
     menuPlacement = 'bottom',
+    error,
   }: SelectProps,
   ref,
 ) {
@@ -167,6 +169,7 @@ export default forwardRef(function Select(
         height: COMP_HEIGHT,
       }),
       menu: (styles) => ({ ...styles, zIndex: 20 }),
+      menuPortal: (styles) => ({ ...styles, zIndex: 50 }),
       ...customStyles,
     }),
     [customStyles, variant],
@@ -232,10 +235,24 @@ export default forwardRef(function Select(
     MultiValue,
   };
 
+  const inputClass = error ? 'border-primary-red' : 'border-primary-border';
+
+  const getGridViewportElement = (): HTMLElement | null => {
+    return document.body;
+  };
+
+  const [menuPortalTarget, setMenuPortalTarget] = useState<HTMLElement | null>(null);
+
+  useEffect(() => {
+    const gridViewportElement = getGridViewportElement();
+    setMenuPortalTarget(gridViewportElement);
+  }, []);
+
   return (
     <div
       className={classNames(
-        'border border-primary-border rounded-md flex items-center text-sm',
+        'border rounded-md flex items-center text-sm',
+        inputClass,
         { 'shadow-sm-shadow': !inline },
         className,
       )}
@@ -272,6 +289,9 @@ export default forwardRef(function Select(
           hideSelectedOptions={false}
           onBlur={onBlur}
           menuPlacement={menuPlacement}
+          menuPortalTarget={menuPortalTarget}
+          menuPosition="fixed"
+          menuShouldScrollIntoView={false}
           filterOption={(option, _inputValue) => {
             if (filteredOptions === null) {
               return true;

@@ -18,14 +18,19 @@ import { useRecoilValue } from 'recoil';
 import { userState } from 'state/account/userState';
 import { currentProductionSelector } from 'state/booking/selectors/currentProductionSelector';
 import { isNullOrEmpty } from 'utils';
-import { weekOptions } from 'utils/getTaskDateStatus';
+import { getWeekOptions } from 'utils/taskDate';
 import { priorityOptions } from 'utils/tasks';
+import { productionJumpState } from 'state/booking/productionJumpState';
+import { addDurationToDate, addOneMonth } from 'services/dateService';
+import { RecurringTasksPopup } from './RecurringTasksPopup';
+import { DeleteRecurringPopup } from './DeleteRecurringPopup';
 
 interface AddTaskProps {
   visible: boolean;
   isMasterTask?: boolean;
   onClose: () => void;
-  task?: Partial<MasterTask> & { ProductionId?: number };
+  task?: Partial<MasterTask> & { ProductionId?: number; ProductionTaskRepeat?: any };
+  productionId?: number;
 }
 
 const RepeatOptions = [
@@ -49,7 +54,13 @@ const LoadingOverlay = () => (
   </div>
 );
 
-const DEFAULT_MASTER_TASK: Partial<MasterTask> & { Progress?: number; DueDate?: string; ProductionId?: number } = {
+const DEFAULT_MASTER_TASK: Partial<MasterTask> & {
+  Progress?: number;
+  DueDate?: string;
+  ProductionId?: number;
+  CompleteDate?: string;
+  TaskCompletedDate?: string;
+} = {
   Id: undefined,
   Code: 0,
   Name: '',
@@ -64,31 +75,54 @@ const DEFAULT_MASTER_TASK: Partial<MasterTask> & { Progress?: number; DueDate?: 
   Progress: 0,
   DueDate: '',
   ProductionId: 0,
+  TaskCompletedDate: '',
 };
 
-const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps) => {
+const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = null }: AddTaskProps) => {
   const [inputs, setInputs] = useState<
-    Partial<MasterTask> & { Progress?: number; DueDate?: string; ProductionId?: number }
-  >(task || DEFAULT_MASTER_TASK);
-
-  const production = useRecoilValue(currentProductionSelector);
-
+    Partial<MasterTask> & {
+      Progress?: number;
+      DueDate?: string;
+      ProductionId?: number;
+      TaskCompletedDate?: string;
+      RepeatInterval?: string;
+      TaskRepeatFromWeekNum?: string;
+      TaskRepeatToWeekNum?: string;
+      ProductionTaskRepeat?: any;
+      PRTId?: number;
+    }
+  >(
+    task ||
+      DEFAULT_MASTER_TASK || {
+        ProductionTaskRepeat: task?.ProductionTaskRepeat.Interval,
+        TaskRepeatFromWeekNum: task?.ProductionTaskRepeat?.FromWeekNum,
+        TaskRepeatToWeekNum: task?.ProductionTaskRepeat?.ToWeekNum,
+        PRTId: task?.ProductionTaskRepeat?.PRTId,
+      },
+  );
+  inputs.RepeatInterval = inputs?.RepeatInterval || inputs.ProductionTaskRepeat?.Interval;
+  inputs.TaskRepeatFromWeekNum = inputs?.TaskRepeatFromWeekNum || inputs.ProductionTaskRepeat?.FromWeekNum;
+  inputs.TaskRepeatToWeekNum = inputs?.TaskRepeatToWeekNum || inputs.ProductionTaskRepeat?.ToWeekNum;
+  const productionList = useRecoilValue(productionJumpState).productions;
+  const production =
+    useRecoilValue(currentProductionSelector) || productionList.find((item) => item.Id === productionId);
   useEffect(() => {
     setInputs(task);
   }, [task]);
-
-  const [confirm, setConfirm] = useState<boolean>(false);
 
   const [status, setStatus] = useState({ submitted: true, submitting: false });
   const [loading, setLoading] = useState<boolean>(false);
   const [isCloned, setIsCloned] = useState<boolean>(false);
   const [isChecked, setIsChecked] = useState<boolean>(false);
-
+  const [isRecurring, setIsRecurring] = useState<boolean>(false);
+  const [showRecurringConfirmation, setShowRecurringConfirmation] = useState<boolean>(false);
+  const [taskRecurringInfo, setTaskRecurringInfo] = useState(null);
+  const [showRecurringDelete, setShowRecurringDelete] = useState<boolean>(false);
+  const [showSingleDelete, setShowSingleDelete] = useState<boolean>(false);
   const priorityOptionList = useMemo(
     () => priorityOptions.map((option) => ({ ...option, text: `${option.value} - ${option.text}` })),
     [],
   );
-
   const showCode = useMemo(() => {
     return inputs?.Id ? `${production?.ShowCode}${production?.Code}-${inputs.Code}` : null;
   }, [inputs?.Id, production?.ShowCode, production?.Code, inputs.Code]);
@@ -129,6 +163,10 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
   }, [users]);
 
   const handleOnChange = (e: any) => {
+    if (taskRecurringInfo === null) {
+      setTaskRecurringInfo(inputs);
+    }
+
     let { id, value, checked } = e.target;
     if (
       [
@@ -143,13 +181,18 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
     )
       value = parseInt(value, 10);
 
+    if (checked != null) {
+      setIsRecurring(checked);
+    }
+
     if (id === 'RepeatInterval' && checked) {
+      setIsRecurring(checked);
       value = 'once';
     }
 
     let newInputs = { ...inputs, [id]: value };
     if (id === 'Progress' && value === 100) {
-      newInputs = { ...newInputs, DueDate: moment.utc(new Date(), 'DD/MM/YY').toString() };
+      newInputs = { ...newInputs, TaskCompletedDate: moment.utc(new Date(), 'DD/MM/YY').toString() };
       setInputs(newInputs);
     } else {
       setInputs(newInputs);
@@ -158,51 +201,128 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
     setStatus({ ...status, submitted: false });
   };
 
-  // NEED TO REPLACE THIS WITH THE NEW CODE REFERENCING THE NEW TABLE
-  // const repeatInterval: boolean = inputs?.RepeatInterval === 'once';
-  const repeatInterval = true;
-  const handleMasterTask = async () => {
-    try {
-      omit(inputs, ['DueDate', 'Progress', 'ProductionId']);
-      if (inputs.Id) {
-        await axios.post('/api/tasks/master/update', inputs);
-        setLoading(false);
-        onClose();
-        setInputs(DEFAULT_MASTER_TASK);
-      } else {
-        const endpoint = '/api/tasks/master/create';
-        await axios.post(endpoint, inputs);
-        setLoading(false);
-        onClose();
-        setInputs(DEFAULT_MASTER_TASK);
-      }
-    } catch (error) {
-      setLoading(false);
+  const getNewTasksNum = (prodStartDate: Date, taskRepeatFromWeekNum, taskRepeatToWeekNum, repeatInterval): number => {
+    let taskStartDate = addDurationToDate(prodStartDate, taskRepeatFromWeekNum * 7, true);
+    const taskEndDate = addDurationToDate(prodStartDate, taskRepeatToWeekNum * 7, true);
+
+    const multiplier = repeatInterval === 'biweekly' ? 2 : 1;
+    let counter = 0;
+
+    while (taskStartDate <= taskEndDate) {
+      counter++;
+      taskStartDate =
+        repeatInterval === 'monthly'
+          ? addOneMonth(taskStartDate)
+          : addDurationToDate(taskStartDate, 7 * multiplier, true);
+    }
+
+    return counter;
+  };
+
+  const checkIfRecurringModal = async (isRecurring: boolean, previousInfo, newInfo) => {
+    if (isMasterTask) {
+      await handleOnSubmit();
       onClose();
       setInputs(DEFAULT_MASTER_TASK);
+      return;
+    } else {
+      if (previousInfo === null) {
+        await handleOnSubmit();
+        onClose();
+        setInputs(DEFAULT_MASTER_TASK);
+        return;
+      }
+    }
+
+    const fieldsToCheck = ['TaskRepeatToWeekNum', 'TaskRepeatFromWeekNum', 'RepeatInterval'];
+    let differenceInObj = false;
+    fieldsToCheck.forEach((field) => {
+      if (newInfo[field] !== previousInfo[field]) {
+        differenceInObj = true;
+      }
+    });
+
+    if (!differenceInObj) {
+      await handleOnSubmit();
+      onClose();
+    } else if (previousInfo?.Name === undefined) {
+      await handleOnSubmit();
+      onClose();
+    } else {
+      setShowRecurringConfirmation(true);
+    }
+  };
+
+  const getNumTaskDifference = (previousTaskInfo, updatedTaskInfo, production) => {
+    if (previousTaskInfo?.Name === null) {
+      setShowRecurringConfirmation(false);
+      handleOnSubmit();
+    }
+
+    const previousTasks = getNewTasksNum(
+      new Date(production?.StartDate),
+      previousTaskInfo?.TaskRepeatFromWeekNum,
+      previousTaskInfo?.TaskRepeatToWeekNum,
+      previousTaskInfo?.RepeatInterval,
+    );
+
+    const updatedTasks = getNewTasksNum(
+      new Date(production?.StartDate),
+      updatedTaskInfo?.TaskRepeatFromWeekNum,
+      updatedTaskInfo?.TaskRepeatToWeekNum,
+      updatedTaskInfo?.RepeatInterval,
+    );
+    return updatedTasks - previousTasks;
+  };
+
+  const handleMasterTask = async () => {
+    omit(inputs, ['TaskCompleteByIsPostProduction', 'TaskStartByIsPostProduction', 'ProductionTaskRepeat']);
+    if (inputs.Id) {
+      try {
+        await axios.post(`/api/tasks/master/update/${inputs?.RepeatInterval ? 'recurring' : 'single'}`, inputs);
+        setLoading(false);
+        handleClose();
+      } catch (error) {
+        setLoading(false);
+      }
+    } else {
+      try {
+        const endpoint = `/api/tasks/master/create/${inputs?.RepeatInterval ? 'recurring' : 'single'}/`;
+        await axios.post(endpoint, inputs);
+        setLoading(false);
+        if (isChecked) {
+          await handleMasterTask();
+        }
+        onClose();
+      } catch (error) {
+        setLoading(false);
+        console.error(error);
+      }
     }
   };
 
   const handleOnSubmit = async () => {
-    setLoading(true);
+    setLoading(false);
     if (isMasterTask) {
-      handleMasterTask();
+      await handleMasterTask();
     } else {
-      omit(inputs, ['TaskCompleteByIsPostProduction', 'TaskStartByIsPostProduction']);
+      omit(inputs, ['TaskCompleteByIsPostProduction', 'TaskStartByIsPostProduction', 'ProductionTaskRepeat']);
       if (inputs.Id) {
         try {
-          await axios.post('/api/tasks/update', inputs);
+          await axios.post(`/api/tasks/update${inputs?.RepeatInterval ? '/recurring' : ''}`, inputs);
           setLoading(false);
-          onClose();
+          handleClose();
         } catch (error) {
           setLoading(false);
         }
       } else {
         try {
-          const endpoint = '/api/tasks/create/single/';
+          const endpoint = `/api/tasks/create/${inputs?.RepeatInterval ? 'recurring' : 'single'}/`;
           await axios.post(endpoint, inputs);
           setLoading(false);
-          handleMasterTask();
+          if (isChecked) {
+            await handleMasterTask();
+          }
           onClose();
         } catch (error) {
           setLoading(false);
@@ -214,6 +334,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
 
   const handleClose = () => {
     onClose();
+    setLoading(false);
     setInputs(DEFAULT_MASTER_TASK);
     setIsCloned(false);
   };
@@ -222,12 +343,34 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
     setIsCloned(true);
   };
 
-  const handleConfirm = () => {
-    setConfirm(true);
+  const handleDeletePress = () => {
+    if (isMasterTask) {
+      setShowSingleDelete(true);
+    } else {
+      if (!isNullOrEmpty(inputs?.PRTId)) {
+        setShowRecurringDelete(true);
+      } else {
+        setShowSingleDelete(true);
+      }
+    }
   };
 
-  const handleDelete = async () => {
-    setConfirm(false);
+  const handleRecurringDelete = async (selectOption) => {
+    try {
+      await axios.post(`/api/tasks/delete/recurring`, {
+        selectOption,
+        taskId: inputs.Id,
+        PRTId: inputs.PRTId,
+        weekStart: inputs.StartByWeekNum,
+      });
+      setLoading(false);
+      onClose();
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSingleDelete = async () => {
     setLoading(true);
     if (isMasterTask) {
       try {
@@ -246,6 +389,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
         setLoading(false);
       }
     }
+    setShowSingleDelete(false);
   };
 
   return (
@@ -265,6 +409,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
             id="Name"
             onChange={handleOnChange}
             value={inputs?.Name}
+            testId="txt-task-name"
           />
         </div>
         <div className="col-span-2 col-start-4 flex items-center justify-between">
@@ -276,6 +421,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
             placeholder="Code is assigned when task is created"
             onChange={handleOnChange}
             value={isMasterTask ? inputs?.Code?.toString() : showCode}
+            testId="txt-task-code"
           />
         </div>
         <div className="col-span-2 col-start-4 flex items-center">
@@ -283,10 +429,12 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
             <Label className="!text-secondary pr-6 mr-4" text="Start By" />
             <Select
               value={inputs?.StartByWeekNum}
-              options={weekOptions}
+              options={getWeekOptions(production, isMasterTask, !isMasterTask)}
               placeholder="Week No."
               onChange={(value) => handleOnChange({ target: { id: 'StartByWeekNum', value } })}
-              className="w-32"
+              className="w-52"
+              isSearchable={true}
+              testId="sel-task-start-week"
             />
           </div>
           <div className="flex ml-10">
@@ -294,9 +442,11 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
             <Select
               onChange={(value) => handleOnChange({ target: { id: 'CompleteByWeekNum', value } })}
               value={inputs?.CompleteByWeekNum}
-              options={weekOptions}
+              options={getWeekOptions(production, isMasterTask, !isMasterTask)}
               placeholder="Week No."
-              className="w-32"
+              className="w-52"
+              isSearchable={true}
+              testId="sel-task-complete-week"
             />
           </div>
         </div>
@@ -309,6 +459,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
               className="w-32"
               placeholder="Priority"
               options={priorityOptionList}
+              testId="sel-task-priority"
             />
           </div>
           <div className="flex ml-2">
@@ -321,14 +472,16 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
               isSearchable
               className="w-32"
               options={generatePercentageOptions}
+              testId="sel-task-progress"
             />
           </div>
           <div className="flex ml-2">
             <Label className="!text-secondary pr-6" text="Completed on" />
             <DateInput
               disabled={isMasterTask || !inputs.Progress || inputs.Progress < 100}
-              value={inputs?.DueDate}
-              onChange={(value) => handleOnChange({ target: { id: 'DueDate', value } })}
+              value={inputs?.TaskCompletedDate}
+              onChange={(value) => handleOnChange({ target: { id: 'TaskCompletedDate', value } })}
+              testId="dat-task-complete-date"
             />
           </div>
         </div>
@@ -337,44 +490,53 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
           <div className="flex">
             <Label className="!text-secondary pr-2" text="Only Once" />
             <Checkbox
-              id="RepeatInterval"
-              checked={repeatInterval}
-              onChange={(event) => handleOnChange({ target: { id: 'RepeatInterval', checked: event.target.checked } })}
+              id="isRecurring"
+              checked={isRecurring}
+              onChange={(event) => handleOnChange({ target: { id: 'isRecurring', checked: event.target.checked } })}
+              testId="chk-task-is-recurring"
             />
           </div>
-          <div className="flex">
-            <Label className="!text-secondary px-2" text="Repeat" />
-            <Select
-              onChange={(value) => handleOnChange({ target: { id: 'RepeatInterval', value } })}
-              value={!inputs?.Id}
-              className="w-44"
-              options={RepeatOptions}
-              placeholder="Select..."
-              disabled={repeatInterval}
-            />
-          </div>
-          <div className="flex ml-2">
-            <Label className="!text-secondary pr-2" text="From" />
-            <Select
-              onChange={(value) => handleOnChange({ target: { id: 'TaskRepeatFromWeekNum', value } })}
-              value={!inputs?.Id}
-              options={weekOptions}
-              className="w-32"
-              placeholder="Week No."
-              disabled={repeatInterval}
-            />
-          </div>
-          <div className="flex ml-2">
-            <Label className="!text-secondary pr-2" text="To" />
-            <Select
-              onChange={(value) => handleOnChange({ target: { id: 'TaskRepeatToWeekNum', value } })}
-              value={!inputs?.Id}
-              options={weekOptions}
-              disabled={repeatInterval}
-              placeholder="Week No."
-              className="w-32"
-            />
-          </div>
+          {!isRecurring && (
+            <div className="flex">
+              <Label className="!text-secondary px-2" text="Repeat" />
+              <Select
+                onChange={(value) => handleOnChange({ target: { id: 'RepeatInterval', value } })}
+                value={inputs?.RepeatInterval}
+                className="w-44"
+                options={RepeatOptions}
+                placeholder="Select..."
+                testId="sel-task-repeat-interval"
+              />
+            </div>
+          )}
+          {!isRecurring && (
+            <div className="flex ml-2">
+              <Label className="!text-secondary pr-2" text="From" />
+              <Select
+                onChange={(value) => handleOnChange({ target: { id: 'TaskRepeatFromWeekNum', value } })}
+                value={inputs?.TaskRepeatFromWeekNum}
+                options={getWeekOptions(production, isMasterTask, false)}
+                className="w-32"
+                placeholder="Week No."
+                isSearchable={true}
+                testId="sel-task-repeat-from"
+              />
+            </div>
+          )}
+          {!isRecurring && (
+            <div className="flex ml-2">
+              <Label className="!text-secondary" text="To" />
+              <Select
+                onChange={(value) => handleOnChange({ target: { id: 'TaskRepeatToWeekNum', value } })}
+                value={inputs?.TaskRepeatToWeekNum}
+                options={getWeekOptions(production, isMasterTask, false)}
+                placeholder="Week No."
+                className="w-32"
+                isSearchable={true}
+                testId="sel-task-repeat-to"
+              />
+            </div>
+          )}
         </div>
         <div className="flex">
           <Label className="!text-secondary pr-6 mr-4" text="Assigned to" />
@@ -384,6 +546,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
             options={usersList}
             placeholder="Select Assignee"
             className="w-64"
+            testId="sel-task-assigned-to"
           />
         </div>
         <div>
@@ -394,20 +557,24 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
             value={inputs?.Notes}
             className="w-full min-h-14"
             id="Notes"
+            testId="txt-task-notes"
           />
         </div>
         {!inputs.Id && (
           <div className="flex justify-between">
             <div />
-            <div className="flex">
-              <Label className="!text-secondary pr-2" text="Add to Master Task List" />
-              <Checkbox
-                id="addToMasterTask"
-                checked={isChecked}
-                disabled={isMasterTask}
-                onChange={() => setIsChecked(!isChecked)}
-              />
-            </div>
+
+            {!isMasterTask && (
+              <div className="flex">
+                <Label className="!text-secondary pr-2" text="Add to Master Task List" />
+                <Checkbox
+                  id="addToMasterTask"
+                  checked={isChecked}
+                  onChange={() => setIsChecked(!isChecked)}
+                  testId="chk-task-add-master"
+                />
+              </div>
+            )}
           </div>
         )}
         <div className="flex justify-between">
@@ -416,26 +583,62 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
             <Button variant="secondary" onClick={onClose} className="mr-4 w-[132px]" text="Cancel" />
             {inputs.Id && (
               <>
-                <Button variant="tertiary" onClick={handleConfirm} className="mr-4 w-[132px]" text="Delete" />
-                <Button variant="primary" onClick={handleClone} className="mr-4 w-[132px]" text="Clone this Task" />
+                <Button
+                  variant="tertiary"
+                  onClick={handleDeletePress}
+                  className="mr-4 w-[132px]"
+                  text="Delete"
+                  testId="btn-task-delete"
+                />
+                <Button
+                  variant="primary"
+                  onClick={handleClone}
+                  className="mr-4 w-[132px]"
+                  text="Clone this Task"
+                  testId="btn-task-clone"
+                />
               </>
             )}
             <Button
               variant="primary"
               className="w-[132px]"
-              onClick={handleOnSubmit}
+              onClick={() => {
+                return checkIfRecurringModal(isRecurring, taskRecurringInfo, inputs);
+              }}
               text={inputs.Id ? 'Save' : 'Create New Task'}
+              testId="btn-task-save"
             />
           </div>
         </div>
+        {showRecurringConfirmation && (
+          <RecurringTasksPopup
+            visible={showRecurringConfirmation}
+            onClose={() => {
+              setShowRecurringConfirmation(false);
+            }}
+            numTaskChange={getNumTaskDifference(taskRecurringInfo, inputs, production)}
+            onSubmit={() => {
+              handleOnSubmit();
+            }}
+            isNewTask={inputs?.Id === undefined}
+          />
+        )}
       </form>
+
+      <DeleteRecurringPopup
+        visible={showRecurringDelete}
+        onClose={() => {
+          setShowRecurringDelete(false);
+        }}
+        onSubmit={handleRecurringDelete}
+      />
 
       <ConfirmationDialog
         variant="delete"
-        show={confirm}
-        onYesClick={handleDelete}
-        onNoClick={() => setConfirm(false)}
-        hasOverlay={true}
+        show={showSingleDelete}
+        onYesClick={handleSingleDelete}
+        onNoClick={() => setShowSingleDelete(false)}
+        hasOverlay={false}
       />
     </PopupModal>
   );

@@ -33,9 +33,14 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       },
     });
 
-    await prisma.User.update({
-      where: { Email: email },
-      data: { FirstName: reqBody.firstName, LastName: reqBody.lastName },
+    const result = await prisma.AccountContact.findFirst({
+      where: { AccContAccountId: AccountId },
+      select: { AccContId: true },
+    });
+
+    await prisma.AccountContact.update({
+      where: { AccContId: result.AccContId },
+      data: { AccContFirstName: reqBody?.firstName, AccContLastName: reqBody?.lastName },
     });
 
     res.status(200).json({ status: 'Success' });

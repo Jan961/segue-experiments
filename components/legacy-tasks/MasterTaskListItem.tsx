@@ -13,7 +13,7 @@ import axios from 'axios';
 import { omit } from 'radash';
 import { loggingService } from 'services/loggingService';
 import { Spinner } from 'components/global/Spinner';
-import { getWeekOptions } from 'utils/getTaskDateStatus';
+import { getWeekOptions } from 'utils/taskDate';
 import { FormInputSelect } from 'components/global/forms/FormInputSelect';
 
 interface TaskListItemProps {
@@ -28,7 +28,7 @@ const TaskListItem = ({ task }: TaskListItemProps) => {
   const [showDeleteConfirmation, setShowDeleteConfirmation] = React.useState(false);
   const { users = {} } = useRecoilValue(userState);
   const assignedToUser = useMemo(() => users[task.AssignedToUserId], [task, users]);
-  const weekOptions = useMemo(() => getWeekOptions(''), []);
+  const weekOptions = useMemo(() => getWeekOptions(null, true, false), []);
   // const toggleSelected = () => {
   //   setBulkSelection({ ...bulkSelection, [task.Id]: !bulkSelection[task.Id] });
   // };
@@ -118,7 +118,7 @@ const TaskListItem = ({ task }: TaskListItemProps) => {
           <Spinner className="w-full" size="lg" />
         </div>
       )}
-      <Table.Row className={`!bg-transparent !bg-opacity-[unset] [&>td]:!border-x-0`} hover>
+      <Table.Row className="!bg-transparent !bg-opacity-[unset] [&>td]:!border-x-0" hover>
         {/* <Table.Cell>
           <FormInputCheckbox value={bulkSelection[task.Id]} onChange={toggleSelected} minimal />
         </Table.Cell> */}
@@ -162,7 +162,7 @@ const TaskListItem = ({ task }: TaskListItemProps) => {
       </Table.Row>
       {showDeleteConfirmation && (
         <DeleteConfirmation
-          title={'Delete Master task'}
+          title="Delete Master task"
           onConfirm={onDeleteTask}
           onCancel={() => setShowDeleteConfirmation(false)}
         >
