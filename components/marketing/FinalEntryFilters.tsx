@@ -117,6 +117,7 @@ const FinalEntryFilters = () => {
         options={bookingOptions}
         isClearable
         isSearchable
+        testId="selectBooking"
       />
     </div>
   );

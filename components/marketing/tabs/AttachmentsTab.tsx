@@ -182,7 +182,12 @@ const AttachmentsTab = forwardRef<AttachmentsTabRef, AttachmentsTabProps>((props
         <div>
           <div className="flex flex-row justify-between items-center mb-4">
             <div className="text-xl text-primary-navy font-bold">Venue Attachments</div>
-            <Button text="Upload New File" className="w-[160px]" onClick={() => toggleUploadModal('Venue')} />
+            <Button
+              text="Upload New File"
+              className="w-[160px]"
+              onClick={() => toggleUploadModal('Venue')}
+              testId="btnUpdFileByVenue"
+            />
           </div>
 
           <div className="mb-5">
@@ -193,12 +198,18 @@ const AttachmentsTab = forwardRef<AttachmentsTabRef, AttachmentsTabProps>((props
               tableHeight={250}
               onCellClicked={(e) => handleCellClicked(e)}
               onCellValueChange={handleCellValueChange}
+              testId="tableVenueAttach"
             />
           </div>
 
           <div className="flex flex-row justify-between items-center mb-4">
             <div className="text-xl text-primary-navy font-bold">Production Attachments</div>
-            <Button text="Upload New File" className="w-[160px]" onClick={() => toggleUploadModal('Production')} />
+            <Button
+              text="Upload New File"
+              className="w-[160px]"
+              onClick={() => toggleUploadModal('Production')}
+              testId="btnUpdProdAttach"
+            />
           </div>
 
           <Table
@@ -208,6 +219,7 @@ const AttachmentsTab = forwardRef<AttachmentsTabRef, AttachmentsTabProps>((props
             tableHeight={250}
             onCellClicked={(e) => handleCellClicked(e)}
             onCellValueChange={handleCellValueChange}
+            testId="tableProdAttach"
           />
 
           <UploadModal
@@ -226,6 +238,7 @@ const AttachmentsTab = forwardRef<AttachmentsTabRef, AttachmentsTabProps>((props
             onYesClick={() => deleteAttachment(attachRow, attachIndex)}
             onNoClick={() => setShowConfirm(false)}
             hasOverlay={false}
+            testId="confDialog"
           />
         </div>
       );
