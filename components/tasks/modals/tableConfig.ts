@@ -1,4 +1,5 @@
 import DefaultCellRenderer from 'components/core-ui-lib/Table/renderers/DefaultCellRenderer';
+import MasterTaskNameRenderer from './renderers/MasterTaskNameRenderer';
 
 const getUser = (usersList, id) => {
   const userData = usersList.filter((user) => user.value === id);
@@ -31,7 +32,7 @@ export const getMasterTasksColumnDefs = (usersList = []) => {
     {
       headerName: 'Task Name',
       field: 'Name',
-      cellRenderer: DefaultCellRenderer,
+      cellRenderer: MasterTaskNameRenderer,
       width: 445,
       flex: 1,
     },

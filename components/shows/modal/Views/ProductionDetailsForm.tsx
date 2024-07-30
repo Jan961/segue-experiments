@@ -19,6 +19,7 @@ import { productionFormSchema } from './schema';
 import { debug } from 'utils/logging';
 import { uploadStrings } from 'config/upload';
 import axios from 'axios';
+import classNames from 'classnames';
 
 export interface ProductionFormData {
   id?: number;
@@ -55,7 +56,7 @@ export const defaultProductionFormData: ProductionFormData = {
   company: null,
   email: null,
   frequency: 'W',
-  isArchived: null,
+  isArchived: false,
   prodCode: null,
   imageUrl: '',
   image: null,
@@ -164,7 +165,11 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
     >
       <form className="flex flex-col gap-4 w-[520px] mt-4">
         <div className="flex items-end gap-6 col-span-3 row-start-3">
-          <div className="flex items-center gap-4 col-span-5">
+          <div
+            className={classNames('flex items-center gap-4 col-span-5', {
+              'opacity-30 pointer-events-none cursor-not-allowed': production.isArchived,
+            })}
+          >
             <div
               className="bg-gray-300 w-44 h-32 flex items-center justify-center cursor-pointer"
               onClick={() => setIsUploadOpen(true)}
@@ -188,6 +193,7 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
                 error={validationErrors?.prodCode}
                 maxlength={10}
                 required
+                disabled={production.isArchived}
               />
               <Tooltip>
                 <Icon iconName="info-circle-solid" variant="2xl" />
@@ -224,6 +230,7 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
               from: rehearsalDateBlock?.StartDate ? new Date(rehearsalDateBlock?.StartDate) : null,
               to: rehearsalDateBlock?.EndDate ? new Date(rehearsalDateBlock?.EndDate) : null,
             }}
+            disabled={production.isArchived}
           />
         </div>
         <div className="flex-col">
@@ -241,6 +248,7 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
                 from: productionDateBlock?.StartDate ? new Date(productionDateBlock?.StartDate) : null,
                 to: productionDateBlock?.EndDate ? new Date(productionDateBlock?.EndDate) : null,
               }}
+              disabled={production.isArchived}
             />
           </div>
           {validationErrors.productionDateBlock && (
@@ -258,6 +266,7 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
               value={region}
               isMulti={true}
               renderOption={(option) => <CustomOption option={option} isMulti={true} />}
+              disabled={production.isArchived}
             />
           </div>
           {validationErrors.region && <small className="text-red-400">{validationErrors.region}</small>}
@@ -267,10 +276,12 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
             <Label required text="Currency for Reports" />
             <Select
               className="flex-1"
+              placeholder="Select Currency for Reports"
               onChange={(value) => onChange('currency', value as string)}
               options={currencyListOptions}
               value={currency}
               isSearchable
+              disabled={production.isArchived}
             />
           </div>
           {validationErrors.currency && <small className="text-red-400">{validationErrors.currency}</small>}
@@ -284,6 +295,7 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
               onChange={(value) => onChange('company', value as string)}
               options={productionCompanyOptions}
               value={company}
+              disabled={production.isArchived}
             />
           </div>
           {validationErrors.company && <small className="text-red-400">{validationErrors.company}</small>}
@@ -297,15 +309,18 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
             type="string"
             onChange={(e) => onChange('email', e.target.value)}
             value={email}
+            disabled={production.isArchived}
           />
         </div>
         <div className="flex items-center gap-4">
           <Label text="Input Frequency of Sales Figures" />
           <Select
+            placeholder="Select Frequency of Sales"
             className="w-[150px]"
             onChange={(value) => onChange('frequency', value as string)}
             options={SALES_FIG_OPTIONS}
             value={frequency}
+            disabled={production.isArchived}
           />
         </div>
         <div className="flex items-center gap-[45px]">
@@ -314,6 +329,7 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
             className="w-28 placeholder-primary"
             onChange={({ hrs, min }) => onChange('runningTime', `${hrs || ''}:${min || ''}`)}
             value={runningTime}
+            disabled={production.isArchived}
           />
         </div>
         <div className="flex items-center gap-[85px]">
@@ -325,6 +341,7 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
             type="string"
             onChange={(e) => onChange('runningTimeNote', e.target.value)}
             value={runningTimeNote}
+            disabled={production.isArchived}
           />
         </div>
         <div className="flex items-center ml-1 float-end justify-end">
@@ -335,8 +352,7 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
             onChange={(e) => onChange('isArchived', e.target.checked)}
           />
         </div>
-
-        <div className="pt-3 w-full flex items-center justify-end gap-2">
+        <div className="w-full flex items-center justify-end gap-2">
           <Button onClick={onClose} className="float-right px-4 w-33 font-normal" variant="secondary" text="Cancel" />
           <Button
             className="float-right px-4 font-normal w-33 text-center"
