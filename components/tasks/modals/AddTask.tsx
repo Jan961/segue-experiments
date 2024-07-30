@@ -127,6 +127,7 @@ const AddTask = ({
   const [taskRecurringInfo, setTaskRecurringInfo] = useState(null);
   const [showRecurringDelete, setShowRecurringDelete] = useState<boolean>(false);
   const [showSingleDelete, setShowSingleDelete] = useState<boolean>(false);
+  const [showConfirmationDialog, setShowConfirmationDialog] = useState<boolean>(false);
   const priorityOptionList = useMemo(
     () => priorityOptions.map((option) => ({ ...option, text: `${option.value} - ${option.text}` })),
     [],
@@ -403,10 +404,30 @@ const AddTask = ({
     setShowSingleDelete(false);
   };
 
+  const checkFieldsUpdated = () => {
+    if (taskRecurringInfo === null) return false;
+    for (const key in inputs) {
+      if (taskRecurringInfo?.key) {
+        return true;
+      } else if (taskRecurringInfo[key] !== inputs[key]) {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  const handleCancel = () => {
+    if (checkFieldsUpdated()) {
+      setShowConfirmationDialog(true);
+    } else {
+      handleClose();
+    }
+  };
+
   return (
     <PopupModal
       show={visible}
-      onClose={handleClose}
+      onClose={handleCancel}
       title={inputs.Id ? 'Edit Task' : 'Create New Task'}
       titleClass="text-primary-navy text-xl mb-4"
     >
@@ -592,7 +613,7 @@ const AddTask = ({
         <div className="flex justify-between">
           <div />
           <div className="flex">
-            <Button variant="secondary" onClick={onClose} className="mr-4 w-[132px]" text="Cancel" />
+            <Button variant="secondary" onClick={handleCancel} className="mr-4 w-[132px]" text="Cancel" />
             {inputs.Id && (
               <>
                 <Button
@@ -652,6 +673,17 @@ const AddTask = ({
         onNoClick={() => setShowSingleDelete(false)}
         hasOverlay={false}
       />
+      <ConfirmationDialog
+        variant="cancel"
+        show={showConfirmationDialog}
+        onNoClick={() => {
+          setShowConfirmationDialog(false);
+        }}
+        onYesClick={() => {
+          setShowConfirmationDialog(false);
+          onClose();
+        }}
+       />
     </PopupModal>
   );
 };
