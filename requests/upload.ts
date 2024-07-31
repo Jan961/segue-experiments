@@ -61,7 +61,7 @@ export const uploadFile = async (
   }
 };
 
-export const uploadFileNoModal = async (file: FormData, progress: number, slowProgressInterval) => {
+export const headlessUpload = async (file: FormData, progress: number, slowProgressInterval) => {
   if (isNullOrEmpty(file.get('file'))) {
     const response = await axios.post('/api/upload', file, {
       onUploadProgress: (progressEvent) => {
@@ -88,12 +88,12 @@ export const uploadFileNoModal = async (file: FormData, progress: number, slowPr
   }
 };
 
-export const uploadMultipleFilesNoModal = async (fileList: FormData[], callback: (response: any) => Promise<void>) => {
+export const headlessUploadMultiple = async (fileList: FormData[], callback: (response: any) => Promise<void>) => {
   let progress = 0; // to track overall progress
   let slowProgressInterval; // interval for slow progress simulation
   await Promise.all(
     fileList.map(async (file) => {
-      const response = await uploadFileNoModal(file, progress, slowProgressInterval);
+      const response = await headlessUpload(file, progress, slowProgressInterval);
       progress = 100;
       clearInterval(slowProgressInterval);
       await callback(response);
