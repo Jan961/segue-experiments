@@ -1,7 +1,6 @@
 SELECT
   `ProductionView`.`ProductionId` AS `ProductionId`,
   `ProductionView`.`FullProductionCode` AS `FullProductionCode`,
-  `ProductionView`.`ShowName` AS `ShowName`,
   `frtxigoo_dev`.`Venue`.`VenueCode` AS `VenueCode`,
   `frtxigoo_dev`.`Venue`.`VenueName` AS `VenueName`,
   `frtxigoo_dev`.`Booking`.`BookingId` AS `BookingId`,
