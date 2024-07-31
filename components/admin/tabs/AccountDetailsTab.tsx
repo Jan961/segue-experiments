@@ -8,7 +8,7 @@ import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import { transformToOptions } from 'utils';
 import { Label } from 'components/core-ui-lib';
 import schema from './AccountDetailsValidationSchema';
-import { ImageUpload } from '../ImageUpload/ImageUpload';
+import { AccountLogoUpload } from '../AccountLogoUpload/AccountLogoUpload';
 
 export default function AccountDetailsTab() {
   const [formData, setFormData] = useState<UiAccountType>({ ...initialUiAccountDetails });
@@ -235,7 +235,7 @@ export default function AccountDetailsTab() {
           </div>
         </div>
         <div className="flex flex-col gap-3 w-1/2">
-          <ImageUpload />
+          <AccountLogoUpload />
           <FormField
             currentValue={formData.companyEmail}
             displayText="Email Address"
