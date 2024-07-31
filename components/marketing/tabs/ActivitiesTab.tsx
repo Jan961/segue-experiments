@@ -452,13 +452,18 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
               checked={onSaleCheck}
               onChange={(e) => editBooking('ticketsOnSale', e.target.checked)}
               className="w-[19px] h-[19px] mt-[2px]"
+              testId="checkOnSale"
             />
             <div className="text-base text-primary-input-text font-bold ml-2">On Sale</div>
           </div>
 
           <div className="flex flex-row">
             <div className="text-base text-primary-input-text font-bold mt-1 mr-2">Due to go On Sale</div>
-            <DateInput onChange={(value) => editBooking('ticketsOnSaleFromDate', value)} value={onSaleFromDt} />
+            <DateInput
+              onChange={(value) => editBooking('ticketsOnSaleFromDate', value)}
+              value={onSaleFromDt}
+              testId="dtInOnSaleDate"
+            />
           </div>
 
           <div className="flex flex-row mt-1">
@@ -468,6 +473,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
               checked={marketingPlansCheck}
               onChange={(e) => editBooking('marketingPlanReceived', e.target.checked)}
               className="w-[19px] h-[19px] mt-[2px]"
+              testId="checkMarketPlanIn"
             />
             <div className="text-base text-primary-input-text font-bold ml-2">Marketing Plans Received</div>
           </div>
@@ -479,6 +485,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
               checked={printReqCheck}
               onChange={(e) => editBooking('printReqsReceived', e.target.checked)}
               className="w-[19px] h-[19px] mt-[2px]"
+              testId="checkPrintReqIn"
             />
             <div className="text-base text-primary-input-text font-bold ml-2">Print Requirements Received</div>
           </div>
@@ -490,6 +497,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
               checked={contactInfoCheck}
               onChange={(e) => editBooking('contactInfoReceived', e.target.checked)}
               className="w-[19px] h-[19px] mt-[2px]"
+              testId="checkContactInfoIn"
             />
             <div className="text-base text-primary-input-text font-bold ml-2">Contact Info Received</div>
           </div>
@@ -507,10 +515,15 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
                   onChange={(value) => editBooking('marketingCostsStatus', value.toString())}
                   placeholder="Select Approval Status"
                   isClearable={false}
+                  testId="selectApprStat"
                 />
               </div>
               <div className="flex flex-col mt-8 ml-8">
-                <DateInput onChange={(value) => editBooking('marketingCostsApprovalDate', value)} value={changeDate} />
+                <DateInput
+                  onChange={(value) => editBooking('marketingCostsApprovalDate', value)}
+                  value={changeDate}
+                  testId="dtInApprDate"
+                />
               </div>
               <div className="flex flex-col ml-8 mt-1">
                 <TextArea
@@ -519,6 +532,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
                   placeholder="Notes Field"
                   onBlur={(e) => editBooking('marketingCostsNotes', e.target.value)}
                   onChange={(e) => setChangeNotes(e.target.value)}
+                  testId="textAreaCostNotes"
                 />
               </div>
             </div>
@@ -531,12 +545,20 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
               iconProps={{ className: 'h-4 w-3' }}
               sufixIconName="excel"
               onClick={onExport}
+              testId="btnActivityRep"
             />
-            <Button text="Add New Activity" className="w-[160px]" onClick={addActivity} />
+
+            <Button text="Add New Activity" className="w-[160px]" onClick={addActivity} testId="btnAddNewAct" />
           </div>
         </div>
         <div className="w-[1086px] h-[375px]">
-          <Table columnDefs={actColDefs} rowData={actRowData} styleProps={styleProps} tableHeight={250} />
+          <Table
+            columnDefs={actColDefs}
+            rowData={actRowData}
+            styleProps={styleProps}
+            tableHeight={250}
+            testId="tableActivity"
+          />
 
           <div
             className={classNames(
@@ -578,7 +600,13 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
         <div className="leading-6 text-xl text-primary-input-text font-bold mt-1 flex-row">Global Activities</div>
 
         <div className="w-[1086px] h-[500px]">
-          <Table columnDefs={globalColDefs} rowData={globalRowData} styleProps={styleProps} tableHeight={250} />
+          <Table
+            columnDefs={globalColDefs}
+            rowData={globalRowData}
+            styleProps={styleProps}
+            tableHeight={250}
+            testId="tableGlobActivity"
+          />
 
           <div
             className={classNames(
@@ -635,6 +663,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
           onYesClick={() => saveActivity('delete', actRow)}
           onNoClick={() => setShowConfirm(false)}
           hasOverlay={false}
+          testId="modalConf"
         />
       </div>
     );

@@ -128,9 +128,27 @@ const ArchivedSalesTab = forwardRef<ArchSalesTabRef, ArchSalesProps>((props, ref
       <div>
         <div>
           <div className="flex flex-row gap-4 mb-5">
-            <Button text="For this Venue" className="w-[132px]" onClick={() => showArchSalesComp('venue')} />
-            <Button text="For this Town" className="w-[132px]" onClick={() => showArchSalesComp('town')} />
-            <Button text="Any Venue / Town" className="w-[132px]" onClick={() => showArchSalesComp('both')} />
+            <Button
+              text="For this Venue"
+              className="w-[132px]"
+              onClick={() => showArchSalesComp('venue')}
+              testId="btnArchByVenue"
+            />
+
+            <Button
+              text="For this Town"
+              className="w-[132px]"
+              onClick={() => showArchSalesComp('town')}
+              testId="btnArchByTown"
+            />
+
+            <Button
+              text="Any Venue / Town"
+              className="w-[132px]"
+              onClick={() => showArchSalesComp('both')}
+              testId="btnArchByBoth"
+            />
+
             <Button
               text="Export Displayed Sales Data"
               className="w-[232px]"
@@ -138,6 +156,7 @@ const ArchivedSalesTab = forwardRef<ArchSalesTabRef, ArchSalesProps>((props, ref
               sufixIconName="excel"
               disabled={!archivedDataAvail}
               onClick={() => onExport()}
+              testId="btnExportData"
             />
 
             <ArchSalesDialog

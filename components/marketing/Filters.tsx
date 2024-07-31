@@ -161,6 +161,7 @@ const Filters = () => {
 
         <div className="flex items-center gap-4 mt-1">
           <Select
+            testId="selectBooking"
             onChange={changeBooking}
             value={selectedValue}
             disabled={!productionId}
@@ -176,23 +177,26 @@ const Filters = () => {
             disabled={!futureBookings.hasFutureBooking || !productionId}
             className="text-sm leading-8 w-[132px]"
             onClick={goToToday}
+            testId="btnGoToToday"
           />
           <Button
             text="Previous Date"
             disabled={selectedIndex === 0 || selectedValue === null || !productionId}
             className="text-sm leading-8 w-[132px]"
             onClick={goToPrevious}
+            testId="btnGoToPrev"
           />
           <Button
             text="Next Date"
             disabled={selectedIndex === bookingOptions?.length - 1 || !productionId}
             className="text-sm leading-8 w-[132px]"
             onClick={goToNext}
+            testId="btnGoToNext"
           />
 
           {/* Iframe placed next to buttons but in the same flex container */}
           <div className="self-end -mt-[60px] cursor-pointer">
-            <Iframe variant="xs" src={landingURL} className="" />
+            <Iframe variant="xs" src={landingURL} />
           </div>
         </div>
       </div>

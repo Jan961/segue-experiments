@@ -10,19 +10,16 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
 
     const companyDetails = await prisma.Account.findFirst({
       where: { AccountId: { equals: AccountId } },
+      include: {
+        AccountContact: true,
+      },
     });
-
-    const userDetails = await prisma.User.findFirst({
-      where: { Email: { equals: email } },
-    });
-
-    const completeCompanyDetails = { ...companyDetails, ...userDetails };
 
     const countryList = await prisma.Country.findMany({ select: { Id: true, Name: true } });
 
     const currencyList = await getAllCurrencyList();
 
-    res.status(200).json({ companyDetails: completeCompanyDetails, countryList, currencyList });
+    res.status(200).json({ companyDetails, countryList, currencyList });
   } catch (err) {
     console.log(err);
     res.status(500).json({ error: 'Error Updating Account Information' });

@@ -31,6 +31,7 @@ const DEFAULT_TASK: ProductionTaskDTO = {
   AssignedToUserId: 2,
   Progress: 0,
   Priority: 0,
+  TaskCompletedDate: new Date(null),
 };
 
 const TaskEditor = ({ task, triggerClose, open, recurring = false }: NewTaskFormProps) => {
@@ -191,7 +192,7 @@ const TaskEditor = ({ task, triggerClose, open, recurring = false }: NewTaskForm
           {/* <StyledDialog.FooterDelete onClick={handleDelete} disabled={creating || status.submitting}>Delete</StyledDialog.FooterDelete> */}
           <StyledDialog.FooterContinue disabled={status.submitted || status.submitting || isLoading} submit>
             <div className="flex items-center gap-2">
-              {isLoading && <Spinner size={'sm'} />}
+              {isLoading && <Spinner size="sm" />}
               {creating ? 'Create' : 'Update'}
             </div>
           </StyledDialog.FooterContinue>

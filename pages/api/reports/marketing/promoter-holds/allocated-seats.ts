@@ -29,14 +29,15 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const workbook = new ExcelJS.Workbook();
   const worksheet = workbook.addWorksheet('Allocated Seats');
 
-  createHeaderRow(worksheet, productionName, 16, 'H');
-  createHeaderRow(worksheet, venueAndDate, 14, 'H');
-  createHeaderRow(worksheet, 'Allocated Seats Report', 12, 'H');
+  createHeaderRow(worksheet, productionName, 16, 'I');
+  createHeaderRow(worksheet, venueAndDate, 14, 'I');
+  createHeaderRow(worksheet, 'Allocated Seats Report', 12, 'I');
 
   const headerRow = worksheet.addRow([
     'Perf Date',
     'Perf Time',
-    'Name / Email of Person \r\n Receiving Tickets',
+    'Name',
+    'Email',
     'Arranged by',
     'Comments',
     'Seats',
@@ -76,7 +77,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       const row = worksheet.addRow([
         date,
         time,
-        `${TicketHolderEmail} \r\n ${TicketHolderName}`,
+        TicketHolderName,
+        TicketHolderEmail,
         arrangedBy,
         Comments,
         Seats,

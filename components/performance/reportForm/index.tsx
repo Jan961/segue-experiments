@@ -11,7 +11,7 @@ import { TextField } from './TextField';
 import { TimeRange } from './TimeRange';
 import { StyledTimeField } from './StyledTimeField';
 import { GetOutField } from './GetOutField';
-import { isValidDateString, formatDuration, getDuration } from 'services/dateService';
+import { isValidDate, formatDuration, getDuration } from 'services/dateService';
 
 interface ReportFormProps {
   bookingId?: string;
@@ -31,9 +31,7 @@ const ReportForm = ({
   const { venue, town, performanceDate, performanceTime, csm, lighting, asm } = reportData ?? {};
 
   const formatPerformanceTime =
-    performanceTime !== undefined && isValidDateString(performanceTime)
-      ? format(new Date(performanceTime), 'HH:mm')
-      : '';
+    performanceTime !== undefined && isValidDate(performanceTime) ? format(new Date(performanceTime), 'HH:mm') : '';
   const {
     register,
     handleSubmit,
@@ -204,7 +202,7 @@ const ReportForm = ({
           <TextField
             label="Performance Date"
             value={
-              performanceDate !== undefined && isValidDateString(performanceDate)
+              performanceDate !== undefined && isValidDate(performanceDate)
                 ? format(new Date(performanceDate), 'eee dd/MM/yyyy')
                 : ''
             }
@@ -213,7 +211,7 @@ const ReportForm = ({
           <TextField
             label="Performance Time"
             value={
-              performanceTime !== undefined && isValidDateString(performanceTime)
+              performanceTime !== undefined && isValidDate(performanceTime)
                 ? format(new Date(performanceTime), 'HH:mm')
                 : ''
             }

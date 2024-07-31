@@ -166,6 +166,7 @@ const SalesEntryFilters: React.FC<Props> = ({ onDateChanged }) => {
               isClearable
               isSearchable
               label={tourLabel}
+              testId="selectWeek"
             />
           </div>
         </div>
@@ -181,6 +182,7 @@ const SalesEntryFilters: React.FC<Props> = ({ onDateChanged }) => {
           options={bookingOptions}
           isClearable
           isSearchable
+          testId="selectBooking"
         />
       </div>
     </div>
