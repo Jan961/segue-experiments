@@ -135,6 +135,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (!access) return res.status(401).end();
     // Validate the incoming payload
     const validatedData = await productionSchema().validate(req.body, { abortEarly: false });
+    // Ensure the Production record exists
+    const productionExists = await prisma.production.findUnique({
+      where: { Id: req.body?.id },
+    });
+
+    if (!productionExists) {
+      return res.status(404).json({ message: 'Production record not found' });
+    }
     const updateData = await prepareUpdateData(req.body);
     // Update the production record
     const updatedProduction = await prisma.production.update({
@@ -143,6 +151,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
     res.status(200).json(updatedProduction);
   } catch (error) {
+    console.log(error);
     if (error instanceof yup.ValidationError) {
       return res.status(400).json({ message: 'Validation error', errors: error.errors });
     }
