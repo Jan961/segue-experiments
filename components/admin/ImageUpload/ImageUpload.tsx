@@ -40,10 +40,9 @@ export const ImageUpload = () => {
 
   const onDelete = async () => {
     try {
-      console.log(uploadedFile.location);
       await axios.delete(`/api/file/delete?location=${uploadedFile.location}`);
-      console.log('here');
       await axios.post('/api/admin/accountDetails/accountLogo/update', { fileId: null });
+      setUploadedFile(null);
     } catch (exception) {
       console.log(exception, 'Error. Failed to delete file.');
     }
@@ -75,44 +74,45 @@ export const ImageUpload = () => {
   }, []);
 
   return (
-    <div className="h-[190px] overflow-y-hidden overflow-x-hidden bg-green-500">
-      <div className="mt-[24px] bg-red-500">
-        <div className="flex items-center justify-end gap-x-3 ">
-          <p className="text-primary-input-text">Company Logo</p>
-
+    <div className="h-[190px] overflow-y-hidden overflow-x-hidden ">
+      <div className="h-full">
+        <div className="h-full relative">
           {uploadedFile ? (
             <Image
               src={uploadedFile.imageUrl}
               alt="..."
-              width={50}
-              height={50}
               onClick={() => setOpenUploadModal(true)}
+              layout="fill"
+              style={{ cursor: 'pointer', objectPosition: 'right', objectFit: 'contain' }}
             />
           ) : (
-            <Button
-              onClick={() => {
-                setOpenUploadModal(true);
-              }}
-              text="Upload"
-              variant="secondary"
-              className="w-[132px] mr-1"
-            />
+            <div className="flex flex-col items-end">
+              <p className="text-primary-input-text mr-1">Company Logo</p>
+              <Button
+                onClick={() => {
+                  setOpenUploadModal(true);
+                }}
+                text="Upload"
+                variant="secondary"
+                className="w-[132px] mr-1"
+              />
+            </div>
           )}
-
-          <UploadModal
-            title="Upload Company Logo"
-            visible={openUploadModal}
-            info="Please upload your company logo here. Image should be no larger than 300px wide x 200px high (Max 500kb). Images in a square or portrait format will be proportionally scaled to fit with the rectangular boundary box. Suitable image formats are jpg, tiff, svg, and png."
-            allowedFormats={['image/jpg', 'image/tiff', 'image/svg', 'image/png']}
-            onClose={() => {
-              setOpenUploadModal(false);
-            }}
-            maxFileSize={1024 * 500}
-            onSave={onSave}
-            value={uploadedFile}
-            customHandleFileDelete={onDelete}
-          />
         </div>
+
+        <UploadModal
+          title="Upload Company Logo"
+          visible={openUploadModal}
+          info="Please upload your company logo here. Image should be no larger than 300px wide x 200px high (Max 500kb). Images in a square or portrait format will be proportionally scaled to fit with the rectangular boundary box. Suitable image formats are jpg, tiff, svg, and png."
+          allowedFormats={['image/jpg', 'image/tiff', 'image/svg', 'image/png']}
+          onClose={() => {
+            setOpenUploadModal(false);
+          }}
+          maxFileSize={1024 * 500}
+          onSave={onSave}
+          value={uploadedFile}
+          customHandleFileDelete={onDelete}
+        />
       </div>
     </div>
   );
