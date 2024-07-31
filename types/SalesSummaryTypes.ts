@@ -8,6 +8,7 @@ export enum BOOK_STATUS_CODES {
 export enum VENUE_CURRENCY_SYMBOLS {
   POUND = '£',
   EURO = '€',
+  USD = '$',
 }
 
 export enum SALES_TYPE_NAME {
@@ -17,6 +18,7 @@ export enum SALES_TYPE_NAME {
 
 export type TSalesView = {
   ShowName: string;
+  BookingId: string;
   ProductionId: number;
   FullProductionCode: string;
   ProductionStartDate: string;
@@ -68,6 +70,7 @@ export type TRequiredFields = {
   Seats: number;
   NotOnSalesDate: TSalesView['NotOnSalesDate'];
   SetProductionWeekNum: TSalesView['SetProductionWeekNum'];
+  BookingId: TSalesView['BookingId'];
 };
 
 export type TRequiredFieldsFinalFormat = TRequiredFields & {
