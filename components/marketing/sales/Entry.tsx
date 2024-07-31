@@ -353,30 +353,30 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
         }
       }
 
-      // holds and comps
-      const response = await axios.post('/api/marketing/sales/read/holdComp', {
-        bookingId: bookings.selected,
-        salesDate,
-      });
+      if (!previous) {
+        // holds and comps - only run if not retrieving previous values - previous is only valid for the main sales
+        const response = await axios.post('/api/marketing/sales/read/holdComp', {
+          bookingId: bookings.selected,
+          salesDate,
+          productionId,
+        });
 
-      const holdCompList = response.data;
+        const holdCompList = response.data;
 
-      console.log(holdCompList);
+        if (typeof holdCompList === 'object') {
+          const holdCompData = holdCompList as HoldCompSet;
 
-      if (typeof holdCompList === 'object') {
-        const holdCompData = holdCompList as HoldCompSet;
+          setHoldData(holdCompData.holds);
+          setCompData(holdCompData.comps);
+        }
 
-        setHoldData(holdCompData.holds);
-        setCompData(holdCompData.comps);
+        const booking = bookings.bookings.find((booking) => booking.Id === bookings.selected);
+
+        setBookingSaleNotes(booking.BookingSalesNotes === null ? '' : booking.BookingSalesNotes);
+        setCompNotes(booking.BookingCompNotes === null ? '' : booking.BookingCompNotes);
+        setHoldNotes(booking.BookingHoldNotes === null ? '' : booking.BookingHoldNotes);
+        setBookingHasSchoolSales(booking.BookingHasSchoolsSales);
       }
-
-      // get the booking details to set the notes fields
-      const booking = bookings.bookings.find((booking) => booking.Id === bookings.selected);
-
-      setBookingSaleNotes(booking.BookingSalesNotes === null ? '' : booking.BookingSalesNotes);
-      setCompNotes(booking.BookingCompNotes === null ? '' : booking.BookingCompNotes);
-      setHoldNotes(booking.BookingHoldNotes === null ? '' : booking.BookingHoldNotes);
-      setBookingHasSchoolSales(booking.BookingHasSchoolsSales);
 
       setLoading(false);
     } catch (error) {
@@ -449,13 +449,13 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
   useEffect(() => {
     const initForm = async () => {
       try {
-        setSalesDate(new Date());
-        // set the current days sales figues if available
-        setSalesFigures(new Date(), false);
+        let inputDate = new Date();
+        if (salesDate !== null) {
+          inputDate = salesDate;
+        }
 
-        // set the prev sales figures to the previously enter values
-        // not the best way but to be improved when the marketing module is being refactored in full
-        setSalesFigures(salesDate, true);
+        setSalesFigures(inputDate, false);
+        setSalesFigures(inputDate, true);
       } catch (error) {
         console.log(error);
       }

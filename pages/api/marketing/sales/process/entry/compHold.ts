@@ -2,14 +2,14 @@ import prisma from 'lib/prisma';
 
 export default async function handle(req, res) {
   try {
-    let { setId } = req.body;
+    let { setId, bookingId, salesDate } = req.body;
 
     if (setId === -1) {
       const setResult = await prisma.SalesSet.create({
         data: {
-          SetBookingId: parseInt(req.body.bookingId),
+          SetBookingId: parseInt(bookingId),
           SetPerformanceId: null,
-          SetSalesFiguresDate: req.body.salesDate,
+          SetSalesFiguresDate: salesDate,
           SetBrochureReleased: false,
           SetSingleSeats: false,
           SetNotOnSale: false,
@@ -29,9 +29,6 @@ export default async function handle(req, res) {
           SetHoldHoldTypeId: req.body.data.id,
         },
       });
-
-      console.log(currentHold);
-      console.log(setId);
 
       if (currentHold !== null) {
         await prisma.setHold.update({
@@ -62,9 +59,9 @@ export default async function handle(req, res) {
 
       if (currentComp !== null) {
         await prisma.setComp.update({
-          where: { SetCompSetId: setId },
+          where: { SetCompId: currentComp.SetCompId },
           data: {
-            SetCompSeats: req.body.field === 'seats' ? parseInt(req.body.value) : currentComp.SetCompSetId,
+            SetCompSeats: req.body.field === 'seats' ? parseInt(req.body.value) : currentComp.SetCompSeats,
           },
         });
       } else {
