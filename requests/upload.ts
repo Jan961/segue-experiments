@@ -10,6 +10,27 @@ interface UploadImageResponse {
   [key: string]: any;
 }
 
+export const onUploadProgress = (progressEvent, formData, progress, slowProgressInterval, onProgress = null) => {
+  const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+  if (percentCompleted <= 50) {
+    progress = percentCompleted;
+  } else if (percentCompleted === 100) {
+    progress = 50;
+    clearInterval(slowProgressInterval);
+    slowProgressInterval = setInterval(() => {
+      if (progress < 95) {
+        progress += 0.5;
+        if (onProgress) onProgress(formData.get('file') as File, progress);
+      } else {
+        clearInterval(slowProgressInterval);
+      }
+    }, 100);
+  }
+
+  if (onProgress) onProgress(formData.get('file') as File, progress);
+  return onUploadProgress;
+};
+
 export const uploadFile = async (
   formData: FormData,
   onProgress: (file: File, progress: number) => void,
@@ -21,25 +42,8 @@ export const uploadFile = async (
 
   try {
     const response = await axios.post<UploadImageResponse>('/api/upload', formData, {
-      onUploadProgress: (progressEvent) => {
-        const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-        if (percentCompleted <= 50) {
-          progress = percentCompleted;
-        } else if (percentCompleted === 100) {
-          progress = 50;
-          clearInterval(slowProgressInterval);
-          slowProgressInterval = setInterval(() => {
-            if (progress < 95) {
-              progress += 0.5;
-              onProgress(formData.get('file') as File, progress);
-            } else {
-              clearInterval(slowProgressInterval);
-            }
-          }, 100);
-        }
-
-        onProgress(formData.get('file') as File, progress);
-      },
+      onUploadProgress: (progressEvent) =>
+        onUploadProgress(progressEvent, formData, progress, slowProgressInterval, onProgress),
     });
 
     progress = 100;
@@ -64,22 +68,7 @@ export const uploadFile = async (
 export const headlessUpload = async (file: FormData, progress: number, slowProgressInterval) => {
   if (isNullOrEmpty(file.get('file'))) {
     const response = await axios.post('/api/upload', file, {
-      onUploadProgress: (progressEvent) => {
-        const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-        if (percentCompleted <= 50) {
-          progress = percentCompleted;
-        } else if (percentCompleted === 100) {
-          progress = 50;
-          clearInterval(slowProgressInterval);
-          slowProgressInterval = setInterval(() => {
-            if (progress < 95) {
-              progress += 0.5;
-            } else {
-              clearInterval(slowProgressInterval);
-            }
-          }, 100);
-        }
-      },
+      onUploadProgress: (progressEvent) => onUploadProgress(progressEvent, file, progress, slowProgressInterval, null),
     });
     notify.success(ToastMessages.imageUploadSuccess);
     return response;
