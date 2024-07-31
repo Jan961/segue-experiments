@@ -7,6 +7,7 @@ import { UiTransformedVenue } from 'utils/venue';
 import { UploadModal } from 'components/core-ui-lib';
 import { UploadedFile } from 'components/core-ui-lib/UploadModal/interface';
 import { techSpecsFileFormats } from '../techSpecsFileFormats';
+import { isNullOrEmpty } from '../../../utils';
 
 interface VenueTechnicalDetailsFormProps {
   venue: Partial<UiTransformedVenue>;
@@ -78,19 +79,21 @@ const VenueTechnicalDetailsForm = ({
     });
 
     for (const file of venue.files) {
-      const response = await fetch(file.FileUrl);
-      const blob = await response.blob();
-      const tempFile = new File([blob], file.name, { type: blob.type });
-      const widget: UploadedFile = {
-        size: tempFile.size,
-        name: tempFile.name,
-        imageUrl: file.imageUrl,
-        fileLocation: file.fileLocation,
-        fileId: file.id,
-      };
-      newFileWidgets.push(widget);
+      if (!isNullOrEmpty(file)) {
+        const response = await fetch(file.FileUrl);
+        const blob = await response.blob();
+        const tempFile = new File([blob], file.name, { type: blob.type });
+        const widget: UploadedFile = {
+          size: tempFile.size,
+          name: tempFile.name,
+          imageUrl: file.imageUrl,
+          location: file.fileLocation,
+          fileId: file.id,
+        };
+        newFileWidgets.push(widget);
+      }
+      setFileWidgets(newFileWidgets);
     }
-    setFileWidgets(newFileWidgets);
   };
 
   return (
@@ -109,8 +112,8 @@ const VenueTechnicalDetailsForm = ({
           isMultiple={true}
           maxFiles={30}
           maxFileSize={15360 * 1024}
-          customHandleFileDelete={async (file) => {
-            if (file?.fileLocation && file?.fileId) {
+          customHandleFileDelete={async (file: UploadedFile) => {
+            if (file?.location && file?.fileId) {
               setFilesToDelete((prevFilesToDelete) => [...prevFilesToDelete, file]);
             } else {
               const fileIndex = fileList.findIndex((files) => {

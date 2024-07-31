@@ -19,6 +19,7 @@ import Loader from 'components/core-ui-lib/Loader';
 import useAxiosCancelToken from 'hooks/useCancelToken';
 import { isNullOrEmpty } from 'utils';
 import { uploadMultipleFiles } from 'utils/uploadFile';
+import { UploadedFile } from '../../core-ui-lib/UploadModal/interface';
 
 interface AddEditVenueModalProps {
   visible: boolean;
@@ -46,7 +47,7 @@ export default function AddEditVenueModal({
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [fileList, setFileList] = useState<FormData[]>([]);
-  const [filesToDelete, setFilesToDelete] = useState<any>([]);
+  const [filesToDelete, setFilesToDelete] = useState<UploadedFile[]>([]);
   const cancelToken = useAxiosCancelToken();
   const handleInputChange = (field: string, value: any) => {
     let sanitizedValue = value;
