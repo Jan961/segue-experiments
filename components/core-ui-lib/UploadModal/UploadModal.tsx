@@ -12,7 +12,7 @@ const UploadModal: React.FC<UploadModalProps> = ({
   onClose,
   info,
   isMultiple,
-  maxFiles,
+  maxFiles = 1,
   maxFileSize,
   allowedFormats,
   onChange,
