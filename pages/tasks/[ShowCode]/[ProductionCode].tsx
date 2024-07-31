@@ -14,7 +14,6 @@ import { userState } from 'state/account/userState';
 import { useEffect, useMemo, useState } from 'react';
 import { getColumnDefs } from 'components/tasks/tableConfig';
 import { mapToProductionTasksDTO } from 'mappers/tasks';
-import { useRouter } from 'next/router';
 import NewProductionEmpty from 'components/tasks/modals/NewProductionEmpty';
 import NewProductionTask from 'components/tasks/modals/NewProductionTask';
 import { intialTasksState, tasksfilterState } from 'state/tasks/tasksFilterState';
@@ -28,8 +27,6 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
   const { users } = useRecoilValue(userState);
 
   const filter = useRecoilValue(tasksfilterState);
-
-  const router = useRouter();
 
   const usersList = useMemo(
     () =>
@@ -56,7 +53,6 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
 
   const handleShowTask = () => {
     setShowAddTask(false);
-    router.replace(router.asPath);
   };
 
   const isFilterMatchingInitialState = () => {
@@ -102,20 +98,15 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
     else setIsProductionTaskList(true);
   };
 
-  const handleMasterListClose = (val: string) => {
+  const handleMasterListClose = (_val: string) => {
     setIsMasterTaskList(false);
-    if (val === 'data-added') {
-      router.replace(router.asPath);
-    }
   };
 
-  const handleProductionListClose = (val: string) => {
+  const handleProductionListClose = (_val: string) => {
     setIsProductionTaskList(false);
     setIsMasterTaskList(false);
-    if (val === 'data-added') {
-      router.replace(router.asPath);
-    }
   };
+
   const currentProductionObj = useRecoilValue(productionJumpState).productions.find((item) => item.Id === ProductionId);
 
   return (
