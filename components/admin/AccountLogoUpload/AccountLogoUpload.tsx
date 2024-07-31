@@ -60,7 +60,6 @@ export const AccountLogoUpload = () => {
         });
         const data = await response.json();
         const file = data.accountLogoFile.File;
-        console.log(file);
         if (file) {
           setUploadedFile({
             id: file.Id,
