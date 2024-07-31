@@ -139,7 +139,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
         data = { ...data, schools: currSalesFigureSet.schools };
       }
 
-      const response = await axios.post('/api/marketing/sales/process/entry/sales', data);
+      const response = await axios.post('/api/marketing/sales/process/entry/upsert', data);
 
       if (typeof response.data === 'object') {
         const setIdObj = response.data as { setId: number; transaction: string };
@@ -172,7 +172,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
         field,
       };
 
-      const checkFutureResponse = await axios.post('/api/marketing/sales/read/checkFuture', futureaCheckData);
+      const checkFutureResponse = await axios.post('/api/marketing/sales/checkFuture/read', futureaCheckData);
       const futureData = checkFutureResponse.data;
 
       const inputData = {
@@ -185,7 +185,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
         bookingId: bookings.selected,
       };
 
-      const response = await axios.post('/api/marketing/sales/process/entry/compHold', inputData);
+      const response = await axios.post('/api/marketing/sales/process/entry/compHold/upsert', inputData);
 
       if (typeof response.data === 'object') {
         const setIdObj = response.data as { setId: number };
@@ -233,7 +233,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
 
   const batchUpdate = async () => {
     try {
-      await axios.post('/api/marketing/sales/process/entry/batchUpdate', batchUpdateData);
+      await axios.post('/api/marketing/sales/process/entry/batchUpdate/update', batchUpdateData);
       setShowWarning(false);
     } catch (error) {
       console.log(error);
