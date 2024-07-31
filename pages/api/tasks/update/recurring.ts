@@ -4,7 +4,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { getEmailFromReq, checkAccess } from 'services/userService';
 import { generateRecurringProductionTasks, getNewTasksNum } from 'services/TaskService';
 import { calculateWeekNumber } from 'services/dateService';
-import { isNullOrEmpty } from '../../../../utils';
+import { isNullOrEmpty } from 'utils';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
