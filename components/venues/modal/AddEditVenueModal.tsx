@@ -18,7 +18,7 @@ import { ConfVariant } from 'components/core-ui-lib/ConfirmationDialog/Confirmat
 import Loader from 'components/core-ui-lib/Loader';
 import useAxiosCancelToken from 'hooks/useCancelToken';
 import { isNullOrEmpty } from 'utils';
-import { uploadMultipleFiles } from 'utils/uploadFile';
+import { uploadMultipleFilesNoModal } from 'requests/upload';
 import { UploadedFile } from '../../core-ui-lib/UploadModal/interface';
 
 interface AddEditVenueModalProps {
@@ -153,7 +153,7 @@ export default function AddEditVenueModal({
         await axios.post('/api/venue/techSpecs/create', fileRec);
       }
     };
-    await uploadMultipleFiles(fileList, callBack);
+    await uploadMultipleFilesNoModal(fileList, callBack);
   };
   return (
     <>

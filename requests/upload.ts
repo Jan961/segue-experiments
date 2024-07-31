@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { notify } from 'components/core-ui-lib';
 import { ToastMessages } from 'config/shows';
+import { isNullOrEmpty } from '../utils';
 
 interface UploadImageResponse {
   id?: number;
@@ -58,4 +59,45 @@ export const uploadFile = async (
     clearInterval(slowProgressInterval);
     throw new Error('Error uploading file. Please try again.');
   }
+};
+
+export const uploadFileNoModal = async (file: FormData, progress: number, slowProgressInterval) => {
+  if (isNullOrEmpty(file.get('file'))) {
+    const response = await axios.post('/api/upload', file, {
+      onUploadProgress: (progressEvent) => {
+        const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+        if (percentCompleted <= 50) {
+          progress = percentCompleted;
+        } else if (percentCompleted === 100) {
+          progress = 50;
+          clearInterval(slowProgressInterval);
+          slowProgressInterval = setInterval(() => {
+            if (progress < 95) {
+              progress += 0.5;
+            } else {
+              clearInterval(slowProgressInterval);
+            }
+          }, 100);
+        }
+      },
+    });
+
+    return response;
+  } else {
+    return null;
+  }
+};
+
+export const uploadMultipleFilesNoModal = async (fileList: FormData[], callback: (response: any) => Promise<void>) => {
+  let progress = 0; // to track overall progress
+  let slowProgressInterval; // interval for slow progress simulation
+  await Promise.all(
+    fileList.map(async (file) => {
+      const response = await uploadFileNoModal(file, progress, slowProgressInterval);
+      progress = 100;
+      clearInterval(slowProgressInterval);
+      await callback(response);
+      notify.success(ToastMessages.imageUploadSuccess);
+    }),
+  );
 };
