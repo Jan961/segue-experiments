@@ -409,9 +409,7 @@ const AddTask = ({
   const checkFieldsUpdated = () => {
     if (taskRecurringInfo === null) return false;
     for (const key in inputs) {
-      if (taskRecurringInfo?.key) {
-        return true;
-      } else if (taskRecurringInfo[key] !== inputs[key]) {
+      if (taskRecurringInfo?.key || taskRecurringInfo[key] !== inputs[key]) {
         return true;
       }
     }
@@ -501,7 +499,7 @@ const AddTask = ({
             <Select
               disabled={isMasterTask}
               onChange={(value) => handleOnChange({ target: { id: 'Progress', value } })}
-              value={inputs?.Progress?.toString().length > 0 ? inputs?.Progress?.toString() : '0'}
+              value={inputs?.Progress?.toString() || '0'}
               placeholder="Progress"
               isSearchable
               className="w-32"

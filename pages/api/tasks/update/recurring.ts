@@ -92,7 +92,13 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
               }
             });
 
-            await prisma.ProductionTask.deleteMany({ where: { Id: { in: tasksToDelete.map((task) => task.Id) } } });
+            await prisma.$transaction(async (prisma) => {
+              await prisma.ProductionTask.deleteMany({
+                where: {
+                  Id: { in: tasksToDelete.map((task) => task.Id) },
+                },
+              });
+            });
 
             const createdTasks = await Promise.all(
               newTasks.map(async (task) => {

@@ -1,6 +1,5 @@
 import DefaultCellRenderer from 'components/core-ui-lib/Table/renderers/DefaultCellRenderer';
 import MasterTaskNameRenderer from './renderers/MasterTaskNameRenderer';
-import TaskRepeatingRenderer from '../TaskRepeatingRenderer';
 
 const getUser = (usersList, id) => {
   const userData = usersList.filter((user) => user.value === id);
@@ -102,7 +101,10 @@ export const getProductionTasksColumnDefs = (usersList = []) => {
     {
       headerName: 'Task Name',
       field: 'Name',
-      cellRenderer: TaskRepeatingRenderer,
+      valueGetter: function (params) {
+        return params.value + (params.data.PRTId ? ` - Repeats ${params.data.RepeatInterval}` : '');
+      },
+      cellRenderer: DefaultCellRenderer,
       width: 445,
       flex: 1,
     },

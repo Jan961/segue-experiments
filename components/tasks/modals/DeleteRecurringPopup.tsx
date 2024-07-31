@@ -47,7 +47,13 @@ export const DeleteRecurringPopup = ({ visible, onClose, onSubmit }: DeleteRecur
         />
 
         <div className="flex mt-2">
-          <Button variant="secondary" onClick={onClose} className="mr-4 w-[132px]" text="Cancel" />
+          <Button
+            variant="secondary"
+            onClick={onClose}
+            className="mr-4 w-[132px]"
+            text="Cancel"
+            testId="btn-recurring-cancel"
+          />
           <Button
             variant="primary"
             className="w-[132px]"
@@ -55,6 +61,7 @@ export const DeleteRecurringPopup = ({ visible, onClose, onSubmit }: DeleteRecur
               onSubmit(optionList[selectedOption].text);
             }}
             text="OK"
+            testId="btn-recurring-confirm"
           />
         </div>
       </form>
