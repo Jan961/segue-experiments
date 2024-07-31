@@ -12,7 +12,7 @@ const UploadModal: React.FC<UploadModalProps> = ({
   onClose,
   info,
   isMultiple,
-  maxFiles,
+  maxFiles = 1,
   maxFileSize,
   allowedFormats,
   onChange,
@@ -127,10 +127,16 @@ const UploadModal: React.FC<UploadModalProps> = ({
       return;
     }
 
-    if (maxFiles && files.length > maxFiles) {
-      setError(`You can upload up to ${maxFiles} files.`);
-      setSelectedFiles([]);
-      onChange?.([]);
+    if (maxFiles && files.length + selectedFiles.length > maxFiles) {
+      setError(`You can only upload up to ${maxFiles} file(s).`);
+      setSelectedFiles(selectedFiles);
+      setIsUploading(false);
+      if (hiddenFileInput.current) {
+        hiddenFileInput.current.value = '';
+      }
+      setProgress({});
+      setErrorMessages({});
+      setUploadedImageUrls(uploadedImageUrls);
       return;
     }
 
@@ -199,11 +205,11 @@ const UploadModal: React.FC<UploadModalProps> = ({
           />
         </div>
         {error && (
-          <div data-testid="error" className="text-primary-red text-sm text-center">
+          <div data-testid="error" className="text-primary-red text-sm ">
             {error}
           </div>
         )}
-        <div className="grid grid-cols-1 gap-4 mt-3 max-h-60 overflow-y-auto">
+        <div className="grid grid-cols-1 gap-4  max-h-60 overflow-y-auto">
           {selectedFiles?.map((file, index) => (
             <FileCard
               key={index}
