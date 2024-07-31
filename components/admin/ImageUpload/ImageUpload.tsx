@@ -10,13 +10,11 @@ export const ImageUpload = () => {
   const [uploadedFileUrl, setUploadedFileUrl] = useState(null);
 
   const onUploadSuccess = async ({ fileId }) => {
-    await axios.post('/api/admin/accountDetails/update', { fileId });
+    await axios.post('/api/admin/accountDetails/accountLogo/update', { fileId });
   };
 
   const onSave = async (file, onProgress, onError, onUploadingImage) => {
     const formData = new FormData();
-    console.log(file);
-    console.log('yo');
     formData.append('file', file[0].file);
     formData.append('path', `admin/account/logo`);
 
@@ -25,16 +23,12 @@ export const ImageUpload = () => {
       if (response.status >= 400 && response.status < 600) {
         onError(file[0].file, 'Error uploading file. Please try again.');
       } else {
-        console.log('uploaded ok, here is response locaton:');
-        console.log(getFileUrl(response.location));
-        setUploadedFileUrl((prev) => ({ ...prev, imageUrl: getFileUrl(response.location) }));
+        setUploadedFileUrl(getFileUrl(response.location));
         onUploadSuccess({ fileId: response.id });
       }
     } catch (error) {
       onError(file[0].file, 'Error uploading file. Please try again.');
     }
-
-    console.log(setUploadedFileUrl);
   };
 
   useEffect(() => {
