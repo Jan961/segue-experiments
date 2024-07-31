@@ -142,13 +142,14 @@ const UploadModal: React.FC<UploadModalProps> = ({
         errorMessages[file?.name] = `Invalid file format. Allowed formats: ${allowedFormats.join(', ')}.`;
       }
     }
-    const filesList = Array.from(files).map((file) => ({
+
+    const filesList: UploadedFile[] = Array.from(files).map((file) => ({
       name: file?.name,
       size: file?.size,
       file,
     }));
     setError('');
-    setSelectedFiles(filesList);
+    setSelectedFiles([...selectedFiles, ...filesList]);
     onChange?.(filesList);
     hiddenFileInput.current.value = '';
   };
