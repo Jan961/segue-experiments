@@ -29,11 +29,23 @@ export const ImageUpload = () => {
           name: response.originalFilename,
           imageUrl: getFileUrl(response.location),
           size: null,
+          location: response.location,
         });
         onUploadSuccess({ fileId: response.id });
       }
     } catch (error) {
       onError(file[0].file, 'Error uploading file. Please try again.');
+    }
+  };
+
+  const onDelete = async () => {
+    try {
+      console.log(uploadedFile.location);
+      await axios.delete(`/api/file/delete?location=${uploadedFile.location}`);
+      console.log('here');
+      await axios.post('/api/admin/accountDetails/accountLogo/update', { fileId: null });
+    } catch (exception) {
+      console.log(exception, 'Error. Failed to delete file.');
     }
   };
 
@@ -50,8 +62,9 @@ export const ImageUpload = () => {
         setUploadedFile({
           id: file.Id,
           name: file.OriginalFilename,
-          imageUrl: getFileUrl(data.accountLogoFile.File.Location),
+          imageUrl: getFileUrl(file.Location),
           size: null,
+          location: file.Location,
         });
       } catch (error) {
         console.log(error);
@@ -97,6 +110,7 @@ export const ImageUpload = () => {
             maxFileSize={1024 * 500}
             onSave={onSave}
             value={uploadedFile}
+            customHandleFileDelete={onDelete}
           />
         </div>
       </div>
