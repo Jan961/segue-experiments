@@ -81,7 +81,7 @@ export const uploadFileNoModal = async (file: FormData, progress: number, slowPr
         }
       },
     });
-
+    notify.success(ToastMessages.imageUploadSuccess);
     return response;
   } else {
     return null;
@@ -97,7 +97,6 @@ export const uploadMultipleFilesNoModal = async (fileList: FormData[], callback:
       progress = 100;
       clearInterval(slowProgressInterval);
       await callback(response);
-      notify.success(ToastMessages.imageUploadSuccess);
     }),
   );
 };
