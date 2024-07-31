@@ -39,12 +39,14 @@ export const AccountLogoUpload = () => {
   };
 
   const onDelete = async () => {
-    try {
-      await axios.delete(`/api/file/delete?location=${uploadedFile.location}`);
-      await axios.post('/api/admin/accountDetails/accountLogo/update', { fileId: null });
-      setUploadedFile(null);
-    } catch (exception) {
-      console.log(exception, 'Error. Failed to delete file.');
+    if (uploadedFile) {
+      try {
+        await axios.delete(`/api/file/delete?location=${uploadedFile.location}`);
+        await axios.post('/api/admin/accountDetails/accountLogo/update', { fileId: null });
+        setUploadedFile(null);
+      } catch (exception) {
+        console.log(exception, 'Error. Failed to delete file.');
+      }
     }
   };
 
@@ -58,13 +60,16 @@ export const AccountLogoUpload = () => {
         });
         const data = await response.json();
         const file = data.accountLogoFile.File;
-        setUploadedFile({
-          id: file.Id,
-          name: file.OriginalFilename,
-          imageUrl: getFileUrl(file.Location),
-          size: null,
-          location: file.Location,
-        });
+        console.log(file);
+        if (file) {
+          setUploadedFile({
+            id: file.Id,
+            name: file.OriginalFilename,
+            imageUrl: getFileUrl(file.Location),
+            size: null,
+            location: file.Location,
+          });
+        }
       } catch (error) {
         console.log(error);
       }
