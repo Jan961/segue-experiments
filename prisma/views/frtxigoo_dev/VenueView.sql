@@ -5,7 +5,7 @@ SELECT
   `frtxigoo_dev`.`Venue`.`VenueStatusCode` AS `VenueStatusCode`,
   `frtxigoo_dev`.`Venue`.`VenueWebsite` AS `VenueWebsite`,
   `frtxigoo_dev`.`VenueFamily`.`VenueFamilyName` AS `VenueFamily`,
-  `MainCountry`.`CountryCurrencyCode` AS `VenueCurrencyCode`,
+  `frtxigoo_dev`.`Venue`.`VenueCurrencyCode` AS `VenueCurrencyCode`,
   `frtxigoo_dev`.`Venue`.`VenueVATIndicator` AS `VenueVATIndicator`,
   `frtxigoo_dev`.`Venue`.`VenueTechSpecsURL` AS `VenueTechSpecsURL`,
   `frtxigoo_dev`.`Venue`.`VenueSeats` AS `VenueSeats`,
@@ -46,28 +46,23 @@ FROM
       (
         (
           (
-            (
-              `frtxigoo_dev`.`Venue`
-              LEFT JOIN `frtxigoo_dev`.`VenueAddress` `MainAddress` ON(
-                `frtxigoo_dev`.`Venue`.`VenueId` = `MainAddress`.`VenueAddressVenueId`
-                AND `MainAddress`.`VenueAddressTypeName` = 'Main'
-              )
-            )
-            LEFT JOIN `frtxigoo_dev`.`VenueAddress` `DeliveryAddress` ON(
-              `frtxigoo_dev`.`Venue`.`VenueId` = `DeliveryAddress`.`VenueAddressVenueId`
-              AND `DeliveryAddress`.`VenueAddressTypeName` = 'Delivery'
+            `frtxigoo_dev`.`Venue`
+            LEFT JOIN `frtxigoo_dev`.`VenueAddress` `MainAddress` ON(
+              `frtxigoo_dev`.`Venue`.`VenueId` = `MainAddress`.`VenueAddressVenueId`
+              AND `MainAddress`.`VenueAddressTypeName` = 'Main'
             )
           )
-          LEFT JOIN `frtxigoo_dev`.`VenueFamily` ON(
-            `frtxigoo_dev`.`Venue`.`VenueVenueFamilyId` = `frtxigoo_dev`.`VenueFamily`.`VenueFamilyId`
+          LEFT JOIN `frtxigoo_dev`.`VenueAddress` `DeliveryAddress` ON(
+            `frtxigoo_dev`.`Venue`.`VenueId` = `DeliveryAddress`.`VenueAddressVenueId`
+            AND `DeliveryAddress`.`VenueAddressTypeName` = 'Delivery'
           )
         )
-        LEFT JOIN `frtxigoo_dev`.`Country` `MainCountry` ON(
-          `MainAddress`.`VenueAddressCountryId` = `MainCountry`.`CountryId`
+        LEFT JOIN `frtxigoo_dev`.`VenueFamily` ON(
+          `frtxigoo_dev`.`Venue`.`VenueVenueFamilyId` = `frtxigoo_dev`.`VenueFamily`.`VenueFamilyId`
         )
       )
-      LEFT JOIN `frtxigoo_dev`.`Currency` `MainCurrency` ON(
-        `MainCountry`.`CountryCurrencyCode` = `MainCurrency`.`CurrencyCode`
+      LEFT JOIN `frtxigoo_dev`.`Country` `MainCountry` ON(
+        `MainAddress`.`VenueAddressCountryId` = `MainCountry`.`CountryId`
       )
     )
     LEFT JOIN `frtxigoo_dev`.`Country` `DeliveryCountry` ON(

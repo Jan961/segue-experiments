@@ -1,5 +1,6 @@
 import { Venue, VenueAddress, VenueBarredVenue, VenueContact, VenueRole } from '@prisma/client';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
+import fileInterface from './fileInterface';
 
 export interface PrimaryAddress {
   primaryAddressId?: number;
@@ -74,6 +75,7 @@ export interface UiVenue {
   what3WordsStage?: string;
   what3WordsLoading?: string;
   barredVenues?: UiBarredVenue[];
+  files?: fileInterface[];
 }
 
 export const transformVenueContacts = (contacts?: VenueContact & { VenueRole: VenueRole }): UiVenueContact => {
@@ -128,6 +130,7 @@ export const transformVenues = (
     VenueAddress: VenueAddress[];
     VenueBarredVenue_VenueBarredVenue_VBVVenueIdToVenue: VenueBarredVenue[];
     VenueContact: (VenueContact & { VenueRole: VenueRole })[];
+    Files: fileInterface[];
   })[],
 ): UiTransformedVenue[] => {
   return Venues.map(
@@ -162,6 +165,7 @@ export const transformVenues = (
       AddressLoadingW3W,
       VenueBarredVenue_VenueBarredVenue_VBVVenueIdToVenue: BarredVenues,
       VenueContact,
+      Files,
     }) => {
       const address1 = trasformVenueAddress(VenueAddress?.[0]) || {};
       const address2 = trasformVenueAddress(VenueAddress?.[1]) || {};
@@ -202,6 +206,7 @@ export const transformVenues = (
         ...address1,
         ...address2,
         venueContacts,
+        files: Files,
       };
     },
   );
