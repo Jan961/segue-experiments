@@ -95,11 +95,12 @@ const UploadModal: React.FC<UploadModalProps> = ({
     setUploadedImageUrls({});
   };
 
-  const handleFileDelete = (file) => {
-    const fileName = file?.name;
+  const handleFileDelete = (fileName) => {
+    const deletedFile = selectedFiles.find((file) => file?.name === fileName);
     if (customHandleFileDelete) {
-      customHandleFileDelete(file);
+      customHandleFileDelete(deletedFile);
     }
+
     const filesList = selectedFiles.filter((file) => file?.name !== fileName);
     setSelectedFiles(filesList);
     onChange?.(filesList);
@@ -125,6 +126,7 @@ const UploadModal: React.FC<UploadModalProps> = ({
       onChange?.([]);
       return;
     }
+
     if (maxFiles && files.length > maxFiles) {
       setError(`You can upload up to ${maxFiles} files.`);
       setSelectedFiles([]);
@@ -211,7 +213,7 @@ const UploadModal: React.FC<UploadModalProps> = ({
               errorMessage={errorMessages[file?.name]}
               imageUrl={uploadedImageUrls[file?.name]}
               onDelete={() => {
-                handleFileDelete(file);
+                handleFileDelete(file?.name);
               }}
             />
           ))}
