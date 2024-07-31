@@ -172,7 +172,10 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
             })}
           >
             <div
-              className="bg-gray-300 w-44 h-32 flex items-center justify-center cursor-pointer"
+              className={classNames('w-44 h-32 flex items-center justify-center cursor-pointer', {
+                'bg-white': imageUrl,
+                'bg-gray-300': !imageUrl,
+              })}
               onClick={() => setIsUploadOpen(true)}
             >
               {imageUrl ? (
