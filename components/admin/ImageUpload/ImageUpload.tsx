@@ -2,12 +2,13 @@ import { UploadModal, Button } from 'components/core-ui-lib';
 import { getFileUrl } from 'lib/s3';
 import { useEffect, useState } from 'react';
 import { uploadFile } from 'requests/upload';
+import { UploadedFile } from 'components/core-ui-lib/UploadModal/interface';
 import Image from 'next/image';
 import axios from 'axios';
 
 export const ImageUpload = () => {
   const [openUploadModal, setOpenUploadModal] = useState<boolean>(false);
-  const [uploadedFileUrl, setUploadedFileUrl] = useState(null);
+  const [uploadedFile, setUploadedFile] = useState<UploadedFile>(null);
 
   const onUploadSuccess = async ({ fileId }) => {
     await axios.post('/api/admin/accountDetails/accountLogo/update', { fileId });
@@ -23,7 +24,12 @@ export const ImageUpload = () => {
       if (response.status >= 400 && response.status < 600) {
         onError(file[0].file, 'Error uploading file. Please try again.');
       } else {
-        setUploadedFileUrl(getFileUrl(response.location));
+        setUploadedFile({
+          id: response.id,
+          name: response.originalFilename,
+          imageUrl: getFileUrl(response.location),
+          size: null,
+        });
         onUploadSuccess({ fileId: response.id });
       }
     } catch (error) {
@@ -40,7 +46,13 @@ export const ImageUpload = () => {
           body: null,
         });
         const data = await response.json();
-        setUploadedFileUrl(getFileUrl(data.accountLogoFile.File.Location));
+        const file = data.accountLogoFile.File;
+        setUploadedFile({
+          id: file.Id,
+          name: file.OriginalFilename,
+          imageUrl: getFileUrl(data.accountLogoFile.File.Location),
+          size: null,
+        });
       } catch (error) {
         console.log(error);
       }
@@ -55,8 +67,14 @@ export const ImageUpload = () => {
         <div className="flex items-center justify-end gap-x-3 ">
           <p className="text-primary-input-text">Company Logo</p>
 
-          {uploadedFileUrl ? (
-            <Image src={uploadedFileUrl} alt="..." width={50} height={50} onClick={() => setOpenUploadModal(true)} />
+          {uploadedFile ? (
+            <Image
+              src={uploadedFile.imageUrl}
+              alt="..."
+              width={50}
+              height={50}
+              onClick={() => setOpenUploadModal(true)}
+            />
           ) : (
             <Button
               onClick={() => {
@@ -78,6 +96,7 @@ export const ImageUpload = () => {
             }}
             maxFileSize={1024 * 500}
             onSave={onSave}
+            value={uploadedFile}
           />
         </div>
       </div>
