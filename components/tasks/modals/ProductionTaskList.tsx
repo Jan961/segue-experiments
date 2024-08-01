@@ -15,12 +15,15 @@ import Select from 'components/core-ui-lib/Select';
 import ProductionOption from 'components/global/nav/ProductionOption';
 import Checkbox from 'components/core-ui-lib/Checkbox';
 import { ConfirmationDialog } from 'components/core-ui-lib';
+import ExistingTasks from './ExistingTasks';
+import { isNullOrEmpty } from '../../../utils';
 
 interface ProductionTaskListProps {
   visible: boolean;
   onClose: (val?: string) => void;
   productionId?: number;
   isMaster?: boolean;
+  currentProductionTasks?: any[];
 }
 
 const LoadingOverlay = () => (
@@ -29,17 +32,24 @@ const LoadingOverlay = () => (
   </div>
 );
 
-const ProductionTaskList = ({ visible, onClose, productionId, isMaster = false }: ProductionTaskListProps) => {
+const ProductionTaskList = ({
+  visible,
+  onClose,
+  productionId,
+  isMaster = false,
+  currentProductionTasks = [],
+}: ProductionTaskListProps) => {
   const { users } = useRecoilValue(userState);
   console.log(productionId);
   const styleProps = { headerColor: tileColors.tasks };
   const [rowData, setRowData] = useState([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [confirm, setConfirm] = useState<boolean>(false);
-
   const [productionJump, setProductionJump] = useRecoilState(productionJumpState);
   const [selected, setSelected] = useState(null);
   const [includeArchived, setIncludeArchived] = useState<boolean>(productionJump?.includeArchived || false);
+  const [showExistingTaskModal, setShowExistingTaskModal] = useState<boolean>(false);
+  const [duplicateTasks, setDuplicateTasks] = useState([]);
 
   const productionsData = useMemo(() => {
     const productionOptions = [];
@@ -90,6 +100,28 @@ const ProductionTaskList = ({ visible, onClose, productionId, isMaster = false }
     setSelectedRows(selectedData);
   };
 
+  const findDuplicateTasks = () => {
+    const duplicateTasks = [];
+    const ptrList = [];
+    selectedRows.forEach((task) => {
+      currentProductionTasks.forEach((existingTask) => {
+        if (isNullOrEmpty(existingTask?.CopiedFrom)) return;
+
+        if (existingTask?.CopiedFrom === 'R') {
+          if (task?.PRTId === existingTask.CopiedId) {
+            if (!ptrList.includes(task.PRTId)) {
+              duplicateTasks.push(task);
+              ptrList.push(task.PRTId);
+            }
+          } else if (existingTask?.CopiedFrom === 'P') {
+            if (task?.Id === existingTask.CopiedId) duplicateTasks.push(task);
+          }
+        }
+      });
+    });
+    return duplicateTasks;
+  };
+
   const handleFetchTasks = async () => {
     setLoading(true);
     try {
@@ -110,7 +142,7 @@ const ProductionTaskList = ({ visible, onClose, productionId, isMaster = false }
     fetchTasks();
   }, [selected]);
 
-  const handleSubmit = async () => {
+  const createTasks = async () => {
     setLoading(true);
     if (isMaster) {
       try {
@@ -167,6 +199,16 @@ const ProductionTaskList = ({ visible, onClose, productionId, isMaster = false }
         setLoading(false);
         console.error(error);
       }
+    }
+  };
+
+  const handleSubmit = async () => {
+    const duplicates = findDuplicateTasks();
+    setDuplicateTasks(duplicates);
+    if (duplicates.length > 0) {
+      setShowExistingTaskModal(true);
+    } else {
+      await createTasks();
     }
   };
 
@@ -261,6 +303,17 @@ const ProductionTaskList = ({ visible, onClose, productionId, isMaster = false }
         }}
         onNoClick={() => setConfirm(false)}
         hasOverlay={false}
+      />
+      <ExistingTasks
+        visible={showExistingTaskModal}
+        onCancel={() => {
+          setShowExistingTaskModal(false);
+        }}
+        onConfirm={async () => {
+          setShowExistingTaskModal(false);
+          await createTasks();
+        }}
+        duplicateList={duplicateTasks}
       />
     </PopupModal>
   );

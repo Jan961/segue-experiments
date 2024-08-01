@@ -69,8 +69,8 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
             await prisma.ProductionTask.create({
               data: {
                 ...newTask,
-                CopiedFrom: 'P',
-                CopiedId: task.Id,
+                CopiedFrom: 'R',
+                CopiedId: task.PRTId,
               },
             });
           }),
