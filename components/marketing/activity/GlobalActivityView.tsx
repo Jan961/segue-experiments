@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Button, ConfirmationDialog, Table } from 'components/core-ui-lib';
-import useAxios from 'hooks/useAxios';
 import { useRecoilValue } from 'recoil';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import { Spinner } from 'components/global/Spinner';
@@ -13,6 +12,7 @@ import { startOfDay } from 'date-fns';
 import { filterState } from 'state/marketing/filterState';
 import fuseFilter from 'utils/fuseFilter';
 import { isNullOrEmpty } from 'utils';
+import axios from 'axios';
 
 type GlobalActivitiesResponse = {
   activities: GlobalActivity[];
@@ -44,8 +44,6 @@ const GlobalActivityView = () => {
   const [allRows, setAllRows] = useState([]);
   const filter = useRecoilValue(filterState);
 
-  const { fetchData } = useAxios();
-
   const venueList = useMemo(() => {
     try {
       const venues = bookings.bookings.map((option) => {
@@ -70,13 +68,10 @@ const GlobalActivityView = () => {
   }, [bookings.bookings]);
 
   const getTourWeeks = async (productionId) => {
-    const data = await fetchData({
-      url: '/api/marketing/sales/tourWeeks/' + productionId.toString(),
-      method: 'POST',
-    });
+    const response = await axios.get(`/api/marketing/sales/tourWeeks/${productionId.toString()}`);
 
-    if (typeof data === 'object') {
-      const tourData = data as TourResponse;
+    if (typeof response.data === 'object') {
+      const tourData = response.data as TourResponse;
       setTourWeeks(tourData.data);
     }
   };
@@ -87,11 +82,7 @@ const GlobalActivityView = () => {
   };
 
   const deleteGlobalActivity = async () => {
-    await fetchData({
-      url: '/api/marketing/globalActivities/delete',
-      method: 'POST',
-      data: actRow,
-    });
+    await axios.post('/api/marketing/globalActivities/delete', actRow);
 
     const rowIndex = rowData.findIndex((gba) => gba.id === actRow.Id);
     const newRows = [...rowData];
@@ -107,11 +98,7 @@ const GlobalActivityView = () => {
   const updateGlobalActivity = async (type: string, data: GlobalActivity) => {
     if (type === 'add') {
       try {
-        await fetchData({
-          url: '/api/marketing/globalActivities/create',
-          method: 'POST',
-          data,
-        });
+        await axios.post('/api/marketing/globalActivities/create', data);
 
         const tableRow = {
           actName: data.Name,
@@ -131,11 +118,7 @@ const GlobalActivityView = () => {
         console.log(error);
       }
     } else if (type === 'edit') {
-      await fetchData({
-        url: '/api/marketing/globalActivities/update',
-        method: 'POST',
-        data,
-      });
+      await axios.post('/api/marketing/globalActivities/update', data);
 
       const updatedRow = {
         actName: data.Name,
@@ -161,13 +144,10 @@ const GlobalActivityView = () => {
 
   const toggleModal = async (type: ActivityModalVariant, data: any) => {
     try {
-      const actTypeResponse = await fetchData({
-        url: '/api/marketing/globalActivities/production/' + productionId.toString(),
-        method: 'POST',
-      });
+      const response = await axios.get(`/api/marketing/globalActivities/production/${productionId.toString()}`);
 
-      if (typeof actTypeResponse === 'object') {
-        const globalActivities = actTypeResponse as GlobalActivitiesResponse;
+      if (typeof response.data === 'object') {
+        const globalActivities = response.data as GlobalActivitiesResponse;
         const tempRow = {
           Name: data.actName,
           ActivityTypeId: globalActivities.activityTypes.find((type) => type.text === data.actType).value,
@@ -197,13 +177,10 @@ const GlobalActivityView = () => {
 
   const getGlobalActivities = async () => {
     try {
-      const data = await fetchData({
-        url: '/api/marketing/globalActivities/production/' + productionId.toString(),
-        method: 'POST',
-      });
+      const response = await axios.get(`/api/marketing/globalActivities/production/${productionId.toString()}`);
 
-      if (typeof data === 'object') {
-        const globalActivities = data as GlobalActivitiesResponse;
+      if (typeof response.data === 'object') {
+        const globalActivities = response.data as GlobalActivitiesResponse;
 
         setActivityTypes(globalActivities.activityTypes);
         setColDefs(globalActivityColDefs(toggleModal, currency.symbol));
