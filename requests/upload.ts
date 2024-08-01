@@ -12,6 +12,9 @@ interface UploadImageResponse {
 
 export const onUploadProgress = (progressEvent, formData, progress, slowProgressInterval, onProgress = null) => {
   const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+  if (percentCompleted === 100) {
+    return;
+  }
   if (percentCompleted <= 50) {
     progress = percentCompleted;
   } else if (percentCompleted === 100) {
@@ -26,9 +29,7 @@ export const onUploadProgress = (progressEvent, formData, progress, slowProgress
       }
     }, 100);
   }
-
   if (onProgress) onProgress(formData.get('file') as File, progress);
-  return onUploadProgress;
 };
 
 export const uploadFile = async (
