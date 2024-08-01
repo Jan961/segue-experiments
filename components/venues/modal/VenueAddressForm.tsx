@@ -102,16 +102,16 @@ const VenueAddressForm = ({
           />
         </label>
         <div className="flex flex-col">
-          <label className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
-            <Tooltip
-              body="For venues in the United Kingdom: Please select Scotland, England, Wales or Northern Ireland as the Country"
-              width="w-[200px]"
-            >
+          <label className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between w-full">
+            <div className="flex items-center gap-x-1">
               <p className="text-primary-input-text">Country</p>
-
-              <Icon iconName="info-circle-solid" />
-            </Tooltip>
-
+              <Tooltip
+                body="For venues in the United Kingdom: Please select Scotland, England, Wales or Northern Ireland as the Country"
+                width="w-[200px]"
+              >
+                <Icon iconName="info-circle-solid" />
+              </Tooltip>
+            </div>
             <Select
               testId="primary-country"
               name="primaryCountry"
@@ -220,14 +220,15 @@ const VenueAddressForm = ({
         </label>
 
         <label className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
-          <Tooltip
-            body="For venues in the United Kingdom: Please select Scotland, England, Wales or Northern Ireland as the Country"
-            width="w-[200px]"
-          >
+          <div className="flex items-center gap-x-1">
             <p className="text-primary-input-text">Country</p>
-
-            <Icon iconName="info-circle-solid" />
-          </Tooltip>
+            <Tooltip
+              body="For venues in the United Kingdom: Please select Scotland, England, Wales or Northern Ireland as the Country"
+              width="w-[200px]"
+            >
+              <Icon iconName="info-circle-solid" />
+            </Tooltip>
+          </div>
           <Select
             testId="delivery-country"
             name="deliveryCountry"
