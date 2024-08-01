@@ -26,10 +26,8 @@ const FileCard = ({ fileName, fileSize, onDelete, progress, errorMessage, imageU
           <div className="w-full">
             <p className="text-primary-navy font-bold text-[15px] flex justify-between items-center">{status}</p>
             <div className="flex flex-row w-full justify-between items-center">
-              <div className="float-left">
-                <p className="text-secondary text-sm">
-                  {fileName?.length > 30 ? fileName?.slice(0, 30) + '...' : fileName}
-                </p>
+              <div className="float-left w-56">
+                <p className="text-secondary text-sm truncate">{fileName}</p>
               </div>
               <div className="flex flex-row md:w-[180px] sm:w-[100px] justify-between items-center float-right">
                 {fileSize && <p className="text-secondary text-sm">Size: {fileSizeFormatter(fileSize)}</p>}
