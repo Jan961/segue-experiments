@@ -185,8 +185,6 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
         bookingId: bookings.selected,
       };
 
-      console.log(inputData);
-
       const response = await axios.post('/api/marketing/sales/process/entry/compHold/upsert', inputData);
 
       if (typeof response.data === 'object') {
