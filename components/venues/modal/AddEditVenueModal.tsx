@@ -161,7 +161,7 @@ export default function AddEditVenueModal({
         onClose={onClose}
         title="Add / Edit Venue"
         show={visible}
-        panelClass="relative"
+        panelClass="relative h-[90vh] overflow-x-auto pb-4"
         titleClass="text-xl text-primary-navy "
       >
         <form className="w-[1026px]">
@@ -246,7 +246,7 @@ export default function AddEditVenueModal({
                 testId="add-venues-save-and-close-btn"
                 disabled={isSaving || isDeleting}
                 text={isSaving ? 'Saving...' : 'Save and Close'}
-                className="w-32"
+                className="w-32 mb-4"
                 onClick={handleSaveAndClose}
               >
                 {isSaving && <Loader variant="lg" iconProps={{ stroke: '#FFF' }} />}
