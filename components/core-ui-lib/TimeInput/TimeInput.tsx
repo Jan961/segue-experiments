@@ -17,6 +17,7 @@ export interface TimeInputProps {
   name?: string; // Also ID
   disabled?: boolean;
   className?: string;
+  tabIndexShow?: boolean;
 }
 
 const baseClass =
@@ -26,7 +27,7 @@ const DEFAULT_TIME = { hrs: '', min: '', sec: '' };
 const isOfTypTime = (t: any): t is Time => t.hrs !== undefined && t.min !== undefined;
 
 const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
-  ({ onChange, value, onBlur, disabled, className }: TimeInputProps, ref) => {
+  ({ onChange, value, onBlur, disabled, className, tabIndexShow }: TimeInputProps, ref) => {
     const [time, setTime] = useState<Time>(DEFAULT_TIME);
     const [isFocused, setIsFocused] = useState(false);
     const disabledClass = disabled ? `!bg-disabled-input !cursor-not-allowed !pointer-events-none` : '';
@@ -123,7 +124,7 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
           onBlur={handleInputBlur}
           onFocus={(e) => e.target.select()}
           disabled={disabled}
-          tabIndex={1}
+          tabIndex={tabIndexShow ? 0 : 1}
         />
         <span className="">:</span>
         <input
@@ -137,7 +138,7 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
           onBlur={handleInputBlur}
           onFocus={(e) => e.target.select()}
           disabled={disabled}
-          tabIndex={2}
+          tabIndex={tabIndexShow ? 0 : 2}
           onKeyDown={handleMinKeyDown}
         />
       </div>

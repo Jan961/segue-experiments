@@ -509,6 +509,7 @@ export const EditDealMemoContractModal = ({
               onChange={() => {
                 return null;
               }}
+              tabIndexShow={true}
             />
             <div className=" text-primary-input-text font-bold ml-8 mr-4">Notes</div>
 
@@ -538,6 +539,7 @@ export const EditDealMemoContractModal = ({
               onChange={(value) =>
                 editDemoModalData('DeMoVenueCurfewTime', convertTimeToTodayDateFormat(value), 'dealMemo')
               }
+              tabIndexShow={true}
             />
             {/* <TextInput placeholder="hh:mm" testId="venueText" className="w-[80px] mt-1 mb-1" /> */}
             <div className=" text-primary-input-text font-bold ml-8 mr-4">Notes</div>
@@ -1689,6 +1691,7 @@ export const EditDealMemoContractModal = ({
                 onChange={(value) =>
                   editDemoModalData('DeMoTechArrivalTime', convertTimeToTodayDateFormat(value), 'dealMemo')
                 }
+                tabIndexShow={true}
               />
             </div>
           </div>
