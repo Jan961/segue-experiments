@@ -119,9 +119,8 @@ const handler = async (req, res) => {
   const title = `${FullProductionCode} ${ShowName} Travel Summary - ${moment().format('DD.MM.YY')}`;
   worksheet.addRow([title]);
   worksheet.addRow([]);
-  worksheet.addRow(['Production', '', '', '', '', 'Onward Travel']);
+  worksheet.addRow(['', '', '', '', '', 'Onward Travel']);
   worksheet.addRow(['Day', 'Date', 'Week', 'Venue', 'Town', 'Time', 'Miles']);
-  // Day, Date, Week, Venue, Town, Time, Miles
   worksheet.addRow([]);
   const map: { [key: string]: SCHEDULE_VIEW } = formattedData.reduce((acc, x) => ({ ...acc, [getKey(x)]: x }), {});
   const daysDiff = moment(toDate).diff(moment(fromDate), 'days');
@@ -263,13 +262,6 @@ const handler = async (req, res) => {
   worksheet.getColumn('C').alignment = { horizontal: 'right' };
   worksheet.getColumn('F').alignment = { horizontal: 'right' };
   worksheet.getColumn('G').alignment = { horizontal: 'right' };
-  firstRowFormatting({ worksheet });
-  for (let row = 2; row <= 4; row++) {
-    styleHeader({ worksheet, row, numberOfColumns });
-  }
-
-  makeRowTextBoldAndAllignLeft({ worksheet, row: 3, numberOfColumns: 7 });
-  makeRowTextBoldAndAllignLeft({ worksheet, row: 4, numberOfColumns: 7 });
   addWidthAsPerContent({
     worksheet,
     fromColNumber: 2,
@@ -280,6 +272,14 @@ const handler = async (req, res) => {
     rowsToIgnore: 4,
     maxColWidth: Infinity,
   });
+  firstRowFormatting({ worksheet });
+  for (let row = 2; row <= 4; row++) {
+    styleHeader({ worksheet, row, numberOfColumns });
+  }
+  for (let row = 1; row <= 4; row++) {
+    makeRowTextBoldAndAllignLeft({ worksheet, row, numberOfColumns });
+  }
+  worksheet.getCell(1, 1).font = { size: 16, color: { argb: COLOR_HEXCODE.WHITE }, bold: true };
   const filename = `${title}`;
   if (format === 'pdf') {
     worksheet.pageSetup.printArea = `A1:${worksheet.getColumn(11).letter}${worksheet.rowCount}`;

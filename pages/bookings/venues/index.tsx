@@ -93,7 +93,6 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
     },
     [refreshTable, setEditVenueContext],
   );
-
   return (
     <>
       <Layout title="Venues | Segue" flush>
@@ -118,6 +117,7 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
           venueRoleOptionList={venueRoleOptionList}
           visible={!!editVenueContext}
           onClose={onModalClose}
+          fetchVenues={fetchVenues}
         />
       )}
     </>

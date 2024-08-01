@@ -186,6 +186,7 @@ export const initialVenueTechnicalDetails = {
   techLXNotes: '',
   techLXDesk: '',
   techSpecsUrl: '',
+  files: [],
 };
 
 export const initialVenueState = {

@@ -1,4 +1,5 @@
 import prisma from 'lib/prisma';
+import { addDurationToDate, getMonday } from 'services/dateService';
 import { getEmailFromReq, checkAccess } from 'services/userService';
 
 export type LastPerfDate = {
@@ -12,121 +13,255 @@ const removeTime = (inputDate: Date) => {
   return new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0, 0);
 };
 
+const getCompHoldData = async (salesDate, bookingId) => {
+  const holdTypes = await prisma.holdType.findMany({
+    orderBy: {
+      HoldTypeSeqNo: 'asc',
+    },
+  });
+
+  const compTypes = await prisma.compType.findMany({
+    orderBy: {
+      CompTypeSeqNo: 'asc',
+    },
+  });
+
+  const rawHoldData = await prisma.salesSet.findMany({
+    where: {
+      SetBookingId: bookingId,
+    },
+    select: {
+      SetSalesFiguresDate: true,
+      SetId: true,
+      SetHold: {
+        select: {
+          SetHoldSeats: true,
+          SetHoldValue: true,
+          SetHoldId: true,
+          SetHoldSetId: true,
+          HoldType: {
+            select: {
+              HoldTypeId: true,
+              HoldTypeName: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  // Filter the data to include only the dates without time
+  const holdData = rawHoldData.reduce((acc, salesSet) => {
+    const inputWeek = getMonday(salesSet.SetSalesFiguresDate);
+    const selectedWeek = getMonday(salesDate);
+
+    if (removeTime(inputWeek).getTime() === removeTime(selectedWeek).getTime()) {
+      salesSet.SetHold.forEach((setHold) => {
+        acc.push({
+          seats: setHold.SetHoldSeats,
+          value: setHold.SetHoldValue,
+          id: setHold.HoldType.HoldTypeId,
+          name: setHold.HoldType.HoldTypeName,
+          recId: setHold.SetHoldId,
+          setId: setHold.SetHoldSetId,
+        });
+      });
+    }
+    return acc;
+  }, []);
+
+  const rawCompData = await prisma.salesSet.findMany({
+    where: {
+      SetBookingId: bookingId,
+    },
+    select: {
+      SetSalesFiguresDate: true,
+      SetId: true,
+      SetComp: {
+        select: {
+          SetCompSeats: true,
+          SetCompId: true,
+          CompType: {
+            select: {
+              CompTypeId: true,
+              CompTypeCode: true,
+              CompTypeName: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  const compData = rawCompData.reduce((acc, salesSet) => {
+    const inputWeek = getMonday(salesSet.SetSalesFiguresDate);
+    const selectedWeek = getMonday(salesDate);
+
+    if (removeTime(inputWeek).getTime() === removeTime(selectedWeek).getTime()) {
+      const { SetId, SetComp } = salesSet;
+      SetComp.forEach((setComp) => {
+        const { SetCompSeats, SetCompId, CompType } = setComp;
+        const { CompTypeId, CompTypeName } = CompType;
+        acc.push({
+          seats: SetCompSeats,
+          id: CompTypeId,
+          name: CompTypeName,
+          recId: SetCompId,
+          setId: SetId,
+        });
+      });
+    }
+    return acc;
+  }, []);
+
+  const holdResult = holdTypes.map((hold) => {
+    const holdRecIndex = holdData.findIndex((rec) => rec.id === hold.HoldTypeId);
+    if (holdRecIndex === -1) {
+      return {
+        name: hold.HoldTypeName,
+        seats: 0,
+        value: 0,
+        id: hold.HoldTypeId,
+      };
+    } else {
+      return {
+        ...holdData[holdRecIndex],
+      };
+    }
+  });
+
+  const compResult = compTypes.map((comp) => {
+    const compRecIndex = compData.findIndex((rec) => rec.id === comp.CompTypeId);
+    if (compRecIndex === -1) {
+      return {
+        name: comp.CompTypeName,
+        seats: 0,
+        id: comp.CompTypeId,
+      };
+    } else {
+      return {
+        ...compData[compRecIndex],
+      };
+    }
+  });
+
+  let setId = -1;
+  if (holdData.length > 0 || compData.length > 0) {
+    if ('setId' in holdData[0]) {
+      setId = holdData[0].setId;
+    } else {
+      setId = compData[0].setId;
+    }
+  }
+
+  return {
+    holds: holdResult,
+    comps: compResult,
+    setId,
+  };
+};
+
+const isDataAvailable = (data) => {
+  const hSeatsCheck = data.holds.every((item) => item.seats === 0);
+  const hValueCheck = data.holds.every((item) => item.value === 0);
+  const cSeatsCheck = data.comps.every((item) => item.seats === 0);
+
+  const checksArray = [hSeatsCheck, hValueCheck, cSeatsCheck];
+
+  return !checksArray.every((item) => item === true);
+};
+
+const copyData = (data, datesTried, bookingId) => {
+  datesTried.forEach(async (dtIn) => {
+    // create a SalesSet and get a setID for this week that has no data
+    const setResult = await prisma.SalesSet.create({
+      data: {
+        SetBookingId: parseInt(bookingId),
+        SetPerformanceId: null,
+        SetSalesFiguresDate: dtIn,
+        SetBrochureReleased: false,
+        SetSingleSeats: false,
+        SetNotOnSale: false,
+        SetIsFinalFigures: false,
+        SetIsCopy: false,
+      },
+    });
+
+    const dbUpdates = [];
+
+    // hold data first
+    data.holds.forEach((holdRec) => {
+      if (holdRec.seats > 0 || holdRec.value > 0) {
+        dbUpdates.push(
+          prisma.setHold.create({
+            data: {
+              SetHoldSetId: setResult.SetId,
+              SetHoldHoldTypeId: holdRec.id,
+              SetHoldSeats: parseInt(holdRec.seats),
+              SetHoldValue: parseFloat(holdRec.value),
+            },
+          }),
+        );
+      }
+    });
+
+    // comp data
+    data.comps.forEach((compRec) => {
+      if (compRec.seats > 0) {
+        dbUpdates.push(
+          prisma.setComp.create({
+            data: {
+              SetCompSetId: setResult.SetId,
+              SetCompCompTypeId: compRec.id,
+              SetCompSeats: parseInt(compRec.seats),
+            },
+          }),
+        );
+      }
+    });
+
+    await prisma.$transaction(dbUpdates);
+  });
+};
+
 export default async function handle(req, res) {
   try {
     const bookingId = parseInt(req.body.bookingId);
     const salesDate = new Date(req.body.salesDate);
+    const ProductionId = req.body.productionId;
 
     const email = await getEmailFromReq(req);
     const access = await checkAccess(email);
     if (!access) return res.status(401).end();
 
-    let holdDataResult = [];
-    let compDataResult = [];
-    let setId = -1;
+    let result = {};
 
-    const holdData = await prisma.$queryRaw`
-        SELECT 
-            SalesSet.SetSalesFiguresDate, 
-            HoldType.HoldTypeId, 
-            HoldType.HoldTypeCode, 
-            HoldType.HoldTypeName, 
-            SetHold.SetHoldSeats, 
-            SetHold.SetHoldValue,
-            SetHold.SetHoldId,
-            SalesSet.SetId
-        FROM 
-            SalesSet
-        CROSS JOIN 
-            HoldType
-        LEFT OUTER JOIN 
-            SetHold 
-        ON 
-            HoldType.HoldTypeId = SetHold.SetHoldHoldTypeId 
-            AND SalesSet.SetId = SetHold.SetHoldSetId
-        WHERE 
-            SalesSet.SetBookingId = ${bookingId}
-        ORDER BY 
-            HoldTypeSeqNo
-    `;
+    const { SalesFrequency } = await prisma.production.findUnique({
+      where: {
+        Id: ProductionId,
+      },
+      select: {
+        SalesFrequency: true,
+      },
+    });
 
-    const compData = await prisma.$queryRaw`
-        SELECT
-            SalesSet.SetSalesFiguresDate,
-            CompType.CompTypeId,
-            CompType.CompTypeCode,
-            CompType.CompTypeName,
-            SetComp.SetCompSeats,
-            SetComp.SetCompId,
-            SalesSet.SetId
-        FROM
-            SalesSet
-        CROSS JOIN
-            CompType
-        LEFT OUTER JOIN
-            SetComp
-        ON
-            CompType.CompTypeId = SetComp.SetCompCompTypeId
-            AND SalesSet.SetId = SetComp.SetCompSetId
-        WHERE
-            SalesSet.SetBookingId = ${bookingId}
-        ORDER BY
-            CompTypeSeqNo
-    `;
+    // loop through previous sales until we find a set that exists
+    let currentDate = salesDate;
+    const triedDates = [];
 
-    const filteredHolds = holdData.filter(
-      (sale) => removeTime(sale.SetSalesFiguresDate).getTime() === removeTime(salesDate).getTime(),
-    );
+    do {
+      result = await getCompHoldData(currentDate, bookingId);
 
-    const filteredComps = compData.filter(
-      (sale) => removeTime(sale.SetSalesFiguresDate).getTime() === removeTime(salesDate).getTime(),
-    );
-
-    // if filteredHolds is [], populate with the hold types
-    if (filteredHolds.length === 0) {
-      const holdTypes = await prisma.$queryRaw`select * from HoldType order by HoldTypeSeqNo`;
-      holdDataResult = holdTypes.map((hold) => {
-        return { name: hold.HoldTypeName, seats: 0, value: 0, id: hold.HoldTypeId, recId: null };
-      });
-      // else map the db fields to nicer field names to be handled in the UI
-    } else {
-      holdDataResult = filteredHolds.map((hold) => {
-        return {
-          name: hold.HoldTypeName,
-          seats: hold.SetHoldSeats,
-          value: hold.SetHoldValue,
-          id: hold.HoldTypeId,
-          recId: hold.SetHoldId,
-        };
-      });
-    }
-
-    // if filteredComps is [], populate with the comp types
-    if (filteredHolds.length === 0) {
-      const compTypes = await prisma.$queryRaw`select * from CompType order by CompTypeSeqNo`;
-      compDataResult = compTypes.map((comp) => {
-        return { name: comp.CompTypeName, seats: 0, id: comp.CompTypeId, recId: null };
-      });
-      // else map the db fields to nicer field names to be handled in the UI
-    } else {
-      compDataResult = filteredComps.map((comp) => {
-        return { name: comp.CompTypeName, seats: comp.SetCompSeats, id: comp.CompTypeId, recId: comp.SetCompId };
-      });
-    }
-
-    if (filteredHolds.length > 0 || filteredComps.length > 0) {
-      if ('SetId' in filteredHolds[0]) {
-        setId = filteredHolds[0].SetId;
-      } else {
-        setId = filteredComps[0].SetId;
+      if (!isDataAvailable(result)) {
+        triedDates.push(currentDate);
+        currentDate = addDurationToDate(currentDate, SalesFrequency === 'W' ? 7 : 1, false);
       }
-    }
+    } while (!isDataAvailable(result));
 
-    const result = {
-      holds: holdDataResult,
-      comps: compDataResult,
-      setId,
-    };
+    // if tried dates is greater than 0, we need to copy the new found data into the weeks that were missed
+    if (triedDates.length > 0) {
+      copyData(result, triedDates, bookingId);
+    }
 
     res.status(200).json(result);
   } catch (err) {

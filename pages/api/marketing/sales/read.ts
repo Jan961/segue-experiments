@@ -108,6 +108,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         },
       },
     });
+
     if (!salesSet) {
       let salesFigureDate = SetSalesFiguresDate;
       if (!SetSalesFiguresDate && isFinalFigures) {

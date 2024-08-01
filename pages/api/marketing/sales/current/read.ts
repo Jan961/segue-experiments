@@ -25,7 +25,12 @@ export default async function handle(req, res) {
     if (!access) return res.status(401).end();
 
     const data = await prisma.salesView.findMany({
-      where: { BookingId: bookingId },
+      where: {
+        BookingId: bookingId,
+        SaleTypeName: {
+          not: '',
+        },
+      },
       select: {
         SaleTypeName: true,
         Seats: true,

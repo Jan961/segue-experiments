@@ -28,9 +28,15 @@ export const DeleteRecurringPopup = ({ visible, onClose, onSubmit }: DeleteRecur
   };
   const optionList = createOptions();
   return (
-    <PopupModal show={visible} onClose={onClose}>
-      <div>
-        <h1>This is a repeating task. Do you want to:</h1>
+    <PopupModal
+      show={visible}
+      onClose={onClose}
+      title="This is a repeating task"
+      titleClass="text-primary-navy text-xl mb-2"
+      hasOverlay={false}
+    >
+      <form className="flex flex-col gap-2">
+        <p>Would you like to...</p>
         <Select
           testId="select-recurring-delete"
           options={optionList}
@@ -39,20 +45,26 @@ export const DeleteRecurringPopup = ({ visible, onClose, onSubmit }: DeleteRecur
             setSelectedOption(option);
           }}
         />
-      </div>
-      <Button variant="primary" className="bg-primary-red" onClick={onClose} testId="btn-delete-cancel">
-        Cancel
-      </Button>
-      <Button
-        testId="btn-delete-confirm"
-        variant="secondary"
-        disabled={selectedOption === null}
-        onClick={() => {
-          onSubmit(optionList[selectedOption].text);
-        }}
-      >
-        Continue
-      </Button>
+
+        <div className="flex mt-2">
+          <Button
+            variant="secondary"
+            onClick={onClose}
+            className="mr-4 w-[132px]"
+            text="Cancel"
+            testId="btn-recurring-cancel"
+          />
+          <Button
+            variant="primary"
+            className="w-[132px]"
+            onClick={() => {
+              onSubmit(optionList[selectedOption].text);
+            }}
+            text="OK"
+            testId="btn-recurring-confirm"
+          />
+        </div>
+      </form>
     </PopupModal>
   );
 };
