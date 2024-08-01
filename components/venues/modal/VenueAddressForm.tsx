@@ -86,25 +86,37 @@ const VenueAddressForm = ({
         </label>
         <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
           <p className="text-primary-input-text">Town</p>
-          <TextInput
-            testId="primary-address-town"
-            placeholder="Enter Town"
-            className="w-full justify-between"
-            inputClassName="w-full"
-            value={formData.primaryTown}
-            onChange={(e) => handleInputChange('primaryTown', e.target.value)}
-          />
+          <div>
+            <TextInput
+              testId="primary-address-town"
+              placeholder="Enter Town"
+              className="w-full justify-between"
+              inputClassName="w-full"
+              value={formData.primaryTown}
+              error={validationErrors.primaryTown}
+              onChange={(e) => handleInputChange('primaryTown', e.target.value)}
+            />
+            {validationErrors.primaryTown && (
+              <small className="text-primary-red flex absolute">{validationErrors.primaryTown}</small>
+            )}
+          </div>
         </label>
         <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
           <p className="text-primary-input-text">Postcode</p>
-          <TextInput
-            testId="primary-address-postcode"
-            placeholder="Enter Postcode"
-            className="w-full justify-between"
-            inputClassName="w-full"
-            value={formData.primaryPostCode}
-            onChange={(e) => handleInputChange('primaryPostCode', e.target.value)}
-          />
+          <div>
+            <TextInput
+              testId="primary-address-postcode"
+              placeholder="Enter Postcode"
+              className="w-full justify-between"
+              inputClassName="w-full"
+              value={formData.primaryPostCode}
+              onChange={(e) => handleInputChange('primaryPostCode', e.target.value)}
+              error={validationErrors.primaryPostCode}
+            />
+            {validationErrors.primaryPostCode && (
+              <small className="text-primary-red flex absolute">{validationErrors.primaryPostCode}</small>
+            )}
+          </div>
         </label>
         <div className="flex flex-col">
           <label className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between w-full">

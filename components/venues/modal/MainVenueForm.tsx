@@ -63,7 +63,6 @@ const MainVenueForm = ({
               iconName="info-circle-solid"
               value={formData.venueCode}
               error={validationErrors.venueCode}
-              onBlur={() => handleInputChange('venueCode', formData.venueCode)}
               onChange={(e) => handleInputChange('venueCode', e.target.value)}
             />
             {validationErrors.venueCode && (
@@ -79,7 +78,7 @@ const MainVenueForm = ({
           options={venueStatusOptions}
           onChange={(value) => handleInputChange('venueStatus', value)}
           value={formData.venueStatus}
-          placeholder="<Venue Status DROPDOWN>"
+          placeholder="Select Venue Status"
           className="w-[430px] font-bold place-self-end"
         />
         {validationErrors.venueStatus && (
