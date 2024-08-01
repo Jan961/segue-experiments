@@ -41,9 +41,9 @@ export const BookingReports = ({ visible = false, onClose, productionId }: Booki
         break;
       case 'tourSummary':
         notify.promise(exportBookingSchedule(productionId), {
-          loading: 'Generating tour summary report',
-          success: 'Tour summary report downloaded successfully',
-          error: 'Error generating tour summary report',
+          loading: 'Generating Travel Summary Report...',
+          success: 'Travel Summary Report downloaded successfully',
+          error: 'Error generating Travel Summary Report',
         });
         break;
       case 'masterPlan':
