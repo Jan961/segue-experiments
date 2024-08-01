@@ -161,7 +161,7 @@ export default function AddEditVenueModal({
         onClose={onClose}
         title="Add / Edit Venue"
         show={visible}
-        panelClass="relative h-[90vh] overflow-x-auto pb-4"
+        panelClass="relative h-[95vh] overflow-x-auto pb-4"
         titleClass="text-xl text-primary-navy "
       >
         <form className="w-[1054px] pr-7">
