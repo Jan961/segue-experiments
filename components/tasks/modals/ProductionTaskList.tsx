@@ -31,7 +31,7 @@ const LoadingOverlay = () => (
 
 const ProductionTaskList = ({ visible, onClose, productionId, isMaster = false }: ProductionTaskListProps) => {
   const { users } = useRecoilValue(userState);
-
+  console.log(productionId);
   const styleProps = { headerColor: tileColors.tasks };
   const [rowData, setRowData] = useState([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -139,11 +139,12 @@ const ProductionTaskList = ({ visible, onClose, productionId, isMaster = false }
       }
     } else {
       try {
-        const endpoint = '/api/tasks/create/multiple/';
-        const tasksData = selectedRows.map((task: MasterTask) => {
+        const endpoint = '/api/tasks/addfrom/production/create';
+        const tasksData = selectedRows.map((task) => {
+          console.log(task);
           return {
             Id: task.Id,
-            ProductionId: productionId,
+            ProductionId: selected,
             Code: task.Code,
             Name: task.Name,
             CompleteByIsPostProduction: false,
@@ -153,9 +154,13 @@ const ProductionTaskList = ({ visible, onClose, productionId, isMaster = false }
             AssignedToUserId: task.AssignedToUserId,
             Progress: 0,
             Priority: task.Priority,
+            PRTId: task.PRTId,
+            FromWeekNum: task.TaskRepeatFromWeekNum,
+            Interval: task.RepeatInterval,
+            ToWeekNum: task.TaskRepeatToWeekNum,
           };
         });
-        await axios.post(endpoint, tasksData);
+        await axios.post(endpoint, { selectedTaskList: tasksData, ProductionId: productionId });
         setLoading(false);
         onClose('data-added');
       } catch (error) {
