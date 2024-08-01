@@ -52,7 +52,7 @@ export const UploadLogoRenderer = (params, fetchProductionCompanies, onUploadSuc
   };
 
   return (
-    <div className="h-full flex justify-center items-center">
+    <div className="h-full flex justify-center items-center relative">
       {!fileLocation ? (
         <Button
           text="Upload Logo"
@@ -64,8 +64,8 @@ export const UploadLogoRenderer = (params, fetchProductionCompanies, onUploadSuc
         <Image
           src={getFileUrl(fileLocation)}
           alt={fileName}
-          width={200}
-          height={200}
+          layout="fill"
+          style={{ cursor: 'pointer', objectPosition: 'center', objectFit: 'contain' }}
           onClick={() => setOpenUploadModal(true)}
         />
       )}
