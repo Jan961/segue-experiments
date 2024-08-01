@@ -42,7 +42,7 @@ const MainVenueForm = ({
   };
   return (
     <>
-      <div className="flex flex-col">
+      <div className="flex flex-col mb-1">
         <label htmlFor="" className="flex flex-row gap-5 justify-between">
           <div className="flex gap-x-1">
             <p className="text-primary-input-text">Venue Code</p>
@@ -67,12 +67,12 @@ const MainVenueForm = ({
               onChange={(e) => handleInputChange('venueCode', e.target.value)}
             />
             {validationErrors.venueCode && (
-              <small className="text-primary-red flex">{validationErrors.venueCode}</small>
+              <small className="text-primary-red absolute">{validationErrors.venueCode}</small>
             )}
           </Tooltip>
         </label>
       </div>
-      <div className="flex flex-col">
+      <div className="flex flex-col mb-1">
         <Select
           testId="main-venue-status"
           label="Venue Status"
@@ -86,7 +86,7 @@ const MainVenueForm = ({
           <small className="text-primary-red w-[430px]">{validationErrors.venueStatus}</small>
         )}
       </div>
-      <div className="flex flex-col">
+      <div className="flex flex-col mb-1">
         <label htmlFor="" className="flex flex-row gap-5 justify-between ">
           <div className="flex gap-x-1">
             <p className="text-primary-input-text">Venue Code</p>
@@ -101,11 +101,13 @@ const MainVenueForm = ({
               error={validationErrors.venueName}
               onChange={(e) => handleInputChange('venueName', e.target.value)}
             />
-            {validationErrors.venueName && <small className="text-primary-red">{validationErrors.venueName}</small>}
+            {validationErrors.venueName && (
+              <small className="text-primary-red absolute">{validationErrors.venueName}</small>
+            )}
           </div>
         </label>
       </div>
-      <div className="flex flex-row justify-between pl-20">
+      <div className="flex flex-row justify-between pl-20 mb-1">
         <Checkbox
           testId="main-venue-vat-checkbox"
           label="VAT Indicator"
@@ -121,7 +123,7 @@ const MainVenueForm = ({
           onChange={(e) => handleInputChange('culturallyExempt', e.target.value)}
         />
       </div>
-      <div className="flex flex-col">
+      <div className="flex flex-col mb-1">
         <label className="flex flex-row gap-5 justify-between">
           <p className="text-primary-input-text">Venue Family</p>
           <Select
@@ -136,7 +138,7 @@ const MainVenueForm = ({
         </label>
         {validationErrors.venueFamily && <small className="text-primary-red">{validationErrors.venueFamily}</small>}
       </div>
-      <label htmlFor="" className="flex flex-row gap-5 justify-between ">
+      <label htmlFor="" className="flex flex-row gap-5 justify-between mb-1">
         <p className="text-primary-input-text">Town Population</p>
         <TextInput
           testId="main-venue-town-population"
@@ -147,8 +149,7 @@ const MainVenueForm = ({
           onChange={(e) => handleInputChange('townPopulation', parseFloat(e.target.value))}
         />
       </label>
-
-      <div className="flex flex-col">
+      <div className="flex flex-col mb-1">
         <label htmlFor="" className="flex flex-row gap-5 justify-between ">
           <p className="text-primary-input-text">Capacity</p>
           <TextInput
@@ -162,10 +163,9 @@ const MainVenueForm = ({
         </label>
         {validationErrors.venueCapacity && <small className="text-primary-red">{validationErrors.venueCapacity}</small>}
       </div>
-
       <label
         htmlFor=""
-        className="grid grid-cols-[100px_minmax(500px,_1fr)] flex-row gap-10 justify-between col-span-2 w-full"
+        className="grid grid-cols-[100px_minmax(500px,_1fr)] flex-row gap-10 justify-between col-span-2 w-full mb-1"
       >
         <p className="text-primary-input-text">Website</p>
         <TextInput
@@ -179,7 +179,7 @@ const MainVenueForm = ({
       </label>
       <label
         htmlFor=""
-        className="grid grid-cols-[100px_minmax(500px,_1fr)] flex-row gap-10 justify-between col-span-2 w-full"
+        className="grid grid-cols-[100px_minmax(500px,_1fr)] flex-row gap-10 justify-between col-span-2 w-full mb-1"
       >
         <p className="text-primary-input-text">Notes</p>
         <TextArea

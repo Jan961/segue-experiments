@@ -4,7 +4,7 @@ import TextInput from 'components/core-ui-lib/TextInput';
 import { initialVenueAddressDetails } from 'config/venue';
 import { useState } from 'react';
 import { UiTransformedVenue } from 'utils/venue';
-import { Icon, Tooltip , Label } from 'components/core-ui-lib';
+import { Icon, Tooltip, Label } from 'components/core-ui-lib';
 
 interface VenueAddressFormProps {
   venue: Partial<UiTransformedVenue>;
@@ -38,7 +38,7 @@ const VenueAddressForm = ({
   };
   return (
     <>
-      <div className="flex flex-col gap-5">
+      <div className="flex flex-col gap-6">
         <h2 className="text-base text-primary-input-text font-bold pt-7">Primary</h2>
         <div className="flex flex-col">
           <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
@@ -57,7 +57,7 @@ const VenueAddressForm = ({
                 onChange={(e) => handleInputChange('primaryAddress1', e.target.value)}
               />
               {validationErrors.primaryAddress1 && (
-                <small className="text-primary-red flex">{validationErrors.primaryAddress1}</small>
+                <small className="text-primary-red flex absolute">{validationErrors.primaryAddress1}</small>
               )}
             </div>
           </label>
@@ -133,7 +133,7 @@ const VenueAddressForm = ({
                 error={validationErrors.primaryCountry && true}
               />
               {validationErrors.primaryCountry && (
-                <small className="text-primary-red flex">{validationErrors.primaryCountry}</small>
+                <small className="text-primary-red flex absolute">{validationErrors.primaryCountry}</small>
               )}
             </div>
           </label>
@@ -172,7 +172,7 @@ const VenueAddressForm = ({
           />
         </label>
       </div>
-      <div className="flex flex-col gap-5">
+      <div className="flex flex-col gap-6">
         <h2 className="text-base text-primary-input-text font-bold pt-7">Delivery</h2>
         <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
           <p className="text-primary-input-text">Address 1</p>
