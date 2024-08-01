@@ -24,7 +24,7 @@ const InputRenderer = (props: SelectRendererProps) => {
       <TextInput
         id="venueText"
         type="number"
-        className="w-full text-primary-input-text font-bold"
+        className="w-full  font-bold"
         value={!isNullOrEmpty(props.holdValue) ? props.holdValue[props.data.HoldTypeName][props.colDef.field] : 0}
         onChange={(value) => props.onChange(value, props.holdValue, props.data.HoldTypeName, props.colDef.field)}
       />

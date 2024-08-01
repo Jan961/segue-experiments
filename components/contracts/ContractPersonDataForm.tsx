@@ -10,7 +10,7 @@ interface ContractPersonDataFormProps {
 export const ContractPersonDataForm = ({ height }: ContractPersonDataFormProps) => {
   return (
     <>
-      <div className={`h-[${height}] w-[82vw] overflow-y-scroll`}>
+      <div className={`${height} w-[82vw] overflow-y-scroll`}>
         <div className="text-xl text-primary-navy font-bold ">Person Details</div>
 
         {addNewPersonInputData.map((newPersonData) => {
@@ -27,7 +27,7 @@ export const ContractPersonDataForm = ({ height }: ContractPersonDataFormProps) 
               <TextInput
                 className=" text-primary-input-text font-bold w-full"
                 disabled
-                // value={contactsData.phone}
+                // value={AddressTown}
                 // placeholder={
                 //   contactsData.phone ? 'Add details to the Contact Database' : 'Please select from the dropdown above'
                 // }
@@ -42,7 +42,7 @@ export const ContractPersonDataForm = ({ height }: ContractPersonDataFormProps) 
                 onChange={() => {
                   return null;
                 }}
-                //   value={formData.DeMoOnSaleDate}
+                //   value={PersonPassportExpiryDate}
               />
               <div className="text-xs text-primary-input-text font-bold ml-4">
                 (<span className="underline">NOTE:</span> Expiry date is 10 years from{' '}
@@ -59,7 +59,7 @@ export const ContractPersonDataForm = ({ height }: ContractPersonDataFormProps) 
               <TextInput
                 className=" text-primary-input-text font-bold w-full"
                 disabled
-                // value={contactsData.phone}
+                // value={AddressPostcode}
                 // placeholder={
                 //   contactsData.phone ? 'Add details to the Contact Database' : 'Please select from the dropdown above'
                 // }
@@ -79,7 +79,7 @@ export const ContractPersonDataForm = ({ height }: ContractPersonDataFormProps) 
                 options={booleanOptions}
                 isClearable
                 isSearchable
-                //   value={formData.DeMoAdvancePaymentRequired}
+                //   value={PersonEligibleToWork}
               />
               <div className="text-primary-input-text font-bold ml-2 mr-2">Checked</div>
               <Select
@@ -91,7 +91,7 @@ export const ContractPersonDataForm = ({ height }: ContractPersonDataFormProps) 
                 options={booleanOptions}
                 isClearable
                 isSearchable
-                //   value={formData.DeMoAdvancePaymentRequired}
+                //   value={PersonFEUCheckByUserId}
               />
             </div>
           </div>
@@ -129,21 +129,25 @@ export const ContractPersonDataForm = ({ height }: ContractPersonDataFormProps) 
                 options={booleanOptions}
                 isClearable
                 isSearchable
-                //   value={formData.DeMoGuarantee}
+                //   value={PersonFEURequired}
               />
             </div>
           </div>
         </div>
-        {['General Notes', 'Relevant Health Details', 'Advisory Notes'].map((input) => {
+        {[
+          ['General Notes', 'PersonNotes'],
+          ['Relevant Health Details', 'PersonHealthNotes'],
+          ['Advisory Notes', 'PersonAdvisoryNotes'],
+        ].map((input) => {
           return (
             <>
               <div className="flex items-center mb-2">
-                <div className="w-[13vw] text-primary-input-text font-bold">{input}</div>
+                <div className="w-[13vw] text-primary-input-text font-bold">{input[0]}</div>
                 <div className="w-4/5">
                   <TextInput
                     id="venueText"
                     className="w-full text-primary-input-text font-bold"
-                    //   value={venueData ? venueData[input[1]] : ''}
+                    //   value={input[1]}
                     disabled={true}
                     placeholder="Notes"
                   />

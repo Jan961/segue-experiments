@@ -670,9 +670,9 @@ model MasterTask {
   Notes                          String?           @map("TaskNotes") @db.VarChar(500)
   AssignedToUserId               Int?              @map("TaskAssignedToUserId")
   StartByWeekNum                 Int?              @map("TaskStartByWeekNum") @db.SmallInt
-  TaskStartByIsPostProduction    Boolean           @default(false) @db.Bit(1)
+  TaskStartByIsPostProduction    Boolean           @default(dbgenerated("(b'0')")) @db.Bit(1)
   CompleteByWeekNum              Int?              @map("TaskCompleteByWeekNum") @db.SmallInt
-  TaskCompleteByIsPostProduction Boolean           @default(false) @db.Bit(1)
+  TaskCompleteByIsPostProduction Boolean           @default(dbgenerated("(b'0')")) @db.Bit(1)
   MTRId                          Int?              @map("TaskMTRId")
   Account                        Account           @relation(fields: [AccountId], references: [AccountId], onDelete: Cascade, map: "Account_MasterTask")
   MasterTaskRepeat               MasterTaskRepeat? @relation(fields: [MTRId], references: [Id], onDelete: Cascade, map: "MasterTaskRepeat_MasterTask")
@@ -682,7 +682,6 @@ model MasterTask {
   @@index([AssignedToUserId], map: "User_MasterTask_Assigned")
   @@index([MTRId], map: "MasterTaskRepeat_MasterTask")
 }
-
 
 model AccountUserProduction {
   AUPId           Int         @id @default(autoincrement())
@@ -1196,13 +1195,13 @@ model PersonRole {
 }
 
 model MasterTaskRepeat {
-  Id                             Int          @map("MTRId")@id @default(autoincrement())
-  FromWeekNum                    Int          @map("MTRFromWeekNum")@db.SmallInt
-  FromWeekNumIsPostProduction Boolean      @map("MTRFromWeekNumIsPostProduction")@default(dbgenerated("(b'0')")) @db.Bit(1)
-  ToWeekNum                   Int          @map("MTRToWeekNum")@db.SmallInt
-  ToWeekNumIsPostProduction   Boolean      @map("MTRToWeekNumIsPostProduction")@default(dbgenerated("(b'0')")) @db.Bit(1)
-  Interval                    String       @map("MTRInterval")@db.VarChar(20)
-  MasterTask                     MasterTask[]
+  Id                          Int          @id @default(autoincrement()) @map("MTRId")
+  FromWeekNum                 Int          @map("MTRFromWeekNum") @db.SmallInt
+  FromWeekNumIsPostProduction Boolean      @default(dbgenerated("(b'0')")) @map("MTRFromWeekNumIsPostProduction") @db.Bit(1)
+  ToWeekNum                   Int          @map("MTRToWeekNum") @db.SmallInt
+  ToWeekNumIsPostProduction   Boolean      @default(dbgenerated("(b'0')")) @map("MTRToWeekNumIsPostProduction") @db.Bit(1)
+  Interval                    String       @map("MTRInterval") @db.VarChar(20)
+  MasterTask                  MasterTask[]
 }
 
 model ProductionTaskRepeat {
@@ -1584,7 +1583,7 @@ view SalesView {
   VenueCurrencySymbolUnicode  String?   @db.VarChar(30)
   ConversionToCurrencyCode    String?   @db.VarChar(3)
   ConversionRate              Decimal?  @db.Decimal(8, 4)
-  SetId                       Int       @default(0)
+  SetId                       Int?      @default(0)
   SetSalesFiguresDate         DateTime? @db.Date
   SetBookingWeekNum           Int?      @db.SmallInt
   SetProductionWeekDate       DateTime? @db.Date
@@ -1596,7 +1595,7 @@ view SalesView {
   SetSingleSeats              Boolean?  @default(dbgenerated("(b'0')")) @db.Bit(1)
   SetBrochureReleased         Boolean?  @default(dbgenerated("(b'0')")) @db.Bit(1)
   SetIsCopy                   Boolean?  @default(dbgenerated("(b'0')")) @db.Bit(1)
-  SaleTypeName                String    @db.VarChar(45)
+  SaleTypeName                String?   @db.VarChar(45)
   Seats                       Decimal?  @db.Decimal(32, 0)
   Value                       Decimal?  @db.Decimal(32, 2)
   TotalCapacity               Float?

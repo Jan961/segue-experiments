@@ -16,7 +16,7 @@ export const ContractNewPersonModal = ({ openNewPersonContract, onClose }: Contr
       onClose={onClose}
       // hasOverlay={showSalesSnapshot}
     >
-      <ContractPersonDataForm height="80vh" />
+      <ContractPersonDataForm height="h-[80vh]" />
 
       <div className="w-full mt-4 flex justify-end items-center">
         <Button className="w-33" variant="secondary" text="Cancel" />
