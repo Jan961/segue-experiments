@@ -93,7 +93,7 @@ const ArchSalesDialog = ({
 
     try {
       const data = await fetchData({
-        url: '/api/marketing/archivedSales/bookingSelection',
+        url: '/api/marketing/archivedSales/bookingSelection/read',
         method: 'POST',
         data: {
           salesByType: variant === 'venue' ? 'venue' : 'town',
