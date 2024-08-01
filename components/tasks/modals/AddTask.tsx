@@ -631,6 +631,7 @@ const AddTask = ({
                   className="mr-4 w-[132px]"
                   text="Clone this Task"
                   testId="btn-task-clone"
+                  disabled={!isNullOrEmpty(inputs?.RepeatInterval)}
                 />
               </>
             )}

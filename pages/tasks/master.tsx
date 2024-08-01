@@ -181,7 +181,12 @@ const MasterTasks = (props: InferGetServerSidePropsType<typeof getServerSideProp
         onClose={handleNewProductionTaskModal}
         handleNewProductionTaskSubmit={handleNewProductionTaskSubmit}
       />
-      <MasterTaskList visible={isMasterTaskList} onClose={handleMasterListClose} isMaster />
+      <MasterTaskList
+        visible={isMasterTaskList}
+        onClose={handleMasterListClose}
+        isMaster
+        currentProductionTasks={filteredTasks}
+      />
       <ProductionTaskList
         visible={isProductionTaskList}
         onClose={handleProductionListClose}
