@@ -13,6 +13,7 @@ import {
 import { addWidthAsPerContent } from 'services/reportsService';
 import { makeRowTextBoldAndAllignLeft } from './promoter-holds';
 import { convertToPDF } from 'utils/report';
+import { bookingStatusMap } from 'config/bookings';
 
 type SCHEDULE_VIEW = {
   ProductionId: number;
@@ -132,7 +133,7 @@ const handler = async (req, res) => {
     ProductionStartDate: moment(x.ProductionStartDate).format('YYYY-MM-DD'),
     ProductionEndDate: moment(x.ProductionEndDate).format('YYYY-MM-DD'),
   }));
-  const worksheet = workbook.addWorksheet('Travel Summary', {
+  const worksheet = workbook.addWorksheet('Tour Schedule', {
     pageSetup: { fitToPage: true, fitToHeight: 5, fitToWidth: 7 },
     views: [{ state: 'frozen', xSplit: 0, ySplit: 5 }],
   });
@@ -149,15 +150,16 @@ const handler = async (req, res) => {
   const title = `${FullProductionCode} ${ShowName} Tour Schedule - ${moment().format('DD.MM.YY')}`;
   worksheet.addRow([title]);
   worksheet.addRow([`Exported: ${moment().format('DD/MM/YY [at] HH:mm')} - Layout: Standard`]);
-  worksheet.addRow(['', '', '', '', '', '', '', '', 'PERFS', 'PERF1', 'PERF2', '']);
+  worksheet.addRow(['', '', '', '', '', '', '', 'BOOKING', '', 'PERFS', 'PERF1', 'PERF2', '']);
   worksheet.addRow([
     'PROD',
     'DAY',
     'DATE',
-    'WEEK',
+    'WK',
     'VENUE/DETAILS',
     'TOWN',
-    'PENCIL',
+    'DAY TYPE',
+    'STATUS',
     'CAPACITY',
     '/DAY',
     'TIME',
@@ -210,7 +212,18 @@ const handler = async (req, res) => {
         cellColor: COLOR_HEXCODE.WHITE,
       });
     } else {
-      const { ProductionWeekNum, Location, EntryName, TimeMins, Mileage, VenueSeats, EntryId, PencilNum } = value;
+      const {
+        ProductionWeekNum,
+        Location,
+        EntryName,
+        TimeMins,
+        Mileage,
+        VenueSeats,
+        EntryId,
+        PencilNum,
+        EntryStatusCode,
+        EntryType = '',
+      } = value;
       const formattedTime = TimeMins ? minutesInHHmmFormat(Number(TimeMins)) : '';
       const performances = bookingIdPerformanceMap[EntryId];
       const performancesOnThisDay = performances?.filter?.((performance) =>
@@ -227,10 +240,12 @@ const handler = async (req, res) => {
         dateInIncomingFormat.format('DD/MM/YY'),
         ProductionWeekNum,
         EntryName || '',
+        ...((isOtherDay && [Location || '', EntryType || '']) || []),
         ...((!isOtherDay &&
           !isCancelled && [
             Location || '',
-            PencilNum,
+            'Performance',
+            `${bookingStatusMap?.[EntryStatusCode] || ''} ${PencilNum ? `(${PencilNum})` : ''}`,
             VenueSeats,
             performancesOnThisDay?.length,
             performancesOnThisDay?.[0]?.performanceTime || '',
@@ -319,14 +334,14 @@ const handler = async (req, res) => {
     startingColAsCharWIthCapsOn: 'B',
     minColWidth: 10,
     bufferWidth: 0,
-    rowsToIgnore: 4,
+    rowsToIgnore: 2,
     maxColWidth: Infinity,
   });
   worksheet.getColumn('A').width = 7;
   worksheet.getColumn('B').width = 5;
   worksheet.getColumn('C').width = 12;
   worksheet.getColumn('D').width = 5;
-  // worksheet.getColumn('H').width = 5;
+  worksheet.getColumn('G').width = 15;
   worksheet.getColumn('I').width = 5;
   worksheet.getColumn('J').width = 7;
   worksheet.getColumn('K').width = 7;

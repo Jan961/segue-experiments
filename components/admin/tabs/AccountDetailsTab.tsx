@@ -8,7 +8,7 @@ import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import { transformToOptions } from 'utils';
 import { Label } from 'components/core-ui-lib';
 import schema from './AccountDetailsValidationSchema';
-import { AccountLogoUpload } from '../AccountLogoUpload/AccountLogoUpload';
+import { AccountLogoUpload } from '../accountLogoUpload/AccountLogoUpload';
 
 export default function AccountDetailsTab() {
   const [formData, setFormData] = useState<UiAccountType>({ ...initialUiAccountDetails });
