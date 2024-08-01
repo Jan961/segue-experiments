@@ -185,6 +185,8 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
         bookingId: bookings.selected,
       };
 
+      console.log(inputData);
+
       const response = await axios.post('/api/marketing/sales/process/entry/compHold/upsert', inputData);
 
       if (typeof response.data === 'object') {
@@ -452,6 +454,8 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
         let inputDate = new Date();
         if (salesDate !== null) {
           inputDate = salesDate;
+        } else {
+          setSalesDate(new Date());
         }
 
         setSalesFigures(inputDate, false);
