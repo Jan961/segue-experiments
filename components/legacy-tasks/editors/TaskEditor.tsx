@@ -68,6 +68,7 @@ const TaskEditor = ({ task, triggerClose, open, recurring = false }: NewTaskForm
     }
 
     setIsLoading(true);
+
     if (inputs.Id) {
       try {
         await axios.post('/api/tasks/update', inputs);

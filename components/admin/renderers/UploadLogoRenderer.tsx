@@ -25,7 +25,7 @@ export const UploadLogoRenderer = (params, fetchProductionCompanies, onUploadSuc
 
     try {
       const response = await uploadFile(formData, onProgress, onError, onUploadingImage);
-      if (response.status >= 400 && response.status <= 499) {
+      if (response.status >= 400 && response.status < 600) {
         onError(file[0].file, 'Error uploading file. Please try again.');
       } else {
         setUploadedFile((prev) => ({ ...prev, imageUrl: getFileUrl(response.location) }));

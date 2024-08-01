@@ -12,7 +12,7 @@ const UploadModal: React.FC<UploadModalProps> = ({
   onClose,
   info,
   isMultiple,
-  maxFiles,
+  maxFiles = 1,
   maxFileSize,
   allowedFormats,
   onChange,
@@ -96,8 +96,9 @@ const UploadModal: React.FC<UploadModalProps> = ({
   };
 
   const handleFileDelete = (fileName) => {
+    const deletedFile = selectedFiles.find((file) => file?.name === fileName);
     if (customHandleFileDelete) {
-      customHandleFileDelete();
+      customHandleFileDelete(deletedFile);
     }
 
     const filesList = selectedFiles.filter((file) => file?.name !== fileName);
@@ -126,10 +127,16 @@ const UploadModal: React.FC<UploadModalProps> = ({
       return;
     }
 
-    if (maxFiles && files.length > maxFiles) {
+    if (maxFiles && files.length + selectedFiles.length > maxFiles) {
       setError(`You can upload up to ${maxFiles} files.`);
-      setSelectedFiles([]);
-      onChange?.([]);
+      setSelectedFiles(selectedFiles);
+      setIsUploading(false);
+      if (hiddenFileInput.current) {
+        hiddenFileInput.current.value = '';
+      }
+      setProgress({});
+      setErrorMessages({});
+      setUploadedImageUrls(uploadedImageUrls);
       return;
     }
 
@@ -141,13 +148,14 @@ const UploadModal: React.FC<UploadModalProps> = ({
         errorMessages[file?.name] = `Invalid file format. Allowed formats: ${allowedFormats.join(', ')}.`;
       }
     }
-    const filesList = Array.from(files).map((file) => ({
+
+    const filesList: UploadedFile[] = Array.from(files).map((file) => ({
       name: file?.name,
       size: file?.size,
       file,
     }));
     setError('');
-    setSelectedFiles(filesList);
+    setSelectedFiles([...selectedFiles, ...filesList]);
     onChange?.(filesList);
     hiddenFileInput.current.value = '';
   };
@@ -197,11 +205,11 @@ const UploadModal: React.FC<UploadModalProps> = ({
           />
         </div>
         {error && (
-          <div data-testid="error" className="text-primary-red text-sm text-center">
+          <div data-testid="error" className="text-primary-red text-sm ">
             {error}
           </div>
         )}
-        <div className="grid grid-cols-1 gap-4 mt-3 max-h-60 overflow-y-auto">
+        <div className="grid grid-cols-1 gap-4  max-h-60 overflow-y-auto">
           {selectedFiles?.map((file, index) => (
             <FileCard
               key={index}

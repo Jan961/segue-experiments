@@ -1,16 +1,33 @@
 import { Select, TextInput } from 'components/core-ui-lib';
 import { booleanOptions } from 'config/contracts';
+import { useState } from 'react';
 
 interface AddPersonDataProps {
   first?: string;
   second?: string;
   type?: string;
+  dataFieldFirst?: string;
+  dataFieldSecond?: string;
 }
 interface NewPersonDataProps {
   newPersonData: AddPersonDataProps;
 }
 
 export const AddNewPersonInput = ({ newPersonData }: NewPersonDataProps) => {
+  const [newPersonForm, setNewPersonForm] = useState({});
+  const handleAddNewPersonForm = (key: string, value, type: string) => {
+    const updatedFormData = {
+      ...newPersonForm,
+      [key]: value,
+    };
+
+    if (type === 'dealMemo') {
+      setNewPersonForm({ ...updatedFormData });
+    }
+    // setFormEdited(true);
+    // setNewPersonForm()
+  };
+
   return (
     <div className="flex mt-2 items-center">
       {newPersonData.first && (
@@ -21,6 +38,9 @@ export const AddNewPersonInput = ({ newPersonData }: NewPersonDataProps) => {
               <TextInput
                 className=" text-primary-input-text font-bold w-full"
                 disabled
+                onChange={(value) => {
+                  handleAddNewPersonForm(newPersonData.dataFieldFirst, value, 'dealMemo');
+                }}
                 // value={contactsData.phone}
                 // placeholder={
                 //   contactsData.phone ? 'Add details to the Contact Database' : 'Please select from the dropdown above'
@@ -52,6 +72,9 @@ export const AddNewPersonInput = ({ newPersonData }: NewPersonDataProps) => {
               <TextInput
                 className=" text-primary-input-text font-bold w-full"
                 disabled
+                onChange={(value) => {
+                  handleAddNewPersonForm(newPersonData.dataFieldSecond, value, 'dealMemo');
+                }}
                 // value={contactsData.phone}
                 // placeholder={
                 //   contactsData.phone ? 'Add details to the Contact Database' : 'Please select from the dropdown above'

@@ -31,6 +31,7 @@ interface AddTaskProps {
   onClose: () => void;
   task?: Partial<MasterTask> & { ProductionId?: number; ProductionTaskRepeat?: any };
   productionId?: number;
+  updateTableData: (task: any, isAdding: boolean) => Promise<void>;
 }
 
 const RepeatOptions = [
@@ -78,7 +79,14 @@ const DEFAULT_MASTER_TASK: Partial<MasterTask> & {
   TaskCompletedDate: '',
 };
 
-const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = null }: AddTaskProps) => {
+const AddTask = ({
+  visible,
+  onClose,
+  task,
+  isMasterTask = false,
+  productionId = null,
+  updateTableData,
+}: AddTaskProps) => {
   const [inputs, setInputs] = useState<
     Partial<MasterTask> & {
       Progress?: number;
@@ -119,6 +127,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
   const [taskRecurringInfo, setTaskRecurringInfo] = useState(null);
   const [showRecurringDelete, setShowRecurringDelete] = useState<boolean>(false);
   const [showSingleDelete, setShowSingleDelete] = useState<boolean>(false);
+  const [showConfirmationDialog, setShowConfirmationDialog] = useState<boolean>(false);
   const priorityOptionList = useMemo(
     () => priorityOptions.map((option) => ({ ...option, text: `${option.value} - ${option.text}` })),
     [],
@@ -202,6 +211,8 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
   };
 
   const getNewTasksNum = (prodStartDate: Date, taskRepeatFromWeekNum, taskRepeatToWeekNum, repeatInterval): number => {
+    if (isNullOrEmpty(repeatInterval)) return 1;
+
     let taskStartDate = addDurationToDate(prodStartDate, taskRepeatFromWeekNum * 7, true);
     const taskEndDate = addDurationToDate(prodStartDate, taskRepeatToWeekNum * 7, true);
 
@@ -224,12 +235,15 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
       await handleOnSubmit();
       onClose();
       setInputs(DEFAULT_MASTER_TASK);
+      await updateTableData(newInfo, true);
       return;
     } else {
       if (previousInfo === null) {
         await handleOnSubmit();
         onClose();
+        await updateTableData(newInfo, true);
         setInputs(DEFAULT_MASTER_TASK);
+
         return;
       }
     }
@@ -290,9 +304,6 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
         const endpoint = `/api/tasks/master/create/${inputs?.RepeatInterval ? 'recurring' : 'single'}/`;
         await axios.post(endpoint, inputs);
         setLoading(false);
-        if (isChecked) {
-          await handleMasterTask();
-        }
         onClose();
       } catch (error) {
         setLoading(false);
@@ -305,6 +316,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
     setLoading(false);
     if (isMasterTask) {
       await handleMasterTask();
+      await updateTableData(inputs, true);
     } else {
       omit(inputs, ['TaskCompleteByIsPostProduction', 'TaskStartByIsPostProduction', 'ProductionTaskRepeat']);
       if (inputs.Id) {
@@ -312,6 +324,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
           await axios.post(`/api/tasks/update${inputs?.RepeatInterval ? '/recurring' : ''}`, inputs);
           setLoading(false);
           handleClose();
+          await updateTableData(inputs, true);
         } catch (error) {
           setLoading(false);
         }
@@ -319,11 +332,10 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
         try {
           const endpoint = `/api/tasks/create/${inputs?.RepeatInterval ? 'recurring' : 'single'}/`;
           await axios.post(endpoint, inputs);
+          if (isChecked) await handleMasterTask();
           setLoading(false);
-          if (isChecked) {
-            await handleMasterTask();
-          }
           onClose();
+          await updateTableData(inputs, true);
         } catch (error) {
           setLoading(false);
           console.error(error);
@@ -377,6 +389,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
         await axios.delete(`/api/tasks/master/delete/${inputs?.Id}`);
         setLoading(false);
         onClose();
+        await updateTableData(inputs, false);
       } finally {
         setLoading(false);
       }
@@ -385,6 +398,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
         await axios.delete(`/api/tasks/delete/${inputs?.Id}`);
         setLoading(false);
         onClose();
+        await updateTableData(inputs, false);
       } finally {
         setLoading(false);
       }
@@ -392,10 +406,28 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
     setShowSingleDelete(false);
   };
 
+  const checkFieldsUpdated = () => {
+    if (taskRecurringInfo === null) return false;
+    for (const key in inputs) {
+      if (taskRecurringInfo?.key || taskRecurringInfo[key] !== inputs[key]) {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  const handleCancel = () => {
+    if (checkFieldsUpdated()) {
+      setShowConfirmationDialog(true);
+    } else {
+      handleClose();
+    }
+  };
+
   return (
     <PopupModal
       show={visible}
-      onClose={handleClose}
+      onClose={handleCancel}
       title={inputs.Id ? 'Edit Task' : 'Create New Task'}
       titleClass="text-primary-navy text-xl mb-4"
     >
@@ -467,11 +499,12 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
             <Select
               disabled={isMasterTask}
               onChange={(value) => handleOnChange({ target: { id: 'Progress', value } })}
-              value={inputs?.Progress?.toString()}
+              value={inputs?.Progress?.toString() || '0'}
               placeholder="Progress"
               isSearchable
               className="w-32"
               options={generatePercentageOptions}
+              isClearable={false}
               testId="sel-task-progress"
             />
           </div>
@@ -580,7 +613,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
         <div className="flex justify-between">
           <div />
           <div className="flex">
-            <Button variant="secondary" onClick={onClose} className="mr-4 w-[132px]" text="Cancel" />
+            <Button variant="secondary" onClick={handleCancel} className="mr-4 w-[132px]" text="Cancel" />
             {inputs.Id && (
               <>
                 <Button
@@ -639,6 +672,17 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
         onYesClick={handleSingleDelete}
         onNoClick={() => setShowSingleDelete(false)}
         hasOverlay={false}
+      />
+      <ConfirmationDialog
+        variant="cancel"
+        show={showConfirmationDialog}
+        onNoClick={() => {
+          setShowConfirmationDialog(false);
+        }}
+        onYesClick={() => {
+          setShowConfirmationDialog(false);
+          onClose();
+        }}
       />
     </PopupModal>
   );

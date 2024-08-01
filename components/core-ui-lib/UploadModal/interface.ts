@@ -11,6 +11,8 @@ export interface UploadedFile {
   error?: string;
   file?: File;
   imageUrl?: string;
+  location?: string;
+  fileId?: number;
 }
 
 export interface FileCardProps {
@@ -39,7 +41,7 @@ export interface UploadModalProps {
     onUploadingImage: (file: File, imageUrl: string) => void,
   ) => void;
   value?: UploadedFile[] | UploadedFile;
-  customHandleFileDelete?: () => Promise<void>;
+  customHandleFileDelete?: (deletedFile?: any) => Promise<void>;
 }
 
 export const attachmentMimeTypes = {

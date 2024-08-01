@@ -44,8 +44,8 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
             counter,
           );
         } else {
-          return {
-            data: {
+          return [
+            {
               ProductionId,
               Code: (await getMaxProductionTaskCode(ProductionId)) + 1,
               Name: task.Name,
@@ -62,11 +62,10 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
                 task.StartByWeekNum > calculateWeekNumber(prodBlock?.StartDate, prodBlock?.EndDate),
               CompleteByWeekNum: task.CompleteByWeekNum,
             },
-          };
+          ];
         }
       }),
     );
-
     const taskObjects = await Promise.all(
       createdTasks.map(async (task) => {
         return await Promise.all(
@@ -86,6 +85,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     return res.status(200).json(taskObjects);
   } catch (err) {
     console.log(err);
-    res.status(500).json({ error: 'Error creating Recurring ProductionTask' });
+    res.status(500).json({ error: 'Error creating adding from Master Task' });
   }
 }

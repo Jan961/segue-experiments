@@ -1,9 +1,11 @@
 import Layout from 'components/Layout';
+import { SalesEntryRef } from 'components/marketing/activity/GlobalActivityView';
 import SalesEntryFilters from 'components/marketing/SalesEntryFilters';
 import { bookingMapperWithVenue, venueRoleMapper } from 'lib/mappers';
 import { InitialState } from 'lib/recoil';
 import { GetServerSideProps } from 'next';
 import { objectify } from 'radash';
+import { useRef } from 'react';
 import { getSaleableBookings } from 'services/bookingService';
 import { getRoles } from 'services/contactService';
 import { getAccountId, getEmailFromReq, getUserNameFromReq, getUsers } from 'services/userService';
@@ -12,11 +14,19 @@ import { BookingJump } from 'state/marketing/bookingJumpState';
 import { getProductionJumpState } from 'utils/getProductionJumpState';
 
 const Index = () => {
+  const salesEntryRef = useRef<SalesEntryRef>();
+
+  const handleDateChanged = (salesWeek) => {
+    if (salesEntryRef.current) {
+      salesEntryRef.current.resetForm(salesWeek);
+    }
+  };
+
   return (
     <div>
       <Layout title="Marketing | Segue">
         <div className="mb-8">
-          <SalesEntryFilters />
+          <SalesEntryFilters onDateChanged={handleDateChanged} />
         </div>
       </Layout>
     </div>

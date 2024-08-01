@@ -32,15 +32,27 @@ type TPromoter = {
   CompAllocationVenueConfirmationNotes: string | null;
 };
 
-const alignColumnTextRight = ({ worksheet, colAsChar }: { worksheet: any; colAsChar: string }) => {
-  worksheet.getColumn(colAsChar).eachCell((cell) => {
-    cell.alignment = { horizontal: 'right' };
-  });
+interface ICellAlignment {
+  horizontal?: string;
+  vertical?: string;
+}
+
+const defaultAlignment: ICellAlignment = {
+  horizontal: 'left',
+  vertical: 'top',
 };
 
-const alignCellTextCenter = ({ worksheet, colAsChar }: { worksheet: any; colAsChar: string }) => {
+const alignColumnCells = ({
+  worksheet,
+  colAsChar,
+  alignment = defaultAlignment,
+}: {
+  worksheet: any;
+  colAsChar: string;
+  alignment: ICellAlignment;
+}) => {
   worksheet.getColumn(colAsChar).eachCell((cell) => {
-    cell.alignment = { horizontal: 'center' };
+    cell.alignment = alignment;
   });
 };
 
@@ -59,18 +71,12 @@ export const makeRowTextBoldAndAllignLeft = ({
   for (let col = 1; col <= totalColumns; col++) {
     const cell = worksheet.getCell(row, col);
     cell.font = { bold: true, color: { argb: COLOR_HEXCODE.WHITE } };
-    cell.alignment = { horizontal: 'left' };
+    cell.alignment = { horizontal: 'left', vertical: 'top' };
     cell.fill = {
       type: 'pattern',
       pattern: 'solid',
       fgColor: { argb: bgColor },
     };
-    // cell.border = {
-    //   top: { style: 'double', color: { argb: COLOR_HEXCODE.WHITE } },
-    //   left: { style: 'double', color: { argb: COLOR_HEXCODE.WHITE } },
-    //   bottom: { style: 'double', color: { argb: COLOR_HEXCODE.WHITE } },
-    //   right: { style: 'double', color: { argb: COLOR_HEXCODE.WHITE } }
-    // }
   }
 };
 
@@ -181,13 +187,13 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   worksheet.mergeCells('F3:G3');
   worksheet.mergeCells('H3:I3');
 
-  // for (let char = 'A', i = 0; i < numberOfColumns; i++, char = String.fromCharCode(char.charCodeAt(0) + 1)) {
-  //   worksheet.getColumn(char).width = 15
-  // }
-  alignColumnTextRight({ worksheet, colAsChar: 'D' });
-  alignColumnTextRight({ worksheet, colAsChar: 'E' });
-  alignCellTextCenter({ worksheet, colAsChar: 'F' });
-  alignCellTextCenter({ worksheet, colAsChar: 'H' });
+  for (let char = 'A', i = 0; i < numberOfColumns; i++, char = String.fromCharCode(char.charCodeAt(0) + 1)) {
+    alignColumnCells({ worksheet, colAsChar: char, alignment: { horizontal: 'left', vertical: 'top' } });
+  }
+  alignColumnCells({ worksheet, colAsChar: 'D', alignment: { horizontal: 'right', vertical: 'top' } });
+  alignColumnCells({ worksheet, colAsChar: 'E', alignment: { horizontal: 'right', vertical: 'top' } });
+  alignColumnCells({ worksheet, colAsChar: 'F', alignment: { horizontal: 'center', vertical: 'top' } });
+  alignColumnCells({ worksheet, colAsChar: 'H', alignment: { horizontal: 'center', vertical: 'top' } });
 
   for (let row = 1; row <= 4; row++) {
     makeRowTextBoldAndAllignLeft({ worksheet, row, numberOfColumns, bgColor: COLOR_HEXCODE.DARK_GREEN });

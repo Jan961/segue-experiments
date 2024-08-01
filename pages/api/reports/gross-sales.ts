@@ -8,6 +8,7 @@ import { ALIGNMENT, alignCellText, styleHeader } from './masterplan';
 import { getExportedAtTitle } from 'utils/export';
 import { currencyCodeToSymbolMap } from 'config/Reports';
 import { convertToPDF } from 'utils/report';
+import { BOOK_STATUS_CODES, SALES_TYPE_NAME } from 'types/MarketingTypes';
 
 type SALES_SUMMARY = {
   ProductionId: number;
@@ -21,7 +22,8 @@ type SALES_SUMMARY = {
   EntryId: number;
   EntryName: string;
   EntryType: string;
-  Value: number | null;
+  EntryStatusCode: BOOK_STATUS_CODES;
+  Value: any | null;
   VenueCurrencyCode: string | null;
   VenueCurrencySymbol: string | null;
   ConversionRate: number | null;
@@ -54,12 +56,14 @@ const colorTextAndBGCell = ({
   col,
   textColor,
   cellColor,
+  numFmt,
 }: {
   worksheet: any;
   row: number;
   col: number;
   textColor?: COLOR_HEXCODE;
   cellColor?: COLOR_HEXCODE;
+  numFmt?: string;
 }) => {
   if (!textColor && !cellColor) {
     return;
@@ -67,6 +71,9 @@ const colorTextAndBGCell = ({
   const cell = worksheet.getCell(row, col);
   if (textColor) {
     cell.font = { color: { argb: 'ffffffff' }, bold: true };
+  }
+  if (numFmt) {
+    cell.numFmt = numFmt;
   }
   if (cellColor) {
     cell.fill = {
@@ -106,6 +113,7 @@ const handler = async (req, res) => {
   if (productionId) {
     conditions.push(Prisma.sql` ProductionId=${productionId}`);
   }
+  conditions.push(Prisma.sql` SaleTypeName=${SALES_TYPE_NAME.GENERAL_SALES}`);
   const where: Prisma.Sql = conditions.length ? Prisma.sql` where ${Prisma.join(conditions, ' and ')}` : Prisma.empty;
 
   const data: SALES_SUMMARY[] = await prisma.$queryRaw`select * FROM SalesSummaryView ${where} order by EntryDate;`;
@@ -114,6 +122,7 @@ const handler = async (req, res) => {
   const workbook = new ExcelJS.Workbook();
   const formattedData = data.map((x) => ({
     ...x,
+    Value: x.Value?.toNumber?.() || 0,
     EntryDate: moment(x.EntryDate).format('YYYY-MM-DD'),
     ProductionStartDate: moment(x.ProductionStartDate).format('YYYY-MM-DD'),
     ProductionEndDate: moment(x.ProductionEndDate).format('YYYY-MM-DD'),
@@ -156,11 +165,15 @@ const handler = async (req, res) => {
   const r6: string[] = [];
   const r7: string[] = [];
   const r8: string[] = [];
-  const r9: string[] = [];
+  const r9: any[] = [];
 
   const mergeRowCol: { row: number[]; col: number[] }[] = [];
-  const cellColor: { cell: { rowNo: number; colNo: number }; cellColor?: COLOR_HEXCODE; textColor?: COLOR_HEXCODE }[] =
-    [];
+  const cellColor: {
+    cell: { rowNo: number; colNo: number };
+    cellColor?: COLOR_HEXCODE;
+    textColor?: COLOR_HEXCODE;
+    numFmt?: string;
+  }[] = [];
   const totalOfCurrency: { [key: string]: number } = { '£': 0, '€': 0 };
   for (let i = 1; i <= daysDiff || weekPending; i++) {
     weekPending = true;
@@ -206,8 +219,10 @@ const handler = async (req, res) => {
       }
       r7.push(value.Location || '');
       r8.push(value.EntryName || '');
-      r9.push(value.VenueCurrencySymbol && value.Value ? `${value.VenueCurrencySymbol}${value.Value}` : '');
-      if (value.VenueCurrencySymbol && value.Value) {
+      r9.push(value.Value ? value.Value : '');
+      console.log(9, colNo, typeof value.Value, value.Value);
+      cellColor.push({ cell: { rowNo: 9, colNo }, numFmt: (value.VenueCurrencySymbol || '') + '#,##0.00' });
+      if (value.VenueCurrencySymbol && value.Value && value.EntryStatusCode !== 'X') {
         const val = totalOfCurrency[value.VenueCurrencySymbol];
         if (val || val === 0) {
           totalOfCurrency[value.VenueCurrencySymbol] = new Decimal(val)
@@ -221,6 +236,10 @@ const handler = async (req, res) => {
       ) {
         cellColor.push({ cell: { rowNo: 7, colNo }, cellColor: COLOR_HEXCODE.RED, textColor: COLOR_HEXCODE.WHITE });
         cellColor.push({ cell: { rowNo: 8, colNo }, cellColor: COLOR_HEXCODE.RED, textColor: COLOR_HEXCODE.WHITE });
+      }
+      if (value.EntryStatusCode === 'X') {
+        cellColor.push({ cell: { rowNo: 7, colNo }, cellColor: COLOR_HEXCODE.BLACK, textColor: COLOR_HEXCODE.WHITE });
+        cellColor.push({ cell: { rowNo: 8, colNo }, cellColor: COLOR_HEXCODE.BLACK, textColor: COLOR_HEXCODE.WHITE });
       }
     }
 
@@ -320,13 +339,16 @@ const handler = async (req, res) => {
       cell: { rowNo, colNo },
       cellColor,
       textColor,
+      numFmt,
     } = ele;
+    console.log(rowNo, colNo, numFmt);
     colorTextAndBGCell({
       worksheet,
       row: rowNo,
       col: colNo,
       ...(textColor && { textColor }),
       ...(cellColor && { cellColor }),
+      ...(numFmt && { numFmt }),
     });
   });
   styleHeader({ worksheet, row: 1, bgColor: COLOR_HEXCODE.DARK_GREEN });

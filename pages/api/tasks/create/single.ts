@@ -14,7 +14,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     if (!access) return res.status(401).end();
 
     const code = await getMaxProductionTaskCode(ProductionId);
-
     const createResult = await prisma.productionTask.create({
       data: {
         ProductionId: task.ProductionId,
