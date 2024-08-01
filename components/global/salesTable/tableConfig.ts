@@ -229,7 +229,13 @@ export const salesColDefs = (schoolDataAvail, isMarketing, booking, setSalesActi
     {
       headerName: 'Week',
       field: 'week',
-      cellRenderer: DefaultCellRenderer,
+      cellRenderer: function (params) {
+        if (params.data.isFinal) {
+          return 'Final';
+        } else {
+          return params.data.week;
+        }
+      },
       cellStyle: (params) => {
         return {
           ...getCellColor(params.data, true, schoolDataAvail),
