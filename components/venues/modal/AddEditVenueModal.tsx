@@ -254,7 +254,7 @@ export default function AddEditVenueModal({
             </div>
           </div>
         </form>
-        <div className="flex justify-end float-right block w-full">
+        <div className="flex justify-end float-right w-full">
           {hasErrors && <p className="text-primary-red mt-4">Please fill all required fields</p>}
         </div>
         <ConfirmationDialog

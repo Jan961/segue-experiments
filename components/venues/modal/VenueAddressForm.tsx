@@ -4,7 +4,7 @@ import TextInput from 'components/core-ui-lib/TextInput';
 import { initialVenueAddressDetails } from 'config/venue';
 import { useState } from 'react';
 import { UiTransformedVenue } from 'utils/venue';
-import { Icon, Tooltip } from 'components/core-ui-lib';
+import { Icon, Tooltip , Label } from 'components/core-ui-lib';
 
 interface VenueAddressFormProps {
   venue: Partial<UiTransformedVenue>;
@@ -42,20 +42,25 @@ const VenueAddressForm = ({
         <h2 className="text-base text-primary-input-text font-bold pt-7">Primary</h2>
         <div className="flex flex-col">
           <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
-            <p className=" text-primary-input-text">Address 1</p>
-            <TextInput
-              testId="primary-address-1"
-              placeholder="Enter Address 1"
-              className="w-full justify-between"
-              inputClassName="w-full"
-              value={formData.primaryAddress1}
-              error={validationErrors.primaryAddress1}
-              onChange={(e) => handleInputChange('primaryAddress1', e.target.value)}
-            />
+            <div className="flex gap-x-1">
+              <p className="text-primary-input-text">Venue Code</p>
+              <Label required text="" />
+            </div>
+            <div>
+              <TextInput
+                testId="primary-address-1"
+                placeholder="Enter Address 1"
+                className="w-full justify-between"
+                inputClassName="w-full"
+                value={formData.primaryAddress1}
+                error={validationErrors.primaryAddress1}
+                onChange={(e) => handleInputChange('primaryAddress1', e.target.value)}
+              />
+              {validationErrors.primaryAddress1 && (
+                <small className="text-primary-red flex">{validationErrors.primaryAddress1}</small>
+              )}
+            </div>
           </label>
-          {validationErrors.primaryAddress1 && (
-            <small className="text-primary-red flex">{validationErrors.primaryAddress1}</small>
-          )}
         </div>
         <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
           <p className="text-primary-input-text">Address 2</p>
@@ -104,7 +109,10 @@ const VenueAddressForm = ({
         <div className="flex flex-col">
           <label className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between w-full">
             <div className="flex items-center gap-x-1">
-              <p className="text-primary-input-text">Country</p>
+              <div className="flex gap-x-1">
+                <p className="text-primary-input-text">Country</p>
+                <Label required text="" />
+              </div>
               <Tooltip
                 body="For venues in the United Kingdom: Please select Scotland, England, Wales or Northern Ireland as the Country"
                 width="w-[200px]"
@@ -112,20 +120,23 @@ const VenueAddressForm = ({
                 <Icon iconName="info-circle-solid" />
               </Tooltip>
             </div>
-            <Select
-              testId="primary-country"
-              name="primaryCountry"
-              className="w-full font-bold"
-              placeholder="Country"
-              value={formData.primaryCountry}
-              onChange={(value) => handleInputChange('primaryCountry', parseInt(value as string, 10))}
-              options={countryOptions}
-              isSearchable
-            />
+            <div>
+              <Select
+                testId="primary-country"
+                name="primaryCountry"
+                className="w-full font-bold"
+                placeholder="Country"
+                value={formData.primaryCountry}
+                onChange={(value) => handleInputChange('primaryCountry', parseInt(value as string, 10))}
+                options={countryOptions}
+                isSearchable
+                error={validationErrors.primaryCountry && true}
+              />
+              {validationErrors.primaryCountry && (
+                <small className="text-primary-red flex">{validationErrors.primaryCountry}</small>
+              )}
+            </div>
           </label>
-          {validationErrors.primaryCountry && (
-            <small className="text-primary-red flex">{validationErrors.primaryCountry}</small>
-          )}
         </div>
         <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
           <p className="text-primary-input-text">Phone</p>
@@ -221,7 +232,10 @@ const VenueAddressForm = ({
 
         <label className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
           <div className="flex items-center gap-x-1">
-            <p className="text-primary-input-text">Country</p>
+            <div className="flex gap-x-1">
+              <p className="text-primary-input-text">Country</p>
+              <Label required text="" />
+            </div>
             <Tooltip
               body="For venues in the United Kingdom: Please select Scotland, England, Wales or Northern Ireland as the Country"
               width="w-[200px]"

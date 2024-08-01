@@ -8,6 +8,7 @@ import Tooltip from 'components/core-ui-lib/Tooltip';
 import { initialMainVenueDetails, venueStatusOptions } from 'config/venue';
 import { useState } from 'react';
 import { UiTransformedVenue } from 'utils/venue';
+import { Label } from 'components/core-ui-lib';
 
 interface MainVenueFormProps {
   venue: Partial<UiTransformedVenue>;
@@ -43,7 +44,10 @@ const MainVenueForm = ({
     <>
       <div className="flex flex-col">
         <label htmlFor="" className="flex flex-row gap-5 justify-between">
-          <p className="text-primary-input-text">Venue Code</p>
+          <div className="flex gap-x-1">
+            <p className="text-primary-input-text">Venue Code</p>
+            <Label required text="" />
+          </div>
           <Tooltip
             width="w-[200px]"
             position="right"
@@ -62,9 +66,11 @@ const MainVenueForm = ({
               onBlur={() => handleInputChange('venueCode', formData.venueCode)}
               onChange={(e) => handleInputChange('venueCode', e.target.value)}
             />
+            {validationErrors.venueCode && (
+              <small className="text-primary-red flex">{validationErrors.venueCode}</small>
+            )}
           </Tooltip>
         </label>
-        {validationErrors.venueCode && <small className="text-primary-red flex">{validationErrors.venueCode}</small>}
       </div>
       <div className="flex flex-col">
         <Select
@@ -82,17 +88,22 @@ const MainVenueForm = ({
       </div>
       <div className="flex flex-col">
         <label htmlFor="" className="flex flex-row gap-5 justify-between ">
-          <p className="text-primary-input-text">Venue Name</p>
-          <TextInput
-            testId="main-venue-name"
-            placeholder="Enter Venue Name"
-            className="w-[364px]"
-            value={formData.venueName}
-            error={validationErrors.venueName}
-            onChange={(e) => handleInputChange('venueName', e.target.value)}
-          />
+          <div className="flex gap-x-1">
+            <p className="text-primary-input-text">Venue Code</p>
+            <Label required text="" />
+          </div>
+          <div>
+            <TextInput
+              testId="main-venue-name"
+              placeholder="Enter Venue Name"
+              className="w-[364px]"
+              value={formData.venueName}
+              error={validationErrors.venueName}
+              onChange={(e) => handleInputChange('venueName', e.target.value)}
+            />
+            {validationErrors.venueName && <small className="text-primary-red">{validationErrors.venueName}</small>}
+          </div>
         </label>
-        {validationErrors.venueName && <small className="text-primary-red">{validationErrors.venueName}</small>}
       </div>
       <div className="flex flex-row justify-between pl-20">
         <Checkbox
