@@ -56,10 +56,10 @@ const MasterTaskList = ({ visible, onClose, productionId, currentProductionTasks
       currentProductionTasks.forEach((existingTask) => {
         if (isNullOrEmpty(existingTask?.CopiedFrom)) return;
         if (existingTask?.CopiedFrom === 'D') {
-          if (task?.PRTId === existingTask.CopiedId) {
-            if (!mtrList.includes(task.MRTId)) {
+          if (task?.MTRId === existingTask.CopiedId) {
+            if (!mtrList.includes(task.MTRId)) {
               duplicateTasks.push(task);
-              mtrList.push(task.MRTId);
+              mtrList.push(task.MTRId);
             }
           }
         } else if (existingTask?.CopiedFrom === 'M') {
