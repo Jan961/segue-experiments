@@ -15,7 +15,8 @@ import ProductionOption from 'components/global/nav/ProductionOption';
 import Checkbox from 'components/core-ui-lib/Checkbox';
 import { ConfirmationDialog } from 'components/core-ui-lib';
 import ExistingTasks from './ExistingTasks';
-import { isNullOrEmpty } from '../../../utils';
+import { isNullOrEmpty } from 'utils';
+import { useRouter } from 'next/router';
 
 interface ProductionTaskListProps {
   visible: boolean;
@@ -39,7 +40,6 @@ const ProductionTaskList = ({
   currentProductionTasks = [],
 }: ProductionTaskListProps) => {
   const { users } = useRecoilValue(userState);
-  console.log(productionId);
   const styleProps = { headerColor: tileColors.tasks };
   const [rowData, setRowData] = useState([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -49,6 +49,8 @@ const ProductionTaskList = ({
   const [includeArchived, setIncludeArchived] = useState<boolean>(productionJump?.includeArchived || false);
   const [showExistingTaskModal, setShowExistingTaskModal] = useState<boolean>(false);
   const [duplicateTasks, setDuplicateTasks] = useState([]);
+
+  const router = useRouter();
 
   const productionsData = useMemo(() => {
     const productionOptions = [];
@@ -174,6 +176,7 @@ const ProductionTaskList = ({
       await axios.post(endpoint, { selectedTaskList: tasksData, ProductionId: productionId });
       setLoading(false);
       onClose('data-added');
+      await router.replace(router.asPath);
     } catch (error) {
       setLoading(false);
       console.error(error);

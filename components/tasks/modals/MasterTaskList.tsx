@@ -11,6 +11,7 @@ import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import Loader from 'components/core-ui-lib/Loader';
 import { isNullOrEmpty } from '../../../utils';
 import ExistingTasks from './ExistingTasks';
+import { useRouter } from 'next/router';
 
 interface MasterTaskListProps {
   visible: boolean;
@@ -35,7 +36,7 @@ const MasterTaskList = ({ visible, onClose, productionId, currentProductionTasks
   const [loading, setLoading] = useState<boolean>(false);
   const [showExistingTaskModal, setShowExistingTaskModal] = useState<boolean>(false);
   const [duplicateTasks, setDuplicateTasks] = useState([]);
-
+  const router = useRouter();
   const handleFetchTasks = async () => {
     setLoading(true);
     try {
@@ -116,6 +117,7 @@ const MasterTaskList = ({ visible, onClose, productionId, currentProductionTasks
       await axios.post(endpoint, { selectedTaskList: selectedRows, ProductionId: productionId });
       setLoading(false);
       onClose('data-added');
+      await router.replace(router.asPath);
     } catch (error) {
       setLoading(false);
       onClose();

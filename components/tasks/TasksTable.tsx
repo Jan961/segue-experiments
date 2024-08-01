@@ -10,6 +10,7 @@ import Loader from 'components/core-ui-lib/Loader';
 import { ProductionTaskDTO } from 'interfaces';
 import { useRouter } from 'next/router';
 import AddTask from './modals/AddTask';
+import { isNullOrEmpty } from '../../utils';
 
 interface TasksTableProps {
   rowData?: any;
@@ -62,6 +63,7 @@ export default function TasksTable({
       console.log(task);
 
       await axios.post(`/api/tasks/${task.PRTId ? 'update/single' : 'update'}`, updatedTask);
+      await updateTableData();
     } catch (error) {
       console.log(error);
       setIsLoading(false);
@@ -106,7 +108,12 @@ export default function TasksTable({
     else handleShowTask();
   };
 
-  const updateTableData = async (task: any) => {
+  const updateTableData = async (task?: any) => {
+    if (isNullOrEmpty(task)) {
+      await router.push(router.asPath);
+      return;
+    }
+
     const updatedTask = { ...task, Progress: parseInt(task.Progress), Notes: task.Notes };
     const updatedRowData = rowData.map((row) => {
       if (row.Id === task.Id) return updatedTask;
