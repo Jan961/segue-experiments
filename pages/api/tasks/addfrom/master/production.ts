@@ -84,7 +84,20 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
               ? false
               : task.CompleteByWeekNum > calculateWeekNumber(prodStartDate, prodEndDate),
         };
-        const filteredTask = omit(task, ['Id', 'FromWeekNum', 'ToWeekNum', 'Interval']);
+        const filteredTask = omit(task, [
+          'Id',
+          'FromWeekNum',
+          'ToWeekNum',
+          'Interval',
+          'AccountId',
+          'MTRId',
+          'MasterTaskRepeat',
+          'RepeatInterval',
+          'TaskRepeatFromWeekNum',
+          'TaskRepeatToWeekNum',
+          'TaskStartByIsPostProduction',
+          'TaskCompleteByIsPostProduction',
+        ]);
         const newTaskRecord = {
           ...filteredTask,
           ...taskCompleteBys,
