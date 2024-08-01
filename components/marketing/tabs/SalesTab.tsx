@@ -17,6 +17,7 @@ const SalesTab = forwardRef<SalesTabRef, SalesTabProps>((props, ref) => {
   const [dataAvailable, setDataAvailable] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [bookingIdVal, setBookingIdVal] = useState(null);
+  const [showError, setShowError] = useState<boolean>(false);
 
   useImperativeHandle(ref, () => ({
     resetData: () => {
@@ -31,6 +32,9 @@ const SalesTab = forwardRef<SalesTabRef, SalesTabProps>((props, ref) => {
       if (Array.isArray(data) && data.length > 0) {
         const tempSales = data as Array<SalesSnapshot>;
         setRowData(tempSales);
+        setIsLoading(false);
+      } else {
+        setShowError(true);
         setIsLoading(false);
       }
     } catch (exception) {
@@ -56,15 +60,21 @@ const SalesTab = forwardRef<SalesTabRef, SalesTabProps>((props, ref) => {
       );
     } else {
       return (
-        <SalesTable
-          containerHeight="h-auto"
-          containerWidth="w-[1465px]"
-          module="marketing"
-          variant="salesSnapshot"
-          data={rowData}
-          booking={bookingIdVal}
-          tableHeight={640}
-        />
+        <div>
+          {showError ? (
+            <div>No sales figures to show.</div>
+          ) : (
+            <SalesTable
+              containerHeight="h-auto"
+              containerWidth="w-[1465px]"
+              module="marketing"
+              variant="salesSnapshot"
+              data={rowData}
+              booking={bookingIdVal}
+              tableHeight={640}
+            />
+          )}
+        </div>
       );
     }
   }
