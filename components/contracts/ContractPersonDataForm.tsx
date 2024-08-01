@@ -2,12 +2,35 @@ import { Checkbox, DateInput, Select, TextInput } from 'components/core-ui-lib';
 import { AddNewPersonInput } from './AddNewPersonInputs';
 import { addNewPersonInputData, agencyDetailsData, emergecnyContactData, salaryDetailsData } from './utils';
 import { booleanOptions } from 'config/contracts';
+import { useState } from 'react';
+// import axios from 'axios';
 
 interface ContractPersonDataFormProps {
   height: string;
 }
 
 export const ContractPersonDataForm = ({ height }: ContractPersonDataFormProps) => {
+  const [newPersonForm, setNewPersonForm] = useState({});
+
+  const handleAddpersonData = (key, value) => {
+    console.log('key=>value', key, value, newPersonForm);
+    const updatedFormData = {
+      ...newPersonForm,
+      [key]: value,
+    };
+
+    setNewPersonForm({ ...updatedFormData });
+  };
+
+  const saveData = async () => {
+    // let data = axios.post()
+    // const venueData = await axios.post(`/api/company-contracts/addPersonDetails/${selectedTableCell.contract.venueId}`);
+    // const response = await axios.post('/api/company-contracts/addPersonDetails/', {
+    //   formData:newPersonForm,
+    //   productionId:23
+    // });
+  };
+
   return (
     <>
       <div className={`${height} w-[82vw] overflow-y-scroll`}>
@@ -16,10 +39,15 @@ export const ContractPersonDataForm = ({ height }: ContractPersonDataFormProps) 
         {addNewPersonInputData.map((newPersonData) => {
           return (
             <>
-              <AddNewPersonInput newPersonData={newPersonData} />
+              <AddNewPersonInput
+                newPersonData={newPersonData}
+                handleAddpersonData={(key, value) => handleAddpersonData(key, value)}
+                newPersonForm={newPersonForm}
+              />
             </>
           );
         })}
+        <button onClick={() => saveData()}>save</button>
         <div className="flex mt-2 items-center">
           <div className="w-1/2 flex items-center">
             <div className="text-primary-input-text font-bold mr-4 w-[11vw]">Town</div>
@@ -202,7 +230,11 @@ export const ContractPersonDataForm = ({ height }: ContractPersonDataFormProps) 
         {emergecnyContactData.map((newPersonData) => {
           return (
             <>
-              <AddNewPersonInput newPersonData={newPersonData} />
+              <AddNewPersonInput
+                newPersonData={newPersonData}
+                handleAddpersonData={(key, value) => handleAddpersonData(key, value)}
+                newPersonForm={newPersonForm}
+              />
             </>
           );
         })}
@@ -212,7 +244,11 @@ export const ContractPersonDataForm = ({ height }: ContractPersonDataFormProps) 
         {agencyDetailsData.map((newPersonData) => {
           return (
             <>
-              <AddNewPersonInput newPersonData={newPersonData} />
+              <AddNewPersonInput
+                newPersonData={newPersonData}
+                handleAddpersonData={(key, value) => handleAddpersonData(key, value)}
+                newPersonForm={newPersonForm}
+              />
             </>
           );
         })}
@@ -257,7 +293,11 @@ export const ContractPersonDataForm = ({ height }: ContractPersonDataFormProps) 
         {salaryDetailsData.map((newPersonData) => {
           return (
             <>
-              <AddNewPersonInput newPersonData={newPersonData} />
+              <AddNewPersonInput
+                newPersonData={newPersonData}
+                handleAddpersonData={(key, value) => handleAddpersonData(key, value)}
+                newPersonForm={newPersonForm}
+              />
             </>
           );
         })}

@@ -140,7 +140,7 @@ export const addNewPersonInputData = [
     second: 'Email Address',
     type: 'textInput',
     dataFieldFirst: 'PersonFirstName',
-    dataFieldSecond: 'PersonLastName',
+    dataFieldSecond: 'PersonEmail',
   },
   {
     first: 'Last Name',
@@ -163,7 +163,13 @@ export const addNewPersonInputData = [
     dataFieldFirst: 'Address2',
     dataFieldSecond: 'PersonPassportName',
   },
-  { first: ' ', second: 'Passport Number', type: 'textInput', dataFieldFirst: 'Address3' },
+  {
+    first: ' ',
+    second: 'Passport Number',
+    type: 'textInput',
+    dataFieldFirst: 'Address3',
+    dataFieldSecond: 'passportNumber',
+  },
 ];
 
 export const emergecnyContactData = [

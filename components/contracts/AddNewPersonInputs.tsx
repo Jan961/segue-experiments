@@ -1,6 +1,5 @@
 import { Select, TextInput } from 'components/core-ui-lib';
 import { booleanOptions } from 'config/contracts';
-import { useState } from 'react';
 
 interface AddPersonDataProps {
   first?: string;
@@ -11,19 +10,24 @@ interface AddPersonDataProps {
 }
 interface NewPersonDataProps {
   newPersonData: AddPersonDataProps;
+  handleAddpersonData: (x, y) => void;
+  newPersonForm: any;
 }
 
-export const AddNewPersonInput = ({ newPersonData }: NewPersonDataProps) => {
-  const [newPersonForm, setNewPersonForm] = useState({});
-  const handleAddNewPersonForm = (key: string, value, type: string) => {
-    const updatedFormData = {
-      ...newPersonForm,
-      [key]: value,
-    };
+export const AddNewPersonInput = ({ newPersonData, handleAddpersonData, newPersonForm }: NewPersonDataProps) => {
+  // const [newPersonForm, setNewPersonForm] = useState({});
+  const handleAddNewPersonForm = (key: string, value) => {
+    handleAddpersonData(key, value);
+    // console.log("key===>",key,value)
+    // const updatedFormData = {
+    //   ...newPersonForm,
+    //   [key]: value,
+    // };
 
-    if (type === 'dealMemo') {
-      setNewPersonForm({ ...updatedFormData });
-    }
+    // // if (type === 'dealMemo') {
+    //   setNewPersonForm({ ...updatedFormData });
+    // // }
+    // console.log("==>",newPersonForm)
     // setFormEdited(true);
     // setNewPersonForm()
   };
@@ -37,11 +41,10 @@ export const AddNewPersonInput = ({ newPersonData }: NewPersonDataProps) => {
             {newPersonData.type === 'textInput' && (
               <TextInput
                 className=" text-primary-input-text font-bold w-full"
-                disabled
                 onChange={(value) => {
-                  handleAddNewPersonForm(newPersonData.dataFieldFirst, value, 'dealMemo');
+                  handleAddNewPersonForm(newPersonData.dataFieldFirst, value.target.value);
                 }}
-                // value={contactsData.phone}
+                value={newPersonForm ? newPersonForm[newPersonData.dataFieldFirst] : ''}
                 // placeholder={
                 //   contactsData.phone ? 'Add details to the Contact Database' : 'Please select from the dropdown above'
                 // }
@@ -71,11 +74,10 @@ export const AddNewPersonInput = ({ newPersonData }: NewPersonDataProps) => {
             {newPersonData.type === 'textInput' && (
               <TextInput
                 className=" text-primary-input-text font-bold w-full"
-                disabled
                 onChange={(value) => {
-                  handleAddNewPersonForm(newPersonData.dataFieldSecond, value, 'dealMemo');
+                  handleAddNewPersonForm(newPersonData.dataFieldSecond, value.target.value);
                 }}
-                // value={contactsData.phone}
+                value={newPersonForm ? newPersonForm[newPersonData.dataFieldSecond] : ''}
                 // placeholder={
                 //   contactsData.phone ? 'Add details to the Contact Database' : 'Please select from the dropdown above'
                 // }
