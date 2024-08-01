@@ -38,7 +38,12 @@ export default async function handle(req, res) {
 
     // Fetch data using Prisma Client
     const data = await prisma.salesView.findMany({
-      where: { BookingId },
+      where: {
+        BookingId,
+        SaleTypeName: {
+          not: '',
+        },
+      },
       orderBy: [{ BookingFirstDate: 'asc' }, { SetSalesFiguresDate: 'asc' }],
     });
 
