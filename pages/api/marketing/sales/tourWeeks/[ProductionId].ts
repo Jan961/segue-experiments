@@ -13,20 +13,36 @@ export default async function handle(req, res) {
     const access = await checkAccess(email);
     if (!access) return res.status(401).end();
 
-    const dateBlock =
-      await prisma.$queryRaw`select * from DateBlock WHERE DateBlockProductionId = ${ProductionId} AND DateBlockIsPrimary = 1`;
+    const dateBlock = await prisma.dateBlock.findMany({
+      where: {
+        ProductionId,
+        IsPrimary: true,
+      },
+    });
 
-    const prodCo =
-      await prisma.$queryRaw`select ProdCoSaleStartWeek from ProductionCompany WHERE ProdCoAccountId = ${accountId}`;
+    const prodCo = await prisma.productionCompany.findMany({
+      where: {
+        AccountId: accountId,
+      },
+      select: {
+        ProdCoSaleStartWeek: true,
+      },
+    });
 
-    const production =
-      await prisma.$queryRaw`select ProductionSalesFrequency from Production WHERE ProductionId = ${ProductionId}`;
+    const production = await prisma.production.findUnique({
+      where: {
+        Id: ProductionId,
+      },
+      select: {
+        SalesFrequency: true,
+      },
+    });
 
     const salesStartWeek = prodCo[0].ProdCoSaleStartWeek;
     const numWeeks = salesStartWeek.ProdCoSaleStartWeek > 0 ? salesStartWeek : salesStartWeek * -1;
-    const salesFrequency = production[0].ProductionSalesFrequency;
+    const salesFrequency = production.SalesFrequency;
 
-    const startDate = addDurationToDate(dateBlock[0].DateBlockStartDate, numWeeks * 7, false);
+    const startDate = addDurationToDate(dateBlock[0].StartDate, numWeeks * 7, false);
     const endDate = dateBlock[0].DateBlockEndDate;
     const dateStartMonday = getMonday(startDate);
     const weeks = getWeeksBetweenDates(dateStartMonday.toISOString(), endDate);
