@@ -7,7 +7,6 @@ import { userState } from 'state/account/userState';
 import { useEffect, useMemo, useState } from 'react';
 import { tileColors } from 'config/global';
 import axios from 'axios';
-import { MasterTask } from '@prisma/client';
 import Loader from 'components/core-ui-lib/Loader';
 import { ARCHIVED_OPTION_STYLES } from 'components/global/nav/ProductionJumpMenu';
 import { productionJumpState } from 'state/booking/productionJumpState';
@@ -105,7 +104,9 @@ const ProductionTaskList = ({
     const ptrList = [];
     const singleList = [];
     selectedRows.forEach((task) => {
+      console.log(task);
       currentProductionTasks.forEach((existingTask) => {
+        console.log(existingTask);
         if (isNullOrEmpty(existingTask?.CopiedFrom)) return;
 
         if (existingTask?.CopiedFrom === 'R') {
@@ -150,61 +151,35 @@ const ProductionTaskList = ({
 
   const createTasks = async () => {
     setLoading(true);
-    if (isMaster) {
-      try {
-        const tasksData = selectedRows.map((task: MasterTask) => {
-          return {
-            Code: task.Code,
-            Name: task.Name,
-            CompleteByIsPostProduction: false,
-            StartByIsPostProduction: false,
-            StartByWeekNum: task.StartByWeekNum,
-            CompleteByWeekNum: task.CompleteByWeekNum,
-            AssignedToUserId: task.AssignedToUserId,
-            Priority: task.Priority,
-            Notes: task.Notes,
-            TaskStartByIsPostProduction: false,
-            TaskCompleteByIsPostProduction: false,
-          };
-        });
-        const endpoint = '/api/tasks/master/multiple';
-        await axios.post(endpoint, tasksData);
-        setLoading(false);
-        onClose('data-added');
-      } catch (error) {
-        setLoading(false);
-        onClose();
-      }
-    } else {
-      try {
-        const endpoint = '/api/tasks/addfrom/production/create';
-        const tasksData = selectedRows.map((task) => {
-          console.log(task);
-          return {
-            Id: task.Id,
-            ProductionId: selected,
-            Code: task.Code,
-            Name: task.Name,
-            CompleteByIsPostProduction: false,
-            StartByIsPostProduction: false,
-            StartByWeekNum: task.StartByWeekNum,
-            CompleteByWeekNum: task.CompleteByWeekNum,
-            AssignedToUserId: task.AssignedToUserId,
-            Progress: 0,
-            Priority: task.Priority,
-            PRTId: task.PRTId,
-            FromWeekNum: task.TaskRepeatFromWeekNum,
-            Interval: task.RepeatInterval,
-            ToWeekNum: task.TaskRepeatToWeekNum,
-          };
-        });
-        await axios.post(endpoint, { selectedTaskList: tasksData, ProductionId: productionId });
-        setLoading(false);
-        onClose('data-added');
-      } catch (error) {
-        setLoading(false);
-        console.error(error);
-      }
+    try {
+      const endpoint = `/api/tasks/addfrom/production/${isMaster ? 'master' : 'production'}`;
+      const tasksData = selectedRows.map((task) => {
+        console.log(task);
+        return {
+          Id: task.Id,
+          ProductionId: selected,
+          Code: task.Code,
+          Name: task.Name,
+          CompleteByIsPostProduction: false,
+          StartByIsPostProduction: false,
+          StartByWeekNum: task.StartByWeekNum,
+          CompleteByWeekNum: task.CompleteByWeekNum,
+          AssignedToUserId: task.AssignedToUserId,
+          Progress: 0,
+          Priority: task.Priority,
+          PRTId: task.PRTId,
+          MTRId: task.MTRId,
+          FromWeekNum: task.TaskRepeatFromWeekNum,
+          Interval: task.RepeatInterval,
+          ToWeekNum: task.TaskRepeatToWeekNum,
+        };
+      });
+      await axios.post(endpoint, { selectedTaskList: tasksData, ProductionId: productionId });
+      setLoading(false);
+      onClose('data-added');
+    } catch (error) {
+      setLoading(false);
+      console.error(error);
     }
   };
 

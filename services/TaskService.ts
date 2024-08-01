@@ -91,7 +91,7 @@ export const generateRecurringMasterTasks = async (requestBody, MTRId: number) =
           Code: 'desc',
         },
       })
-    )?.Code + 1 || 0;
+    )?.Code + 1 || 1;
 
   const tasksToCreate = [];
 
