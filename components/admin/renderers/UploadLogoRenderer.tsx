@@ -14,7 +14,7 @@ export const UploadLogoRenderer = (params, fetchProductionCompanies, onUploadSuc
 
   useEffect(() => {
     if (fileLocation) {
-      setUploadedFile((prev) => ({ ...prev, name: fileName, imageUrl: getFileUrl(fileLocation) }));
+      setUploadedFile((prev) => ({ ...prev, id, name: fileName, imageUrl: getFileUrl(fileLocation) }));
     }
   }, [fileLocation]);
 
