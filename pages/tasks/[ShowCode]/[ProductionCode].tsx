@@ -105,7 +105,6 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
     setIsProductionTaskList(false);
     setIsMasterTaskList(false);
   };
-  console.log(filteredProductions[0].Tasks);
   const currentProductionObj = useRecoilValue(productionJumpState).productions.find((item) => item.Id === ProductionId);
   return (
     <Layout title="Tasks | Segue" flush>
@@ -141,7 +140,12 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
         onClose={handleNewProductionTaskModal}
         handleNewProductionTaskSubmit={handleNewProductionTaskSubmit}
       />
-      <MasterTaskList visible={isMasterTaskList} onClose={handleMasterListClose} productionId={ProductionId} />
+      <MasterTaskList
+        visible={isMasterTaskList}
+        onClose={handleMasterListClose}
+        productionId={ProductionId}
+        currentProductionTasks={filteredProductions[0].Tasks}
+      />
       <ProductionTaskList
         visible={isProductionTaskList}
         onClose={handleProductionListClose}

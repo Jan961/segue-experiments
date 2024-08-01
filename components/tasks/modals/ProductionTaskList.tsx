@@ -104,11 +104,8 @@ const ProductionTaskList = ({
     const ptrList = [];
     const singleList = [];
     selectedRows.forEach((task) => {
-      console.log(task);
       currentProductionTasks.forEach((existingTask) => {
-        console.log(existingTask);
         if (isNullOrEmpty(existingTask?.CopiedFrom)) return;
-
         if (existingTask?.CopiedFrom === 'R') {
           if (task?.PRTId === existingTask.CopiedId) {
             if (!ptrList.includes(task.PRTId)) {
