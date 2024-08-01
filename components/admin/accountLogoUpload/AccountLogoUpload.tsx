@@ -11,7 +11,11 @@ export const AccountLogoUpload = () => {
   const [uploadedFile, setUploadedFile] = useState<UploadedFile>(null);
 
   const onUploadSuccess = async ({ fileId }) => {
-    await axios.post('/api/admin/accountDetails/accountLogo/update', { fileId });
+    try {
+      await axios.post('/api/admin/accountDetails/accountLogo/update', { fileId });
+    } catch (error) {
+      console.log(error, 'Failed to update database with file.');
+    }
   };
 
   const onSave = async (file, onProgress, onError, onUploadingImage) => {
