@@ -28,7 +28,13 @@ export const UploadLogoRenderer = (params, fetchProductionCompanies, onUploadSuc
       if (response.status >= 400 && response.status < 600) {
         onError(file[0].file, 'Error uploading file. Please try again.');
       } else {
-        setUploadedFile((prev) => ({ ...prev, imageUrl: getFileUrl(response.location) }));
+        setUploadedFile({
+          id: response.id,
+          name: response.originalFilename,
+          imageUrl: getFileUrl(response.location),
+          size: null,
+          location: response.location,
+        });
         onUploadSucess({ companyName, companyVATNo, id, webSite, fileId: response.id });
       }
     } catch (error) {
@@ -38,7 +44,7 @@ export const UploadLogoRenderer = (params, fetchProductionCompanies, onUploadSuc
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`/api/file/delete?location${fileLocation}`);
+      await axios.delete(`/api/file/delete?location=${fileLocation}`);
       await axios.post('/api/productionCompanies/update', {
         id,
         companyName,
