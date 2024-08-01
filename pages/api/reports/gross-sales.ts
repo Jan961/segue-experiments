@@ -8,7 +8,7 @@ import { ALIGNMENT, alignCellText, styleHeader } from './masterplan';
 import { getExportedAtTitle } from 'utils/export';
 import { currencyCodeToSymbolMap } from 'config/Reports';
 import { convertToPDF } from 'utils/report';
-import { BOOK_STATUS_CODES } from 'types/MarketingTypes';
+import { BOOK_STATUS_CODES, SALES_TYPE_NAME } from 'types/MarketingTypes';
 
 type SALES_SUMMARY = {
   ProductionId: number;
@@ -113,6 +113,7 @@ const handler = async (req, res) => {
   if (productionId) {
     conditions.push(Prisma.sql` ProductionId=${productionId}`);
   }
+  conditions.push(Prisma.sql` SaleTypeName=${SALES_TYPE_NAME.GENERAL_SALES}`);
   const where: Prisma.Sql = conditions.length ? Prisma.sql` where ${Prisma.join(conditions, ' and ')}` : Prisma.empty;
 
   const data: SALES_SUMMARY[] = await prisma.$queryRaw`select * FROM SalesSummaryView ${where} order by EntryDate;`;
