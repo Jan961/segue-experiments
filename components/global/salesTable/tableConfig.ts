@@ -230,11 +230,7 @@ export const salesColDefs = (schoolDataAvail, isMarketing, booking, setSalesActi
       headerName: 'Week',
       field: 'week',
       cellRenderer: function (params) {
-        if (params.data.isFinal) {
-          return 'Final';
-        } else {
-          return params.data.week;
-        }
+        return params.data.isFinal ? 'Final' : params.data.week;
       },
       cellStyle: (params) => {
         return {
