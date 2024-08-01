@@ -353,7 +353,9 @@ export const salesEntryColDefs = (type: string, currency: string, handleUpdate) 
         return {
           value: isNullOrEmpty(params.data.seats) ? '0' : params.data.seats.toString(),
           className: 'w-[100px] ml-1 mt-1',
-          onUpdate: (value) => handleUpdate(value, params.data, type, 'seats'),
+          onUpdate: (value) => {
+            handleUpdate(value, params.data, type, 'seats');
+          },
           currency: '',
         };
       },

@@ -17,6 +17,9 @@ import VenueContactForm from './VenueContactsForm';
 import { ConfVariant } from 'components/core-ui-lib/ConfirmationDialog/ConfirmationDialog';
 import Loader from 'components/core-ui-lib/Loader';
 import useAxiosCancelToken from 'hooks/useCancelToken';
+import { isNullOrEmpty } from 'utils';
+import { headlessUploadMultiple } from 'requests/upload';
+import { UploadedFile } from 'components/core-ui-lib/UploadModal/interface';
 
 interface AddEditVenueModalProps {
   visible: boolean;
@@ -25,6 +28,7 @@ interface AddEditVenueModalProps {
   venueRoleOptionList: SelectOption[];
   venue?: UiTransformedVenue;
   onClose: (isSuccess?: boolean) => void;
+  fetchVenues: (payload?: any) => Promise<void>;
 }
 
 export default function AddEditVenueModal({
@@ -34,6 +38,7 @@ export default function AddEditVenueModal({
   venueRoleOptionList,
   countryOptions,
   onClose,
+  fetchVenues,
 }: AddEditVenueModalProps) {
   const [formData, setFormData] = useState({ ...initialVenueState, ...(venue || {}) });
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
@@ -41,6 +46,8 @@ export default function AddEditVenueModal({
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState<boolean>(false);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
   const [isSaving, setIsSaving] = useState<boolean>(false);
+  const [fileList, setFileList] = useState<FormData[]>([]);
+  const [filesToDelete, setFilesToDelete] = useState<UploadedFile[]>([]);
   const cancelToken = useAxiosCancelToken();
   const handleInputChange = (field: string, value: any) => {
     let sanitizedValue = value;
@@ -55,8 +62,9 @@ export default function AddEditVenueModal({
 
   const createVenue = async (venue: UiTransformedVenue) => {
     try {
-      await axios.post('/api/venue/create', venue, { cancelToken });
+      const data = await axios.post('/api/venue/create', venue, { cancelToken });
       onClose(true);
+      return data;
     } catch (e) {
       debug('Error creating venue', e);
     }
@@ -64,8 +72,9 @@ export default function AddEditVenueModal({
 
   const updateVenue = async (venue: UiTransformedVenue) => {
     try {
-      await axios.post('/api/venue/update/' + venue.id, venue, { cancelToken });
+      const data = await axios.post('/api/venue/update/' + venue.id, venue, { cancelToken });
       onClose(true);
+      return data;
     } catch (e) {
       debug('Error updating venue', e);
     }
@@ -75,9 +84,11 @@ export default function AddEditVenueModal({
     setIsSaving(true);
     const isValid = await validateVenue(formData);
     if (isValid) {
-      const apiPromise = formData.id ? updateVenue(formData) : createVenue(formData);
-      await apiPromise;
+      const apiResponse = formData.id ? await updateVenue(formData) : await createVenue(formData);
+      await saveFiles(apiResponse);
+      await deleteFileOnServer();
     }
+    await fetchVenues();
     setIsSaving(false);
   };
 
@@ -120,6 +131,30 @@ export default function AddEditVenueModal({
     setIsDeleting(false);
   }, [onClose, toggleDeleteConfirmation, venue.id]);
 
+  const deleteFileOnServer = async () => {
+    const promises = filesToDelete.map(async (file) => {
+      const fileId = file.fileId;
+      if (fileId) {
+        await axios.post('/api/venue/techSpecs/delete', { fileId });
+      }
+    });
+    await Promise.all(promises);
+    setFilesToDelete([]);
+  };
+
+  const saveFiles = async (venueResponse: any) => {
+    const callBack = async (response) => {
+      if (!isNullOrEmpty(response)) {
+        const fileRec = {
+          FileId: response.data.id,
+          VenueId: venueResponse.data.Id,
+          Description: 'Tech Spec',
+        };
+        await axios.post('/api/venue/techSpecs/create', fileRec);
+      }
+    };
+    await headlessUploadMultiple(fileList, callBack);
+  };
   return (
     <>
       <PopupModal
@@ -165,6 +200,10 @@ export default function AddEditVenueModal({
               onChange={onChange}
               validationErrors={validationErrors}
               updateValidationErrrors={updateValidationErrors}
+              setFileList={setFileList}
+              fileList={fileList}
+              setFilesToDelete={setFilesToDelete}
+              filesToDelete={filesToDelete}
             />
             <div className="pt-7 ">
               <h2 className="text-xl text-primary-navy font-bold ">Barring</h2>
