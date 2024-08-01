@@ -55,13 +55,23 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           },
         });
       } else {
-        const filteredTask = omit(task, ['Id', 'FromWeekNum', 'ToWeekNum', 'Interval']);
+        const filteredTask = omit(task, [
+          'Id',
+          'FromWeekNum',
+          'ToWeekNum',
+          'Interval',
+          'ProductionId',
+          'Progress',
+          'CompleteByIsPostProduction',
+          'StartByIsPostProduction',
+          'PRTId',
+        ]);
         return await prisma.MasterTask.create({
           data: {
             ...filteredTask,
             AccountId,
-            StartByIsPostProduction: false,
-            CompleteByIsPostProduction: false,
+            TaskStartByIsPostProduction: false,
+            TaskCompleteByIsPostProduction: false,
             Code: Code + 1,
             CopiedFrom: 'P',
             CopiedId: task.Id,

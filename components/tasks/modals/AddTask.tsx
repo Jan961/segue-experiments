@@ -321,7 +321,7 @@ const AddTask = ({
       omit(inputs, ['TaskCompleteByIsPostProduction', 'TaskStartByIsPostProduction', 'ProductionTaskRepeat']);
       if (inputs.Id) {
         try {
-          await axios.post(`/api/tasks/update${inputs?.RepeatInterval ? '/recurring' : ''}`, inputs);
+          await axios.post(`/api/tasks/update${inputs?.RepeatInterval ? '/recurring' : '/single'}`, inputs);
           setLoading(false);
           handleClose();
           await updateTableData(inputs, true);

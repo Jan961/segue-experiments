@@ -15,17 +15,27 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       const access = await checkAccess(email, { TaskId: Id });
       if (!access) return res.status(401).end();
 
-      const taskObj = await prisma.ProductionTask.findFirst({
+      let taskObj = await prisma.ProductionTask.findFirst({
         where: { Id },
-        include: { Production: { include: { DateBlock: true } } },
+        include: { Production: { include: { DateBlock: true } }, ProductionTaskRepeat: true },
       });
-      const { TaskRepeatFromWeekNum, TaskRepeatToWeekNum, RepeatInterval } = req.body;
+      taskObj = { ...taskObj, ...taskObj?.ProductionTaskRepeat };
+      if (!isNullOrEmpty(taskObj?.ProductionTaskRepeat)) {
+        taskObj = {
+          ...taskObj,
+          TaskRepeatFromWeekNum: taskObj?.ProductionTaskRepeat.FromWeekNum,
+          TaskRepeatToWeekNum: taskObj?.ProductionTaskRepeat.ToWeekNum,
+          RepeatInterval: taskObj?.ProductionTaskRepeat.Interval,
+        };
+      }
+      const { TaskRepeatToWeekNum, RepeatInterval } = req.body;
+      const TaskRepeatFromWeekNum = parseInt(req.body?.TaskRepeatFromWeekNum);
       const { PRTId } = req.body;
       const fieldList = ['TaskRepeatFromWeekNum', 'TaskRepeatToWeekNum', 'RepeatInterval', 'PRTId'];
 
       let fieldDifference = false;
       fieldList.forEach((field) => {
-        if (taskObj.field !== req.body[field]) {
+        if (taskObj[field] !== req.body[field]) {
           fieldDifference = true;
         }
       });
