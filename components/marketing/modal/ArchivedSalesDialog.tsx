@@ -56,6 +56,7 @@ const ArchSalesDialog = ({
   const [selectedCondition, setSelectedCondition] = useState(null);
   const [venueList, setVenueList] = useState<Array<SelectOption>>([]);
   const [townList, setTownList] = useState<Array<SelectOption>>([]);
+  const [loading, setLoading] = useState<boolean>(true);
   const router = useRouter();
   const { fetchData } = useAxios();
 
@@ -64,6 +65,8 @@ const ArchSalesDialog = ({
   const getBookingSelection = async (data) => {
     setProdCompData([]);
     setErrorMessage('');
+    setLoading(true);
+
     if (data === undefined) {
       return;
     }
@@ -101,6 +104,7 @@ const ArchSalesDialog = ({
           showCode: router.query.ShowCode.toString(),
         },
       });
+
       if (Array.isArray(data) && data.length > 0) {
         const bookingData = data as Array<BookingSelection>;
         const { ShowCode, ProductionCode } = router.query;
@@ -133,9 +137,16 @@ const ArchSalesDialog = ({
         );
 
         setProdCompData(sortedData);
+
+        // if sortedData (without current production) has a length of 0 - show error
+        if (sortedData.length === 0) {
+          setErrorMessage('There are no productions to compare.');
+        }
       } else {
         setErrorMessage('There are no productions to compare.');
       }
+
+      setLoading(false);
     } catch (error) {
       console.log(error);
     }
@@ -243,12 +254,37 @@ const ArchSalesDialog = ({
 
             {selectedCondition !== null && errorMessage === '' && (
               <div>
-                {prodCompData.length === 0 ? (
+                {loading ? (
                   <Spinner size="md" />
                 ) : (
+                  <div>
+                    {prodCompData.length > 0 && (
+                      <SalesTable
+                        containerHeight="h-auto"
+                        containerWidth="w-auto"
+                        module="marketing"
+                        variant="prodCompArch"
+                        onCellValChange={selectForComparison}
+                        data={prodCompData}
+                        cellRenderParams={{ selected: selectedBookings }}
+                        productions={productions}
+                      />
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        ) : (
+          <div>
+            {loading ? (
+              <Spinner size="md" />
+            ) : (
+              <div>
+                {prodCompData.length > 0 && (
                   <SalesTable
                     containerHeight="h-auto"
-                    containerWidth="w-auto"
+                    containerWidth="w-[340px]"
                     module="marketing"
                     variant="prodCompArch"
                     onCellValChange={selectForComparison}
@@ -258,23 +294,6 @@ const ArchSalesDialog = ({
                   />
                 )}
               </div>
-            )}
-          </div>
-        ) : (
-          <div>
-            {prodCompData.length === 0 ? (
-              <Spinner size="md" />
-            ) : (
-              <SalesTable
-                containerHeight="h-auto"
-                containerWidth="w-[340px]"
-                module="marketing"
-                variant="prodCompArch"
-                onCellValChange={selectForComparison}
-                data={prodCompData}
-                cellRenderParams={{ selected: selectedBookings }}
-                productions={productions}
-              />
             )}
           </div>
         )}
