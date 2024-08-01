@@ -106,7 +106,6 @@ export const EditDealMemoContractModal = ({
     setFormData({ ...demoModalData });
     const priceData = filterPrice(demoModalData.DealMemoPrice);
     const holdTypeData = filterHoldTypeData(dealHoldType, demoModalData.DealMemoHold);
-    console.log('dealHoldType, demoModalData.DealMemoHold', dealHoldType, demoModalData.DealMemoHold, holdTypeData);
 
     setSeatKillsData(holdTypeData);
     setdealMemoPriceFormData(priceData[0]);
