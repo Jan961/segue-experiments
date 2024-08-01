@@ -103,6 +103,7 @@ const ProductionTaskList = ({
   const findDuplicateTasks = () => {
     const duplicateTasks = [];
     const ptrList = [];
+    const singleList = [];
     selectedRows.forEach((task) => {
       currentProductionTasks.forEach((existingTask) => {
         if (isNullOrEmpty(existingTask?.CopiedFrom)) return;
@@ -113,8 +114,13 @@ const ProductionTaskList = ({
               duplicateTasks.push(task);
               ptrList.push(task.PRTId);
             }
-          } else if (existingTask?.CopiedFrom === 'P') {
-            if (task?.Id === existingTask.CopiedId) duplicateTasks.push(task);
+          }
+        } else if (existingTask?.CopiedFrom === 'P') {
+          if (task?.Id === existingTask.CopiedId) {
+            if (!singleList.includes(task.Id)) {
+              duplicateTasks.push(task);
+              singleList.push(task.Id);
+            }
           }
         }
       });

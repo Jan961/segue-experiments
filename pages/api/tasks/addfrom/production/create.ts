@@ -23,7 +23,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     console.log(productionWeeks);
     const prodStartDate = productionWeeks.StartDate;
     const prodEndDate = productionWeeks.EndDate;
-    const counter = 0;
+    const counter = 1;
 
     const taskList = selectedTaskList.map(async (task, index) => {
       console.log('INPUT TASK');
@@ -85,7 +85,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
               ? false
               : task.CompleteByWeekNum > calculateWeekNumber(prodStartDate, prodEndDate),
         };
-        const filteredTask = omit(task, ['Id']);
+        const filteredTask = omit(task, ['Id', 'FromWeekNum', 'ToWeekNum', 'Interval']);
         const newTaskRecord = {
           ...filteredTask,
           ...taskCompleteBys,
