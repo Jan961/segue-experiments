@@ -69,7 +69,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     let filteredVenues = fuseFilter(tempVenues, searchQuery, ['Name', 'Code', 'Town']);
 
     if (filteredVenues.length > 0) {
-      const returnLength = filteredVenues.length >= limit ? limit : filteredVenues.length;
+      const returnLength = limit && filteredVenues.length >= limit ? limit : filteredVenues.length;
       filteredVenues = await Promise.all(
         filteredVenues.slice(0, returnLength).map(async (venue) => {
           const files = await Promise.all(
