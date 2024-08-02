@@ -117,8 +117,8 @@ const MasterTaskList = ({ visible, onClose, productionId }: MasterTaskListProps)
       const endpoint = `/api/tasks/addfrom/master/${isNullOrEmpty(productionId) ? 'master' : 'production'}`;
       await axios.post(endpoint, { selectedTaskList: selectedRows, ProductionId: productionId });
       setLoading(false);
-      onClose('data-added');
       await router.replace(router.asPath);
+      onClose('data-added');
     } catch (error) {
       setLoading(false);
       onClose();

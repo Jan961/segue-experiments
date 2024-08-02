@@ -147,7 +147,6 @@ const ProductionTaskList = ({ visible, onClose, productionId, isMaster = false }
     try {
       const endpoint = `/api/tasks/addfrom/production/${isMaster ? 'master' : 'production'}`;
       const tasksData = selectedRows.map((task) => {
-        console.log(task);
         return {
           Id: task.Id,
           ProductionId: selected,
@@ -169,8 +168,8 @@ const ProductionTaskList = ({ visible, onClose, productionId, isMaster = false }
       });
       await axios.post(endpoint, { selectedTaskList: tasksData, ProductionId: productionId });
       setLoading(false);
-      onClose('data-added');
       await router.replace(router.asPath);
+      onClose('data-added');
     } catch (error) {
       setLoading(false);
       console.error(error);
