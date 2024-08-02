@@ -15,6 +15,7 @@ import { ConfDialogVariant } from 'components/core-ui-lib/ConfirmationDialog/Con
 import { globalModalVenueColDefs, styleProps } from '../table/tableConfig';
 import { Table } from 'components/core-ui-lib';
 import { isValidDate } from 'services/dateService';
+import axios from 'axios';
 
 export type ActivityModalVariant = 'add' | 'edit' | 'delete' | 'view';
 
@@ -99,7 +100,7 @@ export default function GlobalActivityModal({
     return sortedVenues;
   }, [venues, selectedList]);
 
-  const initForm = () => {
+  const initForm = async () => {
     let dropList = null;
 
     if (venues.length === 0 || variant === 'view') {
@@ -127,15 +128,18 @@ export default function GlobalActivityModal({
       setActNotes('');
       setCost('');
     } else if (variant === 'edit' || variant === 'view') {
+      const response = await axios.get(`/api/marketing/globalActivities/venueIds/${data.Id}`);
+      const venueIds = response.data.map((rec) => rec.VenueId);
+
       setActName(data.Name);
       setActType(data.ActivityTypeId);
       setActDate(isValidDate(data.Date) ? startOfDay(new Date(data.Date)) : null);
       setActFollowUp(data.FollowUpRequired);
       setFollowUpDt(isValidDate(data.DueByDate) ? startOfDay(new Date(data.DueByDate)) : null);
-      setCost(data.Cost.toString());
+      setCost(data.Cost.toFixed(2).toString());
       setActNotes(data.Notes);
       setActId(data.Id);
-      setSelectedList(data.VenueIds === null ? [] : data.VenueIds);
+      setSelectedList(venueIds);
     }
   };
 
