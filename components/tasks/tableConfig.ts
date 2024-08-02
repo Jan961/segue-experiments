@@ -8,7 +8,8 @@ import getTaskDateStatusColor, { getWeekOptions } from 'utils/taskDate';
 import { calculateTaskStatus } from 'utils/tasks';
 import IconRenderer from 'components/bookings/table/IconRenderer';
 import MasterTaskNameRenderer from './modals/renderers/MasterTaskNameRenderer';
-import CloneButtonRenderer from './master/CloneButtonRenderer';
+import ButtonRenderer from '../core-ui-lib/Table/renderers/ButtonRenderer';
+import { isNullOrEmpty } from 'utils';
 
 export const styleProps = { headerColor: tileColors.tasks };
 
@@ -227,10 +228,11 @@ export const getMasterTasksColumnDefs = (usersList = []) => {
     {
       headerName: '',
       field: 'clone',
-      cellRenderer: CloneButtonRenderer,
-      cellRendererParams: {
+      cellRenderer: ButtonRenderer,
+      cellRendererParams: (params) => ({
         buttonText: 'Clone',
-      },
+        disabled: !isNullOrEmpty(params.data.MTRId),
+      }),
       resizable: false,
       cellClass: 'no-right-border',
       width: 80,
