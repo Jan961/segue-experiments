@@ -212,34 +212,36 @@ const Final = () => {
       if (Object.values(sales).length > 0) {
         const salesFigures = sales as SalesFigureSet;
 
-        setSetId(sales.setId);
+        if (sales.setId) {
+          setSetId(sales.setId);
 
-        // set the sales figures, if available
-        setGenSeatsSold(validateSale(salesFigures.general?.seatsSold));
-        setGenSeatsSoldVal(validateSale(salesFigures.general?.seatsSoldVal));
-        setSchSeatsSold(validateSale(salesFigures.schools?.seatsSold));
-        setSchSeatsSoldVal(validateSale(salesFigures.schools?.seatsSoldVal));
+          // set the sales figures, if available
+          setGenSeatsSold(validateSale(salesFigures.general?.seatsSold));
+          setGenSeatsSoldVal(validateSale(salesFigures.general?.seatsSoldVal));
+          setSchSeatsSold(validateSale(salesFigures.schools?.seatsSold));
+          setSchSeatsSoldVal(validateSale(salesFigures.schools?.seatsSoldVal));
 
-        if (salesFigures.user === undefined) {
-          setUserConfirmed(false);
-          setConfirmedUser('');
-        } else {
-          setUserConfirmed(true);
-          setConfirmedUser(salesFigures.user);
+          if (isNullOrEmpty(salesFigures.user)) {
+            setUserConfirmed(false);
+            setConfirmedUser('');
+          } else {
+            setUserConfirmed(true);
+            setConfirmedUser(salesFigures.user);
+          }
         }
-      }
 
-      // get the booking details to set the notes fields
-      const booking = bookings.bookings.find((booking) => booking.Id === bookings.selected);
+        // get the booking details to set the notes fields
+        const booking = bookings.bookings.find((booking) => booking.Id === bookings.selected);
 
-      setBookingSaleNotes(booking.BookingSalesNotes === null ? '' : booking.BookingSalesNotes);
-      setDiscrepancyNotes(booking.BookingFinalSalesDiscrepancyNotes);
-      setHasSchoolSales(booking.BookingHasSchoolsSales);
+        setBookingSaleNotes(booking.BookingSalesNotes === null ? '' : booking.BookingSalesNotes);
+        setDiscrepancyNotes(booking.BookingFinalSalesDiscrepancyNotes);
+        setHasSchoolSales(booking.BookingHasSchoolsSales);
 
-      // if discrepancy notes is not null set show them
-      if (!isNullOrEmpty(booking.BookingFinalSalesDiscrepancyNotes)) {
-        setShowDiscrepancyNotes(true);
-        setDiscepancyButtonText('Edit');
+        // if discrepancy notes is not null set show them
+        if (!isNullOrEmpty(booking.BookingFinalSalesDiscrepancyNotes)) {
+          setShowDiscrepancyNotes(true);
+          setDiscepancyButtonText('Edit');
+        }
       }
 
       setLoading(false);

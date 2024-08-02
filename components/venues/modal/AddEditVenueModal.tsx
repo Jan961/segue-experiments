@@ -161,10 +161,10 @@ export default function AddEditVenueModal({
         onClose={onClose}
         title="Add / Edit Venue"
         show={visible}
-        panelClass="relative"
+        panelClass="relative h-[95vh] overflow-x-auto pb-4"
         titleClass="text-xl text-primary-navy "
       >
-        <form className="w-[1026px]">
+        <form className="w-[1054px] pr-7">
           <h2 className="text-xl text-primary-navy font-bold">Main</h2>
           <div className="grid grid-cols-2 gap-5">
             <MainVenueForm
@@ -246,17 +246,17 @@ export default function AddEditVenueModal({
                 testId="add-venues-save-and-close-btn"
                 disabled={isSaving || isDeleting}
                 text={isSaving ? 'Saving...' : 'Save and Close'}
-                className="w-32"
+                className="w-32 mb-4"
                 onClick={handleSaveAndClose}
               >
                 {isSaving && <Loader variant="lg" iconProps={{ stroke: '#FFF' }} />}
               </Button>
             </div>
           </div>
+          <div className="flex justify-end float-right w-full">
+            {hasErrors && <p className="text-primary-red pb-3">Please fill all required fields</p>}
+          </div>
         </form>
-        <div className="flex justify-end float-right block w-full">
-          {hasErrors && <p className="text-primary-red mt-4">Please fill all required fields</p>}
-        </div>
         <ConfirmationDialog
           variant={ConfVariant.Delete}
           show={showDeleteConfirmation}

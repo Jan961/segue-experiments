@@ -19,6 +19,7 @@ const UploadModal: React.FC<UploadModalProps> = ({
   onSave,
   value,
   customHandleFileDelete,
+  testId = 'core-ui-lib-upload-model',
 }) => {
   const hiddenFileInput = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<string>('');
@@ -181,13 +182,17 @@ const UploadModal: React.FC<UploadModalProps> = ({
       }}
     >
       <div className="flex flex-col gap-2 w-full md:w-[592px] font-calibri non-italic pr-3">
-        <div className="text-primary text-xl font-bold">{title}</div>
-        <div className="text-secondary w-full md:w-[533px] text-[15px] font-normal">{info}</div>
+        <div data-testid={`${testId}-title`} className="text-primary text-xl font-bold">
+          {title}
+        </div>
+        <div data-testid={`${testId}-info`} className="text-secondary w-full md:w-[533px] text-[15px] font-normal">
+          {info}
+        </div>
         <div
           className="h-[200px] w-full md:w-[535px] bg-silver-gray-100 flex flex-col justify-center items-center cursor-pointer relative"
           onClick={() => hiddenFileInput.current?.click()}
           id="image"
-          data-testid="image"
+          data-testid={`${testId}-upload-image`}
         >
           <Icon iconName="upload-to-cloud" variant="7xl" />
           <p className="text-secondary max-w-[222px] text-[15px] text-center font-normal mt-2">

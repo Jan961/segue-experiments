@@ -18,6 +18,17 @@ interface VenueContactDetailsFormProps {
   module?: string;
 }
 
+const gridOptions = {
+  getRowNodeId: (data) => {
+    return data.roleName;
+  },
+  onRowDataUpdated: (params) => {
+    params.api.forEachNode((rowNode) => {
+      rowNode.id = rowNode.data.roleName;
+    });
+  },
+};
+
 const VenueContactForm = ({
   onChange,
   venue,
@@ -142,7 +153,7 @@ const VenueContactForm = ({
       </div>
       <div className="min-h-52">
         <Table
-          testId="venue-contracts-table"
+          testId="venue-contacts-table"
           columnDefs={venueContactDefs(venueRoleOptionList)}
           rowData={venueContacts}
           styleProps={tableStyleProps}
@@ -150,6 +161,7 @@ const VenueContactForm = ({
           onCellClicked={onCellClicked}
           onCellValueChange={handleCellValueChange}
           tableHeight={tableHeight}
+          gridOptions={gridOptions}
         />
         {showDeleteModal && (
           <ConfirmationDialog

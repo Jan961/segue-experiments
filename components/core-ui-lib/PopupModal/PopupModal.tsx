@@ -77,7 +77,7 @@ export default function PopupModal({
             >
               <Dialog.Panel
                 className={classNames(
-                  'px-7 pt-7 pb-5 transform bg-primary-white text-left align-middle shadow-xl transition-all',
+                  'pl-7 pt-7 pb-5 transform bg-primary-white text-left align-middle shadow-xl transition-all',
                   panelClass,
                 )}
               >
@@ -85,16 +85,15 @@ export default function PopupModal({
                   <Icon
                     iconName="cross"
                     variant="lg"
-                    className="hover:scale-105 fixed right-4 top-4"
+                    className="hover:scale-105 sticky left-[95%]"
                     onClick={onClose}
                     data-testid="close-icon"
                   />
                 )}
-                <Dialog.Title as="h3" className={`text-lg font-bold leading-6 ${titleClass}`}>
+                <Dialog.Title as="h3" className={`-mt-6 text-lg font-bold leading-6 ${titleClass}`}>
                   {title}
                 </Dialog.Title>
-
-                <div className="mt-1">{children}</div>
+                <div className="mt-4">{children}</div>
               </Dialog.Panel>
             </Transition.Child>
           </div>

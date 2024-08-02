@@ -1,6 +1,7 @@
+import { startOfDay } from 'date-fns';
 import prisma from 'lib/prisma';
 import { addDurationToDate, getMonday } from 'services/dateService';
-import { getEmailFromReq, checkAccess } from 'services/userService';
+import { getEmailFromReq, checkAccess, getAccountIdFromReq } from 'services/userService';
 
 export type LastPerfDate = {
   BookingId: number;
@@ -228,6 +229,7 @@ export default async function handle(req, res) {
   try {
     const bookingId = parseInt(req.body.bookingId);
     const salesDate = new Date(req.body.salesDate);
+    const accountId = await getAccountIdFromReq(req);
     const ProductionId = req.body.productionId;
 
     const email = await getEmailFromReq(req);
@@ -245,6 +247,29 @@ export default async function handle(req, res) {
       },
     });
 
+    // get first week of sales - this will depend of the production week start
+    // this will determine how far back the process looks for hold/comp figure and define the stopping point
+    const prodCo = await prisma.productionCompany.findMany({
+      where: {
+        AccountId: accountId,
+      },
+      select: {
+        ProdCoSaleStartWeek: true,
+      },
+    });
+
+    const dateBlock = await prisma.dateBlock.findMany({
+      where: {
+        ProductionId,
+        IsPrimary: true,
+      },
+    });
+
+    const salesStartWeek = prodCo[0].ProdCoSaleStartWeek;
+    const numWeeks = salesStartWeek.ProdCoSaleStartWeek > 0 ? salesStartWeek : salesStartWeek * -1;
+    const startDate = addDurationToDate(dateBlock[0].StartDate, numWeeks * 7, false);
+    const firstSalesDate = SalesFrequency === 'W' ? getMonday(startDate) : startDate;
+
     // loop through previous sales until we find a set that exists
     let currentDate = salesDate;
     const triedDates = [];
@@ -255,6 +280,12 @@ export default async function handle(req, res) {
       if (!isDataAvailable(result)) {
         triedDates.push(currentDate);
         currentDate = addDurationToDate(currentDate, SalesFrequency === 'W' ? 7 : 1, false);
+
+        // if the first sales date has been reached, there is no comps/holds to recover
+        // if this is the case, return blank values
+        if (firstSalesDate.getTime() === startOfDay(currentDate).getTime()) {
+          res.status(200).json(result);
+        }
       }
     } while (!isDataAvailable(result));
 

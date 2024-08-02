@@ -1,5 +1,6 @@
 import TextInput from 'components/core-ui-lib/TextInput';
 import { Label } from 'components/core-ui-lib';
+import FormError from 'components/core-ui-lib/FormError';
 
 interface FormFieldProps {
   currentValue: string;
@@ -23,11 +24,10 @@ export const FormField = ({
   return (
     <label htmlFor="" className="grid w-full">
       <div className="flex gap-x-1">
-        <p className="text-primary-input-text">{displayText}</p>
-        <div>
-          <Label required={required} text="" className=" absolute" />
+        <div className="flex">
+          <Label required={required} text={displayText} variant="md" />
+          <FormError error={validationCheck} className="mt-1 ml-1" />
         </div>
-        {validationCheck && <small className="text-primary-red self-center ml-1">{validationCheck}</small>}
       </div>
       <TextInput
         testId="company-info-input"
