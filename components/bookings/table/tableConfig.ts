@@ -712,6 +712,7 @@ export const venueContactDefs = (defaultRoles) => [
     cellRendererParams: {
       iconProps: {
         iconName: 'delete',
+        testId: 'delete-contact',
       },
       tooltipPosition: 'left',
       popover: true,
