@@ -7,7 +7,7 @@ import IconRowRenderer from '../../global/salesTable/renderers/IconRowRenderer';
 export const attachmentsColDefs = [
   {
     headerName: 'Title',
-    field: 'FileOriginalFilename',
+    field: 'Name',
     editable: true,
     cellRenderer: DefaultTextRenderer,
     width: 600,

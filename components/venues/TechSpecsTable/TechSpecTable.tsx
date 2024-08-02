@@ -3,7 +3,7 @@ import { Table, UploadModal } from '../../core-ui-lib';
 import Button from '../../core-ui-lib/Button';
 import { techSpecsFileFormats } from '../techSpecsFileFormats';
 import { UploadedFile } from '../../core-ui-lib/UploadModal/interface';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import axios from 'axios';
 
 interface TechSpecTableProps {
@@ -11,23 +11,33 @@ interface TechSpecTableProps {
 }
 
 export const TechSpecTable = ({ venueId }: TechSpecTableProps) => {
-  const [uploadVisible, setUploadVisible] = useState<boolean>(false);
+  const [uploadVisible, setUploadVisible] = useState<boolean>(null);
   const [fileWidgets, setFileWidgets] = useState<UploadedFile[]>([]);
   const [rowData, setRowData] = useState([]);
 
-  setRowData(rowData);
   const fetchFileList = async () => {
-    const fileList: UploadedFile[] = await axios.post('/api/venue/techSpecs/list', { VenueId: venueId });
+    const fileList: any[] = (await axios.post('/api/venue/techSpecs/list', { VenueId: venueId })).data;
+    console.log(fileList);
     setFileWidgets([]);
+    setRowData(fileList);
+    const updatedFiles = await Promise.all(
+      fileList.map(async (file) => {
+        const response = await fetch(file.imageUrl);
+        const blob = await response.blob();
+        const tempFile = new File([blob], file.name, { type: blob.type });
+        return { ...file, size: tempFile.size }; // Return the updated file object
+      }),
+    );
 
-    for (const file of fileList) {
-      const response = await fetch(file.imageUrl);
-      const blob = await response.blob();
-      const tempFile = new File([blob], file.name, { type: blob.type });
-      file.size = tempFile.size;
-      setFileWidgets([...fileWidgets, file]);
-    }
+    // Update the state once with all the updated files
+    setFileWidgets([...fileWidgets, ...updatedFiles]);
   };
+
+  useEffect(() => {
+    if (venueId && uploadVisible !== true) {
+      fetchFileList();
+    }
+  }, [uploadVisible]);
 
   const onSave = () => {
     console.log('sss');
@@ -55,12 +65,12 @@ export const TechSpecTable = ({ venueId }: TechSpecTableProps) => {
         testId="upload-venue-tech-spec-btn"
         text={fileWidgets.length > 0 ? 'NEW View/ Edit Tech Specs' : 'NEW Upload Tech Specs'}
         onClick={async () => {
-          fetchFileList();
+          await fetchFileList();
           setUploadVisible(true);
         }}
       />
 
-      <Table columnDefs={attachmentsColDefs} rowData={[]} />
+      <Table columnDefs={attachmentsColDefs} rowData={rowData} />
     </div>
   );
 };

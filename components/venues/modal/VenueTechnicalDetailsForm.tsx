@@ -8,6 +8,7 @@ import { UploadModal } from 'components/core-ui-lib';
 import { UploadedFile } from 'components/core-ui-lib/UploadModal/interface';
 import { techSpecsFileFormats } from '../techSpecsFileFormats';
 import { isNullOrEmpty } from '../../../utils';
+import { TechSpecTable } from '../TechSpecsTable/TechSpecTable';
 
 interface VenueTechnicalDetailsFormProps {
   venue: Partial<UiTransformedVenue>;
@@ -95,7 +96,7 @@ const VenueTechnicalDetailsForm = ({
       setFileWidgets(newFileWidgets);
     }
   };
-
+  console.log(venue);
   return (
     <>
       {uploadVisible && (
@@ -158,6 +159,7 @@ const VenueTechnicalDetailsForm = ({
           }}
         />
       </div>
+      <TechSpecTable venueId={venue.id} />
       <div className="grid grid-cols-2 gap-5 pt-5">
         <div className="flex flex-col gap-5">
           <label htmlFor="" className="grid grid-cols-[100px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
