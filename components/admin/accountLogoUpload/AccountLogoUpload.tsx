@@ -3,7 +3,6 @@ import { getFileUrl } from 'lib/s3';
 import { useEffect, useState } from 'react';
 import { uploadFile } from 'requests/upload';
 import { UploadedFile } from 'components/core-ui-lib/UploadModal/interface';
-import Image from 'next/image';
 import axios from 'axios';
 
 export const AccountLogoUpload = () => {
@@ -86,13 +85,14 @@ export const AccountLogoUpload = () => {
       <div className="h-full">
         <div className="h-full relative">
           {uploadedFile ? (
-            <Image
-              src={uploadedFile.imageUrl}
-              alt="..."
-              onClick={() => setOpenUploadModal(true)}
-              layout="fill"
-              style={{ cursor: 'pointer', objectPosition: 'right', objectFit: 'contain' }}
-            />
+            <div className="flex justify-end">
+              <img
+                src={uploadedFile.imageUrl}
+                alt="Account Logo"
+                onClick={() => setOpenUploadModal(true)}
+                style={{ objectFit: 'contain', cursor: 'pointer' }}
+              />
+            </div>
           ) : (
             <div className="flex flex-col items-end">
               <p className="text-primary-input-text mr-1">Company Logo</p>
