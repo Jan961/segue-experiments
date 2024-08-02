@@ -452,6 +452,8 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
         let inputDate = new Date();
         if (salesDate !== null) {
           inputDate = salesDate;
+        } else {
+          setSalesDate(new Date());
         }
 
         setSalesFigures(inputDate, false);

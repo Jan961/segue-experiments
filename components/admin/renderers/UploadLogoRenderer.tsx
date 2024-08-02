@@ -14,7 +14,7 @@ export const UploadLogoRenderer = (params, fetchProductionCompanies, onUploadSuc
 
   useEffect(() => {
     if (fileLocation) {
-      setUploadedFile((prev) => ({ ...prev, name: fileName, imageUrl: getFileUrl(fileLocation) }));
+      setUploadedFile((prev) => ({ ...prev, id, name: fileName, imageUrl: getFileUrl(fileLocation) }));
     }
   }, [fileLocation]);
 
@@ -28,7 +28,13 @@ export const UploadLogoRenderer = (params, fetchProductionCompanies, onUploadSuc
       if (response.status >= 400 && response.status < 600) {
         onError(file[0].file, 'Error uploading file. Please try again.');
       } else {
-        setUploadedFile((prev) => ({ ...prev, imageUrl: getFileUrl(response.location) }));
+        setUploadedFile({
+          id: response.id,
+          name: response.originalFilename,
+          imageUrl: getFileUrl(response.location),
+          size: null,
+          location: response.location,
+        });
         onUploadSucess({ companyName, companyVATNo, id, webSite, fileId: response.id });
       }
     } catch (error) {
@@ -38,7 +44,7 @@ export const UploadLogoRenderer = (params, fetchProductionCompanies, onUploadSuc
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`/api/file/delete?location${fileLocation}`);
+      await axios.delete(`/api/file/delete?location=${fileLocation}`);
       await axios.post('/api/productionCompanies/update', {
         id,
         companyName,
@@ -52,7 +58,7 @@ export const UploadLogoRenderer = (params, fetchProductionCompanies, onUploadSuc
   };
 
   return (
-    <div className="h-full flex justify-center items-center">
+    <div className="h-full flex justify-center items-center relative">
       {!fileLocation ? (
         <Button
           text="Upload Logo"
@@ -64,8 +70,8 @@ export const UploadLogoRenderer = (params, fetchProductionCompanies, onUploadSuc
         <Image
           src={getFileUrl(fileLocation)}
           alt={fileName}
-          width={200}
-          height={200}
+          layout="fill"
+          style={{ cursor: 'pointer', objectPosition: 'center', objectFit: 'contain' }}
           onClick={() => setOpenUploadModal(true)}
         />
       )}
@@ -74,7 +80,7 @@ export const UploadLogoRenderer = (params, fetchProductionCompanies, onUploadSuc
         title="Image Attachment"
         info="Please upload your company image here. Image should be no larger than 300px wide x 200px high (Max 500kb). Images in a square or portrait format will be proportionally scaled to fit with the rectangular boundary box.
 Suitable image formats are jpg, tiff, svg, and png."
-        allowedFormats={['image/jpg', 'image/png', 'image/tiff', 'image/svg']}
+        allowedFormats={['image/jpeg', 'image/png', 'image/tiff', 'image/svg']}
         onClose={() => {
           setOpenUploadModal(false);
           fetchProductionCompanies();
