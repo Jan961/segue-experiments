@@ -34,6 +34,8 @@ import { formattedDateWithDay, toISO } from 'services/dateService';
 import { EditDealMemoContractModal } from './EditDealMemoContractModal';
 import { transformToOptions } from 'utils';
 import LoadingOverlay from 'components/shows/LoadingOverlay';
+import { attachmentsColDefs } from '../tableConfig';
+import Table from 'components/core-ui-lib/Table';
 
 const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClose: () => void }) => {
   const productionJumpState = useRecoilValue(currentProductionSelector);
@@ -49,6 +51,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
     ...initialEditContractFormData,
     ...selectedTableCell.contract,
   });
+  const [contractAttatchmentRows, setContractAttatchmentRows] = useState([]);
   const [demoModalData, setDemoModalData] = useState<Partial<DealMemoContractFormData>>({});
   const modalTitle = `${productionJumpState.ShowCode + productionJumpState.Code} | ${productionJumpState.ShowName} | ${
     selectedTableCell.contract.venue
@@ -99,7 +102,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
     };
     callDealMemoData();
   }, []);
-
+  setContractAttatchmentRows([]);
   const editContractModalData = async (key: string, value, type: string) => {
     const updatedFormData = {
       ...formData,
@@ -239,6 +242,12 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
             <div className="flex justify-end">
               <Button className="mr-3 w-33" variant="primary" text="Add Attachments" />
             </div>
+            <Table
+              columnDefs={attachmentsColDefs}
+              rowData={contractAttatchmentRows}
+              tableHeight={250}
+              testId="tableVenueAttach"
+            />
           </div>
           <div className="w-[652px] h-[980px] rounded border-2 border-secondary ml-2 p-3 bg-primary-blue bg-opacity-15">
             <div className="flex justify-between">
