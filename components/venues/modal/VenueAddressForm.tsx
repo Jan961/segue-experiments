@@ -94,7 +94,7 @@ const VenueAddressForm = ({
               error={validationErrors.primaryTown}
               onChange={(e) => handleInputChange('primaryTown', e.target.value)}
             />
-            <FormError error={validationErrors.primaryTown} />
+            <FormError error={validationErrors.primaryTown} className="absolute" />
           </div>
         </label>
         <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
@@ -109,7 +109,7 @@ const VenueAddressForm = ({
               onChange={(e) => handleInputChange('primaryPostCode', e.target.value)}
               error={validationErrors.primaryPostCode}
             />
-            <FormError error={validationErrors.primaryPostCode} />
+            <FormError error={validationErrors.primaryPostCode} className="absolute" />
           </div>
         </label>
         <div className="flex flex-col">
@@ -139,7 +139,7 @@ const VenueAddressForm = ({
                 isSearchable
                 error={validationErrors.primaryCountry && true}
               />
-              <FormError error={validationErrors.primaryCountry} />
+              <FormError error={validationErrors.primaryCountry} className="absolute" />
             </div>
           </label>
         </div>
