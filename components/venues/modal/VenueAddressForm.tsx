@@ -43,8 +43,7 @@ const VenueAddressForm = ({
         <div className="flex flex-col">
           <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
             <div className="flex gap-x-1">
-              <p className="text-primary-input-text">Venue Code</p>
-              <Label required text="" />
+              <Label required text="Venue Code" variant="md" />
             </div>
             <div>
               <TextInput
@@ -85,7 +84,7 @@ const VenueAddressForm = ({
           />
         </label>
         <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
-          <p className="text-primary-input-text">Town</p>
+          <Label required text="Town" variant="md" />
           <div>
             <TextInput
               testId="primary-address-town"
@@ -102,7 +101,7 @@ const VenueAddressForm = ({
           </div>
         </label>
         <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
-          <p className="text-primary-input-text">Postcode</p>
+          <Label required text="Postcode" variant="md" />
           <div>
             <TextInput
               testId="primary-address-postcode"
@@ -122,8 +121,7 @@ const VenueAddressForm = ({
           <label className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between w-full">
             <div className="flex  gap-x-1">
               <div className="flex gap-x-1">
-                <p className="text-primary-input-text">Country</p>
-                <Label required text="" />
+                <Label required text="Country" variant="md" />
               </div>
               <div className="mt-1">
                 <Tooltip
@@ -247,8 +245,7 @@ const VenueAddressForm = ({
         <label className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
           <div className="flex gap-x-1">
             <div className="flex gap-x-1">
-              <p className="text-primary-input-text">Country</p>
-              <Label required text="" />
+              <Label required text="Country" variant="md" />
             </div>
             <div className="mt-1">
               <Tooltip

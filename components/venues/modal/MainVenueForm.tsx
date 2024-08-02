@@ -45,8 +45,7 @@ const MainVenueForm = ({
       <div className="flex flex-col mb-1">
         <label htmlFor="" className="flex flex-row gap-5 justify-between">
           <div className="flex gap-x-1">
-            <p className="text-primary-input-text">Venue Code</p>
-            <Label required text="" />
+            <Label required text="Venue Code" variant="md" />
           </div>
           <Tooltip
             width="w-[200px]"
@@ -88,8 +87,7 @@ const MainVenueForm = ({
       <div className="flex flex-col mb-1">
         <label htmlFor="" className="flex flex-row gap-5 justify-between ">
           <div className="flex gap-x-1">
-            <p className="text-primary-input-text">Venue Code</p>
-            <Label required text="" />
+            <Label required text="Venue Name" variant="md" />
           </div>
           <div>
             <TextInput
