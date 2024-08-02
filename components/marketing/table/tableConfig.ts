@@ -435,13 +435,6 @@ export const globalActivityColDefs = (updateActivity, currencySymbol) => [
     hide: true,
   },
   {
-    headerName: 'Venue Ids',
-    field: 'venueIds',
-    cellRenderer: DefaultCellRenderer,
-    width: 95,
-    hide: true,
-  },
-  {
     headerName: 'Activity Name',
     field: 'actName',
     cellRenderer: DefaultCellRenderer,
