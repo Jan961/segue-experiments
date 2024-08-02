@@ -33,6 +33,7 @@ export interface UploadModalProps {
   maxFiles?: number;
   maxFileSize?: number;
   allowedFormats: string[];
+  testId?: string;
   onChange?: (selectedFiles: UploadedFile[]) => void;
   onSave?: (
     selectedFiles: UploadedFile[],

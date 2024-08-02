@@ -94,7 +94,6 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
   const getActivities = async (bookingId: string) => {
     try {
       setActColDefs(activityColDefs(activityUpdate, currency.symbol));
-      setGlobalColDefs(globalActivityTabColDefs(viewGlobalActivity, currency.symbol));
 
       const { data } = await axios.get(`/api/marketing/activities/${bookingId}`);
 
@@ -140,7 +139,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
       ) {
         const tempGlobList = globalActivities.activities.map((act) => ({
           actName: act.Name,
-          actType: globalActivities.activityTypes.find((type) => type.value === act.ActivityTypeId)?.text,
+          actType: globalActivities.activityTypes.find((type) => type.Id === act.ActivityTypeId)?.Name,
           actDate: startOfDay(new Date(act.Date)),
           followUpCheck: act.FollowUpRequired,
           followUpDt: act.DueByDate === '' ? null : startOfDay(new Date(act.DueByDate)),
@@ -152,6 +151,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
 
         setGlobalTotalCost(globalActivities.activities.reduce((sum, item) => sum + item.Cost, 0));
 
+        setGlobalColDefs(globalActivityTabColDefs(viewGlobalActivity, currency.symbol));
         setGlobalRowData(tempGlobList);
       }
 

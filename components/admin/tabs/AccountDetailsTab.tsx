@@ -9,6 +9,7 @@ import { transformToOptions } from 'utils';
 import { Label } from 'components/core-ui-lib';
 import schema from './AccountDetailsValidationSchema';
 import { AccountLogoUpload } from '../accountLogoUpload/AccountLogoUpload';
+import FormError from 'components/core-ui-lib/FormError';
 
 export default function AccountDetailsTab() {
   const [formData, setFormData] = useState<UiAccountType>({ ...initialUiAccountDetails });
@@ -247,13 +248,10 @@ export default function AccountDetailsTab() {
           />
           <div>
             <div className="flex gap-x-1">
-              <p className="text-primary-input-text">Currency for Payment</p>
-              <div>
-                <Label required={true} text="" className=" absolute" />
+              <div className="flex">
+                <Label required={true} text="Currency for Payment" variant="md" className="" />
+                <FormError error={validationErrors.currencyForPayment} className="mt-1 ml-1" />
               </div>
-              {validationErrors.currencyForPayment && (
-                <small className="text-primary-red self-center ml-1">{validationErrors.currencyForPayment}</small>
-              )}
             </div>
             <Select
               name="currencyForPayment"
@@ -306,13 +304,10 @@ export default function AccountDetailsTab() {
           />
           <div>
             <div className="flex gap-x-1">
-              <p className="text-primary-input-text">Company Currency</p>
-              <div>
-                <Label required={true} text="" className=" absolute" />
+              <div className="flex">
+                <Label required={true} text="Company Currency" variant="md" className="" />
+                <FormError error={validationErrors.currency} className="mt-1 ml-1" />
               </div>
-              {validationErrors.currency && (
-                <small className="text-primary-red self-center ml-1">{validationErrors.currency}</small>
-              )}
             </div>
             <Select
               name="currency"
