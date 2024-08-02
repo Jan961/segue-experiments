@@ -164,7 +164,7 @@ export default function AddEditVenueModal({
         panelClass="relative h-[95vh] overflow-x-auto pb-4"
         titleClass="text-xl text-primary-navy"
       >
-        <form className="w-[1054px]">
+        <form className="w-[1026px]">
           <h2 className="text-xl text-primary-navy font-bold">Main</h2>
           <div className="grid grid-cols-2 gap-5">
             <MainVenueForm
