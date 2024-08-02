@@ -17,7 +17,7 @@ import { ConfirmationDialog } from 'components/core-ui-lib';
 import ExistingTasks from './ExistingTasks';
 import { isNullOrEmpty } from 'utils';
 import { useRouter } from 'next/router';
-import { productionState } from '../../../state/tasks/productionState';
+import { productionState } from 'state/tasks/productionState';
 
 interface ProductionTaskListProps {
   visible: boolean;

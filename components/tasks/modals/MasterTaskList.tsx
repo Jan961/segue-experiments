@@ -9,10 +9,10 @@ import { tileColors } from 'config/global';
 import axios from 'axios';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import Loader from 'components/core-ui-lib/Loader';
-import { isNullOrEmpty } from '../../../utils';
+import { isNullOrEmpty } from 'utils';
 import ExistingTasks from './ExistingTasks';
 import { useRouter } from 'next/router';
-import { productionState } from '../../../state/tasks/productionState';
+import { productionState } from 'state/tasks/productionState';
 
 interface MasterTaskListProps {
   visible: boolean;

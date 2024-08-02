@@ -10,7 +10,7 @@ import Loader from 'components/core-ui-lib/Loader';
 import { ProductionTaskDTO } from 'interfaces';
 import { useRouter } from 'next/router';
 import AddTask from './modals/AddTask';
-import { isNullOrEmpty } from '../../utils';
+import { isNullOrEmpty } from 'utils';
 
 interface TasksTableProps {
   rowData?: any;
