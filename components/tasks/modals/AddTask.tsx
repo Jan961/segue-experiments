@@ -24,6 +24,7 @@ import { productionJumpState } from 'state/booking/productionJumpState';
 import { addDurationToDate, addOneMonth } from 'services/dateService';
 import { RecurringTasksPopup } from './RecurringTasksPopup';
 import { DeleteRecurringPopup } from './DeleteRecurringPopup';
+import { useRouter } from 'next/router';
 
 interface AddTaskProps {
   visible: boolean;
@@ -128,6 +129,7 @@ const AddTask = ({
   const [showRecurringDelete, setShowRecurringDelete] = useState<boolean>(false);
   const [showSingleDelete, setShowSingleDelete] = useState<boolean>(false);
   const [showConfirmationDialog, setShowConfirmationDialog] = useState<boolean>(false);
+  const router = useRouter();
   const priorityOptionList = useMemo(
     () => priorityOptions.map((option) => ({ ...option, text: `${option.value} - ${option.text}` })),
     [],
@@ -295,6 +297,7 @@ const AddTask = ({
       try {
         await axios.post(`/api/tasks/master/update/${inputs?.RepeatInterval ? 'recurring' : 'single'}`, inputs);
         setLoading(false);
+        await router.replace(router.asPath);
         handleClose();
       } catch (error) {
         setLoading(false);
@@ -304,7 +307,8 @@ const AddTask = ({
         const endpoint = `/api/tasks/master/create/${inputs?.RepeatInterval ? 'recurring' : 'single'}/`;
         await axios.post(endpoint, inputs);
         setLoading(false);
-        onClose();
+        await router.replace(router.asPath);
+        handleClose();
       } catch (error) {
         setLoading(false);
         console.error(error);
@@ -323,6 +327,7 @@ const AddTask = ({
         try {
           await axios.post(`/api/tasks/update${inputs?.RepeatInterval ? '/recurring' : '/single'}`, inputs);
           setLoading(false);
+          await router.replace(router.asPath);
           handleClose();
           await updateTableData(inputs, true);
         } catch (error) {
@@ -334,7 +339,8 @@ const AddTask = ({
           await axios.post(endpoint, inputs);
           if (isChecked) await handleMasterTask();
           setLoading(false);
-          onClose();
+          await router.replace(router.asPath);
+          handleClose();
           await updateTableData(inputs, true);
         } catch (error) {
           setLoading(false);
@@ -375,6 +381,7 @@ const AddTask = ({
         PRTId: inputs.PRTId,
         weekStart: inputs.StartByWeekNum,
       });
+      await router.replace(router.asPath);
       setLoading(false);
       onClose();
     } finally {
@@ -390,6 +397,7 @@ const AddTask = ({
         setLoading(false);
         onClose();
         await updateTableData(inputs, false);
+        await router.replace(router.asPath);
       } finally {
         setLoading(false);
       }
@@ -399,6 +407,7 @@ const AddTask = ({
         setLoading(false);
         onClose();
         await updateTableData(inputs, false);
+        await router.replace(router.asPath);
       } finally {
         setLoading(false);
       }
