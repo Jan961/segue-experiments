@@ -77,7 +77,7 @@ export default function PopupModal({
             >
               <Dialog.Panel
                 className={classNames(
-                  'pl-7 pt-7 pb-5 transform bg-primary-white text-left align-middle shadow-xl transition-all',
+                  'px-7 pt-7 pb-5 transform bg-primary-white text-left align-middle shadow-xl transition-all',
                   panelClass,
                 )}
               >
@@ -85,7 +85,7 @@ export default function PopupModal({
                   <Icon
                     iconName="cross"
                     variant="lg"
-                    className="hover:scale-105 sticky left-[95%]"
+                    className="hover:scale-105 sticky left-full"
                     onClick={onClose}
                     data-testid="close-icon"
                   />
