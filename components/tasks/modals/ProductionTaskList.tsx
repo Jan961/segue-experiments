@@ -17,13 +17,13 @@ import { ConfirmationDialog } from 'components/core-ui-lib';
 import ExistingTasks from './ExistingTasks';
 import { isNullOrEmpty } from 'utils';
 import { useRouter } from 'next/router';
+import { productionState } from '../../../state/tasks/productionState';
 
 interface ProductionTaskListProps {
   visible: boolean;
   onClose: (val?: string) => void;
   productionId?: number;
   isMaster?: boolean;
-  currentProductionTasks?: any[];
 }
 
 const LoadingOverlay = () => (
@@ -32,13 +32,7 @@ const LoadingOverlay = () => (
   </div>
 );
 
-const ProductionTaskList = ({
-  visible,
-  onClose,
-  productionId,
-  isMaster = false,
-  currentProductionTasks = [],
-}: ProductionTaskListProps) => {
+const ProductionTaskList = ({ visible, onClose, productionId, isMaster = false }: ProductionTaskListProps) => {
   const { users } = useRecoilValue(userState);
   const styleProps = { headerColor: tileColors.tasks };
   const [rowData, setRowData] = useState([]);
@@ -49,7 +43,7 @@ const ProductionTaskList = ({
   const [includeArchived, setIncludeArchived] = useState<boolean>(productionJump?.includeArchived || false);
   const [showExistingTaskModal, setShowExistingTaskModal] = useState<boolean>(false);
   const [duplicateTasks, setDuplicateTasks] = useState([]);
-
+  const unfilteredTasks = useRecoilValue(productionState).filter((prod) => prod.Id === productionId)[0]?.Tasks || [];
   const router = useRouter();
 
   const productionsData = useMemo(() => {
@@ -106,7 +100,7 @@ const ProductionTaskList = ({
     const ptrList = [];
     const singleList = [];
     selectedRows.forEach((task) => {
-      currentProductionTasks.forEach((existingTask) => {
+      unfilteredTasks.forEach((existingTask) => {
         if (isNullOrEmpty(existingTask?.CopiedFrom)) return;
         if (existingTask?.CopiedFrom === 'R') {
           if (task?.PRTId === existingTask.CopiedId) {

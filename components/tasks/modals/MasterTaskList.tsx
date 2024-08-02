@@ -12,13 +12,13 @@ import Loader from 'components/core-ui-lib/Loader';
 import { isNullOrEmpty } from '../../../utils';
 import ExistingTasks from './ExistingTasks';
 import { useRouter } from 'next/router';
+import { productionState } from '../../../state/tasks/productionState';
 
 interface MasterTaskListProps {
   visible: boolean;
   onClose: (val?: string) => void;
   productionId?: number;
   isMaster?: boolean;
-  currentProductionTasks?: any[];
 }
 
 const LoadingOverlay = () => (
@@ -27,7 +27,7 @@ const LoadingOverlay = () => (
   </div>
 );
 
-const MasterTaskList = ({ visible, onClose, productionId, currentProductionTasks }: MasterTaskListProps) => {
+const MasterTaskList = ({ visible, onClose, productionId }: MasterTaskListProps) => {
   const { users } = useRecoilValue(userState);
 
   const styleProps = { headerColor: tileColors.tasks };
@@ -36,6 +36,7 @@ const MasterTaskList = ({ visible, onClose, productionId, currentProductionTasks
   const [loading, setLoading] = useState<boolean>(false);
   const [showExistingTaskModal, setShowExistingTaskModal] = useState<boolean>(false);
   const [duplicateTasks, setDuplicateTasks] = useState([]);
+  const unfilteredTasks = useRecoilValue(productionState).filter((prod) => prod.Id === productionId)[0]?.Tasks || [];
   const router = useRouter();
   const handleFetchTasks = async () => {
     setLoading(true);
@@ -54,7 +55,7 @@ const MasterTaskList = ({ visible, onClose, productionId, currentProductionTasks
     const mtrList = [];
     const singleList = [];
     selectedRows.forEach((task) => {
-      currentProductionTasks.forEach((existingTask) => {
+      unfilteredTasks.forEach((existingTask) => {
         if (isNullOrEmpty(existingTask?.CopiedFrom)) return;
         if (existingTask?.CopiedFrom === 'D') {
           if (task?.MTRId === existingTask.CopiedId) {
