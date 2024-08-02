@@ -1,6 +1,8 @@
 import prisma from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import fuseFilter from 'utils/fuseFilter';
+import { getFileCardFromFileId } from 'services/fileService';
+import { omit } from 'radash';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   const { country, town, productionId, searchQuery, limit } = req.body;
@@ -36,6 +38,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       where: queryConditions,
       include: {
         VenueAddress: true,
+        VenueFile: true,
         VenueContact: {
           include: {
             VenueRole: true,
@@ -54,6 +57,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         },
       ],
     });
+
     const tempVenues = venues.map((venue) => {
       return {
         ...venue,
@@ -62,10 +66,25 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         })?.Town,
       };
     });
-    const filteredVenues = fuseFilter(tempVenues, searchQuery, ['Name', 'Code', 'Town']);
+    let filteredVenues = fuseFilter(tempVenues, searchQuery, ['Name', 'Code', 'Town']);
+
     if (filteredVenues.length > 0) {
-      const returnLength = filteredVenues.length >= limit ? limit : filteredVenues.length;
-      res.status(200).json(filteredVenues.slice(0, returnLength));
+      const returnLength = limit && filteredVenues.length >= limit ? limit : filteredVenues.length;
+      filteredVenues = await Promise.all(
+        filteredVenues.slice(0, returnLength).map(async (venue) => {
+          const files = await Promise.all(
+            venue.VenueFile.map(async (file) => {
+              return await getFileCardFromFileId(file.FileId);
+            }),
+          );
+          venue = omit(venue, ['VenueFile']);
+          return {
+            ...venue,
+            Files: files,
+          };
+        }),
+      );
+      res.status(200).json(filteredVenues);
     } else {
       res.status(200).json([]);
     }

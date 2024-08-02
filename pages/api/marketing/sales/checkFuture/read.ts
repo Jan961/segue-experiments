@@ -25,7 +25,7 @@ export default async function handle(req, res) {
         .sort((a, b) => new Date(a.SetSalesFiguresDate).getTime() - new Date(b.SetSalesFiguresDate).getTime())
         .filter((element, index, array) => index === 0 || element.SetHoldSeats === array[0].SetHoldSeats);
     } else {
-      const data = await prisma.salesSet.findMany({
+      data = await prisma.salesSet.findMany({
         where: {
           SetBookingId: req.body.bookingId,
           SetSalesFiguresDate: {
@@ -33,31 +33,10 @@ export default async function handle(req, res) {
           },
           SetComp: {
             some: {
-              compType: {
-                compTypeId: req.body.typeId,
-              },
+              SetCompCompTypeId: req.body.typeId,
             },
           },
         },
-        include: {
-          SetComp: {
-            include: {
-              CompType: true,
-            },
-          },
-        },
-        orderBy: [
-          {
-            SetComp: {
-              compType: {
-                compTypeName: 'asc',
-              },
-            },
-          },
-          {
-            SetSalesFiguresDate: 'asc',
-          },
-        ],
       });
 
       result = data

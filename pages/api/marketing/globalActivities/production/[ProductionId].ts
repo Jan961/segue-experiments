@@ -54,7 +54,7 @@ export const getActivitiesByProductionId = async (ProductionId) => {
 };
 
 const fieldsMapper = (original) => ({
-  Id: original.VenueId,
+  Id: original.Id,
   ProductionId: original.ProductionId,
   Date: convertDate(original.Date),
   Name: original.Name,

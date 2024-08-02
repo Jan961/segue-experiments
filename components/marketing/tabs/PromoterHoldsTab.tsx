@@ -73,9 +73,7 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
       const promData = response.data;
 
       if (
-        promData.allocations &&
-        Array.isArray(promData.allocations) &&
-        promData.allocations.length > 0 &&
+        (promData.allocations && Array.isArray(promData.allocations) && promData.allocations.length > 0) ||
         Array.isArray(promData.holds)
       ) {
         setHoldList(promData.holds);

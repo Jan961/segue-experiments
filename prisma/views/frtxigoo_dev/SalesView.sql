@@ -15,10 +15,8 @@ SELECT
   `VenueView`.`VenueCode` AS `VenueCode`,
   `VenueView`.`VenueName` AS `VenueName`,
   `VenueView`.`VenueCurrencyCode` AS `VenueCurrencyCode`,
-  `frtxigoo_dev`.`Currency`.`CurrencySymbolUnicode` AS `VenueCurrencySymbolUnicode`,
   `frtxigoo_dev`.`ConversionRate`.`ConversionToCurrencyCode` AS `ConversionToCurrencyCode`,
   `frtxigoo_dev`.`ConversionRate`.`ConversionRate` AS `ConversionRate`,
-  `frtxigoo_dev`.`SalesSet`.`SetId` AS `SetId`,
   `frtxigoo_dev`.`SalesSet`.`SetSalesFiguresDate` AS `SetSalesFiguresDate`,
   `CalculateWeekNum`(
     `frtxigoo_dev`.`SalesSet`.`SetSalesFiguresDate`,

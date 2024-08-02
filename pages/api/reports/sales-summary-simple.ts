@@ -1,5 +1,6 @@
 import { Prisma } from '@prisma/client';
 import ExcelJS from 'exceljs';
+import { format } from 'date-fns';
 import prisma from 'lib/prisma';
 import moment from 'moment';
 import {
@@ -10,17 +11,13 @@ import {
   colorCell,
   getChangeVsLastWeekValue,
   getCurrencyWiseTotal,
-  getMapKeyForValue,
   getValuesFromObject,
   getWeekWiseGrandTotalInPound,
   handleAddingWeeklyTotalRow,
   makeRowTextBold,
   makeRowTextBoldAndALignCenter,
   makeTextBoldOfNRows,
-  groupBasedOnVenueWeeksKeepingVenueCommon,
   CONSTANTS,
-  getUniqueAndSortedHeaderProductionColumns,
-  getMapKey,
   formatWeek,
   LEFT_PORTION_KEYS,
   getSeatsColumnForWeekTotal,
@@ -35,14 +32,12 @@ import {
   colorTextAndBGCell,
 } from 'services/salesSummaryService';
 import {
+  BOOK_STATUS_CODES,
   SALES_TYPE_NAME,
-  TGroupBasedOnWeeksKeepingVenueCommon,
-  TKeyAndGroupBasedOnWeeksKeepingVenueCommonMapping,
   TRequiredFields,
   TRequiredFieldsFinalFormat,
   TSalesView,
   TotalForSheet,
-  UniqueHeadersObject,
   VENUE_CURRENCY_SYMBOLS,
   WeekAggregateSeatsDetail,
   WeekAggregates,
@@ -53,6 +48,71 @@ import { getEmailFromReq, checkAccess } from 'services/userService';
 import { styleHeader } from './masterplan';
 import { currencyCodeToSymbolMap } from 'config/Reports';
 import { convertToPDF } from 'utils/report';
+import { calculateWeekNumber, getWeeksBetweenDates } from 'services/dateService';
+import { group, unique } from 'radash';
+
+interface ProductionWeek {
+  mondayDate: string;
+  productionWeekNum: string;
+}
+
+interface ProductionSummary {
+  FullProductionCode: string;
+  ProductionWeekNum: number;
+  StartDate: Date;
+  EndDate: Date;
+  Venue: string;
+  Town: string;
+  VenueCurrencyCode: string;
+  VenueCurrencySymbol: VENUE_CURRENCY_SYMBOLS;
+  BookingId: number;
+  BookingFirstDate: Date;
+  BookingStatusCode: BOOK_STATUS_CODES;
+  Week: string;
+  Day: string;
+  Date: Date;
+  ConversionRate: number;
+  Value: number;
+  FormattedFinalFiguresValue: number;
+  NotOnSalesDate?: string;
+  FinalSetSalesFiguresDate?: string;
+}
+const fetchProductionBookings = async (productionId: number): Promise<ProductionSummary[]> => {
+  const conditions: Prisma.Sql[] = [];
+  if (productionId) {
+    conditions.push(Prisma.sql`ProductionId = ${productionId} `);
+  }
+  conditions.push(Prisma.sql` SaleTypeName=${SALES_TYPE_NAME.GENERAL_SALES}`);
+  const where: Prisma.Sql = conditions.length ? Prisma.sql` where ${Prisma.join(conditions, ' and ')}` : Prisma.empty;
+  const data: any[] = await prisma.$queryRaw`select 
+                                                            FullProductionCode, 
+                                                            ProductionStartDate as StartDate, 
+                                                            ProductionEndDate as EndDate, 
+                                                            EntryName as Venue, 
+                                                            ProductionWeekNum,
+                                                            VenueCurrencyCode, 
+                                                            Location as Town, 
+                                                            EntryId as BookingId, 
+                                                            EntryDate as BookingFirstDate, 
+                                                            EntryStatusCode as BookingStatusCode,
+                                                            Value,
+                                                            ConversionRate,
+                                                            FinalSetSalesFiguresDate 
+                                                          FROM SalesSummaryView  
+                                                          ${where} 
+                                                          order by BookingFirstDate;`;
+  const summary = unique(data, (entry) => entry.BookingId)
+    .map((entry) => ({
+      ...entry,
+      Day: format(new Date(entry.BookingFirstDate), 'EEEE'),
+      Week: formatWeek(entry.ProductionWeekNum),
+      Date: entry.BookingFirstDate,
+      VenueCurrencySymbol: currencyCodeToSymbolMap[entry.VenueCurrencyCode],
+      FormattedFinalFiguresValue: entry.Value?.toNumber?.() || 0,
+    }))
+    .sort((a, b) => new Date(a.BookingFirstDate).getTime() - new Date(b.BookingFirstDate).getTime());
+  return summary;
+};
 
 // TODO
 // Decimal upto 2 places fix
@@ -63,7 +123,12 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   const email = await getEmailFromReq(req);
   const access = await checkAccess(email, { ProductionId: productionId });
   if (!access) return res.status(401).end();
-
+  const bookings = await fetchProductionBookings(+productionId);
+  const { StartDate, EndDate } = bookings?.[0] || {};
+  const weeks: ProductionWeek[] = getWeeksBetweenDates(fromWeek, toWeek || EndDate).map((week) => ({
+    productionWeekNum: formatWeek(calculateWeekNumber(new Date(StartDate), new Date(week.mondayDate))),
+    ...week,
+  }));
   const workbook = new ExcelJS.Workbook();
   const conditions: Prisma.Sql[] = [];
   if (productionId) {
@@ -72,6 +137,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   if (fromWeek && toWeek) {
     conditions.push(Prisma.sql`setProductionWeekDate BETWEEN ${fromWeek} AND ${toWeek}`);
   }
+  conditions.push(Prisma.sql` SaleTypeName=${SALES_TYPE_NAME.GENERAL_SALES}`);
   const where: Prisma.Sql = conditions.length ? Prisma.sql` where ${Prisma.join(conditions, ' and ')}` : Prisma.empty;
   const data: TSalesView[] =
     await prisma.$queryRaw`select * FROM SalesView ${where} order by BookingFirstDate, SetSalesFiguresDate;`;
@@ -97,7 +163,9 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         Seats,
         NotOnSalesDate,
         SetProductionWeekNum,
+        BookingId,
       }) => ({
+        BookingId,
         BookingProductionWeekNum,
         BookingFirstDate,
         VenueTown,
@@ -128,7 +196,14 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     Date: x.BookingFirstDate,
     Town: x.VenueTown,
     Venue: x.VenueName,
+    SetProductionWeekDate: x.SetProductionWeekDate
+      ? new Date(x.SetProductionWeekDate)?.toISOString()?.split('T')?.[0]
+      : '',
   }));
+  const bookingSalesByWeek = group(
+    finalFormattedValues,
+    (value) => `${value.BookingId} ${value.SetProductionWeekDate}`,
+  );
 
   // Write data to the worksheet
   const worksheet = workbook.addWorksheet('Sales Summary', {
@@ -136,20 +211,9 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     views: [{ state: 'frozen', xSplit: 5, ySplit: 5 }],
   });
 
-  const mapOfCreatedKeyAndModifiedFetchedValue: { [key: string]: TRequiredFieldsFinalFormat } =
-    finalFormattedValues.reduce(
-      (acc, x) => ({
-        ...acc,
-        [getMapKey(x)]: x,
-      }),
-      {},
-    );
-
   // Logic for headers
-  const uniqueProductionColumns: UniqueHeadersObject[] =
-    getUniqueAndSortedHeaderProductionColumns(finalFormattedValues);
-  const headerWeekNums: string[] = uniqueProductionColumns.map((x) => x.FormattedSetProductionWeekNum);
-  const headerWeekDates: string[] = uniqueProductionColumns.map((x) => x.SetProductionWeekDate);
+  const headerWeekNums: string[] = weeks.map((x) => x.productionWeekNum);
+  const headerWeekDates: string[] = weeks.map((x) => x.mondayDate);
 
   // Adding Heading
   const title = salesReportName({ isWeeklyReport, isSeatsDataRequired, data });
@@ -166,7 +230,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     '',
     '',
     '',
-    ...uniqueProductionColumns.map((x) => x.FormattedSetProductionWeekNum),
+    ...headerWeekNums,
     CONSTANTS.CHANGE_VS,
     ...(isSeatsDataRequired ? [CONSTANTS.RUN_SEATS, CONSTANTS.RUN_SEATS, CONSTANTS.RUN_SALES] : []),
   ];
@@ -177,19 +241,11 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     'Date',
     'Town',
     'Venue',
-    ...uniqueProductionColumns.map((x) => convertDateFormat(x.SetProductionWeekDate)),
+    ...headerWeekDates.map((week) => convertDateFormat(week)),
     'Last Week',
     ...(isSeatsDataRequired ? ['Sold', 'Capacity', 'vs Capacity'] : []),
   ]);
   worksheet.addRow([]);
-
-  // for (let char = 'A', i = 0; i < columns.length; i++, char = String.fromCharCode(char.charCodeAt(0) + 1)) {
-  //   worksheet.getColumn(char).width = 17
-  // }
-
-  const groupBasedOnVenue: TKeyAndGroupBasedOnWeeksKeepingVenueCommonMapping = groupBasedOnVenueWeeksKeepingVenueCommon(
-    { modifiedFetchedValues: finalFormattedValues },
-  );
 
   const totalForWeeks: WeekAggregates = headerWeekNums.reduce((acc, x) => ({ ...acc, [x]: [] }), {});
   let totalRowWeekWise: WeekAggregates = headerWeekNums.reduce((acc, x) => ({ ...acc, [x]: [] }), {});
@@ -212,10 +268,10 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     Percentage?: number;
     Currency?: TRequiredFieldsFinalFormat['VenueCurrencySymbol'];
   } = {};
-  Object.values(groupBasedOnVenue).forEach((rowAsJSON: TGroupBasedOnWeeksKeepingVenueCommon) => {
+  bookings.forEach((booking) => {
     // Adding Weekly Totals
     if (isWeeklyReport) {
-      if (lastBookingWeek !== rowAsJSON.Week) {
+      if (lastBookingWeek !== booking.Week) {
         const rowsAdded: number = handleAddingWeeklyTotalRow({
           worksheet,
           headerWeekNums,
@@ -227,7 +283,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         makeTextBoldOfNRows({ worksheet, startingRow: row, numberOfRowsAdded: rowsAdded });
         row += rowsAdded;
         totalRowWeekWise = headerWeekNums.reduce((acc, x) => ({ ...acc, [x]: [] }), {});
-        lastBookingWeek = rowAsJSON.Week;
+        lastBookingWeek = booking.Week;
         totalCurrencyAndWeekWiseSeatsTotal = Object.values(VENUE_CURRENCY_SYMBOLS).reduce(
           (acc, symbol) => ({ ...acc, [symbol]: [] }),
           {},
@@ -236,54 +292,54 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     }
 
     // Calculating Values
-    const arr: any[] = getValuesFromObject(rowAsJSON, LEFT_PORTION_KEYS);
-    const values: number[] = [];
+    const arr: any[] = getValuesFromObject(booking, LEFT_PORTION_KEYS);
+    const values: any[] = [];
     for (let i = 0, col = 6; i < variableColsLength; i++, col++) {
-      const key: string = getMapKeyForValue(rowAsJSON, {
-        FormattedSetProductionWeekNum: headerWeekNums[i],
-        SetProductionWeekDate: headerWeekDates[i],
-      });
-      const val: TRequiredFieldsFinalFormat = mapOfCreatedKeyAndModifiedFetchedValue[key];
+      const val = bookingSalesByWeek?.[`${booking.BookingId} ${headerWeekDates[i]}`]?.[0];
       let totalObjToPush: Pick<TotalForSheet, 'Value' | 'ConversionRate' | 'VenueCurrencySymbol'> = {
         Value: 0,
         ConversionRate: 0,
-        VenueCurrencySymbol: rowAsJSON.VenueCurrencySymbol,
+        VenueCurrencySymbol: booking.VenueCurrencySymbol,
       };
       if (val) {
         values.push(val.Value);
-        totalObjToPush = {
-          Value: val.Value,
-          ConversionRate: val.ConversionRate,
-          VenueCurrencySymbol: val.VenueCurrencySymbol,
-        };
+        if (booking.BookingStatusCode !== BOOK_STATUS_CODES.X) {
+          totalObjToPush = {
+            Value: val.Value,
+            ConversionRate: val.ConversionRate,
+            VenueCurrencySymbol: val.VenueCurrencySymbol,
+          };
+        }
         if (isSeatsDataRequired) {
           seatsData = {
             Seats: val.Seats,
             TotalCapacity: val.TotalCapacity,
             Percentage: val.Seats === 0 || val.TotalCapacity === 0 ? 0.0 : val.Seats / val.TotalCapacity,
           };
-          totalCurrencyAndWeekWiseSeatsTotal[val.VenueCurrencySymbol].push({
-            Seats: seatsData.Seats as number,
-            TotalCapacity: seatsData.TotalCapacity as number,
-            VenueCurrencySymbol: val.VenueCurrencySymbol,
-          });
-          totalCurrencyWiseSeatsTotal[val.VenueCurrencySymbol].push({
-            Seats: seatsData.Seats as number,
-            TotalCapacity: seatsData.TotalCapacity as number,
-            VenueCurrencySymbol: val.VenueCurrencySymbol,
-          });
+          if (booking.BookingStatusCode !== BOOK_STATUS_CODES.X) {
+            totalCurrencyAndWeekWiseSeatsTotal[val.VenueCurrencySymbol].push({
+              Seats: seatsData.Seats as number,
+              TotalCapacity: seatsData.TotalCapacity as number,
+              VenueCurrencySymbol: val.VenueCurrencySymbol,
+            });
+            totalCurrencyWiseSeatsTotal[val.VenueCurrencySymbol].push({
+              Seats: seatsData.Seats as number,
+              TotalCapacity: seatsData.TotalCapacity as number,
+              VenueCurrencySymbol: val.VenueCurrencySymbol,
+            });
+          }
         }
       } else {
-        if (moment(rowAsJSON.Date).valueOf() < moment(headerWeekDates[i]).valueOf()) {
+        if (moment(booking.Date).valueOf() < moment(headerWeekDates[i]).valueOf()) {
           totalObjToPush = {
-            Value: rowAsJSON.FormattedFinalFiguresValue,
-            ConversionRate: rowAsJSON.ConversionRate,
-            VenueCurrencySymbol: rowAsJSON.VenueCurrencySymbol,
+            Value: booking.FormattedFinalFiguresValue,
+            ConversionRate: booking.ConversionRate,
+            VenueCurrencySymbol: booking.VenueCurrencySymbol,
           };
-          values.push(rowAsJSON.FormattedFinalFiguresValue);
+          values.push(booking.FormattedFinalFiguresValue);
         } else {
-          totalObjToPush = { Value: 0, ConversionRate: 0, VenueCurrencySymbol: rowAsJSON.VenueCurrencySymbol };
-          values.push(0);
+          totalObjToPush = { Value: 0, ConversionRate: 0, VenueCurrencySymbol: booking.VenueCurrencySymbol };
+          values.push('');
         }
       }
 
@@ -297,7 +353,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
 
     // Calculating Current Vs Prev Week Value
     const currVSPrevWeekValue: number = calculateCurrVSPrevWeekValue({ valuesArrayOnly: values });
-    const { VenueCurrencySymbol } = rowAsJSON;
+    const { VenueCurrencySymbol } = booking;
     const rowData: string[] = [
       ...arr,
       ...values.map((num) => num),
@@ -332,11 +388,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
 
     // For Color Coding
     for (let i = 0, col = 6; i < variableColsLength; i++, col++) {
-      const key: string = getMapKeyForValue(rowAsJSON, {
-        FormattedSetProductionWeekNum: headerWeekNums[i],
-        SetProductionWeekDate: headerWeekDates[i],
-      });
-      const val: TRequiredFieldsFinalFormat = mapOfCreatedKeyAndModifiedFetchedValue[key];
+      const val = bookingSalesByWeek?.[`${booking.BookingId} ${headerWeekDates[i]}`]?.[0];
       if (val) {
         assignBackgroundColor({
           worksheet,
@@ -345,14 +397,14 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           props: {
             SetIsCopy: val.SetIsCopy,
             SetBrochureReleased: val.SetBrochureReleased,
-            BookingStatusCode: val.BookingStatusCode,
+            BookingStatusCode: booking.BookingStatusCode,
             Date: val.Date,
             SetProductionWeekDate: headerWeekDates[i],
-            NotOnSalesDate: rowAsJSON.NotOnSalesDate,
+            NotOnSalesDate: val.NotOnSalesDate,
           },
           meta: { weekCols: variableColsLength + 1 },
         });
-        if (val.BookingStatusCode === 'X') {
+        if (booking.BookingStatusCode === 'X') {
           colorTextAndBGCell({
             worksheet,
             row,
@@ -362,13 +414,13 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           });
         }
       } else {
-        if (rowAsJSON?.BookingStatusCode === 'X') continue;
-        if (moment(rowAsJSON.Date).valueOf() < moment(headerWeekDates[i]).valueOf()) {
+        if (booking?.BookingStatusCode === 'X') continue;
+        if (moment(booking.Date).valueOf() < moment(headerWeekDates[i]).valueOf()) {
           colorCell({ worksheet, row, col, argbColor: COLOR_HEXCODE.BLUE });
         }
         if (
-          rowAsJSON.NotOnSalesDate &&
-          moment(headerWeekDates[i]).valueOf() < moment(rowAsJSON.NotOnSalesDate).valueOf()
+          booking?.NotOnSalesDate &&
+          moment(headerWeekDates[i]).valueOf() < moment(booking.NotOnSalesDate).valueOf()
         ) {
           colorCell({ worksheet, row, col, argbColor: COLOR_HEXCODE.RED });
         }
@@ -558,16 +610,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   worksheet.getColumn('A').width = 9;
   worksheet.getColumn('B').width = 5;
   worksheet.getColumn('C').width = 10;
-  addWidthAsPerContent({
-    worksheet,
-    fromColNumber: 4,
-    toColNumber: numberOfColumns,
-    startingColAsCharWIthCapsOn: 'D',
-    minColWidth: 10,
-    bufferWidth: 2,
-    rowsToIgnore: 4,
-    maxColWidth: Infinity,
-  });
 
   // Column Styling
   alignCellTextRight({ worksheet, colAsChar: 'C' });
@@ -586,6 +628,16 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   styleHeader({ worksheet, row: 2, bgColor: COLOR_HEXCODE.DARK_GREEN });
   styleHeader({ worksheet, row: 3, bgColor: COLOR_HEXCODE.DARK_GREEN });
   styleHeader({ worksheet, row: 4, bgColor: COLOR_HEXCODE.DARK_GREEN });
+  addWidthAsPerContent({
+    worksheet,
+    fromColNumber: 4,
+    toColNumber: numberOfColumns,
+    startingColAsCharWIthCapsOn: 'D',
+    minColWidth: 8,
+    bufferWidth: 2,
+    rowsToIgnore: 2,
+    maxColWidth: Infinity,
+  });
   worksheet.getCell(1, 1).font = { size: 16, color: { argb: COLOR_HEXCODE.WHITE }, bold: true };
   if (format === 'pdf') {
     worksheet.pageSetup.printArea = `A1:${worksheet.getColumn(columns.length).letter}${row}`;
