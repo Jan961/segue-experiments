@@ -13,7 +13,7 @@ const errorSizeMap = {
 };
 
 export default function FormError({ error, className, variant = 'xs', testId }: FormErrorProps) {
-  const baseClass = `text-primary-red font-calibri absolute ${errorSizeMap[variant]}`;
+  const baseClass = `text-primary-red font-calibri ${errorSizeMap[variant]}`;
   return (
     <p data-testid={testId} className={`${className} ${baseClass}`}>
       {error}

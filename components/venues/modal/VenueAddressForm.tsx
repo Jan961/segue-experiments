@@ -56,7 +56,7 @@ const VenueAddressForm = ({
                 error={validationErrors.primaryAddress1}
                 onChange={(e) => handleInputChange('primaryAddress1', e.target.value)}
               />
-              <FormError error={validationErrors.primaryAddress1} />
+              <FormError error={validationErrors.primaryAddress1} className="absolute" />
             </div>
           </label>
         </div>
