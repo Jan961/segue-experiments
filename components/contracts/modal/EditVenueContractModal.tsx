@@ -167,74 +167,83 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
       hasOverlay={false}
     >
       <div className="h-[80vh] w-auto overflow-y-scroll flex">
-        <div className="h-[800px]   flex">
-          <div className="w-[423px] h-[980px] rounded border-2 border-secondary mr-2 p-3 bg-primary-blue bg-opacity-15">
-            <div className="flex">
-              <div className=" text-primary-input-text font-bold text-lg mr-8">Deal Memo</div>
-              <div className="flex items-center">
-                <Button className="w-32" variant="primary" text="Create/Edit Deal Memo" onClick={handleEditDealMemo} />
-                <Button className="ml-3 w-32" variant="primary" text="View as PDF" />
+        <div className="h-[800px] flex">
+          <div className="flex flex-col gap-y-6">
+            <div className="w-[423px] h-[680px] rounded border-2 border-secondary mr-2 p-3 bg-primary-blue bg-opacity-15">
+              <div className="flex">
+                <div className=" text-primary-input-text font-bold text-lg mr-8">Deal Memo</div>
+                <div className="flex items-center">
+                  <Button
+                    className="w-32"
+                    variant="primary"
+                    text="Create/Edit Deal Memo"
+                    onClick={handleEditDealMemo}
+                  />
+                  <Button className="ml-3 w-32" variant="primary" text="View as PDF" />
+                </div>
               </div>
-            </div>
-            <div className=" text-primary-input-text font-bold text-sm mt-1.5">Deal Memo Status</div>
-            <Select
-              options={allStatusOptions}
-              className="bg-primary-white w-52"
-              placeholder="Deal Memo Status"
-              onChange={(value) => editContractModalData('dealMemoStatus', value, 'booking')}
-              value={contractsKeyStatusMap[formData.StatusCode]}
-              isClearable
-              isSearchable
-            />
+              <div className=" text-primary-input-text font-bold text-sm mt-1.5">Deal Memo Status</div>
+              <Select
+                options={allStatusOptions}
+                className="bg-primary-white w-52"
+                placeholder="Deal Memo Status"
+                onChange={(value) => editContractModalData('dealMemoStatus', value, 'booking')}
+                value={contractsKeyStatusMap[formData.StatusCode]}
+                isClearable
+                isSearchable
+              />
 
-            <div className=" text-primary-input-text font-bold text-sm mt-6">Completed By</div>
-            <Select
-              onChange={() => {
-                return null;
-              }}
-              className="bg-primary-white w-52"
-              options={[{ text: 'Select Assignee', value: null }, ...userList]}
-              isClearable
-              isSearchable
-            />
-
-            <div className=" text-primary-input-text font-bold text-sm mt-6">Approved By</div>
-            <Select
-              onChange={() => {
-                return null;
-              }}
-              className="bg-primary-white w-52"
-              options={[{ text: 'Select Assignee', value: null }, ...userList]}
-              isClearable
-              isSearchable
-            />
-            <div className="flex items-center mt-6">
-              <div className=" text-primary-input-text font-bold text-sm">Date Issued</div>
-              <DateInput
+              <div className=" text-primary-input-text font-bold text-sm mt-6">Completed By</div>
+              <Select
                 onChange={() => {
                   return null;
                 }}
-                value={formData.SignedDate}
+                className="bg-primary-white w-52"
+                options={[{ text: 'Select Assignee', value: null }, ...userList]}
+                isClearable
+                isSearchable
               />
 
-              <div className=" text-primary-input-text font-bold text-sm">Date Returned</div>
-
-              <DateInput
+              <div className=" text-primary-input-text font-bold text-sm mt-6">Approved By</div>
+              <Select
                 onChange={() => {
                   return null;
                 }}
-                value={formData.SignedDate}
+                className="bg-primary-white w-52"
+                options={[{ text: 'Select Assignee', value: null }, ...userList]}
+                isClearable
+                isSearchable
               />
-            </div>
+              <div className="flex items-center mt-6">
+                <div className=" text-primary-input-text font-bold text-sm">Date Issued</div>
+                <DateInput
+                  onChange={() => {
+                    return null;
+                  }}
+                  value={formData.SignedDate}
+                />
 
-            <div className=" text-primary-input-text font-bold text-sm mt-6">Notes</div>
-            <TextArea className="h-[580px] w-[400px]" value={formData.DealNotes} />
+                <div className=" text-primary-input-text font-bold text-sm">Date Returned</div>
+
+                <DateInput
+                  onChange={() => {
+                    return null;
+                  }}
+                  value={formData.SignedDate}
+                />
+              </div>
+
+              <div className=" text-primary-input-text font-bold text-sm mt-6">Notes</div>
+              <TextArea className="h-[300px] w-[400px]" value={formData.DealNotes} />
+            </div>
+            <div className="flex justify-end">
+              <Button className="mr-3 w-33" variant="primary" text="Add Attachments" />
+            </div>
           </div>
           <div className="w-[652px] h-[980px] rounded border-2 border-secondary ml-2 p-3 bg-primary-blue bg-opacity-15">
             <div className="flex justify-between">
               <div className=" text-primary-input-text font-bold text-lg">Venue Contract</div>
               <div className="flex mr-2">
-                <Button className="ml-4 w-33" variant="primary" text="Add Attachments" />
                 <Button className="ml-4 w-33" variant="primary" text="View as PDF" />
               </div>
             </div>
