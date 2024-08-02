@@ -34,8 +34,10 @@ import { formattedDateWithDay, toISO } from 'services/dateService';
 import { EditDealMemoContractModal } from './EditDealMemoContractModal';
 import { transformToOptions } from 'utils';
 import LoadingOverlay from 'components/shows/LoadingOverlay';
-import { attachmentsColDefs } from '../tableConfig';
+import { attachmentsColDefs, contractsStyleProps } from '../tableConfig';
 import Table from 'components/core-ui-lib/Table';
+import { UploadModal } from 'components/core-ui-lib';
+import { attachmentMimeTypes } from 'components/core-ui-lib/UploadModal/interface';
 
 const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClose: () => void }) => {
   const productionJumpState = useRecoilValue(currentProductionSelector);
@@ -51,7 +53,6 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
     ...initialEditContractFormData,
     ...selectedTableCell.contract,
   });
-  const [contractAttatchmentRows, setContractAttatchmentRows] = useState([]);
   const [demoModalData, setDemoModalData] = useState<Partial<DealMemoContractFormData>>({});
   const modalTitle = `${productionJumpState.ShowCode + productionJumpState.Code} | ${productionJumpState.ShowName} | ${
     selectedTableCell.contract.venue
@@ -70,6 +71,10 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
       ),
     [users],
   );
+
+  const [showUploadModal, setShowUploadModal] = useState<boolean>(false);
+  const [contractAttatchmentRows, setContractAttatchmentRows] = useState([]);
+  const [filesForUpload, setFilesForUpload] = useState([]);
 
   const producerList = useMemo(() => {
     const list = {};
@@ -102,7 +107,6 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
     };
     callDealMemoData();
   }, []);
-  setContractAttatchmentRows([]);
   const editContractModalData = async (key: string, value, type: string) => {
     const updatedFormData = {
       ...formData,
@@ -118,6 +122,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
   };
 
   const handleFormData = async () => {
+    console.log(filesForUpload);
     const bookingData = Object.keys(saveBookingFormData).length > 0;
     const contractData = Object.keys(saveContractFormData).length > 0;
     if (contractData) {
@@ -159,6 +164,19 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
   const handleDemoFormClose = () => {
     setEditDealMemoModal(false);
     callDealMemoApi();
+  };
+
+  const onSave = async (file) => {
+    setFilesForUpload([...filesForUpload, file]);
+    setContractAttatchmentRows(
+      file.map((file) => {
+        return {
+          FileOriginalFilename: file.name,
+          FileUploadedDateTime: new Date(),
+        };
+      }),
+    );
+    setShowUploadModal(false);
   };
 
   return (
@@ -239,15 +257,23 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
               <div className=" text-primary-input-text font-bold text-sm mt-6">Notes</div>
               <TextArea className="h-[300px] w-[400px]" value={formData.DealNotes} />
             </div>
-            <div className="flex justify-end">
-              <Button className="mr-3 w-33" variant="primary" text="Add Attachments" />
+            <div className="w-[423px] flex justify-end">
+              <Button
+                onClick={() => setShowUploadModal(!showUploadModal)}
+                className="mr-3 w-33"
+                variant="primary"
+                text="Add Attachments"
+              />
             </div>
-            <Table
-              columnDefs={attachmentsColDefs}
-              rowData={contractAttatchmentRows}
-              tableHeight={250}
-              testId="tableVenueAttach"
-            />
+            <div className="bg-red-500 h-[1000px] w-[423px]">
+              <Table
+                columnDefs={attachmentsColDefs}
+                rowData={contractAttatchmentRows}
+                styleProps={contractsStyleProps}
+                testId="tableVenueAttach"
+                tableHeight={550}
+              />
+            </div>
           </div>
           <div className="w-[652px] h-[980px] rounded border-2 border-secondary ml-2 p-3 bg-primary-blue bg-opacity-15">
             <div className="flex justify-between">
@@ -568,6 +594,15 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
         <Button onClick={() => handleCancelForm(false)} className="w-33" variant="secondary" text="Cancel" />
         <Button onClick={handleFormData} className="ml-4 w-33" variant="primary" text="Save and Close" />
       </div>
+      <UploadModal
+        visible={showUploadModal}
+        title="Upload Venue Contract Attachments"
+        info="Please upload your file by dragging it into the grey box below or by clicking the upload cloud."
+        allowedFormats={attachmentMimeTypes.venueContract}
+        onClose={() => setShowUploadModal(false)}
+        maxFileSize={5120 * 1024} // 5MB
+        onSave={onSave}
+      />
       <ConfirmationDialog
         labelYes="Yes"
         labelNo="No"
