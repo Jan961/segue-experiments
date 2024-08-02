@@ -5,6 +5,7 @@ import { initialVenueAddressDetails } from 'config/venue';
 import { useState } from 'react';
 import { UiTransformedVenue } from 'utils/venue';
 import { Icon, Tooltip, Label } from 'components/core-ui-lib';
+import FormError from 'components/core-ui-lib/FormError';
 
 interface VenueAddressFormProps {
   venue: Partial<UiTransformedVenue>;
@@ -43,7 +44,7 @@ const VenueAddressForm = ({
         <div className="flex flex-col">
           <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
             <div className="flex gap-x-1">
-              <Label required text="Venue Code" variant="md" />
+              <Label required text="Address 1" variant="md" />
             </div>
             <div>
               <TextInput
@@ -55,9 +56,7 @@ const VenueAddressForm = ({
                 error={validationErrors.primaryAddress1}
                 onChange={(e) => handleInputChange('primaryAddress1', e.target.value)}
               />
-              {validationErrors.primaryAddress1 && (
-                <small className="text-primary-red flex absolute">{validationErrors.primaryAddress1}</small>
-              )}
+              <FormError error={validationErrors.primaryAddress1} />
             </div>
           </label>
         </div>
@@ -95,9 +94,7 @@ const VenueAddressForm = ({
               error={validationErrors.primaryTown}
               onChange={(e) => handleInputChange('primaryTown', e.target.value)}
             />
-            {validationErrors.primaryTown && (
-              <small className="text-primary-red flex absolute">{validationErrors.primaryTown}</small>
-            )}
+            <FormError error={validationErrors.primaryTown} />
           </div>
         </label>
         <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
@@ -112,9 +109,7 @@ const VenueAddressForm = ({
               onChange={(e) => handleInputChange('primaryPostCode', e.target.value)}
               error={validationErrors.primaryPostCode}
             />
-            {validationErrors.primaryPostCode && (
-              <small className="text-primary-red flex absolute">{validationErrors.primaryPostCode}</small>
-            )}
+            <FormError error={validationErrors.primaryPostCode} />
           </div>
         </label>
         <div className="flex flex-col">
@@ -144,9 +139,7 @@ const VenueAddressForm = ({
                 isSearchable
                 error={validationErrors.primaryCountry && true}
               />
-              {validationErrors.primaryCountry && (
-                <small className="text-primary-red flex absolute">{validationErrors.primaryCountry}</small>
-              )}
+              <FormError error={validationErrors.primaryCountry} />
             </div>
           </label>
         </div>

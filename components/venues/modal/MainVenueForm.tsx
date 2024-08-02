@@ -9,7 +9,7 @@ import { initialMainVenueDetails, venueStatusOptions } from 'config/venue';
 import { useState } from 'react';
 import { UiTransformedVenue } from 'utils/venue';
 import { Label } from 'components/core-ui-lib';
-
+import FormError from 'components/core-ui-lib/FormError';
 interface MainVenueFormProps {
   venue: Partial<UiTransformedVenue>;
   venueFamilyOptionList: SelectOption[];
@@ -64,9 +64,7 @@ const MainVenueForm = ({
               error={validationErrors.venueCode}
               onChange={(e) => handleInputChange('venueCode', e.target.value)}
             />
-            {validationErrors.venueCode && (
-              <small className="text-primary-red absolute">{validationErrors.venueCode}</small>
-            )}
+            <FormError error={validationErrors.venueCode} />
           </Tooltip>
         </label>
       </div>
@@ -80,9 +78,7 @@ const MainVenueForm = ({
           placeholder="Select Venue Status"
           className="w-[430px] font-bold place-self-end"
         />
-        {validationErrors.venueStatus && (
-          <small className="text-primary-red w-[430px]">{validationErrors.venueStatus}</small>
-        )}
+        <FormError error={validationErrors.venueStatus} />
       </div>
       <div className="flex flex-col mb-1">
         <label htmlFor="" className="flex flex-row gap-5 justify-between ">
@@ -98,9 +94,7 @@ const MainVenueForm = ({
               error={validationErrors.venueName}
               onChange={(e) => handleInputChange('venueName', e.target.value)}
             />
-            {validationErrors.venueName && (
-              <small className="text-primary-red absolute">{validationErrors.venueName}</small>
-            )}
+            <FormError error={validationErrors.venueName} />
           </div>
         </label>
       </div>
