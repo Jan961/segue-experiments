@@ -1,0 +1,66 @@
+import { attachmentsColDefs } from './tableConfig';
+import { Table, UploadModal } from '../../core-ui-lib';
+import Button from '../../core-ui-lib/Button';
+import { techSpecsFileFormats } from '../techSpecsFileFormats';
+import { UploadedFile } from '../../core-ui-lib/UploadModal/interface';
+import { useState } from 'react';
+import axios from 'axios';
+
+interface TechSpecTableProps {
+  venueId: number;
+}
+
+export const TechSpecTable = ({ venueId }: TechSpecTableProps) => {
+  const [uploadVisible, setUploadVisible] = useState<boolean>(false);
+  const [fileWidgets, setFileWidgets] = useState<UploadedFile[]>([]);
+  const [rowData, setRowData] = useState([]);
+
+  setRowData(rowData);
+  const fetchFileList = async () => {
+    const fileList: UploadedFile[] = await axios.post('/api/venue/techSpecs/list', { VenueId: venueId });
+    setFileWidgets([]);
+
+    for (const file of fileList) {
+      const response = await fetch(file.imageUrl);
+      const blob = await response.blob();
+      const tempFile = new File([blob], file.name, { type: blob.type });
+      file.size = tempFile.size;
+      setFileWidgets([...fileWidgets, file]);
+    }
+  };
+
+  const onSave = () => {
+    console.log('sss');
+  };
+
+  return (
+    <div>
+      {uploadVisible && (
+        <UploadModal
+          title="Upload Tech Specs"
+          visible={uploadVisible}
+          info="Upload or view this venues tech specs. You can upload a maximum of 30 files each with a maxiumum file size of 15MB."
+          allowedFormats={techSpecsFileFormats}
+          onClose={() => {
+            setUploadVisible(false);
+          }}
+          onSave={onSave}
+          value={fileWidgets}
+          isMultiple={true}
+          maxFiles={30}
+          maxFileSize={15360 * 1024}
+        />
+      )}
+      <Button
+        testId="upload-venue-tech-spec-btn"
+        text={fileWidgets.length > 0 ? 'NEW View/ Edit Tech Specs' : 'NEW Upload Tech Specs'}
+        onClick={async () => {
+          fetchFileList();
+          setUploadVisible(true);
+        }}
+      />
+
+      <Table columnDefs={attachmentsColDefs} rowData={[]} />
+    </div>
+  );
+};
