@@ -102,20 +102,20 @@ const ProductionTaskList = ({ visible, onClose, productionId, isMaster = false }
     selectedRows.forEach((task) => {
       unfilteredTasks.forEach((existingTask) => {
         if (isNullOrEmpty(existingTask?.CopiedFrom)) return;
-        if (existingTask?.CopiedFrom === 'R') {
-          if (task?.PRTId === existingTask.CopiedId) {
-            if (!ptrList.includes(task.PRTId)) {
-              duplicateTasks.push(task);
-              ptrList.push(task.PRTId);
-            }
-          }
-        } else if (existingTask?.CopiedFrom === 'P') {
-          if (task?.Id === existingTask.CopiedId) {
-            if (!singleList.includes(task.Id)) {
-              duplicateTasks.push(task);
-              singleList.push(task.Id);
-            }
-          }
+        if (
+          existingTask?.CopiedFrom === 'R' &&
+          task?.PRTId === existingTask.CopiedId &&
+          !ptrList.includes(task.PRTId)
+        ) {
+          duplicateTasks.push(task);
+          ptrList.push(task.PRTId);
+        } else if (
+          existingTask?.CopiedFrom === 'P' &&
+          task?.Id === existingTask.CopiedId &&
+          !singleList.includes(task.Id)
+        ) {
+          duplicateTasks.push(task);
+          singleList.push(task.Id);
         }
       });
     });

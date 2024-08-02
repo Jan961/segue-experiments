@@ -15,8 +15,8 @@ const ExistingTasks = ({ visible, duplicateList, onCancel, onConfirm }: Existing
       <h1 className="text-2xl font-semibold text-primary">Existing Tasks</h1>
       This/ these task(s) already exist.
       <ul className="list-disc pl-3 pt-3">
-        {duplicateList.map((task, index) => (
-          <li key={index}>{`Task ${task.Code} ${task.Name}`}</li>
+        {duplicateList.map((task) => (
+          <li key={task.Id}>{`Task ${task.Code} ${task.Name}`}</li>
         ))}
       </ul>
       <div className="pt-3">
