@@ -27,13 +27,7 @@ const NewProductionTask = ({ visible, onClose, handleNewProductionTaskSubmit }: 
   };
 
   return (
-    <PopupModal
-      show={visible}
-      onClose={handleClose}
-      title="Add Task"
-      titleClass="text-primary-navy text-xl mb-2"
-      hasOverlay={true}
-    >
+    <PopupModal show={visible} onClose={handleClose} title="Add Task" titleClass="text-primary-navy text-xl mb-2">
       <form className="flex flex-col gap-2">
         <p>Would you like to...</p>
         <Select
