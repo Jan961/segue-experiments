@@ -450,7 +450,7 @@ export const globalActivityColDefs = (updateActivity, currencySymbol) => [
     headerName: 'Date',
     field: 'actDate',
     cellRenderer: function (params) {
-      return !params.data.actDate ? ' ' : formatInputDate(params.data.actDate);
+      return isNaN(params.data.actDate) ? '' : formatInputDate(params.data.actDate);
     },
     cellStyle: {
       paddingLeft: '8px',
@@ -611,7 +611,7 @@ export const globalActivityTabColDefs = (showGlobalActivity, currencySymbol) => 
     headerName: 'Date',
     field: 'actDate',
     cellRenderer: function (params) {
-      return isNaN(params.data.actDate) ? ' ' : formatInputDate(params.data.actDate);
+      return isNaN(params.data.actDate) ? '' : formatInputDate(params.data.actDate);
     },
     cellStyle: {
       paddingLeft: '8px',
