@@ -123,6 +123,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
         }));
 
         calculateActivityTotals(tempRows);
+
         setActRowData(tempRows);
       }
 
@@ -563,7 +564,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
           <div
             className={classNames(
               'flex flex-col w-[487px] h-[69px] bg-primary-green/[0.30] rounded-xl mt-5 px-2 float-right',
-              actRowData.length === 0 ? '-mt-[250px]' : '',
+              actRowData.length === 0 ? '-mt-64' : '',
             )}
           >
             <div className="flex flex-row gap-4">
