@@ -7,6 +7,17 @@ type Props = {
   onSelectVenue: (venue: UiTransformedVenue) => void;
 };
 
+const gridOptions = {
+  getRowNodeId: (data) => {
+    return data.venueCode;
+  },
+  onRowDataUpdated: (params) => {
+    params.api.forEachNode((rowNode) => {
+      rowNode.id = rowNode.data.venueCode;
+    });
+  },
+};
+
 const VenueTable = ({ items, onSelectVenue }: Props) => {
   const handleCellClick = (e: { data: UiTransformedVenue }) => {
     onSelectVenue(e.data);
@@ -20,6 +31,7 @@ const VenueTable = ({ items, onSelectVenue }: Props) => {
         columnDefs={items === null ? null : venueColumnDefs}
         rowData={items}
         styleProps={styleProps}
+        gridOptions={gridOptions}
       />
     </div>
   );
