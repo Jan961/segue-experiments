@@ -253,10 +253,10 @@ export default function AddEditVenueModal({
               </Button>
             </div>
           </div>
+          <div className="flex justify-end float-right w-full">
+            {hasErrors && <p className="text-primary-red pb-3">Please fill all required fields</p>}
+          </div>
         </form>
-        <div className="flex justify-end float-right w-full">
-          {hasErrors && <p className="text-primary-red mt-4">Please fill all required fields</p>}
-        </div>
         <ConfirmationDialog
           variant={ConfVariant.Delete}
           show={showDeleteConfirmation}
