@@ -102,7 +102,6 @@ export const getProductionTasksColumnDefs = (usersList = []) => {
       headerName: 'Task Name',
       field: 'Name',
       valueGetter: function (params) {
-        console.log(params);
         return params.data.Name + (params.data.PRTId ? ` - Repeats ${params.data.RepeatInterval}` : '');
       },
       cellRenderer: DefaultCellRenderer,

@@ -111,7 +111,6 @@ const MasterTasks = (props: InferGetServerSidePropsType<typeof getServerSideProp
   };
 
   const onRowDoubleClicked = (e) => {
-    console.log(e);
     setCurrentTask(e.data);
     setShowAddTask(true);
   };

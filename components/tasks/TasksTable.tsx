@@ -60,7 +60,6 @@ export default function TasksTable({
       });
       setIsLoading(false);
       setRows(updatedRowData);
-      console.log(task);
 
       await axios.post(`/api/tasks/${task.PRTId ? 'update/single' : 'update'}`, updatedTask);
       await updateTableData();

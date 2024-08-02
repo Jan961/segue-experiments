@@ -20,14 +20,12 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       },
       select: { StartDate: true, EndDate: true },
     });
-    console.log(productionWeeks);
+
     const prodStartDate = productionWeeks.StartDate;
     const prodEndDate = productionWeeks.EndDate;
     const counter = 1;
 
     const taskList = selectedTaskList.map(async (task, index) => {
-      console.log('INPUT TASK');
-      console.log(task);
       if (!isNullOrEmpty(task?.MTRId)) {
         const { RepeatInterval, TaskRepeatFromWeekNum, TaskRepeatToWeekNum } = task;
         const recurringTaskRecord = {
@@ -38,7 +36,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           ToWeekNumIsPostProduction: false,
         };
         const newRepeatingTask = await prisma.ProductionTaskRepeat.create({ data: { ...recurringTaskRecord } });
-        console.log(newRepeatingTask);
 
         const recurringTaskInfo = {
           Name: task.Name,
@@ -62,7 +59,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           newRepeatingTask.Id,
           counter,
         );
-        console.log(newProdTasks);
         return await Promise.all(
           newProdTasks.map(async (newTask) => {
             await prisma.ProductionTask.create({
@@ -108,7 +104,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           Progress: 0,
           TaskCompletedDate: null,
         };
-        console.log(newTaskRecord);
         return await prisma.ProductionTask.create({ data: { ...newTaskRecord } });
       }
     });

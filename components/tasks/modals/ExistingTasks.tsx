@@ -1,4 +1,4 @@
-import { PopupModal , Button } from 'components/core-ui-lib';
+import { PopupModal, Button } from 'components/core-ui-lib';
 
 interface ExistingTasksProps {
   visible: boolean;
@@ -10,7 +10,6 @@ interface ExistingTasksProps {
 }
 
 const ExistingTasks = ({ visible, duplicateList, onCancel, onConfirm }: ExistingTasksProps) => {
-  console.log(duplicateList);
   return (
     <PopupModal show={visible} onClose={onCancel}>
       <h1 className="text-2xl font-semibold text-primary">Existing Tasks</h1>
