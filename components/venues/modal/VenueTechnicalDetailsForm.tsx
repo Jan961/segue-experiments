@@ -1,23 +1,18 @@
-import Button from 'components/core-ui-lib/Button';
 import TextArea from 'components/core-ui-lib/TextArea';
 import TextInput from 'components/core-ui-lib/TextInput';
 import { initialVenueTechnicalDetails } from 'config/venue';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { UiTransformedVenue } from 'utils/venue';
-import { UploadModal } from 'components/core-ui-lib';
-import { UploadedFile } from 'components/core-ui-lib/UploadModal/interface';
-import { techSpecsFileFormats } from '../techSpecsFileFormats';
-import { isNullOrEmpty } from '../../../utils';
+
+import { TechSpecTable } from '../techSpecsTable/TechSpecTable';
 
 interface VenueTechnicalDetailsFormProps {
   venue: Partial<UiTransformedVenue>;
   validationErrors?: Record<string, string>;
   onChange: (data: any) => void;
   updateValidationErrrors?: (key: string, value: string) => void;
-  fileList: any;
   setFileList: (data: any) => void;
-  setFilesToDelete: (data: any) => void;
-  filesToDelete: any;
+  setDeleteList: (data: any) => void;
 }
 
 const VenueTechnicalDetailsForm = ({
@@ -25,19 +20,10 @@ const VenueTechnicalDetailsForm = ({
   validationErrors,
   onChange,
   updateValidationErrrors,
-  fileList,
   setFileList,
-  setFilesToDelete,
+  setDeleteList,
 }: VenueTechnicalDetailsFormProps) => {
   const [formData, setFormData] = useState<Partial<UiTransformedVenue>>({ ...initialVenueTechnicalDetails, ...venue });
-  const [uploadVisible, setUploadVisible] = useState<boolean>(false);
-  const [fileWidgets, setFileWidgets] = useState<UploadedFile[]>([]);
-  useEffect(() => {
-    const loadWidgets = async () => {
-      await makeWidgets();
-    };
-    loadWidgets();
-  }, [fileList]);
 
   const handleInputChange = (field: string, value: any) => {
     const updatedFormData = {
@@ -51,84 +37,8 @@ const VenueTechnicalDetailsForm = ({
     }
   };
 
-  const onSave = async (files) => {
-    const newFileList = [...fileList];
-    for (const file of files) {
-      const formData = new FormData();
-      formData.append('file', file.file);
-      formData.append('path', 'techSpecs');
-      newFileList.push(formData);
-    }
-    setFileList(newFileList);
-    setUploadVisible(false);
-  };
-
-  const makeWidgets = async () => {
-    const newFileWidgets = [];
-    fileList.forEach((file) => {
-      const tempFile = file.get('file');
-      if (tempFile?.size && tempFile.name) {
-        const widget: UploadedFile = {
-          size: tempFile.size,
-          name: tempFile.name,
-          imageUrl: URL.createObjectURL(tempFile),
-        };
-
-        newFileWidgets.push(widget);
-      }
-    });
-
-    for (const file of venue.files) {
-      if (!isNullOrEmpty(file)) {
-        const response = await fetch(file.FileUrl);
-        const blob = await response.blob();
-        const tempFile = new File([blob], file.name, { type: blob.type });
-        const widget: UploadedFile = {
-          size: tempFile.size,
-          name: tempFile.name,
-          imageUrl: file.imageUrl,
-          location: file.fileLocation,
-          fileId: file.id,
-        };
-        newFileWidgets.push(widget);
-      }
-      setFileWidgets(newFileWidgets);
-    }
-  };
-
   return (
     <>
-      {uploadVisible && (
-        <UploadModal
-          title="Upload Tech Specs"
-          visible={uploadVisible}
-          info="Upload or view this venues tech specs. You can upload a maximum of 30 files each with a maxiumum file size of 15MB."
-          allowedFormats={techSpecsFileFormats}
-          onClose={() => {
-            setUploadVisible(false);
-          }}
-          onSave={onSave}
-          value={fileWidgets}
-          isMultiple={true}
-          maxFiles={30}
-          maxFileSize={15360 * 1024}
-          customHandleFileDelete={async (file: UploadedFile) => {
-            if (file?.location && file?.fileId) {
-              setFilesToDelete((prevFilesToDelete) => [...prevFilesToDelete, file]);
-            } else {
-              const fileIndex = fileList.findIndex((files) => {
-                const tempFile = files.get('file');
-                return tempFile.name === file.name;
-              });
-              if (fileIndex !== -1) {
-                const updatedFileList = [...fileList];
-                updatedFileList.splice(fileIndex, 1);
-                setFileList(updatedFileList);
-              }
-            }
-          }}
-        />
-      )}
       <div className="flex flex-row  justify-between">
         <div className="flex flex-col">
           <label
@@ -148,16 +58,8 @@ const VenueTechnicalDetailsForm = ({
           </label>
           {validationErrors.techSpecsUrl && <small className="text-primary-red">{validationErrors.techSpecsUrl}</small>}
         </div>
-        <Button
-          testId="upload-venue-tech-spec-btn"
-          text={fileWidgets.length > 0 ? 'View/ Edit Tech Specs' : 'Upload Tech Specs'}
-          onClick={async () => {
-            setFileWidgets([]);
-            await makeWidgets();
-            setUploadVisible(true);
-          }}
-        />
       </div>
+      <TechSpecTable venueId={venue.id} setFilesToSend={setFileList} setFilesToDelete={setDeleteList} />
       <div className="grid grid-cols-2 gap-5 pt-5">
         <div className="flex flex-col gap-5">
           <label htmlFor="" className="grid grid-cols-[100px_minmax(300px,_1fr)] gap-10 justify-between  w-full">

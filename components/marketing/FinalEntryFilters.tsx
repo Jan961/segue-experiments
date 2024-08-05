@@ -21,7 +21,7 @@ const FinalEntryFilters = () => {
 
   const getCurrency = async (bookingId) => {
     try {
-      const response = await axios.get(`/api/marketing/currency/${bookingId}`);
+      const response = await axios.get(`/api/marketing/currency/booking/${bookingId}`);
 
       if (response.data) {
         const { currency } = response.data;
