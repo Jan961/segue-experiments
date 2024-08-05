@@ -297,22 +297,22 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
         <div className="h-[800px] flex">
           <div className="flex flex-col gap-y-3">
             <div className="w-[423px] rounded border-2 border-secondary mr-2 p-3 bg-primary-blue bg-opacity-15">
-              <div className="flex">
+              <div className="flex mb-5 justify-between">
                 <div className=" text-primary-input-text font-bold text-lg mr-8">Deal Memo</div>
-                <div className="flex items-center">
+                <div className="flex items-center gap-x-2">
                   <Button
                     className="w-32"
                     variant="primary"
                     text="Create/Edit Deal Memo"
                     onClick={handleEditDealMemo}
                   />
-                  <Button className="ml-3 w-32" variant="primary" text="View as PDF" />
+                  <Button className="w-32" variant="primary" text="View as PDF" />
                 </div>
               </div>
               <div className=" text-primary-input-text font-bold text-sm mt-1.5">Deal Memo Status</div>
               <Select
                 options={allStatusOptions}
-                className="bg-primary-white w-52"
+                className="bg-primary-white w-full"
                 placeholder="Deal Memo Status"
                 onChange={(value) => editContractModalData('dealMemoStatus', value, 'booking')}
                 value={contractsKeyStatusMap[formData.StatusCode]}
@@ -325,7 +325,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                 onChange={() => {
                   return null;
                 }}
-                className="bg-primary-white w-52"
+                className="bg-primary-white w-full"
                 options={[{ text: 'Select Assignee', value: null }, ...userList]}
                 isClearable
                 isSearchable
@@ -336,28 +336,31 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                 onChange={() => {
                   return null;
                 }}
-                className="bg-primary-white w-52"
+                className="bg-primary-white w-full"
                 options={[{ text: 'Select Assignee', value: null }, ...userList]}
                 isClearable
                 isSearchable
               />
-              <div className="flex items-center mt-6">
-                <div className=" text-primary-input-text font-bold text-sm">Date Issued</div>
-                <DateInput
-                  onChange={() => {
-                    return null;
-                  }}
-                  value={formData.SignedDate}
-                />
+              <div className="flex items-center mt-6 justify-between px-3">
+                <div>
+                  <div className=" text-primary-input-text font-bold text-sm">Date Issued</div>
+                  <DateInput
+                    onChange={() => {
+                      return null;
+                    }}
+                    value={formData.SignedDate}
+                  />
+                </div>
 
-                <div className=" text-primary-input-text font-bold text-sm">Date Returned</div>
-
-                <DateInput
-                  onChange={() => {
-                    return null;
-                  }}
-                  value={formData.SignedDate}
-                />
+                <div>
+                  <div className=" text-primary-input-text font-bold text-sm">Date Returned</div>
+                  <DateInput
+                    onChange={() => {
+                      return null;
+                    }}
+                    value={formData.SignedDate}
+                  />
+                </div>
               </div>
 
               <div className=" text-primary-input-text font-bold text-sm mt-6">Notes</div>
