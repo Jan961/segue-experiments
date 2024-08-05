@@ -2,6 +2,7 @@ import prisma from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getEmailFromReq, checkAccess } from 'services/userService';
 import { isNullOrEmpty } from 'utils';
+import { deleteFile } from '../../../../services/uploadService';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -9,10 +10,12 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const email = await getEmailFromReq(req);
     const access = await checkAccess(email);
     if (!access) return res.status(401).end();
-    await prisma.File.delete({
+
+    const fileObj = await prisma.File.delete({
       where: { Id: fileId },
     });
 
+    await deleteFile(fileObj.Location);
     const venueFileObj = await prisma.VenueFile.findFirst({
       where: { FileId: fileId, Type: 'Tech Specs' },
       select: { Id: true },
@@ -21,7 +24,8 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       await prisma.VenueFile.delete({
         where: { FileId: fileId, Id: venueFileObj.Id },
       });
-      res.status(200).json({});
+
+      res.status(200).json();
     } else {
       res.status(400).json('File was already deleted.');
     }

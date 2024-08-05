@@ -39,9 +39,9 @@ export const TechSpecTable = ({ venueId, setFilesToSend, setFilesToDelete }: Tec
     filesToUpload.forEach((file) => {
       if (file?.fileId > maxFileId && isNullOrEmpty(file?.imageUrl)) maxFileId = file.fileId;
     });
-
+    console.log(new Date().toISOString());
     const newRowData = files.map((file) => {
-      return { ...file, fileId: maxFileId++ };
+      return { ...file, fileId: maxFileId++, uploadDateTime: new Date().toISOString() };
     });
     setRowData((prevRowData) => [...newRowData, ...prevRowData]);
     setFilesToUpload((prevFilesList) => [...newRowData, ...prevFilesList]);
@@ -49,11 +49,12 @@ export const TechSpecTable = ({ venueId, setFilesToSend, setFilesToDelete }: Tec
     setUploadVisible(false);
   };
   const onDelete = async () => {
+    const delId = fileToDelete.fileId;
     if (isNullOrEmpty(fileToDelete?.imageUrl)) {
-      setFilesToSend((prevFilesList) => prevFilesList.filter((file) => file.fileId !== fileToDelete.fileId));
-      setFilesToUpload((prevFilesList) => prevFilesList.filter((file) => file.fileId !== fileToDelete.fileId));
+      setFilesToSend((prevFilesList) => prevFilesList.filter((file) => file.fileId !== delId));
+      setFilesToUpload((prevFilesList) => prevFilesList.filter((file) => file.fileId !== delId));
     } else {
-      setRowData((prevRowData) => prevRowData.filter((file) => file.fileId !== fileToDelete.fileId));
+      setRowData((prevRowData) => prevRowData.filter((file) => file.fileId !== delId));
       setFilesToDelete((prevFileList) => [...prevFileList, fileToDelete.fileId]);
     }
     setFileToDelete(null);
