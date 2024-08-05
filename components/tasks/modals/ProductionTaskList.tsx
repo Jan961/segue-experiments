@@ -7,7 +7,6 @@ import { userState } from 'state/account/userState';
 import { useEffect, useMemo, useState } from 'react';
 import { tileColors } from 'config/global';
 import axios from 'axios';
-import { MasterTask } from '@prisma/client';
 import Loader from 'components/core-ui-lib/Loader';
 import { ARCHIVED_OPTION_STYLES } from 'components/global/nav/ProductionJumpMenu';
 import { productionJumpState } from 'state/booking/productionJumpState';
@@ -15,6 +14,10 @@ import Select from 'components/core-ui-lib/Select';
 import ProductionOption from 'components/global/nav/ProductionOption';
 import Checkbox from 'components/core-ui-lib/Checkbox';
 import { ConfirmationDialog } from 'components/core-ui-lib';
+import ExistingTasks from './ExistingTasks';
+import { isNullOrEmpty } from 'utils';
+import { useRouter } from 'next/router';
+import { productionState } from 'state/tasks/productionState';
 
 interface ProductionTaskListProps {
   visible: boolean;
@@ -31,15 +34,17 @@ const LoadingOverlay = () => (
 
 const ProductionTaskList = ({ visible, onClose, productionId, isMaster = false }: ProductionTaskListProps) => {
   const { users } = useRecoilValue(userState);
-
   const styleProps = { headerColor: tileColors.tasks };
   const [rowData, setRowData] = useState([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [confirm, setConfirm] = useState<boolean>(false);
-
   const [productionJump, setProductionJump] = useRecoilState(productionJumpState);
   const [selected, setSelected] = useState(null);
   const [includeArchived, setIncludeArchived] = useState<boolean>(productionJump?.includeArchived || false);
+  const [showExistingTaskModal, setShowExistingTaskModal] = useState<boolean>(false);
+  const [duplicateTasks, setDuplicateTasks] = useState([]);
+  const unfilteredTasks = useRecoilValue(productionState).filter((prod) => prod.Id === productionId)[0]?.Tasks || [];
+  const router = useRouter();
 
   const productionsData = useMemo(() => {
     const productionOptions = [];
@@ -90,6 +95,33 @@ const ProductionTaskList = ({ visible, onClose, productionId, isMaster = false }
     setSelectedRows(selectedData);
   };
 
+  const findDuplicateTasks = () => {
+    const duplicateTasks = [];
+    const ptrList = [];
+    const singleList = [];
+    selectedRows.forEach((task) => {
+      unfilteredTasks.forEach((existingTask) => {
+        if (isNullOrEmpty(existingTask?.CopiedFrom)) return;
+        if (
+          existingTask?.CopiedFrom === 'R' &&
+          task?.PRTId === existingTask.CopiedId &&
+          !ptrList.includes(task.PRTId)
+        ) {
+          duplicateTasks.push(task);
+          ptrList.push(task.PRTId);
+        } else if (
+          existingTask?.CopiedFrom === 'P' &&
+          task?.Id === existingTask.CopiedId &&
+          !singleList.includes(task.Id)
+        ) {
+          duplicateTasks.push(task);
+          singleList.push(task.Id);
+        }
+      });
+    });
+    return duplicateTasks;
+  };
+
   const handleFetchTasks = async () => {
     setLoading(true);
     try {
@@ -110,58 +142,47 @@ const ProductionTaskList = ({ visible, onClose, productionId, isMaster = false }
     fetchTasks();
   }, [selected]);
 
-  const handleSubmit = async () => {
+  const createTasks = async () => {
     setLoading(true);
-    if (isMaster) {
-      try {
-        const tasksData = selectedRows.map((task: MasterTask) => {
-          return {
-            Code: task.Code,
-            Name: task.Name,
-            CompleteByIsPostProduction: false,
-            StartByIsPostProduction: false,
-            StartByWeekNum: task.StartByWeekNum,
-            CompleteByWeekNum: task.CompleteByWeekNum,
-            AssignedToUserId: task.AssignedToUserId,
-            Priority: task.Priority,
-            Notes: task.Notes,
-            TaskStartByIsPostProduction: false,
-            TaskCompleteByIsPostProduction: false,
-          };
-        });
-        const endpoint = '/api/tasks/master/multiple';
-        await axios.post(endpoint, tasksData);
-        setLoading(false);
-        onClose('data-added');
-      } catch (error) {
-        setLoading(false);
-        onClose();
-      }
+    try {
+      const endpoint = `/api/tasks/addfrom/production/${isMaster ? 'master' : 'production'}`;
+      const tasksData = selectedRows.map((task) => {
+        return {
+          Id: task.Id,
+          ProductionId: selected,
+          Code: task.Code,
+          Name: task.Name,
+          CompleteByIsPostProduction: false,
+          StartByIsPostProduction: false,
+          StartByWeekNum: task.StartByWeekNum,
+          CompleteByWeekNum: task.CompleteByWeekNum,
+          AssignedToUserId: task.AssignedToUserId,
+          Progress: 0,
+          Priority: task.Priority,
+          PRTId: task.PRTId,
+          MTRId: task.MTRId,
+          FromWeekNum: task.TaskRepeatFromWeekNum,
+          Interval: task.RepeatInterval,
+          ToWeekNum: task.TaskRepeatToWeekNum,
+        };
+      });
+      await axios.post(endpoint, { selectedTaskList: tasksData, ProductionId: productionId });
+      setLoading(false);
+      await router.replace(router.asPath);
+      onClose('data-added');
+    } catch (error) {
+      setLoading(false);
+      console.error(error);
+    }
+  };
+
+  const handleSubmit = async () => {
+    const duplicates = findDuplicateTasks();
+    setDuplicateTasks(duplicates);
+    if (duplicates.length > 0) {
+      setShowExistingTaskModal(true);
     } else {
-      try {
-        const endpoint = '/api/tasks/create/multiple/';
-        const tasksData = selectedRows.map((task: MasterTask) => {
-          return {
-            Id: task.Id,
-            ProductionId: productionId,
-            Code: task.Code,
-            Name: task.Name,
-            CompleteByIsPostProduction: false,
-            StartByIsPostProduction: false,
-            StartByWeekNum: task.StartByWeekNum,
-            CompleteByWeekNum: task.CompleteByWeekNum,
-            AssignedToUserId: task.AssignedToUserId,
-            Progress: 0,
-            Priority: task.Priority,
-          };
-        });
-        await axios.post(endpoint, tasksData);
-        setLoading(false);
-        onClose('data-added');
-      } catch (error) {
-        setLoading(false);
-        console.error(error);
-      }
+      await createTasks();
     }
   };
 
@@ -256,6 +277,17 @@ const ProductionTaskList = ({ visible, onClose, productionId, isMaster = false }
         }}
         onNoClick={() => setConfirm(false)}
         hasOverlay={false}
+      />
+      <ExistingTasks
+        visible={showExistingTaskModal}
+        onCancel={() => {
+          setShowExistingTaskModal(false);
+        }}
+        onConfirm={async () => {
+          setShowExistingTaskModal(false);
+          await createTasks();
+        }}
+        duplicateList={duplicateTasks}
       />
     </PopupModal>
   );
