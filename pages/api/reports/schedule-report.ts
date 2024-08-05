@@ -129,7 +129,7 @@ const handler = async (req, res) => {
       performanceDate: Date ? Date.toISOString() : null,
     });
   });
-  const { RehearsalStartDate: fromDate, ProductionEndDate: toDate } = data?.[0] || {};
+  // const { RehearsalStartDate: fromDate, ProductionEndDate: toDate } = data?.[0] || {};
   const workbook = new ExcelJS.Workbook();
   const formattedData = data.map((x) => ({
     ...x,
@@ -186,7 +186,7 @@ const handler = async (req, res) => {
   ]);
   worksheet.addRow([]);
   const map: { [key: string]: SCHEDULE_VIEW } = formattedData.reduce((acc, x) => ({ ...acc, [getKey(x)]: x }), {});
-  const daysDiff = moment(toDate).diff(moment(fromDate), 'days');
+  const daysDiff = moment(to).diff(moment(from), 'days');
   let rowNo = 5;
   let prevProductionWeekNum = '';
   let lastWeekMetaInfo = {
@@ -201,8 +201,8 @@ const handler = async (req, res) => {
   const performancesPerDay: number[] = [];
   for (let i = 1; i <= daysDiff; i++) {
     lastWeekMetaInfo = { ...lastWeekMetaInfo, weekTotalPrinted: false };
-    const weekDay = moment(moment(fromDate).add(i - 1, 'day')).format('dddd');
-    const dateInIncomingFormat = moment(moment(fromDate).add(i - 1, 'day'));
+    const weekDay = moment(moment(from).add(i - 1, 'day')).format('dddd');
+    const dateInIncomingFormat = moment(moment(from).add(i - 1, 'day'));
     const key = getKey({ FullProductionCode, ShowName, EntryDate: dateInIncomingFormat.format('YYYY-MM-DD') });
     const value: SCHEDULE_VIEW = map[key];
     const isOtherDay = [
