@@ -112,6 +112,7 @@ model Contract {
   Exceptions           String?                @map("ContractExceptions") @db.LongText
   Booking              Booking                @relation(fields: [BookingId], references: [Id], onDelete: Cascade, map: "Booking_Contract")
   ContractAttachedFile ContractAttachedFile[]
+  ContractFile         ContractFile[]
 }
 
 model Currency {
@@ -707,6 +708,7 @@ model Production {
   LogoFileId            Int?                    @map("ProductionLogoFileId")
   ReportCurrencyCode    String                  @map("ProductionReportCurrencyCode") @db.VarChar(3)
   ProdCoId              Int?                    @map("ProductionProdCoId")
+  ACCContract           ACCContract[]
   AccountUserProduction AccountUserProduction[]
   ConversionRate        ConversionRate[]
   DateBlock             DateBlock[]
@@ -964,6 +966,7 @@ model File {
   Location          String              @map("FileLocation") @db.VarChar(512)
   UploadDateTime    DateTime            @map("FileUploadDateTime") @db.DateTime(0)
   UploadUserId      Int                 @map("FileUploadUserId")
+  SizeBytes         BigInt?             @map("FileSizeBytes")
   Account           Account[]
   User              User                @relation(fields: [UploadUserId], references: [Id], onDelete: NoAction, map: "UserAttachedFile")
   Production        Production[]
@@ -1056,10 +1059,12 @@ model ACCContract {
   TotalHolPay                                                   Decimal?            @map("ACCCTotalHolPay") @db.Decimal(10, 2)
   TotalFeeNotes                                                 String?             @map("ACCCTotalFeeNotes") @db.LongText
   CancelFee                                                     Decimal?            @map("ACCCCancelFee") @db.Decimal(10, 2)
+  ProductionId                                                  Int                 @map("ACCCProductionId")
   ACCClause                                                     ACCClause[]
   AccountUser_ACCContract_ACCCCheckedByAccUserIdToAccountUser   AccountUser?        @relation("ACCContract_ACCCCheckedByAccUserIdToAccountUser", fields: [CheckedByAccUserId], references: [Id], onDelete: Cascade, map: "AccountUser_AccContract_Checker")
   AccountUser_ACCContract_ACCCCompletedByAccUserIdToAccountUser AccountUser?        @relation("ACCContract_ACCCCompletedByAccUserIdToAccountUser", fields: [CompletedByAccUserId], references: [Id], onDelete: Cascade, map: "AccountUser_AccContract_Completer")
   Currency                                                      Currency?           @relation(fields: [CurrencyCode], references: [Code], onDelete: NoAction, map: "Currency_ACCContract")
+  Production                                                    Production          @relation(fields: [ProductionId], references: [Id], onDelete: Cascade, map: "Production_ACCContract")
   Venue                                                         Venue?              @relation(fields: [RehearsalVenueId], references: [Id], onDelete: Cascade, map: "Venue_ACCContract")
   ACCContractPerson                                             ACCContractPerson[]
   ACCPayment                                                    ACCPayment[]
@@ -1067,8 +1072,9 @@ model ACCContract {
 
   @@index([CheckedByAccUserId], map: "AccountUser_AccContract_Checker")
   @@index([CompletedByAccUserId], map: "AccountUser_AccContract_Completer")
-  @@index([CurrencyCode], map: "Currency_ACCContract")
   @@index([RehearsalVenueId], map: "Venue_ACCContract")
+  @@index([CurrencyCode], map: "CA")
+  @@index([ProductionId], map: "Production_ACCContract")
 }
 
 model ACCContractPerson {
@@ -1265,15 +1271,26 @@ model PersonPerson {
 }
 
 model ACCClause {
-  Id                  Int                @map("ClauseId") @id @default(autoincrement())
-  ACCContractId       Int                @map("ClauseACCContractId")
-  StdClauseId         Int?               @map("ClauseStdClauseId")
-  Text                String?            @map("ClauseText") @db.LongText
-  ACCContract         ACCContract        @relation(fields: [ACCContractId], references: [ContractId], onDelete: Cascade, map: "ACCContract_ACCClause")
-  ACCStandardClause   ACCStandardClause? @relation(fields: [StdClauseId], references: [Id], onDelete: Cascade, map: "ACCStandardClause_ACCClause")
+  Id                Int                @id @default(autoincrement()) @map("ClauseId")
+  ACCContractId     Int                @map("ClauseACCContractId")
+  StdClauseId       Int?               @map("ClauseStdClauseId")
+  Text              String?            @map("ClauseText") @db.LongText
+  ACCContract       ACCContract        @relation(fields: [ACCContractId], references: [ContractId], onDelete: Cascade, map: "ACCContract_ACCClause")
+  ACCStandardClause ACCStandardClause? @relation(fields: [StdClauseId], references: [Id], onDelete: Cascade, map: "ACCStandardClause_ACCClause")
 
   @@index([ACCContractId], map: "ACCContract_ACCClause")
   @@index([StdClauseId], map: "ACCStandardClause_ACCClause")
+}
+
+model ContractFile {
+  Id                Int      @map("ContractFileId") @id @default(autoincrement())
+  ContractBookingId Int      @map("ContractFileContractBookingId") 
+  FileId            Int      @map("ContractFileFileId") 
+  Type              String?  @map("ContractFileType") @db.VarChar(20)
+  Description       String?  @map("ContractFileDescription") @db.VarChar(80)
+  Contract          Contract @relation(fields: [ContractBookingId], references: [BookingId], onDelete: Cascade, map: "Contract_ContractFile")
+
+  @@index([ContractBookingId], map: "Contract_ContractFile")
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
@@ -1647,6 +1664,7 @@ view SalesSummaryView {
   SaleTypeName               String?   @db.VarChar(45)
   SetSalesFiguresDate        DateTime? @db.Date
   FinalSetSalesFiguresDate   DateTime? @db.Date
+  NotOnSaleDate              DateTime? @db.Date
 
   @@ignore
 }
