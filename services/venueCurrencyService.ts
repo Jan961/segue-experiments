@@ -61,3 +61,26 @@ export const getCurrencyCodeFromCountryId: (countryId: number) => Promise<any> =
   });
   return currencyCodeQuery?.CurrencyCode;
 };
+
+export const getCurrencyFromProductionId: (productionId: number) => Promise<any> = async (productionId: number) => {
+  const currencyCodeQuery: any | null = await prisma.Production.findFirst({
+    where: {
+      Id: { equals: productionId },
+    },
+    select: {
+      ReportCurrencyCode: true,
+    },
+  });
+
+  const currencySymbolQuery: any | null = await prisma.Currency.findFirst({
+    where: {
+      Code: { equals: currencyCodeQuery?.ReportCurrencyCode },
+    },
+    select: {
+      SymbolUnicode: true,
+    },
+  });
+  const currencySymbol: string | null = currencySymbolQuery?.SymbolUnicode || null;
+
+  return currencySymbol ? charCodeToCurrency(currencySymbol) : null;
+};

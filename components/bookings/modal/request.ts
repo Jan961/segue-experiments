@@ -1,6 +1,7 @@
 import axios, { AxiosResponseHeaders } from 'axios';
 import moment from 'moment';
 import { getMonday, getTimezonOffset } from 'services/dateService';
+import { FilterState } from 'state/booking/filterState';
 
 export const downloadFromContent = (content: Blob, filename: string) => {
   const url = window.URL.createObjectURL(content);
@@ -32,9 +33,13 @@ const getFileNameFromHeaders = (headers: AxiosResponseHeaders, defaultName: stri
   return suggestedName;
 };
 
-export const onScheduleReport = async (ProductionId: number) => {
+export const onScheduleReport = async (ProductionId: number, filters: Partial<FilterState> = {}) => {
   try {
-    const response = await axios.post('/api/reports/schedule-report', { ProductionId }, { responseType: 'blob' });
+    const response = await axios.post(
+      '/api/reports/schedule-report',
+      { ProductionId, ...filters },
+      { responseType: 'blob' },
+    );
 
     if (response.status >= 200 && response.status < 300) {
       const defaultName = `${ProductionId}`;
@@ -49,9 +54,13 @@ export const onScheduleReport = async (ProductionId: number) => {
   }
 };
 
-export const exportBookingSchedule = async (ProductionId: number) => {
+export const exportBookingSchedule = async (ProductionId: number, filters: Partial<FilterState> = {}) => {
   try {
-    const response = await axios.post('/api/reports/booking-schedule', { ProductionId }, { responseType: 'blob' });
+    const response = await axios.post(
+      '/api/reports/booking-schedule',
+      { ProductionId, ...filters },
+      { responseType: 'blob' },
+    );
 
     if (response.status >= 200 && response.status < 300) {
       const defaultName = `${ProductionId}`;

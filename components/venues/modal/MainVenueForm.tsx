@@ -64,7 +64,7 @@ const MainVenueForm = ({
               error={validationErrors.venueCode}
               onChange={(e) => handleInputChange('venueCode', e.target.value)}
             />
-            <FormError error={validationErrors.venueCode} />
+            <FormError error={validationErrors.venueCode} className="absolute" />
           </Tooltip>
         </label>
       </div>
@@ -78,7 +78,7 @@ const MainVenueForm = ({
           placeholder="Select Venue Status"
           className="w-[430px] font-bold place-self-end"
         />
-        <FormError error={validationErrors.venueStatus} />
+        <FormError error={validationErrors.venueStatus} className="absolute" />
       </div>
       <div className="flex flex-col mb-1">
         <label htmlFor="" className="flex flex-row gap-5 justify-between ">
@@ -94,7 +94,7 @@ const MainVenueForm = ({
               error={validationErrors.venueName}
               onChange={(e) => handleInputChange('venueName', e.target.value)}
             />
-            <FormError error={validationErrors.venueName} />
+            <FormError error={validationErrors.venueName} className="absolute" />
           </div>
         </label>
       </div>
