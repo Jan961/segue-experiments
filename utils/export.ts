@@ -3,6 +3,7 @@ import pdfFonts from 'pdfmake/build/vfs_fonts';
 import { pdfStandardColors } from 'config/global';
 import { ExcelExportParams, ExcelRow } from 'ag-grid-enterprise';
 import { formatDateWithTimezoneOffset } from 'services/dateService';
+import { COLOR_HEXCODE } from 'services/salesSummaryService';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 export const exportToExcel = (tableRef, extraContent = {}) => {
@@ -160,4 +161,19 @@ export const getExportedAtTitle = (timezoneOffset = 0) => {
     dateFormat: 'DD/MM/YY',
     timezoneOffset,
   })} at ${formatDateWithTimezoneOffset({ date, dateFormat: 'HH:mm', timezoneOffset })}`;
+};
+
+const borderStyles = {
+  top: { style: 'thin', color: { argb: COLOR_HEXCODE.BORDER_GRAY } },
+  left: { style: 'thin', color: { argb: COLOR_HEXCODE.BORDER_GRAY } },
+  bottom: { style: 'thin', color: { argb: COLOR_HEXCODE.BORDER_GRAY } },
+  right: { style: 'thin', color: { argb: COLOR_HEXCODE.BORDER_GRAY } },
+};
+
+export const addBorderToAllCells = ({ worksheet }: { worksheet: any }) => {
+  worksheet.eachRow({ includeEmpty: true }, function (row) {
+    row.eachCell({ includeEmpty: true }, function (cell) {
+      cell.border = borderStyles;
+    });
+  });
 };
