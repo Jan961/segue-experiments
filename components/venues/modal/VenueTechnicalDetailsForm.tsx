@@ -4,7 +4,7 @@ import { initialVenueTechnicalDetails } from 'config/venue';
 import { useState } from 'react';
 import { UiTransformedVenue } from 'utils/venue';
 
-import { TechSpecTable } from '../TechSpecsTable/TechSpecTable';
+import { TechSpecTable } from '../techSpecsTable/TechSpecTable';
 
 interface VenueTechnicalDetailsFormProps {
   venue: Partial<UiTransformedVenue>;
