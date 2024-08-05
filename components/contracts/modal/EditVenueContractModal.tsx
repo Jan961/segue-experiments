@@ -202,6 +202,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
           FileId: response.data.id,
           FileType: response.data.MediaType,
           Description: 'Contract Attachment',
+          Type: 'Contract Attachment',
         };
         try {
           await axios.post(`/api/contracts/create/attachments/${selectedTableCell.contract.Id}`, fileRec);
@@ -295,7 +296,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
       <div className="h-[80vh] w-auto overflow-y-scroll flex">
         <div className="h-[800px] flex">
           <div className="flex flex-col gap-y-3">
-            <div className="w-[423px]  rounded border-2 border-secondary mr-2 p-3 bg-primary-blue bg-opacity-15">
+            <div className="w-[423px] rounded border-2 border-secondary mr-2 p-3 bg-primary-blue bg-opacity-15">
               <div className="flex">
                 <div className=" text-primary-input-text font-bold text-lg mr-8">Deal Memo</div>
                 <div className="flex items-center">
@@ -377,7 +378,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                   rowData={contractAttatchmentRows}
                   styleProps={contractsStyleProps}
                   testId="tableVenueAttach"
-                  tableHeight={550}
+                  tableHeight={435}
                   onCellClicked={(e) => handleCellClicked(e)}
                 />
               </div>
