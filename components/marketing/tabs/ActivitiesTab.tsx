@@ -123,6 +123,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
         }));
 
         calculateActivityTotals(tempRows);
+
         setActRowData(tempRows);
       }
 
@@ -527,7 +528,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
               </div>
               <div className="flex flex-col ml-8 mt-1">
                 <TextArea
-                  className="mt-2 h-[52px] w-[425px]"
+                  className="mt-2 h-[52px] w-[425px] resize-none"
                   value={changeNotes}
                   placeholder="Notes Field"
                   onBlur={(e) => editBooking('marketingCostsNotes', e.target.value)}
@@ -558,12 +559,13 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
             styleProps={styleProps}
             tableHeight={250}
             testId="tableActivity"
+            gridOptions={{ suppressHorizontalScroll: true }}
           />
 
           <div
             className={classNames(
               'flex flex-col w-[487px] h-[69px] bg-primary-green/[0.30] rounded-xl mt-5 px-2 float-right',
-              actRowData.length === 0 ? '-mt-[250px]' : '',
+              actRowData.length === 0 ? '-mt-64' : '',
             )}
           >
             <div className="flex flex-row gap-4">

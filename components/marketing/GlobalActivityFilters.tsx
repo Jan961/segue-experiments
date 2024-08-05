@@ -14,7 +14,7 @@ const GlobalActivityFilters = () => {
 
   const getCurrency = async (productionId) => {
     try {
-      const response = await axios.post('/api/marketing/currency/' + productionId, {});
+      const response = await axios.get(`/api/marketing/currency/production/${productionId}`);
 
       if (response.data && typeof response.data === 'object') {
         const currencyObject = response.data as { currency: string };
@@ -30,16 +30,10 @@ const GlobalActivityFilters = () => {
   };
 
   useEffect(() => {
-    // hardcoding currency to the currency of bookingId 10 but this will in time change to production
-    getCurrency(10);
-  }, [productionId]);
-
-  // Ensuring the currency is set on initial component mount
-  useEffect(() => {
-    if (!productionId) {
-      getCurrency(10);
+    if (productionId) {
+      getCurrency(productionId);
     }
-  }, []);
+  }, [productionId]);
 
   return (
     <div>
