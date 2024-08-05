@@ -13,6 +13,9 @@ import {
 import { addWidthAsPerContent } from 'services/reportsService';
 import { makeRowTextBoldAndAllignLeft } from './promoter-holds';
 import { convertToPDF } from 'utils/report';
+import { toSql } from 'services/dateService';
+import { addBorderToAllCells } from 'utils/export';
+import { bookingStatusMap } from 'config/bookings';
 
 type SCHEDULE_VIEW = {
   ProductionId: number;
@@ -76,22 +79,24 @@ const addTime = (timeArr: string[] = []) => {
   return `${hour + Number(h)}:${Number(m)}`;
 };
 const getKey = ({ FullProductionCode, ShowName, EntryDate }) => `${FullProductionCode} - ${ShowName} - ${EntryDate}`;
-// const formatDate = (date) => moment(date).format('DD/MM/YY')
 
 const handler = async (req, res) => {
-  const { ProductionId, format } = req.body || {};
+  const { ProductionId, startDate: from, endDate: to, status, format } = req.body || {};
 
-  // const formatedFromDate = formatDate(fromDate)
-  // const formatedToDate = formatDate(toDate)
-  // if (!fromDate || !toDate || !ProductionId) {
-  //   throw new Error('Params are missing')
-  // }
+  const formatedFromDate = toSql(from);
+  const formatedToDate = toSql(to);
+  if (!from || !to || !ProductionId) {
+    throw new Error('Params are missing');
+  }
   const conditions: Prisma.Sql[] = [];
-  // if (fromDate && toDate) {
-  //   conditions.push(Prisma.sql`EntryDate BETWEEN ${fromDate} AND ${toDate}`)
-  // }
+  if (from && to) {
+    conditions.push(Prisma.sql`EntryDate BETWEEN ${formatedFromDate} AND ${formatedToDate}`);
+  }
   if (ProductionId) {
     conditions.push(Prisma.sql` ProductionId=${ProductionId}`);
+  }
+  if (status && status !== 'all') {
+    conditions.push(Prisma.sql` EntryStatusCode=${status}`);
   }
   const where: Prisma.Sql = conditions.length ? Prisma.sql` where ${Prisma.join(conditions, ' and ')}` : Prisma.empty;
   const data: SCHEDULE_VIEW[] = await prisma.$queryRaw`select * FROM ScheduleView ${where} order by EntryDate;`;
@@ -117,8 +122,21 @@ const handler = async (req, res) => {
   }
   const { ShowName, FullProductionCode } = data[0];
   const title = `${FullProductionCode} ${ShowName} Travel Summary - ${moment().format('DD.MM.YY')}`;
+  let headerRowsLength = 4;
   worksheet.addRow([title]);
   worksheet.addRow([]);
+  if (from) {
+    worksheet.addRow([`Start Date: ${formatedFromDate}`]);
+    headerRowsLength++;
+  }
+  if (to) {
+    worksheet.addRow([`End Date: ${formatedToDate}`]);
+    headerRowsLength++;
+  }
+  if (status) {
+    worksheet.addRow([`Status: ${status === 'all' ? 'All' : bookingStatusMap[status]}`]);
+    headerRowsLength++;
+  }
   worksheet.addRow(['', '', '', '', '', 'Onward Travel']);
   worksheet.addRow(['Day', 'Date', 'Week', 'Venue', 'Town', 'Time', 'Miles']);
   worksheet.addRow([]);
@@ -273,12 +291,13 @@ const handler = async (req, res) => {
     maxColWidth: Infinity,
   });
   firstRowFormatting({ worksheet });
-  for (let row = 2; row <= 4; row++) {
+  for (let row = 2; row <= headerRowsLength; row++) {
     styleHeader({ worksheet, row, numberOfColumns });
   }
   for (let row = 1; row <= 4; row++) {
     makeRowTextBoldAndAllignLeft({ worksheet, row, numberOfColumns });
   }
+  addBorderToAllCells({ worksheet });
   worksheet.getCell(1, 1).font = { size: 16, color: { argb: COLOR_HEXCODE.WHITE }, bold: true };
   const filename = `${title}`;
   if (format === 'pdf') {
