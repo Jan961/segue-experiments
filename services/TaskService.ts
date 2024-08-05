@@ -91,7 +91,7 @@ export const generateRecurringMasterTasks = async (requestBody, MTRId: number) =
           Code: 'desc',
         },
       })
-    )?.Code + 1 || 0;
+    )?.Code + 1 || 1;
 
   const tasksToCreate = [];
 
@@ -198,7 +198,7 @@ export const generateRecurringProductionTasks = async (requestBody, prodBlock, p
       Name,
       Priority,
       Notes,
-      Progress: Progress || 0,
+      Progress: parseInt(Progress) || 0,
       AssignedToUserId,
       CompleteByIsPostProduction: CompleteByWeekNum > calculateWeekNumber(prodStartDate, prodBlock?.EndDate),
       StartByWeekNum: calculateWeekNumber(prodStartDate, taskStartDate),
