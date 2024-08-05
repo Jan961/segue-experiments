@@ -326,9 +326,10 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                   return null;
                 }}
                 className="bg-primary-white w-full"
-                options={[{ text: 'Select Assignee', value: null }, ...userList]}
+                options={[...userList]}
                 isClearable
                 isSearchable
+                placeholder="Select User"
               />
 
               <div className=" text-primary-input-text font-bold text-sm mt-6">Approved By</div>
@@ -337,9 +338,10 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                   return null;
                 }}
                 className="bg-primary-white w-full"
-                options={[{ text: 'Select Assignee', value: null }, ...userList]}
+                options={[...userList]}
                 isClearable
                 isSearchable
+                placeholder="Select User"
               />
               <div className="flex items-center mt-6 justify-between px-3">
                 <div>
@@ -448,8 +450,8 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                 <Select
                   onChange={(value) => editContractModalData('SignedBy', value, 'contract')}
                   className="bg-primary-white w-52"
-                  placeholder="User Name Dropdown"
-                  options={[{ text: 'Select Assignee', value: null }, ...userList]}
+                  placeholder="Select User"
+                  options={[...userList]}
                   isClearable
                   isSearchable
                   value={formData.SignedBy ? producerList[formData.SignedBy] : ''}
