@@ -168,15 +168,25 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
 
   const onSave = async (file) => {
     setFilesForUpload([...filesForUpload, file]);
-    setContractAttatchmentRows(
-      file.map((file) => {
+    console.log(filesForUpload);
+    setContractAttatchmentRows([
+      ...file.map((file) => {
         return {
           FileOriginalFilename: file.name,
           FileUploadedDateTime: new Date(),
         };
       }),
-    );
+      ...contractAttatchmentRows,
+    ]);
+    console.log(contractAttatchmentRows);
     setShowUploadModal(false);
+  };
+
+  const handleCellClicked = (event) => {
+    if (event.column.colId === 'ViewBtn') {
+      const fileUrl = event.data.FileURL;
+      window.open(fileUrl, '_blank');
+    }
   };
 
   return (
@@ -272,6 +282,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                 styleProps={contractsStyleProps}
                 testId="tableVenueAttach"
                 tableHeight={550}
+                onCellClicked={(e) => handleCellClicked(e)}
               />
             </div>
           </div>
@@ -602,6 +613,8 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
         onClose={() => setShowUploadModal(false)}
         maxFileSize={5120 * 1024} // 5MB
         onSave={onSave}
+        maxFiles={30}
+        isMultiple={true}
       />
       <ConfirmationDialog
         labelYes="Yes"
