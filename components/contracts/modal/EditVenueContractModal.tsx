@@ -76,6 +76,9 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
   const [showUploadModal, setShowUploadModal] = useState<boolean>(false);
   const [contractAttatchmentRows, setContractAttatchmentRows] = useState([]);
   const [filesForUpload, setFilesForUpload] = useState<FormData[]>([]);
+  const [fileDeleteConfirm, setFileDeleteConfirm] = useState<boolean>();
+  const [attachRow, setAttachRow] = useState();
+  const [attachIndex, setAttachIndex] = useState();
 
   const producerList = useMemo(() => {
     const list = {};
@@ -158,7 +161,11 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
           FileType: response.data.MediaType,
           Description: 'Contract Attachment',
         };
-        await axios.post('/api/contracts/create/attachments/', fileRec);
+        try {
+          await axios.post('/api/contracts/create/attachments/', fileRec);
+        } catch (error) {
+          console.log(error, 'Error - failed to update database with attachments');
+        }
       }
     };
     await headlessUploadMultiple(filesForUpload, callBack);
@@ -200,6 +207,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
           FileOriginalFilename: file.name,
           FileUploadedDateTime: new Date(),
           FileURL: URL.createObjectURL(file.file),
+          FileUploaded: false,
         };
       }),
       ...contractAttatchmentRows,
@@ -208,10 +216,33 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
   };
 
   const handleCellClicked = (event) => {
+    console.log(event.data);
     if (event.column.colId === 'ViewBtn') {
       const fileUrl = event.data.FileURL;
       window.open(fileUrl, '_blank');
+    } else if (event.column.colId === 'icons') {
+      setAttachRow(event.data);
+      setAttachIndex(event.rowIndex);
+      setFileDeleteConfirm(true);
     }
+  };
+
+  const handleDeleteAttachment = async (data, rowIndex) => {
+    if (data.FileUploaded) {
+      try {
+        await axios.post('/api/contracts/delete/attachments', data);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
+    const newRows = [...contractAttatchmentRows];
+    if (rowIndex !== -1) {
+      newRows.splice(rowIndex, 1);
+    }
+    setContractAttatchmentRows(newRows);
+
+    setFileDeleteConfirm(false);
   };
 
   return (
@@ -648,6 +679,14 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
         variant="cancel"
         onNoClick={() => setCancelModal(false)}
         onYesClick={() => handleCancelForm(true)}
+      />
+      <ConfirmationDialog
+        labelYes="Yes"
+        labelNo="No"
+        show={fileDeleteConfirm}
+        variant="delete"
+        onNoClick={() => setFileDeleteConfirm(false)}
+        onYesClick={() => handleDeleteAttachment(attachRow, attachIndex)}
       />
       {editDealMemoModal && (
         <EditDealMemoContractModal

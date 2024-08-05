@@ -4,6 +4,7 @@ import { getEmailFromReq, checkAccess } from 'services/userService';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
+    console.log('creating attachment');
     const BookingId: number = parseInt(req.query.BookingId as string);
 
     const email = await getEmailFromReq(req);
