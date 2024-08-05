@@ -294,8 +294,8 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
     >
       <div className="h-[80vh] w-auto overflow-y-scroll flex">
         <div className="h-[800px] flex">
-          <div className="flex flex-col gap-y-6">
-            <div className="w-[423px] h-[680px] rounded border-2 border-secondary mr-2 p-3 bg-primary-blue bg-opacity-15">
+          <div className="flex flex-col gap-y-3">
+            <div className="w-[423px]  rounded border-2 border-secondary mr-2 p-3 bg-primary-blue bg-opacity-15">
               <div className="flex">
                 <div className=" text-primary-input-text font-bold text-lg mr-8">Deal Memo</div>
                 <div className="flex items-center">
@@ -360,25 +360,27 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
               </div>
 
               <div className=" text-primary-input-text font-bold text-sm mt-6">Notes</div>
-              <TextArea className="h-[300px] w-[400px]" value={formData.DealNotes} />
+              <TextArea className="h-[125px] w-[400px]" value={formData.DealNotes} />
             </div>
-            <div className="w-[423px] flex justify-end">
-              <Button
-                onClick={() => setShowUploadModal(!showUploadModal)}
-                className="mr-3 w-33"
-                variant="primary"
-                text="Add Attachments"
-              />
-            </div>
-            <div className="bg-red-500 h-[1000px] w-[423px]">
-              <Table
-                columnDefs={attachmentsColDefs}
-                rowData={contractAttatchmentRows}
-                styleProps={contractsStyleProps}
-                testId="tableVenueAttach"
-                tableHeight={550}
-                onCellClicked={(e) => handleCellClicked(e)}
-              />
+            <div className="flex flex-col gap-y-2">
+              <div className="w-[423px] flex justify-end">
+                <Button
+                  onClick={() => setShowUploadModal(!showUploadModal)}
+                  className="mr-1 w-33"
+                  variant="primary"
+                  text="Add Attachments"
+                />
+              </div>
+              <div className="w-[423px]">
+                <Table
+                  columnDefs={attachmentsColDefs}
+                  rowData={contractAttatchmentRows}
+                  styleProps={contractsStyleProps}
+                  testId="tableVenueAttach"
+                  tableHeight={550}
+                  onCellClicked={(e) => handleCellClicked(e)}
+                />
+              </div>
             </div>
           </div>
           <div className="w-[652px] h-[980px] rounded border-2 border-secondary ml-2 p-3 bg-primary-blue bg-opacity-15">
@@ -700,17 +702,20 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
         <Button onClick={() => handleCancelForm(false)} className="w-33" variant="secondary" text="Cancel" />
         <Button onClick={handleFormData} className="ml-4 w-33" variant="primary" text="Save and Close" />
       </div>
-      <UploadModal
-        visible={showUploadModal}
-        title="Upload Venue Contract Attachments"
-        info="Please upload your file by dragging it into the grey box below or by clicking the upload cloud."
-        allowedFormats={attachmentMimeTypes.venueContract}
-        onClose={() => setShowUploadModal(false)}
-        maxFileSize={5120 * 1024} // 5MB
-        onSave={onSave}
-        maxFiles={30}
-        isMultiple={true}
-      />
+      {showUploadModal && (
+        <UploadModal
+          visible={showUploadModal}
+          title="Upload Venue Contract Attachments"
+          info="Please upload your file by dragging it into the grey box below or by clicking the upload cloud."
+          allowedFormats={attachmentMimeTypes.venueContract}
+          onClose={() => setShowUploadModal(false)}
+          maxFileSize={5120 * 1024} // 5MB
+          onSave={onSave}
+          maxFiles={30}
+          isMultiple={true}
+        />
+      )}
+
       <ConfirmationDialog
         labelYes="Yes"
         labelNo="No"
