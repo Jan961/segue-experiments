@@ -559,6 +559,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
             styleProps={styleProps}
             tableHeight={250}
             testId="tableActivity"
+            gridOptions={{ suppressHorizontalScroll: true }}
           />
 
           <div
