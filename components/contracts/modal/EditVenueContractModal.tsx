@@ -39,6 +39,7 @@ import Table from 'components/core-ui-lib/Table';
 import { UploadModal } from 'components/core-ui-lib';
 import { attachmentMimeTypes } from 'components/core-ui-lib/UploadModal/interface';
 import { headlessUploadMultiple } from 'requests/upload';
+import { getFileUrl } from 'lib/s3';
 
 const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClose: () => void }) => {
   const productionJumpState = useRecoilValue(currentProductionSelector);
@@ -103,13 +104,37 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
       setVenue(venueData.data as unknown as Venue);
     }
   };
+
   useEffect(() => {
     const callDealMemoData = async () => {
       setIsLoading(true);
       await callDealMemoApi();
       setIsLoading(false);
     };
+
+    const fetchContractAttachments = async () => {
+      try {
+        console.log(selectedTableCell.contract.Id);
+        const response = await axios.get(`/api/contracts/read/attachments/${selectedTableCell.contract.Id}`);
+        const data = response.data;
+        setContractAttatchmentRows([
+          ...data.map((file) => {
+            return {
+              FileId: file.Id,
+              FileOriginalFilename: file.OriginalFilename,
+              FileUploadedDateTime: file.UploadDateTime,
+              FileURL: getFileUrl(file.Location),
+              FileUploaded: true,
+            };
+          }),
+          ...contractAttatchmentRows,
+        ]);
+      } catch (error) {
+        console.log(error, 'Error - failed to fetch contract file attachments');
+      }
+    };
     callDealMemoData();
+    fetchContractAttachments();
   }, []);
   const editContractModalData = async (key: string, value, type: string) => {
     const updatedFormData = {
@@ -127,6 +152,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
 
   const handleFormData = async () => {
     console.log(filesForUpload);
+
     const bookingData = Object.keys(saveBookingFormData).length > 0;
     const contractData = Object.keys(saveContractFormData).length > 0;
     if (contractData) {
@@ -217,6 +243,8 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
 
   const handleCellClicked = (event) => {
     console.log(event.data);
+    console.log(selectedTableCell.contract.Id);
+
     if (event.column.colId === 'ViewBtn') {
       const fileUrl = event.data.FileURL;
       window.open(fileUrl, '_blank');

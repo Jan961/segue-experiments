@@ -4,7 +4,6 @@ import { checkAccess, getEmailFromReq } from 'services/userService';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
-    console.log('2');
     const BookingId = parseInt(req.query.bookingId as string);
 
     const email = await getEmailFromReq(req);
