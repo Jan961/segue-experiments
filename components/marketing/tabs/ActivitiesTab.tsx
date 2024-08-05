@@ -528,7 +528,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
               </div>
               <div className="flex flex-col ml-8 mt-1">
                 <TextArea
-                  className="mt-2 h-[52px] w-[425px]"
+                  className="mt-2 h-[52px] w-[425px] resize-none"
                   value={changeNotes}
                   placeholder="Notes Field"
                   onBlur={(e) => editBooking('marketingCostsNotes', e.target.value)}
