@@ -1,6 +1,8 @@
 export const ToastMessages = {
   imageUploadSuccess: 'Image upload successful.',
   imageUploadFailure: 'Image upload failed. Please retry.',
+  fileUploadSuccess: 'Files uploaded successfully',
+  fileUploadFailure: 'Files failed to upload.',
   createNewProductionSuccess: 'Production created.',
   createNewProductionFailure: 'Production creation failed. Please retry.',
   updateProductionSuccess: 'Production details updated successfully.',
