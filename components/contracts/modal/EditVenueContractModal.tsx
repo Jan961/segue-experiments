@@ -153,12 +153,12 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
   const saveFiles = async () => {
     const callBack = async (response) => {
       if (!isNullOrEmpty(response)) {
-        // const fileRec = {
-        //   FileId: response.data.id,
-        //   VenueId: venueResponse.data.Id,
-        //   Description: 'Tech Spec',
-        // };
-        // await axios.post('/api/venue/techSpecs/create', fileRec);
+        const fileRec = {
+          FileId: response.data.id,
+          FileType: response.data.MediaType,
+          Description: 'Contract Attachment',
+        };
+        await axios.post('/api/contracts/create/attachments/', fileRec);
       }
     };
     await headlessUploadMultiple(filesForUpload, callBack);
