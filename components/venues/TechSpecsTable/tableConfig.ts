@@ -1,8 +1,8 @@
-import DefaultTextRenderer from '../../core-ui-lib/Table/renderers/DefaultTextRenderer';
-import formatInputDate from '../../../utils/dateInputFormat';
-import { getTimeFromDateAndTime } from '../../../services/dateService';
-import ButtonRenderer from '../../core-ui-lib/Table/renderers/ButtonRenderer';
-import IconRowRenderer from '../../global/salesTable/renderers/IconRowRenderer';
+import DefaultTextRenderer from 'components/core-ui-lib/Table/renderers/DefaultTextRenderer';
+import formatInputDate from 'utils/dateInputFormat';
+import { getTimeFromDateAndTime } from 'services/dateService';
+import ButtonRenderer from 'components/core-ui-lib/Table/renderers/ButtonRenderer';
+import IconRowRenderer from 'components/global/salesTable/renderers/IconRowRenderer';
 
 export const attachmentsColDefs = [
   {
@@ -18,7 +18,6 @@ export const attachmentsColDefs = [
     cellRenderer: DefaultTextRenderer,
     cellRendererParams: function (params) {
       const updDate = new Date(params.data.uploadDateTime);
-      console.log(formatInputDate(updDate) + ' ' + getTimeFromDateAndTime(updDate));
       return {
         value: formatInputDate(updDate) + ' ' + getTimeFromDateAndTime(updDate),
       };

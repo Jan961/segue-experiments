@@ -1,8 +1,8 @@
 import { attachmentsColDefs } from './tableConfig';
-import { ConfirmationDialog, Table, UploadModal } from '../../core-ui-lib';
-import Button from '../../core-ui-lib/Button';
+import { ConfirmationDialog, Table, UploadModal } from 'components/core-ui-lib';
+import Button from 'components/core-ui-lib/Button';
 import { techSpecsFileFormats } from '../techSpecsFileFormats';
-import { UploadedFile } from '../../core-ui-lib/UploadModal/interface';
+import { UploadedFile } from 'components/core-ui-lib/UploadModal/interface';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { isNullOrEmpty } from 'utils';
