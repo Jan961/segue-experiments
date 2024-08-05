@@ -25,7 +25,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         where: { FileId: fileId, Id: venueFileObj.Id },
       });
 
-      res.status(200).json();
+      res.status(200).json(venueFileObj);
     } else {
       res.status(400).json('File was already deleted.');
     }
