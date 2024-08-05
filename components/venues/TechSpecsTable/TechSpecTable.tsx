@@ -39,7 +39,6 @@ export const TechSpecTable = ({ venueId, setFilesToSend, setFilesToDelete }: Tec
     filesToUpload.forEach((file) => {
       if (file?.fileId > maxFileId && isNullOrEmpty(file?.imageUrl)) maxFileId = file.fileId;
     });
-    console.log(new Date().toISOString());
     const newRowData = files.map((file) => {
       return { ...file, fileId: maxFileId++, uploadDateTime: new Date().toISOString() };
     });
@@ -48,6 +47,7 @@ export const TechSpecTable = ({ venueId, setFilesToSend, setFilesToDelete }: Tec
     setFilesToSend((prevFilesList) => [...newRowData, ...prevFilesList]);
     setUploadVisible(false);
   };
+
   const onDelete = async () => {
     const delId = fileToDelete.fileId;
     if (isNullOrEmpty(fileToDelete?.imageUrl)) {
@@ -100,14 +100,16 @@ export const TechSpecTable = ({ venueId, setFilesToSend, setFilesToDelete }: Tec
           maxFileSize={15360 * 1024}
         />
       )}
-      <Button
-        testId="upload-venue-tech-spec-btn"
-        text="Upload Tech Specs"
-        onClick={async () => {
-          await fetchFileList();
-          setUploadVisible(true);
-        }}
-      />
+      <div className="ag-floating-top mb-4 flex justify-end">
+        <Button
+          testId="upload-venue-tech-spec-btn"
+          text="Upload Tech Specs"
+          onClick={async () => {
+            await fetchFileList();
+            setUploadVisible(true);
+          }}
+        />
+      </div>
 
       <Table columnDefs={attachmentsColDefs} rowData={rowData} onCellClicked={handleCellClick} />
     </div>
