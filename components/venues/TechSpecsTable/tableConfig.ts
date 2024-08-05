@@ -7,34 +7,36 @@ import IconRowRenderer from '../../global/salesTable/renderers/IconRowRenderer';
 export const attachmentsColDefs = [
   {
     headerName: 'Title',
-    field: 'Name',
+    field: 'name',
     editable: true,
     cellRenderer: DefaultTextRenderer,
     width: 600,
   },
   {
     headerName: 'Date Uploaded',
-    field: 'FileUploadedDateTime',
+    field: 'uploadDateTime',
     cellRenderer: DefaultTextRenderer,
     cellRendererParams: function (params) {
-      const updDate = new Date(params.data.FileUploadedDateTime);
+      const updDate = new Date(params.data.uploadDateTime);
+      console.log(formatInputDate(updDate) + ' ' + getTimeFromDateAndTime(updDate));
       return {
         value: formatInputDate(updDate) + ' ' + getTimeFromDateAndTime(updDate),
       };
     },
-    width: 150,
+    width: 130,
   },
   {
     headerName: 'Date File Created',
     field: 'FileDateTime',
     cellRenderer: DefaultTextRenderer,
     cellRendererParams: function (params) {
-      const fileDt = new Date(params.data.FileDateTime);
+      const updDate = new Date(params.data.uploadDateTime);
+      console.log(formatInputDate(updDate) + ' ' + getTimeFromDateAndTime(updDate));
       return {
-        value: formatInputDate(fileDt) + ' ' + getTimeFromDateAndTime(fileDt),
+        value: formatInputDate(updDate) + ' ' + getTimeFromDateAndTime(updDate),
       };
     },
-    width: 150,
+    width: 130,
   },
   {
     headerName: 'View',

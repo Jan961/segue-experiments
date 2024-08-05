@@ -20,17 +20,6 @@ export const TechSpecTable = ({ venueId }: TechSpecTableProps) => {
     console.log(fileList);
     setFileWidgets([]);
     setRowData(fileList);
-    const updatedFiles = await Promise.all(
-      fileList.map(async (file) => {
-        const response = await fetch(file.imageUrl);
-        const blob = await response.blob();
-        const tempFile = new File([blob], file.name, { type: blob.type });
-        return { ...file, size: tempFile.size }; // Return the updated file object
-      }),
-    );
-
-    // Update the state once with all the updated files
-    setFileWidgets([...fileWidgets, ...updatedFiles]);
   };
 
   useEffect(() => {

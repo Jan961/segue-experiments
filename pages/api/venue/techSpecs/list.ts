@@ -25,7 +25,14 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const uploadedFileArr = await Promise.all(
       fileInfo.map(async (file) => {
         const imageUrl = await getFileUrl(file.Location);
-        return { size: -1, name: file.OriginalFilename, imageUrl, location: file.Location, fileId: file.Id };
+        return {
+          size: -1,
+          name: file.OriginalFilename,
+          imageUrl,
+          location: file.Location,
+          fileId: file.Id,
+          uploadDateTime: file.UploadDateTime,
+        };
       }),
     );
 
