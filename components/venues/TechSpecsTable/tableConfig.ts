@@ -10,7 +10,7 @@ export const attachmentsColDefs = [
     field: 'name',
     editable: true,
     cellRenderer: DefaultTextRenderer,
-    width: 600,
+    width: 700,
   },
   {
     headerName: 'Date Uploaded',
@@ -23,20 +23,7 @@ export const attachmentsColDefs = [
         value: formatInputDate(updDate) + ' ' + getTimeFromDateAndTime(updDate),
       };
     },
-    width: 130,
-  },
-  {
-    headerName: 'Date File Created',
-    field: 'FileDateTime',
-    cellRenderer: DefaultTextRenderer,
-    cellRendererParams: function (params) {
-      const updDate = new Date(params.data.uploadDateTime);
-      console.log(formatInputDate(updDate) + ' ' + getTimeFromDateAndTime(updDate));
-      return {
-        value: formatInputDate(updDate) + ' ' + getTimeFromDateAndTime(updDate),
-      };
-    },
-    width: 130,
+    width: 150,
   },
   {
     headerName: 'View',

@@ -153,7 +153,18 @@ export default function AddEditVenueModal({
         await axios.post('/api/venue/techSpecs/create', fileRec);
       }
     };
-    await headlessUploadMultiple(fileList, callBack);
+    console.log(fileList);
+    const newFileList = [];
+
+    const fileArr = fileList.map((file: any) => file?.file);
+    for (const file of fileArr) {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('path', 'techSpecs');
+      newFileList.push(formData);
+    }
+    console.log(newFileList);
+    await headlessUploadMultiple(newFileList, callBack);
   };
   return (
     <>

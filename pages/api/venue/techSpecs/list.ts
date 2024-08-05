@@ -20,7 +20,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       where: { Id: { in: venueFiles } },
       select: { OriginalFilename: true, MediaType: true, Location: true, UploadDateTime: true, Id: true },
     });
-    console.log(fileInfo);
 
     const uploadedFileArr = await Promise.all(
       fileInfo.map(async (file) => {
