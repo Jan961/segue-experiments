@@ -57,20 +57,20 @@ const MasterTaskList = ({ visible, onClose, productionId }: MasterTaskListProps)
     selectedRows.forEach((task) => {
       unfilteredTasks.forEach((existingTask) => {
         if (isNullOrEmpty(existingTask?.CopiedFrom)) return;
-        if (existingTask?.CopiedFrom === 'D') {
-          if (task?.MTRId === existingTask.CopiedId) {
-            if (!mtrList.includes(task.MTRId)) {
-              duplicateTasks.push(task);
-              mtrList.push(task.MTRId);
-            }
-          }
-        } else if (existingTask?.CopiedFrom === 'M') {
-          if (task?.Id === existingTask.CopiedId) {
-            if (!singleList.includes(task.Id)) {
-              duplicateTasks.push(task);
-              singleList.push(task.Id);
-            }
-          }
+        if (
+          existingTask?.CopiedFrom === 'D' &&
+          task?.MTRId === existingTask.CopiedId &&
+          !mtrList.includes(task.MTRId)
+        ) {
+          duplicateTasks.push(task);
+          mtrList.push(task.MTRId);
+        } else if (
+          existingTask?.CopiedFrom === 'M' &&
+          task?.Id === existingTask.CopiedId &&
+          !singleList.includes(task.Id)
+        ) {
+          duplicateTasks.push(task);
+          singleList.push(task.Id);
         }
       });
     });
