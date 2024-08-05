@@ -14,6 +14,9 @@ export default async function handle(req, res) {
       where: {
         BookingId: bookingId,
         SetIsFinalFigures: true,
+        SaleTypeName: {
+          not: '',
+        },
       },
       select: {
         SaleTypeName: true,
