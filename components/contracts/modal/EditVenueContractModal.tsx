@@ -114,7 +114,6 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
 
     const fetchContractAttachments = async () => {
       try {
-        console.log(selectedTableCell.contract.Id);
         const response = await axios.get(`/api/contracts/read/attachments/${selectedTableCell.contract.Id}`);
         const data = response.data;
         setContractAttatchmentRows([
@@ -125,9 +124,9 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
               FileUploadedDateTime: file.UploadDateTime,
               FileURL: getFileUrl(file.Location),
               FileUploaded: true,
+              FileLocation: file.Location,
             };
           }),
-          ...contractAttatchmentRows,
         ]);
       } catch (error) {
         console.log(error, 'Error - failed to fetch contract file attachments');
@@ -136,6 +135,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
     callDealMemoData();
     fetchContractAttachments();
   }, []);
+
   const editContractModalData = async (key: string, value, type: string) => {
     const updatedFormData = {
       ...formData,
@@ -258,9 +258,11 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
   const handleDeleteAttachment = async (data, rowIndex) => {
     if (data.FileUploaded) {
       try {
-        await axios.post('/api/contracts/delete/attachments', data);
+        await axios.delete(`/api/file/delete?location=${data.FileLocation}`);
+        await axios.post(`/api/contracts/delete/attachments/${selectedTableCell.contract.Id}`, data);
       } catch (error) {
         console.log(error);
+        setFileDeleteConfirm(false);
       }
     }
 

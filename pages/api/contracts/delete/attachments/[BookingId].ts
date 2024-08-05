@@ -10,22 +10,26 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const access = await checkAccess(email, { BookingId });
     if (!access) return res.status(401).end();
 
-    const contractFiles = (
-      await prisma.ContractFile.findMany({
-        where: {
-          ContractBookingId: BookingId,
-        },
-        select: { FileId: true },
-      })
-    ).map((file) => file.FileId);
+    const data = req.body;
 
-    const files = await prisma.file.findMany({
-      where: { Id: { in: contractFiles } },
+    const result = await prisma.ContractFile.findFirst({
+      where: {
+        FileId: data.Id,
+      },
+      select: {
+        Id: true,
+      },
     });
 
-    await res.json(files);
+    await prisma.ContractFile.delete({
+      where: {
+        Id: result.Id,
+      },
+    });
+
+    res.status(200).json({ status: 'Success' });
   } catch (err) {
     console.log(err);
-    res.status(403).json({ err: 'Error occurred while generating search results.' });
+    res.status(403).json({ err: 'Error occurred while deleting Contract File' });
   }
 }
