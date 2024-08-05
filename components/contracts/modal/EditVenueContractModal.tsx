@@ -167,18 +167,19 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
   };
 
   const onSave = async (file) => {
+    // filesForUpload - upload these on Save & Close, then on Modal load, put them into table.
+    // contractAttachmentRows - still add files that have not been uploaded yet
     setFilesForUpload([...filesForUpload, file]);
-    console.log(filesForUpload);
     setContractAttatchmentRows([
       ...file.map((file) => {
         return {
           FileOriginalFilename: file.name,
           FileUploadedDateTime: new Date(),
+          FileURL: URL.createObjectURL(file.file),
         };
       }),
       ...contractAttatchmentRows,
     ]);
-    console.log(contractAttatchmentRows);
     setShowUploadModal(false);
   };
 
