@@ -18,6 +18,7 @@ import NewProductionTask from 'components/tasks/modals/NewProductionTask';
 import ProductionTaskList from 'components/tasks/modals/ProductionTaskList';
 import MasterTaskList from 'components/tasks/modals/MasterTaskList';
 import NotesPopup from 'components/tasks/NotesPopup';
+import { isNullOrEmpty } from 'utils';
 
 export const LoadingOverlay = () => (
   <div className="inset-0 absolute bg-white bg-opacity-50 z-50 flex justify-center items-center">
@@ -57,8 +58,10 @@ const MasterTasks = (props: InferGetServerSidePropsType<typeof getServerSideProp
     if (e.column.colId === 'delete') {
       setConfirm(true);
     } else if (e.column.colId === 'clone') {
-      delete e.data.Id;
-      setShowAddTask(true);
+      if (isNullOrEmpty(e.data.MTRId)) {
+        delete e.data.Id;
+        setShowAddTask(true);
+      }
     } else if (e.column.colId === 'edit') {
       setShowAddTask(true);
     } else if (e.column.colId === 'Notes') {

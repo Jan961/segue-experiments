@@ -5,7 +5,7 @@ import moment from 'moment';
 import Decimal from 'decimal.js';
 import { COLOR_HEXCODE } from 'services/salesSummaryService';
 import { ALIGNMENT, alignCellText, styleHeader } from './masterplan';
-import { getExportedAtTitle } from 'utils/export';
+import { addBorderToAllCells, getExportedAtTitle } from 'utils/export';
 import { currencyCodeToSymbolMap } from 'config/Reports';
 import { convertToPDF } from 'utils/report';
 import { BOOK_STATUS_CODES, SALES_TYPE_NAME } from 'types/MarketingTypes';
@@ -65,7 +65,7 @@ const colorTextAndBGCell = ({
   cellColor?: COLOR_HEXCODE;
   numFmt?: string;
 }) => {
-  if (!textColor && !cellColor) {
+  if (!textColor && !cellColor && !numFmt) {
     return;
   }
   const cell = worksheet.getCell(row, col);
@@ -178,8 +178,10 @@ const handler = async (req, res) => {
   for (let i = 1; i <= daysDiff || weekPending; i++) {
     weekPending = true;
 
+    const j = i + 1;
     const weekDay = moment(moment(fromDate).add(i - 1, 'day')).format('dddd');
     const dateInIncomingFormat = moment(moment(fromDate).add(i - 1, 'day')).format('YYYY-MM-DD');
+    const nextDateInIncomingFormat = moment(moment(fromDate).add(j - 1, 'day')).format('YYYY-MM-DD');
     const date = formatDate(dateInIncomingFormat);
 
     if (i % 7 === 1) {
@@ -206,8 +208,9 @@ const handler = async (req, res) => {
     }
 
     const key = getKey({ FullProductionCode, ShowName, EntryDate: dateInIncomingFormat });
+    const nextKey = getKey({ FullProductionCode, ShowName, EntryDate: nextDateInIncomingFormat });
     const value: SALES_SUMMARY = map[key];
-
+    const nextValue: SALES_SUMMARY = map[nextKey];
     if (!value) {
       r7.push('');
       r8.push('');
@@ -219,15 +222,23 @@ const handler = async (req, res) => {
       }
       r7.push(value.Location || '');
       r8.push(value.EntryName || '');
-      r9.push(value.Value ? value.Value : '');
-      console.log(9, colNo, typeof value.Value, value.Value);
-      cellColor.push({ cell: { rowNo: 9, colNo }, numFmt: (value.VenueCurrencySymbol || '') + '#,##0.00' });
-      if (value.VenueCurrencySymbol && value.Value && value.EntryStatusCode !== 'X') {
-        const val = totalOfCurrency[value.VenueCurrencySymbol];
-        if (val || val === 0) {
-          totalOfCurrency[value.VenueCurrencySymbol] = new Decimal(val)
-            .plus(new Decimal(value.Value).toFixed(2))
-            .toFixed(2) as any as number;
+      if (nextValue && nextValue.EntryId === value.EntryId) {
+        r9.push('');
+        cellColor.push({
+          cell: { rowNo: 9, colNo },
+          cellColor: COLOR_HEXCODE.BLUE,
+          numFmt: (value.VenueCurrencySymbol || '') + '#,##0.00',
+        });
+      } else {
+        r9.push(value.Value ? value.Value : '');
+        cellColor.push({ cell: { rowNo: 9, colNo }, numFmt: (value.VenueCurrencySymbol || '') + '#,##0.00' });
+        if (value.VenueCurrencySymbol && value.Value && value.EntryStatusCode !== 'X') {
+          const val = totalOfCurrency[value.VenueCurrencySymbol];
+          if (val || val === 0) {
+            totalOfCurrency[value.VenueCurrencySymbol] = new Decimal(val)
+              .plus(new Decimal(value.Value).toFixed(2))
+              .toFixed(2) as any as number;
+          }
         }
       }
       if (
@@ -355,6 +366,7 @@ const handler = async (req, res) => {
   styleHeader({ worksheet, row: 2, bgColor: COLOR_HEXCODE.DARK_GREEN });
   alignCellText({ worksheet, row: 1, col: 1, align: ALIGNMENT.LEFT });
   alignCellText({ worksheet, row: 2, col: 1, align: ALIGNMENT.LEFT });
+  addBorderToAllCells({ worksheet });
   worksheet.getCell(1, 1).font = { size: 16, color: { argb: COLOR_HEXCODE.WHITE }, bold: true };
   if (format === 'pdf') {
     worksheet.pageSetup.printArea = `A1:${worksheet.getColumn(11).letter}${worksheet.rowCount}`;
