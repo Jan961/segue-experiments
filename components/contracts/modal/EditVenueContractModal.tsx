@@ -431,7 +431,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
               <div className="w-4/5 flex">
                 <Select
                   onChange={(value) => editContractModalData('StatusCode', value, 'contract')}
-                  className="bg-primary-white w-52"
+                  className="bg-primary-white w-full"
                   value={formData.StatusCode}
                   placeholder="Contract Status"
                   options={allStatusOptions}
