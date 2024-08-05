@@ -11,10 +11,11 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     if (!access) return res.status(401).end();
 
     const data = req.body;
+    console.log(data);
 
     const result = await prisma.ContractFile.findFirst({
       where: {
-        FileId: data.Id,
+        FileId: data.FileId,
       },
       select: {
         Id: true,
