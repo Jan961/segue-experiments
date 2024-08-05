@@ -11,10 +11,7 @@ interface VenueTechnicalDetailsFormProps {
   validationErrors?: Record<string, string>;
   onChange: (data: any) => void;
   updateValidationErrrors?: (key: string, value: string) => void;
-  fileList: any;
   setFileList: (data: any) => void;
-  setFilesToDelete: (data: any) => void;
-  filesToDelete: any;
 }
 
 const VenueTechnicalDetailsForm = ({
@@ -22,7 +19,6 @@ const VenueTechnicalDetailsForm = ({
   validationErrors,
   onChange,
   updateValidationErrrors,
-  fileList,
   setFileList,
 }: VenueTechnicalDetailsFormProps) => {
   const [formData, setFormData] = useState<Partial<UiTransformedVenue>>({ ...initialVenueTechnicalDetails, ...venue });
@@ -39,8 +35,6 @@ const VenueTechnicalDetailsForm = ({
     }
   };
 
-  console.log(venue);
-  console.log(fileList);
   return (
     <>
       <div className="flex flex-row  justify-between">

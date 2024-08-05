@@ -83,7 +83,6 @@ export const headlessUploadMultiple = async (fileList: FormData[], callback: (re
   let slowProgressInterval; // interval for slow progress simulation
   await Promise.all(
     fileList.map(async (file) => {
-      console.log(file);
       const response = await headlessUpload(file, progress, slowProgressInterval);
       progress = 100;
       clearInterval(slowProgressInterval);

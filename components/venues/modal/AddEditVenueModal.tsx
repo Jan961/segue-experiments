@@ -19,7 +19,6 @@ import Loader from 'components/core-ui-lib/Loader';
 import useAxiosCancelToken from 'hooks/useCancelToken';
 import { isNullOrEmpty } from 'utils';
 import { headlessUploadMultiple } from 'requests/upload';
-import { UploadedFile } from 'components/core-ui-lib/UploadModal/interface';
 
 interface AddEditVenueModalProps {
   visible: boolean;
@@ -47,7 +46,6 @@ export default function AddEditVenueModal({
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [fileList, setFileList] = useState<FormData[]>([]);
-  const [filesToDelete, setFilesToDelete] = useState<UploadedFile[]>([]);
   const cancelToken = useAxiosCancelToken();
   const handleInputChange = (field: string, value: any) => {
     let sanitizedValue = value;
@@ -86,7 +84,6 @@ export default function AddEditVenueModal({
     if (isValid) {
       const apiResponse = formData.id ? await updateVenue(formData) : await createVenue(formData);
       await saveFiles(apiResponse);
-      await deleteFileOnServer();
     }
     await fetchVenues();
     setIsSaving(false);
@@ -131,18 +128,7 @@ export default function AddEditVenueModal({
     setIsDeleting(false);
   }, [onClose, toggleDeleteConfirmation, venue.id]);
 
-  const deleteFileOnServer = async () => {
-    const promises = filesToDelete.map(async (file) => {
-      const fileId = file.fileId;
-      if (fileId) {
-        await axios.post('/api/venue/techSpecs/delete', { fileId });
-      }
-    });
-    await Promise.all(promises);
-    setFilesToDelete([]);
-  };
-
-  const saveFiles = async (venueResponse: any) => {
+  const saveFiles = async (venueResponse) => {
     const callBack = async (response) => {
       if (!isNullOrEmpty(response)) {
         const fileRec = {
@@ -153,7 +139,6 @@ export default function AddEditVenueModal({
         await axios.post('/api/venue/techSpecs/create', fileRec);
       }
     };
-    console.log(fileList);
     const newFileList = [];
 
     const fileArr = fileList.map((file: any) => file?.file);
@@ -163,7 +148,6 @@ export default function AddEditVenueModal({
       formData.append('path', 'techSpecs');
       newFileList.push(formData);
     }
-    console.log(newFileList);
     await headlessUploadMultiple(newFileList, callBack);
   };
   return (
@@ -212,9 +196,6 @@ export default function AddEditVenueModal({
               validationErrors={validationErrors}
               updateValidationErrrors={updateValidationErrors}
               setFileList={setFileList}
-              fileList={fileList}
-              setFilesToDelete={setFilesToDelete}
-              filesToDelete={filesToDelete}
             />
             <div className="pt-7 ">
               <h2 className="text-xl text-primary-navy font-bold ">Barring</h2>
