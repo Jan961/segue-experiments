@@ -32,12 +32,13 @@ import {
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import { formattedDateWithDay, toISO } from 'services/dateService';
 import { EditDealMemoContractModal } from './EditDealMemoContractModal';
-import { transformToOptions } from 'utils';
+import { isNullOrEmpty, transformToOptions } from 'utils';
 import LoadingOverlay from 'components/shows/LoadingOverlay';
 import { attachmentsColDefs, contractsStyleProps } from '../tableConfig';
 import Table from 'components/core-ui-lib/Table';
 import { UploadModal } from 'components/core-ui-lib';
 import { attachmentMimeTypes } from 'components/core-ui-lib/UploadModal/interface';
+import { headlessUploadMultiple } from 'requests/upload';
 
 const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClose: () => void }) => {
   const productionJumpState = useRecoilValue(currentProductionSelector);
@@ -74,7 +75,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
 
   const [showUploadModal, setShowUploadModal] = useState<boolean>(false);
   const [contractAttatchmentRows, setContractAttatchmentRows] = useState([]);
-  const [filesForUpload, setFilesForUpload] = useState([]);
+  const [filesForUpload, setFilesForUpload] = useState<FormData[]>([]);
 
   const producerList = useMemo(() => {
     const list = {};
@@ -142,8 +143,25 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
     }
     setSaveBookingFormData({});
     setSaveContractFormData({});
+
+    await saveFiles();
+
     onClose();
     router.replace(router.asPath);
+  };
+
+  const saveFiles = async () => {
+    const callBack = async (response) => {
+      if (!isNullOrEmpty(response)) {
+        // const fileRec = {
+        //   FileId: response.data.id,
+        //   VenueId: venueResponse.data.Id,
+        //   Description: 'Tech Spec',
+        // };
+        // await axios.post('/api/venue/techSpecs/create', fileRec);
+      }
+    };
+    await headlessUploadMultiple(filesForUpload, callBack);
   };
 
   const handleCancelForm = (cancel: boolean) => {
@@ -166,12 +184,18 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
     callDealMemoApi();
   };
 
-  const onSave = async (file) => {
-    // filesForUpload - upload these on Save & Close, then on Modal load, put them into table.
-    // contractAttachmentRows - still add files that have not been uploaded yet
-    setFilesForUpload([...filesForUpload, file]);
+  const onSave = async (files) => {
+    const newFileList = [...filesForUpload];
+    for (const file of files) {
+      const formData = new FormData();
+      formData.append('file', file.file);
+      formData.append('path', 'contracts/attachments');
+      newFileList.push(formData);
+    }
+    setFilesForUpload(newFileList);
+
     setContractAttatchmentRows([
-      ...file.map((file) => {
+      ...files.map((file) => {
         return {
           FileOriginalFilename: file.name,
           FileUploadedDateTime: new Date(),
