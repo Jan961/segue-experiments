@@ -80,6 +80,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
   const [fileDeleteConfirm, setFileDeleteConfirm] = useState<boolean>();
   const [attachRow, setAttachRow] = useState();
   const [attachIndex, setAttachIndex] = useState();
+  const [filesToDelete, setFilesToDelete] = useState([]);
 
   const producerList = useMemo(() => {
     const list = {};
@@ -174,9 +175,24 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
     setSaveContractFormData({});
 
     await saveFiles();
+    await deleteFiles();
 
     onClose();
     router.replace(router.asPath);
+  };
+
+  const deleteFiles = async () => {
+    try {
+      await Promise.all(
+        filesToDelete.map(async (file) => {
+          console.log(file);
+          await axios.delete(`/api/file/delete?location=${file.FileLocation}`);
+          await axios.post(`/api/contracts/delete/attachments/${selectedTableCell.contract.Id}`, file);
+        }),
+      );
+    } catch (error) {
+      console.log(error, 'Error - failed to delete files from database');
+    }
   };
 
   const saveFiles = async () => {
@@ -257,13 +273,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
 
   const handleDeleteAttachment = async (data, rowIndex) => {
     if (data.FileUploaded) {
-      try {
-        await axios.delete(`/api/file/delete?location=${data.FileLocation}`);
-        await axios.post(`/api/contracts/delete/attachments/${selectedTableCell.contract.Id}`, data);
-      } catch (error) {
-        console.log(error);
-        setFileDeleteConfirm(false);
-      }
+      setFilesToDelete([...filesToDelete, data]);
     }
 
     const newRows = [...contractAttatchmentRows];
@@ -271,7 +281,6 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
       newRows.splice(rowIndex, 1);
     }
     setContractAttatchmentRows(newRows);
-
     setFileDeleteConfirm(false);
   };
 
