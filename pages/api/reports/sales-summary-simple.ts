@@ -50,6 +50,7 @@ import { currencyCodeToSymbolMap } from 'config/Reports';
 import { convertToPDF } from 'utils/report';
 import { calculateWeekNumber, getWeeksBetweenDates } from 'services/dateService';
 import { group, unique } from 'radash';
+import { addBorderToAllCells } from 'utils/export';
 
 interface ProductionWeek {
   mondayDate: string;
@@ -85,22 +86,22 @@ const fetchProductionBookings = async (productionId: number): Promise<Production
   conditions.push(Prisma.sql` SaleTypeName=${SALES_TYPE_NAME.GENERAL_SALES}`);
   const where: Prisma.Sql = conditions.length ? Prisma.sql` where ${Prisma.join(conditions, ' and ')}` : Prisma.empty;
   const data: any[] = await prisma.$queryRaw`select 
-                                                            FullProductionCode, 
-                                                            ProductionStartDate as StartDate, 
-                                                            ProductionEndDate as EndDate, 
-                                                            EntryName as Venue, 
-                                                            ProductionWeekNum,
-                                                            VenueCurrencyCode, 
-                                                            Location as Town, 
-                                                            EntryId as BookingId, 
-                                                            EntryDate as BookingFirstDate, 
-                                                            EntryStatusCode as BookingStatusCode,
-                                                            Value,
-                                                            ConversionRate,
-                                                            FinalSetSalesFiguresDate 
-                                                          FROM SalesSummaryView  
-                                                          ${where} 
-                                                          order by BookingFirstDate;`;
+                                                FullProductionCode, 
+                                                ProductionStartDate as StartDate, 
+                                                ProductionEndDate as EndDate, 
+                                                EntryName as Venue, 
+                                                ProductionWeekNum,
+                                                VenueCurrencyCode, 
+                                                Location as Town, 
+                                                EntryId as BookingId, 
+                                                EntryDate as BookingFirstDate, 
+                                                EntryStatusCode as BookingStatusCode,
+                                                Value,
+                                                ConversionRate,
+                                                FinalSetSalesFiguresDate
+                                              FROM SalesSummaryView  
+                                              ${where} 
+                                              order by BookingFirstDate;`;
   const summary = unique(data, (entry) => entry.BookingId)
     .map((entry) => ({
       ...entry,
@@ -638,6 +639,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     rowsToIgnore: 2,
     maxColWidth: Infinity,
   });
+  addBorderToAllCells({ worksheet });
   worksheet.getCell(1, 1).font = { size: 16, color: { argb: COLOR_HEXCODE.WHITE }, bold: true };
   if (format === 'pdf') {
     worksheet.pageSetup.printArea = `A1:${worksheet.getColumn(columns.length).letter}${row}`;
