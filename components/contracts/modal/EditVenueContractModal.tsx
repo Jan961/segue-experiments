@@ -162,7 +162,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
           Description: 'Contract Attachment',
         };
         try {
-          await axios.post('/api/contracts/create/attachments/', fileRec);
+          await axios.post(`/api/contracts/create/attachments/${selectedTableCell.contract.Id}`, fileRec);
         } catch (error) {
           console.log(error, 'Error - failed to update database with attachments');
         }
