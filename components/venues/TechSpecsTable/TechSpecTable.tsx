@@ -10,9 +10,10 @@ import { isNullOrEmpty } from 'utils';
 interface TechSpecTableProps {
   venueId: number;
   setFilesToSend: (params: any) => void;
+  setFilesToDelete: (params: any) => void;
 }
 
-export const TechSpecTable = ({ venueId, setFilesToSend }: TechSpecTableProps) => {
+export const TechSpecTable = ({ venueId, setFilesToSend, setFilesToDelete }: TechSpecTableProps) => {
   const [uploadVisible, setUploadVisible] = useState<boolean>(null);
   const [rowData, setRowData] = useState([]);
   const [confirmVisible, setConfirmVisible] = useState<boolean>(false);
@@ -31,7 +32,7 @@ export const TechSpecTable = ({ venueId, setFilesToSend }: TechSpecTableProps) =
     if (venueId && confirmVisible === false && uploadVisible !== true) {
       fetchFileList();
     }
-  }, [confirmVisible]);
+  }, []);
 
   const onSave = (files) => {
     let maxFileId = 0;
@@ -52,11 +53,8 @@ export const TechSpecTable = ({ venueId, setFilesToSend }: TechSpecTableProps) =
       setFilesToSend((prevFilesList) => prevFilesList.filter((file) => file.fileId !== fileToDelete.fileId));
       setFilesToUpload((prevFilesList) => prevFilesList.filter((file) => file.fileId !== fileToDelete.fileId));
     } else {
-      try {
-        await axios.post('/api/venue/techSpecs/delete', { fileId: fileToDelete.fileId });
-      } catch (exception) {
-        console.log(exception);
-      }
+      setRowData((prevRowData) => prevRowData.filter((file) => file.fileId !== fileToDelete.fileId));
+      setFilesToDelete((prevFileList) => [...prevFileList, fileToDelete.fileId]);
     }
     setFileToDelete(null);
     setConfirmVisible(false);

@@ -46,6 +46,7 @@ export default function AddEditVenueModal({
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [fileList, setFileList] = useState<FormData[]>([]);
+  const [deleteList, setDeleteList] = useState<number[]>([]);
   const cancelToken = useAxiosCancelToken();
   const handleInputChange = (field: string, value: any) => {
     let sanitizedValue = value;
@@ -84,9 +85,22 @@ export default function AddEditVenueModal({
     if (isValid) {
       const apiResponse = formData.id ? await updateVenue(formData) : await createVenue(formData);
       await saveFiles(apiResponse);
+      await deleteFiles();
     }
     await fetchVenues();
     setIsSaving(false);
+  };
+
+  const deleteFiles = async () => {
+    await Promise.all(
+      deleteList.map(async (file) => {
+        try {
+          await axios.post('/api/venue/techSpecs/delete', { fileId: file });
+        } catch (exception) {
+          console.log(exception);
+        }
+      }),
+    );
   };
 
   async function validateVenue(data: UiTransformedVenue) {
@@ -196,6 +210,7 @@ export default function AddEditVenueModal({
               validationErrors={validationErrors}
               updateValidationErrrors={updateValidationErrors}
               setFileList={setFileList}
+              setDeleteList={setDeleteList}
             />
             <div className="pt-7 ">
               <h2 className="text-xl text-primary-navy font-bold ">Barring</h2>

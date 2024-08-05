@@ -12,6 +12,7 @@ interface VenueTechnicalDetailsFormProps {
   onChange: (data: any) => void;
   updateValidationErrrors?: (key: string, value: string) => void;
   setFileList: (data: any) => void;
+  setDeleteList: (data: any) => void;
 }
 
 const VenueTechnicalDetailsForm = ({
@@ -20,6 +21,7 @@ const VenueTechnicalDetailsForm = ({
   onChange,
   updateValidationErrrors,
   setFileList,
+  setDeleteList,
 }: VenueTechnicalDetailsFormProps) => {
   const [formData, setFormData] = useState<Partial<UiTransformedVenue>>({ ...initialVenueTechnicalDetails, ...venue });
 
@@ -57,7 +59,7 @@ const VenueTechnicalDetailsForm = ({
           {validationErrors.techSpecsUrl && <small className="text-primary-red">{validationErrors.techSpecsUrl}</small>}
         </div>
       </div>
-      <TechSpecTable venueId={venue.id} setFilesToSend={setFileList} />
+      <TechSpecTable venueId={venue.id} setFilesToSend={setFileList} setFilesToDelete={setDeleteList} />
       <div className="grid grid-cols-2 gap-5 pt-5">
         <div className="flex flex-col gap-5">
           <label htmlFor="" className="grid grid-cols-[100px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
