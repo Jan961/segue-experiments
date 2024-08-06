@@ -53,9 +53,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
   });
   console.log(formData);
   const [demoModalData, setDemoModalData] = useState<Partial<DealMemoContractFormData>>({});
-  const modalTitle = `${productionJumpState.ShowCode + productionJumpState.Code}  ${productionJumpState.ShowName} | ${
-    selectedTableCell.contract.venue
-  } | ${formattedDateWithDay(productionJumpState.StartDate)} - ${formattedDateWithDay(productionJumpState.EndDate)}`;
+  const [modalTitle, setModalTitle] = useState<string>();
   const { fetchData } = useAxios();
   const router = useRouter();
   const { users } = useRecoilValue(userState);
@@ -78,6 +76,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
   const [attachRow, setAttachRow] = useState();
   const [attachIndex, setAttachIndex] = useState();
   const [filesToDelete, setFilesToDelete] = useState([]);
+  const [lastDates, setLastDates] = useState([]);
 
   const producerList = useMemo(() => {
     const list = {};
@@ -130,9 +129,33 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
         console.log(error, 'Error - failed to fetch contract file attachments');
       }
     };
+
+    const getLastDates = async () => {
+      const productionId = productionJumpState.Id;
+      if (!productionId) return;
+      try {
+        const { data } = await axios(`/api/performances/lastDate/${productionId}`);
+        setLastDates(data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
     callDealMemoData();
     fetchContractAttachments();
+    getLastDates();
   }, []);
+
+  useEffect(() => {
+    const lastDate = lastDates.find((date) => date.BookingId === formData.Id)?.LastPerformanceDate;
+    const formattedLastDate = formattedDateWithDay(lastDate);
+    const lastPerformanceDate =
+      formattedLastDate === formattedDateWithDay(formData.FirstDate) ? '' : `- ${formattedLastDate}`;
+    const title = `${productionJumpState.ShowCode + productionJumpState.Code}  ${productionJumpState.ShowName} | ${
+      selectedTableCell.contract.venue
+    } | ${formattedDateWithDay(formData.FirstDate)} ${lastPerformanceDate}`;
+    setModalTitle(title);
+  }, [lastDates]);
 
   const editContractModalData = async (key: string, value, type: string) => {
     const updatedFormData = {

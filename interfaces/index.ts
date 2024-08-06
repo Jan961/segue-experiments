@@ -638,6 +638,8 @@ export interface VenueContractFormData {
   status: string;
   SignedBy: string;
   currencyCode: string;
+  FirstDate: string;
+  Id: string;
 }
 
 export interface SaveContractFormState {
