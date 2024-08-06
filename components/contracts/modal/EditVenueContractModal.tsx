@@ -6,12 +6,7 @@ import DateInput from 'components/core-ui-lib/DateInput';
 import TextArea from 'components/core-ui-lib/TextArea/TextArea';
 import Checkbox from 'components/core-ui-lib/Checkbox';
 import TextInput from 'components/core-ui-lib/TextInput';
-import {
-  allStatusOptions,
-  contractsKeyStatusMap,
-  dealTypeOptions,
-  initialEditContractFormData,
-} from 'config/contracts';
+import { allStatusOptions, dealTypeOptions, initialEditContractFormData } from 'config/contracts';
 import { useRecoilValue } from 'recoil';
 import { useRouter } from 'next/router';
 import { currentProductionSelector } from 'state/booking/selectors/currentProductionSelector';
@@ -55,6 +50,8 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
     ...initialEditContractFormData,
     ...selectedTableCell.contract,
   });
+  console.log(formData.StatusCode);
+  console.log(allStatusOptions);
   const [demoModalData, setDemoModalData] = useState<Partial<DealMemoContractFormData>>({});
   const modalTitle = `${productionJumpState.ShowCode + productionJumpState.Code} | ${productionJumpState.ShowName} | ${
     selectedTableCell.contract.venue
@@ -313,9 +310,9 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
               <Select
                 options={allStatusOptions}
                 className="bg-primary-white w-full"
-                placeholder="Deal Memo Status"
+                placeholder="Select Deal Memo Status"
                 onChange={(value) => editContractModalData('dealMemoStatus', value, 'booking')}
-                value={contractsKeyStatusMap[formData.StatusCode]}
+                value={formData.StatusCode}
                 isClearable
                 isSearchable
               />
