@@ -12,7 +12,7 @@ SELECT
   `frtxigoo_dev`.`Show`.`ShowCode` AS `ShowCode`,
   `frtxigoo_dev`.`Show`.`ShowName` AS `ShowName`,
   `frtxigoo_dev`.`Show`.`ShowType` AS `ShowType`,
-  `frtxigoo_dev`.`Production`.`ProductionLogo` AS `ProductionLogo`,
+  `frtxigoo_dev`.`Production`.`ProductionLogoFileId` AS `ProductionLogoFileId`,
 (
     SELECT
       `frtxigoo_dev`.`DateBlock`.`DateBlockStartDate`

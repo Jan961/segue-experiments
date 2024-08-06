@@ -1,5 +1,5 @@
 SELECT
-  `ProductionView`.`FullProductionCode` AS `FullProductionCode`,
+  `frtxigoo_dev`.`ProductionView`.`FullProductionCode` AS `FullProductionCode`,
   `frtxigoo_dev`.`Venue`.`VenueCode` AS `VenueCode`,
   `frtxigoo_dev`.`Venue`.`VenueName` AS `VenueName`,
   `frtxigoo_dev`.`Venue`.`VenueSeats` AS `VenueSeats`,
@@ -11,36 +11,36 @@ SELECT
   sum(`BookingHoldCompUnionView`.`Seats`) AS `Seats`,
 (
     SELECT
-      `SalesSetTotalsView`.`Seats`
+      `frtxigoo_dev`.`SalesSetTotalsView`.`Seats`
     FROM
       `frtxigoo_dev`.`SalesSetTotalsView`
     WHERE
-      `SalesSetTotalsView`.`SetBookingId` = `frtxigoo_dev`.`Booking`.`BookingId`
-      AND `SalesSetTotalsView`.`SaleTypeName` = 'General Sales'
-      AND `SalesSetTotalsView`.`SetSalesFiguresDate` = (
+      `frtxigoo_dev`.`SalesSetTotalsView`.`SetBookingId` = `frtxigoo_dev`.`Booking`.`BookingId`
+      AND `frtxigoo_dev`.`SalesSetTotalsView`.`SaleTypeName` = 'General Sales'
+      AND `frtxigoo_dev`.`SalesSetTotalsView`.`SetSalesFiguresDate` = (
         SELECT
           max(`SS1`.`SetSalesFiguresDate`)
         FROM
           `frtxigoo_dev`.`SalesSet` `SS1`
         WHERE
-          `SS1`.`SetBookingId` = `SalesSetTotalsView`.`SetBookingId`
+          `SS1`.`SetBookingId` = `frtxigoo_dev`.`SalesSetTotalsView`.`SetBookingId`
       )
   ) AS `SoldSeats`,
 (
     SELECT
-      `SalesSetTotalsView`.`Seats`
+      `frtxigoo_dev`.`SalesSetTotalsView`.`Seats`
     FROM
       `frtxigoo_dev`.`SalesSetTotalsView`
     WHERE
-      `SalesSetTotalsView`.`SetBookingId` = `frtxigoo_dev`.`Booking`.`BookingId`
-      AND `SalesSetTotalsView`.`SaleTypeName` = 'General Reserved'
-      AND `SalesSetTotalsView`.`SetSalesFiguresDate` = (
+      `frtxigoo_dev`.`SalesSetTotalsView`.`SetBookingId` = `frtxigoo_dev`.`Booking`.`BookingId`
+      AND `frtxigoo_dev`.`SalesSetTotalsView`.`SaleTypeName` = 'General Reserved'
+      AND `frtxigoo_dev`.`SalesSetTotalsView`.`SetSalesFiguresDate` = (
         SELECT
           max(`SS1`.`SetSalesFiguresDate`)
         FROM
           `frtxigoo_dev`.`SalesSet` `SS1`
         WHERE
-          `SS1`.`SetBookingId` = `SalesSetTotalsView`.`SetBookingId`
+          `SS1`.`SetBookingId` = `frtxigoo_dev`.`SalesSetTotalsView`.`SetBookingId`
       )
   ) AS `ReservedSeats`
 FROM
@@ -50,7 +50,7 @@ FROM
         (
           `frtxigoo_dev`.`ProductionView`
           JOIN `frtxigoo_dev`.`DateBlock` ON(
-            `ProductionView`.`ProductionId` = `frtxigoo_dev`.`DateBlock`.`DateBlockProductionId`
+            `frtxigoo_dev`.`ProductionView`.`ProductionId` = `frtxigoo_dev`.`DateBlock`.`DateBlockProductionId`
           )
         )
         JOIN `frtxigoo_dev`.`Booking` ON(
@@ -74,7 +74,7 @@ FROM
     )
   )
 GROUP BY
-  `ProductionView`.`FullProductionCode`,
+  `frtxigoo_dev`.`ProductionView`.`FullProductionCode`,
   `frtxigoo_dev`.`Venue`.`VenueCode`,
   `frtxigoo_dev`.`Venue`.`VenueName`,
   `frtxigoo_dev`.`Venue`.`VenueSeats`,

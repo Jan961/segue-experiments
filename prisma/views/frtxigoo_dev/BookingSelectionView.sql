@@ -2,14 +2,14 @@ SELECT
   `frtxigoo_dev`.`Booking`.`BookingId` AS `BookingId`,
   `frtxigoo_dev`.`Booking`.`BookingStatusCode` AS `BookingStatusCode`,
   `frtxigoo_dev`.`Booking`.`BookingFirstDate` AS `BookingFirstDate`,
-  `VenueView`.`VenueId` AS `VenueId`,
-  `VenueView`.`VenueCode` AS `VenueCode`,
-  `VenueView`.`VenueMainAddressTown` AS `VenueMainAddressTown`,
-  `ProductionView`.`ProductionId` AS `ProductionId`,
-  `ProductionView`.`FullProductionCode` AS `FullProductionCode`,
+  `frtxigoo_dev`.`VenueView`.`VenueId` AS `VenueId`,
+  `frtxigoo_dev`.`VenueView`.`VenueCode` AS `VenueCode`,
+  `frtxigoo_dev`.`VenueView`.`VenueMainAddressTown` AS `VenueMainAddressTown`,
+  `frtxigoo_dev`.`ProductionView`.`ProductionId` AS `ProductionId`,
+  `frtxigoo_dev`.`ProductionView`.`FullProductionCode` AS `FullProductionCode`,
   `CalculateWeekNum`(
-    `ProductionView`.`ProductionEndDate`,
-    `ProductionView`.`ProductionStartDate`
+    `frtxigoo_dev`.`ProductionView`.`ProductionEndDate`,
+    `frtxigoo_dev`.`ProductionView`.`ProductionStartDate`
   ) AS `ProductionLengthWeeks`
 FROM
   (
@@ -17,7 +17,7 @@ FROM
       (
         `frtxigoo_dev`.`Booking`
         JOIN `frtxigoo_dev`.`VenueView` ON(
-          `frtxigoo_dev`.`Booking`.`BookingVenueId` = `VenueView`.`VenueId`
+          `frtxigoo_dev`.`Booking`.`BookingVenueId` = `frtxigoo_dev`.`VenueView`.`VenueId`
         )
       )
       JOIN `frtxigoo_dev`.`DateBlock` ON(
@@ -25,6 +25,6 @@ FROM
       )
     )
     JOIN `frtxigoo_dev`.`ProductionView` ON(
-      `ProductionView`.`ProductionId` = `frtxigoo_dev`.`DateBlock`.`DateBlockProductionId`
+      `frtxigoo_dev`.`ProductionView`.`ProductionId` = `frtxigoo_dev`.`DateBlock`.`DateBlockProductionId`
     )
   )

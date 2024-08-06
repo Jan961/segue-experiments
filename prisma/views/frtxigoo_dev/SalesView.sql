@@ -11,12 +11,14 @@ SELECT
     `frtxigoo_dev`.`Booking`.`BookingFirstDate`,
     `ProductionView`.`ProductionStartDate`
   ) AS `BookingProductionWeekNum`,
-  `VenueView`.`VenueMainAddressTown` AS `VenueTown`,
-  `VenueView`.`VenueCode` AS `VenueCode`,
-  `VenueView`.`VenueName` AS `VenueName`,
-  `VenueView`.`VenueCurrencyCode` AS `VenueCurrencyCode`,
+  `frtxigoo_dev`.`VenueView`.`VenueMainAddressTown` AS `VenueTown`,
+  `frtxigoo_dev`.`VenueView`.`VenueCode` AS `VenueCode`,
+  `frtxigoo_dev`.`VenueView`.`VenueName` AS `VenueName`,
+  `frtxigoo_dev`.`VenueView`.`VenueCurrencyCode` AS `VenueCurrencyCode`,
+  `frtxigoo_dev`.`Currency`.`CurrencySymbolUnicode` AS `VenueCurrencySymbolUnicode`,
   `frtxigoo_dev`.`ConversionRate`.`ConversionToCurrencyCode` AS `ConversionToCurrencyCode`,
   `frtxigoo_dev`.`ConversionRate`.`ConversionRate` AS `ConversionRate`,
+  `frtxigoo_dev`.`SalesSet`.`SetId` AS `SetId`,
   `frtxigoo_dev`.`SalesSet`.`SetSalesFiguresDate` AS `SetSalesFiguresDate`,
   `CalculateWeekNum`(
     `frtxigoo_dev`.`SalesSet`.`SetSalesFiguresDate`,
@@ -47,7 +49,7 @@ SELECT
       `frtxigoo_dev`.`Performance`
     WHERE
       `frtxigoo_dev`.`Performance`.`PerformanceBookingId` = `frtxigoo_dev`.`Booking`.`BookingId`
-  ) * `VenueView`.`VenueSeats` AS `TotalCapacity`,
+  ) * `frtxigoo_dev`.`VenueView`.`VenueSeats` AS `TotalCapacity`,
   `FinalFiguresSet`.`SetSalesFiguresDate` AS `FinalFiguresDate`,
   `FinalFiguresTotals`.`Seats` AS `FinalFiguresSeats`,
   `FinalFiguresTotals`.`Value` AS `FinalFiguresValue`,
@@ -85,15 +87,15 @@ FROM
                       )
                     )
                     JOIN `frtxigoo_dev`.`VenueView` ON(
-                      `frtxigoo_dev`.`Booking`.`BookingVenueId` = `VenueView`.`VenueId`
+                      `frtxigoo_dev`.`Booking`.`BookingVenueId` = `frtxigoo_dev`.`VenueView`.`VenueId`
                     )
                   )
                   JOIN `frtxigoo_dev`.`Currency` ON(
-                    `VenueView`.`VenueCurrencyCode` = `frtxigoo_dev`.`Currency`.`CurrencyCode`
+                    `frtxigoo_dev`.`VenueView`.`VenueCurrencyCode` = `frtxigoo_dev`.`Currency`.`CurrencyCode`
                   )
                 )
                 LEFT JOIN `frtxigoo_dev`.`ConversionRate` ON(
-                  `VenueView`.`VenueCurrencyCode` = `frtxigoo_dev`.`ConversionRate`.`ConversionFromCurrencyCode`
+                  `frtxigoo_dev`.`VenueView`.`VenueCurrencyCode` = `frtxigoo_dev`.`ConversionRate`.`ConversionFromCurrencyCode`
                   AND `ProductionView`.`ProductionId` = `frtxigoo_dev`.`ConversionRate`.`ConversionProductionId`
                 )
               )

@@ -1,5 +1,5 @@
 import { Account, AccountContact } from '@prisma/client';
-import prisma from 'lib/prisma';
+import prisma from 'lib/prisma_master';
 import { omit } from 'radash';
 export const createAccount = async (account: Partial<Account>, tx = prisma) => {
   const newAccount = await tx.account.create({
