@@ -637,6 +637,7 @@ export interface VenueContractFormData {
   DealNotes: string;
   status: string;
   SignedBy: string;
+  currencyCode: string;
 }
 
 export interface SaveContractFormState {

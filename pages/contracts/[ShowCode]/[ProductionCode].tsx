@@ -73,7 +73,9 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     (v) => v.Id,
     (v: any) => {
       const Town: string | null = v.VenueAddress.find((address: any) => address?.TypeName === 'Main')?.Town ?? null;
-      return { Id: v.Id, Code: v.Code, Name: v.Name, Town, Seats: v.Seats, Count: 0 };
+      const CurrencyCode: string | null =
+        v.VenueAddress.find((address: any) => address?.TypeName === 'Main')?.Country?.Currency?.SymbolUnicode ?? null;
+      return { Id: v.Id, Code: v.Code, Name: v.Name, Town, Seats: v.Seats, Count: 0, CurrencyCode };
     },
   );
   const dayTypeMap = objectify(dateTypeRaw, (type: DateType) => type.Id);

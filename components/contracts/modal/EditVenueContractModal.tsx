@@ -35,6 +35,7 @@ import { UploadModal } from 'components/core-ui-lib';
 import { attachmentMimeTypes } from 'components/core-ui-lib/UploadModal/interface';
 import { headlessUploadMultiple } from 'requests/upload';
 import { getFileUrl } from 'lib/s3';
+import charCodeToCurrency from 'utils/charCodeToCurrency';
 
 const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClose: () => void }) => {
   const productionJumpState = useRecoilValue(currentProductionSelector);
@@ -561,7 +562,9 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
               </div>
               <div className="w-4/5 flex items-center justify-between">
                 <div className="flex  items-center">
-                  <div className=" text-primary-input-text font-bold text-sm mr-1">£</div>
+                  <div className=" text-primary-input-text font-bold text-sm mr-1">
+                    {charCodeToCurrency(formData.currencyCode)}
+                  </div>
                   <TextInput id="venueText" className="w-[100px]" />
                 </div>
                 <div className="flex  items-center">
