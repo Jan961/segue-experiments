@@ -3,9 +3,23 @@ import prisma from 'lib/prisma';
 import { addDurationToDate, getMonday } from 'services/dateService';
 import { getEmailFromReq, checkAccess, getAccountIdFromReq } from 'services/userService';
 
-export type LastPerfDate = {
-  BookingId: number;
-  LastPerformanaceDate: string;
+interface Hold {
+  name: string;
+  seats: number;
+  value: number;
+  id: number;
+}
+
+interface Comp {
+  name: string;
+  seats: number;
+  id: number;
+}
+
+type Res = {
+  holds: Array<Hold>;
+  comps: Array<Comp>;
+  setId: number;
 };
 
 // date-fns startOfDay not applicable for this use case
@@ -232,6 +246,45 @@ const copyData = async (data, datesTried, bookingId) => {
   return results[results.length - 1];
 };
 
+const getDealMemoHoldsByBookingId = async (bookingId: number) => {
+  const booking = await prisma.booking.findUnique({
+    where: {
+      Id: bookingId,
+    },
+    include: {
+      DealMemo: true,
+    },
+  });
+
+  // if there is no dealMemo record against the booking return an empty array
+  if (booking?.DealMemo === null) {
+    return [];
+  }
+
+  const dealMemoHolds = await prisma.dealMemoHold.findMany({
+    where: {
+      DMHoldDeMoId: booking?.DealMemo.DeMoId,
+    },
+    include: {
+      HoldType: {
+        select: {
+          HoldTypeId: true,
+          HoldTypeName: true,
+        },
+      },
+    },
+  });
+
+  return dealMemoHolds.map((hold) => {
+    return {
+      name: hold.HoldType.HoldTypeName,
+      seats: hold.DMHoldSeats,
+      value: hold.DMHoldValue,
+      id: hold.HoldType.HoldTypeId,
+    };
+  });
+};
+
 export default async function handle(req, res) {
   try {
     const bookingId = parseInt(req.body.bookingId);
@@ -243,7 +296,7 @@ export default async function handle(req, res) {
     const access = await checkAccess(email);
     if (!access) return res.status(401).end();
 
-    let result = {};
+    let result: Res = null;
 
     const { SalesFrequency } = await prisma.production.findUnique({
       where: {
@@ -291,6 +344,15 @@ export default async function handle(req, res) {
         // if the first sales date has been reached, there is no comps/holds to recover
         // if this is the case, return blank values
         if (firstSalesDate.getTime() === startOfDay(currentDate).getTime()) {
+          // as there is no hold/comp data found - the hold data is copied from the deal memo
+          const dealMemoHolds = await getDealMemoHoldsByBookingId(bookingId);
+
+          // if dealMemoHolds has a length of 0, there is no dealMemo stored against the booking.
+          // only actions if dealMemoHolds is greater than 0
+          if (dealMemoHolds.length > 0) {
+            result = { ...result, holds: dealMemoHolds };
+          }
+
           res.status(200).json(result);
         }
       }
