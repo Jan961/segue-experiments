@@ -112,6 +112,7 @@ model Contract {
   Exceptions           String?                @map("ContractExceptions") @db.LongText
   Booking              Booking                @relation(fields: [BookingId], references: [Id], onDelete: Cascade, map: "Booking_Contract")
   ContractAttachedFile ContractAttachedFile[]
+  ContractFile         ContractFile[]
 }
 
 model Currency {
@@ -719,10 +720,10 @@ model Production {
   ProductionTask        ProductionTask[]
 
   @@unique([Code, ShowId], map: "SECONDARY")
-  @@index([LogoFileId], map: "Production_File")
   @@index([ShowId], map: "Show_Production")
   @@index([ReportCurrencyCode], map: "Currency_Production")
   @@index([ProdCoId], map: "ProductionCompany_Production")
+  @@index([LogoFileId], map: "Production_File")
 }
 
 model ProductionTask {
@@ -1071,9 +1072,9 @@ model ACCContract {
 
   @@index([CheckedByAccUserId], map: "AccountUser_AccContract_Checker")
   @@index([CompletedByAccUserId], map: "AccountUser_AccContract_Completer")
+  @@index([ACCCRehearsalVenueId], map: "Venue_ACCContract")
   @@index([CurrencyCode], map: "CA")
   @@index([ACCCProductionId], map: "Production_ACCContract")
-  @@index([ACCCRehearsalVenueId], map: "Venue_ACCContract")
 }
 
 model ACCContractPerson {
@@ -1279,6 +1280,17 @@ model ACCClause {
 
   @@index([ACCContractId], map: "ACCContract_ACCClause")
   @@index([StdClauseId], map: "ACCStandardClause_ACCClause")
+}
+
+model ContractFile {
+  ContractFileId                Int      @id @default(autoincrement())
+  ContractFileContractBookingId Int
+  ContractFileFileId            Int
+  ContractFileType              String?  @db.VarChar(20)
+  ContractFileDescription       String?  @db.VarChar(80)
+  Contract                      Contract @relation(fields: [ContractFileContractBookingId], references: [BookingId], onDelete: Cascade, map: "Contract_ContractFile")
+
+  @@index([ContractFileContractBookingId], map: "Contract_ContractFile")
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
