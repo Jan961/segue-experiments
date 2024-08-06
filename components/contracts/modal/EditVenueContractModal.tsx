@@ -53,7 +53,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
   });
   console.log(formData);
   const [demoModalData, setDemoModalData] = useState<Partial<DealMemoContractFormData>>({});
-  const modalTitle = `${productionJumpState.ShowCode + productionJumpState.Code} | ${productionJumpState.ShowName} | ${
+  const modalTitle = `${productionJumpState.ShowCode + productionJumpState.Code}  ${productionJumpState.ShowName} | ${
     selectedTableCell.contract.venue
   } | ${formattedDateWithDay(productionJumpState.StartDate)} - ${formattedDateWithDay(productionJumpState.EndDate)}`;
   const { fetchData } = useAxios();
@@ -571,6 +571,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                   <div className=" text-primary-input-text font-bold text-sm mr-1">Royalty</div>
                   <TextInput
                     id="venueText"
+                    type="number"
                     className="w-[100px]"
                     value={formData.RoyaltyPercentage}
                     onChange={(value) => editContractModalData('RoyaltyPercentage', value.target.value, 'contract')}
@@ -580,7 +581,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
 
                 <div className="flex  items-center">
                   <div className=" text-primary-input-text font-bold text-sm mr-1">Promoter</div>
-                  <TextInput id="venueText" className="w-[100px]" />
+                  <TextInput id="venueText" type="number" className="w-[100px]" />
                   <div className=" text-primary-input-text font-bold text-sm ml-1">%</div>
                 </div>
               </div>
