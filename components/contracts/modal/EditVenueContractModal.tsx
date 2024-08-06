@@ -6,7 +6,7 @@ import DateInput from 'components/core-ui-lib/DateInput';
 import TextArea from 'components/core-ui-lib/TextArea/TextArea';
 import Checkbox from 'components/core-ui-lib/Checkbox';
 import TextInput from 'components/core-ui-lib/TextInput';
-import { allStatusOptions, dealTypeOptions, initialEditContractFormData } from 'config/contracts';
+import { statusOptions, dealTypeOptions, initialEditContractFormData } from 'config/contracts';
 import { useRecoilValue } from 'recoil';
 import { useRouter } from 'next/router';
 import { currentProductionSelector } from 'state/booking/selectors/currentProductionSelector';
@@ -305,7 +305,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
               </div>
               <div className=" text-primary-input-text font-bold text-sm mt-1.5">Deal Memo Status</div>
               <Select
-                options={allStatusOptions}
+                options={statusOptions}
                 className="bg-primary-white w-full"
                 placeholder="Select Deal Memo Status"
                 onChange={(value) => editContractModalData('dealMemoStatus', value, 'booking')}
@@ -430,7 +430,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                   className="bg-primary-white w-full"
                   value={formData.StatusCode}
                   placeholder="Contract Status"
-                  options={allStatusOptions}
+                  options={statusOptions}
                   isClearable
                   isSearchable
                 />
