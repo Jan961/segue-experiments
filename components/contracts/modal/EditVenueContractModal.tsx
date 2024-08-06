@@ -50,8 +50,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
     ...initialEditContractFormData,
     ...selectedTableCell.contract,
   });
-  console.log(formData.StatusCode);
-  console.log(allStatusOptions);
+  console.log(formData);
   const [demoModalData, setDemoModalData] = useState<Partial<DealMemoContractFormData>>({});
   const modalTitle = `${productionJumpState.ShowCode + productionJumpState.Code} | ${productionJumpState.ShowName} | ${
     selectedTableCell.contract.venue
@@ -149,8 +148,6 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
   };
 
   const handleFormData = async () => {
-    console.log(filesForUpload);
-
     const bookingData = Object.keys(saveBookingFormData).length > 0;
     const contractData = Object.keys(saveContractFormData).length > 0;
     if (contractData) {
@@ -182,7 +179,6 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
     try {
       await Promise.all(
         filesToDelete.map(async (file) => {
-          console.log(file);
           await axios.delete(`/api/file/delete?location=${file.FileLocation}`);
           await axios.post(`/api/contracts/delete/attachments/${selectedTableCell.contract.Id}`, file);
         }),
@@ -548,14 +544,14 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
             </div>
             <div className="flex mt-2.5 items-center">
               <div className="w-1/5">
-                <div className=" text-primary-input-text font-bold text-sm">Notes</div>
+                <div className=" text-primary-input-text font-bold text-sm">Details</div>
               </div>
 
               <div className="w-4/5">
                 <TextArea
                   className="mt-2.5 h-[58px] w-[498px]"
-                  value={formData.bookingNotes}
-                  onChange={(value) => editContractModalData('bookingNotes', value.target.value, 'booking')}
+                  value={formData.Notes}
+                  onChange={(value) => editContractModalData('Notes', value.target.value, 'contract')}
                 />
               </div>
             </div>
