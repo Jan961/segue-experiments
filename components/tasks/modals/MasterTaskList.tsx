@@ -9,6 +9,10 @@ import { tileColors } from 'config/global';
 import axios from 'axios';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import Loader from 'components/core-ui-lib/Loader';
+import { isNullOrEmpty } from 'utils';
+import ExistingTasks from './ExistingTasks';
+import { useRouter } from 'next/router';
+import { productionState } from 'state/tasks/productionState';
 
 interface MasterTaskListProps {
   visible: boolean;
@@ -30,7 +34,10 @@ const MasterTaskList = ({ visible, onClose, productionId }: MasterTaskListProps)
   const [rowData, setRowData] = useState([]);
   const [confirm, setConfirm] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
-
+  const [showExistingTaskModal, setShowExistingTaskModal] = useState<boolean>(false);
+  const [duplicateTasks, setDuplicateTasks] = useState([]);
+  const unfilteredTasks = useRecoilValue(productionState).filter((prod) => prod.Id === productionId)[0]?.Tasks || [];
+  const router = useRouter();
   const handleFetchTasks = async () => {
     setLoading(true);
     try {
@@ -41,6 +48,33 @@ const MasterTaskList = ({ visible, onClose, productionId }: MasterTaskListProps)
       setLoading(false);
       console.error(error);
     }
+  };
+
+  const findDuplicateTasks = () => {
+    const duplicateTasks = [];
+    const mtrList = [];
+    const singleList = [];
+    selectedRows.forEach((task) => {
+      unfilteredTasks.forEach((existingTask) => {
+        if (isNullOrEmpty(existingTask?.CopiedFrom)) return;
+        if (
+          existingTask?.CopiedFrom === 'D' &&
+          task?.MTRId === existingTask.CopiedId &&
+          !mtrList.includes(task.MTRId)
+        ) {
+          duplicateTasks.push(task);
+          mtrList.push(task.MTRId);
+        } else if (
+          existingTask?.CopiedFrom === 'M' &&
+          task?.Id === existingTask.CopiedId &&
+          !singleList.includes(task.Id)
+        ) {
+          duplicateTasks.push(task);
+          singleList.push(task.Id);
+        }
+      });
+    });
+    return duplicateTasks;
   };
 
   useEffect(() => {
@@ -77,18 +111,28 @@ const MasterTaskList = ({ visible, onClose, productionId }: MasterTaskListProps)
     }
   };
 
-  const handleSubmit = async () => {
+  const createTasks = async () => {
     setLoading(true);
-
     try {
-      const endpoint = '/api/tasks/addfrom/master';
+      const endpoint = `/api/tasks/addfrom/master/${isNullOrEmpty(productionId) ? 'master' : 'production'}`;
       await axios.post(endpoint, { selectedTaskList: selectedRows, ProductionId: productionId });
       setLoading(false);
+      await router.replace(router.asPath);
       onClose('data-added');
     } catch (error) {
       setLoading(false);
       onClose();
       console.error(error);
+    }
+  };
+
+  const handleSubmit = async () => {
+    const duplicates = findDuplicateTasks();
+    setDuplicateTasks(duplicates);
+    if (duplicates.length > 0) {
+      setShowExistingTaskModal(true);
+    } else {
+      await createTasks();
     }
   };
 
@@ -131,6 +175,17 @@ const MasterTaskList = ({ visible, onClose, productionId }: MasterTaskListProps)
         }}
         onNoClick={() => setConfirm(false)}
         hasOverlay={true}
+      />
+      <ExistingTasks
+        visible={showExistingTaskModal}
+        onCancel={() => {
+          setShowExistingTaskModal(false);
+        }}
+        onConfirm={async () => {
+          setShowExistingTaskModal(false);
+          await createTasks();
+        }}
+        duplicateList={duplicateTasks}
       />
     </PopupModal>
   );
