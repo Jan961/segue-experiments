@@ -309,7 +309,6 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                 className="bg-primary-white w-full"
                 placeholder="Select Deal Memo Status"
                 onChange={(value) => editContractModalData('dealMemoStatus', value, 'booking')}
-                value={formData.StatusCode}
                 isClearable
                 isSearchable
               />
@@ -360,7 +359,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
               </div>
 
               <div className=" text-primary-input-text font-bold text-sm mt-6">Notes</div>
-              <TextArea className="h-[125px] w-[400px]" value={formData.DealNotes} />
+              <TextArea className="h-[125px] w-[400px]" value="" />
             </div>
             <div className="flex flex-col gap-y-2">
               <div className="w-[423px] flex justify-end">
@@ -429,7 +428,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                   onChange={(value) => editContractModalData('StatusCode', value, 'contract')}
                   className="bg-primary-white w-full"
                   value={formData.StatusCode}
-                  placeholder="Contract Status"
+                  placeholder="Select Contract Status"
                   options={statusOptions}
                   isClearable
                   isSearchable
@@ -551,7 +550,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
               <div className="w-4/5">
                 <TextArea
                   className="mt-2.5 h-[58px] w-[498px]"
-                  value={formData.Notes}
+                  value={formData.DealNotes}
                   onChange={(value) => editContractModalData('Notes', value.target.value, 'contract')}
                 />
               </div>
