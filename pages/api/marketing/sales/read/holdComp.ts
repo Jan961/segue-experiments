@@ -172,8 +172,8 @@ const isDataAvailable = (data) => {
   return !checksArray.every((item) => item === true);
 };
 
-const copyData = (data, datesTried, bookingId) => {
-  datesTried.forEach(async (dtIn) => {
+const copyData = async (data, datesTried, bookingId) => {
+  const promises = datesTried.map(async (dtIn) => {
     // create a SalesSet and get a setID for this week that has no data
     const setResult = await prisma.SalesSet.create({
       data: {
@@ -222,7 +222,14 @@ const copyData = (data, datesTried, bookingId) => {
     });
 
     await prisma.$transaction(dbUpdates);
+
+    // Return the setId for each created SalesSet
+    return setResult.SetId;
   });
+
+  // Wait for all promises to complete and return the last setId
+  const results = await Promise.all(promises);
+  return results[results.length - 1];
 };
 
 export default async function handle(req, res) {
@@ -291,7 +298,8 @@ export default async function handle(req, res) {
 
     // if tried dates is greater than 0, we need to copy the new found data into the weeks that were missed
     if (triedDates.length > 0) {
-      copyData(result, triedDates, bookingId);
+      const latestSetId = await copyData(result, triedDates, bookingId);
+      result = { ...result, setId: latestSetId };
     }
 
     res.status(200).json(result);

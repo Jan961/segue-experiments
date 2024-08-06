@@ -443,9 +443,7 @@ export const salesColDefs = (schoolDataAvail, isMarketing, booking, setSalesActi
         const currSchResValue =
           params.data.schReservations === '' ? 0 : parseFloat(stripSymbolAndRound(params.data.schReservations));
         const currGenResValue =
-          params.data.genReservations === ''
-            ? 0
-            : parseFloat(stripSymbolAndRound(params.data.genReservations.substring(1)));
+          params.data.genReservations === '' ? 0 : parseFloat(stripSymbolAndRound(params.data.genReservations));
         const totalReserve = currSchResValue + currGenResValue;
         const currSchSoldVal =
           params.data.schTotalValue === '' ? 0 : parseFloat(stripSymbolAndRound(params.data.schTotalValue));
@@ -455,6 +453,7 @@ export const salesColDefs = (schoolDataAvail, isMarketing, booking, setSalesActi
 
         const currencySymbol = params.data.genTotalValue.charAt(0);
         const currentValue = totalReserve + totalSold;
+
         return currentValue === 0 ? '-' : currencySymbol + currentValue.toFixed(2).toString();
       },
       width: 100,
@@ -505,7 +504,7 @@ export const salesColDefs = (schoolDataAvail, isMarketing, booking, setSalesActi
 
         // if negative display the minus sign before the currencySymbol
         if (valueChange < 0) {
-          return currencySymbol + '-' + (valueChange * -1).toFixed(2).toString();
+          return '-' + currencySymbol + (valueChange * -1).toFixed(2).toString();
         } else if (valueChange > 0) {
           return currencySymbol + parseInt(valueChange).toFixed(2).toString();
         } else {
