@@ -75,7 +75,7 @@ interface ProductionSummary {
   ConversionRate: number;
   Value: number;
   FormattedFinalFiguresValue: number;
-  NotOnSalesDate?: string;
+  NotOnSaleDate?: string;
   FinalSetSalesFiguresDate?: string;
 }
 const fetchProductionBookings = async (productionId: number): Promise<ProductionSummary[]> => {
@@ -98,7 +98,8 @@ const fetchProductionBookings = async (productionId: number): Promise<Production
                                                 EntryStatusCode as BookingStatusCode,
                                                 Value,
                                                 ConversionRate,
-                                                FinalSetSalesFiguresDate
+                                                FinalSetSalesFiguresDate,
+                                                NotOnSaleDate
                                               FROM SalesSummaryView  
                                               ${where} 
                                               order by BookingFirstDate;`;
@@ -419,10 +420,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         if (moment(booking.Date).valueOf() < moment(headerWeekDates[i]).valueOf()) {
           colorCell({ worksheet, row, col, argbColor: COLOR_HEXCODE.BLUE });
         }
-        if (
-          booking?.NotOnSalesDate &&
-          moment(headerWeekDates[i]).valueOf() < moment(booking.NotOnSalesDate).valueOf()
-        ) {
+        if (booking?.NotOnSaleDate && moment(headerWeekDates[i]).valueOf() < moment(booking.NotOnSaleDate).valueOf()) {
           colorCell({ worksheet, row, col, argbColor: COLOR_HEXCODE.RED });
         }
       }
