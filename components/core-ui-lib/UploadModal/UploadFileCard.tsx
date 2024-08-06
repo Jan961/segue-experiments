@@ -1,6 +1,5 @@
 import Icon from 'components/core-ui-lib/Icon';
 import ProgressBar from '../ProgressBar';
-import Tooltip from '../Tooltip';
 import { fileSizeFormatter, getStatusFromProgress } from 'utils/index';
 import { FileCardProps } from './interface';
 import { useCallback, useMemo, useState } from 'react';
@@ -27,12 +26,8 @@ const FileCard = ({ fileName, fileSize, onDelete, progress, errorMessage, imageU
           <div className="w-full">
             <p className="text-primary-navy font-bold text-[15px] flex justify-between items-center">{status}</p>
             <div className="flex flex-row w-full justify-between items-center">
-              <div className="float-left">
-                <Tooltip title={fileName} body={fileName?.length > 30 ? fileName : ''}>
-                  <p className="text-secondary text-sm">
-                    {fileName?.length > 30 ? fileName?.slice(0, 30) + '...' : fileName}
-                  </p>
-                </Tooltip>
+              <div className="float-left w-56">
+                <p className="text-secondary text-sm truncate">{fileName}</p>
               </div>
               <div className="flex flex-row md:w-[180px] sm:w-[100px] justify-between items-center float-right">
                 {fileSize && <p className="text-secondary text-sm">Size: {fileSizeFormatter(fileSize)}</p>}

@@ -7,6 +7,8 @@ import MasterPlanReportModal from './MasterPlanReportModal';
 import { useRecoilValue } from 'recoil';
 import BookingHelper from 'utils/booking';
 import { productionJumpState } from 'state/booking/productionJumpState';
+import { filterState } from 'state/booking/filterState';
+import { pick } from 'radash';
 
 interface BookingReportProps {
   visible: boolean;
@@ -17,6 +19,7 @@ interface BookingReportProps {
 
 export const BookingReports = ({ visible = false, onClose, productionId }: BookingReportProps) => {
   const { productions, selected } = useRecoilValue(productionJumpState);
+  const filters = useRecoilValue(filterState);
   const lastShowDate = useMemo(() => {
     const helper = new BookingHelper({});
     const { end } = helper.getRangeFromDateBlocks(productions);
@@ -33,18 +36,21 @@ export const BookingReports = ({ visible = false, onClose, productionId }: Booki
   const onExport = async (key: string): Promise<void> => {
     switch (key) {
       case 'tourSchedule':
-        notify.promise(onScheduleReport(productionId), {
+        notify.promise(onScheduleReport(productionId, pick(filters, ['startDate', 'endDate', 'status', 'venueText'])), {
           loading: 'Generating tour schedule report',
           success: 'Tour schedule report downloaded successfully',
           error: 'Error generating tour schedule report',
         });
         break;
       case 'tourSummary':
-        notify.promise(exportBookingSchedule(productionId), {
-          loading: 'Generating Travel Summary Report...',
-          success: 'Travel Summary Report downloaded successfully',
-          error: 'Error generating Travel Summary Report',
-        });
+        notify.promise(
+          exportBookingSchedule(productionId, pick(filters, ['startDate', 'endDate', 'status', 'venueText'])),
+          {
+            loading: 'Generating Travel Summary Report...',
+            success: 'Travel Summary Report downloaded successfully',
+            error: 'Error generating Travel Summary Report',
+          },
+        );
         break;
       case 'masterPlan':
         setShowMasterPlanReportModal(true);

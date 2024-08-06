@@ -435,13 +435,6 @@ export const globalActivityColDefs = (updateActivity, currencySymbol) => [
     hide: true,
   },
   {
-    headerName: 'Venue Ids',
-    field: 'venueIds',
-    cellRenderer: DefaultCellRenderer,
-    width: 95,
-    hide: true,
-  },
-  {
     headerName: 'Activity Name',
     field: 'actName',
     cellRenderer: DefaultCellRenderer,
@@ -457,7 +450,7 @@ export const globalActivityColDefs = (updateActivity, currencySymbol) => [
     headerName: 'Date',
     field: 'actDate',
     cellRenderer: function (params) {
-      return !params.data.actDate ? '' : formatInputDate(params.data.actDate);
+      return isNaN(params.data.actDate) ? '' : formatInputDate(params.data.actDate);
     },
     cellStyle: {
       paddingLeft: '8px',
@@ -603,13 +596,6 @@ export const globalModalVenueColDefs = (weekList, selectVenue, selectMultiVenue,
 
 export const globalActivityTabColDefs = (showGlobalActivity, currencySymbol) => [
   {
-    headerName: 'Venue Ids',
-    field: 'venueIds',
-    cellRenderer: DefaultCellRenderer,
-    width: 95,
-    hide: true,
-  },
-  {
     headerName: 'Activity Name',
     field: 'actName',
     cellRenderer: DefaultCellRenderer,
@@ -625,7 +611,7 @@ export const globalActivityTabColDefs = (showGlobalActivity, currencySymbol) => 
     headerName: 'Date',
     field: 'actDate',
     cellRenderer: function (params) {
-      return isNaN(params.data.actDate) ? null : formatInputDate(params.data.actDate);
+      return isNaN(params.data.actDate) ? '' : formatInputDate(params.data.actDate);
     },
     cellStyle: {
       paddingLeft: '8px',
@@ -652,7 +638,7 @@ export const globalActivityTabColDefs = (showGlobalActivity, currencySymbol) => 
     headerName: 'Cost',
     field: 'cost',
     cellRenderer: (params) => {
-      return currencySymbol + params.data.cost; // .toFixed(2);
+      return currencySymbol + params.data.cost.toFixed(2);
     },
     cellStyle: {
       paddingLeft: '8px',

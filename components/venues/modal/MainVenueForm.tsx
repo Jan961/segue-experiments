@@ -8,7 +8,8 @@ import Tooltip from 'components/core-ui-lib/Tooltip';
 import { initialMainVenueDetails, venueStatusOptions } from 'config/venue';
 import { useState } from 'react';
 import { UiTransformedVenue } from 'utils/venue';
-
+import { Label } from 'components/core-ui-lib';
+import FormError from 'components/core-ui-lib/FormError';
 interface MainVenueFormProps {
   venue: Partial<UiTransformedVenue>;
   venueFamilyOptionList: SelectOption[];
@@ -41,9 +42,11 @@ const MainVenueForm = ({
   };
   return (
     <>
-      <div className="flex flex-col">
+      <div className="flex flex-col mb-1">
         <label htmlFor="" className="flex flex-row gap-5 justify-between">
-          <p className="text-primary-input-text">Venue Code</p>
+          <div className="flex gap-x-1">
+            <Label required text="Venue Code" variant="md" />
+          </div>
           <Tooltip
             width="w-[200px]"
             position="right"
@@ -59,42 +62,43 @@ const MainVenueForm = ({
               iconName="info-circle-solid"
               value={formData.venueCode}
               error={validationErrors.venueCode}
-              onBlur={() => handleInputChange('venueCode', formData.venueCode)}
               onChange={(e) => handleInputChange('venueCode', e.target.value)}
             />
+            <FormError error={validationErrors.venueCode} className="absolute" />
           </Tooltip>
         </label>
-        {validationErrors.venueCode && <small className="text-primary-red flex">{validationErrors.venueCode}</small>}
       </div>
-      <div className="flex flex-col">
+      <div className="flex flex-col mb-1">
         <Select
           testId="main-venue-status"
           label="Venue Status"
           options={venueStatusOptions}
           onChange={(value) => handleInputChange('venueStatus', value)}
           value={formData.venueStatus}
-          placeholder="<Venue Status DROPDOWN>"
+          placeholder="Select Venue Status"
           className="w-[430px] font-bold place-self-end"
         />
-        {validationErrors.venueStatus && (
-          <small className="text-primary-red w-[430px]">{validationErrors.venueStatus}</small>
-        )}
+        <FormError error={validationErrors.venueStatus} className="absolute" />
       </div>
-      <div className="flex flex-col">
+      <div className="flex flex-col mb-1">
         <label htmlFor="" className="flex flex-row gap-5 justify-between ">
-          <p className="text-primary-input-text">Venue Name</p>
-          <TextInput
-            testId="main-venue-name"
-            placeholder="Enter Venue Name"
-            className="w-[364px]"
-            value={formData.venueName}
-            error={validationErrors.venueName}
-            onChange={(e) => handleInputChange('venueName', e.target.value)}
-          />
+          <div className="flex gap-x-1">
+            <Label required text="Venue Name" variant="md" />
+          </div>
+          <div>
+            <TextInput
+              testId="main-venue-name"
+              placeholder="Enter Venue Name"
+              className="w-[364px]"
+              value={formData.venueName}
+              error={validationErrors.venueName}
+              onChange={(e) => handleInputChange('venueName', e.target.value)}
+            />
+            <FormError error={validationErrors.venueName} className="absolute" />
+          </div>
         </label>
-        {validationErrors.venueName && <small className="text-primary-red">{validationErrors.venueName}</small>}
       </div>
-      <div className="flex flex-row justify-between pl-20">
+      <div className="flex flex-row justify-between pl-20 mb-1">
         <Checkbox
           testId="main-venue-vat-checkbox"
           label="VAT Indicator"
@@ -110,7 +114,7 @@ const MainVenueForm = ({
           onChange={(e) => handleInputChange('culturallyExempt', e.target.value)}
         />
       </div>
-      <div className="flex flex-col">
+      <div className="flex flex-col mb-1">
         <label className="flex flex-row gap-5 justify-between">
           <p className="text-primary-input-text">Venue Family</p>
           <Select
@@ -125,7 +129,7 @@ const MainVenueForm = ({
         </label>
         {validationErrors.venueFamily && <small className="text-primary-red">{validationErrors.venueFamily}</small>}
       </div>
-      <label htmlFor="" className="flex flex-row gap-5 justify-between ">
+      <label htmlFor="" className="flex flex-row gap-5 justify-between mb-1">
         <p className="text-primary-input-text">Town Population</p>
         <TextInput
           testId="main-venue-town-population"
@@ -136,8 +140,7 @@ const MainVenueForm = ({
           onChange={(e) => handleInputChange('townPopulation', parseFloat(e.target.value))}
         />
       </label>
-
-      <div className="flex flex-col">
+      <div className="flex flex-col mb-1">
         <label htmlFor="" className="flex flex-row gap-5 justify-between ">
           <p className="text-primary-input-text">Capacity</p>
           <TextInput
@@ -151,10 +154,9 @@ const MainVenueForm = ({
         </label>
         {validationErrors.venueCapacity && <small className="text-primary-red">{validationErrors.venueCapacity}</small>}
       </div>
-
       <label
         htmlFor=""
-        className="grid grid-cols-[100px_minmax(500px,_1fr)] flex-row gap-10 justify-between col-span-2 w-full"
+        className="grid grid-cols-[100px_minmax(500px,_1fr)] flex-row gap-10 justify-between col-span-2 w-full mb-1"
       >
         <p className="text-primary-input-text">Website</p>
         <TextInput
@@ -168,7 +170,7 @@ const MainVenueForm = ({
       </label>
       <label
         htmlFor=""
-        className="grid grid-cols-[100px_minmax(500px,_1fr)] flex-row gap-10 justify-between col-span-2 w-full"
+        className="grid grid-cols-[100px_minmax(500px,_1fr)] flex-row gap-10 justify-between col-span-2 w-full mb-1"
       >
         <p className="text-primary-input-text">Notes</p>
         <TextArea
