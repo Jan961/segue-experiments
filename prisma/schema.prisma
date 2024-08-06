@@ -966,7 +966,7 @@ model File {
   Location          String              @map("FileLocation") @db.VarChar(512)
   UploadDateTime    DateTime            @map("FileUploadDateTime") @db.DateTime(0)
   UploadUserId      Int                 @map("FileUploadUserId")
-  FileSizeBytes     BigInt?
+  SizeBytes         BigInt?             @map("FileSizeBytes")
   Account           Account[]
   User              User                @relation(fields: [UploadUserId], references: [Id], onDelete: NoAction, map: "UserAttachedFile")
   Production        Production[]
@@ -1036,45 +1036,45 @@ model ACCContract {
   DateReturned                                                  DateTime?           @map("ACCCDateReturned") @db.Date
   Notes                                                         String?             @map("ACCCNotes") @db.LongText
   CurrencyCode                                                  String?             @map("ACCCCurrencyCode") @db.VarChar(3)
-  ACCCFirstDay                                                  DateTime?           @db.Date
-  ACCCLastDay                                                   DateTime?           @db.Date
-  ACCCAvailability                                              String?             @db.LongText
-  ACCCRehearsalLocation                                         String?             @db.VarChar(30)
-  ACCCRehearsalVenueId                                          Int?
-  ACCCRehearsalVenueNotes                                       String?             @db.LongText
-  ACCCIsAccomProvided                                           Boolean             @default(dbgenerated("(b'0')")) @db.Bit(1)
-  ACCCAccomNotes                                                String?             @db.LongText
-  ACCCIsTransportProvided                                       Boolean             @default(dbgenerated("(b'0')")) @db.Bit(1)
-  ACCCTransportNotes                                            String?             @db.LongText
-  ACCCIsNominatedDriver                                         Boolean             @default(dbgenerated("(b'0')")) @db.Bit(1)
-  ACCCNominatedDriverNotes                                      String?             @db.LongText
-  ACCCPaymentType                                               String?             @db.VarChar(1)
-  ACCCWeeklyRehFee                                              Decimal?            @db.Decimal(10, 2)
-  ACCCWeeklyRehHolPay                                           Decimal?            @db.Decimal(10, 2)
-  ACCCWeeklyPerfFee                                             Decimal?            @db.Decimal(10, 2)
-  ACCCWeeklyPerfHolPay                                          Decimal?            @db.Decimal(10, 2)
-  ACCCWeeklySubs                                                Decimal?            @db.Decimal(10, 2)
-  ACCCWeeklySubsNotes                                           String?             @db.LongText
-  ACCCTotalFee                                                  Decimal?            @db.Decimal(10, 2)
-  ACCCTotalHolPay                                               Decimal?            @db.Decimal(10, 2)
-  ACCCTotalFeeNotes                                             String?             @db.LongText
-  ACCCCancelFee                                                 Decimal?            @db.Decimal(10, 2)
-  ACCCProductionId                                              Int
+  FirstDay                                                      DateTime?           @map("ACCCFirstDay") @db.Date
+  LastDay                                                       DateTime?           @map("ACCCLastDay") @db.Date
+  Availability                                                  String?             @map("ACCCAvailability") @db.LongText
+  RehearsalLocation                                             String?             @map("ACCCRehearsalLocation") @db.VarChar(30)
+  RehearsalVenueId                                              Int?                @map("ACCCRehearsalVenueId")
+  RehearsalVenueNotes                                           String?             @map("ACCCRehearsalVenueNotes") @db.LongText
+  IsAccomProvided                                               Boolean             @default(dbgenerated("(b'0')")) @map("ACCCIsAccomProvided") @db.Bit(1)
+  AccomNotes                                                    String?             @map("ACCCAccomNotes") @db.LongText
+  IsTransportProvided                                           Boolean             @default(dbgenerated("(b'0')")) @map("ACCCIsTransportProvided") @db.Bit(1)
+  TransportNotes                                                String?             @map("ACCCTransportNotes") @db.LongText
+  IsNominatedDriver                                             Boolean             @default(dbgenerated("(b'0')")) @map("ACCCIsNominatedDriver") @db.Bit(1)
+  NominatedDriverNotes                                          String?             @map("ACCCNominatedDriverNotes") @db.LongText
+  PaymentType                                                   String?             @map("ACCCPaymentType") @db.VarChar(1)
+  WeeklyRehFee                                                  Decimal?            @map("ACCCWeeklyRehFee") @db.Decimal(10, 2)
+  WeeklyRehHolPay                                               Decimal?            @map("ACCCWeeklyRehHolPay") @db.Decimal(10, 2)
+  WeeklyPerfFee                                                 Decimal?            @map("ACCCWeeklyPerfFee") @db.Decimal(10, 2)
+  WeeklyPerfHolPay                                              Decimal?            @map("ACCCWeeklyPerfHolPay") @db.Decimal(10, 2)
+  WeeklySubs                                                    Decimal?            @map("ACCCWeeklySubs") @db.Decimal(10, 2)
+  WeeklySubsNotes                                               String?             @map("ACCCWeeklySubsNotes") @db.LongText
+  TotalFee                                                      Decimal?            @map("ACCCTotalFee") @db.Decimal(10, 2)
+  TotalHolPay                                                   Decimal?            @map("ACCCTotalHolPay") @db.Decimal(10, 2)
+  TotalFeeNotes                                                 String?             @map("ACCCTotalFeeNotes") @db.LongText
+  CancelFee                                                     Decimal?            @map("ACCCCancelFee") @db.Decimal(10, 2)
+  ProductionId                                                  Int                 @map("ACCCProductionId")
   ACCClause                                                     ACCClause[]
   AccountUser_ACCContract_ACCCCheckedByAccUserIdToAccountUser   AccountUser?        @relation("ACCContract_ACCCCheckedByAccUserIdToAccountUser", fields: [CheckedByAccUserId], references: [Id], onDelete: Cascade, map: "AccountUser_AccContract_Checker")
   AccountUser_ACCContract_ACCCCompletedByAccUserIdToAccountUser AccountUser?        @relation("ACCContract_ACCCCompletedByAccUserIdToAccountUser", fields: [CompletedByAccUserId], references: [Id], onDelete: Cascade, map: "AccountUser_AccContract_Completer")
-  Currency                                                      Currency?           @relation(fields: [CurrencyCode], references: [Code], onDelete: NoAction, map: "CA")
-  Production                                                    Production          @relation(fields: [ACCCProductionId], references: [Id], onDelete: Cascade, map: "Production_ACCContract")
-  Venue                                                         Venue?              @relation(fields: [ACCCRehearsalVenueId], references: [Id], onDelete: Cascade, map: "Venue_ACCContract")
+  Currency                                                      Currency?           @relation(fields: [CurrencyCode], references: [Code], onDelete: NoAction, map: "Currency_ACCContract")
+  Production                                                    Production          @relation(fields: [ProductionId], references: [Id], onDelete: Cascade, map: "Production_ACCContract")
+  Venue                                                         Venue?              @relation(fields: [RehearsalVenueId], references: [Id], onDelete: Cascade, map: "Venue_ACCContract")
   ACCContractPerson                                             ACCContractPerson[]
   ACCPayment                                                    ACCPayment[]
   ACCPubEvent                                                   ACCPubEvent[]
 
   @@index([CheckedByAccUserId], map: "AccountUser_AccContract_Checker")
   @@index([CompletedByAccUserId], map: "AccountUser_AccContract_Completer")
-  @@index([ACCCRehearsalVenueId], map: "Venue_ACCContract")
+  @@index([RehearsalVenueId], map: "Venue_ACCContract")
   @@index([CurrencyCode], map: "CA")
-  @@index([ACCCProductionId], map: "Production_ACCContract")
+  @@index([ProductionId], map: "Production_ACCContract")
 }
 
 model ACCContractPerson {
@@ -1283,14 +1283,14 @@ model ACCClause {
 }
 
 model ContractFile {
-  ContractFileId                Int      @id @default(autoincrement())
-  ContractFileContractBookingId Int
-  ContractFileFileId            Int
-  ContractFileType              String?  @db.VarChar(20)
-  ContractFileDescription       String?  @db.VarChar(80)
-  Contract                      Contract @relation(fields: [ContractFileContractBookingId], references: [BookingId], onDelete: Cascade, map: "Contract_ContractFile")
+  Id                Int      @id @default(autoincrement()) @map("ContractFileId")
+  ContractBookingId Int      @map("ContractFileContractBookingId")
+  FileId            Int      @map("ContractFileFileId")
+  Type              String?  @map("ContractFileType") @db.VarChar(20)
+  Description       String?  @map("ContractFileDescription") @db.VarChar(80)
+  Contract          Contract @relation(fields: [ContractBookingId], references: [BookingId], onDelete: Cascade, map: "Contract_ContractFile")
 
-  @@index([ContractFileContractBookingId], map: "Contract_ContractFile")
+  @@index([ContractBookingId], map: "Contract_ContractFile")
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
