@@ -53,7 +53,11 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
   });
   console.log(formData);
   const [demoModalData, setDemoModalData] = useState<Partial<DealMemoContractFormData>>({});
-  const [modalTitle, setModalTitle] = useState<string>();
+  const [modalTitle, setModalTitle] = useState<string>(
+    `${productionJumpState.ShowCode + productionJumpState.Code} ${productionJumpState.ShowName} | ${
+      selectedTableCell.contract.venue
+    } | `,
+  );
   const { fetchData } = useAxios();
   const router = useRouter();
   const { users } = useRecoilValue(userState);
@@ -148,9 +152,10 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
 
   useEffect(() => {
     const lastDate = lastDates.find((date) => date.BookingId === formData.Id)?.LastPerformanceDate;
+    if (!lastDate) return;
     const formattedLastDate = formattedDateWithDay(lastDate);
     const lastPerformanceDate =
-      formattedLastDate === formattedDateWithDay(formData.FirstDate) ? '' : `- ${formattedLastDate}`;
+      formattedLastDate === formattedDateWithDay(formData.FirstDate) ? '' : `to ${formattedLastDate}`;
     const title = `${productionJumpState.ShowCode + productionJumpState.Code}  ${productionJumpState.ShowName} | ${
       selectedTableCell.contract.venue
     } | ${formattedDateWithDay(formData.FirstDate)} ${lastPerformanceDate}`;
