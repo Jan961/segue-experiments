@@ -37,7 +37,6 @@ const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetails
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [showModal, setShowModal] = useState(false);
   const handleAccountDetailsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(e.target);
     onChange({ ...accountDetails, [e.target.name]: e.target.value });
   };
 
