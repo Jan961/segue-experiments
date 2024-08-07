@@ -36,6 +36,8 @@ import { attachmentMimeTypes } from 'components/core-ui-lib/UploadModal/interfac
 import { headlessUploadMultiple } from 'requests/upload';
 import { getFileUrl } from 'lib/s3';
 import charCodeToCurrency from 'utils/charCodeToCurrency';
+import { v4 as uuidv4 } from 'uuid';
+import { DateTimeEntry } from 'types/ContractTypes';
 
 const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClose: () => void }) => {
   const productionJumpState = useRecoilValue(currentProductionSelector);
@@ -91,6 +93,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
     });
     return list;
   }, [users]);
+
   const callDealMemoApi = async () => {
     const demoModalData = await axios.get<DealMemoContractFormData>(
       `/api/dealMemo/getDealMemo/${selectedTableCell.contract.Id ? selectedTableCell.contract.Id : 1}`,
@@ -307,6 +310,34 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
     setFileDeleteConfirm(false);
   };
 
+  const parseAndSortDates = (arr: string[]): DateTimeEntry[] => {
+    const parsedEntries = arr.map((str) => {
+      const [timePart, isoDatePart] = str.split('? ');
+      return { timePart: timePart.trim(), date: new Date(isoDatePart.trim()), id: uuidv4() };
+    });
+
+    parsedEntries.sort((a, b) => a.date.getTime() - b.date.getTime());
+
+    const groupedByDate = parsedEntries.reduce(
+      (acc, entry) => {
+        const dateKey = entry.date.toISOString().split('T')[0];
+        if (!acc[dateKey]) {
+          acc[dateKey] = [];
+        }
+        acc[dateKey].push(entry.timePart);
+        return acc;
+      },
+      {} as Record<string, string[]>,
+    );
+
+    const result = Object.entries(groupedByDate).map(([date, times]) => {
+      const formattedDate = `${date} ${times.join(' ')}`;
+      return { formattedDate, id: uuidv4() };
+    });
+
+    return result;
+  };
+
   return (
     <PopupModal
       show={visible}
@@ -426,25 +457,17 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
               </div>
             </div>
             <div className="flex mt-2.5">
-              <div className=" text-primary-input-text font-bold text-sm">Perf / Day</div>
+              <div className=" text-primary-input-text font-bold text-sm">Perf(s)</div>
               <div className=" text-primary-input-text text-sm ml-5">{formData.performanceCount}</div>
               <div className=" text-primary-input-text font-bold text-sm ml-4">Times</div>
-              <div className=" text-primary-input-text font-bold text-sm ml-2">1</div>
-              <div className=" text-primary-input-text text-sm ml-1">
-                {formData.performanceTimes && formData.performanceTimes.split(';')[0].split('?')[0]} -
-                {formData.performanceTimes &&
-                  formattedDateWithDay(formData.performanceTimes.split(';')[0].split('?')[1])}
-              </div>
-              <div className=" text-primary-input-text font-bold text-sm ml-2">2</div>
-              <div className=" text-primary-input-text text-sm ml-1">
-                {/* {formData.performanceTimes && formData.performanceTimes.split(';')[1]} */}
-                {formData.performanceTimes &&
-                  formData.performanceTimes.split(';')[1] &&
-                  formData.performanceTimes.split(';')[1].split('?')[0]}{' '}
-                -
-                {formData.performanceTimes &&
-                  formData.performanceTimes.split(';')[1] &&
-                  formattedDateWithDay(formData.performanceTimes.split(';')[1].split('?')[1])}
+              <div>
+                {parseAndSortDates(formData.performanceTimes).map((dateTimeEntry) => {
+                  return (
+                    <div key={dateTimeEntry.id} className=" text-primary-input-text  text-sm ml-4">
+                      {dateTimeEntry.formattedDate}
+                    </div>
+                  );
+                })}
               </div>
             </div>
             <div className="flex mt-2.5 items-center">

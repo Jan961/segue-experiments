@@ -42,9 +42,8 @@ class ContractsHelper {
     const performanceTimes = PerformanceIds.map(
       (performanceId) =>
         this.performanceDict[performanceId]?.Time?.substring(0, 5) + `? ${this.performanceDict[performanceId]?.Date}`,
-    )
-      .filter((time) => time)
-      .join('; ');
+    ).filter((time) => time);
+
     return {
       Id: booking?.Id,
       count,
