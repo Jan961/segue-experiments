@@ -1,40 +1,54 @@
 import axios from 'axios';
-import { v4 as uuidv4 } from 'uuid';
 
-export const createClientDB = async () => {
-  const organisationId = uuidv4();
+const deployments = ['dev', 'staging', 'demo', 'prod'];
+const DB_USER_PREVILIGES = 'SELECT,INSERT,UPDATE,DELETE,CREATE,EXECUTE,SHOW VIEW';
+
+export const createClientDB = async (organisationId: string) => {
+  if (!organisationId) {
+    throw new Error('Unable to create new DB. OrganisationId is required');
+  }
+
+  const deploymentEnv = process.env.VERCEL_URL ? deployments.find((d) => process.env.VERCEL_URL.includes(d)) : 'dev';
+  if (!deploymentEnv) {
+    throw new Error('Unable to create new DB as deployment environment is invalid');
+  }
+
   const headers = {
     'Content-Type': 'application/json',
     Authorization: `cpanel ${process.env.DB_USER}:${process.env.DB_API_KEY}`,
   };
   const url = `https://${process.env.DB_SERVER}:${process.env.DB_PORT}/execute/Mysql`;
-
+  const dbName = `${process.env.DB_USER}_${deploymentEnv}_${organisationId}`;
+  const dbUser = `${process.env.DB_USER}_${deploymentEnv}User`;
+  const dboUser = `${process.env.DB_USER}_${deploymentEnv}DBO`;
   // Create the DB
   const createDBUrl = `${url}/create_database`;
   const { data: dbData } = await axios.post(
     createDBUrl,
-    { name: `${process.env.DB_USER}_${organisationId}` },
+    { name: dbName },
     {
       headers,
     },
   );
   if (dbData.status === 1) {
-    // Create a user and DBO user nad grant them previlidges to the DB
-    const { data: user } = await axios.post(
-      `${url}/create_user`,
-      { name: `${process.env.DB_USER}_${organisationId}_DBUser`, password: uuidv4() },
+    // Grant users previlidges to the DB
+    const { data: dbUserResponse } = await axios.post(
+      `${url}/set_privileges_on_database`,
+      { database: dbName, user: dbUser, privileges: DB_USER_PREVILIGES },
       {
         headers,
       },
     );
-    console.log('new db user', user);
-    await axios.post(
-      `${url}/create_user`,
-      { name: `${process.env.DB_USER}_${organisationId}_DBOUser`, password: uuidv4() },
+
+    const { data: usedboUserResponse } = await axios.post(
+      `${url}/set_privileges_on_database`,
+      { database: dbName, user: dboUser, privileges: 'ALL' },
       {
         headers,
       },
     );
+
+    console.log('USers updated', dbUserResponse, usedboUserResponse);
   }
   console.log('new db data', createDBUrl, dbData);
 };

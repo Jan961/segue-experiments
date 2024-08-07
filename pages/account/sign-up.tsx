@@ -11,7 +11,7 @@ import getAllPlans from 'services/subscriptionPlans';
 import AccountConfirmation from 'components/account/AccountConfirmation';
 import { Elements } from '@stripe/react-stripe-js';
 import axios from 'axios';
-import { Button, notify } from 'components/core-ui-lib';
+import { notify } from 'components/core-ui-lib';
 
 export const getServerSideProps: GetServerSideProps = async () => {
   const planColors = ['#41a29a', '#0093c0', '#7b568d'];
@@ -79,21 +79,9 @@ const NewAccount = ({ plans }: { stripeOptions: any; plans: Plan[] }) => {
     }
   };
 
-  const createDB = async () => {
-    try {
-      await axios.post('/api/account/db/create', 'sachinc');
-    } catch (error) {
-      console.error(error);
-      notify.error(ACCOUNT_CREATION_FAILED_ERROR);
-    }
-  };
-
   return (
     <div className={`${calibri.variable} font-calibri background-gradient flex flex-col py-20  px-6`}>
       <Image className="mx-auto mb-2" height={160} width={310} src="/segue/segue_logo_full.png" alt="Segue" />
-      <div>
-        <Button text="Create Database" className="mx-auto mb-2" onClick={createDB} />
-      </div>
       <Wizard>
         <AccountDetailsForm
           accountDetails={accountDetails}

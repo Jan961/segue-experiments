@@ -14,6 +14,8 @@ export const mapAccountFromPrismaFields = (account: Account) => {
     postcode: account.AccountAddressPostcode,
     country: account.AccountAddressCountry,
     organisationId: account.AccountOrganisationId,
+    termsAgreedBy: account.AccountTermsAgreedBy,
+    termsAgreedDate: account.AccountTermsAgreedDate,
   };
 };
 
@@ -39,6 +41,7 @@ export const mapToAccountPrismaFields = (account: any) => {
 export const mapToAccountContactPrismaFields = (account: any) => {
   return {
     AccContId: account.contactId || null,
+    AccContAccountId: account.accountId,
     AccContFirstName: account.firstName,
     AccContLastName: account.lastName,
     AccContPhone: account.phoneNumber,
