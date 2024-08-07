@@ -53,7 +53,6 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
     ...initialEditContractFormData,
     ...selectedTableCell.contract,
   });
-  console.log(formData);
   const [demoModalData, setDemoModalData] = useState<Partial<DealMemoContractFormData>>({});
   const [modalTitle, setModalTitle] = useState<string>(
     `${productionJumpState.ShowCode + productionJumpState.Code} ${productionJumpState.ShowName} | ${
@@ -95,62 +94,77 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
   }, [users]);
 
   const callDealMemoApi = async () => {
-    const demoModalData = await axios.get<DealMemoContractFormData>(
-      `/api/dealMemo/getDealMemo/${selectedTableCell.contract.Id ? selectedTableCell.contract.Id : 1}`,
-    );
-    const getHoldType = await axios.get<DealMemoHoldType>(`/api/dealMemo/getHoldType/${selectedTableCell.contract.Id}`);
-    setDealHoldType(getHoldType.data as DealMemoHoldType);
-    if (demoModalData.data && demoModalData.data.DeMoBookingId) {
-      setDemoModalData(demoModalData.data as unknown as DealMemoContractFormData);
+    try {
+      const demoModalData = await axios.get<DealMemoContractFormData>(
+        `/api/dealMemo/getDealMemo/${selectedTableCell.contract.Id ? selectedTableCell.contract.Id : 1}`,
+      );
+      const getHoldType = await axios.get<DealMemoHoldType>(
+        `/api/dealMemo/getHoldType/${selectedTableCell.contract.Id}`,
+      );
+      setDealHoldType(getHoldType.data as DealMemoHoldType);
+      if (demoModalData.data && demoModalData.data.DeMoBookingId) {
+        setDemoModalData(demoModalData.data as unknown as DealMemoContractFormData);
+      }
+    } catch (error) {
+      console.log(error, 'Error - failed to fetch Deal Memo information.');
     }
-    if (selectedTableCell.contract && selectedTableCell.contract.venueId) {
-      const venueData = await axios.get(`/api/venue/${selectedTableCell.contract.venueId}`);
-      setVenue(venueData.data as unknown as Venue);
+  };
+
+  const fetchVenueData = async () => {
+    try {
+      if (selectedTableCell.contract && selectedTableCell.contract.venueId) {
+        const venueData = await axios.get(`/api/venue/${selectedTableCell.contract.venueId}`);
+        setVenue(venueData.data as unknown as Venue);
+        console.log(venue);
+      }
+    } catch (error) {
+      console.log(error, 'Error - failed to fetch Venue Data for current booking.');
+    }
+  };
+
+  const fetchContractAttachments = async () => {
+    try {
+      const response = await axios.get(`/api/contracts/read/attachments/${selectedTableCell.contract.Id}`);
+      const data = response.data;
+      setContractAttatchmentRows([
+        ...data.map((file) => {
+          return {
+            FileId: file.Id,
+            FileOriginalFilename: file.OriginalFilename,
+            FileUploadedDateTime: file.UploadDateTime,
+            FileURL: getFileUrl(file.Location),
+            FileUploaded: true,
+            FileLocation: file.Location,
+          };
+        }),
+      ]);
+    } catch (error) {
+      console.log(error, 'Error - failed to fetch contract file attachments');
+    }
+  };
+
+  const fetchLastDates = async () => {
+    const productionId = productionJumpState.Id;
+    if (!productionId) return;
+    try {
+      const { data } = await axios(`/api/performances/lastDate/${productionId}`);
+      setLastDates(data);
+    } catch (error) {
+      console.log(error);
     }
   };
 
   useEffect(() => {
-    const callDealMemoData = async () => {
+    const loadData = async () => {
       setIsLoading(true);
       await callDealMemoApi();
+      await fetchContractAttachments();
+      await fetchLastDates();
+      await fetchVenueData();
       setIsLoading(false);
     };
 
-    const fetchContractAttachments = async () => {
-      try {
-        const response = await axios.get(`/api/contracts/read/attachments/${selectedTableCell.contract.Id}`);
-        const data = response.data;
-        setContractAttatchmentRows([
-          ...data.map((file) => {
-            return {
-              FileId: file.Id,
-              FileOriginalFilename: file.OriginalFilename,
-              FileUploadedDateTime: file.UploadDateTime,
-              FileURL: getFileUrl(file.Location),
-              FileUploaded: true,
-              FileLocation: file.Location,
-            };
-          }),
-        ]);
-      } catch (error) {
-        console.log(error, 'Error - failed to fetch contract file attachments');
-      }
-    };
-
-    const getLastDates = async () => {
-      const productionId = productionJumpState.Id;
-      if (!productionId) return;
-      try {
-        const { data } = await axios(`/api/performances/lastDate/${productionId}`);
-        setLastDates(data);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    callDealMemoData();
-    fetchContractAttachments();
-    getLastDates();
+    loadData();
   }, []);
 
   useEffect(() => {
@@ -441,7 +455,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
               </div>
             </div>
           </div>
-          <div className="w-[652px] h-[980px] rounded border-2 border-secondary ml-2 p-3 bg-primary-blue bg-opacity-15">
+          <div className="w-[652px] h-fit rounded border-2 border-secondary ml-2 p-3 bg-primary-blue bg-opacity-15">
             <div className="flex justify-between">
               <div className=" text-primary-input-text font-bold text-lg">Venue Contract</div>
               <div className="flex mr-2">
@@ -679,21 +693,21 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
               <div className="w-1/5">
                 <div className=" text-primary-input-text font-bold text-sm">Barring Clause</div>
               </div>
-              <div className="w-4/5 flex">
-                <div className="w-1/3 flex">
+              <div className="w-4/5 flex gap-x-5">
+                <div className="flex">
                   <div className=" text-primary-input-text font-bold text-sm mr-2">Pre Show</div>
                   <div className=" text-primary-input-text  text-sm">
                     {venue.BarringWeeksPre ? venue.BarringWeeksPre : '-'}
                   </div>
                 </div>
 
-                <div className="w-1/3 flex justify-center">
+                <div className="flex ">
                   <div className=" text-primary-input-text font-bold text-sm mr-2">Post Show</div>
                   <div className=" text-primary-input-text  text-sm">
                     {venue.BarringWeeksPost ? venue.BarringWeeksPost : '-'}
                   </div>
                 </div>
-                <div className="w-1/3 flex justify-end">
+                <div className="flex ">
                   <div className=" text-primary-input-text font-bold text-sm mr-2">Miles</div>
                   <div className=" text-primary-input-text  text-sm">
                     {venue.BarringMiles ? venue.BarringMiles : '-'}
