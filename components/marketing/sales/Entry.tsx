@@ -71,6 +71,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
   const [generalErrors, setGeneralErrors] = useState([]);
   const [warningIssued, setWarningIssued] = useState<boolean>(false);
   const currency = useRecoilValue(currencyState);
+  const [salesApiAction, setSalesApiAction] = useState('create');
 
   const compareSalesFigures = (prev: SalesFigure, curr: SalesFigure) => {
     // If prev is null, there are no errors.
@@ -126,6 +127,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
         setId,
         general: currSalesFigureSet.general,
         schools: {},
+        action: salesApiAction,
       };
 
       const emptySchools = {
@@ -277,8 +279,9 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
     try {
       setLoading(true);
 
-      // initialise values
-      setSetId(-1);
+      let salesSetId = -1;
+      let compHoldSetId = -1;
+
       const emptySalesSet = {
         setId: 0,
         general: {
@@ -299,6 +302,9 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
         setPrevSalesFigureSet(emptySalesSet);
       } else {
         setCurrSalesFigureSet(emptySalesSet);
+
+        // resetting api action every time a new week is selected
+        setSalesApiAction('create');
       }
 
       // handle when the useImperitive calls this function on selection of a sales week/day before the booking is selected
@@ -329,6 +335,12 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
       if (typeof sales === 'object' && !isNullOrEmpty(sales)) {
         const salesFigures = sales as SalesFigureSet;
 
+        // if the code gets into this block - there will be sales figures and therefore when running the api, it should update opposed to create
+        // previous check as we only want to do this for the selected week
+        if (!previous) {
+          setSalesApiAction('update');
+        }
+
         // set the sales figures, if available
         const general: SalesFigure = {
           seatsReserved: validateSale(salesFigures.general?.seatsReserved),
@@ -348,7 +360,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
           setPrevSalesFigureSet({ general, schools, setId: salesFigures.setId });
         } else {
           // only ever set the setId for the current week
-          setSetId(salesFigures.setId);
+          salesSetId = salesFigures.setId;
           setCurrSalesFigureSet({ general, schools, setId: salesFigures.setId });
         }
       }
@@ -368,6 +380,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
 
           setHoldData(holdCompData.holds);
           setCompData(holdCompData.comps);
+          compHoldSetId = holdCompData.setId;
         }
 
         const booking = bookings.bookings.find((booking) => booking.Id === bookings.selected);
@@ -376,6 +389,17 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
         setCompNotes(booking.BookingCompNotes === null ? '' : booking.BookingCompNotes);
         setHoldNotes(booking.BookingHoldNotes === null ? '' : booking.BookingHoldNotes);
         setBookingHasSchoolSales(booking.BookingHasSchoolsSales);
+
+        // by default - we will set the sales setId to the set connected to the sales values
+        // if, for some reason, the hold/comps are set first, the setId from holds/comps will be used
+        // if both are -1, it will remain -1 and the API will know to create a setId
+        if (salesSetId > -1) {
+          setSetId(salesSetId);
+        } else if (compHoldSetId > -1) {
+          setSetId(compHoldSetId);
+        } else {
+          setSetId(-1);
+        }
       }
 
       setLoading(false);

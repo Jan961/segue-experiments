@@ -2,9 +2,7 @@ import prisma from 'lib/prisma';
 
 export default async function handle(req, res) {
   try {
-    let { bookingId, salesDate, general, schools, setId } = req.body;
-
-    const transactionState = setId === -1 ? 'create' : 'update';
+    let { bookingId, salesDate, general, schools, setId, action } = req.body;
 
     if (setId === -1) {
       const setResult = await prisma.SalesSet.create({
@@ -63,11 +61,11 @@ export default async function handle(req, res) {
       });
     }
 
-    if (transactionState === 'create') {
+    if (action === 'create') {
       await prisma.Sale.createMany({
         data: sales,
       });
-    } else if (transactionState === 'update') {
+    } else if (action === 'update') {
       const salesUpdates = [];
 
       // even though only one record should match query, as we don't have the saleID, we need to use updateMany
@@ -89,7 +87,7 @@ export default async function handle(req, res) {
       await prisma.$transaction(salesUpdates);
     }
 
-    res.status(200).json({ setId, transaction: transactionState });
+    res.status(200).json({ setId, transaction: action });
   } catch (e) {
     console.error('Error:', e);
     res.status(500).json({ error: e.message });
