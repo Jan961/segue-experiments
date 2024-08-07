@@ -5,6 +5,7 @@ import React, { useState } from 'react';
 import { useWizard } from 'react-use-wizard';
 import Select from 'components/core-ui-lib/Select';
 import schema from './schema/accountDetailsFormSchema';
+import { Checkbox, PopupModal } from 'components/core-ui-lib';
 
 export type Account = {
   accountId?: number;
@@ -32,7 +33,7 @@ interface AccountDetailsFormProps {
 const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetailsFormProps) => {
   const { nextStep } = useWizard();
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
-
+  const [showModal, setShowModal] = useState(false);
   const handleAccountDetailsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onChange({ ...accountDetails, [e.target.name]: e.target.value });
   };
@@ -56,6 +57,10 @@ const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetails
     if (await validateForm(accountDetails)) {
       onSave(() => nextStep());
     }
+  };
+
+  const handleShowLicenseModal = () => {
+    if (!showModal) setShowModal(true);
   };
 
   return (
@@ -231,11 +236,38 @@ const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetails
               onChange={handleAccountDetailsChange}
             />
           </div>
+          <div className="relative pt-2">
+            <a href="#" onClick={handleShowLicenseModal} className="text-md ml-6 relative mt-3 underline">
+              VIEW SOFTWARE LICENCE AGREEMENT
+            </a>
+            <Checkbox
+              testId="payment-details-form-licence-agreement"
+              id="licence-agreement"
+              name="licence-agreement"
+              onChange={handleAccountDetailsChange}
+              label="I have read and agree to the terms"
+              required
+            />
+            {validationErrors.agreementChecked && (
+              <small className="text-primary-red mt-1">{validationErrors.agreementChecked}</small>
+            )}
+          </div>
           <div className="w-full flex gap-2  items-center justify-end mt-10">
             <Button text="Next" onClick={handleNextClick} className="w-32" />
           </div>
         </section>
       </div>
+      <PopupModal
+        show={showModal}
+        onClose={() => setShowModal(false)}
+        title="Licnese Agreement"
+        titleClass="text-xl text-primary-navy font-bold -mt-2"
+        hasOverlay={false}
+      >
+        <div className="w-80 h-80 p-4">
+          <p className="text-primary-input-text">Pleace holder for Licence Agreement text</p>
+        </div>
+      </PopupModal>
     </div>
   );
 };
