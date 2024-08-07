@@ -31,13 +31,13 @@ const removeTime = (inputDate: Date) => {
 const getCompHoldData = async (salesDate, bookingId) => {
   const holdTypes = await prisma.holdType.findMany({
     orderBy: {
-      HoldTypeId: 'asc',
+      HoldTypeSeqNo: 'asc',
     },
   });
 
   const compTypes = await prisma.compType.findMany({
     orderBy: {
-      CompTypeId: 'asc',
+      CompTypeSeqNo: 'asc',
     },
   });
 

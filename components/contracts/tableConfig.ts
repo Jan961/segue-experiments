@@ -163,7 +163,6 @@ export const standardSeatKillsColumnDefs = (onChangeData, holdValue) => [
       textAlign: 'center',
       overflow: 'visible',
     },
-    headerClass: 'right-border-full',
     suppressMovable: true,
     sortable: false,
     resizable: false,
