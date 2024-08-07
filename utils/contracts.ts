@@ -41,8 +41,10 @@ class ContractsHelper {
     } = this.venueDict[VenueId] || {};
     const performanceTimes = PerformanceIds.map(
       (performanceId) =>
-        this.performanceDict[performanceId]?.Time?.substring(0, 5) + `? ${this.performanceDict[performanceId]?.Date}`,
+        `${this.performanceDict[performanceId]?.Time?.substring(0, 5) ?? ''}? ${this.performanceDict[performanceId]
+          ?.Date}`,
     ).filter((time) => time);
+    console.log(performanceTimes);
 
     return {
       Id: booking?.Id,

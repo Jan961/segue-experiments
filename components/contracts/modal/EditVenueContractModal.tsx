@@ -115,7 +115,6 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
       if (selectedTableCell.contract && selectedTableCell.contract.venueId) {
         const venueData = await axios.get(`/api/venue/${selectedTableCell.contract.venueId}`);
         setVenue(venueData.data as unknown as Venue);
-        console.log(venue);
       }
     } catch (error) {
       console.log(error, 'Error - failed to fetch Venue Data for current booking.');
@@ -298,9 +297,6 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
   };
 
   const handleCellClicked = (event) => {
-    console.log(event.data);
-    console.log(selectedTableCell.contract.Id);
-
     if (event.column.colId === 'ViewBtn') {
       const fileUrl = event.data.FileURL;
       window.open(fileUrl, '_blank');
