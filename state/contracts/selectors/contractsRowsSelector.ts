@@ -42,11 +42,6 @@ export const contractsRowsSelector = selector({
       const { ProductionId, PrimaryDateBlock } = data;
       const production = productionDict[ProductionId] || {};
       const rowData = transformer(data);
-
-      // if (type === "Performance") {
-      //   console.log(rowData)
-      // }
-
       const week = calculateWeekNumber(new Date(PrimaryDateBlock?.StartDate), new Date(date));
       const otherDayType = dayTypes.find(({ Id }) => Id === data.DateTypeId)?.Name;
       const getValueForDayType = (value, type) => {
