@@ -44,7 +44,6 @@ class ContractsHelper {
         `${this.performanceDict[performanceId]?.Time?.substring(0, 5) ?? ''}? ${this.performanceDict[performanceId]
           ?.Date}`,
     ).filter((time) => time);
-    console.log(performanceTimes);
 
     return {
       Id: booking?.Id,

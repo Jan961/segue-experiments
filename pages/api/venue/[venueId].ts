@@ -15,8 +15,13 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           },
         },
         VenueAddress: true, // Include related VenueContact data
+        VenueBarredVenue_VenueBarredVenue_VBVVenueIdToVenue: true,
       },
     });
+
+    venue.BarredVenues = venue.VenueBarredVenue_VenueBarredVenue_VBVVenueIdToVenue;
+    delete venue.VenueBarredVenue_VenueBarredVenue_VBVVenueIdToVenue;
+
     res.status(200).json(venue);
   } catch (e) {
     res.status(500).json({ err: e });
