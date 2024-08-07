@@ -43,7 +43,7 @@ export default async function handle(req, res) {
     const salesFrequency = production.SalesFrequency;
 
     const startDate = addDurationToDate(dateBlock[0].StartDate, numWeeks * 7, false);
-    const endDate = dateBlock[0].DateBlockEndDate;
+    const endDate = dateBlock[0].EndDate;
     const dateStartMonday = getMonday(startDate);
     const weeks = getWeeksBetweenDates(dateStartMonday.toISOString(), endDate);
 
