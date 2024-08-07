@@ -23,7 +23,9 @@ export type Account = {
   firstName: string;
   lastName: string;
   phoneNumber: string;
+  agreementChecked: boolean;
 };
+
 interface AccountDetailsFormProps {
   accountDetails: Account;
   onChange: (v: Account) => void;
@@ -35,6 +37,7 @@ const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetails
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [showModal, setShowModal] = useState(false);
   const handleAccountDetailsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log(e.target);
     onChange({ ...accountDetails, [e.target.name]: e.target.value });
   };
 
@@ -71,7 +74,7 @@ const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetails
           <div className="mb-2">
             <Label text="First Name" required />
             <TextInput
-              data-testid="first-name"
+              testId="first-name"
               name="firstName"
               placeholder="Enter first name"
               className="w-full"
@@ -85,7 +88,7 @@ const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetails
           <div className="mb-2">
             <Label text="Last Name" required />
             <TextInput
-              data-testid="last-name"
+              testId="last-name"
               name="lastName"
               placeholder="Enter last name"
               className="w-full"
@@ -97,7 +100,7 @@ const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetails
           <div className="mb-2">
             <Label text="Company" required />
             <TextInput
-              data-testid="company-name"
+              testId="company-name"
               name="companyName"
               placeholder="Enter name of main company"
               className="w-full"
@@ -111,7 +114,7 @@ const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetails
           <div className="mb-2">
             <Label text="Phone Number" required />
             <TextInput
-              data-testid="phone-number"
+              testId="phone-number"
               name="phoneNumber"
               placeholder="Enter phone number"
               className="w-full"
@@ -125,7 +128,7 @@ const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetails
           <div className="mb-2">
             <Label text="Address line 1" required />
             <TextInput
-              data-testid="address-line1"
+              testId="address-line1"
               name="addressLine1"
               placeholder="Enter address line 1"
               className="w-full"
@@ -139,7 +142,7 @@ const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetails
           <div className="mb-2">
             <Label text="Address line 2" required />
             <TextInput
-              data-testid="address-line2"
+              testId="address-line2"
               name="addressLine2"
               placeholder="Enter address line 2"
               className="w-full"
@@ -153,7 +156,7 @@ const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetails
           <div className="mb-2">
             <Label text="Address line 3" />
             <TextInput
-              data-testid="address-line3"
+              testId="address-line3"
               name="addressLine3"
               placeholder="Enter address line 3"
               className="w-full"
@@ -166,7 +169,7 @@ const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetails
           <div className="mb-2">
             <Label text="Town" required />
             <TextInput
-              data-testid="town"
+              testId="town"
               name="town"
               placeholder="Enter town"
               className="w-full"
@@ -178,7 +181,7 @@ const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetails
           <div className="mb-2">
             <Label text="Postcode" required />
             <TextInput
-              data-testid="post-code"
+              testId="post-code"
               name="postcode"
               placeholder="Enter postcode"
               className="w-full"
@@ -190,6 +193,7 @@ const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetails
           <div className="mb-2">
             <Label text="Country" required />
             <Select
+              testId="country"
               name="country"
               placeholder="Select country"
               className="w-full h-[31px]"
@@ -203,7 +207,7 @@ const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetails
           <div className="mb-2">
             <Label text="Company Email Address" required />
             <TextInput
-              data-testid="company-email"
+              testId="company-email"
               name="email"
               placeholder="EnterCompany Email Addressr"
               className="w-full"
@@ -215,6 +219,7 @@ const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetails
           <div className="mb-2">
             <Label text="Currency for Payment" required />
             <Select
+              testId="currency"
               name="currency"
               placeholder="Select currency"
               className="w-full h-[31px]"
@@ -228,7 +233,7 @@ const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetails
           <div className="mb-2">
             <Label text="VAT Number" />
             <TextInput
-              data-testid="vat-number"
+              testId="vat-number"
               name="vatNumber"
               placeholder="Enter VAT Number"
               className="w-full"
@@ -241,9 +246,10 @@ const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetails
               VIEW SOFTWARE LICENCE AGREEMENT
             </a>
             <Checkbox
-              testId="payment-details-form-licence-agreement"
+              testId="licence-agreement"
               id="licence-agreement"
-              name="licence-agreement"
+              name="agreementChecked"
+              checked={accountDetails.agreementChecked}
               onChange={handleAccountDetailsChange}
               label="I have read and agree to the terms"
               required
