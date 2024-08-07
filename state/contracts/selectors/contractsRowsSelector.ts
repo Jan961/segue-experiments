@@ -42,6 +42,11 @@ export const contractsRowsSelector = selector({
       const { ProductionId, PrimaryDateBlock } = data;
       const production = productionDict[ProductionId] || {};
       const rowData = transformer(data);
+
+      // if (type === "Performance") {
+      //   console.log(rowData)
+      // }
+
       const week = calculateWeekNumber(new Date(PrimaryDateBlock?.StartDate), new Date(date));
       const otherDayType = dayTypes.find(({ Id }) => Id === data.DateTypeId)?.Name;
       const getValueForDayType = (value, type) => {
@@ -138,7 +143,12 @@ export const contractsRowsSelector = selector({
       }, {});
       Object.keys(performancesGroup).forEach((date) => {
         bookedDates.push(getKey(date));
-        addRow(date, 'Performance', { ...b, PerformanceIds: performancesGroup[date] }, helper.getContractsDetails);
+        addRow(
+          date,
+          'Performance',
+          { ...b, PerformanceIds: Object.values(performancesGroup).flatMap((arr) => arr) },
+          helper.getContractsDetails,
+        );
       });
     });
     Object.values(other).forEach((o) => {
