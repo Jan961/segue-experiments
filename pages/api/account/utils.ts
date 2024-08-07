@@ -32,14 +32,13 @@ export const mapToAccountPrismaFields = (account: any) => {
     AccountAddressCountry: account.country,
     AccountOrganisationId: account.organisationId,
     AccountTermsAgreedBy: account.email,
-    AccountTermsAgreedDate: new Date().toISOString(),
+    AccountTermsAgreedDate: new Date(),
   };
 };
 
 export const mapToAccountContactPrismaFields = (account: any) => {
   return {
     AccContId: account.contactId || null,
-    AccContAccountId: account.accountId,
     AccContFirstName: account.firstName,
     AccContLastName: account.lastName,
     AccContPhone: account.phoneNumber,
