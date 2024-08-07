@@ -48,7 +48,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
   const [editDealMemoModal, setEditDealMemoModal] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [venue, setVenue] = useState<Partial<Venue>>({});
-  const [barredVenues, setBarredVenues] = useState<Partial<Venue>>({});
+  const [barredVenues, setBarredVenues] = useState<Partial<Venue>[]>([]);
   const [dealHoldType, setDealHoldType] = useState<Partial<DealMemoHoldType>>({});
   const [formData, setFormData] = useState<Partial<VenueContractFormData>>({
     ...initialEditContractFormData,
@@ -115,9 +115,9 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
     try {
       if (selectedTableCell.contract && selectedTableCell.contract.venueId) {
         const venueData = await axios.get(`/api/venue/${selectedTableCell.contract.venueId}`);
-        setVenue(venueData.data as unknown as Venue);
+        setVenue(venueData.data as Venue);
         const barredVenues = await axios.get(`/api/venue/barredVenues/${selectedTableCell.contract.venueId}`);
-        setBarredVenues(barredVenues.data as unknown as Venue);
+        setBarredVenues(barredVenues.data as Venue[]);
       }
     } catch (error) {
       console.log(error, 'Error - failed to fetch Venue Data for current booking.');
@@ -725,7 +725,11 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
               <div className="w-4/5 flex">
                 <div className=" text-primary-input-text font-bold text-sm mr-2">Venues</div>
                 <div className=" text-primary-input-text  text-sm ml-3">
-                  {venue.BarringMiles ? venue.BarringMiles : '-'}
+                  {barredVenues && barredVenues.length > 0
+                    ? barredVenues.map((venue) => {
+                        return <div key={venue.Id}>{venue.Name}</div>;
+                      })
+                    : '-'}
                 </div>
               </div>
             </div>
