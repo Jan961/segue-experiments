@@ -2,7 +2,7 @@ import { loggingService } from 'services/loggingService';
 import prisma from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getEmailFromReq, checkAccess } from 'services/userService';
-import { BookingAttachedFile } from '@prisma/client';
+import { BookingAttachedFile } from 'prisma/generated/prisma-client';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {

@@ -8,7 +8,7 @@ import { CustomSelect } from './CustomSelect';
 import { dateToSimple } from 'services/dateService';
 import { format } from 'date-fns';
 import Link from 'next/link';
-import { Production } from '@prisma/client';
+import { Production } from 'prisma/generated/prisma-client';
 
 const fetcher = async (url: string): Promise<any> => await axios(url).then((res) => res.data);
 

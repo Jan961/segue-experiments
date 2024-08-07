@@ -4,7 +4,7 @@ import Layout from '../../components/Layout';
 import Switchboard from '../../components/reports/switchboard';
 import { productionEditorMapper } from 'lib/mappers';
 import { getAccountIdFromReq } from 'services/userService';
-import { Production } from '@prisma/client';
+import { Production } from 'prisma/generated/prisma-client';
 
 type ReportsProps = {
   activeProductions: any & Production[];
@@ -13,7 +13,7 @@ type ReportsProps = {
 const Index = ({ activeProductions = [] }: ReportsProps) => {
   return (
     <Layout title="Reports | Segue">
-      <Switchboard activeProductions={activeProductions}></Switchboard>
+      <Switchboard activeProductions={activeProductions} />
     </Layout>
   );
 };

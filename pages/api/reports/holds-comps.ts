@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client';
+import { Prisma } from 'prisma/generated/prisma-client';
 import ExcelJS from 'exceljs';
 import prisma from 'lib/prisma';
 import moment from 'moment';
