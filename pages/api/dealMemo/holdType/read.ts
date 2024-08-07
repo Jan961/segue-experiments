@@ -14,7 +14,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       },
     });
 
-    res.json(holdTypes);
+    res.status(200).json(holdTypes);
   } catch (err) {
     console.log(err);
     res.status(403).json({ err: 'Error occurred while getting data for Deal Memo' });
