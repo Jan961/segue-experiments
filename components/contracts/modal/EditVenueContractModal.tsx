@@ -48,6 +48,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
   const [editDealMemoModal, setEditDealMemoModal] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [venue, setVenue] = useState<Partial<Venue>>({});
+  const [barredVenues, setBarredVenues] = useState<Partial<Venue>>({});
   const [dealHoldType, setDealHoldType] = useState<Partial<DealMemoHoldType>>({});
   const [formData, setFormData] = useState<Partial<VenueContractFormData>>({
     ...initialEditContractFormData,
@@ -115,11 +116,17 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
       if (selectedTableCell.contract && selectedTableCell.contract.venueId) {
         const venueData = await axios.get(`/api/venue/${selectedTableCell.contract.venueId}`);
         setVenue(venueData.data as unknown as Venue);
+        const barredVenues = await axios.get(`/api/venue/barredVenues/${selectedTableCell.contract.venueId}`);
+        setBarredVenues(barredVenues.data as unknown as Venue);
       }
     } catch (error) {
       console.log(error, 'Error - failed to fetch Venue Data for current booking.');
     }
   };
+
+  useEffect(() => {
+    console.log(barredVenues);
+  }, [barredVenues]);
 
   const fetchContractAttachments = async () => {
     try {
