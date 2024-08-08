@@ -3,7 +3,7 @@ import DefaultCellRenderer from 'components/core-ui-lib/Table/renderers/DefaultC
 import DefaultTextRenderer from 'components/core-ui-lib/Table/renderers/DefaultTextRenderer';
 import IconRowRenderer from 'components/global/salesTable/renderers/IconRowRenderer';
 import { tileColors } from 'config/global';
-import { getTimeFromDateAndTime } from 'services/dateService';
+import { getTimeFromDateAndTime, isValidDate } from 'services/dateService';
 import formatInputDate from 'utils/dateInputFormat';
 import TwoLineRenderer from './TwoLineRenderer';
 import ButtonRenderer from 'components/core-ui-lib/Table/renderers/ButtonRenderer';
@@ -30,7 +30,7 @@ export const activityColDefs = (updateActivity, currencySymbol) => [
     headerName: 'Date',
     field: 'actDate',
     cellRenderer: function (params) {
-      return !params.data.actDate ? null : formatInputDate(params.data.actDate);
+      return isValidDate(params.data.actDate) ? formatInputDate(params.data.actDate) : '';
     },
     cellStyle: {
       paddingLeft: '8px',
@@ -92,7 +92,7 @@ export const activityColDefs = (updateActivity, currencySymbol) => [
     headerName: 'Due By Date',
     field: 'followUpDt',
     cellRenderer: function (params) {
-      return !params.data.followUpDt ? null : formatInputDate(params.data.followUpDt);
+      return isValidDate(params.data.followUpDt) ? formatInputDate(params.data.followUpDt) : '';
     },
     width: 100,
     hide: true,
@@ -129,7 +129,7 @@ export const contactNoteColDefs = (updateContactNote, userList) => [
     headerName: 'Date',
     field: 'ContactDate',
     cellRenderer: function (params) {
-      return formatInputDate(params.data.ContactDate);
+      return isValidDate(params.data.ContactDate) ? formatInputDate(params.data.ContactDate) : '';
     },
     cellStyle: {
       paddingLeft: '8px',
@@ -449,8 +449,8 @@ export const globalActivityColDefs = (updateActivity, currencySymbol) => [
   {
     headerName: 'Date',
     field: 'actDate',
-    cellRenderer: function (params) {
-      return isNaN(params.data.actDate) ? '' : formatInputDate(params.data.actDate);
+    cellRenderer: (params) => {
+      return isValidDate(params.data.actDate) ? formatInputDate(params.data.actDate) : '';
     },
     cellStyle: {
       paddingLeft: '8px',
@@ -477,7 +477,7 @@ export const globalActivityColDefs = (updateActivity, currencySymbol) => [
     headerName: 'Cost',
     field: 'cost',
     cellRenderer: (params) => {
-      return `${currencySymbol === undefined ? '' : currencySymbol}${params.data.cost.toFixed(2)}`;
+      return `${currencySymbol || ''}${params.data.cost ? params.data.cost.toFixed(2) : '0.00'}`;
     },
     cellStyle: {
       paddingLeft: '8px',
@@ -502,8 +502,8 @@ export const globalActivityColDefs = (updateActivity, currencySymbol) => [
   {
     headerName: 'Due By Date',
     field: 'followUpDt',
-    cellRenderer: function (params) {
-      return formatInputDate(params.data.followUpDt);
+    cellRenderer: (params) => {
+      return isValidDate(params.data.followUpDt) ? formatInputDate(params.data.followUpDt) : ' ';
     },
     width: 100,
     hide: true,
@@ -611,7 +611,7 @@ export const globalActivityTabColDefs = (showGlobalActivity, currencySymbol) => 
     headerName: 'Date',
     field: 'actDate',
     cellRenderer: function (params) {
-      return isNaN(params.data.actDate) ? '' : formatInputDate(params.data.actDate);
+      return isValidDate(params.data.actDate) ? formatInputDate(params.data.actDate) : '';
     },
     cellStyle: {
       paddingLeft: '8px',
