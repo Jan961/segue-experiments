@@ -129,6 +129,16 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
 
       const venueId = bookings.bookings.find((booking) => booking.Id === bookings.selected)?.Venue?.Id;
 
+      // get the currency rate for the global activity cost
+      const currResponse = await axios.get(`/api/marketing/currencyConversion/read`, {
+        params: {
+          bookingId,
+          productionId,
+        },
+      });
+
+      const conversionRate = currResponse.data.conversion;
+
       const response = await axios.get(`/api/marketing/globalActivities/venue/${venueId}`);
       const globalActivities = response.data;
 
@@ -143,7 +153,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
           actDate: startOfDay(new Date(act.Date)),
           followUpCheck: act.FollowUpRequired,
           followUpDt: act.DueByDate === '' ? null : startOfDay(new Date(act.DueByDate)),
-          cost: act.Cost,
+          cost: parseFloat(act.Cost) * conversionRate,
           id: act.Id,
           notes: act.Notes,
           venueIds: act.VenueIds,
@@ -399,7 +409,6 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
 
       // set checkbox row on activities tab
       const booking = bookings.bookings.find((booking) => booking.Id === props.bookingId);
-
       setOnSaleCheck(booking.TicketsOnSale);
       setMarketingPlansCheck(booking.MarketingPlanReceived);
       setPrintReqCheck(booking.PrintReqsReceived);
