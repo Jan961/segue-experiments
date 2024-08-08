@@ -135,7 +135,6 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
       if (
         globalActivities &&
         Array.isArray(globalActivities.activities) &&
-        globalActivities.activities.length > 0 &&
         Array.isArray(globalActivities.activityTypes)
       ) {
         const tempGlobList = globalActivities.activities.map((act) => ({
@@ -564,8 +563,8 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
 
           <div
             className={classNames(
-              'flex flex-col w-[487px] h-[69px] bg-primary-green/[0.30] rounded-xl mt-5 px-2 float-right',
-              actRowData.length === 0 ? '-mt-64' : '',
+              'flex flex-col w-[487px] h-[69px] bg-primary-green/[0.30] rounded-xl px-2 float-right',
+              actRowData.length === 0 ? '-mt-64' : 'mt-5',
             )}
           >
             <div className="flex flex-row gap-4">
@@ -612,8 +611,8 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
 
           <div
             className={classNames(
-              'flex flex-col w-[331px] h-[69px] bg-primary-green/[0.30] rounded-xl mt-5 px-2 float-right',
-              globalRowData.length === 0 ? '-mt-[350px]' : '',
+              'flex flex-col w-[331px] h-[69px] bg-primary-green/[0.30] rounded-xl px-2 float-right',
+              globalRowData.length === 0 ? '-mt-[350px]' : 'mt-5',
             )}
           >
             <div className="flex flex-row gap-4">
