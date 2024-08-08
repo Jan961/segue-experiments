@@ -13,7 +13,12 @@ export const getCurrencyFromBookingId = async (bookingId: number, returnCurrency
       select: { VenueId: true },
     });
 
-    const venueId = venueIdQuery ? venueIdQuery?.VenueId : null;
+    const venueId = venueIdQuery?.VenueId || null;
+
+    // return null if venueId is null
+    if (!venueId) {
+      return null;
+    }
 
     const venueCountryQuery: any | null = await prisma.VenueAddress.findFirst({
       where: {
@@ -27,6 +32,11 @@ export const getCurrencyFromBookingId = async (bookingId: number, returnCurrency
 
     const countryId: number | null = venueCountryQuery?.CountryId || null;
 
+    // handling null, don't call next query if null
+    if (!countryId) {
+      return null;
+    }
+
     const currencyCodeQuery: any | null = await prisma.Country.findFirst({
       where: {
         Id: { equals: countryId },
@@ -35,7 +45,13 @@ export const getCurrencyFromBookingId = async (bookingId: number, returnCurrency
         CurrencyCode: true,
       },
     });
+
     const currencyCode: string | null = currencyCodeQuery?.CurrencyCode;
+
+    // if currencyCode is null, don't run the currency firstFirst query
+    if (!currencyCode) {
+      return null;
+    }
 
     const currencySymbolQuery: any | null = await prisma.Currency.findFirst({
       where: {
@@ -48,11 +64,7 @@ export const getCurrencyFromBookingId = async (bookingId: number, returnCurrency
 
     const currencySymbol: string | null = currencySymbolQuery?.SymbolUnicode || null;
 
-    if (currencySymbol) {
-      return returnCurrencyCode ? currencyCode : charCodeToCurrency(currencySymbol);
-    } else {
-      return null;
-    }
+    return returnCurrencyCode ? currencyCode : charCodeToCurrency(currencySymbol);
   } catch (exception) {
     console.log(exception);
   }
@@ -103,12 +115,7 @@ export const getCurrencyFromProductionId = async (productionId: number, returnCu
     // Extract the currency symbol from the query result
     const currencySymbol: string | null = currencySymbolQuery?.SymbolUnicode || null;
 
-    // If returnCharCode is true, return the currencySymbol (charCode), otherwise return the currency name
-    if (currencySymbol) {
-      return returnCurrencyCode ? currencyCode : charCodeToCurrency(currencySymbol);
-    } else {
-      return null;
-    }
+    return returnCurrencyCode ? currencyCode : charCodeToCurrency(currencySymbol);
   } catch (exception) {
     console.log(exception);
     return null;

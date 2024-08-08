@@ -15,7 +15,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const productionSymbol = await getCurrencyFromProductionId(parseInt(productionId.toString()), true);
 
     // if either currency code is blank return 1 so there is no change to as a result of the conversion
-    if (bookingSymbol === '' || productionSymbol === '') {
+    if (!bookingSymbol || !productionSymbol) {
       res.status(200).json({ conversion: 1 });
     } else {
       const currencyConversion = await prisma.conversionRate.findFirst({
