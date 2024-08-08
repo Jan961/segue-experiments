@@ -1,7 +1,7 @@
 import { startOfWeek, differenceInWeeks, addWeeks, isBefore, isValid, format } from 'date-fns';
 import { toZonedTime } from 'date-fns-tz';
 import moment from 'moment';
-import { v4 as uuidv4 } from 'uuid';
+import { v4 } from 'uuid';
 import { DateTimeEntry } from 'types/ContractTypes';
 
 // regex for dd/mm/yy
@@ -380,7 +380,7 @@ export const getTimezonOffset = () => {
 export const parseAndSortDates = (arr: string[]): DateTimeEntry[] => {
   const parsedEntries = arr.map((str) => {
     const [timePart, isoDatePart] = str.split('? ');
-    return { timePart: timePart.trim(), date: new Date(isoDatePart.trim()), id: uuidv4() };
+    return { timePart: timePart.trim(), date: new Date(isoDatePart.trim()), id: v4() };
   });
 
   parsedEntries.sort((a, b) => a.date.getTime() - b.date.getTime());
@@ -399,7 +399,7 @@ export const parseAndSortDates = (arr: string[]): DateTimeEntry[] => {
 
   const result = Object.entries(groupedByDate).map(([date, times]) => {
     const formattedDate = `${date} ${times.join(' ')}`;
-    return { formattedDate, id: uuidv4() };
+    return { formattedDate, id: v4() };
   });
 
   return result;
