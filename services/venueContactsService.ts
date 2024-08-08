@@ -5,6 +5,9 @@ export const getContactNotesByBookingId = async (BookingId: number) => {
     where: {
       BookingId,
     },
+    orderBy: {
+      ContactDate: 'desc',
+    },
   });
   return data;
 };

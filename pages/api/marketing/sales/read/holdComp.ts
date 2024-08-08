@@ -3,9 +3,23 @@ import prisma from 'lib/prisma';
 import { addDurationToDate, getMonday } from 'services/dateService';
 import { getEmailFromReq, checkAccess, getAccountIdFromReq } from 'services/userService';
 
-export type LastPerfDate = {
-  BookingId: number;
-  LastPerformanaceDate: string;
+interface Hold {
+  name: string;
+  seats: number;
+  value: number;
+  id: number;
+}
+
+interface Comp {
+  name: string;
+  seats: number;
+  id: number;
+}
+
+type Res = {
+  holds: Array<Hold>;
+  comps: Array<Comp>;
+  setId: number;
 };
 
 // date-fns startOfDay not applicable for this use case
@@ -17,13 +31,13 @@ const removeTime = (inputDate: Date) => {
 const getCompHoldData = async (salesDate, bookingId) => {
   const holdTypes = await prisma.holdType.findMany({
     orderBy: {
-      HoldTypeSeqNo: 'asc',
+      HoldTypeId: 'asc',
     },
   });
 
   const compTypes = await prisma.compType.findMany({
     orderBy: {
-      CompTypeSeqNo: 'asc',
+      CompTypeId: 'asc',
     },
   });
 
@@ -172,8 +186,8 @@ const isDataAvailable = (data) => {
   return !checksArray.every((item) => item === true);
 };
 
-const copyData = (data, datesTried, bookingId) => {
-  datesTried.forEach(async (dtIn) => {
+const copyData = async (data, datesTried, bookingId) => {
+  const promises = datesTried.map(async (dtIn) => {
     // create a SalesSet and get a setID for this week that has no data
     const setResult = await prisma.SalesSet.create({
       data: {
@@ -222,6 +236,52 @@ const copyData = (data, datesTried, bookingId) => {
     });
 
     await prisma.$transaction(dbUpdates);
+
+    // Return the setId for each created SalesSet
+    return setResult.SetId;
+  });
+
+  // Wait for all promises to complete and return the last setId
+  const results = await Promise.all(promises);
+  return results[results.length - 1];
+};
+
+const getDealMemoHoldsByBookingId = async (bookingId: number) => {
+  const booking = await prisma.booking.findUnique({
+    where: {
+      Id: bookingId,
+    },
+    include: {
+      DealMemo: true,
+    },
+  });
+
+  // if there is no dealMemo record against the booking return an empty array
+  if (booking?.DealMemo === null) {
+    return [];
+  }
+
+  const dealMemoHolds = await prisma.dealMemoHold.findMany({
+    where: {
+      DMHoldDeMoId: booking?.DealMemo.DeMoId,
+    },
+    include: {
+      HoldType: {
+        select: {
+          HoldTypeId: true,
+          HoldTypeName: true,
+        },
+      },
+    },
+  });
+
+  return dealMemoHolds.map((hold) => {
+    return {
+      name: hold.HoldType.HoldTypeName,
+      seats: hold.DMHoldSeats,
+      value: hold.DMHoldValue,
+      id: hold.HoldType.HoldTypeId,
+    };
   });
 };
 
@@ -236,7 +296,7 @@ export default async function handle(req, res) {
     const access = await checkAccess(email);
     if (!access) return res.status(401).end();
 
-    let result = {};
+    let result: Res = null;
 
     const { SalesFrequency } = await prisma.production.findUnique({
       where: {
@@ -284,6 +344,15 @@ export default async function handle(req, res) {
         // if the first sales date has been reached, there is no comps/holds to recover
         // if this is the case, return blank values
         if (firstSalesDate.getTime() === startOfDay(currentDate).getTime()) {
+          // as there is no hold/comp data found - the hold data is copied from the deal memo
+          const dealMemoHolds = await getDealMemoHoldsByBookingId(bookingId);
+
+          // if dealMemoHolds has a length of 0, there is no dealMemo stored against the booking.
+          // only actions if dealMemoHolds is greater than 0
+          if (dealMemoHolds.length > 0) {
+            result = { ...result, holds: dealMemoHolds };
+          }
+
           res.status(200).json(result);
         }
       }
@@ -291,7 +360,8 @@ export default async function handle(req, res) {
 
     // if tried dates is greater than 0, we need to copy the new found data into the weeks that were missed
     if (triedDates.length > 0) {
-      copyData(result, triedDates, bookingId);
+      const latestSetId = await copyData(result, triedDates, bookingId);
+      result = { ...result, setId: latestSetId };
     }
 
     res.status(200).json(result);

@@ -1,11 +1,6 @@
 import prisma from 'lib/prisma';
 import { getEmailFromReq, checkAccess } from 'services/userService';
 
-export type LastPerfDate = {
-  BookingId: number;
-  LastPerformanaceDate: string;
-};
-
 // date-fns startOfDay not applicable for this use case
 const removeTime = (inputDate: Date) => {
   const date = new Date(inputDate);
