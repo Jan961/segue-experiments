@@ -44,7 +44,7 @@ import {
   dateToTimeString,
   formattedDateWithDay,
   getShortWeekFormat,
-} from 'services/dateService';
+ parseAndSortDates } from 'services/dateService';
 import { VENUE_CURRENCY_SYMBOLS } from 'types/MarketingTypes';
 import StandardSeatKillsTable from '../table/StandardSeatKillsTable';
 import LoadingOverlay from 'components/shows/LoadingOverlay';
@@ -470,19 +470,19 @@ export const EditDealMemoContractModal = ({
           <div className="w-4/5 flex">
             <div>
               {selectedTableCell.contract.performanceTimes &&
-                selectedTableCell.contract.performanceTimes
-                  .split(';')
-                  .map((times) => (
-                    <TextInput
-                      key={times}
-                      testId="performanceDate"
-                      className="w-[350px] mt-1 mb-1 text-primary-input-text font-bold"
-                      disabled
-                      value={`${getShortWeekFormat(times.split('?')[1])} ${formattedDateWithDay(
-                        times.split('?')[1],
-                      )} : ${times.split('?')[0]}`}
-                    />
-                  ))}
+                parseAndSortDates(selectedTableCell.contract.performanceTimes).map((dateTimeEntry) => (
+                  <TextInput
+                    key={dateTimeEntry.id}
+                    testId="performanceDate"
+                    className="w-[350px] mt-1 mb-1 text-primary-input-text font-bold"
+                    disabled
+                    value={
+                      getShortWeekFormat(dateTimeEntry.formattedDate) +
+                      ' ' +
+                      formattedDateWithDay(dateTimeEntry.formattedDate)
+                    }
+                  />
+                ))}
               {!selectedTableCell.contract.performanceTimes && (
                 <TextInput
                   testId="performanceTime"

@@ -1,6 +1,8 @@
 import { startOfWeek, differenceInWeeks, addWeeks, isBefore, isValid, format } from 'date-fns';
 import { toZonedTime } from 'date-fns-tz';
 import moment from 'moment';
+import { v4 as uuidv4 } from 'uuid';
+import { DateTimeEntry } from 'types/ContractTypes';
 
 // regex for dd/mm/yy
 export const DATE_PATTERN = /(\d{2}\/\d{2}\/\d{2})/;
@@ -372,4 +374,33 @@ export const dateToTimeString = (dateStr) => {
 
 export const getTimezonOffset = () => {
   return new Date().getTimezoneOffset();
+};
+
+// Expect string to come in format "HH:MM? YYYY-MM-DD" - where HH:MM may not be included
+export const parseAndSortDates = (arr: string[]): DateTimeEntry[] => {
+  const parsedEntries = arr.map((str) => {
+    const [timePart, isoDatePart] = str.split('? ');
+    return { timePart: timePart.trim(), date: new Date(isoDatePart.trim()), id: uuidv4() };
+  });
+
+  parsedEntries.sort((a, b) => a.date.getTime() - b.date.getTime());
+
+  const groupedByDate = parsedEntries.reduce(
+    (acc, entry) => {
+      const dateKey = entry.date.toISOString().split('T')[0];
+      if (!acc[dateKey]) {
+        acc[dateKey] = [];
+      }
+      acc[dateKey].push(entry.timePart);
+      return acc;
+    },
+    {} as Record<string, string[]>,
+  );
+
+  const result = Object.entries(groupedByDate).map(([date, times]) => {
+    const formattedDate = `${date} ${times.join(' ')}`;
+    return { formattedDate, id: uuidv4() };
+  });
+
+  return result;
 };

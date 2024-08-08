@@ -24,7 +24,7 @@ import {
   VenueContractFormData,
 } from 'interfaces';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
-import { formattedDateWithDay, toISO } from 'services/dateService';
+import { formattedDateWithDay, toISO , parseAndSortDates } from 'services/dateService';
 import { EditDealMemoContractModal } from './EditDealMemoContractModal';
 import { isNullOrEmpty, transformToOptions } from 'utils';
 import LoadingOverlay from 'components/shows/LoadingOverlay';
@@ -35,8 +35,6 @@ import { attachmentMimeTypes } from 'components/core-ui-lib/UploadModal/interfac
 import { headlessUploadMultiple } from 'requests/upload';
 import { getFileUrl } from 'lib/s3';
 import charCodeToCurrency from 'utils/charCodeToCurrency';
-import { v4 as uuidv4 } from 'uuid';
-import { DateTimeEntry } from 'types/ContractTypes';
 import { UiVenue, transformVenues } from 'utils/venue';
 import { ConfDialogVariant } from 'components/core-ui-lib/ConfirmationDialog/ConfirmationDialog';
 
@@ -84,6 +82,8 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
   const [lastDates, setLastDates] = useState([]);
   const [showConfirmationDialog, setShowConfirmationDialog] = useState<boolean>(false);
   const [confirmationVariant, setConfirmationVariant] = useState<string>('cancel');
+
+  console.log(selectedTableCell.contract);
 
   const producerList = useMemo(() => {
     const list = {};
@@ -336,34 +336,6 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
     } else if (confirmationVariant === 'delete') {
       handleDeleteAttachment(attachRow, attachIndex);
     }
-  };
-
-  const parseAndSortDates = (arr: string[]): DateTimeEntry[] => {
-    const parsedEntries = arr.map((str) => {
-      const [timePart, isoDatePart] = str.split('? ');
-      return { timePart: timePart.trim(), date: new Date(isoDatePart.trim()), id: uuidv4() };
-    });
-
-    parsedEntries.sort((a, b) => a.date.getTime() - b.date.getTime());
-
-    const groupedByDate = parsedEntries.reduce(
-      (acc, entry) => {
-        const dateKey = entry.date.toISOString().split('T')[0];
-        if (!acc[dateKey]) {
-          acc[dateKey] = [];
-        }
-        acc[dateKey].push(entry.timePart);
-        return acc;
-      },
-      {} as Record<string, string[]>,
-    );
-
-    const result = Object.entries(groupedByDate).map(([date, times]) => {
-      const formattedDate = `${date} ${times.join(' ')}`;
-      return { formattedDate, id: uuidv4() };
-    });
-
-    return result;
   };
 
   return (
