@@ -153,31 +153,37 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
   };
 
   const handleFormData = async () => {
-    const bookingData = Object.keys(saveBookingFormData).length > 0;
-    const contractData = Object.keys(saveContractFormData).length > 0;
-    if (contractData) {
-      await fetchData({
-        url: `/api/contracts/update/venueContract/${selectedTableCell.contract.Id}`,
-        method: 'PATCH',
-        data: saveContractFormData,
-      });
-    }
+    const handleUpload = async () => {
+      const bookingData = Object.keys(saveBookingFormData).length > 0;
+      const contractData = Object.keys(saveContractFormData).length > 0;
+      if (contractData) {
+        await fetchData({
+          url: `/api/contracts/update/venueContract/${selectedTableCell.contract.Id}`,
+          method: 'PATCH',
+          data: saveContractFormData,
+        });
+      }
 
-    if (bookingData) {
-      await fetchData({
-        url: `/api/contracts/update/venueContractBooking/${selectedTableCell.contract.Id}`,
-        method: 'PATCH',
-        data: saveBookingFormData,
-      });
-    }
-    setSaveBookingFormData({});
-    setSaveContractFormData({});
+      if (bookingData) {
+        await fetchData({
+          url: `/api/contracts/update/venueContractBooking/${selectedTableCell.contract.Id}`,
+          method: 'PATCH',
+          data: saveBookingFormData,
+        });
+      }
+      setSaveBookingFormData({});
+      setSaveContractFormData({});
 
-    await saveFiles();
-    await deleteFiles();
+      await saveFiles();
+      await deleteFiles();
 
-    onClose();
-    router.replace(router.asPath);
+      onClose();
+      router.replace(router.asPath);
+    };
+
+    setIsLoading(true);
+    await handleUpload();
+    setIsLoading(false);
   };
 
   const deleteFiles = async () => {
