@@ -71,7 +71,7 @@ export const headlessUpload = async (file: FormData, progress: number, slowProgr
     const response = await axios.post('/api/upload', file, {
       onUploadProgress: (progressEvent) => onUploadProgress(progressEvent, file, progress, slowProgressInterval, null),
     });
-    notify.success(ToastMessages.imageUploadSuccess);
+    notify.success(ToastMessages.fileUploadSuccess);
     return response;
   } else {
     return null;
