@@ -83,6 +83,8 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
   const [lastDates, setLastDates] = useState([]);
   const [showConfirmationDialog, setShowConfirmationDialog] = useState<boolean>(false);
   const [confirmationVariant, setConfirmationVariant] = useState<string>('cancel');
+  const [dealMemoCreated, setDealMemoCreated] = useState<boolean>(true);
+  const [dealMemoButtonText, setDealMemoButtonText] = useState<string>('Deal Memo');
 
   useEffect(() => {
     console.log(demoModalData);
@@ -102,7 +104,13 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
     const demoModalData = await axios.get<DealMemoContractFormData>(
       `/api/dealMemo/getDealMemo/${selectedTableCell.contract.Id ? selectedTableCell.contract.Id : 1}`,
     );
-    console.log(demoModalData);
+    if (!demoModalData.data) {
+      setDealMemoCreated(false);
+      setDealMemoButtonText('Create Deal Memo');
+    } else {
+      setDealMemoCreated(true);
+      setDealMemoButtonText('Edit Deal Memo');
+    }
     const getHoldType = await axios.get<DealMemoHoldType>(`/api/dealMemo/getHoldType/${selectedTableCell.contract.Id}`);
     setDealHoldType(getHoldType.data as DealMemoHoldType);
     if (demoModalData.data && demoModalData.data.BookingId) {
@@ -356,72 +364,75 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
               <div className="flex justify-between">
                 <div className="text-primary-input-text font-bold text-lg">Deal Memo</div>
                 <div className="flex gap-x-2">
+                  <Button className="w-32" variant="primary" text={dealMemoButtonText} onClick={handleEditDealMemo} />
                   <Button
-                    className="w-32"
+                    className={`w-32 ${
+                      dealMemoCreated ? '' : ' text-gray-500 pointer-events-none select-none opacity-25'
+                    }`}
                     variant="primary"
-                    text="Create/Edit Deal Memo"
-                    onClick={handleEditDealMemo}
-                  />
-                  <Button className="w-32" variant="primary" text="View as PDF" />
-                </div>
-              </div>
-              <div className=" text-primary-input-text font-bold text-sm mt-1.5">Deal Memo Status</div>
-              <Select
-                options={statusOptions}
-                className="bg-primary-white w-full"
-                placeholder="Select Deal Memo Status"
-                onChange={(value) => editContractModalData('dealMemoStatus', value, 'booking')}
-                isClearable
-                isSearchable
-              />
-
-              <div className=" text-primary-input-text font-bold text-sm mt-6">Completed By</div>
-              <Select
-                onChange={() => {
-                  return null;
-                }}
-                className="bg-primary-white w-full"
-                options={[...userList]}
-                isClearable
-                isSearchable
-                placeholder="Select User"
-              />
-
-              <div className=" text-primary-input-text font-bold text-sm mt-6">Approved By</div>
-              <Select
-                onChange={() => {
-                  return null;
-                }}
-                className="bg-primary-white w-full"
-                options={[...userList]}
-                isClearable
-                isSearchable
-                placeholder="Select User"
-              />
-              <div className="flex items-center mt-6 justify-between px-3">
-                <div>
-                  <div className=" text-primary-input-text font-bold text-sm">Date Issued</div>
-                  <DateInput
-                    onChange={() => {
-                      return null;
-                    }}
-                    value={formData.SignedDate}
-                  />
-                </div>
-
-                <div>
-                  <div className=" text-primary-input-text font-bold text-sm">Date Returned</div>
-                  <DateInput
-                    onChange={() => {
-                      return null;
-                    }}
-                    value={formData.SignedDate}
+                    text="View as PDF"
                   />
                 </div>
               </div>
+              <div className={`${dealMemoCreated ? '' : ' text-gray-500 pointer-events-none select-none opacity-50'}`}>
+                <div className=" text-primary-input-text font-bold text-sm mt-1.5">Deal Memo Status</div>
+                <Select
+                  options={statusOptions}
+                  className="bg-primary-white w-full"
+                  placeholder="Select Deal Memo Status"
+                  onChange={(value) => editContractModalData('dealMemoStatus', value, 'booking')}
+                  isClearable
+                  isSearchable
+                />
 
-              <div className=" text-primary-input-text font-bold text-sm mt-6">Notes</div>
-              <TextArea className="h-[125px] w-[400px]" value="" />
+                <div className=" text-primary-input-text font-bold text-sm mt-6">Completed By</div>
+                <Select
+                  onChange={() => {
+                    return null;
+                  }}
+                  className="bg-primary-white w-full"
+                  options={[...userList]}
+                  isClearable
+                  isSearchable
+                  placeholder="Select User"
+                />
+
+                <div className=" text-primary-input-text font-bold text-sm mt-6">Approved By</div>
+                <Select
+                  onChange={() => {
+                    return null;
+                  }}
+                  className="bg-primary-white w-full"
+                  options={[...userList]}
+                  isClearable
+                  isSearchable
+                  placeholder="Select User"
+                />
+                <div className="flex items-center mt-6 justify-between px-3">
+                  <div>
+                    <div className=" text-primary-input-text font-bold text-sm">Date Issued</div>
+                    <DateInput
+                      onChange={() => {
+                        return null;
+                      }}
+                      value={formData.SignedDate}
+                    />
+                  </div>
+
+                  <div>
+                    <div className=" text-primary-input-text font-bold text-sm">Date Returned</div>
+                    <DateInput
+                      onChange={() => {
+                        return null;
+                      }}
+                      value={formData.SignedDate}
+                    />
+                  </div>
+                </div>
+
+                <div className=" text-primary-input-text font-bold text-sm mt-6">Notes</div>
+                <TextArea className="h-[125px] w-[400px]" value="" />
+              </div>
             </div>
             <div className="flex flex-col gap-y-2">
               <div className="w-[423px] flex justify-end">
