@@ -37,14 +37,14 @@ import { getFileUrl } from 'lib/s3';
 import charCodeToCurrency from 'utils/charCodeToCurrency';
 import { v4 as uuidv4 } from 'uuid';
 import { DateTimeEntry } from 'types/ContractTypes';
-import { UiVenue , transformVenues } from 'utils/venue';
+import { UiVenue, transformVenues } from 'utils/venue';
+import { ConfDialogVariant } from 'components/core-ui-lib/ConfirmationDialog/ConfirmationDialog';
 
 const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClose: () => void }) => {
   const productionJumpState = useRecoilValue(currentProductionSelector);
   const selectedTableCell = useRecoilValue(addEditContractsState);
   const [saveContractFormData, setSaveContractFormData] = useState<Partial<SaveContractFormState>>({});
   const [saveBookingFormData, setSaveBookingFormData] = useState<Partial<SaveContractBookingFormState>>({});
-  const [cancelModal, setCancelModal] = useState<boolean>(false);
   const [editDealMemoModal, setEditDealMemoModal] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [venue, setVenue] = useState<Partial<UiVenue>>({});
@@ -78,11 +78,12 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
   const [showUploadModal, setShowUploadModal] = useState<boolean>(false);
   const [contractAttatchmentRows, setContractAttatchmentRows] = useState([]);
   const [filesForUpload, setFilesForUpload] = useState<FormData[]>([]);
-  const [fileDeleteConfirm, setFileDeleteConfirm] = useState<boolean>();
   const [attachRow, setAttachRow] = useState();
   const [attachIndex, setAttachIndex] = useState();
   const [filesToDelete, setFilesToDelete] = useState([]);
   const [lastDates, setLastDates] = useState([]);
+  const [showConfirmationDialog, setShowConfirmationDialog] = useState<boolean>(false);
+  const [confirmationVariant, setConfirmationVariant] = useState<string>('cancel');
 
   const producerList = useMemo(() => {
     const list = {};
@@ -196,31 +197,37 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
   };
 
   const handleFormData = async () => {
-    const bookingData = Object.keys(saveBookingFormData).length > 0;
-    const contractData = Object.keys(saveContractFormData).length > 0;
-    if (contractData) {
-      await fetchData({
-        url: `/api/contracts/update/venueContract/${selectedTableCell.contract.Id}`,
-        method: 'PATCH',
-        data: saveContractFormData,
-      });
-    }
+    const handleUpload = async () => {
+      const bookingData = Object.keys(saveBookingFormData).length > 0;
+      const contractData = Object.keys(saveContractFormData).length > 0;
+      if (contractData) {
+        await fetchData({
+          url: `/api/contracts/update/venueContract/${selectedTableCell.contract.Id}`,
+          method: 'PATCH',
+          data: saveContractFormData,
+        });
+      }
 
-    if (bookingData) {
-      await fetchData({
-        url: `/api/contracts/update/venueContractBooking/${selectedTableCell.contract.Id}`,
-        method: 'PATCH',
-        data: saveBookingFormData,
-      });
-    }
-    setSaveBookingFormData({});
-    setSaveContractFormData({});
+      if (bookingData) {
+        await fetchData({
+          url: `/api/contracts/update/venueContractBooking/${selectedTableCell.contract.Id}`,
+          method: 'PATCH',
+          data: saveBookingFormData,
+        });
+      }
+      setSaveBookingFormData({});
+      setSaveContractFormData({});
 
-    await saveFiles();
-    await deleteFiles();
+      await saveFiles();
+      await deleteFiles();
 
-    onClose();
-    router.replace(router.asPath);
+      onClose();
+      router.replace(router.asPath);
+    };
+
+    setIsLoading(true);
+    await handleUpload();
+    setIsLoading(false);
   };
 
   const deleteFiles = async () => {
@@ -260,7 +267,8 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
       onClose();
     }
     if (Object.keys(saveBookingFormData).length > 0 || Object.keys(saveContractFormData).length > 0) {
-      setCancelModal(true);
+      setConfirmationVariant('cancel');
+      setShowConfirmationDialog(true);
     } else {
       onClose();
     }
@@ -306,7 +314,8 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
     } else if (event.column.colId === 'icons') {
       setAttachRow(event.data);
       setAttachIndex(event.rowIndex);
-      setFileDeleteConfirm(true);
+      setConfirmationVariant('delete');
+      setShowConfirmationDialog(true);
     }
   };
 
@@ -320,7 +329,15 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
       newRows.splice(rowIndex, 1);
     }
     setContractAttatchmentRows(newRows);
-    setFileDeleteConfirm(false);
+    setShowConfirmationDialog(false);
+  };
+
+  const handleOnCancelYes = () => {
+    if (confirmationVariant === 'cancel') {
+      handleCancelForm(true);
+    } else if (confirmationVariant === 'delete') {
+      handleDeleteAttachment(attachRow, attachIndex);
+    }
   };
 
   const parseAndSortDates = (arr: string[]): DateTimeEntry[] => {
@@ -357,15 +374,14 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
       title={modalTitle}
       titleClass={classNames('text-xl text-primary-navy font-bold -mt-2.5')}
       onClose={() => handleCancelForm(false)}
-      hasOverlay={false}
     >
       <div className="h-[80vh] w-auto overflow-y-scroll flex">
         <div className="h-[800px] flex">
           <div className="flex flex-col gap-y-3">
             <div className="w-[423px] rounded border-2 border-secondary mr-2 p-3 bg-primary-blue bg-opacity-15">
-              <div className="flex mb-5 justify-between">
-                <div className=" text-primary-input-text font-bold text-lg mr-8">Deal Memo</div>
-                <div className="flex items-center gap-x-2">
+              <div className="flex">
+                <div className="text-primary-input-text font-bold text-lg mr-8">Deal Memo</div>
+                <div className="flex items-center">
                   <Button
                     className="w-32"
                     variant="primary"
@@ -773,7 +789,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
           visible={showUploadModal}
           title="Upload Venue Contract Attachments"
           info="Please upload your file by dragging it into the grey box below or by clicking the upload cloud."
-          allowedFormats={attachmentMimeTypes.venueContract}
+          allowedFormats={attachmentMimeTypes.genericAttachment}
           onClose={() => setShowUploadModal(false)}
           maxFileSize={5120 * 1024} // 5MB
           onSave={onSave}
@@ -785,18 +801,10 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
       <ConfirmationDialog
         labelYes="Yes"
         labelNo="No"
-        show={cancelModal}
-        variant="cancel"
-        onNoClick={() => setCancelModal(false)}
-        onYesClick={() => handleCancelForm(true)}
-      />
-      <ConfirmationDialog
-        labelYes="Yes"
-        labelNo="No"
-        show={fileDeleteConfirm}
-        variant="delete"
-        onNoClick={() => setFileDeleteConfirm(false)}
-        onYesClick={() => handleDeleteAttachment(attachRow, attachIndex)}
+        show={showConfirmationDialog}
+        variant={confirmationVariant as ConfDialogVariant}
+        onNoClick={() => setShowConfirmationDialog(false)}
+        onYesClick={() => handleOnCancelYes()}
       />
       {editDealMemoModal && (
         <EditDealMemoContractModal

@@ -7,7 +7,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const BookingId: number = parseInt(req.query.BookingId as string);
 
     const email = await getEmailFromReq(req);
-    const access = await checkAccess(email, { BookingId });
+    const access = await checkAccess(email);
     if (!access) return res.status(401).end();
 
     const data = req.body;
