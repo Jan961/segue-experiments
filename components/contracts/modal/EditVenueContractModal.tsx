@@ -24,7 +24,7 @@ import {
   VenueContractFormData,
 } from 'interfaces';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
-import { formattedDateWithDay, toISO , parseAndSortDates } from 'services/dateService';
+import { formattedDateWithDay, toISO, parseAndSortDates } from 'services/dateService';
 import { EditDealMemoContractModal } from './EditDealMemoContractModal';
 import { isNullOrEmpty, transformToOptions } from 'utils';
 import LoadingOverlay from 'components/shows/LoadingOverlay';
@@ -82,8 +82,6 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
   const [lastDates, setLastDates] = useState([]);
   const [showConfirmationDialog, setShowConfirmationDialog] = useState<boolean>(false);
   const [confirmationVariant, setConfirmationVariant] = useState<string>('cancel');
-
-  console.log(selectedTableCell.contract);
 
   const producerList = useMemo(() => {
     const list = {};
