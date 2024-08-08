@@ -16,7 +16,6 @@ import axios from 'axios';
 import { bookingStatusMap } from 'config/bookings';
 import { userState } from 'state/account/userState';
 import { useEffect, useMemo, useState } from 'react';
-import { Venue } from '@prisma/client';
 import {
   DealMemoContractFormData,
   DealMemoHoldType,
@@ -38,6 +37,7 @@ import { getFileUrl } from 'lib/s3';
 import charCodeToCurrency from 'utils/charCodeToCurrency';
 import { v4 as uuidv4 } from 'uuid';
 import { DateTimeEntry } from 'types/ContractTypes';
+import { UiVenue , transformVenues } from 'utils/venue';
 
 const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClose: () => void }) => {
   const productionJumpState = useRecoilValue(currentProductionSelector);
@@ -47,8 +47,8 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
   const [cancelModal, setCancelModal] = useState<boolean>(false);
   const [editDealMemoModal, setEditDealMemoModal] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [venue, setVenue] = useState<Partial<Venue>>({});
-  const [barredVenues, setBarredVenues] = useState<Partial<Venue>[]>([]);
+  const [venue, setVenue] = useState<Partial<UiVenue>>({});
+  const [barredVenues, setBarredVenues] = useState<Partial<UiVenue>[]>([]);
   const [dealHoldType, setDealHoldType] = useState<Partial<DealMemoHoldType>>({});
   const [formData, setFormData] = useState<Partial<VenueContractFormData>>({
     ...initialEditContractFormData,
@@ -115,18 +115,14 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
     try {
       if (selectedTableCell.contract && selectedTableCell.contract.venueId) {
         const venueData = await axios.get(`/api/venue/${selectedTableCell.contract.venueId}`);
-        setVenue(venueData.data as Venue);
+        setVenue(transformVenues([venueData.data])[0]);
         const barredVenues = await axios.get(`/api/venue/barredVenues/${selectedTableCell.contract.venueId}`);
-        setBarredVenues(barredVenues.data as Venue[]);
+        setBarredVenues(transformVenues(barredVenues.data));
       }
     } catch (error) {
       console.log(error, 'Error - failed to fetch Venue Data for current booking.');
     }
   };
-
-  useEffect(() => {
-    console.log(barredVenues);
-  }, [barredVenues]);
 
   const fetchContractAttachments = async () => {
     try {
@@ -614,12 +610,12 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
               <div className="w-1/5">
                 <div className=" text-primary-input-text font-bold text-sm">Details</div>
               </div>
-
               <div className="w-4/5">
                 <TextArea
                   className="mt-2.5 h-[58px] w-[498px]"
                   value={formData.DealNotes}
-                  onChange={(value) => editContractModalData('Notes', value.target.value, 'contract')}
+                  onChange={(value) => editContractModalData('DealNotes', value.target.value, 'booking')}
+                  placeholder="Deal Details"
                 />
               </div>
             </div>
@@ -699,21 +695,17 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
               <div className="w-4/5 flex gap-x-5">
                 <div className="flex">
                   <div className=" text-primary-input-text font-bold text-sm mr-2">Pre Show</div>
-                  <div className=" text-primary-input-text  text-sm">
-                    {venue.BarringWeeksPre ? venue.BarringWeeksPre : '-'}
-                  </div>
+                  <div className=" text-primary-input-text  text-sm">{venue.preShow ? venue.preShow : '-'}</div>
                 </div>
 
                 <div className="flex ">
                   <div className=" text-primary-input-text font-bold text-sm mr-2">Post Show</div>
-                  <div className=" text-primary-input-text  text-sm">
-                    {venue.BarringWeeksPost ? venue.BarringWeeksPost : '-'}
-                  </div>
+                  <div className=" text-primary-input-text  text-sm">{venue.postShow ? venue.postShow : '-'}</div>
                 </div>
                 <div className="flex ">
                   <div className=" text-primary-input-text font-bold text-sm mr-2">Miles</div>
                   <div className=" text-primary-input-text  text-sm">
-                    {venue.BarringMiles ? venue.BarringMiles : '-'}
+                    {venue.barringMiles ? venue.barringMiles : '-'}
                   </div>
                 </div>
               </div>
@@ -727,7 +719,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                 <div className=" text-primary-input-text  text-sm ml-3">
                   {barredVenues && barredVenues.length > 0
                     ? barredVenues.map((venue) => {
-                        return <div key={venue.Id}>{venue.Name}</div>;
+                        return <div key={venue.id}>{venue.venueName}</div>;
                       })
                     : '-'}
                 </div>

@@ -169,7 +169,7 @@ export const transformVenues = (
     }) => {
       const address1 = trasformVenueAddress(VenueAddress?.[0]) || {};
       const address2 = trasformVenueAddress(VenueAddress?.[1]) || {};
-      const barredVenues: UiBarredVenue[] = BarredVenues.map(({ Id: id, BarredVenueId: barredVenueId }) => ({
+      const barredVenues: UiBarredVenue[] = BarredVenues?.map(({ Id: id, BarredVenueId: barredVenueId }) => ({
         id,
         barredVenueId,
       }));

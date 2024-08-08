@@ -13,7 +13,7 @@ export const dealTypeOptions: SelectOption[] = [
   { text: 'Split', value: 'SPLT' },
   { text: 'Guarantee', value: 'GUA' },
   { text: 'Call Single', value: 'CS' },
-  { text: 'Call multiple', value: 'CM' },
+  { text: 'Call Multiple', value: 'CM' },
   { text: 'First Call Against Split', value: 'FCAS' },
 ];
 export const allStatusOptions: SelectOption[] = [{ text: 'All', value: 'all' }, ...statusOptions];
