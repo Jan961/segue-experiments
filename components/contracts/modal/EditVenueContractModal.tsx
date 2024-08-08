@@ -53,7 +53,6 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
     ...initialEditContractFormData,
     ...selectedTableCell.contract,
   });
-  console.log(selectedTableCell.contract);
   const [demoModalData, setDemoModalData] = useState<Partial<DealMemoContractFormData>>({});
   const [modalTitle, setModalTitle] = useState<string>(
     `${productionJumpState.ShowCode + productionJumpState.Code} ${productionJumpState.ShowName} | ${
@@ -529,10 +528,10 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                   <div className=" text-primary-input-text font-bold text-sm mr-2">Returned from Venue</div>
 
                   <DateInput
-                    onChange={(value) =>
+                    onChange={(value) => {
                       formData.ReceivedBackDate.toString() !== toISO(value) &&
-                      editContractModalData('ReceivedBackDate', value, 'contract')
-                    }
+                        editContractModalData('ReceivedBackDate', value, 'contract');
+                    }}
                     value={formData.ReceivedBackDate}
                     className="z-[1000]"
                     position="!-left-24"
@@ -547,9 +546,10 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                   className="flex flex-row-reverse"
                   labelClassName="!text-base"
                   id="includeExcludedVenues"
-                  onChange={() => {
-                    return null;
+                  onChange={(e) => {
+                    editContractModalData('BankDetailsSent', e.target.value, 'contract');
                   }}
+                  checked={formData.BankDetailsSent}
                 />
               </div>
               <div className="flex flex-1 items-center justify-center">
@@ -558,9 +558,10 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                   className="flex flex-row-reverse"
                   labelClassName="!text-base"
                   id="includeExcludedVenues"
-                  onChange={() => {
-                    return null;
+                  onChange={(e) => {
+                    editContractModalData('TechSpecSent', e.target.value, 'contract');
                   }}
+                  checked={formData.TechSpecSent}
                 />
               </div>
               <div className="flex flex-1 items-center justify-end">
@@ -569,9 +570,10 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                   className="flex flex-row-reverse"
                   labelClassName="!text-base"
                   id="includeExcludedVenues"
-                  onChange={() => {
-                    return null;
+                  onChange={(e) => {
+                    editContractModalData('PRSCertSent', e.target.value, 'contract');
                   }}
+                  checked={formData.PRSCertSent}
                 />
               </div>
             </div>

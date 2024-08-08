@@ -645,8 +645,11 @@ export interface VenueContractFormData {
   currencyCode: string;
   FirstDate: string;
   Id: string;
+  BankDetailsSent: boolean;
+  TechSpecSent: boolean;
+  PRSCertSent: boolean;
   GP: string;
-  Test: string;
+  PromoterPercent: string;
 }
 
 export interface SaveContractFormState {
