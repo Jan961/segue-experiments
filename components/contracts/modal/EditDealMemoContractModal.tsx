@@ -241,7 +241,7 @@ export const EditDealMemoContractModal = ({
       dataDemo[key] = {
         ...dataDemo[key],
         [dataKey]: data,
-        DMPDeMoId: formData.DeMoId,
+        DMPDeMoId: formData.Id,
       };
       setdealMemoPriceFormData({ ...dataDemo });
     }
@@ -293,7 +293,7 @@ export const EditDealMemoContractModal = ({
     const updateCallData = { ...callData[index], [dataKey]: value };
     callData[index] = updateCallData;
     // eslint-disable-next-line dot-notation
-    callData[index]['DMCDeMoId'] = demoModalData.DeMoId;
+    callData[index]['DMCDeMoId'] = demoModalData.Id;
     setDealCall([...callData]);
   };
 
@@ -367,9 +367,9 @@ export const EditDealMemoContractModal = ({
           <div className="w-4/5 flex">
             <DateInput
               onChange={(value) => {
-                editDemoModalData('DeMoDateIssued', value, 'dealMemo');
+                editDemoModalData('DateIssued', value, 'dealMemo');
               }}
-              value={formData.DeMoDateIssued}
+              value={formData.DateIssued}
             />
           </div>
         </div>
@@ -383,14 +383,14 @@ export const EditDealMemoContractModal = ({
             have any queries about the Deal Memo, please contact{' '}
             <Select
               onChange={(value) => {
-                editDemoModalData('DeMoAccContId', value, 'dealMemo');
+                editDemoModalData('AccContId', value, 'dealMemo');
               }}
               className="bg-primary-white w-3/12 ml-2 mr-2"
               placeholder="Please select..."
               options={[{ text: 'Select Assignee', value: null }, ...userList]}
               isClearable
               isSearchable
-              value={formData.DeMoAccContId}
+              value={formData.AccContId}
             />
             ASAP
           </span>
@@ -522,8 +522,8 @@ export const EditDealMemoContractModal = ({
               <TextArea
                 testId="prePostShow"
                 className="w-full h-auto"
-                value={formData.DeMoPrePostShowEvents}
-                onChange={(value) => editDemoModalData('DeMoPrePostShowEvents', value.target.value, 'dealMemo')}
+                value={formData.PrePostShowEvents}
+                onChange={(value) => editDemoModalData('PrePostShowEvents', value.target.value, 'dealMemo')}
               />
             </div>
           </div>
@@ -533,10 +533,10 @@ export const EditDealMemoContractModal = ({
           <div className="w-4/5 flex items-center">
             <TimeInput
               className="w-fit h-[31px] [&>input]:!h-[25px] [&>input]:!w-11 !justify-center shadow-input-shadow"
-              value={formData && formData.DeMoVenueCurfewTime ? dateToTimeString(formData.DeMoVenueCurfewTime) : null}
+              value={formData && formData.VenueCurfewTime ? dateToTimeString(formData.VenueCurfewTime) : null}
               disabled={disableDate}
               onChange={(value) =>
-                editDemoModalData('DeMoVenueCurfewTime', convertTimeToTodayDateFormat(value), 'dealMemo')
+                editDemoModalData('VenueCurfewTime', convertTimeToTodayDateFormat(value), 'dealMemo')
               }
               tabIndexShow={true}
             />
@@ -546,8 +546,8 @@ export const EditDealMemoContractModal = ({
             <TextInput
               testId="notes"
               className="w-[51vw]"
-              value={formData.DeMoRunningTimeNotes}
-              onChange={(value) => editDemoModalData('DeMoRunningTimeNotes', value.target.value, 'dealMemo')}
+              value={formData.RunningTimeNotes}
+              onChange={(value) => editDemoModalData('RunningTimeNotes', value.target.value, 'dealMemo')}
             />
           </div>
         </div>
@@ -578,13 +578,13 @@ export const EditDealMemoContractModal = ({
           <div className="w-1/5 text-primary-input-text font-bold">Programmer</div>
           <div className="w-4/5">
             <Select
-              onChange={(value) => editDemoModalData('DeMoProgrammerVenueContactId', value, 'dealMemo')}
+              onChange={(value) => editDemoModalData('ProgrammerVenueContactId', value, 'dealMemo')}
               options={[{ text: 'Select Assignee', value: null }, ...venueUserList]}
               className="bg-primary-white w-full"
               placeholder="Please select..."
               isClearable
               isSearchable
-              value={formData.DeMoProgrammerVenueContactId}
+              value={formData.ProgrammerVenueContactId}
             />
           </div>
         </div>
@@ -596,13 +596,13 @@ export const EditDealMemoContractModal = ({
               className="w-full text-primary-input-text font-bold"
               disabled
               placeholder={
-                venueUserData[formData.DeMoProgrammerVenueContactId]
+                venueUserData[formData.ProgrammerVenueContactId]
                   ? 'Add details to Venue Database'
                   : 'Please select from the dropdown above'
               }
               value={
-                venueUserData[formData.DeMoProgrammerVenueContactId]
-                  ? venueUserData[formData.DeMoProgrammerVenueContactId].Phone
+                venueUserData[formData.ProgrammerVenueContactId]
+                  ? venueUserData[formData.ProgrammerVenueContactId].Phone
                   : ''
               }
             />
@@ -616,13 +616,13 @@ export const EditDealMemoContractModal = ({
               className="w-full text-primary-input-text font-bold"
               disabled
               placeholder={
-                venueUserData[formData.DeMoProgrammerVenueContactId]
+                venueUserData[formData.ProgrammerVenueContactId]
                   ? 'Add details to Venue Database'
                   : 'Please select from the dropdown above'
               }
               value={
-                venueUserData[formData.DeMoProgrammerVenueContactId]
-                  ? venueUserData[formData.DeMoProgrammerVenueContactId].Email
+                venueUserData[formData.ProgrammerVenueContactId]
+                  ? venueUserData[formData.ProgrammerVenueContactId].Email
                   : ''
               }
             />
@@ -636,10 +636,10 @@ export const EditDealMemoContractModal = ({
             <TextInput
               testId="dealText"
               className="w-[100px]"
-              value={formData.DeMoROTTPercentage}
+              value={formData.ROTTPercentage}
               type="number"
               onChange={(value) =>
-                editDemoModalData('DeMoROTTPercentage', filterPercentage(parseFloat(value.target.value)), 'dealMemo')
+                editDemoModalData('ROTTPercentage', filterPercentage(parseFloat(value.target.value)), 'dealMemo')
               }
             />{' '}
             <div className=" text-primary-input-text font-bold ml-2">%</div>
@@ -647,10 +647,10 @@ export const EditDealMemoContractModal = ({
             <TextInput
               testId="prsText"
               className="w-[100px]"
-              value={formData.DeMoPRSPercentage}
+              value={formData.PRSPercentage}
               type="number"
               onChange={(value) =>
-                editDemoModalData('DeMoPRSPercentage', filterPercentage(parseFloat(value.target.value)), 'dealMemo')
+                editDemoModalData('PRSPercentage', filterPercentage(parseFloat(value.target.value)), 'dealMemo')
               }
             />
             <div className=" text-primary-input-text font-bold ml-2">%</div>
@@ -661,14 +661,14 @@ export const EditDealMemoContractModal = ({
           <div className="w-4/5 flex items-center">
             <Select
               onChange={(value) => {
-                editDemoModalData('DeMoGuarantee', value === 1, 'dealMemo');
+                editDemoModalData('Guarantee', value === 1, 'dealMemo');
               }}
               className="bg-primary-white w-26 mr-3"
               placeholder="Please select.."
               options={booleanOptions}
               isClearable
               isSearchable
-              value={formData.DeMoGuarantee}
+              value={formData.Guarantee}
             />
             <div className="text-primary-input-text font-bold ml-14 mr-5">{VENUE_CURRENCY_SYMBOLS.POUND}</div>
 
@@ -676,12 +676,12 @@ export const EditDealMemoContractModal = ({
               testId="guarnteeText"
               className="w-[140px] ml-1"
               type="number"
-              value={formData.DeMoGuaranteeAmount}
+              value={formData.GuaranteeAmount}
               onChange={(value) =>
-                editDemoModalData('DeMoGuaranteeAmount', filterCurrencyNum(parseFloat(value.target.value)), 'dealMemo')
+                editDemoModalData('GuaranteeAmount', filterCurrencyNum(parseFloat(value.target.value)), 'dealMemo')
               }
               placeholder="00.00"
-              disabled={!formData.DeMoGuarantee}
+              disabled={!formData.Guarantee}
             />
           </div>
         </div>
@@ -690,14 +690,14 @@ export const EditDealMemoContractModal = ({
           <div className="w-4/5 flex ">
             <Select
               onChange={(value) => {
-                editDemoModalData('DeMoHasCalls', value === 1, 'dealMemo');
+                editDemoModalData('HasCalls', value === 1, 'dealMemo');
               }}
               className="bg-primary-white w-26 mr-1 h-8"
               placeholder="Please select.."
               options={booleanOptions}
               isClearable
               isSearchable
-              value={formData.DeMoHasCalls}
+              value={formData.HasCalls}
             />
             <div>
               {dealCall.map((call, index) => {
@@ -715,7 +715,7 @@ export const EditDealMemoContractModal = ({
                       options={callOptions}
                       isClearable
                       isSearchable
-                      disabled={!formData.DeMoHasCalls}
+                      disabled={!formData.HasCalls}
                     />
 
                     <Select
@@ -728,7 +728,7 @@ export const EditDealMemoContractModal = ({
                       options={callValueOptions}
                       isClearable
                       isSearchable
-                      disabled={!formData.DeMoHasCalls}
+                      disabled={!formData.HasCalls}
                     />
                     <div
                       className={`text-primary-input-text font-bold ml-8 ${
@@ -742,7 +742,7 @@ export const EditDealMemoContractModal = ({
                       type="number"
                       value={dealCall[index].DMCValue}
                       placeholder="00.00"
-                      disabled={!formData.DeMoHasCalls}
+                      disabled={!formData.HasCalls}
                       onChange={(value) =>
                         editDemoCallModalData('DMCValue', filterCurrencyNum(parseFloat(value.target.value)), index)
                       }
@@ -755,7 +755,7 @@ export const EditDealMemoContractModal = ({
                         <Icon
                           className="ml-2"
                           iconName="plus-circle-solid"
-                          onClick={() => formData.DeMoHasCalls && handleCall(true, index)}
+                          onClick={() => formData.HasCalls && handleCall(true, index)}
                           variant="lg"
                         />
                       )}
@@ -764,7 +764,7 @@ export const EditDealMemoContractModal = ({
                         <Icon
                           className="ml-2"
                           iconName="minus-circle-solid"
-                          onClick={() => formData.DeMoHasCalls && handleCall(false, index)}
+                          onClick={() => formData.HasCalls && handleCall(false, index)}
                           variant="lg"
                         />
                       )}
@@ -782,10 +782,10 @@ export const EditDealMemoContractModal = ({
               testId="promoterSplitText"
               className="w-[100px] ml-6"
               type="number"
-              value={formData.DeMoPromoterSplitPercentage}
+              value={formData.PromoterSplitPercentage}
               onChange={(value) =>
                 editDemoModalData(
-                  'DeMoPromoterSplitPercentage',
+                  'PromoterSplitPercentage',
                   filterPercentage(parseFloat(value.target.value)),
                   'dealMemo',
                 )
@@ -799,22 +799,18 @@ export const EditDealMemoContractModal = ({
             <TextInput
               testId="venueSplitText"
               className="w-[100px]"
-              value={formData.DeMoVenueSplitPercentage}
+              value={formData.VenueSplitPercentage}
               onChange={(value) =>
-                editDemoModalData(
-                  'DeMoVenueSplitPercentage',
-                  filterPercentage(parseFloat(value.target.value)),
-                  'dealMemo',
-                )
+                editDemoModalData('VenueSplitPercentage', filterPercentage(parseFloat(value.target.value)), 'dealMemo')
               }
             />
             <div className="text-primary-input-text font-bold ml-2 mr-2">%</div>
           </div>
         </div>
         {[
-          ['Venue Rental', 'DeMoVenueRental', 'DeMoVenueRentalNotes'],
-          ['Staffing Contra', 'DeMoStaffingContra', 'DeMoStaffingContraNotes'],
-          ['Agreed Contra Items', 'DeMoAgreedContraItems', 'DeMoAgreedContraItemsNotes'],
+          ['Venue Rental', 'VenueRental', 'VenueRentalNotes'],
+          ['Staffing Contra', 'StaffingContra', 'StaffingContraNotes'],
+          ['Agreed Contra Items', 'AgreedContraItems', 'AgreedContraItemsNotes'],
         ].map((inputData) => {
           return (
             <div key={inputData[0]} className="flex items-center mt-4">
@@ -847,13 +843,13 @@ export const EditDealMemoContractModal = ({
           <div className="w-1/5 text-primary-input-text font-bold">Box Office Manager</div>
           <div className="w-4/5 flex">
             <Select
-              onChange={(value) => editDemoModalData('DeMoBOMVenueContactId', value, 'dealMemo')}
+              onChange={(value) => editDemoModalData('BOMVenueContactId', value, 'dealMemo')}
               className="bg-primary-white w-full"
               placeholder="Please select..."
               options={venueUserList}
               isClearable
               isSearchable
-              value={formData.DeMoBOMVenueContactId}
+              value={formData.BOMVenueContactId}
             />
           </div>
         </div>
@@ -864,14 +860,12 @@ export const EditDealMemoContractModal = ({
               testId="boxOfficePhoneText"
               className="w-full text-primary-input-text font-bold"
               placeholder={
-                venueUserData[formData.DeMoBOMVenueContactId]
+                venueUserData[formData.BOMVenueContactId]
                   ? 'Add details to Venue Database'
                   : 'Please select from the dropdown above'
               }
               disabled
-              value={
-                venueUserData[formData.DeMoBOMVenueContactId] ? venueUserData[formData.DeMoBOMVenueContactId].Phone : ''
-              }
+              value={venueUserData[formData.BOMVenueContactId] ? venueUserData[formData.BOMVenueContactId].Phone : ''}
             />
           </div>
         </div>
@@ -882,14 +876,12 @@ export const EditDealMemoContractModal = ({
               testId="boxOfficeEmailText"
               className="w-full text-primary-input-text font-bold"
               placeholder={
-                venueUserData[formData.DeMoBOMVenueContactId]
+                venueUserData[formData.BOMVenueContactId]
                   ? 'Add details to Venue Database'
                   : 'Please select from the dropdown above'
               }
               disabled
-              value={
-                venueUserData[formData.DeMoBOMVenueContactId] ? venueUserData[formData.DeMoBOMVenueContactId].Email : ''
-              }
+              value={venueUserData[formData.BOMVenueContactId] ? venueUserData[formData.BOMVenueContactId].Email : ''}
             />
           </div>
         </div>
@@ -898,9 +890,9 @@ export const EditDealMemoContractModal = ({
           <div className="w-4/5 flex">
             <DateInput
               onChange={(value) => {
-                editDemoModalData('DeMoOnSaleDate', value, 'dealMemo');
+                editDemoModalData('OnSaleDate', value, 'dealMemo');
               }}
-              value={formData.DeMoOnSaleDate}
+              value={formData.OnSaleDate}
             />
           </div>
         </div>
@@ -908,13 +900,13 @@ export const EditDealMemoContractModal = ({
           <div className="w-1/5 text-primary-input-text font-bold">Accounts Contact for Settlement</div>
           <div className="w-4/5 flex">
             <Select
-              onChange={(value) => editDemoModalData('DeMoSettlementVenueContactId', value, 'dealMemo')}
+              onChange={(value) => editDemoModalData('SettlementVenueContactId', value, 'dealMemo')}
               className="bg-primary-white w-full"
               placeholder="Please select..."
               options={venueUserList}
               isClearable
               isSearchable
-              value={formData.DeMoSettlementVenueContactId}
+              value={formData.SettlementVenueContactId}
             />
           </div>
         </div>
@@ -926,13 +918,13 @@ export const EditDealMemoContractModal = ({
               className="w-full text-primary-input-text font-bold"
               disabled
               placeholder={
-                venueUserData[formData.DeMoSettlementVenueContactId]
+                venueUserData[formData.SettlementVenueContactId]
                   ? 'Add details to Venue Database'
                   : 'Please select from the dropdown above'
               }
               value={
-                venueUserData[formData.DeMoSettlementVenueContactId]
-                  ? venueUserData[formData.DeMoSettlementVenueContactId].Phone
+                venueUserData[formData.SettlementVenueContactId]
+                  ? venueUserData[formData.SettlementVenueContactId].Phone
                   : ''
               }
             />
@@ -946,13 +938,13 @@ export const EditDealMemoContractModal = ({
               className="w-full text-primary-input-text font-bold"
               disabled
               placeholder={
-                venueUserData[formData.DeMoSettlementVenueContactId]
+                venueUserData[formData.SettlementVenueContactId]
                   ? 'Add details to Venue Database'
                   : 'Please select from the dropdown above'
               }
               value={
-                venueUserData[formData.DeMoSettlementVenueContactId]
-                  ? venueUserData[formData.DeMoSettlementVenueContactId].Email
+                venueUserData[formData.SettlementVenueContactId]
+                  ? venueUserData[formData.SettlementVenueContactId].Email
                   : ''
               }
             />
@@ -972,8 +964,8 @@ export const EditDealMemoContractModal = ({
             <TextInput
               testId="sellCapacityText"
               className="w-auto"
-              value={formData.DeMoSellableSeats}
-              onChange={(value) => editDemoModalData('DeMoSellableSeats', parseFloat(value.target.value), 'dealMemo')}
+              value={formData.SellableSeats}
+              onChange={(value) => editDemoModalData('SellableSeats', parseFloat(value.target.value), 'dealMemo')}
             />
           </div>
         </div>
@@ -993,9 +985,9 @@ export const EditDealMemoContractModal = ({
               <TextArea
                 testId="holdNotesText"
                 className="mt-2 mb-2 w-full h-auto"
-                value={formData.DeMoOtherHolds}
+                value={formData.OtherHolds}
                 placeholder="Notes Field"
-                onChange={(value) => editDemoModalData('DeMoOtherHolds', value.target.value, 'dealMemo')}
+                onChange={(value) => editDemoModalData('OtherHolds', value.target.value, 'dealMemo')}
               />
             </div>
           </div>
@@ -1207,8 +1199,8 @@ export const EditDealMemoContractModal = ({
               testId="levyText"
               className="w-auto"
               type="number"
-              value={formData.DeMoRestorationLevy}
-              onChange={(value) => editDemoModalData('DeMoRestorationLevy', parseFloat(value.target.value), 'dealMemo')}
+              value={formData.RestorationLevy}
+              onChange={(value) => editDemoModalData('RestorationLevy', parseFloat(value.target.value), 'dealMemo')}
             />
             <div className="text-primary-input-text font-bold ml-16 flex">
               Booking fees <div className="ml-4 mr-2">{VENUE_CURRENCY_SYMBOLS.POUND}</div>
@@ -1217,21 +1209,17 @@ export const EditDealMemoContractModal = ({
               testId="bookingFeesText"
               className="w-auto"
               type="number"
-              value={formData.DeMoBookingFees}
-              onChange={(value) => editDemoModalData('DeMoBookingFees', parseFloat(value.target.value), 'dealMemo')}
+              value={formData.BookingFees}
+              onChange={(value) => editDemoModalData('BookingFees', parseFloat(value.target.value), 'dealMemo')}
             />
             <div className="text-primary-input-text font-bold ml-14 mr-2">Credit Card Commission</div>
             <TextInput
               testId="creditCardText"
               className="w-auto"
               type="number"
-              value={formData.DeMoCCCommissionPercent}
+              value={formData.CCCommissionPercent}
               onChange={(value) =>
-                editDemoModalData(
-                  'DeMoCCCommissionPercent',
-                  filterPercentage(parseFloat(value.target.value)),
-                  'dealMemo',
-                )
+                editDemoModalData('CCCommissionPercent', filterPercentage(parseFloat(value.target.value)), 'dealMemo')
               }
             />
             <div className="text-primary-input-text font-bold ml-2">%</div>
@@ -1242,22 +1230,22 @@ export const EditDealMemoContractModal = ({
           <div className="w-4/5 flex items-center">
             <Select
               onChange={(value) => {
-                editDemoModalData('DeMoTxnChargeOption', value, 'dealMemo');
+                editDemoModalData('TxnChargeOption', value, 'dealMemo');
               }}
               className="bg-primary-white w-2/5"
               placeholder="Please select..."
               options={transactionOptions}
               isClearable
               isSearchable
-              value={formData.DeMoTxnChargeOption}
+              value={formData.TxnChargeOption}
             />
             <div className="text-primary-input-text font-bold ml-20 mr-2">{VENUE_CURRENCY_SYMBOLS.POUND}</div>
             <TextInput
               testId="chargesText"
               className="w-auto"
               type="number"
-              value={formData.DeMoTxnChargeAmount}
-              onChange={(value) => editDemoModalData('DeMoTxnChargeAmount', parseFloat(value.target.value), 'dealMemo')}
+              value={formData.TxnChargeAmount}
+              onChange={(value) => editDemoModalData('TxnChargeAmount', parseFloat(value.target.value), 'dealMemo')}
             />
           </div>
         </div>
@@ -1268,8 +1256,8 @@ export const EditDealMemoContractModal = ({
               <TextInput
                 testId="disocuntsText"
                 className="w-full"
-                value={formData.DeMoAgreedDiscounts}
-                onChange={(value) => editDemoModalData('DeMoAgreedDiscounts', value.target.value, 'dealMemo')}
+                value={formData.AgreedDiscounts}
+                onChange={(value) => editDemoModalData('AgreedDiscounts', value.target.value, 'dealMemo')}
               />
             </div>
           </div>
@@ -1281,16 +1269,16 @@ export const EditDealMemoContractModal = ({
           </div>
         </div>
         {[
-          ['Maximum Ticket Agency Allocations', 'DeMoMaxTAAlloc'],
-          ['Ticket Agency Allocations', 'DeMoTAAlloc'],
-          ['Ticket Copy', 'DeMoTicketCopy'],
-          ['Producer Complimentary  Tickets  Per  Performance', 'DeMoProducerCompCount'],
-          ['Other Tickets to be held off sale?', 'DeMoOtherHolds'],
+          ['Maximum Ticket Agency Allocations', 'MaxTAAlloc'],
+          ['Ticket Agency Allocations', 'TAAlloc'],
+          ['Ticket Copy', 'TicketCopy'],
+          ['Producer Complimentary  Tickets  Per  Performance', 'ProducerCompCount'],
+          ['Other Tickets to be held off sale?', 'OtherHolds'],
         ].map((inputData) => {
           return (
             <div key={inputData[1]} className="flex items-center mt-2">
               <div className="w-1/5 text-primary-input-text font-bold">
-                {inputData[1] !== 'DeMoProducerCompCount' ? (
+                {inputData[1] !== 'ProducerCompCount' ? (
                   inputData[0]
                 ) : (
                   <>
@@ -1308,7 +1296,7 @@ export const EditDealMemoContractModal = ({
                   onChange={(value) =>
                     editDemoModalData(
                       inputData[1],
-                      inputData[1] === 'DeMoProducerCompCount' ? parseFloat(value.target.value) : value.target.value,
+                      inputData[1] === 'ProducerCompCount' ? parseFloat(value.target.value) : value.target.value,
                       'dealMemo',
                     )
                   }
@@ -1329,8 +1317,8 @@ export const EditDealMemoContractModal = ({
             <TextInput
               testId="ageLimitText"
               className="w-full"
-              value={formData.DeMoAgeNotes}
-              onChange={(value) => editDemoModalData('DeMoAgeNotes', value.target.value, 'dealMemo')}
+              value={formData.AgeNotes}
+              onChange={(value) => editDemoModalData('AgeNotes', value.target.value, 'dealMemo')}
             />
           </div>
         </div>
@@ -1344,7 +1332,7 @@ export const EditDealMemoContractModal = ({
             />
             <div className=" text-primary-input-text font-bold ml-20 mr-4">If Weekly, on</div>
             <Select
-              onChange={(value) => editDemoModalData('DeMoSalesDayNum', value, 'dealMemo')}
+              onChange={(value) => editDemoModalData('SalesDayNum', value, 'dealMemo')}
               className="bg-primary-white w-[32vw]"
               placeholder="Sales Frequency"
               options={saleFrequencyDay}
@@ -1384,13 +1372,13 @@ export const EditDealMemoContractModal = ({
           <div className="w-1/5 text-primary-input-text font-bold">Marketing Manager</div>
           <div className="w-4/5 flex">
             <Select
-              onChange={(value) => editDemoModalData('DeMoMMVenueContactId', value, 'dealMemo')}
+              onChange={(value) => editDemoModalData('MMVenueContactId', value, 'dealMemo')}
               options={[{ text: 'Select Assignee', value: null }, ...venueUserList]}
               className="bg-primary-white w-full"
               placeholder="Please select..."
               isClearable
               isSearchable
-              value={formData.DeMoMMVenueContactId}
+              value={formData.MMVenueContactId}
             />
           </div>
         </div>
@@ -1401,13 +1389,11 @@ export const EditDealMemoContractModal = ({
               testId="marketingPhoneText"
               className="w-full text-primary-input-text font-bold"
               placeholder={
-                venueUserData[formData.DeMoMMVenueContactId]
+                venueUserData[formData.MMVenueContactId]
                   ? 'Add details to Venue Database'
                   : 'Please select from the dropdown above'
               }
-              value={
-                venueUserData[formData.DeMoMMVenueContactId] ? venueUserData[formData.DeMoMMVenueContactId].Phone : ''
-              }
+              value={venueUserData[formData.MMVenueContactId] ? venueUserData[formData.MMVenueContactId].Phone : ''}
               disabled
             />
           </div>
@@ -1419,13 +1405,11 @@ export const EditDealMemoContractModal = ({
               testId="marketingEmailText"
               className="w-full text-primary-input-text font-bold"
               placeholder={
-                venueUserData[formData.DeMoMMVenueContactId]
+                venueUserData[formData.MMVenueContactId]
                   ? 'Add details to Venue Database'
                   : 'Please select from the dropdown above'
               }
-              value={
-                venueUserData[formData.DeMoMMVenueContactId] ? venueUserData[formData.DeMoMMVenueContactId].Email : ''
-              }
+              value={venueUserData[formData.MMVenueContactId] ? venueUserData[formData.MMVenueContactId].Email : ''}
               disabled
             />
           </div>
@@ -1435,17 +1419,17 @@ export const EditDealMemoContractModal = ({
           <div className="w-4/5 flex items-center">
             <DateInput
               onChange={(value) => {
-                editDemoModalData('DeMoBrochureDeadline', value, 'dealMemo');
+                editDemoModalData('BrochureDeadline', value, 'dealMemo');
               }}
-              value={formData.DeMoBrochureDeadline}
+              value={formData.BrochureDeadline}
             />
             <div className="text-primary-input-text font-bold ml-20 mr-4">Final Proof by</div>
 
             <DateInput
               onChange={(value) => {
-                editDemoModalData('DeMoFinalProofBy', value, 'dealMemo');
+                editDemoModalData('FinalProofBy', value, 'dealMemo');
               }}
-              value={formData.DeMoFinalProofBy}
+              value={formData.FinalProofBy}
             />
           </div>
         </div>
@@ -1454,8 +1438,8 @@ export const EditDealMemoContractModal = ({
           <div className="w-4/5">
             <TextArea
               className=" w-full h-auto"
-              value={formData.DeMoPrintReqs}
-              onChange={(value) => editDemoModalData('DeMoPrintReqs', value.target.value, 'dealMemo')}
+              value={formData.PrintReqs}
+              onChange={(value) => editDemoModalData('PrintReqs', value.target.value, 'dealMemo')}
             />
           </div>
         </div>
@@ -1467,8 +1451,8 @@ export const EditDealMemoContractModal = ({
                 className="pr-10"
                 labelClassName="!text-base"
                 id="includeExcludedVenues"
-                onChange={(value) => editDemoModalData('DeMoPrintDelUseVenueAddress', value.target.value, 'dealMemo')}
-                checked={formData.DeMoPrintDelUseVenueAddress}
+                onChange={(value) => editDemoModalData('PrintDelUseVenueAddress', value.target.value, 'dealMemo')}
+                checked={formData.PrintDelUseVenueAddress}
                 label="Same as Venue Address"
               />
             </div>
@@ -1477,9 +1461,9 @@ export const EditDealMemoContractModal = ({
               <TextInput
                 testId="printDeliveryText"
                 className="w-3/4"
-                disabled={formData.DeMoPrintDelUseVenueAddress}
-                value={formData.DeMoVatCode}
-                onChange={(value) => editDemoModalData('DeMoVatCode', value.target.value, 'dealMemo')}
+                disabled={formData.PrintDelUseVenueAddress}
+                value={formData.VatCode}
+                onChange={(value) => editDemoModalData('VatCode', value.target.value, 'dealMemo')}
               />
             </div>
           </div>
@@ -1493,13 +1477,9 @@ export const EditDealMemoContractModal = ({
               testId="localMarketingText"
               className="w-auto"
               type="number"
-              value={formData.DeMoLocalMarketingBudget}
+              value={formData.LocalMarketingBudget}
               onChange={(value) =>
-                editDemoModalData(
-                  'DeMoLocalMarketingBudget',
-                  filterCurrencyNum(parseFloat(value.target.value)),
-                  'dealMemo',
-                )
+                editDemoModalData('LocalMarketingBudget', filterCurrencyNum(parseFloat(value.target.value)), 'dealMemo')
               }
             />
             <div className="text-primary-input-text font-bold ml-28">Local Marketing Contra </div>
@@ -1510,13 +1490,9 @@ export const EditDealMemoContractModal = ({
               testId="localMarketingText"
               className="w-auto"
               type="number"
-              value={formData.DeMoLocalMarketingContra}
+              value={formData.LocalMarketingContra}
               onChange={(value) =>
-                editDemoModalData(
-                  'DeMoLocalMarketingContra',
-                  filterCurrencyNum(parseFloat(value.target.value)),
-                  'dealMemo',
-                )
+                editDemoModalData('LocalMarketingContra', filterCurrencyNum(parseFloat(value.target.value)), 'dealMemo')
               }
             />
           </div>
@@ -1533,7 +1509,7 @@ export const EditDealMemoContractModal = ({
           <div className="w-1/5 text-primary-input-text font-bold">Seller</div>
           <div className="w-4/5 flex">
             <Select
-              onChange={(value) => editDemoModalData('DeMoSellWho', value, 'dealMemo')}
+              onChange={(value) => editDemoModalData('SellWho', value, 'dealMemo')}
               className="bg-primary-white w-full"
               placeholder="Please select..."
               options={sellerOptions}
@@ -1549,8 +1525,8 @@ export const EditDealMemoContractModal = ({
               className="mr-2"
               labelClassName="!text-base"
               id="includeExcludedVenues"
-              onChange={(value) => editDemoModalData('DeMoSellProgrammes', value.target.value, 'dealMemo')}
-              checked={formData.DeMoSellProgrammes}
+              onChange={(value) => editDemoModalData('SellProgrammes', value.target.value, 'dealMemo')}
+              checked={formData.SellProgrammes}
               label="Programmes"
             />
 
@@ -1558,15 +1534,15 @@ export const EditDealMemoContractModal = ({
               className="ml-2"
               labelClassName="!text-base"
               id="includeExcludedVenues"
-              onChange={(value) => editDemoModalData('DeMoSellMerch', value.target.value, 'dealMemo')}
-              checked={formData.DeMoSellMerch}
+              onChange={(value) => editDemoModalData('SellMerch', value.target.value, 'dealMemo')}
+              checked={formData.SellMerch}
               label="Merchandise"
             />
 
             <TextArea
               className="w-[48vw] ml-2"
-              value={formData.DeMoSellNotes}
-              onChange={(value) => editDemoModalData('DeMoSellNotes', value.target.value, 'dealMemo')}
+              value={formData.SellNotes}
+              onChange={(value) => editDemoModalData('SellNotes', value.target.value, 'dealMemo')}
             />
           </div>
         </div>
@@ -1578,13 +1554,9 @@ export const EditDealMemoContractModal = ({
               testId="venueCommissionText"
               className="w-[150px]"
               type="number"
-              value={formData.DeMoSellProgCommPercent}
+              value={formData.SellProgCommPercent}
               onChange={(value) =>
-                editDemoModalData(
-                  'DeMoSellProgCommPercent',
-                  filterPercentage(parseFloat(value.target.value)),
-                  'dealMemo',
-                )
+                editDemoModalData('SellProgCommPercent', filterPercentage(parseFloat(value.target.value)), 'dealMemo')
               }
             />
             <div className="ml-2">%</div>
@@ -1593,13 +1565,9 @@ export const EditDealMemoContractModal = ({
               testId="merchText"
               className="w-[150px]"
               type="number"
-              value={formData.DeMoSellMerchCommPercent}
+              value={formData.SellMerchCommPercent}
               onChange={(value) =>
-                editDemoModalData(
-                  'DeMoSellMerchCommPercent',
-                  filterPercentage(parseFloat(value.target.value)),
-                  'dealMemo',
-                )
+                editDemoModalData('SellMerchCommPercent', filterPercentage(parseFloat(value.target.value)), 'dealMemo')
               }
             />
             <div className="ml-2">%</div>
@@ -1610,9 +1578,9 @@ export const EditDealMemoContractModal = ({
               testId="fixedPitchText"
               className="w-[150px]"
               type="number"
-              value={formData.DeMoSellPitchFee}
+              value={formData.SellPitchFee}
               onChange={(value) =>
-                editDemoModalData('DeMoSellPitchFee', filterCurrencyNum(parseFloat(value.target.value)), 'dealMemo')
+                editDemoModalData('SellPitchFee', filterCurrencyNum(parseFloat(value.target.value)), 'dealMemo')
               }
             />
           </div>
@@ -1623,13 +1591,13 @@ export const EditDealMemoContractModal = ({
           <div className="w-1/5 text-primary-input-text font-bold">Technical Manager</div>
           <div className="w-4/5 flex">
             <Select
-              onChange={(value) => editDemoModalData('DeMoTechVenueContactId', value, 'dealMemo')}
+              onChange={(value) => editDemoModalData('TechVenueContactId', value, 'dealMemo')}
               options={[{ text: 'Select Assignee', value: null }, ...venueUserList]}
               className="bg-primary-white w-full"
               placeholder="Please select..."
               isClearable
               isSearchable
-              value={formData.DeMoTechVenueContactId}
+              value={formData.TechVenueContactId}
             />
           </div>
         </div>
@@ -1640,15 +1608,11 @@ export const EditDealMemoContractModal = ({
               testId="techPhoneText"
               className="w-full text-primary-input-text font-bold"
               placeholder={
-                venueUserData[formData.DeMoTechVenueContactId]
+                venueUserData[formData.TechVenueContactId]
                   ? 'Add details to Venue Database'
                   : 'Please select from the dropdown above'
               }
-              value={
-                venueUserData[formData.DeMoTechVenueContactId]
-                  ? venueUserData[formData.DeMoTechVenueContactId].Phone
-                  : ''
-              }
+              value={venueUserData[formData.TechVenueContactId] ? venueUserData[formData.TechVenueContactId].Phone : ''}
               disabled
             />
           </div>
@@ -1660,15 +1624,11 @@ export const EditDealMemoContractModal = ({
               testId="techEmailText"
               className="w-full text-primary-input-text font-bold"
               placeholder={
-                venueUserData[formData.DeMoTechVenueContactId]
+                venueUserData[formData.TechVenueContactId]
                   ? 'Add details to Venue Database'
                   : 'Please select from the dropdown above'
               }
-              value={
-                venueUserData[formData.DeMoTechVenueContactId]
-                  ? venueUserData[formData.DeMoTechVenueContactId].Email
-                  : ''
-              }
+              value={venueUserData[formData.TechVenueContactId] ? venueUserData[formData.TechVenueContactId].Email : ''}
               disabled
             />
           </div>
@@ -1678,17 +1638,17 @@ export const EditDealMemoContractModal = ({
           <div className="w-4/5 flex">
             <DateInput
               onChange={(value) => {
-                editDemoModalData('DeMoTechArrivalDate', value, 'dealMemo');
+                editDemoModalData('TechArrivalDate', value, 'dealMemo');
               }}
-              value={formData.DeMoTechArrivalDate}
+              value={formData.TechArrivalDate}
             />
             <div className="ml-4 w-[100px]">
               <TimeInput
                 className="w-fit h-[31px] [&>input]:!h-[25px] [&>input]:!w-11 !justify-center shadow-input-shadow ml-2"
-                value={formData && formData.DeMoTechArrivalTime ? dateToTimeString(formData.DeMoTechArrivalTime) : null}
+                value={formData && formData.TechArrivalTime ? dateToTimeString(formData.TechArrivalTime) : null}
                 disabled={disableDate}
                 onChange={(value) =>
-                  editDemoModalData('DeMoTechArrivalTime', convertTimeToTodayDateFormat(value), 'dealMemo')
+                  editDemoModalData('TechArrivalTime', convertTimeToTodayDateFormat(value), 'dealMemo')
                 }
                 tabIndexShow={true}
               />
@@ -1761,8 +1721,8 @@ export const EditDealMemoContractModal = ({
               <TextInput
                 testId="dressingRoomText"
                 className="w-full"
-                value={formData.DeMoDressingRooms}
-                onChange={(value) => editDemoModalData('DeMoDressingRooms', value.target.value, 'dealMemo')}
+                value={formData.DressingRooms}
+                onChange={(value) => editDemoModalData('DressingRooms', value.target.value, 'dealMemo')}
               />
             </div>
           </div>
@@ -1775,8 +1735,8 @@ export const EditDealMemoContractModal = ({
               className="flex flex-row-reverse mr-2"
               labelClassName="!text-base"
               id="includeExcludedVenues"
-              onChange={(value) => editDemoModalData('DeMoNumFacilitiesLaundry', value.target.value, 'dealMemo')}
-              checked={formData.DeMoNumFacilitiesLaundry}
+              onChange={(value) => editDemoModalData('NumFacilitiesLaundry', value.target.value, 'dealMemo')}
+              checked={formData.NumFacilitiesLaundry}
             />
             <div className="text-primary-input-text font-bold mr-2 ml-6">Dryer</div>
 
@@ -1784,8 +1744,8 @@ export const EditDealMemoContractModal = ({
               className="flex flex-row-reverse mr-2"
               labelClassName="!text-base"
               id="includeExcludedVenues"
-              onChange={(value) => editDemoModalData('DeMoNumFacilitiesDrier', value.target.value, 'dealMemo')}
-              checked={formData.DeMoNumFacilitiesDrier}
+              onChange={(value) => editDemoModalData('NumFacilitiesDrier', value.target.value, 'dealMemo')}
+              checked={formData.NumFacilitiesDrier}
             />
             <div className="text-primary-input-text font-bold mr-2 ml-6">Laundry Room</div>
 
@@ -1793,15 +1753,15 @@ export const EditDealMemoContractModal = ({
               className="flex flex-row-reverse mr-2"
               labelClassName="!text-base"
               id="includeExcludedVenues"
-              onChange={(value) => editDemoModalData('DeMoNumFacilitiesLaundryRoom', value.target.value, 'dealMemo')}
-              checked={formData.DeMoNumFacilitiesLaundryRoom}
+              onChange={(value) => editDemoModalData('NumFacilitiesLaundryRoom', value.target.value, 'dealMemo')}
+              checked={formData.NumFacilitiesLaundryRoom}
             />
             <div className="w-3/5 ml-8">
               <TextInput
                 testId="laundryText"
                 className="w-full"
-                value={formData.DeMoNumFacilitiesNotes}
-                onChange={(value) => editDemoModalData('DeMoNumFacilitiesNotes', value.target.value, 'dealMemo')}
+                value={formData.NumFacilitiesNotes}
+                onChange={(value) => editDemoModalData('NumFacilitiesNotes', value.target.value, 'dealMemo')}
               />
             </div>
           </div>
@@ -1813,8 +1773,8 @@ export const EditDealMemoContractModal = ({
               <TextInput
                 testId="cateringText"
                 className="w-full"
-                value={formData.DeMoNumCateringNotes}
-                onChange={(value) => editDemoModalData('DeMoNumCateringNotes', value.target.value, 'dealMemo')}
+                value={formData.NumCateringNotes}
+                onChange={(value) => editDemoModalData('NumCateringNotes', value.target.value, 'dealMemo')}
               />
             </div>
           </div>
@@ -1828,8 +1788,8 @@ export const EditDealMemoContractModal = ({
               <TextInput
                 testId="baringClauseText"
                 className="w-full"
-                value={formData.DeMoBarringClause}
-                onChange={(value) => editDemoModalData('DeMoBarringClause', value.target.value, 'dealMemo')}
+                value={formData.BarringClause}
+                onChange={(value) => editDemoModalData('BarringClause', value.target.value, 'dealMemo')}
               />
             </div>
           </div>
@@ -1839,14 +1799,14 @@ export const EditDealMemoContractModal = ({
           <div className="w-4/5 flex items-center">
             <Select
               onChange={(value) => {
-                editDemoModalData('DeMoAdvancePaymentRequired', value === 1, 'dealMemo');
+                editDemoModalData('AdvancePaymentRequired', value === 1, 'dealMemo');
               }}
               className="bg-primary-white w-40"
               placeholder="Please select..."
               options={booleanOptions}
               isClearable
               isSearchable
-              value={formData.DeMoAdvancePaymentRequired}
+              value={formData.AdvancePaymentRequired}
             />
             <div className=" text-primary-input-text font-bold ml-20">
               If Yes, Amount<span className="ml-2 mr-2">{VENUE_CURRENCY_SYMBOLS.POUND}</span>
@@ -1856,24 +1816,20 @@ export const EditDealMemoContractModal = ({
               testId="yesAmountText"
               className="w-full"
               type="number"
-              value={formData.DeMoAdvancePaymentAmount}
+              value={formData.AdvancePaymentAmount}
               onChange={(value) =>
-                editDemoModalData(
-                  'DeMoAdvancePaymentAmount',
-                  filterCurrencyNum(parseFloat(value.target.value)),
-                  'dealMemo',
-                )
+                editDemoModalData('AdvancePaymentAmount', filterCurrencyNum(parseFloat(value.target.value)), 'dealMemo')
               }
-              disabled={!formData.DeMoAdvancePaymentRequired}
+              disabled={!formData.AdvancePaymentRequired}
             />
             <div className=" text-primary-input-text font-bold ml-20 mr-2"> Date Payment to be Made</div>
 
             <DateInput
               onChange={(value) => {
-                editDemoModalData('DeMoAdvancePaymentDueBy', value, 'dealMemo');
+                editDemoModalData('AdvancePaymentDueBy', value, 'dealMemo');
               }}
-              value={formData.DeMoAdvancePaymentDueBy}
-              disabled={!formData.DeMoAdvancePaymentRequired}
+              value={formData.AdvancePaymentDueBy}
+              disabled={!formData.AdvancePaymentRequired}
             />
           </div>
         </div>
@@ -1895,8 +1851,8 @@ export const EditDealMemoContractModal = ({
             <TextInput
               testId="withinText"
               className="w-full"
-              value={formData.DeMoSettlementDays}
-              onChange={(value) => editDemoModalData('DeMoSettlementDays', parseFloat(value.target.value), 'dealMemo')}
+              value={formData.SettlementDays}
+              onChange={(value) => editDemoModalData('SettlementDays', parseFloat(value.target.value), 'dealMemo')}
               disabled={contractCheckBox}
             />
 
@@ -1925,8 +1881,8 @@ export const EditDealMemoContractModal = ({
           <div className="w-full">
             <TextArea
               className="h-[113px] w-full"
-              value={formData.DeMoContractClause}
-              onChange={(value) => editDemoModalData('DeMoContractClause', value.target.value, 'dealMemo')}
+              value={formData.ContractClause}
+              onChange={(value) => editDemoModalData('ContractClause', value.target.value, 'dealMemo')}
             />
           </div>
         </div>

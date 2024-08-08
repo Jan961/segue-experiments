@@ -96,19 +96,17 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
   }, [users]);
 
   const callDealMemoApi = async () => {
-    try {
-      const demoModalData = await axios.get<DealMemoContractFormData>(
-        `/api/dealMemo/getDealMemo/${selectedTableCell.contract.Id ? selectedTableCell.contract.Id : 1}`,
-      );
-      const getHoldType = await axios.get<DealMemoHoldType>(
-        `/api/dealMemo/getHoldType/${selectedTableCell.contract.Id}`,
-      );
-      setDealHoldType(getHoldType.data as DealMemoHoldType);
-      if (demoModalData.data && demoModalData.data.DeMoBookingId) {
-        setDemoModalData(demoModalData.data as unknown as DealMemoContractFormData);
-      }
-    } catch (error) {
-      console.log(error, 'Error - failed to fetch Deal Memo information.');
+    const demoModalData = await axios.get<DealMemoContractFormData>(
+      `/api/dealMemo/getDealMemo/${selectedTableCell.contract.Id ? selectedTableCell.contract.Id : 1}`,
+    );
+    const getHoldType = await axios.get<DealMemoHoldType>(`/api/dealMemo/getHoldType/${selectedTableCell.contract.Id}`);
+    setDealHoldType(getHoldType.data as DealMemoHoldType);
+    if (demoModalData.data && demoModalData.data.BookingId) {
+      setDemoModalData(demoModalData.data as unknown as DealMemoContractFormData);
+    }
+    if (selectedTableCell.contract && selectedTableCell.contract.venueId) {
+      const venueData = await axios.get(`/api/venue/${selectedTableCell.contract.venueId}`);
+      setVenue(venueData.data as unknown as UiVenue);
     }
   };
 
