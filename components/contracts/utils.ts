@@ -209,3 +209,9 @@ export const parseAndSortDates = (arr: string[]): DateTimeEntry[] => {
 
   return result;
 };
+
+export const checkDecimalStringFormat = (decimalString, precision, scale) => {
+  const [integerPart, fractionalPart] = decimalString.split('.');
+  if (integerPart.length > precision - scale || (fractionalPart && fractionalPart.length > scale)) return false;
+  return true;
+};

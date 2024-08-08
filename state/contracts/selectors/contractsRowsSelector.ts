@@ -78,7 +78,7 @@ export const contractsRowsSelector = selector({
         BankDetailsSent: contractData[rowData.Id] ? contractData[rowData.Id].BankDetailsSent : '',
         TechSpecSent: contractData[rowData.Id] ? contractData[rowData.Id].TechSpecSent : '',
         PRSCertSent: contractData[rowData.Id] ? contractData[rowData.Id].PRSCertSent : '',
-        GrossProfit: contractData[rowData.Id] ? contractData[rowData.Id].GP : '',
+        GP: contractData[rowData.Id] ? contractData[rowData.Id].GP : '',
         PromoterPercent: contractData[rowData.Id] ? contractData[rowData.Id].PromoterPercent : '',
         DateBlockId: contractBookingData[rowData.Id] ? contractBookingData[rowData.Id].DateBlockId : '',
         VenueId: contractBookingData[rowData.Id] ? contractBookingData[rowData.Id].VenueId : '',

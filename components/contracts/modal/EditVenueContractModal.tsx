@@ -37,7 +37,7 @@ import { getFileUrl } from 'lib/s3';
 import charCodeToCurrency from 'utils/charCodeToCurrency';
 import { UiVenue, transformVenues } from 'utils/venue';
 import { ConfDialogVariant } from 'components/core-ui-lib/ConfirmationDialog/ConfirmationDialog';
-import { parseAndSortDates } from '../utils';
+import { parseAndSortDates, checkDecimalStringFormat } from '../utils';
 
 const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClose: () => void }) => {
   const productionJumpState = useRecoilValue(currentProductionSelector);
@@ -616,7 +616,17 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                   <div className=" text-primary-input-text font-bold text-sm mr-1">
                     {charCodeToCurrency(formData.currencyCode)}
                   </div>
-                  <TextInput id="venueText" className="w-[100px]" />
+                  <TextInput
+                    id="venueText"
+                    type="number"
+                    className="w-[100px]"
+                    value={formData.GP}
+                    onChange={(e) => {
+                      if (checkDecimalStringFormat(e.target.value, 10, 2)) {
+                        editContractModalData('GP', e.target.value, 'contract');
+                      }
+                    }}
+                  />
                 </div>
                 <div className="flex  items-center">
                   <div className=" text-primary-input-text font-bold text-sm mr-1">Royalty</div>
@@ -625,14 +635,28 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                     type="number"
                     className="w-[100px]"
                     value={formData.RoyaltyPercentage}
-                    onChange={(value) => editContractModalData('RoyaltyPercentage', value.target.value, 'contract')}
+                    onChange={(e) => {
+                      if (checkDecimalStringFormat(e.target.value, 5, 2)) {
+                        editContractModalData('RoyaltyPercentage', e.target.value, 'contract');
+                      }
+                    }}
                   />
                   <div className=" text-primary-input-text font-bold text-sm ml-1">%</div>
                 </div>
 
                 <div className="flex  items-center">
                   <div className=" text-primary-input-text font-bold text-sm mr-1">Promoter</div>
-                  <TextInput id="venueText" type="number" className="w-[100px]" />
+                  <TextInput
+                    id="venueText"
+                    type="number"
+                    className="w-[100px]"
+                    value={formData.PromoterPercent}
+                    onChange={(e) => {
+                      if (checkDecimalStringFormat(e.target.value, 6, 3)) {
+                        editContractModalData('PromoterPercent', e.target.value, 'contract');
+                      }
+                    }}
+                  />
                   <div className=" text-primary-input-text font-bold text-sm ml-1">%</div>
                 </div>
               </div>
