@@ -29,12 +29,12 @@ exports.Prisma = Prisma;
 exports.$Enums = {};
 
 /**
- * Prisma Client JS version: 5.13.0
- * Query Engine version: b9a39a7ee606c28e3455d0fd60e78c3ba82b1a2b
+ * Prisma Client JS version: 5.18.0
+ * Query Engine version: 4c784e32044a8a016d99474bd02a3b6123742169
  */
 Prisma.prismaVersion = {
-  client: '5.13.0',
-  engine: 'b9a39a7ee606c28e3455d0fd60e78c3ba82b1a2b',
+  client: '5.18.0',
+  engine: '4c784e32044a8a016d99474bd02a3b6123742169',
 };
 
 Prisma.PrismaClientKnownRequestError = PrismaClientKnownRequestError;
@@ -256,6 +256,7 @@ const config = {
       },
     ],
     previewFeatures: ['views'],
+    sourceFilePath: '/Users/sachinchandorkar/Savee Consulting/Clients/Robert Kelly/segue/prisma/schema_master.prisma',
     isCustomOutput: true,
   },
   relativeEnvPaths: {
@@ -263,8 +264,8 @@ const config = {
     schemaEnvPath: '../../../.env',
   },
   relativePath: '../..',
-  clientVersion: '5.13.0',
-  engineVersion: 'b9a39a7ee606c28e3455d0fd60e78c3ba82b1a2b',
+  clientVersion: '5.18.0',
+  engineVersion: '4c784e32044a8a016d99474bd02a3b6123742169',
   datasourceNames: ['db'],
   activeProvider: 'mysql',
   postinstall: false,

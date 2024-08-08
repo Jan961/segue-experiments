@@ -20,7 +20,7 @@
     "build-storybook": "storybook build",
     "db-dev": "prisma studio",
     "install-libreoffice": "sh ./install-libreoffice.sh",
-    "prisma": "npx prisma generate --schema prisma/schema_master.prisma --watch & npx primsa generate --schmea prisma/schema_client.prisma --watch"
+    "prisma-generate": "prisma generate --schema prisma/schema_master.prisma & primsa generate --schmea prisma/schema_client.prisma"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
@@ -37,7 +37,6 @@
   },
   "dependencies": {
     "@clerk/nextjs": "^4.23.3",
-    "@cpanel/api": "^5.2.0",
     "@devexpress/dx-react-grid": "^4.0.3",
     "@fortawesome/fontawesome-svg-core": "^6.2.0",
     "@fortawesome/free-brands-svg-icons": "^6.2.0",
@@ -68,7 +67,6 @@
     "cheerio": "^1.0.0-rc.12",
     "classnames": "^2.3.2",
     "cors": "^2.8.5",
-    "cpanel-lib": "^0.0.5",
     "csv": "^6.2.6",
     "csv-parser": "^3.0.0",
     "cypress": "^13.6.1",

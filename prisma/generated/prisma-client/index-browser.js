@@ -116,7 +116,6 @@ exports.Prisma.ActivityTypeScalarFieldEnum = {
   Name: 'Name',
   ColourIndex: 'ColourIndex',
   Code: 'Code',
-  OriginalActivityTypeId: 'OriginalActivityTypeId',
 };
 
 exports.Prisma.BookingScalarFieldEnum = {
@@ -149,7 +148,6 @@ exports.Prisma.BookingScalarFieldEnum = {
   MarketingCostsStatus: 'MarketingCostsStatus',
   MarketingCostsApprovalDate: 'MarketingCostsApprovalDate',
   MarketingCostsNotes: 'MarketingCostsNotes',
-  OriginalBookingId: 'OriginalBookingId',
 };
 
 exports.Prisma.BookingActivityScalarFieldEnum = {
@@ -241,7 +239,6 @@ exports.Prisma.VenueScalarFieldEnum = {
   FamilyId: 'FamilyId',
   AddressStageDoorW3W: 'AddressStageDoorW3W',
   AddressLoadingW3W: 'AddressLoadingW3W',
-  OriginalVenueId: 'OriginalVenueId',
 };
 
 exports.Prisma.VenueBarredVenueScalarFieldEnum = {
@@ -356,7 +353,6 @@ exports.Prisma.AvailableCompScalarFieldEnum = {
   PerformanceId: 'PerformanceId',
   Seats: 'Seats',
   AvailableCompNotes: 'AvailableCompNotes',
-  OriginalAvailableHoldId: 'OriginalAvailableHoldId',
 };
 
 exports.Prisma.BookedVenueHistoryScalarFieldEnum = {
@@ -384,7 +380,6 @@ exports.Prisma.CompTypeScalarFieldEnum = {
   CompTypeName: 'CompTypeName',
   CompTypeCode: 'CompTypeCode',
   CompTypeSeqNo: 'CompTypeSeqNo',
-  OriginalCompId: 'OriginalCompId',
 };
 
 exports.Prisma.ConversionRateScalarFieldEnum = {
@@ -400,7 +395,6 @@ exports.Prisma.HoldTypeScalarFieldEnum = {
   HoldTypeName: 'HoldTypeName',
   HoldTypeCode: 'HoldTypeCode',
   HoldTypeSeqNo: 'HoldTypeSeqNo',
-  OriginalHoldId: 'OriginalHoldId',
 };
 
 exports.Prisma.ParsedEmailScalarFieldEnum = {
@@ -438,7 +432,6 @@ exports.Prisma.SalesSetScalarFieldEnum = {
   SetIsFinalFigures: 'SetIsFinalFigures',
   SetFinalSalesApprovedByUser: 'SetFinalSalesApprovedByUser',
   SetIsCopy: 'SetIsCopy',
-  OriginalBookingSaleId: 'OriginalBookingSaleId',
 };
 
 exports.Prisma.SetCompScalarFieldEnum = {

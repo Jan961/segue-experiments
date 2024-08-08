@@ -12,13 +12,12 @@ datasource db {
 }
 
 model ActivityType {
-  Id                     Int                     @id @default(autoincrement()) @map("ActivityTypeId")
-  Name                   String                  @unique(map: "ActivityType_Name_Unique") @map("ActivityTypeName") @db.VarChar(30)
-  ColourIndex            Int?                    @map("ActivityTypeColourIndex") @db.TinyInt
-  Code                   String                  @unique(map: "ActivityType_Code_Unique") @map("ActivityTypeCode") @db.VarChar(2)
-  OriginalActivityTypeId Int?
-  BookingActivity        BookingActivity[]
-  GlobalBookingActivity  GlobalBookingActivity[]
+  Id                    Int                     @id @default(autoincrement()) @map("ActivityTypeId")
+  Name                  String                  @unique(map: "ActivityType_Name_Unique") @map("ActivityTypeName") @db.VarChar(30)
+  ColourIndex           Int?                    @map("ActivityTypeColourIndex") @db.TinyInt
+  Code                  String                  @unique(map: "ActivityType_Code_Unique") @map("ActivityTypeCode") @db.VarChar(2)
+  BookingActivity       BookingActivity[]
+  GlobalBookingActivity GlobalBookingActivity[]
 }
 
 model Booking {
@@ -51,7 +50,6 @@ model Booking {
   MarketingCostsStatus       String?               @map("BookingMarketingCostsStatus") @db.Char(1)
   MarketingCostsApprovalDate DateTime?             @map("BookingMarketingCostsApprovalDate") @db.Date
   MarketingCostsNotes        String?               @map("BookingMarketingCostsNotes") @db.LongText
-  OriginalBookingId          Int
   BookedVenueHistory         BookedVenueHistory[]
   DateBlock                  DateBlock             @relation(fields: [DateBlockId], references: [Id], onDelete: Cascade, map: "DateBlock_Booking")
   Venue                      Venue                 @relation(fields: [VenueId], references: [Id], map: "Venue_Booking")
@@ -182,7 +180,6 @@ model Venue {
   FamilyId                                                  Int?                         @map("VenueVenueFamilyId")
   AddressStageDoorW3W                                       String?                      @map("VenueAddressStageDoorW3W") @db.VarChar(70)
   AddressLoadingW3W                                         String?                      @map("VenueAddressLoadingW3W") @db.VarChar(70)
-  OriginalVenueId                                           Int
   ACCContract                                               ACCContract[]
   BookedVenueHistory                                        BookedVenueHistory[]
   Booking                                                   Booking[]
@@ -372,13 +369,12 @@ model Account {
 }
 
 model AvailableComp {
-  Id                      Int              @id @default(autoincrement()) @map("AvailableCompId")
-  PerformanceId           Int              @map("AvailableCompPerformanceId")
-  Seats                   Int              @default(1) @map("AvailableCompSeats") @db.TinyInt
-  AvailableCompNotes      String?          @db.LongText
-  OriginalAvailableHoldId Int
-  Performance             Performance      @relation(fields: [PerformanceId], references: [Id], onDelete: Cascade, map: "PerformanceMayHaveAvailableComps")
-  CompAllocation          CompAllocation[]
+  Id                 Int              @id @default(autoincrement()) @map("AvailableCompId")
+  PerformanceId      Int              @map("AvailableCompPerformanceId")
+  Seats              Int              @default(1) @map("AvailableCompSeats") @db.TinyInt
+  AvailableCompNotes String?          @db.LongText
+  Performance        Performance      @relation(fields: [PerformanceId], references: [Id], onDelete: Cascade, map: "PerformanceMayHaveAvailableComps")
+  CompAllocation     CompAllocation[]
 
   @@index([PerformanceId], map: "fkBooking_BookingPromoterHoldAvailable")
 }
@@ -414,12 +410,11 @@ model CompAllocation {
 }
 
 model CompType {
-  CompTypeId     Int       @id @default(autoincrement())
-  CompTypeName   String    @unique(map: "CompName") @db.VarChar(30)
-  CompTypeCode   String    @db.VarChar(5)
-  CompTypeSeqNo  Int
-  OriginalCompId Int
-  SetComp        SetComp[]
+  CompTypeId    Int       @id @default(autoincrement())
+  CompTypeName  String    @unique(map: "CompName") @db.VarChar(30)
+  CompTypeCode  String    @db.VarChar(5)
+  CompTypeSeqNo Int
+  SetComp       SetComp[]
 }
 
 model ConversionRate {
@@ -438,13 +433,12 @@ model ConversionRate {
 }
 
 model HoldType {
-  HoldTypeId     Int            @id @default(autoincrement())
-  HoldTypeName   String         @unique(map: "HoldName") @db.VarChar(30)
-  HoldTypeCode   String         @db.VarChar(5)
-  HoldTypeSeqNo  Int
-  OriginalHoldId Int
-  DealMemoHold   DealMemoHold[]
-  SetHold        SetHold[]
+  HoldTypeId    Int            @id @default(autoincrement())
+  HoldTypeName  String         @unique(map: "HoldName") @db.VarChar(30)
+  HoldTypeCode  String         @db.VarChar(5)
+  HoldTypeSeqNo Int
+  DealMemoHold  DealMemoHold[]
+  SetHold       SetHold[]
 }
 
 model ParsedEmail {
@@ -489,7 +483,6 @@ model SalesSet {
   SetIsFinalFigures           Boolean      @default(dbgenerated("(b'0')")) @db.Bit(1)
   SetFinalSalesApprovedByUser String?      @db.VarChar(100)
   SetIsCopy                   Boolean      @default(dbgenerated("(b'0')")) @db.Bit(1)
-  OriginalBookingSaleId       Int
   Sale                        Sale[]
   Booking                     Booking      @relation(fields: [SetBookingId], references: [Id], onDelete: Cascade, map: "Booking_BookingSale")
   Performance                 Performance? @relation(fields: [SetPerformanceId], references: [Id], onDelete: Cascade, map: "Performance_SalesSet")
