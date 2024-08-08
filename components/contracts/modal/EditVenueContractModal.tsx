@@ -84,6 +84,10 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
   const [showConfirmationDialog, setShowConfirmationDialog] = useState<boolean>(false);
   const [confirmationVariant, setConfirmationVariant] = useState<string>('cancel');
 
+  useEffect(() => {
+    console.log(demoModalData);
+  }, [demoModalData]);
+
   const producerList = useMemo(() => {
     const list = {};
     Object.values(users).forEach((listData) => {
@@ -98,6 +102,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
     const demoModalData = await axios.get<DealMemoContractFormData>(
       `/api/dealMemo/getDealMemo/${selectedTableCell.contract.Id ? selectedTableCell.contract.Id : 1}`,
     );
+    console.log(demoModalData);
     const getHoldType = await axios.get<DealMemoHoldType>(`/api/dealMemo/getHoldType/${selectedTableCell.contract.Id}`);
     setDealHoldType(getHoldType.data as DealMemoHoldType);
     if (demoModalData.data && demoModalData.data.BookingId) {
@@ -603,7 +608,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                   className="mt-2.5 h-[58px] w-[498px]"
                   value={formData.DealNotes}
                   onChange={(value) => editContractModalData('DealNotes', value.target.value, 'booking')}
-                  placeholder="Deal Details"
+                  placeholder="Enter Deal Details"
                 />
               </div>
             </div>
@@ -670,7 +675,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                   className="mt-2.5 h-[58px] w-[498px]"
                   value={formData.TicketPriceNotes}
                   onChange={(value) => editContractModalData('TicketPriceNotes', value.target.value, 'booking')}
-                  placeholder="Ticket Pricing Notes"
+                  placeholder="Enter Ticket Pricing Notes"
                 />
               </div>
             </div>
@@ -683,7 +688,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                   className="mt-2.5 h-[58px] w-[498px]"
                   value={formData.MarketingDealNotes}
                   onChange={(value) => editContractModalData('MarketingDealNotes', value.target.value, 'booking')}
-                  placeholder="Marketing Deal"
+                  placeholder="Enter Marketing Deal"
                 />
               </div>
             </div>
@@ -696,7 +701,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                   className="mt-2.5 h-[58px] w-[498px]"
                   value={formData.CrewNotes}
                   onChange={(value) => editContractModalData('CrewNotes', value.target.value, 'booking')}
-                  placeholder="Crew Notes"
+                  placeholder="Enter Crew Notes"
                 />
               </div>
             </div>
@@ -746,6 +751,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                   className="mt-2.5 h-[58px] w-[498px]"
                   value={formData.Exceptions}
                   onChange={(value) => editContractModalData('Exceptions', value.target.value, 'contract')}
+                  placeholder="Enter Exceptions Notes"
                 />
               </div>
             </div>
@@ -758,6 +764,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                   className="mt-2.5 h-[58px] w-[498px]"
                   value={formData.Notes}
                   onChange={(value) => editContractModalData('Notes', value.target.value, 'contract')}
+                  placeholder="Enter Contract Notes"
                 />
               </div>
             </div>
@@ -770,6 +777,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                   className="mt-2.5 h-[58px] w-[498px]"
                   value={formData.MerchandiseNotes}
                   onChange={(value) => editContractModalData('MerchandiseNotes', value.target.value, 'booking')}
+                  placeholder="Enter Merchandise Notes"
                 />
               </div>
             </div>
