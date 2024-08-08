@@ -1283,9 +1283,9 @@ model ACCClause {
 }
 
 model ContractFile {
-  Id                Int      @map("ContractFileId") @id @default(autoincrement())
-  ContractBookingId Int      @map("ContractFileContractBookingId") 
-  FileId            Int      @map("ContractFileFileId") 
+  Id                Int      @id @default(autoincrement()) @map("ContractFileId")
+  ContractBookingId Int      @map("ContractFileContractBookingId")
+  FileId            Int      @map("ContractFileFileId")
   Type              String?  @map("ContractFileType") @db.VarChar(20)
   Description       String?  @map("ContractFileDescription") @db.VarChar(80)
   Contract          Contract @relation(fields: [ContractBookingId], references: [BookingId], onDelete: Cascade, map: "Contract_ContractFile")
