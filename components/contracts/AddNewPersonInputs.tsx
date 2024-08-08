@@ -37,7 +37,7 @@ export const AddNewPersonInput = ({ newPersonData }: NewPersonDataProps) => {
                 options={booleanOptions}
                 isClearable
                 isSearchable
-                //   value={formData.DeMoAdvancePaymentRequired}
+                //   value={formData.AdvancePaymentRequired}
               />
             )}
           </div>
@@ -69,7 +69,7 @@ export const AddNewPersonInput = ({ newPersonData }: NewPersonDataProps) => {
                 options={booleanOptions}
                 isClearable
                 isSearchable
-                //   value={formData.DeMoAdvancePaymentRequired}
+                //   value={formData.AdvancePaymentRequired}
               />
             )}
           </div>

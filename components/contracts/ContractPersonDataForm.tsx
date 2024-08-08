@@ -42,7 +42,7 @@ export const ContractPersonDataForm = ({ height }: ContractPersonDataFormProps) 
                 onChange={() => {
                   return null;
                 }}
-                //   value={formData.DeMoOnSaleDate}
+                //   value={formData.OnSaleDate}
               />
               <div className="text-xs text-primary-input-text font-bold ml-4">
                 (<span className="underline">NOTE:</span> Expiry date is 10 years from{' '}
@@ -79,7 +79,7 @@ export const ContractPersonDataForm = ({ height }: ContractPersonDataFormProps) 
                 options={booleanOptions}
                 isClearable
                 isSearchable
-                //   value={formData.DeMoAdvancePaymentRequired}
+                //   value={formData.AdvancePaymentRequired}
               />
               <div className="text-primary-input-text font-bold ml-2 mr-2">Checked</div>
               <Select
@@ -91,7 +91,7 @@ export const ContractPersonDataForm = ({ height }: ContractPersonDataFormProps) 
                 options={booleanOptions}
                 isClearable
                 isSearchable
-                //   value={formData.DeMoAdvancePaymentRequired}
+                //   value={formData.AdvancePaymentRequired}
               />
             </div>
           </div>
@@ -110,7 +110,7 @@ export const ContractPersonDataForm = ({ height }: ContractPersonDataFormProps) 
                 options={booleanOptions}
                 isClearable
                 isSearchable
-                //   value={formData.DeMoGuarantee}
+                //   value={formData.Guarantee}
               />
             </div>
           </div>
@@ -129,7 +129,7 @@ export const ContractPersonDataForm = ({ height }: ContractPersonDataFormProps) 
                 options={booleanOptions}
                 isClearable
                 isSearchable
-                //   value={formData.DeMoGuarantee}
+                //   value={formData.Guarantee}
               />
             </div>
           </div>
@@ -166,7 +166,7 @@ export const ContractPersonDataForm = ({ height }: ContractPersonDataFormProps) 
                 options={booleanOptions}
                 isClearable
                 isSearchable
-                //   value={formData.DeMoGuarantee}
+                //   value={formData.Guarantee}
               />
             </div>
           </div>
@@ -232,7 +232,7 @@ export const ContractPersonDataForm = ({ height }: ContractPersonDataFormProps) 
               onChange={() => {
                 return null;
               }}
-              // checked={formData.DeMoNumFacilitiesLaundry}
+              // checked={formData.NumFacilitiesLaundry}
             />
             <div className="text-primary-input-text font-bold mr-2 ml-6">Agent</div>
           </div>
@@ -245,7 +245,7 @@ export const ContractPersonDataForm = ({ height }: ContractPersonDataFormProps) 
               onChange={() => {
                 return null;
               }}
-              // checked={formData.DeMoNumFacilitiesLaundry}
+              // checked={formData.NumFacilitiesLaundry}
             />
             <div className="text-primary-input-text font-bold mr-2 ml-6">Company Member</div>
           </div>
