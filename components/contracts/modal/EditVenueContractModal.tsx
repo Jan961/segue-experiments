@@ -153,8 +153,6 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
   };
 
   const handleFormData = async () => {
-    console.log(filesForUpload);
-
     const bookingData = Object.keys(saveBookingFormData).length > 0;
     const contractData = Object.keys(saveContractFormData).length > 0;
     if (contractData) {
@@ -186,7 +184,6 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
     try {
       await Promise.all(
         filesToDelete.map(async (file) => {
-          console.log(file);
           await axios.delete(`/api/file/delete?location=${file.FileLocation}`);
           await axios.post(`/api/contracts/delete/attachments/${selectedTableCell.contract.Id}`, file);
         }),
@@ -261,9 +258,6 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
   };
 
   const handleCellClicked = (event) => {
-    console.log(event.data);
-    console.log(selectedTableCell.contract.Id);
-
     if (event.column.colId === 'ViewBtn') {
       const fileUrl = event.data.FileURL;
       window.open(fileUrl, '_blank');
@@ -302,14 +296,13 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
       title={modalTitle}
       titleClass={classNames('text-xl text-primary-navy font-bold -mt-2.5')}
       onClose={() => handleCancelForm(false)}
-      hasOverlay={false}
     >
       <div className="h-[80vh] w-auto overflow-y-scroll flex">
         <div className="h-[800px] flex">
           <div className="flex flex-col gap-y-3">
             <div className="w-[423px] rounded border-2 border-secondary mr-2 p-3 bg-primary-blue bg-opacity-15">
               <div className="flex">
-                <div className=" text-primary-input-text font-bold text-lg mr-8">Deal Memo</div>
+                <div className="text-primary-input-text font-bold text-lg mr-8">Deal Memo</div>
                 <div className="flex items-center">
                   <Button
                     className="w-32"
