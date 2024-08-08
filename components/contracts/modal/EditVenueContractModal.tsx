@@ -53,6 +53,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
     ...initialEditContractFormData,
     ...selectedTableCell.contract,
   });
+  console.log(selectedTableCell.contract);
   const [demoModalData, setDemoModalData] = useState<Partial<DealMemoContractFormData>>({});
   const [modalTitle, setModalTitle] = useState<string>(
     `${productionJumpState.ShowCode + productionJumpState.Code} ${productionJumpState.ShowName} | ${
@@ -348,9 +349,9 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
         <div className="h-[800px] flex">
           <div className="flex flex-col gap-y-3">
             <div className="w-[423px] rounded border-2 border-secondary mr-2 p-3 bg-primary-blue bg-opacity-15">
-              <div className="flex">
-                <div className="text-primary-input-text font-bold text-lg mr-8">Deal Memo</div>
-                <div className="flex items-center">
+              <div className="flex justify-between">
+                <div className="text-primary-input-text font-bold text-lg">Deal Memo</div>
+                <div className="flex gap-x-2">
                   <Button
                     className="w-32"
                     variant="primary"

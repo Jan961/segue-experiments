@@ -558,6 +558,11 @@ export type ContractStatusType = {
   Notes: string;
   ReceivedBackDate: Date;
   Exceptions: string;
+  BankDetailsSent: boolean;
+  TechSpecSent: boolean;
+  PRSCertSent: boolean;
+  GP: string;
+  PromoterPercent: string;
 };
 
 export type ContractBookingStatusType = {
@@ -640,6 +645,8 @@ export interface VenueContractFormData {
   currencyCode: string;
   FirstDate: string;
   Id: string;
+  GP: string;
+  Test: string;
 }
 
 export interface SaveContractFormState {

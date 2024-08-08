@@ -299,6 +299,11 @@ export const contractStatusmapper = (status: ContractStatusType) => {
       ContractNotes: status.Notes,
       ReceivedBackDate: convertDate(status.ReceivedBackDate),
       Exceptions: status.Exceptions,
+      BankDetailsSent: status.BankDetailsSent,
+      TechSpecSent: status.TechSpecSent,
+      PRSCertSent: status.PRSCertSent,
+      GP: convertToString(status.GP),
+      PromoterPercent: convertToString(status.PromoterPercent),
     };
   }
   return null;
