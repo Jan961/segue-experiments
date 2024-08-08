@@ -775,6 +775,11 @@ export interface DealMemoContractFormData {
   DealMemoTechProvision?: DealMemoTechProvision[];
   DealMemoCall?: any;
   DealMemoHold?: DealMemoHold[];
+  Status?: string;
+  CompletedBy?: string;
+  ApprovedBy?: string;
+  DateReturned?: Date;
+  DeMoNotes?: string;
 }
 
 export interface DealMemoHoldType {

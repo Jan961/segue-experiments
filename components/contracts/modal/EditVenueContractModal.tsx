@@ -44,6 +44,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
   const selectedTableCell = useRecoilValue(addEditContractsState);
   const [saveContractFormData, setSaveContractFormData] = useState<Partial<SaveContractFormState>>({});
   const [saveBookingFormData, setSaveBookingFormData] = useState<Partial<SaveContractBookingFormState>>({});
+  const [saveDealMemoFormData, setSaveDealMemoFormData] = useState<Partial<DealMemoContractFormData>>({});
   const [editDealMemoModal, setEditDealMemoModal] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [venue, setVenue] = useState<Partial<UiVenue>>({});
@@ -204,13 +205,19 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
     if (type === 'contract') {
       setSaveContractFormData({ ...saveContractFormData, [key]: value });
     }
+    if (type === 'dealMemo') {
+      setSaveDealMemoFormData({ ...saveDealMemoFormData, [key]: value });
+    }
   };
 
   const handleFormData = async () => {
     const handleUpload = async () => {
       const bookingData = Object.keys(saveBookingFormData).length > 0;
       const contractData = Object.keys(saveContractFormData).length > 0;
+      const dealMemoData = Object.keys(saveDealMemoFormData).length > 0;
       if (contractData) {
+        console.log('contractData', contractData);
+        console.log('saveContractFormData', saveContractFormData);
         await fetchData({
           url: `/api/contracts/update/venueContract/${selectedTableCell.contract.Id}`,
           method: 'PATCH',
@@ -225,8 +232,19 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
           data: saveBookingFormData,
         });
       }
+
+      if (dealMemoData) {
+        console.log('dealMemoData', dealMemoData);
+        console.log('saveDealMemoFormData', saveDealMemoFormData);
+        await fetchData({
+          url: `/api/contracts/update/dealMemo/${selectedTableCell.contract.Id}`,
+          method: 'PATCH',
+          data: saveDealMemoFormData,
+        });
+      }
       setSaveBookingFormData({});
       setSaveContractFormData({});
+      setSaveDealMemoFormData({});
 
       await saveFiles();
       await deleteFiles();
@@ -380,16 +398,16 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                   options={statusOptions}
                   className="bg-primary-white w-full"
                   placeholder="Select Deal Memo Status"
-                  onChange={(value) => editContractModalData('dealMemoStatus', value, 'booking')}
+                  onChange={(value) => editContractModalData('Status', value, 'dealMemo')}
+                  value={demoModalData.Status}
                   isClearable
                   isSearchable
                 />
 
                 <div className=" text-primary-input-text font-bold text-sm mt-6">Completed By</div>
                 <Select
-                  onChange={() => {
-                    return null;
-                  }}
+                  onChange={(value) => editContractModalData('CompletedBy', value, 'dealMemo')}
+                  value={demoModalData.CompletedBy}
                   className="bg-primary-white w-full"
                   options={[...userList]}
                   isClearable
@@ -399,9 +417,8 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
 
                 <div className=" text-primary-input-text font-bold text-sm mt-6">Approved By</div>
                 <Select
-                  onChange={() => {
-                    return null;
-                  }}
+                  onChange={(value) => editContractModalData('ApprovedBy', value, 'dealMemo')}
+                  value={demoModalData.ApprovedBy}
                   className="bg-primary-white w-full"
                   options={[...userList]}
                   isClearable
@@ -412,10 +429,8 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                   <div>
                     <div className=" text-primary-input-text font-bold text-sm">Date Issued</div>
                     <DateInput
-                      onChange={() => {
-                        return null;
-                      }}
-                      value={formData.SignedDate}
+                      onChange={(value) => editContractModalData('DateIssued', value, 'dealMemo')}
+                      value={demoModalData.DateIssued}
                     />
                   </div>
 
