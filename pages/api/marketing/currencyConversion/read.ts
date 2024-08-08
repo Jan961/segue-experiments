@@ -5,7 +5,7 @@ import prisma from 'lib/prisma';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const { bookingId, productionId } = req.body;
+    const { bookingId, productionId } = req.query;
     if (!bookingId || !productionId) return res.status(400).end();
     const email = await getEmailFromReq(req);
     const access = await checkAccess(email);
