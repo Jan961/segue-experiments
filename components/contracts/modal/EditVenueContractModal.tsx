@@ -719,7 +719,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
           visible={showUploadModal}
           title="Upload Venue Contract Attachments"
           info="Please upload your file by dragging it into the grey box below or by clicking the upload cloud."
-          allowedFormats={attachmentMimeTypes.venueContract}
+          allowedFormats={attachmentMimeTypes.genericAttachment}
           onClose={() => setShowUploadModal(false)}
           maxFileSize={5120 * 1024} // 5MB
           onSave={onSave}
