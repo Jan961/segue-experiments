@@ -36,7 +36,7 @@ import {
   filterPercentage,
   filterPrice,
   filterTechProvision,
-} from '../utils';
+ parseAndSortDates } from '../utils';
 import { DealMemoHold, DealMemoTechProvision } from '@prisma/client';
 import { dealMemoInitialState } from 'state/contracts/contractsFilterState';
 import {
@@ -44,7 +44,7 @@ import {
   dateToTimeString,
   formattedDateWithDay,
   getShortWeekFormat,
- parseAndSortDates } from 'services/dateService';
+} from 'services/dateService';
 import { VENUE_CURRENCY_SYMBOLS } from 'types/MarketingTypes';
 import StandardSeatKillsTable from '../table/StandardSeatKillsTable';
 import LoadingOverlay from 'components/shows/LoadingOverlay';

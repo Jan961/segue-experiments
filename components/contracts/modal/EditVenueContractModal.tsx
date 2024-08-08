@@ -24,7 +24,7 @@ import {
   VenueContractFormData,
 } from 'interfaces';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
-import { formattedDateWithDay, toISO, parseAndSortDates } from 'services/dateService';
+import { formattedDateWithDay, toISO } from 'services/dateService';
 import { EditDealMemoContractModal } from './EditDealMemoContractModal';
 import { isNullOrEmpty, transformToOptions } from 'utils';
 import LoadingOverlay from 'components/shows/LoadingOverlay';
@@ -37,6 +37,7 @@ import { getFileUrl } from 'lib/s3';
 import charCodeToCurrency from 'utils/charCodeToCurrency';
 import { UiVenue, transformVenues } from 'utils/venue';
 import { ConfDialogVariant } from 'components/core-ui-lib/ConfirmationDialog/ConfirmationDialog';
+import { parseAndSortDates } from '../utils';
 
 const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClose: () => void }) => {
   const productionJumpState = useRecoilValue(currentProductionSelector);

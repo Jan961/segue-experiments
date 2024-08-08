@@ -1,3 +1,6 @@
+import { nanoid } from 'nanoid';
+import { DateTimeEntry } from 'types/ContractTypes';
+
 const defaultPrice = {
   Premium: { DMPTicketName: 'Premium', DMPTicketPrice: 0, DMPNumTickets: 0, DMPDeMoId: 0, DMPNotes: '' },
   Concession: { DMPTicketName: 'Concession', DMPTicketPrice: 0, DMPNumTickets: 0, DMPDeMoId: 0, DMPNotes: '' },
@@ -177,3 +180,32 @@ export const salaryDetailsData = [
   { first: 'IBAN (if applicable)', second: 'IBAN (if applicable)', type: 'textInput' },
   { first: 'Country', second: 'Country', type: 'select' },
 ];
+
+// Expect string to come in format "HH:MM? YYYY-MM-DD" - where HH:MM may not be included
+export const parseAndSortDates = (arr: string[]): DateTimeEntry[] => {
+  const parsedEntries = arr.map((str) => {
+    const [timePart, isoDatePart] = str.split('? ');
+    return { timePart: timePart.trim(), date: new Date(isoDatePart.trim()) };
+  });
+
+  parsedEntries.sort((a, b) => a.date.getTime() - b.date.getTime());
+
+  const groupedByDate = parsedEntries.reduce(
+    (acc, entry) => {
+      const dateKey = entry.date.toISOString().split('T')[0];
+      if (!acc[dateKey]) {
+        acc[dateKey] = [];
+      }
+      acc[dateKey].push(entry.timePart);
+      return acc;
+    },
+    {} as Record<string, string[]>,
+  );
+
+  const result = Object.entries(groupedByDate).map(([date, times]) => {
+    const formattedDate = `${date} ${times.join(' ')}`;
+    return { formattedDate, id: nanoid() };
+  });
+
+  return result;
+};
