@@ -24,7 +24,7 @@ const useBookingFilter = () => {
         (selected === -1 || productionId === selected) &&
         (!filter.endDate || new Date(dateTime) <= filter.endDate) &&
         (!filter.startDate || new Date(dateTime) >= filter.startDate) &&
-        (filter.status === 'all' || status === filter.status)
+        (filter.status === 'all' || status === filter.status || (filter.status === 'A' && status === ''))
       );
     });
 

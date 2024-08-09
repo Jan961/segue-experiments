@@ -5,6 +5,11 @@ import DateColumnRenderer from './table/DateColumnRenderer';
 import { tileColors } from 'config/global';
 import InputRenderer from 'components/global/salesTable/renderers/InputRenderer';
 import NoteColumnRenderer from 'components/bookings/table/NoteColumnRenderer';
+import DefaultTextRenderer from 'components/core-ui-lib/Table/renderers/DefaultTextRenderer';
+import formatInputDate from 'utils/dateInputFormat';
+import { getTimeFromDateAndTime } from 'services/dateService';
+import ButtonRenderer from 'components/core-ui-lib/Table/renderers/ButtonRenderer';
+import IconRowRenderer from 'components/global/salesTable/renderers/IconRowRenderer';
 
 export const contractsStyleProps = { headerColor: tileColors.contracts };
 
@@ -177,6 +182,51 @@ export const standardSeatKillsColumnDefs = (onChangeData, holdValue) => [
     headerClass: 'right-border-full',
     suppressMovable: true,
     sortable: false,
+    resizable: false,
+  },
+];
+
+export const attachmentsColDefs = [
+  {
+    headerName: 'Title',
+    field: 'FileOriginalFilename',
+    editable: true,
+    cellRenderer: DefaultTextRenderer,
+    width: 150,
+  },
+  {
+    headerName: 'Date Uploaded',
+    field: 'FileUploadedDateTime',
+    cellRenderer: DefaultTextRenderer,
+    cellRendererParams: function (params) {
+      const updDate = new Date(params.data.FileUploadedDateTime);
+      return {
+        value: formatInputDate(updDate) + ' ' + getTimeFromDateAndTime(updDate),
+      };
+    },
+    width: 100,
+  },
+  {
+    headerName: 'View',
+    field: 'ViewBtn',
+    cellRenderer: ButtonRenderer,
+    cellRendererParams: {
+      buttonText: 'View',
+    },
+    width: 100,
+  },
+  {
+    headerName: '',
+    field: 'icons',
+    cellRenderer: IconRowRenderer,
+    cellRendererParams: {
+      iconList: [
+        {
+          name: 'delete',
+        },
+      ],
+    },
+    width: 80,
     resizable: false,
   },
 ];
