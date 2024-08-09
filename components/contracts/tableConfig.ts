@@ -4,6 +4,7 @@ import VenueColumnRenderer from './table/VenueColumnRenderer';
 import DateColumnRenderer from './table/DateColumnRenderer';
 import { tileColors } from 'config/global';
 import InputRenderer from 'components/global/salesTable/renderers/InputRenderer';
+import NoteColumnRenderer from 'components/bookings/table/NoteColumnRenderer';
 
 export const contractsStyleProps = { headerColor: tileColors.contracts };
 
@@ -93,7 +94,7 @@ export const companyContractsColumnDefs = [
     width: 100,
     minWidth: 100,
   },
-  { headerName: '', field: 'town', cellRenderer: DefaultCellRenderer, minWidth: 100, flex: 1 },
+  { headerName: '', field: 'actionBtn', cellRenderer: DefaultCellRenderer, minWidth: 100, flex: 1 },
   { headerName: 'Completed By', field: 'capacity', cellRenderer: DefaultCellRenderer, width: 150 },
   { headerName: 'Checked By', field: 'performanceCount', cellRenderer: DefaultCellRenderer, width: 90 },
   { headerName: 'Date Issued', field: 'contractStatus', cellRenderer: ContractStatusCellRenderer, width: 180 },
@@ -105,11 +106,21 @@ export const companyContractsColumnDefs = [
     width: 180,
   },
   {
-    headerName: 'Notes',
-    field: 'contractStatus',
-    cellRenderer: ContractStatusCellRenderer,
+    headerName: '',
+    field: 'notes',
+    cellRenderer: NoteColumnRenderer,
+    headerClass: [''],
+    cellRendererParams: {
+      tpActive: true,
+    },
     resizable: false,
-    width: 80,
+    width: 50,
+    cellStyle: {
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      overflow: 'visible',
+    },
   },
 ];
 

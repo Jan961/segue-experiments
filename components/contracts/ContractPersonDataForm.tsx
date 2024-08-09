@@ -1,306 +1,104 @@
-import { Checkbox, DateInput, Select, TextInput } from 'components/core-ui-lib';
-import { AddNewPersonInput } from './AddNewPersonInputs';
-import { addNewPersonInputData, agencyDetailsData, emergecnyContactData, salaryDetailsData } from './utils';
 import { booleanOptions } from 'config/contracts';
-import { useState } from 'react';
-// import axios from 'axios';
+import { useCallback, useMemo, useState } from 'react';
+import { useRecoilValue } from 'recoil';
+import { countryState } from 'state/global/countryState';
+import { transformToOptions } from 'utils';
+import EmergencyContact from './PersonForm/EmergencyContact';
+import SalaryDetailsForm from './PersonForm/SalaryDetailsForm';
+import PersonalDetails from './PersonForm/PersonalDetails';
+import AgencyDetails from './PersonForm/AgencyDetails';
+import { userState } from 'state/account/userState';
 
 interface ContractPersonDataFormProps {
   height: string;
+  updateFormData: (data: any) => void;
 }
 
-export const ContractPersonDataForm = ({ height }: ContractPersonDataFormProps) => {
-  const [newPersonForm, setNewPersonForm] = useState({});
+export const ContractPersonDataForm = ({ height, updateFormData }: ContractPersonDataFormProps) => {
+  const [personData, setPersonData] = useState({});
+  const countryList = useRecoilValue(countryState) || [];
+  const { users = [] } = useRecoilValue(userState);
+  const userOptionList = useMemo(
+    () =>
+      transformToOptions(
+        Object.values(users),
+        null,
+        'Id',
+        ({ FirstName = '', LastName = '', Email = '' }) => `${FirstName || ''} ${LastName || ''} | ${Email || ''}`,
+      ),
+    [users],
+  );
+  const countryOptionList = useMemo(() => transformToOptions(countryList, 'Name', 'Id'), [countryList]);
 
-  const handleAddpersonData = (key, value) => {
-    console.log('key=>value', key, value, newPersonForm);
-    const updatedFormData = {
-      ...newPersonForm,
-      [key]: value,
-    };
-
-    setNewPersonForm({ ...updatedFormData });
-  };
-
-  const saveData = async () => {
-    // let data = axios.post()
-    // const venueData = await axios.post(`/api/company-contracts/addPersonDetails/${selectedTableCell.contract.venueId}`);
-    // const response = await axios.post('/api/company-contracts/addPersonDetails/', {
-    //   formData:newPersonForm,
-    //   productionId:23
-    // });
-  };
+  const onChange = useCallback(
+    (key: string, data: any) => {
+      const updatedFormData = {
+        ...personData,
+        [key]: data,
+      };
+      setPersonData(updatedFormData);
+      updateFormData?.(updatedFormData);
+    },
+    [personData, updateFormData, setPersonData],
+  );
 
   return (
     <>
       <div className={`${height} w-[82vw] overflow-y-scroll`}>
         <div className="text-xl text-primary-navy font-bold ">Person Details</div>
-
-        {addNewPersonInputData.map((newPersonData) => {
-          return (
-            <>
-              <AddNewPersonInput
-                newPersonData={newPersonData}
-                handleAddpersonData={(key, value) => handleAddpersonData(key, value)}
-                newPersonForm={newPersonForm}
-              />
-            </>
-          );
-        })}
-        <button onClick={() => saveData()}>save</button>
-        <div className="flex mt-2 items-center">
-          <div className="w-1/2 flex items-center">
-            <div className="text-primary-input-text font-bold mr-4 w-[11vw]">Town</div>
-            <div className="w-[22vw] ml-4">
-              <TextInput
-                className=" text-primary-input-text font-bold w-full"
-                disabled
-                // value={AddressTown}
-                // placeholder={
-                //   contactsData.phone ? 'Add details to the Contact Database' : 'Please select from the dropdown above'
-                // }
+        <PersonalDetails
+          countryOptionList={countryOptionList}
+          booleanOptions={booleanOptions}
+          userOptionList={userOptionList}
+          onChange={(data) => onChange('personDetails', data)}
+        />
+        <div className="flex mt-8">
+          <div className="w-[50vw]">
+            <div>
+              <h3 className="text-xl text-primary-navy font-bold mb-2">Emergency Contact 1</h3>
+              <EmergencyContact
+                countryOptionList={countryOptionList}
+                onChange={(data) => onChange('emergencyContact1', data)}
               />
             </div>
           </div>
-
-          <div className="w-1/2 flex items-center">
-            <div className="text-primary-input-text font-bold  mr-4 w-2/5">Passport Expiry Date</div>
-            <div className="w-[22vw] ml-4 flex items-center">
-              <DateInput
-                onChange={() => {
-                  return null;
-                }}
-                //   value={PersonPassportExpiryDate}
-              />
-              <div className="text-xs text-primary-input-text font-bold ml-4">
-                (<span className="underline">NOTE:</span> Expiry date is 10 years from{' '}
-                <span className="text-red-500 underline">PASSPORT ISSUE DATE</span>)
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex mt-2 items-center">
-          <div className="w-1/2 flex items-center">
-            <div className="text-primary-input-text font-bold mr-4 w-[11vw]">Postcode</div>
-            <div className="w-[22vw] ml-4">
-              <TextInput
-                className=" text-primary-input-text font-bold w-full"
-                disabled
-                // value={AddressPostcode}
-                // placeholder={
-                //   contactsData.phone ? 'Add details to the Contact Database' : 'Please select from the dropdown above'
-                // }
-              />
-            </div>
-          </div>
-
-          <div className="w-1/2 flex items-center">
-            <div className="text-primary-input-text font-bold  mr-4 w-2/5">Eligible to Work in the UK</div>
-            <div className="w-[22vw] ml-4 flex items-center">
-              <Select
-                onChange={() => {
-                  return null;
-                }}
-                className="bg-primary-white w-40"
-                placeholder="Please select..."
-                options={booleanOptions}
-                isClearable
-                isSearchable
-                //   value={PersonEligibleToWork}
-              />
-              <div className="text-primary-input-text font-bold ml-2 mr-2">Checked</div>
-              <Select
-                onChange={() => {
-                  return null;
-                }}
-                className="bg-primary-white w-40"
-                placeholder="Please select..."
-                options={booleanOptions}
-                isClearable
-                isSearchable
-                //   value={PersonFEUCheckByUserId}
+          <div className="w-[50vw]">
+            <div>
+              <h3 className="text-xl text-primary-navy font-bold mb-2">Emergency Contact 2</h3>
+              <EmergencyContact
+                countryOptionList={countryOptionList}
+                onChange={(data) => onChange('emergencyContact2', data)}
               />
             </div>
           </div>
         </div>
-
-        <div className="flex mt-2 items-center">
-          <div className="w-1/2 flex items-center">
-            <div className="text-primary-input-text font-bold mr-4 w-[10vw]">Country</div>
-            <div className="w-[22vw] ml-8">
-              <Select
-                onChange={() => {
-                  return null;
-                }}
-                className="bg-primary-white w-26 mr-3"
-                placeholder="Please select.."
-                options={booleanOptions}
-                isClearable
-                isSearchable
-                //   value={formData.DeMoGuarantee}
-              />
-            </div>
-          </div>
-
-          <div className="w-1/2 flex items-center">
-            <div className="text-primary-input-text font-bold  mr-4 w-2/5">
-              Is FEU (Foreign Entertainer Union) permission required
-            </div>
-            <div className="w-[22vw] ml-4">
-              <Select
-                onChange={() => {
-                  return null;
-                }}
-                className="bg-primary-white w-40 mr-3"
-                placeholder="Please select.."
-                options={booleanOptions}
-                isClearable
-                isSearchable
-                //   value={PersonFEURequired}
-              />
-            </div>
-          </div>
-        </div>
-        {[
-          ['General Notes', 'PersonNotes'],
-          ['Relevant Health Details', 'PersonHealthNotes'],
-          ['Advisory Notes', 'PersonAdvisoryNotes'],
-        ].map((input) => {
-          return (
-            <>
-              <div className="flex items-center mb-2">
-                <div className="w-[13vw] text-primary-input-text font-bold">{input[0]}</div>
-                <div className="w-4/5">
-                  <TextInput
-                    id="venueText"
-                    className="w-full text-primary-input-text font-bold"
-                    //   value={input[1]}
-                    disabled={true}
-                    placeholder="Notes"
-                  />
-                </div>
-              </div>
-            </>
-          );
-        })}
-
-        <div className="flex mt-2 items-center">
-          <div className="w-1/2 flex items-center">
-            <div className="text-primary-input-text font-bold mr-4 w-[10vw]">Type Of Work</div>
-            <div className="w-[22vw] ml-8">
-              <Select
-                onChange={() => {
-                  return null;
-                }}
-                className="bg-primary-white w-26 mr-3"
-                placeholder="Please select.."
-                options={booleanOptions}
-                isClearable
-                isSearchable
-                //   value={formData.DeMoGuarantee}
-              />
-            </div>
-          </div>
-        </div>
-        {['Other Type Of work', 'Notes Field'].map((type) => {
-          return (
-            <div className="flex mt-2 items-center" key={type}>
-              <div className="w-1/2 flex items-center">
-                <div className="text-primary-input-text font-bold mr-4 w-[11vw]"> </div>
-                <div className="w-[22vw] ml-4">
-                  <TextInput
-                    className=" text-primary-input-text font-bold w-full"
-                    disabled
-                    // value={contactsData.phone}
-                    // placeholder={
-                    //   contactsData.phone ? 'Add details to the Contact Database' : 'Please select from the dropdown above'
-                    // }
-                  />
-                </div>
-              </div>
-            </div>
-          );
-        })}
-
-        <div className="flex">
-          <div className="text-xl text-primary-navy font-bold w-[50vw]">Emergency Contact 1</div>
-          <div className="text-xl text-primary-navy font-bold w-[50vw]">Emergency Contact 2</div>
-        </div>
-        {emergecnyContactData.map((newPersonData) => {
-          return (
-            <>
-              <AddNewPersonInput
-                newPersonData={newPersonData}
-                handleAddpersonData={(key, value) => handleAddpersonData(key, value)}
-                newPersonForm={newPersonForm}
-              />
-            </>
-          );
-        })}
-        <div className="flex">
+        <div className="flex mt-8">
           <div className="text-xl text-primary-navy font-bold w-[50vw]">Agency Details</div>
         </div>
-        {agencyDetailsData.map((newPersonData) => {
-          return (
-            <>
-              <AddNewPersonInput
-                newPersonData={newPersonData}
-                handleAddpersonData={(key, value) => handleAddpersonData(key, value)}
-                newPersonForm={newPersonForm}
-              />
-            </>
-          );
-        })}
-        <div className="flex">
+        <AgencyDetails countryOptionList={countryOptionList} onChange={(data) => onChange('agencyDetails', data)} />
+        <div className="flex mt-8">
           <div className="text-xl text-primary-navy font-bold w-[50vw]">Salary Details</div>
         </div>
-
-        <div className="flex">
-          <div className="text-m text-primary-navy font-bold w-[50vw]">Salary</div>
-          <div className="text-m text-primary-navy font-bold w-[50vw]">Expenses</div>
-        </div>
-
-        <div className="flex">
-          <div className="flex w-[50vw]">
-            <div className="text-sm text-primary-navy font-bold">Salary to be Paid to</div>
-
-            <Checkbox
-              className="flex flex-row-reverse mr-2"
-              labelClassName="!text-base"
-              id="includeExcludedVenues"
-              onChange={() => {
-                return null;
-              }}
-              // checked={formData.DeMoNumFacilitiesLaundry}
-            />
-            <div className="text-primary-input-text font-bold mr-2 ml-6">Agent</div>
-          </div>
-          <div className="flex w-[50vw]">
-            <div className="text-sm text-primary-navy font-bold ">Expenses to be paid to</div>
-            <Checkbox
-              className="flex flex-row-reverse mr-2"
-              labelClassName="!text-base"
-              id="includeExcludedVenues"
-              onChange={() => {
-                return null;
-              }}
-              // checked={formData.DeMoNumFacilitiesLaundry}
-            />
-            <div className="text-primary-input-text font-bold mr-2 ml-6">Company Member</div>
-          </div>
-        </div>
-        {salaryDetailsData.map((newPersonData) => {
-          return (
-            <>
-              <AddNewPersonInput
-                newPersonData={newPersonData}
-                handleAddpersonData={(key, value) => handleAddpersonData(key, value)}
-                newPersonForm={newPersonForm}
+        <div className="flex my-8">
+          <div className="w-[50vw]">
+            <div>
+              <h3 className="text-lg text-primary-navy font-bold mb-2">Salary</h3>
+              <SalaryDetailsForm
+                countryOptionList={countryOptionList}
+                onChange={(data) => onChange('salaryAccountDetails', data)}
               />
-            </>
-          );
-        })}
+            </div>
+          </div>
+          <div className="w-[50vw]">
+            <div>
+              <h3 className="text-lg text-primary-navy font-bold mb-2">Expenses</h3>
+              <SalaryDetailsForm
+                countryOptionList={countryOptionList}
+                onChange={(data) => onChange('expenseAccountDetails', data)}
+              />
+            </div>
+          </div>
+        </div>
       </div>
     </>
   );

@@ -2,11 +2,12 @@ import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import Layout from 'components/Layout';
 import { InitialState } from 'lib/recoil';
 import { getProductionJumpState } from 'utils/getProductionJumpState';
-import { getAccountIdFromReq } from 'services/userService';
+import { getAccountIdFromReq, getUsers } from 'services/userService';
 import useContractsFilter from 'hooks/useContractsFilter';
 import CompanyContractFilters from 'components/contracts/CompanyContractFilters';
 import CompanyContractsTable from 'components/contracts/table/CompanyContractsTable';
 import { getUniqueVenueCountrylist } from 'services/venueService';
+import { objectify } from 'radash';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const ContractsPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
@@ -25,15 +26,19 @@ const ContractsPage = (props: InferGetServerSidePropsType<typeof getServerSidePr
 export default ContractsPage;
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const AccountId = await getAccountIdFromReq(ctx.req);
-  const productionJump = await getProductionJumpState(ctx, 'contracts/company-contracts', AccountId);
+  const accountId = await getAccountIdFromReq(ctx.req);
+  const productionJump = await getProductionJumpState(ctx, 'contracts', accountId);
   const ProductionId = productionJump.selected;
+  const users = await getUsers(accountId);
   const countryList = await getUniqueVenueCountrylist();
   // See _app.tsx for how this is picked up
   const initialState: InitialState = {
     global: {
       productionJump,
       countryList,
+    },
+    account: {
+      user: { users: objectify(users, (user) => user.Id) },
     },
   };
 
