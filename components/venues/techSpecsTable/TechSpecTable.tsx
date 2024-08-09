@@ -66,11 +66,7 @@ export const TechSpecTable = ({ venueId, setFilesToSend, setFilesToDelete }: Tec
       if (isNullOrEmpty(params.data?.imageUrl)) {
         window.open(URL.createObjectURL(params.data.file), '_blank');
       } else {
-        const url = `${
-          params.data.imageUrl
-        }?response-content-disposition=attachment%3B%20filename%3D${encodeURIComponent(params.data.name)}`;
-        console.log(url);
-        window.open(url, '_blank');
+        window.open(params.data.imageUrl, '_blank');
       }
     } else if (column === 'icons') {
       setFileToDelete(params.data);
