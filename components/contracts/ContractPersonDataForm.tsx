@@ -68,29 +68,25 @@ export const ContractPersonDataForm = ({ height, updateFormData }: ContractPerso
             />
           </div>
         </div>
-        <div className="mt-8">
-          <div className="text-xl text-primary-navy font-bold mb-3">Agency Details</div>
-          <AgencyDetails countryOptionList={countryOptionList} onChange={(data) => onChange('agencyDetails', data)} />
-        </div>
-        <div className="my-10">
-          <div className="text-xl text-primary-navy font-bold">Salary Details</div>
-          <div className="grid grid-cols-2 mt-8">
-            <div>
-              <h3 className="text-lg text-primary-navy font-bold mb-3">Salary</h3>
-              <AccountDetailsForm
-                accountType="Salary"
-                countryOptionList={countryOptionList}
-                onChange={(data) => onChange('salaryAccountDetails', data)}
-              />
-            </div>
-            <div>
-              <h3 className="text-lg text-primary-navy font-bold mb-3">Expenses</h3>
-              <AccountDetailsForm
-                accountType="Expenses"
-                countryOptionList={countryOptionList}
-                onChange={(data) => onChange('expenseAccountDetails', data)}
-              />
-            </div>
+        <div className="text-xl text-primary-navy font-bold mt-8 mb-3">Agency Details</div>
+        <AgencyDetails countryOptionList={countryOptionList} onChange={(data) => onChange('agencyDetails', data)} />
+        <div className="text-xl text-primary-navy font-bold mt-10">Salary Details</div>
+        <div className="grid grid-cols-2 my-8">
+          <div>
+            <h3 className="text-lg text-primary-navy font-bold mb-3">Salary</h3>
+            <AccountDetailsForm
+              accountType="Salary"
+              countryOptionList={countryOptionList}
+              onChange={(data) => onChange('salaryAccountDetails', data)}
+            />
+          </div>
+          <div>
+            <h3 className="text-lg text-primary-navy font-bold mb-3">Expenses</h3>
+            <AccountDetailsForm
+              accountType="Expenses"
+              countryOptionList={countryOptionList}
+              onChange={(data) => onChange('expenseAccountDetails', data)}
+            />
           </div>
         </div>
       </div>
