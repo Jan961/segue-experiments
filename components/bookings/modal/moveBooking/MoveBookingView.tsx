@@ -203,10 +203,11 @@ const MoveBookingView = ({
   };
 
   return (
-    <div className="w-[485px]">
+    <div className="w-[485px]" data-testId="move-booking-model">
       <Label className="text-md my-2" text={`Move ${bookingDetails.count} date booking at ${bookingDetails.venue}`} />
       <div className="w-[400px] flex flex-col items-end">
         <Select
+          testId="move-booking-production-selector"
           className="w-full"
           label="Production"
           name="production"
@@ -226,6 +227,7 @@ const MoveBookingView = ({
       <div className="flex item-center gap-2">
         <Label text="New start date" />
         <DateInput
+          testId="new-start-date"
           label="Date"
           onChange={handleDateChange}
           value={bookingDetails.moveDate}
