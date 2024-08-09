@@ -13,19 +13,19 @@ const ExistingTasks = ({ visible, duplicateList, onCancel, onConfirm }: Existing
   return (
     <PopupModal show={visible} onClose={onCancel}>
       <h1 className="text-2xl font-semibold text-primary">Existing Tasks</h1>
-      This/ these task(s) already exist.
+      <p className="text-primary">This/ these task(s) already exist.</p>
       <ul className="list-disc pl-3 pt-3">
         {duplicateList.map((task) => (
-          <li key={task.Id}>{`Task ${task.Code} ${task.Name}`}</li>
+          <li key={task.Id} className="text-primary">{`Task ${task.Code} ${task.Name}`}</li>
         ))}
       </ul>
       <div className="pt-3">
-        Do you wish to continue and create duplicate task(s)?
-        <div className="flex justify-between pt-3">
-          <Button variant="secondary" onClick={onCancel} className="w-28">
+        <p className="text-primary">Do you wish to continue and create duplicate task(s)?</p>
+        <div className="flex pt-3">
+          <Button variant="secondary" onClick={onCancel} className="w-36">
             Cancel
           </Button>
-          <Button onClick={onConfirm} className="w-28">
+          <Button onClick={onConfirm} className="ml-4 w-36">
             OK
           </Button>
         </div>
