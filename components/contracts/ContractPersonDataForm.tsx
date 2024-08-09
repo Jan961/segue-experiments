@@ -45,54 +45,46 @@ export const ContractPersonDataForm = ({ height, updateFormData }: ContractPerso
   return (
     <>
       <div className={`${height} w-[82vw] overflow-y-scroll`}>
-        <div className="text-xl text-primary-navy font-bold ">Person Details</div>
+        <div className="text-xl text-primary-navy font-bold mb-3">Person Details</div>
         <PersonalDetails
           countryOptionList={countryOptionList}
           booleanOptions={booleanOptions}
           userOptionList={userOptionList}
           onChange={(data) => onChange('personDetails', data)}
         />
-        <div className="flex mt-8">
-          <div className="w-[50vw]">
-            <div>
-              <h3 className="text-xl text-primary-navy font-bold mb-2">Emergency Contact 1</h3>
-              <EmergencyContact
-                countryOptionList={countryOptionList}
-                onChange={(data) => onChange('emergencyContact1', data)}
-              />
-            </div>
+        <div className="grid grid-cols-2 mt-10">
+          <div>
+            <h3 className="text-xl text-primary-navy font-bold mb-3">Emergency Contact 1</h3>
+            <EmergencyContact
+              countryOptionList={countryOptionList}
+              onChange={(data) => onChange('emergencyContact1', data)}
+            />
           </div>
-          <div className="w-[50vw]">
-            <div>
-              <h3 className="text-xl text-primary-navy font-bold mb-2">Emergency Contact 2</h3>
-              <EmergencyContact
-                countryOptionList={countryOptionList}
-                onChange={(data) => onChange('emergencyContact2', data)}
-              />
-            </div>
+          <div>
+            <h3 className="text-xl text-primary-navy font-bold mb-3">Emergency Contact 2</h3>
+            <EmergencyContact
+              countryOptionList={countryOptionList}
+              onChange={(data) => onChange('emergencyContact2', data)}
+            />
           </div>
         </div>
-        <div className="flex mt-8">
-          <div className="text-xl text-primary-navy font-bold w-[50vw]">Agency Details</div>
+        <div className="mt-8">
+          <div className="text-xl text-primary-navy font-bold mb-3">Agency Details</div>
+          <AgencyDetails countryOptionList={countryOptionList} onChange={(data) => onChange('agencyDetails', data)} />
         </div>
-        <AgencyDetails countryOptionList={countryOptionList} onChange={(data) => onChange('agencyDetails', data)} />
-        <div className="flex mt-8">
-          <div className="text-xl text-primary-navy font-bold w-[50vw]">Salary Details</div>
-        </div>
-        <div className="flex my-8">
-          <div className="w-[50vw]">
+        <div className="mt-10">
+          <div className="text-xl text-primary-navy font-bold">Salary Details</div>
+          <div className="grid grid-cols-2 mt-8">
             <div>
-              <h3 className="text-lg text-primary-navy font-bold mb-2">Salary</h3>
+              <h3 className="text-lg text-primary-navy font-bold mb-3">Salary</h3>
               <AccountDetailsForm
                 accountType="Salary"
                 countryOptionList={countryOptionList}
                 onChange={(data) => onChange('salaryAccountDetails', data)}
               />
             </div>
-          </div>
-          <div className="w-[50vw]">
             <div>
-              <h3 className="text-lg text-primary-navy font-bold mb-2">Expenses</h3>
+              <h3 className="text-lg text-primary-navy font-bold mb-3">Expenses</h3>
               <AccountDetailsForm
                 accountType="Expenses"
                 countryOptionList={countryOptionList}

@@ -50,10 +50,10 @@ const AgencyDetails = ({ countryOptionList, onChange = noop }: AgencyDetailsProp
     [onChange, setAgencyDetails, agencyDetails],
   );
   return (
-    <div>
-      <div>
-        <div className="flex mt-2 items-center">
-          <div className="w-1/2 flex items-center">
+    <>
+      <div className="grid grid-cols-2">
+        <div className="flex flex-col gap-2">
+          <div className="flex items-start">
             <div className="text-primary-input-text font-bold mr-4 w-[11vw]">Agent First Name</div>
             <div className="w-[22vw] ml-4">
               <TextInput
@@ -65,22 +65,7 @@ const AgencyDetails = ({ countryOptionList, onChange = noop }: AgencyDetailsProp
               />
             </div>
           </div>
-          <div className="w-1/2 flex items-center">
-            <div className="text-primary-input-text font-bold mr-4 w-2/5">Email Address</div>
-            <div className="w-[22vw] ml-4">
-              <TextInput
-                placeholder="Enter Email Address"
-                testId="agency-contact-email"
-                className="text-primary-input-text font-bold w-full"
-                onChange={(event) => handleChange('email', event.target.value)}
-                value={email}
-              />
-            </div>
-          </div>
-        </div>
-
-        <div className="flex mt-2 items-center">
-          <div className="w-1/2 flex items-center">
+          <div className="flex items-start">
             <div className="text-primary-input-text font-bold mr-4 w-[11vw]">Agent Last Name</div>
             <div className="w-[22vw] ml-4">
               <TextInput
@@ -92,22 +77,7 @@ const AgencyDetails = ({ countryOptionList, onChange = noop }: AgencyDetailsProp
               />
             </div>
           </div>
-          <div className="w-1/2 flex items-center">
-            <div className="text-primary-input-text font-bold mr-4 w-2/5">Landline Number</div>
-            <div className="w-[22vw] ml-4">
-              <TextInput
-                placeholder="Enter Landline Number"
-                testId="agency-contact-landline"
-                className="text-primary-input-text font-bold w-full"
-                onChange={(event) => handleChange('landline', event.target.value)}
-                value={landline}
-              />
-            </div>
-          </div>
-        </div>
-
-        <div className="flex mt-2 items-start">
-          <div className="w-1/2 flex items-start">
+          <div className="flex items-start">
             <div className="text-primary-input-text font-bold mr-4 w-[11vw]">Address Line 1</div>
             <div className="w-[22vw] ml-4 flex-col gap-4">
               <TextInput
@@ -133,22 +103,7 @@ const AgencyDetails = ({ countryOptionList, onChange = noop }: AgencyDetailsProp
               />
             </div>
           </div>
-          <div className="w-1/2 flex items-center">
-            <div className="text-primary-input-text font-bold mr-4 w-2/5">Agency Website</div>
-            <div className="w-[22vw] ml-4">
-              <TextInput
-                placeholder="Enter Agency Website"
-                testId="agency-website"
-                className="text-primary-input-text font-bold w-full"
-                onChange={(event) => handleChange('website', event.target.value)}
-                value={website}
-              />
-            </div>
-          </div>
-        </div>
-
-        <div className="flex mt-2 items-center">
-          <div className="w-1/2 flex items-center">
+          <div className="flex items-start">
             <div className="text-primary-input-text font-bold mr-4 w-[11vw]">Agency Name</div>
             <div className="w-[22vw] ml-4">
               <TextInput
@@ -160,22 +115,7 @@ const AgencyDetails = ({ countryOptionList, onChange = noop }: AgencyDetailsProp
               />
             </div>
           </div>
-          <div className="w-1/2 flex items-center">
-            <div className="text-primary-input-text font-bold mr-4 w-2/5">Mobile Number</div>
-            <div className="w-[22vw] ml-4">
-              <TextInput
-                placeholder="Enter Mobile Number"
-                testId="agency-contact-mobile-number"
-                className="text-primary-input-text font-bold w-full"
-                onChange={(event) => handleChange('mobileNumber', event.target.value)}
-                value={mobileNumber}
-              />
-            </div>
-          </div>
-        </div>
-
-        <div className="flex mt-2 items-center">
-          <div className="w-1/2 flex items-center">
+          <div className="flex items-start">
             <div className="text-primary-input-text font-bold mr-4 w-[11vw]">Town</div>
             <div className="w-[22vw] ml-4">
               <TextInput
@@ -187,8 +127,8 @@ const AgencyDetails = ({ countryOptionList, onChange = noop }: AgencyDetailsProp
               />
             </div>
           </div>
-          <div className="w-1/2 flex items-center">
-            <div className="text-primary-input-text font-bold mr-4 w-2/5">Postcode</div>
+          <div className="flex items-start">
+            <div className="text-primary-input-text font-bold mr-4 w-[11vw]">Postcode</div>
             <div className="w-[22vw] ml-4">
               <TextInput
                 placeholder="Enter Postcode"
@@ -199,10 +139,7 @@ const AgencyDetails = ({ countryOptionList, onChange = noop }: AgencyDetailsProp
               />
             </div>
           </div>
-        </div>
-
-        <div className="flex mt-2 items-center">
-          <div className="w-1/2 flex items-center">
+          <div className="flex items-start">
             <div className="text-primary-input-text font-bold mr-4 w-[11vw]">Country</div>
             <div className="w-[22vw] ml-4">
               <Select
@@ -217,10 +154,59 @@ const AgencyDetails = ({ countryOptionList, onChange = noop }: AgencyDetailsProp
               />
             </div>
           </div>
-          <div className="w-1/2 flex items-center" />
+        </div>
+        <div className="flex flex-col gap-2">
+          <div className="flex items-start">
+            <div className="text-primary-input-text font-bold mr-4 w-[11vw]">Email Address</div>
+            <div className="w-[22vw] ml-4">
+              <TextInput
+                placeholder="Enter Email Address"
+                testId="agency-contact-email"
+                className="text-primary-input-text font-bold w-full"
+                onChange={(event) => handleChange('email', event.target.value)}
+                value={email}
+              />
+            </div>
+          </div>
+          <div className="flex items-start">
+            <div className="text-primary-input-text font-bold mr-4 w-[11vw]">Landline Number</div>
+            <div className="w-[22vw] ml-4">
+              <TextInput
+                placeholder="Enter Landline Number"
+                testId="agency-contact-landline"
+                className="text-primary-input-text font-bold w-full"
+                onChange={(event) => handleChange('landline', event.target.value)}
+                value={landline}
+              />
+            </div>
+          </div>
+          <div className="flex items-start">
+            <div className="text-primary-input-text font-bold mr-4 w-[11vw]">Mobile Number</div>
+            <div className="w-[22vw] ml-4">
+              <TextInput
+                placeholder="Enter Mobile Number"
+                testId="agency-contact-mobile-number"
+                className="text-primary-input-text font-bold w-full"
+                onChange={(event) => handleChange('mobileNumber', event.target.value)}
+                value={mobileNumber}
+              />
+            </div>
+          </div>
+          <div className="flex items-start">
+            <div className="text-primary-input-text font-bold mr-4 w-[11vw]">Agency Website</div>
+            <div className="w-[22vw] ml-4">
+              <TextInput
+                placeholder="Enter Agency Website"
+                testId="agency-website"
+                className="text-primary-input-text font-bold w-full"
+                onChange={(event) => handleChange('website', event.target.value)}
+                value={website}
+              />
+            </div>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

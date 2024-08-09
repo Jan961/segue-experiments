@@ -99,10 +99,10 @@ const PersonalDetails = ({ countryOptionList, booleanOptions, userOptionList, on
     [onChange, setFormData, formData],
   );
   return (
-    <div>
-      <div>
-        <div className="flex mt-2 items-center">
-          <div className="w-1/2 flex items-center">
+    <>
+      <div className="grid grid-cols-2">
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center">
             <div className="text-primary-input-text font-bold mr-4 w-[11vw]">First Name</div>
             <div className="w-[22vw] ml-4">
               <TextInput
@@ -114,22 +114,7 @@ const PersonalDetails = ({ countryOptionList, booleanOptions, userOptionList, on
               />
             </div>
           </div>
-          <div className="w-1/2 flex items-center">
-            <div className="text-primary-input-text font-bold mr-4 w-2/5">Email Address</div>
-            <div className="w-[22vw] ml-4">
-              <TextInput
-                testId="person-email"
-                placeholder="Enter Email Address"
-                className="text-primary-input-text font-bold w-full"
-                onChange={(event) => handleChange('email', event.target.value)}
-                value={email}
-              />
-            </div>
-          </div>
-        </div>
-
-        <div className="flex mt-2 items-center">
-          <div className="w-1/2 flex items-center">
+          <div className="flex items-center">
             <div className="text-primary-input-text font-bold mr-4 w-[11vw]">Last Name</div>
             <div className="w-[22vw] ml-4">
               <TextInput
@@ -141,22 +126,7 @@ const PersonalDetails = ({ countryOptionList, booleanOptions, userOptionList, on
               />
             </div>
           </div>
-          <div className="w-1/2 flex items-center">
-            <div className="text-primary-input-text font-bold mr-4 w-2/5">Landline Number</div>
-            <div className="w-[22vw] ml-4">
-              <TextInput
-                testId="person-landline"
-                placeholder="Enter Landline Number"
-                className="text-primary-input-text font-bold w-full"
-                onChange={(event) => handleChange('landline', event.target.value)}
-                value={landline}
-              />
-            </div>
-          </div>
-        </div>
-
-        <div className="flex mt-2 items-start">
-          <div className="w-1/2 flex items-start">
+          <div className="flex items-start">
             <div className="text-primary-input-text font-bold mr-4 w-[11vw]">Address</div>
             <div className="w-[22vw] ml-4">
               <TextInput
@@ -182,7 +152,73 @@ const PersonalDetails = ({ countryOptionList, booleanOptions, userOptionList, on
               />
             </div>
           </div>
-          <div className="w-1/2 flex items-center">
+          <div className="flex items-center">
+            <div className="text-primary-input-text font-bold mr-4 w-[11vw]">Town</div>
+            <div className="w-[22vw] ml-4">
+              <TextInput
+                testId="person-town"
+                placeholder="Enter Town"
+                className=" text-primary-input-text font-bold w-full"
+                onChange={(event) => handleChange('town', event.target.value)}
+                value={town}
+              />
+            </div>
+          </div>
+          <div className="flex items-center">
+            <div className="text-primary-input-text font-bold mr-4 w-[11vw]">Postcode</div>
+            <div className="w-[22vw] ml-4">
+              <TextInput
+                testId="person-postcode"
+                placeholder="Enter Postcode"
+                className=" text-primary-input-text font-bold w-full"
+                onChange={(event) => handleChange('postcode', event.target.value)}
+                value={postcode}
+              />
+            </div>
+          </div>
+          <div className="flex items-center">
+            <div className="text-primary-input-text font-bold mr-4 w-[10vw]">Country</div>
+            <div className="w-[22vw] ml-11">
+              <Select
+                testId="person-country"
+                onChange={(value) => handleChange('country', value as number)}
+                className="bg-primary-white w-26 mr-3"
+                placeholder="Please select.."
+                options={countryOptionList}
+                value={country}
+                isClearable
+                isSearchable
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center">
+            <div className="text-primary-input-text font-bold mr-4 w-2/5">Email Address</div>
+            <div className="w-[22vw] ml-4">
+              <TextInput
+                testId="person-email"
+                placeholder="Enter Email Address"
+                className="text-primary-input-text font-bold w-full"
+                onChange={(event) => handleChange('email', event.target.value)}
+                value={email}
+              />
+            </div>
+          </div>
+          <div className="flex items-center">
+            <div className="text-primary-input-text font-bold mr-4 w-2/5">Landline Number</div>
+            <div className="w-[22vw] ml-4">
+              <TextInput
+                testId="person-landline"
+                placeholder="Enter Landline Number"
+                className="text-primary-input-text font-bold w-full"
+                onChange={(event) => handleChange('landline', event.target.value)}
+                value={landline}
+              />
+            </div>
+          </div>
+          <div className="flex items-center">
             <div className="text-primary-input-text font-bold mr-4 w-2/5">Mobile Number</div>
             <div className="w-[22vw] ml-4">
               <TextInput
@@ -194,11 +230,7 @@ const PersonalDetails = ({ countryOptionList, booleanOptions, userOptionList, on
               />
             </div>
           </div>
-        </div>
-
-        <div className="flex mt-2 items-center">
-          <div className="w-1/2 flex items-center" />
-          <div className="w-1/2 flex items-center">
+          <div className="flex items-center">
             <div className="text-primary-input-text font-bold mr-4 w-2/5">Full Name as it appears on Passport</div>
             <div className="w-[22vw] ml-4">
               <TextInput
@@ -210,11 +242,7 @@ const PersonalDetails = ({ countryOptionList, booleanOptions, userOptionList, on
               />
             </div>
           </div>
-        </div>
-
-        <div className="flex mt-2 items-center">
-          <div className="w-1/2 flex items-center" />
-          <div className="w-1/2 flex items-center">
+          <div className="flex items-center">
             <div className="text-primary-input-text font-bold mr-4 w-2/5">Passport Number</div>
             <div className="w-[22vw] ml-4">
               <TextInput
@@ -226,116 +254,67 @@ const PersonalDetails = ({ countryOptionList, booleanOptions, userOptionList, on
               />
             </div>
           </div>
-        </div>
-      </div>
-
-      <div className="flex mt-2 items-center">
-        <div className="w-1/2 flex items-center">
-          <div className="text-primary-input-text font-bold mr-4 w-[11vw]">Town</div>
-          <div className="w-[22vw] ml-4">
-            <TextInput
-              testId="person-town"
-              placeholder="Enter Town"
-              className=" text-primary-input-text font-bold w-full"
-              onChange={(event) => handleChange('town', event.target.value)}
-              value={town}
-            />
+          <div className="flex items-center">
+            <div className="text-primary-input-text font-bold  mr-4 w-2/5">Passport Expiry Date</div>
+            <div className="w-[22vw] ml-4 flex items-center">
+              <DateInput
+                testId="person-passport-expiry-date"
+                onChange={(value) => handleChange('passportExpiryDate', value?.toISOString?.() || '')}
+                value={passportExpiryDate}
+              />
+              <div className="text-xs text-primary-input-text font-bold ml-4">
+                (<span className="underline">NOTE:</span> Expiry date is 10 years from{' '}
+                <span className="text-red-500 underline">PASSPORT ISSUE DATE</span>)
+              </div>
+            </div>
           </div>
-        </div>
-
-        <div className="w-1/2 flex items-center">
-          <div className="text-primary-input-text font-bold  mr-4 w-2/5">Passport Expiry Date</div>
-          <div className="w-[22vw] ml-4 flex items-center">
-            <DateInput
-              testId="person-passport-expiry-date"
-              onChange={(value) => handleChange('passportExpiryDate', value?.toISOString?.() || '')}
-              value={passportExpiryDate}
-            />
-            <div className="text-xs text-primary-input-text font-bold ml-4">
-              (<span className="underline">NOTE:</span> Expiry date is 10 years from{' '}
-              <span className="text-red-500 underline">PASSPORT ISSUE DATE</span>)
+          <div className="flex items-center">
+            <div className="text-primary-input-text font-bold  mr-4 w-2/5">Eligible to Work in the UK</div>
+            <div className="w-[22vw] ml-4 flex items-center">
+              <Select
+                testId="person-uk-work-eligibility"
+                onChange={(value) => handleChange('hasUKWorkPermit', value as string)}
+                value={hasUKWorkPermit}
+                className="bg-primary-white w-40"
+                placeholder="Please select..."
+                options={booleanOptions}
+                isClearable
+                isSearchable
+              />
+              <div className="text-primary-input-text font-bold ml-2 mr-2">Checked</div>
+              <Select
+                testId="person-checked-by"
+                onChange={(value) => handleChange('checkedBy', value as number)}
+                value={checkedBy}
+                className="bg-primary-white w-60"
+                placeholder="Please select..."
+                options={userOptionList}
+                isClearable
+                isSearchable
+              />
+            </div>
+          </div>
+          <div className="flex items-center">
+            <div className="text-primary-input-text font-bold  mr-4 w-2/5">
+              Is FEU (Foreign Entertainer Union) permission required
+            </div>
+            <div className="w-[22vw] ml-4">
+              <Select
+                testId="person-is-feu-required"
+                onChange={(value) => handleChange('isFEURequired', value as string)}
+                value={isFEURequired}
+                className="bg-primary-white w-40 mr-3"
+                placeholder="Please select.."
+                options={booleanOptions}
+                isClearable
+                isSearchable
+              />
             </div>
           </div>
         </div>
       </div>
 
-      <div className="flex mt-2 items-center">
-        <div className="w-1/2 flex items-center">
-          <div className="text-primary-input-text font-bold mr-4 w-[11vw]">Postcode</div>
-          <div className="w-[22vw] ml-4">
-            <TextInput
-              testId="person-postcode"
-              placeholder="Enter Postcode"
-              className=" text-primary-input-text font-bold w-full"
-              onChange={(event) => handleChange('postcode', event.target.value)}
-              value={postcode}
-            />
-          </div>
-        </div>
-        <div className="w-1/2 flex items-center">
-          <div className="text-primary-input-text font-bold  mr-4 w-2/5">Eligible to Work in the UK</div>
-          <div className="w-[22vw] ml-4 flex items-center">
-            <Select
-              testId="person-uk-work-eligibility"
-              onChange={(value) => handleChange('hasUKWorkPermit', value as string)}
-              value={hasUKWorkPermit}
-              className="bg-primary-white w-40"
-              placeholder="Please select..."
-              options={booleanOptions}
-              isClearable
-              isSearchable
-            />
-            <div className="text-primary-input-text font-bold ml-2 mr-2">Checked</div>
-            <Select
-              testId="person-checked-by"
-              onChange={(value) => handleChange('checkedBy', value as number)}
-              value={checkedBy}
-              className="bg-primary-white w-60"
-              placeholder="Please select..."
-              options={userOptionList}
-              isClearable
-              isSearchable
-            />
-          </div>
-        </div>
-      </div>
-
-      <div className="flex my-2 items-center">
-        <div className="w-1/2 flex items-center">
-          <div className="text-primary-input-text font-bold mr-4 w-[10vw]">Country</div>
-          <div className="w-[22vw] ml-11">
-            <Select
-              testId="person-country"
-              onChange={(value) => handleChange('country', value as number)}
-              className="bg-primary-white w-26 mr-3"
-              placeholder="Please select.."
-              options={countryOptionList}
-              value={country}
-              isClearable
-              isSearchable
-            />
-          </div>
-        </div>
-
-        <div className="w-1/2 flex items-center">
-          <div className="text-primary-input-text font-bold  mr-4 w-2/5">
-            Is FEU (Foreign Entertainer Union) permission required
-          </div>
-          <div className="w-[22vw] ml-4">
-            <Select
-              testId="person-is-feu-required"
-              onChange={(value) => handleChange('isFEURequired', value as string)}
-              value={isFEURequired}
-              className="bg-primary-white w-40 mr-3"
-              placeholder="Please select.."
-              options={booleanOptions}
-              isClearable
-              isSearchable
-            />
-          </div>
-        </div>
-      </div>
-      <div className="flex items-center mb-2">
+      <div className="flex items-center my-2">
         <div className="w-[11vw] mr-4 text-primary-input-text font-bold">General Notes</div>
         <div className="w-full ml-14 pr-5">
           <TextInput
@@ -359,6 +338,7 @@ const PersonalDetails = ({ countryOptionList, booleanOptions, userOptionList, on
           />
         </div>
       </div>
+
       <div className="flex items-center mb-2">
         <div className="w-[11vw] mr-4 text-primary-input-text font-bold">Advisory Notes</div>
         <div className="w-full ml-14  pr-5">
@@ -414,7 +394,7 @@ const PersonalDetails = ({ countryOptionList, booleanOptions, userOptionList, on
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 
