@@ -66,34 +66,17 @@ export const TechSpecTable = ({ venueId, setFilesToSend, setFilesToDelete }: Tec
       if (isNullOrEmpty(params.data?.imageUrl)) {
         window.open(URL.createObjectURL(params.data.file), '_blank');
       } else {
-        try {
-          // Fetch the file as a Blob
-          const response = await fetch(params.data.imageUrl);
-          const blob = await response.blob();
-
-          // Create a temporary URL for the Blob
-          const url = URL.createObjectURL(blob);
-
-          // Create an anchor element and trigger a download
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = params.data.name; // Replace with your desired filename
-          document.body.appendChild(a);
-          a.click();
-
-          // Cleanup
-          document.body.removeChild(a);
-          URL.revokeObjectURL(url);
-        } catch (error) {
-          console.error('Error downloading the file', error);
-        }
+        const url = `${
+          params.data.imageUrl
+        }?response-content-disposition=attachment%3B%20filename%3D${encodeURIComponent(params.data.name)}`;
+        console.log(url);
+        window.open(url, '_blank');
       }
     } else if (column === 'icons') {
       setFileToDelete(params.data);
       setConfirmVisible(true);
     }
   };
-
   return (
     <div>
       {confirmVisible && (

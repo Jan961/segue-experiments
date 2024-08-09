@@ -15,7 +15,8 @@ const bulkFileUpload = async (path, files, userId) => {
       Bucket: process.env.S3_BUCKET_NAME,
       Key: `${path + '/' || ''}${uniqueFileName}`,
       Body: buffer,
-      ContentDisposition: 'inline',
+      FileName: file.originalFilename,
+      ContentDisposition: `attachment; filename="${file.originalFilename}"`,
     };
     const response = await s3.upload(params).promise();
     const data: FileDTO = {
@@ -40,7 +41,8 @@ const singleFileUpload = async (path, file, userId) => {
     Bucket: process.env.S3_BUCKET_NAME,
     Key: `${path + '/' || ''}${uniqueFileName}`,
     Body: buffer,
-    ContentDisposition: 'inline',
+    FileName: file.originalFilename,
+    ContentDisposition: `attachment; filename="${file.originalFilename}"`,
   };
 
   const response = await s3.upload(params).promise();
