@@ -78,6 +78,12 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           in: ['General Sales', 'School Sales'],
         },
         SetBookingId: BookingId,
+        Seats: {
+          not: 0,
+        },
+        Value: {
+          not: 0,
+        },
       },
       select: {
         SetSalesFiguresDate: true,
@@ -151,6 +157,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const GrossProfit = AvgTicketPrice === 0 ? 0 : AvgTicketPrice * TotalSeats;
     const seatsSalePercentage = salesSummary === null ? 0 : (salesSummary?.Seats / TotalSeats) * 100;
     const currentProductionWeekNum = calculateWeekNumber(new Date(), new Date(booking.FirstDate));
+
     const result: SummaryResponseDTO = {
       Performances: performances,
       Info: {

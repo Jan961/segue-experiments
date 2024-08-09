@@ -5,6 +5,7 @@ export const statusOptions: SelectOption[] = [
   { text: 'Pencilled', value: 'U' },
   { text: 'Cancelled', value: 'X' },
   { text: 'Suspended', value: 'S' },
+  { text: 'Available', value: 'A' },
 ];
 export const allStatusOptions: SelectOption[] = [{ text: 'All', value: 'all' }, ...statusOptions];
 

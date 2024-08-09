@@ -129,13 +129,22 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
 
       const venueId = bookings.bookings.find((booking) => booking.Id === bookings.selected)?.Venue?.Id;
 
+      // get the currency rate for the global activity cost
+      const currResponse = await axios.get(`/api/marketing/currencyConversion/read`, {
+        params: {
+          bookingId,
+          productionId,
+        },
+      });
+
+      const conversionRate = currResponse.data.conversion;
+
       const response = await axios.get(`/api/marketing/globalActivities/venue/${venueId}`);
       const globalActivities = response.data;
 
       if (
         globalActivities &&
         Array.isArray(globalActivities.activities) &&
-        globalActivities.activities.length > 0 &&
         Array.isArray(globalActivities.activityTypes)
       ) {
         const tempGlobList = globalActivities.activities.map((act) => ({
@@ -144,7 +153,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
           actDate: startOfDay(new Date(act.Date)),
           followUpCheck: act.FollowUpRequired,
           followUpDt: act.DueByDate === '' ? null : startOfDay(new Date(act.DueByDate)),
-          cost: act.Cost,
+          cost: parseFloat(act.Cost) * conversionRate,
           id: act.Id,
           notes: act.Notes,
           venueIds: act.VenueIds,
@@ -400,7 +409,6 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
 
       // set checkbox row on activities tab
       const booking = bookings.bookings.find((booking) => booking.Id === props.bookingId);
-
       setOnSaleCheck(booking.TicketsOnSale);
       setMarketingPlansCheck(booking.MarketingPlanReceived);
       setPrintReqCheck(booking.PrintReqsReceived);
@@ -564,8 +572,8 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
 
           <div
             className={classNames(
-              'flex flex-col w-[487px] h-[69px] bg-primary-green/[0.30] rounded-xl mt-5 px-2 float-right',
-              actRowData.length === 0 ? '-mt-64' : '',
+              'flex flex-col w-[487px] h-[69px] bg-primary-green/[0.30] rounded-xl px-2 float-right',
+              actRowData.length === 0 ? '-mt-64' : 'mt-5',
             )}
           >
             <div className="flex flex-row gap-4">
@@ -612,8 +620,8 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
 
           <div
             className={classNames(
-              'flex flex-col w-[331px] h-[69px] bg-primary-green/[0.30] rounded-xl mt-5 px-2 float-right',
-              globalRowData.length === 0 ? '-mt-[350px]' : '',
+              'flex flex-col w-[331px] h-[69px] bg-primary-green/[0.30] rounded-xl px-2 float-right',
+              globalRowData.length === 0 ? '-mt-[350px]' : 'mt-5',
             )}
           >
             <div className="flex flex-row gap-4">
