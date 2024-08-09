@@ -388,7 +388,7 @@ export default function NewBookingDetailsView({
       <div className="flex justify-between">
         <div className="text-primary-navy text-xl my-2 font-bold">{productionCode}</div>
       </div>
-      <div className=" w-[750px] lg:w-[1450px] h-full flex flex-col " data-testId="edit-booking-model">
+      <div className=" w-[750px] lg:w-[1450px] h-full flex flex-col " data-testid="edit-booking-model">
         <Table
           testId="edit-booking-details-table"
           ref={tableRef}
