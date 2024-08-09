@@ -46,7 +46,7 @@ export interface UploadModalProps {
 }
 
 export const attachmentMimeTypes = {
-  marketing: [
+  genericAttachment: [
     'application/pdf',
     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
