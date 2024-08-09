@@ -1,13 +1,14 @@
-import { booleanOptions } from 'config/contracts';
 import { useCallback, useMemo, useState } from 'react';
 import { useRecoilValue } from 'recoil';
+import { booleanOptions } from 'config/contracts';
 import { countryState } from 'state/global/countryState';
 import { transformToOptions } from 'utils';
-import EmergencyContact from './PersonForm/EmergencyContact';
-import AccountDetailsForm from './PersonForm/AccountDetailsForm';
-import PersonalDetails from './PersonForm/PersonalDetails';
-import AgencyDetails from './PersonForm/AgencyDetails';
 import { userState } from 'state/account/userState';
+import { Checkbox } from 'components/core-ui-lib';
+import AgencyDetails from './PersonForm/AgencyDetails';
+import PersonalDetails from './PersonForm/PersonalDetails';
+import AccountDetailsForm from './PersonForm/AccountDetailsForm';
+import EmergencyContact from './PersonForm/EmergencyContact';
 
 interface ContractPersonDataFormProps {
   height: string;
@@ -16,6 +17,7 @@ interface ContractPersonDataFormProps {
 
 export const ContractPersonDataForm = ({ height, updateFormData }: ContractPersonDataFormProps) => {
   const [personData, setPersonData] = useState({});
+  const [hideAgencyDetails, setHideAgencyDetails] = useState(false);
   const countryList = useRecoilValue(countryState) || [];
   const { users = [] } = useRecoilValue(userState);
   const userOptionList = useMemo(
@@ -68,12 +70,25 @@ export const ContractPersonDataForm = ({ height, updateFormData }: ContractPerso
             />
           </div>
         </div>
-        <div className="text-xl text-primary-navy font-bold mt-8 mb-3">Agency Details</div>
-        <AgencyDetails countryOptionList={countryOptionList} onChange={(data) => onChange('agencyDetails', data)} />
-        <div className="text-xl text-primary-navy font-bold mt-10">Salary Details</div>
+        <div className="flex gap-4 mt-8 mb-3">
+          <h3 className="text-xl text-primary-navy font-bold">Agency Details</h3>
+          <Checkbox
+            id="toggle-agency-details"
+            testId="toggle-agency-details"
+            label="N/A"
+            checked={hideAgencyDetails}
+            onChange={(e) => setHideAgencyDetails(e.target.checked)}
+          />
+        </div>
+        <AgencyDetails
+          disabled={hideAgencyDetails}
+          countryOptionList={countryOptionList}
+          onChange={(data) => onChange('agencyDetails', data)}
+        />
+        <h3 className="text-xl text-primary-navy font-bold mt-10">Salary Details</h3>
         <div className="grid grid-cols-2 my-8">
           <div>
-            <h3 className="text-lg text-primary-navy font-bold mb-3">Salary</h3>
+            <h3 className="text-base text-primary-navy font-bold mb-3">Salary</h3>
             <AccountDetailsForm
               accountType="Salary"
               countryOptionList={countryOptionList}
@@ -81,7 +96,7 @@ export const ContractPersonDataForm = ({ height, updateFormData }: ContractPerso
             />
           </div>
           <div>
-            <h3 className="text-lg text-primary-navy font-bold mb-3">Expenses</h3>
+            <h3 className="text-base text-primary-navy font-bold mb-3">Expenses</h3>
             <AccountDetailsForm
               accountType="Expenses"
               countryOptionList={countryOptionList}

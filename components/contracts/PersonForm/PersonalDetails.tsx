@@ -353,7 +353,7 @@ const PersonalDetails = ({ countryOptionList, booleanOptions, userOptionList, on
       </div>
       <div className="w-1/2 flex mt-2 items-center">
         <div className="flex items-start">
-          <div className="text-primary-input-text font-bold mr-4 w-[11vw]">Type Of Work</div>
+          <div className="text-primary-input-text font-bold mr-4 w-[11vw]">Type of Work</div>
           <div className="w-[22vw] ml-4  flex flex-col gap-4">
             <Select
               testId="person-roles"

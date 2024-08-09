@@ -20,11 +20,12 @@ const defaultAgencyDetails = {
 };
 
 interface AgencyDetailsProps {
+  disabled: boolean;
   onChange: (data: any) => void;
   countryOptionList: SelectOption[];
 }
 
-const AgencyDetails = ({ countryOptionList, onChange = noop }: AgencyDetailsProps) => {
+const AgencyDetails = ({ countryOptionList, onChange = noop, disabled = false }: AgencyDetailsProps) => {
   const [agencyDetails, setAgencyDetails] = useState(defaultAgencyDetails);
   const {
     firstName,
@@ -62,6 +63,7 @@ const AgencyDetails = ({ countryOptionList, onChange = noop }: AgencyDetailsProp
                 className="text-primary-input-text font-bold w-full"
                 onChange={(event) => handleChange('firstName', event.target.value)}
                 value={firstName}
+                disabled={disabled}
               />
             </div>
           </div>
@@ -74,6 +76,7 @@ const AgencyDetails = ({ countryOptionList, onChange = noop }: AgencyDetailsProp
                 className="text-primary-input-text font-bold w-full"
                 onChange={(event) => handleChange('lastName', event.target.value)}
                 value={lastName}
+                disabled={disabled}
               />
             </div>
           </div>
@@ -86,6 +89,7 @@ const AgencyDetails = ({ countryOptionList, onChange = noop }: AgencyDetailsProp
                 className="text-primary-input-text font-bold w-full"
                 onChange={(event) => handleChange('address1', event.target.value)}
                 value={address1}
+                disabled={disabled}
               />
               <TextInput
                 placeholder="Enter Address 2"
@@ -93,6 +97,7 @@ const AgencyDetails = ({ countryOptionList, onChange = noop }: AgencyDetailsProp
                 className="text-primary-input-text font-bold w-full mt-2"
                 onChange={(event) => handleChange('address2', event.target.value)}
                 value={address2}
+                disabled={disabled}
               />
               <TextInput
                 placeholder="Enter Address 3"
@@ -100,6 +105,7 @@ const AgencyDetails = ({ countryOptionList, onChange = noop }: AgencyDetailsProp
                 className="text-primary-input-text font-bold w-full mt-2"
                 onChange={(event) => handleChange('address3', event.target.value)}
                 value={address3}
+                disabled={disabled}
               />
             </div>
           </div>
@@ -112,6 +118,7 @@ const AgencyDetails = ({ countryOptionList, onChange = noop }: AgencyDetailsProp
                 className="text-primary-input-text font-bold w-full"
                 onChange={(event) => handleChange('name', event.target.value)}
                 value={name}
+                disabled={disabled}
               />
             </div>
           </div>
@@ -124,6 +131,7 @@ const AgencyDetails = ({ countryOptionList, onChange = noop }: AgencyDetailsProp
                 onChange={(event) => handleChange('town', event.target.value)}
                 className="bg-primary-white w-full"
                 value={town}
+                disabled={disabled}
               />
             </div>
           </div>
@@ -136,6 +144,7 @@ const AgencyDetails = ({ countryOptionList, onChange = noop }: AgencyDetailsProp
                 className="text-primary-input-text font-bold w-full"
                 onChange={(event) => handleChange('postcode', event.target.value)}
                 value={postcode}
+                disabled={disabled}
               />
             </div>
           </div>
@@ -151,6 +160,7 @@ const AgencyDetails = ({ countryOptionList, onChange = noop }: AgencyDetailsProp
                 isClearable
                 isSearchable
                 value={country}
+                disabled={disabled}
               />
             </div>
           </div>
@@ -165,6 +175,7 @@ const AgencyDetails = ({ countryOptionList, onChange = noop }: AgencyDetailsProp
                 className="text-primary-input-text font-bold w-full"
                 onChange={(event) => handleChange('email', event.target.value)}
                 value={email}
+                disabled={disabled}
               />
             </div>
           </div>
@@ -177,6 +188,7 @@ const AgencyDetails = ({ countryOptionList, onChange = noop }: AgencyDetailsProp
                 className="text-primary-input-text font-bold w-full"
                 onChange={(event) => handleChange('landline', event.target.value)}
                 value={landline}
+                disabled={disabled}
               />
             </div>
           </div>
@@ -189,6 +201,7 @@ const AgencyDetails = ({ countryOptionList, onChange = noop }: AgencyDetailsProp
                 className="text-primary-input-text font-bold w-full"
                 onChange={(event) => handleChange('mobileNumber', event.target.value)}
                 value={mobileNumber}
+                disabled={disabled}
               />
             </div>
           </div>
@@ -201,6 +214,7 @@ const AgencyDetails = ({ countryOptionList, onChange = noop }: AgencyDetailsProp
                 className="text-primary-input-text font-bold w-full"
                 onChange={(event) => handleChange('website', event.target.value)}
                 value={website}
+                disabled={disabled}
               />
             </div>
           </div>
