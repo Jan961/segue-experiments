@@ -32,7 +32,7 @@ export const createClientDB = async (organisationId: string) => {
   );
   if (dbData.status === 1) {
     // Grant users previlidges to the DB
-    const { data: dbUserResponse } = await axios.post(
+    await axios.post(
       `${url}/set_privileges_on_database`,
       { database: dbName, user: dbUser, privileges: DB_USER_PREVILIGES },
       {
@@ -40,15 +40,12 @@ export const createClientDB = async (organisationId: string) => {
       },
     );
 
-    const { data: usedboUserResponse } = await axios.post(
+    await axios.post(
       `${url}/set_privileges_on_database`,
       { database: dbName, user: dboUser, privileges: 'ALL' },
       {
         headers,
       },
     );
-
-    console.log('USers updated', dbUserResponse, usedboUserResponse);
   }
-  console.log('new db data', createDBUrl, dbData);
 };
