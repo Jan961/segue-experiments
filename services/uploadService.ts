@@ -3,7 +3,7 @@ import fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 import { FileDTO } from 'interfaces';
 import config from 'config';
-import { File } from '@prisma/client';
+import { File } from 'prisma/generated/prisma-client';
 
 const bulkFileUpload = async (path, files, userId) => {
   const metadataList: FileDTO[] = [];

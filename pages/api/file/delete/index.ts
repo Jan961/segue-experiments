@@ -1,4 +1,4 @@
-import { File } from '@prisma/client';
+import { File } from 'prisma/generated/prisma-client';
 import prisma from 'lib/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { deleteFile } from 'services/uploadService';

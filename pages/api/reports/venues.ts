@@ -8,7 +8,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { getEmailFromReq, checkAccess } from 'services/userService';
 import { ALIGNMENT } from './masterplan';
 import { marketingCostsStatusToLabelMap } from 'config/Reports';
-import { Booking } from '@prisma/client';
+import { Booking } from 'prisma/generated/prisma-client';
 import { convertToPDF } from 'utils/report';
 
 type BOOKING = Partial<Booking> & {

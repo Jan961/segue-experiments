@@ -21,7 +21,7 @@ import axios from 'axios';
 import { bookingStatusMap } from 'config/bookings';
 import { userState } from 'state/account/userState';
 import { useEffect, useMemo, useState } from 'react';
-import { Venue } from '@prisma/client';
+import { Venue } from 'prisma/generated/prisma-client';
 import {
   DealMemoContractFormData,
   DealMemoHoldType,

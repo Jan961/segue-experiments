@@ -6,7 +6,7 @@ import { makeRowTextBoldAndAllignLeft } from './promoter-holds';
 import { dateToSimple } from 'services/dateService';
 import { TasksFilterType } from 'state/tasks/tasksFilterState';
 import { group } from 'radash';
-import { ProductionTask } from '@prisma/client';
+import { ProductionTask } from 'prisma/generated/prisma-client';
 import { getWeekNumsToDateMap } from 'utils/getDateFromWeekNum';
 import { convertToPDF } from 'utils/report';
 

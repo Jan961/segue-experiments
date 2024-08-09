@@ -1,4 +1,4 @@
-import { VenueVenue } from '@prisma/client';
+import { VenueVenue } from 'prisma/generated/prisma-client';
 import prisma from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { unique } from 'radash';
