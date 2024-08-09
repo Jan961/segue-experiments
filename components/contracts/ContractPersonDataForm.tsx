@@ -72,7 +72,7 @@ export const ContractPersonDataForm = ({ height, updateFormData }: ContractPerso
           <div className="text-xl text-primary-navy font-bold mb-3">Agency Details</div>
           <AgencyDetails countryOptionList={countryOptionList} onChange={(data) => onChange('agencyDetails', data)} />
         </div>
-        <div className="mt-10">
+        <div className="my-10">
           <div className="text-xl text-primary-navy font-bold">Salary Details</div>
           <div className="grid grid-cols-2 mt-8">
             <div>
