@@ -203,7 +203,7 @@ const MoveBookingView = ({
   };
 
   return (
-    <div className="w-[485px]" data-testId="move-booking-model">
+    <div className="w-[485px]" data-testid="move-booking-model">
       <Label className="text-md my-2" text={`Move ${bookingDetails.count} date booking at ${bookingDetails.venue}`} />
       <div className="w-[400px] flex flex-col items-end">
         <Select
