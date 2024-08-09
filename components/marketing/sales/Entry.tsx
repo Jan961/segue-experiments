@@ -367,7 +367,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
 
       if (!previous) {
         // holds and comps - only run if not retrieving previous values - previous is only valid for the main sales
-        const response = await axios.post('/api/marketing/sales/read/holdComp', {
+        const response = await axios.post('/api/marketing/sales/read/hold-comp', {
           bookingId: bookings.selected,
           salesDate,
           productionId,
