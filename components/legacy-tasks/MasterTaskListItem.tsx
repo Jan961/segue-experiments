@@ -3,7 +3,7 @@ import { Table } from 'components/global/table/Table';
 import React, { useMemo } from 'react';
 // import { bulkSelectionState } from 'state/tasks/bulkSelectionState';
 import { useRecoilValue } from 'recoil';
-import { MasterTask } from '@prisma/client';
+import { MasterTask } from 'prisma/generated/prisma-client';
 import MasterTaskEditor from './editors/MasterTaskEditor';
 import { userState } from 'state/account/userState';
 import { MenuButton } from 'components/global/MenuButton';

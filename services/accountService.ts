@@ -1,5 +1,5 @@
-import { Account, AccountContact } from '@prisma/client';
-import prisma from 'lib/prisma';
+import { Account, AccountContact } from 'prisma/generated/prisma-client';
+import prisma from 'lib/prisma_master';
 import { omit } from 'radash';
 export const createAccount = async (account: Partial<Account>, tx = prisma) => {
   const newAccount = await tx.account.create({
@@ -23,7 +23,7 @@ export const updateAccount = async (account: Partial<Account>, tx = prisma) => {
 export const createAccountContact = async (accountContact: Partial<AccountContact>, tx = prisma) => {
   const newAccountContact = await tx.accountContact.create({
     data: {
-      ...omit(accountContact, ['AccContId']),
+      ...omit(accountContact, ['AccContId', 'AccContAccountId']),
       Account: {
         connect: {
           AccountId: accountContact.AccContAccountId,

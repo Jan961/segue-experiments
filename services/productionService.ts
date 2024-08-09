@@ -1,5 +1,5 @@
 import prisma from 'lib/prisma';
-import { Prisma } from '@prisma/client';
+import { Prisma } from 'prisma/generated/prisma-client';
 import { showProductionMapper, productionEditorMapper } from 'lib/mappers';
 import { getShowWithProductionsById } from './showService';
 import { getAccountId, getEmailFromReq } from './userService';

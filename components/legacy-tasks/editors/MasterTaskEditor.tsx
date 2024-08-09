@@ -1,4 +1,4 @@
-import { MasterTask } from '@prisma/client';
+import { MasterTask } from 'prisma/generated/prisma-client';
 import React, { useMemo } from 'react';
 import { StyledDialog } from 'components/global/StyledDialog';
 import { FormInputSelect } from 'components/global/forms/FormInputSelect';
