@@ -141,7 +141,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
         data = { ...data, schools: currSalesFigureSet.schools };
       }
 
-      const response = await axios.post('/api/marketing/sales/process/entry/upsert', data);
+      const response = await axios.post('/api/marketing/sales/entry/v2/upsert', data);
 
       if (typeof response.data === 'object') {
         const setIdObj = response.data as { setId: number; transaction: string };
@@ -187,7 +187,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
         bookingId: bookings.selected,
       };
 
-      const response = await axios.post('/api/marketing/sales/process/entry/compHold/upsert', inputData);
+      const response = await axios.post('/api/marketing/sales/entry/compHold/upsert', inputData);
 
       if (typeof response.data === 'object') {
         const setIdObj = response.data as { setId: number };
@@ -235,7 +235,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
 
   const batchUpdate = async () => {
     try {
-      await axios.post('/api/marketing/sales/process/entry/batchUpdate/update', batchUpdateData);
+      await axios.post('/api/marketing/sales/entry/batchUpdate/update', batchUpdateData);
       setShowWarning(false);
     } catch (error) {
       console.log(error);
