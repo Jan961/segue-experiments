@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client';
+import { Prisma } from 'prisma/generated/prisma-client';
 import { ShowDTO } from 'interfaces';
 import { showMapper } from 'lib/mappers';
 import prisma from 'lib/prisma';

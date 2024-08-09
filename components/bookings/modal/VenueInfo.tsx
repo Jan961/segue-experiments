@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import { GetServerSideProps } from 'next';
 import { FormInputButton } from 'components/global/forms/FormInputButton';
 import { StyledDialog } from 'components/global/StyledDialog';
-import { Venue } from '@prisma/client';
 import { title } from 'radash';
 
 interface VenueInfoProps {
@@ -38,7 +37,7 @@ export const VenueInfoItem = ({ label, value }: { label: string; value: string }
 
 export const VenueInfo = ({ venueId }: VenueInfoProps) => {
   const [showModal, setShowModal] = React.useState(false);
-  const [venue, setVenue] = React.useState<Venue>(undefined);
+  const [venue, setVenue] = React.useState(undefined);
 
   useEffect(() => {
     if (showModal) {

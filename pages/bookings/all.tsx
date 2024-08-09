@@ -20,7 +20,7 @@ import useBookingFilter from 'hooks/useBookingsFilter';
 import Filters from 'components/bookings/Filters';
 import { getProductionsWithContent } from 'services/productionService';
 import BookingsTable from 'components/bookings/BookingsTable';
-import { DateType } from '@prisma/client';
+import { DateType } from 'prisma/generated/prisma-client';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const BookingPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {

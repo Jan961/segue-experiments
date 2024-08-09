@@ -1,4 +1,4 @@
-import { Account } from '@prisma/client';
+import { Account } from 'prisma/generated/prisma-client';
 
 export const mapAccountFromPrismaFields = (account: Account) => {
   return {
@@ -13,6 +13,9 @@ export const mapAccountFromPrismaFields = (account: Account) => {
     county: account.AccountAddressCounty,
     postcode: account.AccountAddressPostcode,
     country: account.AccountAddressCountry,
+    organisationId: account.AccountOrganisationId,
+    termsAgreedBy: account.AccountTermsAgreedBy,
+    termsAgreedDate: account.AccountTermsAgreedDate,
   };
 };
 
@@ -29,6 +32,9 @@ export const mapToAccountPrismaFields = (account: any) => {
     AccountAddressCounty: account.county,
     AccountAddressPostcode: account.postcode,
     AccountAddressCountry: account.country,
+    AccountOrganisationId: account.organisationId,
+    AccountTermsAgreedBy: account.email,
+    AccountTermsAgreedDate: new Date(),
   };
 };
 

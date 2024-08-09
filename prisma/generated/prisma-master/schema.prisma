@@ -1,0 +1,168 @@
+generator client {
+  provider        = "prisma-client-js"
+  output          = "./generated/prisma-master"
+  previewFeatures = ["views"]
+  binaryTargets   = ["native", "darwin-arm64", "linux-arm64-openssl-1.1.x"]
+}
+
+datasource db {
+  provider  = "mysql"
+  url       = env("MASTER_DATABASE_URL")
+  directUrl = env("MASTER_DATABASE_URL")
+}
+
+model Account {
+  AccountId                  Int                   @id @default(autoincrement())
+  AccountName                String                @db.VarChar(50)
+  AccountAddress1            String?               @db.VarChar(50)
+  AccountAddress2            String?               @db.VarChar(50)
+  AccountAddress3            String?               @db.VarChar(50)
+  AccountAddressTown         String?               @db.VarChar(50)
+  AccountAddressCounty       String?               @db.VarChar(50)
+  AccountAddressPostcode     String?               @db.VarChar(20)
+  AccountAddressCountry      String?               @db.VarChar(30)
+  AccountVATNumber           String?               @db.VarChar(20)
+  AccountCurrencyCode        String                @db.VarChar(3)
+  AccountCompanyNumber       String?               @db.VarChar(20)
+  AccountLogoFileId          Int?
+  AccountMainEmail           String?               @db.VarChar(120)
+  AccountNumPeople           Int?                  @db.TinyInt
+  AccountOrganisationId      String?               @unique(map: "Account_AccountOrganisationId_Unique") @db.VarChar(8)
+  AccountTermsAgreedBy       String?               @db.VarChar(100)
+  AccountTermsAgreedDate     DateTime?             @db.Date
+  AccountWebsite             String?               @db.VarChar(255)
+  AccountTypeOfCompany       String?               @db.VarChar(30)
+  AccountPhone               String?               @db.VarChar(30)
+  AccountPaymentCurrencyCode String?               @db.VarChar(3)
+  Currency                   Currency?             @relation(fields: [AccountPaymentCurrencyCode], references: [CurrencyCode], onDelete: Restrict, map: "Currency_Account_Payment")
+  File                       File?                 @relation(fields: [AccountLogoFileId], references: [FileId], map: "File_Account")
+  AccountContact             AccountContact[]
+  AccountSubscription        AccountSubscription[]
+  AccountUser                AccountUser[]
+  ProductionCompany          ProductionCompany[]
+
+  @@index([AccountPaymentCurrencyCode], map: "Currency_Account_Payment")
+  @@index([AccountLogoFileId], map: "File_Account")
+}
+
+model AccountContact {
+  AccContId        Int     @id @default(autoincrement())
+  AccContAccountId Int
+  AccContFirstName String  @db.VarChar(50)
+  AccContLastName  String? @db.VarChar(50)
+  AccContPhone     String? @db.VarChar(40)
+  AccContMainEmail String? @db.VarChar(120)
+  Account          Account @relation(fields: [AccContAccountId], references: [AccountId], onDelete: Cascade, map: "Account_AccountContact")
+
+  @@index([AccContAccountId], map: "Account_AccountContact")
+}
+
+model AccountSubscription {
+  AccSubId         Int              @id @default(autoincrement())
+  AccSubAccountId  Int
+  AccSubPlanId     Int
+  AccSubStartDate  DateTime         @db.DateTime(0)
+  AccSubEndDate    DateTime?        @db.DateTime(0)
+  AccSubIsActive   Boolean?         @db.Bit(1)
+  Account          Account          @relation(fields: [AccSubAccountId], references: [AccountId], onDelete: Cascade, map: "Account_AccountSubscription")
+  SubscriptionPlan SubscriptionPlan @relation(fields: [AccSubPlanId], references: [PlanId], onDelete: Cascade, map: "SubscriptionPlan_AccountSubscription")
+
+  @@index([AccSubAccountId], map: "Account_AccountSubscription")
+  @@index([AccSubPlanId], map: "SubscriptionPlan_AccountSubscription")
+}
+
+model AccountUser {
+  AccUserId             Int                     @id @default(autoincrement())
+  AccUserUserId         Int                     @unique(map: "AccUserUserId_UNIQUE")
+  AccUserAccountId      Int
+  AccUserIsAdmin        Boolean                 @default(dbgenerated("(b'0')")) @db.Bit(1)
+  AccUserPIN            String?                 @db.VarChar(4)
+  Account               Account                 @relation(fields: [AccUserAccountId], references: [AccountId], onDelete: Cascade, map: "Account_AccountUser")
+  User                  User                    @relation(fields: [AccUserUserId], references: [UserId], onDelete: Cascade, map: "User_AccountUser")
+  AccountUserPermission AccountUserPermission[]
+
+  @@index([AccUserAccountId], map: "Account_AccountUser")
+}
+
+model AccountUserPermission {
+  UserAuthId           Int         @id @default(autoincrement())
+  UserAuthAccUserId    Int
+  UserAuthPermissionId Int
+  AccountUser          AccountUser @relation(fields: [UserAuthAccUserId], references: [AccUserId], onDelete: Cascade, map: "AccountUser_AccountUserPermission")
+  Permission           Permission  @relation(fields: [UserAuthPermissionId], references: [PermissionId], onDelete: Cascade, map: "Permission_AccountUserPermission")
+
+  @@index([UserAuthAccUserId], map: "AccountUser_AccountUserPermission")
+  @@index([UserAuthPermissionId], map: "Permission_AccountUserPermission")
+}
+
+model Currency {
+  CurrencyCode          String    @id @db.VarChar(3)
+  CurrencyName          String    @db.VarChar(30)
+  CurrencySymbolUnicode String?   @db.VarChar(30)
+  Account               Account[]
+}
+
+model DBSetting {
+  DBSettingId    Int    @id @default(autoincrement())
+  DBSettingName  String @unique(map: "SettingName") @db.VarChar(50)
+  DBSettingValue String @db.VarChar(255)
+}
+
+model File {
+  FileId               Int                 @id @default(autoincrement())
+  FileOriginalFilename String              @db.VarChar(200)
+  FileMediaType        String?             @db.VarChar(200)
+  FileLocation         String              @db.VarChar(512)
+  FileUploadDateTime   DateTime            @db.DateTime(0)
+  FileUploadUserId     Int
+  FileSizeBytes        BigInt?
+  Account              Account[]
+  User                 User                @relation(fields: [FileUploadUserId], references: [UserId], map: "User_AttachedFile")
+  ProductionCompany    ProductionCompany[]
+
+  @@index([FileUploadUserId], map: "User_AttachedFile")
+}
+
+model Permission {
+  PermissionId                 Int                     @id @default(autoincrement())
+  PermissionParentPermissionId Int?
+  PermissionName               String                  @db.VarChar(50)
+  PermissionDescription        String                  @db.LongText
+  PermissionSeqNo              Int?                    @db.TinyInt
+  AccountUserPermission        AccountUserPermission[]
+}
+
+model ProductionCompany {
+  ProdCoId            Int     @id @default(autoincrement())
+  ProdCoAccountId     Int
+  ProdCoName          String  @db.VarChar(50)
+  ProdCoWebSite       String? @db.VarChar(80)
+  ProdCoSaleStartWeek Int?    @default(-50) @db.SmallInt
+  ProdCoVATCode       String? @db.VarChar(20)
+  ProdCoLogoFileId    Int?
+  Account             Account @relation(fields: [ProdCoAccountId], references: [AccountId], onDelete: Cascade, map: "Account_ProductionCompany")
+  File                File?   @relation(fields: [ProdCoLogoFileId], references: [FileId], map: "File_ProductionCompany")
+
+  @@index([ProdCoAccountId], map: "Account_ProductionCompany")
+  @@index([ProdCoLogoFileId], map: "File_ProductionCompany")
+}
+
+model SubscriptionPlan {
+  PlanId              Int                   @id @default(autoincrement())
+  PlanName            String                @db.VarChar(100)
+  PlanDescription     String?               @db.LongText
+  PlanPrice           Decimal               @db.Decimal(10, 2)
+  PlanFrequency       Int
+  PlanPriceId         String?               @db.VarChar(100)
+  PlanCurrency        String                @db.VarChar(3)
+  AccountSubscription AccountSubscription[]
+}
+
+model User {
+  UserId        Int          @id @unique(map: "UserIdUnique") @default(autoincrement())
+  UserEmail     String       @unique(map: "UserEmail_uk") @db.VarChar(120)
+  UserFirstName String       @db.VarChar(50)
+  UserLastName  String?      @db.VarChar(50)
+  AccountUser   AccountUser?
+  File          File[]
+}
