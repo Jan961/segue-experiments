@@ -4,6 +4,7 @@ import PopupModal from 'components/core-ui-lib/PopupModal';
 import { ContractPersonDataForm } from '../ContractPersonDataForm';
 import { useState } from 'react';
 import { ContractPreviewDetailsForm } from '../ContractPreviewDetailsDataForm';
+import { noop } from 'utils';
 
 interface BuildNewContractProps {
   openNewPersonContract: boolean;
@@ -55,8 +56,8 @@ export const BuildNewContract = ({ openNewPersonContract, onClose }: BuildNewCon
         </div>
       </div>
       <div className="border-solid border-2 border-primary-navy  rounded p-2">
-        {mainButtonSelection.name && <ContractPersonDataForm height="h-[70vh]" />}
-        {mainButtonSelection.details && <ContractPersonDataForm height="h-[70vh]" />}
+        {mainButtonSelection.name && <ContractPersonDataForm height="h-[70vh]" updateFormData={noop} />}
+        {mainButtonSelection.details && <ContractPersonDataForm height="h-[70vh]" updateFormData={noop} />}
         {mainButtonSelection.preview && <ContractPreviewDetailsForm height="h-[70vh]" />}
       </div>
 
