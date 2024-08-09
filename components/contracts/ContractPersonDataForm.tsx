@@ -4,7 +4,7 @@ import { useRecoilValue } from 'recoil';
 import { countryState } from 'state/global/countryState';
 import { transformToOptions } from 'utils';
 import EmergencyContact from './PersonForm/EmergencyContact';
-import SalaryDetailsForm from './PersonForm/SalaryDetailsForm';
+import AccountDetailsForm from './PersonForm/AccountDetailsForm';
 import PersonalDetails from './PersonForm/PersonalDetails';
 import AgencyDetails from './PersonForm/AgencyDetails';
 import { userState } from 'state/account/userState';
@@ -83,7 +83,8 @@ export const ContractPersonDataForm = ({ height, updateFormData }: ContractPerso
           <div className="w-[50vw]">
             <div>
               <h3 className="text-lg text-primary-navy font-bold mb-2">Salary</h3>
-              <SalaryDetailsForm
+              <AccountDetailsForm
+                accountType="Salary"
                 countryOptionList={countryOptionList}
                 onChange={(data) => onChange('salaryAccountDetails', data)}
               />
@@ -92,7 +93,8 @@ export const ContractPersonDataForm = ({ height, updateFormData }: ContractPerso
           <div className="w-[50vw]">
             <div>
               <h3 className="text-lg text-primary-navy font-bold mb-2">Expenses</h3>
-              <SalaryDetailsForm
+              <AccountDetailsForm
+                accountType="Expenses"
                 countryOptionList={countryOptionList}
                 onChange={(data) => onChange('expenseAccountDetails', data)}
               />

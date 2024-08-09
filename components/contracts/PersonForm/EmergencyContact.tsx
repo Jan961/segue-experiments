@@ -53,6 +53,7 @@ const EmergencyContactForm = ({ countryOptionList = [], onChange }: Props) => {
         <div className="text-primary-input-text font-bold mr-4 w-[11vw]">First Name</div>
         <div className="w-[22vw] ml-4">
           <TextInput
+            testId="emergency-contact-first-name"
             placeholder="Enter First Name"
             className=" text-primary-input-text font-bold w-full"
             onChange={(e) => handleChange('firstName', e.target.value)}
@@ -64,6 +65,7 @@ const EmergencyContactForm = ({ countryOptionList = [], onChange }: Props) => {
         <div className="text-primary-input-text font-bold mr-4 w-[11vw]">Last Name</div>
         <div className="w-[22vw] ml-4">
           <TextInput
+            testId="emergency-contact-last-name"
             placeholder="Enter Last Name"
             className=" text-primary-input-text font-bold w-full"
             onChange={(e) => handleChange('lastName', e.target.value)}
@@ -75,18 +77,21 @@ const EmergencyContactForm = ({ countryOptionList = [], onChange }: Props) => {
         <div className="text-primary-input-text font-bold mr-4 w-[11vw]">Address</div>
         <div className="w-[22vw] ml-4 flex flex-col gap-2">
           <TextInput
+            testId="emergency-contact-address-1"
             placeholder="Enter Address 1"
             className=" text-primary-input-text font-bold w-full"
             onChange={(e) => handleChange('address1', e.target.value)}
             value={address1}
           />
           <TextInput
+            testId="emergency-contact-address-2"
             placeholder="Enter Address 2"
             className=" text-primary-input-text font-bold w-full"
             onChange={(e) => handleChange('address2', e.target.value)}
             value={address2}
           />
           <TextInput
+            testId="emergency-contact-address-3"
             placeholder="Enter Address 3"
             className=" text-primary-input-text font-bold w-full"
             onChange={(e) => handleChange('address3', e.target.value)}
@@ -98,6 +103,7 @@ const EmergencyContactForm = ({ countryOptionList = [], onChange }: Props) => {
         <div className="text-primary-input-text font-bold mr-4 w-[11vw]">Town</div>
         <div className="w-[22vw] ml-4">
           <TextInput
+            testId="emergency-contact-town"
             placeholder="Enter Town"
             className=" text-primary-input-text font-bold w-full"
             onChange={(e) => handleChange('town', e.target.value)}
@@ -109,6 +115,7 @@ const EmergencyContactForm = ({ countryOptionList = [], onChange }: Props) => {
         <div className="text-primary-input-text font-bold mr-4 w-[11vw]">Postcode</div>
         <div className="w-[22vw] ml-4">
           <TextInput
+            testId="emergency-contact-postcode"
             placeholder="Enter Postcode"
             className=" text-primary-input-text font-bold w-full"
             onChange={(e) => handleChange('postcode', e.target.value)}
@@ -120,6 +127,7 @@ const EmergencyContactForm = ({ countryOptionList = [], onChange }: Props) => {
         <div className="text-primary-input-text font-bold mr-4 w-[11vw]">Email Address</div>
         <div className="w-[22vw] ml-4">
           <TextInput
+            testId="emergency-contact-email"
             placeholder="Enter Email Address"
             className=" text-primary-input-text font-bold w-full"
             onChange={(e) => handleChange('email', e.target.value)}
@@ -131,6 +139,7 @@ const EmergencyContactForm = ({ countryOptionList = [], onChange }: Props) => {
         <div className="text-primary-input-text font-bold mr-4 w-[11vw]">Country</div>
         <div className="w-[22vw] ml-4">
           <Select
+            testId="emergency-contact-country"
             placeholder="Select Country"
             className=" text-primary-input-text font-bold w-full"
             onChange={(value) => handleChange('country', value as number)}
@@ -143,6 +152,7 @@ const EmergencyContactForm = ({ countryOptionList = [], onChange }: Props) => {
         <div className="text-primary-input-text font-bold mr-4 w-[11vw]">Landline Number</div>
         <div className="w-[22vw] ml-4">
           <TextInput
+            testId="emergency-contact-landline"
             placeholder="Enter Landline Number"
             className=" text-primary-input-text font-bold w-full"
             onChange={(e) => handleChange('landline', e.target.value)}
@@ -154,6 +164,7 @@ const EmergencyContactForm = ({ countryOptionList = [], onChange }: Props) => {
         <div className="text-primary-input-text font-bold mr-4 w-[11vw]">Mobile Number</div>
         <div className="w-[22vw] ml-4">
           <TextInput
+            testId="emergency-contact-mobile-number"
             placeholder="Enter Mobile Number"
             className=" text-primary-input-text font-bold w-full"
             onChange={(e) => handleChange('mobileNumber', e.target.value)}

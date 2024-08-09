@@ -15,21 +15,8 @@ interface NewPersonDataProps {
 }
 
 export const AddNewPersonInput = ({ newPersonData, handleAddpersonData, newPersonForm }: NewPersonDataProps) => {
-  // const [newPersonForm, setNewPersonForm] = useState({});
   const handleAddNewPersonForm = (key: string, value) => {
     handleAddpersonData(key, value);
-    // console.log("key===>",key,value)
-    // const updatedFormData = {
-    //   ...newPersonForm,
-    //   [key]: value,
-    // };
-
-    // // if (type === 'dealMemo') {
-    //   setNewPersonForm({ ...updatedFormData });
-    // // }
-    // console.log("==>",newPersonForm)
-    // setFormEdited(true);
-    // setNewPersonForm()
   };
 
   return (
@@ -45,9 +32,6 @@ export const AddNewPersonInput = ({ newPersonData, handleAddpersonData, newPerso
                   handleAddNewPersonForm(newPersonData.dataFieldFirst, value.target.value);
                 }}
                 value={newPersonForm ? newPersonForm[newPersonData.dataFieldFirst] : ''}
-                // placeholder={
-                //   contactsData.phone ? 'Add details to the Contact Database' : 'Please select from the dropdown above'
-                // }
               />
             )}
             {newPersonData.type === 'select' && (
@@ -60,7 +44,6 @@ export const AddNewPersonInput = ({ newPersonData, handleAddpersonData, newPerso
                 options={booleanOptions}
                 isClearable
                 isSearchable
-                //   value={formData.DeMoAdvancePaymentRequired}
               />
             )}
           </div>
@@ -78,9 +61,6 @@ export const AddNewPersonInput = ({ newPersonData, handleAddpersonData, newPerso
                   handleAddNewPersonForm(newPersonData.dataFieldSecond, value.target.value);
                 }}
                 value={newPersonForm ? newPersonForm[newPersonData.dataFieldSecond] : ''}
-                // placeholder={
-                //   contactsData.phone ? 'Add details to the Contact Database' : 'Please select from the dropdown above'
-                // }
               />
             )}
 
@@ -94,7 +74,6 @@ export const AddNewPersonInput = ({ newPersonData, handleAddpersonData, newPerso
                 options={booleanOptions}
                 isClearable
                 isSearchable
-                //   value={formData.DeMoAdvancePaymentRequired}
               />
             )}
           </div>

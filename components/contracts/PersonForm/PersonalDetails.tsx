@@ -106,6 +106,7 @@ const PersonalDetails = ({ countryOptionList, booleanOptions, userOptionList, on
             <div className="text-primary-input-text font-bold mr-4 w-[11vw]">First Name</div>
             <div className="w-[22vw] ml-4">
               <TextInput
+                testId="person-first-name"
                 placeholder="Enter First Name"
                 className="text-primary-input-text font-bold w-full"
                 onChange={(event) => handleChange('firstName', event.target.value)}
@@ -117,6 +118,7 @@ const PersonalDetails = ({ countryOptionList, booleanOptions, userOptionList, on
             <div className="text-primary-input-text font-bold mr-4 w-2/5">Email Address</div>
             <div className="w-[22vw] ml-4">
               <TextInput
+                testId="person-email"
                 placeholder="Enter Email Address"
                 className="text-primary-input-text font-bold w-full"
                 onChange={(event) => handleChange('email', event.target.value)}
@@ -131,6 +133,7 @@ const PersonalDetails = ({ countryOptionList, booleanOptions, userOptionList, on
             <div className="text-primary-input-text font-bold mr-4 w-[11vw]">Last Name</div>
             <div className="w-[22vw] ml-4">
               <TextInput
+                testId="person-last-name"
                 placeholder="Enter last Name"
                 className="text-primary-input-text font-bold w-full"
                 onChange={(event) => handleChange('lastName', event.target.value)}
@@ -142,6 +145,7 @@ const PersonalDetails = ({ countryOptionList, booleanOptions, userOptionList, on
             <div className="text-primary-input-text font-bold mr-4 w-2/5">Landline Number</div>
             <div className="w-[22vw] ml-4">
               <TextInput
+                testId="person-landline"
                 placeholder="Enter Landline Number"
                 className="text-primary-input-text font-bold w-full"
                 onChange={(event) => handleChange('landline', event.target.value)}
@@ -151,15 +155,30 @@ const PersonalDetails = ({ countryOptionList, booleanOptions, userOptionList, on
           </div>
         </div>
 
-        <div className="flex mt-2 items-center">
-          <div className="w-1/2 flex items-center">
+        <div className="flex mt-2 items-start">
+          <div className="w-1/2 flex items-start">
             <div className="text-primary-input-text font-bold mr-4 w-[11vw]">Address</div>
             <div className="w-[22vw] ml-4">
               <TextInput
+                testId="person-address-1"
                 placeholder="Enter Address 1"
                 className="text-primary-input-text font-bold w-full"
                 onChange={(event) => handleChange('address1', event.target.value)}
                 value={address1}
+              />
+              <TextInput
+                testId="person-address-2"
+                placeholder="Enter Address 2"
+                className="text-primary-input-text font-bold w-full mt-2"
+                onChange={(event) => handleChange('address2', event.target.value)}
+                value={address2}
+              />
+              <TextInput
+                testId="person-address-3"
+                placeholder="Enter Address 3"
+                className="text-primary-input-text font-bold w-full mt-2"
+                onChange={(event) => handleChange('address3', event.target.value)}
+                value={address3}
               />
             </div>
           </div>
@@ -167,6 +186,7 @@ const PersonalDetails = ({ countryOptionList, booleanOptions, userOptionList, on
             <div className="text-primary-input-text font-bold mr-4 w-2/5">Mobile Number</div>
             <div className="w-[22vw] ml-4">
               <TextInput
+                testId="person-mobile-number"
                 placeholder="Enter Mobile Number"
                 className="text-primary-input-text font-bold w-full"
                 onChange={(event) => handleChange('mobileNumber', event.target.value)}
@@ -177,21 +197,12 @@ const PersonalDetails = ({ countryOptionList, booleanOptions, userOptionList, on
         </div>
 
         <div className="flex mt-2 items-center">
-          <div className="w-1/2 flex items-center">
-            <div className="text-primary-input-text font-bold mr-4 w-[11vw]">Address Line 2</div>
-            <div className="w-[22vw] ml-4">
-              <TextInput
-                placeholder="Enter Address 2"
-                className="text-primary-input-text font-bold w-full"
-                onChange={(event) => handleChange('address2', event.target.value)}
-                value={address2}
-              />
-            </div>
-          </div>
+          <div className="w-1/2 flex items-center" />
           <div className="w-1/2 flex items-center">
             <div className="text-primary-input-text font-bold mr-4 w-2/5">Full Name as it appears on Passport</div>
             <div className="w-[22vw] ml-4">
               <TextInput
+                testId="person-passport-name"
                 placeholder="Enter Name on Passport"
                 className="text-primary-input-text font-bold w-full"
                 onChange={(event) => handleChange('passportName', event.target.value)}
@@ -202,21 +213,12 @@ const PersonalDetails = ({ countryOptionList, booleanOptions, userOptionList, on
         </div>
 
         <div className="flex mt-2 items-center">
-          <div className="w-1/2 flex items-center">
-            <div className="text-primary-input-text font-bold mr-4 w-[11vw]">Address Line 3</div>
-            <div className="w-[22vw] ml-4">
-              <TextInput
-                placeholder="Enter Address 3"
-                className="text-primary-input-text font-bold w-full"
-                onChange={(event) => handleChange('address3', event.target.value)}
-                value={address3}
-              />
-            </div>
-          </div>
+          <div className="w-1/2 flex items-center" />
           <div className="w-1/2 flex items-center">
             <div className="text-primary-input-text font-bold mr-4 w-2/5">Passport Number</div>
             <div className="w-[22vw] ml-4">
               <TextInput
+                testId="person-passport-number"
                 placeholder="Enter Passport Number"
                 className="text-primary-input-text font-bold w-full"
                 onChange={(event) => handleChange('passportNumber', event.target.value)}
@@ -232,6 +234,7 @@ const PersonalDetails = ({ countryOptionList, booleanOptions, userOptionList, on
           <div className="text-primary-input-text font-bold mr-4 w-[11vw]">Town</div>
           <div className="w-[22vw] ml-4">
             <TextInput
+              testId="person-town"
               placeholder="Enter Town"
               className=" text-primary-input-text font-bold w-full"
               onChange={(event) => handleChange('town', event.target.value)}
@@ -244,6 +247,7 @@ const PersonalDetails = ({ countryOptionList, booleanOptions, userOptionList, on
           <div className="text-primary-input-text font-bold  mr-4 w-2/5">Passport Expiry Date</div>
           <div className="w-[22vw] ml-4 flex items-center">
             <DateInput
+              testId="person-passport-expiry-date"
               onChange={(value) => handleChange('passportExpiryDate', value?.toISOString?.() || '')}
               value={passportExpiryDate}
             />
@@ -260,6 +264,7 @@ const PersonalDetails = ({ countryOptionList, booleanOptions, userOptionList, on
           <div className="text-primary-input-text font-bold mr-4 w-[11vw]">Postcode</div>
           <div className="w-[22vw] ml-4">
             <TextInput
+              testId="person-postcode"
               placeholder="Enter Postcode"
               className=" text-primary-input-text font-bold w-full"
               onChange={(event) => handleChange('postcode', event.target.value)}
@@ -271,6 +276,7 @@ const PersonalDetails = ({ countryOptionList, booleanOptions, userOptionList, on
           <div className="text-primary-input-text font-bold  mr-4 w-2/5">Eligible to Work in the UK</div>
           <div className="w-[22vw] ml-4 flex items-center">
             <Select
+              testId="person-uk-work-eligibility"
               onChange={(value) => handleChange('hasUKWorkPermit', value as string)}
               value={hasUKWorkPermit}
               className="bg-primary-white w-40"
@@ -281,6 +287,7 @@ const PersonalDetails = ({ countryOptionList, booleanOptions, userOptionList, on
             />
             <div className="text-primary-input-text font-bold ml-2 mr-2">Checked</div>
             <Select
+              testId="person-checked-by"
               onChange={(value) => handleChange('checkedBy', value as number)}
               value={checkedBy}
               className="bg-primary-white w-60"
@@ -298,6 +305,7 @@ const PersonalDetails = ({ countryOptionList, booleanOptions, userOptionList, on
           <div className="text-primary-input-text font-bold mr-4 w-[10vw]">Country</div>
           <div className="w-[22vw] ml-11">
             <Select
+              testId="person-country"
               onChange={(value) => handleChange('country', value as number)}
               className="bg-primary-white w-26 mr-3"
               placeholder="Please select.."
@@ -315,6 +323,7 @@ const PersonalDetails = ({ countryOptionList, booleanOptions, userOptionList, on
           </div>
           <div className="w-[22vw] ml-4">
             <Select
+              testId="person-is-feu-required"
               onChange={(value) => handleChange('isFEURequired', value as string)}
               value={isFEURequired}
               className="bg-primary-white w-40 mr-3"
@@ -330,6 +339,7 @@ const PersonalDetails = ({ countryOptionList, booleanOptions, userOptionList, on
         <div className="w-[11vw] mr-4 text-primary-input-text font-bold">General Notes</div>
         <div className="w-full ml-14 pr-5">
           <TextInput
+            testId="person-general-notes"
             className="w-full text-primary-input-text font-bold"
             placeholder="Notes"
             onChange={(event) => handleChange('generalNotes', event.target.value)}
@@ -341,6 +351,7 @@ const PersonalDetails = ({ countryOptionList, booleanOptions, userOptionList, on
         <div className="w-[11vw] mr-4 text-primary-input-text font-bold">Relevant Health Details</div>
         <div className="w-full ml-14  pr-5">
           <TextInput
+            testId="person-health-details"
             className="w-full text-primary-input-text font-bold"
             placeholder="Notes"
             onChange={(event) => handleChange('healthDetails', event.target.value)}
@@ -352,6 +363,7 @@ const PersonalDetails = ({ countryOptionList, booleanOptions, userOptionList, on
         <div className="w-[11vw] mr-4 text-primary-input-text font-bold">Advisory Notes</div>
         <div className="w-full ml-14  pr-5">
           <TextInput
+            testId="person-advisory-notes"
             className="w-full text-primary-input-text font-bold"
             placeholder="Notes"
             onChange={(event) => handleChange('advisoryNotes', event.target.value)}
@@ -364,6 +376,7 @@ const PersonalDetails = ({ countryOptionList, booleanOptions, userOptionList, on
           <div className="text-primary-input-text font-bold mr-4 w-[11vw]">Type Of Work</div>
           <div className="w-[22vw] ml-4  flex flex-col gap-4">
             <Select
+              testId="person-roles"
               onChange={(value) => handleChange('workType', value as number[])}
               value={workType}
               className="bg-primary-white w-full"
@@ -376,12 +389,12 @@ const PersonalDetails = ({ countryOptionList, booleanOptions, userOptionList, on
             {otherWorkTypes.map((otherWorkType, i) => (
               <TextInput
                 key={i}
+                testId={`person-other-role-${i + 1}`}
                 className=" text-primary-input-text font-bold w-full"
                 onChange={(event) =>
                   handleChange(
                     'otherWorkTypes',
                     replace(otherWorkTypes, event.target.value as string, (_, idx) => {
-                      console.log(idx, i);
                       return idx === i;
                     }),
                   )
@@ -392,6 +405,7 @@ const PersonalDetails = ({ countryOptionList, booleanOptions, userOptionList, on
             ))}
 
             <TextInput
+              testId="person-notes"
               className=" text-primary-input-text font-bold w-full"
               onChange={(event) => handleChange('notes', event.target.value)}
               value={notes}
