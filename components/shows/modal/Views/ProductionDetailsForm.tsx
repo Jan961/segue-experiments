@@ -205,7 +205,7 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
                 <Icon iconName="info-circle-solid" variant="2xl" />
               </Tooltip>
             </div>
-            {validationErrors.prodCode && <small className="text-red-400">{validationErrors.prodCode}</small>}
+            {validationErrors.prodCode && <small className="text-red-400 ml-[74px]">{validationErrors.prodCode}</small>}
           </div>
         </div>
         {isUploadOpen && (
@@ -258,7 +258,7 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
             />
           </div>
           {validationErrors.productionDateBlock && (
-            <small className="text-red-400">{validationErrors.productionDateBlock}</small>
+            <small className="text-red-400 ml-[154px]">{validationErrors.productionDateBlock}</small>
           )}
         </div>
         <div className="flex-col">
@@ -275,7 +275,7 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
               disabled={production.isArchived}
             />
           </div>
-          {validationErrors.region && <small className="text-red-400">{validationErrors.region}</small>}
+          {validationErrors.region && <small className="text-red-400 ml-[154px]">{validationErrors.region}</small>}
         </div>
         <div className="flex-col">
           <div className="flex items-center gap-7">
@@ -290,7 +290,7 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
               disabled={production.isArchived}
             />
           </div>
-          {validationErrors.currency && <small className="text-red-400">{validationErrors.currency}</small>}
+          {validationErrors.currency && <small className="text-red-400 ml-[154px]">{validationErrors.currency}</small>}
         </div>
         <div className="flex-col">
           <div className="flex items-center gap-[92px]">
@@ -304,7 +304,7 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
               disabled={production.isArchived}
             />
           </div>
-          {validationErrors.company && <small className="text-red-400">{validationErrors.company}</small>}
+          {validationErrors.company && <small className="text-red-400 ml-[154px]">{validationErrors.company}</small>}
         </div>
         <div className="flex items-center gap-6">
           <Label text="Email Address for Sales Figures" />
