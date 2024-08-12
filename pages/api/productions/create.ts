@@ -4,7 +4,7 @@ import * as yup from 'yup';
 import { ProductionDTO } from 'interfaces';
 import prisma from 'lib/prisma';
 import { getEmailFromReq, checkAccess } from 'services/userService';
-import { isUndefined } from 'utils';
+import { isNullOrUndefined } from 'utils';
 import { productionSchema } from 'validators/production';
 
 export const mapToPrismaFields = ({
@@ -49,6 +49,8 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   const production: Partial<ProductionDTO> = mapToPrismaFields(req.body);
   const { ShowId, Image, ReportCurrencyCode, ProdCoId } = production;
 
+  console.log({ imageValue: Image, udv: isNullOrUndefined(Image) });
+
   const email = await getEmailFromReq(req);
   const access = await checkAccess(email, { ShowId });
   if (!access) return res.status(401).end();
@@ -70,7 +72,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
             IsPrimary: dateBlock.IsPrimary,
           })),
         },
-        ...(!isUndefined(Image) && {
+        ...(!isNullOrUndefined(Image) && {
           File: {
             connect: {
               Id: Image?.id,
