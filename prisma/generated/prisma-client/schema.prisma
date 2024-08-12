@@ -2,7 +2,7 @@ generator client {
   provider        = "prisma-client-js"
   output          = "./generated/prisma-client"
   previewFeatures = ["views"]
-  binaryTargets   = ["native", "darwin-arm64", "linux-arm64-openssl-1.1.x"]
+  binaryTargets   = ["native", "darwin-arm64", "linux-arm64-openssl-1.1.x", "windows"]
 }
 
 datasource db {
@@ -721,10 +721,10 @@ model Production {
   ProductionTask        ProductionTask[]
 
   @@unique([Code, ShowId], map: "SECONDARY")
+  @@index([LogoFileId], map: "Production_File")
   @@index([ShowId], map: "Show_Production")
   @@index([ReportCurrencyCode], map: "Currency_Production")
   @@index([ProdCoId], map: "ProductionCompany_Production")
-  @@index([LogoFileId], map: "Production_File")
 }
 
 model ProductionTask {
@@ -1590,7 +1590,7 @@ view SalesView {
   FullProductionCode          String?   @db.VarChar(20)
   ProductionStartDate         DateTime? @db.Date
   ProductionEndDate           DateTime? @db.Date
-  BookingId                   Int       @id @default(0)
+  BookingId                   Int       @default(0)
   BookingFirstDate            DateTime  @db.Date
   BookingStatusCode           String    @default("U") @db.Char(1)
   BookingProductionWeekNum    Int?      @db.SmallInt
@@ -1601,7 +1601,7 @@ view SalesView {
   VenueCurrencySymbolUnicode  String?   @db.VarChar(30)
   ConversionToCurrencyCode    String?   @db.VarChar(3)
   ConversionRate              Decimal?  @db.Decimal(8, 4)
-  SetId                       Int?      @default(0)
+  SetId                       Int       @default(0)
   SetSalesFiguresDate         DateTime? @db.Date
   SetBookingWeekNum           Int?      @db.SmallInt
   SetProductionWeekDate       DateTime? @db.Date
@@ -1613,7 +1613,7 @@ view SalesView {
   SetSingleSeats              Boolean?  @default(dbgenerated("(b'0')")) @db.Bit(1)
   SetBrochureReleased         Boolean?  @default(dbgenerated("(b'0')")) @db.Bit(1)
   SetIsCopy                   Boolean?  @default(dbgenerated("(b'0')")) @db.Bit(1)
-  SaleTypeName                String?   @db.VarChar(45)
+  SaleTypeName                String    @db.VarChar(45)
   Seats                       Decimal?  @db.Decimal(32, 0)
   Value                       Decimal?  @db.Decimal(32, 2)
   TotalCapacity               Float?
@@ -1625,6 +1625,8 @@ view SalesView {
   LastFiguresDate             DateTime? @db.Date
   LastFiguresSeats            Decimal?  @db.Decimal(32, 0)
   LastFiguresValue            Decimal?  @db.Decimal(32, 2)
+
+  @@id([BookingId, SetId, SaleTypeName])
 }
 
 view BookingSelectionView {

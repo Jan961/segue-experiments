@@ -1,4 +1,4 @@
-import { Country } from '@prisma/client';
+import { Country } from 'prisma/generated/prisma-client';
 import { atom } from 'recoil';
 
 export type TCountryState = Array<Country>;
