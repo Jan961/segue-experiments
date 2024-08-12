@@ -25,6 +25,7 @@ export { default as TimeInput } from './TimeInput';
 export { default as Toggle } from './Toggle';
 export { default as Tooltip } from './Tooltip';
 export { default as UploadModal } from './UploadModal';
+export { default as RadioGroup } from './RadioGroup';
 
 // Named exports
 export { notify } from './Notifications';
