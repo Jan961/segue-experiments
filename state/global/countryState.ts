@@ -1,9 +1,9 @@
 import { Country } from '@prisma/client';
 import { atom } from 'recoil';
 
-export type CountryState = Array<Country>;
+export type TCountryState = Array<Country>;
 
-const intialState: CountryState = [];
+const intialState: TCountryState = [];
 
 export const countryState = atom({
   key: 'countryState',

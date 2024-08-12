@@ -43,7 +43,7 @@ import { currencyState } from 'state/marketing/currencyState';
 import { CurrencyList, currencyListState } from 'state/productions/currencyState';
 import { ProductionCompanyList, productionCompanyState } from 'state/productions/productionCompanyState';
 import { currentUserState } from 'state/marketing/currentUserState';
-import { CountryState, countryState } from 'state/global/countryState';
+import { TCountryState, countryState } from 'state/global/countryState';
 
 /*
   Experimental attempt to get Recoil.js working with SSR in React in a DRY manner.
@@ -55,7 +55,7 @@ export type InitialState = Partial<{
   global?: {
     productionJump?: ProductionJump;
     userPrefs?: GlobalStateType;
-    countryList?: CountryState;
+    countryList?: TCountryState;
   };
   tasks?: {
     productions?: ProductionState;
