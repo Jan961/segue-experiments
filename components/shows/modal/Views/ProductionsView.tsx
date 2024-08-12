@@ -123,14 +123,11 @@ const ProductionsView = ({ showData, visible, onClose }: ProductionsViewProps) =
   );
 
   const onSaveProduction = (production: ProductionFormData, cb?: () => void) => {
-    setIsLoading(true);
-    setTimeout(() => {
-      if (production?.id) {
-        updateCurrentProduction(production, cb);
-      } else {
-        createNewProduction(production, cb);
-      }
-    }, 2000);
+    if (production?.id) {
+      updateCurrentProduction(production, cb);
+    } else {
+      createNewProduction(production, cb);
+    }
   };
 
   const updateCurrentProductionState = (data) => {
