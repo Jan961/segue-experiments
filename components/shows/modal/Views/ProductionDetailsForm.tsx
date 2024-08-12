@@ -1,6 +1,6 @@
+import { useEffect, useRef, useCallback, useMemo, useState } from 'react';
 import PopupModal from 'components/core-ui-lib/PopupModal';
 import Select from 'components/core-ui-lib/Select';
-import { useCallback, useMemo, useState } from 'react';
 import Button from 'components/core-ui-lib/Button';
 import Label from 'components/core-ui-lib/Label';
 import Checkbox from 'components/core-ui-lib/Checkbox';
@@ -63,6 +63,7 @@ export const defaultProductionFormData: ProductionFormData = {
   runningTime: null,
   runningTimeNote: '',
 };
+
 const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: ProductionsViewModalProps) => {
   const currencyList = useRecoilValue(currencyListState);
   const productionCompanyList = useRecoilValue(productionCompanyState);
@@ -77,6 +78,23 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
     () => transformToOptions(productionCompanyList, 'name', 'id'),
     [productionCompanyList],
   );
+
+  // Create a ref for the prodCode input
+  const prodCodeRef = useRef(null);
+
+  useEffect(() => {
+    if (visible && prodCodeRef.current) {
+      const focusInterval = setInterval(() => {
+        prodCodeRef.current.focus();
+      }, 50);
+
+      // Stop after 500ms (10 attempts) - this is required because the DateRange component steals the cursor
+      setTimeout(() => {
+        clearInterval(focusInterval);
+      }, 500);
+    }
+  }, [visible]);
+
   const {
     id,
     currency,
@@ -192,6 +210,7 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
               <Label required text="Prod Code" />
               <TextInput
                 id="prodcode"
+                ref={prodCodeRef} // Attach ref to prodCode TextInput
                 className="w-[100px] placeholder-primary"
                 type="string"
                 onChange={(e) => onChange('prodCode', e.target.value)}
