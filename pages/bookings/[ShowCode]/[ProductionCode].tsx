@@ -20,7 +20,7 @@ import useBookingFilter from 'hooks/useBookingsFilter';
 import Filters from 'components/bookings/Filters';
 import { getProductionsWithContent } from 'services/productionService';
 import BookingsTable from 'components/bookings/BookingsTable';
-import { DateType } from '@prisma/client';
+import { DateType } from 'prisma/generated/prisma-client';
 import { useMemo, useRef, useState } from 'react';
 import ExportModal from 'components/core-ui-lib/ExportModal';
 import { useRecoilValue } from 'recoil';

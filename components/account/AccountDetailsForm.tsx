@@ -5,6 +5,7 @@ import React, { useState } from 'react';
 import { useWizard } from 'react-use-wizard';
 import Select from 'components/core-ui-lib/Select';
 import schema from './schema/accountDetailsFormSchema';
+import { Checkbox, PopupModal } from 'components/core-ui-lib';
 
 export type Account = {
   accountId?: number;
@@ -22,7 +23,9 @@ export type Account = {
   firstName: string;
   lastName: string;
   phoneNumber: string;
+  agreementChecked: boolean;
 };
+
 interface AccountDetailsFormProps {
   accountDetails: Account;
   onChange: (v: Account) => void;
@@ -32,7 +35,7 @@ interface AccountDetailsFormProps {
 const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetailsFormProps) => {
   const { nextStep } = useWizard();
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
-
+  const [showModal, setShowModal] = useState(false);
   const handleAccountDetailsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onChange({ ...accountDetails, [e.target.name]: e.target.value });
   };
@@ -58,6 +61,10 @@ const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetails
     }
   };
 
+  const handleShowLicenseModal = () => {
+    if (!showModal) setShowModal(true);
+  };
+
   return (
     <div className="mx-auto w-[700px]">
       <h1 className="mb-4 text-2xl font-bold text-center text-primary-input-text">Company Details</h1>
@@ -66,7 +73,7 @@ const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetails
           <div className="mb-2">
             <Label text="First Name" required />
             <TextInput
-              data-testid="first-name"
+              testId="first-name"
               name="firstName"
               placeholder="Enter first name"
               className="w-full"
@@ -80,7 +87,7 @@ const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetails
           <div className="mb-2">
             <Label text="Last Name" required />
             <TextInput
-              data-testid="last-name"
+              testId="last-name"
               name="lastName"
               placeholder="Enter last name"
               className="w-full"
@@ -92,7 +99,7 @@ const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetails
           <div className="mb-2">
             <Label text="Company" required />
             <TextInput
-              data-testid="company-name"
+              testId="company-name"
               name="companyName"
               placeholder="Enter name of main company"
               className="w-full"
@@ -106,7 +113,7 @@ const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetails
           <div className="mb-2">
             <Label text="Phone Number" required />
             <TextInput
-              data-testid="phone-number"
+              testId="phone-number"
               name="phoneNumber"
               placeholder="Enter phone number"
               className="w-full"
@@ -120,7 +127,7 @@ const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetails
           <div className="mb-2">
             <Label text="Address line 1" required />
             <TextInput
-              data-testid="address-line1"
+              testId="address-line1"
               name="addressLine1"
               placeholder="Enter address line 1"
               className="w-full"
@@ -134,7 +141,7 @@ const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetails
           <div className="mb-2">
             <Label text="Address line 2" required />
             <TextInput
-              data-testid="address-line2"
+              testId="address-line2"
               name="addressLine2"
               placeholder="Enter address line 2"
               className="w-full"
@@ -148,7 +155,7 @@ const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetails
           <div className="mb-2">
             <Label text="Address line 3" />
             <TextInput
-              data-testid="address-line3"
+              testId="address-line3"
               name="addressLine3"
               placeholder="Enter address line 3"
               className="w-full"
@@ -161,7 +168,7 @@ const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetails
           <div className="mb-2">
             <Label text="Town" required />
             <TextInput
-              data-testid="town"
+              testId="town"
               name="town"
               placeholder="Enter town"
               className="w-full"
@@ -173,7 +180,7 @@ const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetails
           <div className="mb-2">
             <Label text="Postcode" required />
             <TextInput
-              data-testid="post-code"
+              testId="post-code"
               name="postcode"
               placeholder="Enter postcode"
               className="w-full"
@@ -185,6 +192,7 @@ const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetails
           <div className="mb-2">
             <Label text="Country" required />
             <Select
+              testId="country"
               name="country"
               placeholder="Select country"
               className="w-full h-[31px]"
@@ -198,7 +206,7 @@ const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetails
           <div className="mb-2">
             <Label text="Company Email Address" required />
             <TextInput
-              data-testid="company-email"
+              testId="company-email"
               name="email"
               placeholder="EnterCompany Email Addressr"
               className="w-full"
@@ -210,6 +218,7 @@ const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetails
           <div className="mb-2">
             <Label text="Currency for Payment" required />
             <Select
+              testId="currency"
               name="currency"
               placeholder="Select currency"
               className="w-full h-[31px]"
@@ -223,7 +232,7 @@ const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetails
           <div className="mb-2">
             <Label text="VAT Number" />
             <TextInput
-              data-testid="vat-number"
+              testId="vat-number"
               name="vatNumber"
               placeholder="Enter VAT Number"
               className="w-full"
@@ -231,11 +240,39 @@ const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetails
               onChange={handleAccountDetailsChange}
             />
           </div>
+          <div className="relative pt-2">
+            <a href="#" onClick={handleShowLicenseModal} className="text-md ml-6 relative mt-3 underline">
+              VIEW SOFTWARE LICENCE AGREEMENT
+            </a>
+            <Checkbox
+              testId="licence-agreement"
+              id="licence-agreement"
+              name="agreementChecked"
+              checked={accountDetails.agreementChecked}
+              onChange={handleAccountDetailsChange}
+              label="I have read and agree to the terms"
+              required
+            />
+            {validationErrors.agreementChecked && (
+              <small className="text-primary-red mt-1">{validationErrors.agreementChecked}</small>
+            )}
+          </div>
           <div className="w-full flex gap-2  items-center justify-end mt-10">
             <Button text="Next" onClick={handleNextClick} className="w-32" />
           </div>
         </section>
       </div>
+      <PopupModal
+        show={showModal}
+        onClose={() => setShowModal(false)}
+        title="Licnese Agreement"
+        titleClass="text-xl text-primary-navy font-bold -mt-2"
+        hasOverlay={false}
+      >
+        <div className="w-80 h-80 p-4">
+          <p className="text-primary-input-text">Pleace holder for Licence Agreement text</p>
+        </div>
+      </PopupModal>
     </div>
   );
 };

@@ -37,7 +37,7 @@ import {
   filterPrice,
   filterTechProvision,
 } from '../utils';
-import { DealMemoHold, DealMemoTechProvision } from '@prisma/client';
+import { DealMemoHold, DealMemoTechProvision } from 'prisma/generated/prisma-client';
 import { dealMemoInitialState } from 'state/contracts/contractsFilterState';
 import {
   convertTimeToTodayDateFormat,

@@ -2,7 +2,7 @@ import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import Layout from 'components/Layout';
 import { getAccountIdFromReq, getUsers } from 'services/userService';
 import { getMasterTasksList } from 'services/TaskService';
-import { MasterTask } from '@prisma/client';
+import { MasterTask } from 'prisma/generated/prisma-client';
 import { getMasterTasksColumnDefs, styleProps } from 'components/tasks/tableConfig';
 import Table from 'components/core-ui-lib/Table';
 import useMasterTasksFilter from 'hooks/useMasterTaskFilter';

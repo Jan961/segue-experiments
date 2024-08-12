@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client';
+import { Prisma } from 'prisma/generated/prisma-client';
 import prisma from 'lib/prisma';
 import { COLOR_HEXCODE } from 'services/salesSummaryService';
 

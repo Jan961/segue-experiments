@@ -1,7 +1,7 @@
 import { loggingService } from 'services/loggingService';
 import prisma from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { CompAllocation } from '@prisma/client';
+import { CompAllocation } from 'prisma/generated/prisma-client';
 import { checkAccess, getEmailFromReq } from 'services/userService';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {

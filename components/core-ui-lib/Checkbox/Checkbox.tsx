@@ -37,7 +37,7 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
     const modifyOnChange = (e: any) => {
       e.stopPropagation();
       const newValue = !checked;
-      const newEvent = { ...e, target: { ...e.target, value: newValue, id: name } };
+      const newEvent = { ...e, target: { ...e.target, value: newValue, id: name, name } };
       onChange(newEvent);
     };
 
