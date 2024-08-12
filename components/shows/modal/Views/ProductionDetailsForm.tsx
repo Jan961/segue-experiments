@@ -83,17 +83,10 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
   const prodCodeRef = useRef(null);
 
   useEffect(() => {
-    if (visible && prodCodeRef.current) {
-      const focusInterval = setInterval(() => {
-        prodCodeRef.current.focus();
-      }, 50);
-
-      // Stop after 500ms (10 attempts) - this is required because the DateRange component steals the cursor
-      setTimeout(() => {
-        clearInterval(focusInterval);
-      }, 500);
+    if (prodCodeRef.current) {
+      prodCodeRef.current.select?.();
     }
-  }, [visible]);
+  }, [prodCodeRef.current]);
 
   const {
     id,
