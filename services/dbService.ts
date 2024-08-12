@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const deployments = ['dev', 'staging', 'demo', 'prod'];
-const DB_USER_PREVILIGES = 'SELECT,INSERT,UPDATE,DELETE,CREATE,EXECUTE,SHOW VIEW';
+const DB_USER_PRIVILEGES = 'SELECT,INSERT,UPDATE,DELETE,EXECUTE,SHOW VIEW';
 
 export const createClientDB = async (organisationId: string) => {
   if (!organisationId) {
@@ -18,7 +18,7 @@ export const createClientDB = async (organisationId: string) => {
     Authorization: `cpanel ${process.env.DB_USER}:${process.env.DB_API_KEY}`,
   };
   const url = `https://${process.env.DB_SERVER}:${process.env.DB_PORT}/execute/Mysql`;
-  const dbName = `${process.env.DB_USER}_${deploymentEnv}_${organisationId}`;
+  const dbName = `${process.env.DB_USER}_${deploymentEnv}_Segue_${organisationId}`;
   const dbUser = `${process.env.DB_USER}_${deploymentEnv}User`;
   const dboUser = `${process.env.DB_USER}_${deploymentEnv}DBO`;
   // Create the DB
@@ -31,10 +31,10 @@ export const createClientDB = async (organisationId: string) => {
     },
   );
   if (dbData.status === 1) {
-    // Grant users previlidges to the DB
+    // Grant users privilidges to the DB
     await axios.post(
       `${url}/set_privileges_on_database`,
-      { database: dbName, user: dbUser, privileges: DB_USER_PREVILIGES },
+      { database: dbName, user: dbUser, privileges: DB_USER_PRIVILEGES },
       {
         headers,
       },
