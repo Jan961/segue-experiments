@@ -7,6 +7,13 @@ input[type='text']:focus {
   box-shadow: none;
 }
 
+/* Autofill styling */
+.autofill-white-bg:-webkit-autofill {
+  background-color: #FFF !important;
+  box-shadow: 0 0 0 1000px #FFF inset !important;
+  -webkit-text-fill-color: #000 !important;
+}
+
 /* Firefox */
 * {
   scrollbar-width: thin;

@@ -45,7 +45,7 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
     },
     ref,
   ) => {
-    const baseClass = `block w-fit-content pl-2 h-[1.9375rem] !border text-sm shadow-input-shadow text-primary-input-text rounded-md outline-none focus:ring-2 focus:ring-primary-input-text ring-inset`;
+    const baseClass = `block w-fit-content pl-2 h-[1.9375rem] !border text-sm shadow-input-shadow text-primary-input-text rounded-md outline-none focus:ring-2 focus:ring-primary-input-text ring-inset autofill-white-bg`;
     const inputClass = error ? '!border-primary-red' : '!border-primary-border';
 
     return (
