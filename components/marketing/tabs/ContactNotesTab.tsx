@@ -47,7 +47,7 @@ const ContactNotesTab = forwardRef<ContactNoteTabRef, ContactNotesTabProps>((pro
       const contactNoteResponse = await axios.get(`/api/marketing/contactNotes/${bookingId}`);
       const contactNotes = contactNoteResponse.data;
 
-      if (contactNotes && Array.isArray(contactNotes) && contactNotes.length > 0) {
+      if (contactNotes && Array.isArray(contactNotes)) {
         setContNoteColDefs(contactNoteColDefs(contactNoteUpdate, users));
         setContactNoteRows(contactNotes);
         setIsLoading(false);

@@ -1,4 +1,4 @@
-import { AccountSubscription } from '@prisma/client';
+import { AccountSubscription } from 'prisma/generated/prisma-client';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { createSubscription } from 'services/subscriptionService';
 

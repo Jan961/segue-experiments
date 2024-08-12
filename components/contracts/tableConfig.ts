@@ -4,6 +4,12 @@ import VenueColumnRenderer from './table/VenueColumnRenderer';
 import DateColumnRenderer from './table/DateColumnRenderer';
 import { tileColors } from 'config/global';
 import InputRenderer from 'components/global/salesTable/renderers/InputRenderer';
+import NoteColumnRenderer from 'components/bookings/table/NoteColumnRenderer';
+import DefaultTextRenderer from 'components/core-ui-lib/Table/renderers/DefaultTextRenderer';
+import formatInputDate from 'utils/dateInputFormat';
+import { getTimeFromDateAndTime } from 'services/dateService';
+import ButtonRenderer from 'components/core-ui-lib/Table/renderers/ButtonRenderer';
+import IconRowRenderer from 'components/global/salesTable/renderers/IconRowRenderer';
 
 export const contractsStyleProps = { headerColor: tileColors.contracts };
 
@@ -93,7 +99,7 @@ export const companyContractsColumnDefs = [
     width: 100,
     minWidth: 100,
   },
-  { headerName: '', field: 'town', cellRenderer: DefaultCellRenderer, minWidth: 100, flex: 1 },
+  { headerName: '', field: 'actionBtn', cellRenderer: DefaultCellRenderer, minWidth: 100, flex: 1 },
   { headerName: 'Completed By', field: 'capacity', cellRenderer: DefaultCellRenderer, width: 150 },
   { headerName: 'Checked By', field: 'performanceCount', cellRenderer: DefaultCellRenderer, width: 90 },
   { headerName: 'Date Issued', field: 'contractStatus', cellRenderer: ContractStatusCellRenderer, width: 180 },
@@ -105,11 +111,21 @@ export const companyContractsColumnDefs = [
     width: 180,
   },
   {
-    headerName: 'Notes',
-    field: 'contractStatus',
-    cellRenderer: ContractStatusCellRenderer,
+    headerName: '',
+    field: 'notes',
+    cellRenderer: NoteColumnRenderer,
+    headerClass: [''],
+    cellRendererParams: {
+      tpActive: true,
+    },
     resizable: false,
-    width: 80,
+    width: 50,
+    cellStyle: {
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      overflow: 'visible',
+    },
   },
 ];
 
@@ -163,9 +179,53 @@ export const standardSeatKillsColumnDefs = (onChangeData, holdValue) => [
       textAlign: 'center',
       overflow: 'visible',
     },
-    headerClass: 'right-border-full',
     suppressMovable: true,
     sortable: false,
+    resizable: false,
+  },
+];
+
+export const attachmentsColDefs = [
+  {
+    headerName: 'Title',
+    field: 'FileOriginalFilename',
+    editable: true,
+    cellRenderer: DefaultTextRenderer,
+    width: 150,
+  },
+  {
+    headerName: 'Date Uploaded',
+    field: 'FileUploadedDateTime',
+    cellRenderer: DefaultTextRenderer,
+    cellRendererParams: function (params) {
+      const updDate = new Date(params.data.FileUploadedDateTime);
+      return {
+        value: formatInputDate(updDate) + ' ' + getTimeFromDateAndTime(updDate),
+      };
+    },
+    width: 100,
+  },
+  {
+    headerName: 'View',
+    field: 'ViewBtn',
+    cellRenderer: ButtonRenderer,
+    cellRendererParams: {
+      buttonText: 'View',
+    },
+    width: 100,
+  },
+  {
+    headerName: '',
+    field: 'icons',
+    cellRenderer: IconRowRenderer,
+    cellRendererParams: {
+      iconList: [
+        {
+          name: 'delete',
+        },
+      ],
+    },
+    width: 80,
     resizable: false,
   },
 ];

@@ -1,4 +1,4 @@
-import { Show } from '@prisma/client';
+import { Show } from 'prisma/generated/prisma-client';
 import Table from 'components/core-ui-lib/Table';
 import { styleProps } from '../bookings/table/tableConfig';
 import { useEffect, useRef, useState } from 'react';

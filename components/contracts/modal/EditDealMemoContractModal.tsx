@@ -37,7 +37,7 @@ import {
   filterPrice,
   filterTechProvision,
 } from '../utils';
-import { DealMemoHold, DealMemoTechProvision } from '@prisma/client';
+import { DealMemoHold, DealMemoTechProvision } from 'prisma/generated/prisma-client';
 import { dealMemoInitialState } from 'state/contracts/contractsFilterState';
 import {
   convertTimeToTodayDateFormat,
@@ -106,7 +106,6 @@ export const EditDealMemoContractModal = ({
     setFormData({ ...demoModalData });
     const priceData = filterPrice(demoModalData.DealMemoPrice);
     const holdTypeData = filterHoldTypeData(dealHoldType, demoModalData.DealMemoHold);
-    console.log('dealHoldType, demoModalData.DealMemoHold', dealHoldType, demoModalData.DealMemoHold, holdTypeData);
 
     setSeatKillsData(holdTypeData);
     setdealMemoPriceFormData(priceData[0]);
@@ -509,10 +508,11 @@ export const EditDealMemoContractModal = ({
               onChange={() => {
                 return null;
               }}
+              tabIndexShow={true}
             />
             <div className=" text-primary-input-text font-bold ml-8 mr-4">Notes</div>
 
-            <TextInput testId="runningNote" className="w-[51vw]" value={productionJumpState.RunningTimeNote} disabled />
+            <TextInput testId="runningNote" className="w-[51vw]" value={productionJumpState.RunningTimeNote} />
           </div>
         </div>
         <div className="flex mt-4">
@@ -538,6 +538,7 @@ export const EditDealMemoContractModal = ({
               onChange={(value) =>
                 editDemoModalData('DeMoVenueCurfewTime', convertTimeToTodayDateFormat(value), 'dealMemo')
               }
+              tabIndexShow={true}
             />
             {/* <TextInput placeholder="hh:mm" testId="venueText" className="w-[80px] mt-1 mb-1" /> */}
             <div className=" text-primary-input-text font-bold ml-8 mr-4">Notes</div>
@@ -636,9 +637,9 @@ export const EditDealMemoContractModal = ({
               testId="dealText"
               className="w-[100px]"
               value={formData.DeMoROTTPercentage}
-              type="number"
+              // type="number"
               onChange={(value) =>
-                editDemoModalData('DeMoROTTPercentage', filterPercentage(parseFloat(value.target.value)), 'dealMemo')
+                editDemoModalData('DeMoROTTPercentage', parseFloat(value.target.value).toFixed(2), 'dealMemo')
               }
             />{' '}
             <div className=" text-primary-input-text font-bold ml-2">%</div>
@@ -1689,6 +1690,7 @@ export const EditDealMemoContractModal = ({
                 onChange={(value) =>
                   editDemoModalData('DeMoTechArrivalTime', convertTimeToTodayDateFormat(value), 'dealMemo')
                 }
+                tabIndexShow={true}
               />
             </div>
           </div>

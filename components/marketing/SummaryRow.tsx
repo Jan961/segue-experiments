@@ -7,11 +7,12 @@ const normalText = 'text-base font-normal text-primary-input-text';
 type SummaryRowProps = {
   label: string;
   data: string;
+  testId?: string;
 };
 
-const SummaryRow: React.FC<SummaryRowProps> = ({ label, data }) => {
+const SummaryRow: React.FC<SummaryRowProps> = ({ label, data, testId }) => {
   return (
-    <div className="flex flex-row">
+    <div data-testid={testId || label} className="flex flex-row">
       <div className={classNames(boldText, 'mr-1')}>{label}</div>
       <div className={normalText}>{data}</div>
     </div>

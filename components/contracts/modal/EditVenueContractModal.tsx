@@ -21,7 +21,7 @@ import axios from 'axios';
 import { bookingStatusMap } from 'config/bookings';
 import { userState } from 'state/account/userState';
 import { useEffect, useMemo, useState } from 'react';
-import { Venue } from '@prisma/client';
+import { Venue } from 'prisma/generated/prisma-client';
 import {
   DealMemoContractFormData,
   DealMemoHoldType,
@@ -32,15 +32,21 @@ import {
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import { formattedDateWithDay, toISO } from 'services/dateService';
 import { EditDealMemoContractModal } from './EditDealMemoContractModal';
-import { transformToOptions } from 'utils';
+import { isNullOrEmpty, transformToOptions } from 'utils';
 import LoadingOverlay from 'components/shows/LoadingOverlay';
+import { attachmentsColDefs, contractsStyleProps } from '../tableConfig';
+import Table from 'components/core-ui-lib/Table';
+import { UploadModal } from 'components/core-ui-lib';
+import { attachmentMimeTypes } from 'components/core-ui-lib/UploadModal/interface';
+import { headlessUploadMultiple } from 'requests/upload';
+import { getFileUrl } from 'lib/s3';
+import { ConfDialogVariant } from 'components/core-ui-lib/ConfirmationDialog/ConfirmationDialog';
 
 const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClose: () => void }) => {
   const productionJumpState = useRecoilValue(currentProductionSelector);
   const selectedTableCell = useRecoilValue(addEditContractsState);
   const [saveContractFormData, setSaveContractFormData] = useState<Partial<SaveContractFormState>>({});
   const [saveBookingFormData, setSaveBookingFormData] = useState<Partial<SaveContractBookingFormState>>({});
-  const [cancelModal, setCancelModal] = useState<boolean>(false);
   const [editDealMemoModal, setEditDealMemoModal] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [venue, setVenue] = useState<Partial<Venue>>({});
@@ -68,6 +74,15 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
     [users],
   );
 
+  const [showUploadModal, setShowUploadModal] = useState<boolean>(false);
+  const [contractAttatchmentRows, setContractAttatchmentRows] = useState([]);
+  const [filesForUpload, setFilesForUpload] = useState<FormData[]>([]);
+  const [attachRow, setAttachRow] = useState();
+  const [attachIndex, setAttachIndex] = useState();
+  const [filesToDelete, setFilesToDelete] = useState([]);
+  const [showConfirmationDialog, setShowConfirmationDialog] = useState<boolean>(false);
+  const [confirmationVariant, setConfirmationVariant] = useState<string>('cancel');
+
   const producerList = useMemo(() => {
     const list = {};
     Object.values(users).forEach((listData) => {
@@ -81,7 +96,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
     const demoModalData = await axios.get<DealMemoContractFormData>(
       `/api/dealMemo/getDealMemo/${selectedTableCell.contract.Id ? selectedTableCell.contract.Id : 1}`,
     );
-    const getHoldType = await axios.get<DealMemoHoldType>(`/api/dealMemo/getHoldType/${selectedTableCell.contract.Id}`);
+    const getHoldType = await axios.get<DealMemoHoldType>('/api/dealMemo/hold-type/read');
     setDealHoldType(getHoldType.data as DealMemoHoldType);
     if (demoModalData.data && demoModalData.data.DeMoBookingId) {
       setDemoModalData(demoModalData.data as unknown as DealMemoContractFormData);
@@ -91,13 +106,36 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
       setVenue(venueData.data as unknown as Venue);
     }
   };
+
   useEffect(() => {
     const callDealMemoData = async () => {
       setIsLoading(true);
       await callDealMemoApi();
       setIsLoading(false);
     };
+
+    const fetchContractAttachments = async () => {
+      try {
+        const response = await axios.get(`/api/contracts/read/attachments/${selectedTableCell.contract.Id}`);
+        const data = response.data;
+        setContractAttatchmentRows([
+          ...data.map((file) => {
+            return {
+              FileId: file.Id,
+              FileOriginalFilename: file.OriginalFilename,
+              FileUploadedDateTime: file.UploadDateTime,
+              FileURL: getFileUrl(file.Location),
+              FileUploaded: true,
+              FileLocation: file.Location,
+            };
+          }),
+        ]);
+      } catch (error) {
+        console.log(error, 'Error - failed to fetch contract file attachments');
+      }
+    };
     callDealMemoData();
+    fetchContractAttachments();
   }, []);
 
   const editContractModalData = async (key: string, value, type: string) => {
@@ -115,27 +153,69 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
   };
 
   const handleFormData = async () => {
-    const bookingData = Object.keys(saveBookingFormData).length > 0;
-    const contractData = Object.keys(saveContractFormData).length > 0;
-    if (contractData) {
-      await fetchData({
-        url: `/api/contracts/update/venueContract/${selectedTableCell.contract.Id}`,
-        method: 'PATCH',
-        data: saveContractFormData,
-      });
-    }
+    const handleUpload = async () => {
+      const bookingData = Object.keys(saveBookingFormData).length > 0;
+      const contractData = Object.keys(saveContractFormData).length > 0;
+      if (contractData) {
+        await fetchData({
+          url: `/api/contracts/update/venueContract/${selectedTableCell.contract.Id}`,
+          method: 'PATCH',
+          data: saveContractFormData,
+        });
+      }
 
-    if (bookingData) {
-      await fetchData({
-        url: `/api/contracts/update/venueContractBooking/${selectedTableCell.contract.Id}`,
-        method: 'PATCH',
-        data: saveBookingFormData,
-      });
+      if (bookingData) {
+        await fetchData({
+          url: `/api/contracts/update/venueContractBooking/${selectedTableCell.contract.Id}`,
+          method: 'PATCH',
+          data: saveBookingFormData,
+        });
+      }
+      setSaveBookingFormData({});
+      setSaveContractFormData({});
+
+      await saveFiles();
+      await deleteFiles();
+
+      onClose();
+      router.replace(router.asPath);
+    };
+
+    setIsLoading(true);
+    await handleUpload();
+    setIsLoading(false);
+  };
+
+  const deleteFiles = async () => {
+    try {
+      await Promise.all(
+        filesToDelete.map(async (file) => {
+          await axios.delete(`/api/file/delete?location=${file.FileLocation}`);
+          await axios.post(`/api/contracts/delete/attachments/${selectedTableCell.contract.Id}`, file);
+        }),
+      );
+    } catch (error) {
+      console.log(error, 'Error - failed to delete files from database');
     }
-    setSaveBookingFormData({});
-    setSaveContractFormData({});
-    onClose();
-    router.replace(router.asPath);
+  };
+
+  const saveFiles = async () => {
+    const callBack = async (response) => {
+      if (!isNullOrEmpty(response)) {
+        const fileRec = {
+          FileId: response.data.id,
+          FileType: response.data.MediaType,
+          Description: 'Contract Attachment',
+          Type: 'Contract Attachment',
+        };
+        try {
+          await axios.post(`/api/contracts/create/attachments/${selectedTableCell.contract.Id}`, fileRec);
+        } catch (error) {
+          console.log(error, 'Error - failed to update database with attachments');
+        }
+      }
+    };
+    await headlessUploadMultiple(filesForUpload, callBack);
   };
 
   const handleCancelForm = (cancel: boolean) => {
@@ -143,7 +223,8 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
       onClose();
     }
     if (Object.keys(saveBookingFormData).length > 0 || Object.keys(saveContractFormData).length > 0) {
-      setCancelModal(true);
+      setConfirmationVariant('cancel');
+      setShowConfirmationDialog(true);
     } else {
       onClose();
     }
@@ -158,83 +239,165 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
     callDealMemoApi();
   };
 
+  const onSave = async (files) => {
+    const newFileList = [...filesForUpload];
+    for (const file of files) {
+      const formData = new FormData();
+      formData.append('file', file.file);
+      formData.append('path', 'contracts/attachments');
+      newFileList.push(formData);
+    }
+    setFilesForUpload(newFileList);
+
+    setContractAttatchmentRows([
+      ...files.map((file) => {
+        return {
+          FileOriginalFilename: file.name,
+          FileUploadedDateTime: new Date(),
+          FileURL: URL.createObjectURL(file.file),
+          FileUploaded: false,
+        };
+      }),
+      ...contractAttatchmentRows,
+    ]);
+    setShowUploadModal(false);
+  };
+
+  const handleCellClicked = (event) => {
+    if (event.column.colId === 'ViewBtn') {
+      const fileUrl = event.data.FileURL;
+      window.open(fileUrl, '_blank');
+    } else if (event.column.colId === 'icons') {
+      setAttachRow(event.data);
+      setAttachIndex(event.rowIndex);
+      setConfirmationVariant('delete');
+      setShowConfirmationDialog(true);
+    }
+  };
+
+  const handleDeleteAttachment = async (data, rowIndex) => {
+    if (data.FileUploaded) {
+      setFilesToDelete([...filesToDelete, data]);
+    }
+
+    const newRows = [...contractAttatchmentRows];
+    if (rowIndex !== -1) {
+      newRows.splice(rowIndex, 1);
+    }
+    setContractAttatchmentRows(newRows);
+    setShowConfirmationDialog(false);
+  };
+
+  const handleOnCancelYes = () => {
+    if (confirmationVariant === 'cancel') {
+      handleCancelForm(true);
+    } else if (confirmationVariant === 'delete') {
+      handleDeleteAttachment(attachRow, attachIndex);
+    }
+  };
+
   return (
     <PopupModal
       show={visible}
       title={modalTitle}
       titleClass={classNames('text-xl text-primary-navy font-bold -mt-2.5')}
       onClose={() => handleCancelForm(false)}
-      hasOverlay={false}
     >
       <div className="h-[80vh] w-auto overflow-y-scroll flex">
-        <div className="h-[800px]   flex">
-          <div className="w-[423px] h-[980px] rounded border-2 border-secondary mr-2 p-3 bg-primary-blue bg-opacity-15">
-            <div className="flex">
-              <div className=" text-primary-input-text font-bold text-lg mr-8">Deal Memo</div>
-              <div className="flex items-center">
-                <Button className="w-32" variant="primary" text="Create/Edit Deal Memo" onClick={handleEditDealMemo} />
-                <Button className="ml-3 w-32" variant="primary" text="View as PDF" />
+        <div className="h-[800px] flex">
+          <div className="flex flex-col gap-y-3">
+            <div className="w-[423px] rounded border-2 border-secondary mr-2 p-3 bg-primary-blue bg-opacity-15">
+              <div className="flex">
+                <div className="text-primary-input-text font-bold text-lg mr-8">Deal Memo</div>
+                <div className="flex items-center">
+                  <Button
+                    className="w-32"
+                    variant="primary"
+                    text="Create/Edit Deal Memo"
+                    onClick={handleEditDealMemo}
+                  />
+                  <Button className="ml-3 w-32" variant="primary" text="View as PDF" />
+                </div>
+              </div>
+              <div className=" text-primary-input-text font-bold text-sm mt-1.5">Deal Memo Status</div>
+              <Select
+                options={allStatusOptions}
+                className="bg-primary-white w-52"
+                placeholder="Deal Memo Status"
+                onChange={(value) => editContractModalData('dealMemoStatus', value, 'booking')}
+                value={contractsKeyStatusMap[formData.StatusCode]}
+                isClearable
+                isSearchable
+              />
+
+              <div className=" text-primary-input-text font-bold text-sm mt-6">Completed By</div>
+              <Select
+                onChange={() => {
+                  return null;
+                }}
+                className="bg-primary-white w-52"
+                options={[{ text: 'Select Assignee', value: null }, ...userList]}
+                isClearable
+                isSearchable
+              />
+
+              <div className=" text-primary-input-text font-bold text-sm mt-6">Approved By</div>
+              <Select
+                onChange={() => {
+                  return null;
+                }}
+                className="bg-primary-white w-52"
+                options={[{ text: 'Select Assignee', value: null }, ...userList]}
+                isClearable
+                isSearchable
+              />
+              <div className="flex items-center mt-6">
+                <div className=" text-primary-input-text font-bold text-sm">Date Issued</div>
+                <DateInput
+                  onChange={() => {
+                    return null;
+                  }}
+                  value={formData.SignedDate}
+                />
+
+                <div className=" text-primary-input-text font-bold text-sm">Date Returned</div>
+
+                <DateInput
+                  onChange={() => {
+                    return null;
+                  }}
+                  value={formData.SignedDate}
+                />
+              </div>
+
+              <div className=" text-primary-input-text font-bold text-sm mt-6">Notes</div>
+              <TextArea className="h-[125px] w-[400px]" value={formData.DealNotes} />
+            </div>
+            <div className="flex flex-col gap-y-2">
+              <div className="w-[423px] flex justify-end">
+                <Button
+                  onClick={() => setShowUploadModal(!showUploadModal)}
+                  className="mr-1 w-33"
+                  variant="primary"
+                  text="Add Attachments"
+                />
+              </div>
+              <div className="w-[423px]">
+                <Table
+                  columnDefs={attachmentsColDefs}
+                  rowData={contractAttatchmentRows}
+                  styleProps={contractsStyleProps}
+                  testId="tableVenueAttach"
+                  tableHeight={435}
+                  onCellClicked={(e) => handleCellClicked(e)}
+                />
               </div>
             </div>
-            <div className=" text-primary-input-text font-bold text-sm mt-1.5">Deal Memo Status</div>
-            <Select
-              options={allStatusOptions}
-              className="bg-primary-white w-52"
-              placeholder="Deal Memo Status"
-              onChange={(value) => editContractModalData('dealMemoStatus', value, 'booking')}
-              value={contractsKeyStatusMap[formData.StatusCode]}
-              isClearable
-              isSearchable
-            />
-
-            <div className=" text-primary-input-text font-bold text-sm mt-6">Completed By</div>
-            <Select
-              onChange={() => {
-                return null;
-              }}
-              className="bg-primary-white w-52"
-              options={[{ text: 'Select Assignee', value: null }, ...userList]}
-              isClearable
-              isSearchable
-            />
-
-            <div className=" text-primary-input-text font-bold text-sm mt-6">Approved By</div>
-            <Select
-              onChange={() => {
-                return null;
-              }}
-              className="bg-primary-white w-52"
-              options={[{ text: 'Select Assignee', value: null }, ...userList]}
-              isClearable
-              isSearchable
-            />
-            <div className="flex items-center mt-6">
-              <div className=" text-primary-input-text font-bold text-sm">Date Issued</div>
-              <DateInput
-                onChange={() => {
-                  return null;
-                }}
-                value={formData.SignedDate}
-              />
-
-              <div className=" text-primary-input-text font-bold text-sm">Date Returned</div>
-
-              <DateInput
-                onChange={() => {
-                  return null;
-                }}
-                value={formData.SignedDate}
-              />
-            </div>
-
-            <div className=" text-primary-input-text font-bold text-sm mt-6">Notes</div>
-            <TextArea className="h-[580px] w-[400px]" value={formData.DealNotes} />
           </div>
           <div className="w-[652px] h-[980px] rounded border-2 border-secondary ml-2 p-3 bg-primary-blue bg-opacity-15">
             <div className="flex justify-between">
               <div className=" text-primary-input-text font-bold text-lg">Venue Contract</div>
               <div className="flex mr-2">
-                <Button className="ml-4 w-33" variant="primary" text="Add Attachments" />
                 <Button className="ml-4 w-33" variant="primary" text="View as PDF" />
               </div>
             </div>
@@ -550,13 +713,27 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
         <Button onClick={() => handleCancelForm(false)} className="w-33" variant="secondary" text="Cancel" />
         <Button onClick={handleFormData} className="ml-4 w-33" variant="primary" text="Save and Close" />
       </div>
+      {showUploadModal && (
+        <UploadModal
+          visible={showUploadModal}
+          title="Upload Venue Contract Attachments"
+          info="Please upload your file by dragging it into the grey box below or by clicking the upload cloud."
+          allowedFormats={attachmentMimeTypes.genericAttachment}
+          onClose={() => setShowUploadModal(false)}
+          maxFileSize={5120 * 1024} // 5MB
+          onSave={onSave}
+          maxFiles={30}
+          isMultiple={true}
+        />
+      )}
+
       <ConfirmationDialog
         labelYes="Yes"
         labelNo="No"
-        show={cancelModal}
-        variant="cancel"
-        onNoClick={() => setCancelModal(false)}
-        onYesClick={() => handleCancelForm(true)}
+        show={showConfirmationDialog}
+        variant={confirmationVariant as ConfDialogVariant}
+        onNoClick={() => setShowConfirmationDialog(false)}
+        onYesClick={() => handleOnCancelYes()}
       />
       {editDealMemoModal && (
         <EditDealMemoContractModal

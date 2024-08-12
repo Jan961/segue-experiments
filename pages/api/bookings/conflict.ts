@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import prisma from 'lib/prisma';
-import { Booking } from '@prisma/client';
+import { Booking } from 'prisma/generated/prisma-client';
 import { bookingMapperWithVenue } from 'lib/mappers';
 import { BookingWithVenueDTO } from 'interfaces';
 

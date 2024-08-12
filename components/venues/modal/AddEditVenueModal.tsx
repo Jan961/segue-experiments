@@ -162,7 +162,7 @@ export default function AddEditVenueModal({
       formData.append('path', 'techSpecs');
       newFileList.push(formData);
     }
-    await headlessUploadMultiple(newFileList, callBack);
+    await headlessUploadMultiple(newFileList, callBack, false);
   };
   return (
     <>

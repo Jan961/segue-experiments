@@ -14,6 +14,7 @@ const newAccountSchema = Yup.object().shape({
     .required('Email is a required field.')
     .matches(/^[^\s@]+@[^\s@]+\.[^\s@]+$/, 'Email must be a valid email'),
   currency: Yup.string().required('Currency is a required field'),
+  agreementChecked: Yup.boolean().oneOf([true], 'You must agree to the terms and conditions'),
 });
 
 export default newAccountSchema;
