@@ -149,7 +149,7 @@ const Final = () => {
       };
 
       const finalEntryCreate = await axios.post(
-        `/api/marketing/sales/process/final/${setId === -1 ? 'create' : 'update'}`,
+        `/api/marketing/sales/final/${setId === -1 ? 'create' : 'update'}`,
         data,
       );
       setSetId(finalEntryCreate.data.setId);

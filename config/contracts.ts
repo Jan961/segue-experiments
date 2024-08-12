@@ -200,3 +200,52 @@ export const initialEditDemoFormData = {
   DeMoSettlementDays: null,
   DeMoContractClause: '',
 };
+
+export const salaryPaidToOptions = [
+  {
+    text: 'Agent',
+    value: 'agent',
+  },
+  {
+    text: 'Company Member',
+    value: 'companyMember',
+  },
+];
+
+export const workTypeOptions = [
+  { text: 'Actor', value: 1 },
+  { text: 'Actor-Musician', value: 2 },
+  { text: 'Assistant Stage Manager (ASM)', value: 3 },
+  { text: 'Chaperone', value: 4 },
+  { text: 'Choreographer', value: 5 },
+  { text: 'Company Manager (CM)', value: 6 },
+  { text: 'Conductor', value: 7 },
+  { text: 'Costume Designer', value: 8 },
+  { text: 'Dancer', value: 9 },
+  { text: 'Deputy Stage Manager (DSM)', value: 10 },
+  { text: 'Director', value: 11 },
+  { text: 'Driver', value: 12 },
+  { text: 'Flyman', value: 13 },
+  { text: 'Lighting Designer (LD)', value: 14 },
+  { text: 'Magician', value: 15 },
+  { text: 'Make Up', value: 16 },
+  { text: 'Musician', value: 17 },
+  { text: 'Production Manager (PM)', value: 18 },
+  { text: 'Puppeteer', value: 19 },
+  { text: 'Set Designer', value: 20 },
+  { text: 'Singer', value: 21 },
+  { text: 'Sound Designer', value: 22 },
+  { text: 'Sound Engineer', value: 23 },
+  { text: 'Stage Crew', value: 24 },
+  { text: 'Stage Manager (SM)', value: 25 },
+  { text: 'Technical Manager (TM)', value: 26 },
+  { text: 'Technical Stage Manager (TSM)', value: 27 },
+  { text: 'Technician – general', value: 28 },
+  { text: 'Technician – LX bias', value: 29 },
+  { text: 'Technician – Sound bias', value: 30 },
+  { text: 'Technician – Video bias', value: 31 },
+  { text: 'Video Designer', value: 32 },
+  { text: 'Wardrobe', value: 33 },
+  { text: 'Wigs', value: 34 },
+  { text: 'Writer', value: 35 },
+];

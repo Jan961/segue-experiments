@@ -512,7 +512,7 @@ export const EditDealMemoContractModal = ({
             />
             <div className=" text-primary-input-text font-bold ml-8 mr-4">Notes</div>
 
-            <TextInput testId="runningNote" className="w-[51vw]" value={productionJumpState.RunningTimeNote} disabled />
+            <TextInput testId="runningNote" className="w-[51vw]" value={productionJumpState.RunningTimeNote} />
           </div>
         </div>
         <div className="flex mt-4">
@@ -637,9 +637,9 @@ export const EditDealMemoContractModal = ({
               testId="dealText"
               className="w-[100px]"
               value={formData.DeMoROTTPercentage}
-              type="number"
+              // type="number"
               onChange={(value) =>
-                editDemoModalData('DeMoROTTPercentage', filterPercentage(parseFloat(value.target.value)), 'dealMemo')
+                editDemoModalData('DeMoROTTPercentage', parseFloat(value.target.value).toFixed(2), 'dealMemo')
               }
             />{' '}
             <div className=" text-primary-input-text font-bold ml-2">%</div>
