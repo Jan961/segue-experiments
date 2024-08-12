@@ -66,24 +66,28 @@ export const uploadFile = async (
   }
 };
 
-export const headlessUpload = async (file: FormData, progress: number, slowProgressInterval) => {
+export const headlessUpload = async (file: FormData, progress: number, slowProgressInterval, showToasts: boolean) => {
   if (isNullOrEmpty(file.get('file'))) {
     const response = await axios.post('/api/upload', file, {
       onUploadProgress: (progressEvent) => onUploadProgress(progressEvent, file, progress, slowProgressInterval, null),
     });
-    notify.success(ToastMessages.fileUploadSuccess);
+    if (showToasts) notify.success(ToastMessages.fileUploadSuccess);
     return response;
   } else {
     return null;
   }
 };
 
-export const headlessUploadMultiple = async (fileList: FormData[], callback: (response: any) => Promise<void>) => {
+export const headlessUploadMultiple = async (
+  fileList: FormData[],
+  callback: (response: any) => Promise<void>,
+  showToasts = true,
+) => {
   let progress = 0; // to track overall progress
   let slowProgressInterval; // interval for slow progress simulation
   await Promise.all(
     fileList.map(async (file) => {
-      const response = await headlessUpload(file, progress, slowProgressInterval);
+      const response = await headlessUpload(file, progress, slowProgressInterval, showToasts);
       progress = 100;
       clearInterval(slowProgressInterval);
       await callback(response);
