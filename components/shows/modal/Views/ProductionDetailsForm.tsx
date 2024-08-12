@@ -12,7 +12,7 @@ import { UploadedFile } from 'components/core-ui-lib/UploadModal/interface';
 import { CustomOption } from 'components/core-ui-lib/Table/renderers/SelectCellRenderer';
 import { useRecoilValue } from 'recoil';
 import { currencyListState } from 'state/productions/currencyState';
-import { transformToOptions } from 'utils';
+import { isNullOrEmpty, transformToOptions } from 'utils';
 import { productionCompanyState } from 'state/productions/productionCompanyState';
 import { ConversionRateDTO, DateBlockDTO } from 'interfaces';
 import { productionFormSchema } from './schema';
@@ -187,25 +187,31 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
               )}
             </div>
           </div>
-          <div className="flex-col">
+          <div className="flex flex-col">
             <div className="flex items-center gap-2">
-              <Label required text="Prod Code" />
-              <TextInput
-                id="prodcode"
-                className="w-[100px] placeholder-primary"
-                type="string"
-                onChange={(e) => onChange('prodCode', e.target.value)}
-                value={prodCode}
-                error={validationErrors?.prodCode}
-                maxlength={10}
-                required
-                disabled={production.isArchived}
-              />
+              <Label className={isNullOrEmpty(validationErrors.prodCode) ? '' : 'h-11'} required text="Prod Code" />
+              <div className="flex flex-col">
+                <TextInput
+                  id="prodcode"
+                  className="w-[100px] placeholder-primary"
+                  type="string"
+                  onChange={(e) => onChange('prodCode', e.target.value)}
+                  value={prodCode}
+                  error={validationErrors?.prodCode}
+                  maxlength={10}
+                  required
+                  disabled={production.isArchived}
+                />
+                {validationErrors.prodCode && <small className="text-red-400">{validationErrors.prodCode}</small>}
+              </div>
               <Tooltip>
-                <Icon iconName="info-circle-solid" variant="2xl" />
+                <Icon
+                  className={isNullOrEmpty(validationErrors.prodCode) ? '' : '-mt-4'}
+                  iconName="info-circle-solid"
+                  variant="2xl"
+                />
               </Tooltip>
             </div>
-            {validationErrors.prodCode && <small className="text-red-400 ml-[74px]">{validationErrors.prodCode}</small>}
           </div>
         </div>
         {isUploadOpen && (
@@ -222,8 +228,8 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
           />
         )}
 
-        <div className="flex items-center gap-[93px] col-span-3 row-start-3">
-          <Label text="Rehearsals" />
+        <div className="flex items-center col-span-3 row-start-3">
+          <Label className="w-40" text="Rehearsals" />
           <DateRange
             className="w-fit"
             label="Date"
@@ -240,74 +246,82 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
           />
         </div>
         <div className="flex-col">
-          <div className="flex items-center gap-12 col-span-3 row-start-3">
-            <Label required text="Production Dates" />
-            <DateRange
-              className="w-fit"
-              label="Date"
-              onChange={({ from, to }) => {
-                const StartDate = from?.toISOString() || '';
-                const EndDate = !productionDateBlock?.EndDate && !to ? from?.toISOString() : to?.toISOString() || '';
-                onChange('productionDateBlock', { ...productionDateBlock, StartDate, EndDate });
-              }}
-              value={{
-                from: productionDateBlock?.StartDate ? new Date(productionDateBlock?.StartDate) : null,
-                to: productionDateBlock?.EndDate ? new Date(productionDateBlock?.EndDate) : null,
-              }}
-              disabled={production.isArchived}
-            />
+          <div className="flex items-center col-span-3 row-start-3">
+            <Label className="w-40" required text="Production Dates" />
+            <div className="flex flex-col">
+              <DateRange
+                className="w-fit"
+                label="Date"
+                onChange={({ from, to }) => {
+                  const StartDate = from?.toISOString() || '';
+                  const EndDate = !productionDateBlock?.EndDate && !to ? from?.toISOString() : to?.toISOString() || '';
+                  onChange('productionDateBlock', { ...productionDateBlock, StartDate, EndDate });
+                }}
+                value={{
+                  from: productionDateBlock?.StartDate ? new Date(productionDateBlock?.StartDate) : null,
+                  to: productionDateBlock?.EndDate ? new Date(productionDateBlock?.EndDate) : null,
+                }}
+                disabled={production.isArchived}
+              />
+              {validationErrors.productionDateBlock && (
+                <small className="text-red-400">{validationErrors.productionDateBlock}</small>
+              )}
+            </div>
           </div>
-          {validationErrors.productionDateBlock && (
-            <small className="text-red-400 ml-[154px]">{validationErrors.productionDateBlock}</small>
-          )}
         </div>
         <div className="flex-col">
-          <div className="flex items-center gap-[107px]">
-            <Label required text="Region" />
-            <Select
-              className="flex-1"
-              placeholder="Select Region(s)"
-              onChange={(value) => onChange('region', value as string)}
-              options={REGIONS_LIST}
-              value={region}
-              isMulti={true}
-              renderOption={(option) => <CustomOption option={option} isMulti={true} />}
-              disabled={production.isArchived}
-            />
+          <div className="flex items-center">
+            <Label className="w-40" required text="Region" />
+            <div className="flex flex-col">
+              <Select
+                className="flex-1 w-[360px]"
+                placeholder="Select Region(s)"
+                onChange={(value) => onChange('region', value as string)}
+                options={REGIONS_LIST}
+                value={region}
+                isMulti={true}
+                renderOption={(option) => <CustomOption option={option} isMulti={true} />}
+                disabled={production.isArchived}
+              />
+              {validationErrors.region && <small className="text-red-400">{validationErrors.region}</small>}
+            </div>
           </div>
-          {validationErrors.region && <small className="text-red-400 ml-[154px]">{validationErrors.region}</small>}
         </div>
         <div className="flex-col">
-          <div className="flex items-center gap-7">
-            <Label required text="Currency for Reports" />
-            <Select
-              className="flex-1"
-              placeholder="Select Currency for Reports"
-              onChange={(value) => onChange('currency', value as string)}
-              options={currencyListOptions}
-              value={currency}
-              isSearchable
-              disabled={production.isArchived}
-            />
+          <div className="flex items-center">
+            <Label className="w-40" required text="Currency for Reports" />
+            <div className="flex flex-col">
+              <Select
+                className="flex-1 w-[360px]"
+                placeholder="Select Currency for Reports"
+                onChange={(value) => onChange('currency', value as string)}
+                options={currencyListOptions}
+                value={currency}
+                isSearchable
+                disabled={production.isArchived}
+              />
+              {validationErrors.currency && <small className="text-red-400">{validationErrors.currency}</small>}
+            </div>
           </div>
-          {validationErrors.currency && <small className="text-red-400 ml-[154px]">{validationErrors.currency}</small>}
         </div>
         <div className="flex-col">
-          <div className="flex items-center gap-[92px]">
-            <Label required text="Company" />
-            <Select
-              className="flex-1"
-              placeholder="Select Production Company"
-              onChange={(value) => onChange('company', value as string)}
-              options={productionCompanyOptions}
-              value={company}
-              disabled={production.isArchived}
-            />
+          <div className="flex items-center">
+            <Label className="w-40" required text="Company" />
+            <div className="flex flex-col">
+              <Select
+                className="flex-1 w-[360px]"
+                placeholder="Select Production Company"
+                onChange={(value) => onChange('company', value as string)}
+                options={productionCompanyOptions}
+                value={company}
+                disabled={production.isArchived}
+              />
+              {validationErrors.company && <small className="text-red-400">{validationErrors.company}</small>}
+            </div>
           </div>
-          {validationErrors.company && <small className="text-red-400 ml-[154px]">{validationErrors.company}</small>}
         </div>
-        <div className="flex items-center gap-6">
-          <Label text="Email Address for Sales Figures" />
+        <div className="flex items-center">
+          <Label className="w-60" text="Email Address for Sales Figures" />
           <TextInput
             id="email"
             className="w-[320px] placeholder-primary"
@@ -318,8 +332,8 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
             disabled={production.isArchived}
           />
         </div>
-        <div className="flex items-center gap-4">
-          <Label text="Input Frequency of Sales Figures" />
+        <div className="flex items-center">
+          <Label className="w-[200px]" text="Input Frequency of Sales Figures" />
           <Select
             placeholder="Select Frequency of Sales"
             className="w-[150px]"
@@ -329,8 +343,8 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
             disabled={production.isArchived}
           />
         </div>
-        <div className="flex items-center gap-[45px]">
-          <Label text="Running Time (inc Intervals)" />
+        <div className="flex items-center">
+          <Label className="w-[200px]" text="Running Time (inc Intervals)" />
           <TimeInput
             className="w-28 placeholder-primary"
             onChange={({ hrs, min }) => onChange('runningTime', `${hrs || ''}:${min || ''}`)}
@@ -338,8 +352,8 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
             disabled={production.isArchived}
           />
         </div>
-        <div className="flex items-center gap-[85px]">
-          <Label text="Running Time Notes" />
+        <div className="flex items-center">
+          <Label className="w-60" text="Running Time Notes" />
           <TextInput
             id="runningTimeNote"
             className="w-[320px] placeholder-primary"
