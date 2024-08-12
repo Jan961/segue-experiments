@@ -141,7 +141,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
         data = { ...data, schools: currSalesFigureSet.schools };
       }
 
-      const response = await axios.post('/api/marketing/sales/process/entry/upsert', data);
+      const response = await axios.post('/api/marketing/sales/entry/v2/upsert', data);
 
       if (typeof response.data === 'object') {
         const setIdObj = response.data as { setId: number; transaction: string };
@@ -174,7 +174,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
         field,
       };
 
-      const checkFutureResponse = await axios.post('/api/marketing/sales/checkFuture/read', futureaCheckData);
+      const checkFutureResponse = await axios.post('/api/marketing/sales/check-future/read', futureaCheckData);
       const futureData = checkFutureResponse.data;
 
       const inputData = {
@@ -187,7 +187,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
         bookingId: bookings.selected,
       };
 
-      const response = await axios.post('/api/marketing/sales/process/entry/compHold/upsert', inputData);
+      const response = await axios.post('/api/marketing/sales/entry/comp-hold/upsert', inputData);
 
       if (typeof response.data === 'object') {
         const setIdObj = response.data as { setId: number };
@@ -235,7 +235,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
 
   const batchUpdate = async () => {
     try {
-      await axios.post('/api/marketing/sales/process/entry/batchUpdate/update', batchUpdateData);
+      await axios.post('/api/marketing/sales/entry/batch-update/update', batchUpdateData);
       setShowWarning(false);
     } catch (error) {
       console.log(error);
@@ -367,7 +367,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
 
       if (!previous) {
         // holds and comps - only run if not retrieving previous values - previous is only valid for the main sales
-        const response = await axios.post('/api/marketing/sales/read/holdComp', {
+        const response = await axios.post('/api/marketing/sales/read/hold-comp', {
           bookingId: bookings.selected,
           salesDate,
           productionId,

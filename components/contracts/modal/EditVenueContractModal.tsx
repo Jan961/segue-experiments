@@ -96,7 +96,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
     const demoModalData = await axios.get<DealMemoContractFormData>(
       `/api/dealMemo/getDealMemo/${selectedTableCell.contract.Id ? selectedTableCell.contract.Id : 1}`,
     );
-    const getHoldType = await axios.get<DealMemoHoldType>(`/api/dealMemo/getHoldType/${selectedTableCell.contract.Id}`);
+    const getHoldType = await axios.get<DealMemoHoldType>('/api/dealMemo/hold-type/read');
     setDealHoldType(getHoldType.data as DealMemoHoldType);
     if (demoModalData.data && demoModalData.data.DeMoBookingId) {
       setDemoModalData(demoModalData.data as unknown as DealMemoContractFormData);
