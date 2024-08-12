@@ -1,6 +1,6 @@
+import { useEffect, useRef, useCallback, useMemo, useState } from 'react';
 import PopupModal from 'components/core-ui-lib/PopupModal';
 import Select from 'components/core-ui-lib/Select';
-import { useCallback, useMemo, useState } from 'react';
 import Button from 'components/core-ui-lib/Button';
 import Label from 'components/core-ui-lib/Label';
 import Checkbox from 'components/core-ui-lib/Checkbox';
@@ -63,6 +63,7 @@ export const defaultProductionFormData: ProductionFormData = {
   runningTime: null,
   runningTimeNote: '',
 };
+
 const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: ProductionsViewModalProps) => {
   const currencyList = useRecoilValue(currencyListState);
   const productionCompanyList = useRecoilValue(productionCompanyState);
@@ -77,6 +78,16 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
     () => transformToOptions(productionCompanyList, 'name', 'id'),
     [productionCompanyList],
   );
+
+  // Create a ref for the prodCode input
+  const prodCodeRef = useRef(null);
+
+  useEffect(() => {
+    if (prodCodeRef.current) {
+      prodCodeRef.current.select?.();
+    }
+  }, [prodCodeRef.current]);
+
   const {
     id,
     currency,
