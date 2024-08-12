@@ -20,7 +20,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     } else {
       const currencyConversion = await prisma.conversionRate.findFirst({
         where: {
-          ProductionId: productionId,
+          ProductionId: parseInt(productionId.toString()),
           FromCurrencyCode: productionSymbol,
           ToCurrencyCode: bookingSymbol,
         },
