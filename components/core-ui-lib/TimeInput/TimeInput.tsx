@@ -12,12 +12,14 @@ export type Time = {
 export interface TimeInputProps {
   onChange: (e: any) => void;
   onBlur?: (e: any) => void;
+  onInput?: (e: any) => void;
   label?: string;
   value: string | Time;
   name?: string; // Also ID
   disabled?: boolean;
   className?: string;
   tabIndexShow?: boolean;
+  index?: number;
 }
 
 const baseClass =
@@ -27,7 +29,7 @@ const DEFAULT_TIME = { hrs: '', min: '', sec: '' };
 const isOfTypTime = (t: any): t is Time => t.hrs !== undefined && t.min !== undefined;
 
 const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
-  ({ onChange, value, onBlur, disabled, className, tabIndexShow }: TimeInputProps, ref) => {
+  ({ onChange, value, onBlur, disabled, className, tabIndexShow, index, onInput }: TimeInputProps, ref) => {
     const [time, setTime] = useState<Time>(DEFAULT_TIME);
     const [isFocused, setIsFocused] = useState(false);
     const disabledClass = disabled ? `!bg-disabled-input !cursor-not-allowed !pointer-events-none` : '';
@@ -36,6 +38,7 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
 
     const handleInputChange = (e) => {
       const { name, value } = e.target;
+
       const v = value.replace(/^\D/, '');
       if (v.length < 3) {
         if (name === 'hrs' && (v === '' || parseInt(value) < 24)) {
@@ -101,7 +104,6 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
         setTime(DEFAULT_TIME);
       }
     }, [value]);
-
     return disabled ? (
       <Label text={`${time.hrs} : ${time.min}`} className={`${baseClass} ${disabledClass}`} />
     ) : (
@@ -110,10 +112,11 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
         onFocus={handleFocus}
         onBlur={handleBlur}
         className={classNames(baseClass, className)}
-        tabIndex={-1} // Make the div focusable
+        //  tabIndex={-1} // Make the div focusable
       >
         <input
           data-testid="hourInput"
+          data-index={index}
           ref={hrsRef}
           name="hrs"
           value={time.hrs}
@@ -125,6 +128,7 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
           onFocus={(e) => e.target.select()}
           disabled={disabled}
           tabIndex={tabIndexShow ? 0 : 1}
+          onInput={onInput}
         />
         <span className="">:</span>
         <input
@@ -140,6 +144,8 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
           disabled={disabled}
           tabIndex={tabIndexShow ? 0 : 2}
           onKeyDown={handleMinKeyDown}
+          data-index={index}
+          onInput={onInput}
         />
       </div>
     );
