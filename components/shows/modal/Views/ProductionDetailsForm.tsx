@@ -84,7 +84,7 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
 
   useEffect(() => {
     if (prodCodeRef.current) {
-      prodCodeRef.current.select?.();
+      prodCodeRef.current?.select?.();
     }
   }, [prodCodeRef]);
 
