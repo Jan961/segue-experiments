@@ -11,6 +11,7 @@ import { rowsSelector } from 'state/booking/selectors/rowsSelector';
 import Form from './Form';
 import { formatMinutes } from 'utils/booking';
 import BarringCheck from './BarringCheck';
+import { isNull } from 'utils';
 
 type GapSuggestProps = {
   startDate: string;
@@ -32,7 +33,6 @@ const GapSuggest = ({ startDate, endDate, productionId, onOkClick = () => null }
   const bookingDict = useRecoilValue(bookingState);
   const { rows: bookings } = useRecoilValue(rowsSelector);
   const [rows, setRows] = useState(null);
-  const [rowsReturned, setRowsReturned] = useState<boolean>(false);
   const [selectedVenueIds, setSelectedVenueIds] = useState<number[]>([]);
   const [barringCheckContext, setBarringCheckContext] = useState<number | null>(null);
   const tableRef = useRef(null);
@@ -75,12 +75,10 @@ const GapSuggest = ({ startDate, endDate, productionId, onOkClick = () => null }
         setSelectedVenueIds([]);
         setRows(response.data?.VenueInfo);
         onSuccess(response.data);
-        setRowsReturned(true);
       }
     } catch (error) {
       onError(error);
       setRows([]);
-      setRowsReturned(true);
     }
   };
 
@@ -128,7 +126,7 @@ const GapSuggest = ({ startDate, endDate, productionId, onOkClick = () => null }
       <div className="flex flex-col">
         <Form onSave={getSuggestions} />
       </div>
-      {rows?.length > 0 && (
+      {rows?.length > 0 ? (
         <div>
           <div className="block">
             <div className="text-md my-2">Check the box of venues you wish to remove from this list.</div>
@@ -163,11 +161,12 @@ const GapSuggest = ({ startDate, endDate, productionId, onOkClick = () => null }
             />
           </div>
         </div>
-      )}
-      {rows?.length === 0 && rowsReturned && (
-        <div className="absolute left-[50%] bottom-5 -translate-x-1/2 text-primary-red">
-          No venues to suggest. Please widen Search Criteria.
-        </div>
+      ) : (
+        !isNull(rows) && (
+          <div className="absolute left-1/2 bottom-5 -translate-x-1/2 text-primary-red">
+            No venues to suggest. Please widen Search Criteria.
+          </div>
+        )
       )}
       {barringCheckContext && (
         <BarringCheck
