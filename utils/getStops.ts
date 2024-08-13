@@ -9,9 +9,6 @@ export const getStops = (bookingDict: BookingState, performanceDict: Performance
   const bookings = Object.values(bookingDict);
   const bookingsByProduction = group(bookings, (booking) => booking.ProductionId);
 
-  console.log('Printing Bookings:');
-  console.log(bookingsByProduction);
-
   return Object.keys(bookingsByProduction).reduce((map, productionId) => {
     const grouped = bookingsByProduction[productionId]?.reduce(
       (acc, { VenueId, Date: BookingDate, PerformanceIds, StatusCode }) => {
