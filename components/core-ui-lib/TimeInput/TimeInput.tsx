@@ -56,13 +56,11 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
     const handleChange = (e) => {
       onChange(e);
       const { name, value } = e.target;
-
       setTime((prev) => ({ ...prev, [name]: value }));
     };
 
     const handleInputChange = (e) => {
       const { name, value } = onInput(e);
-      console.log(value);
       setTime((prev) => ({ ...prev, [name]: value }));
     };
 
