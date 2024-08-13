@@ -146,6 +146,7 @@ const Final = () => {
           seatsSold: parseInt(genSeatsSold),
           seatsSoldVal: parseFloat(genSeatsSoldVal),
         },
+        SetId: setId,
       };
 
       const finalEntryCreate = await axios.post(
@@ -368,7 +369,7 @@ const Final = () => {
                               className="w-[137px] h-[31px] flex flex-col -mt-1"
                               placeholder="Enter Seats"
                               id="genSeatsSold"
-                              value={genSeatsSold}
+                              value={genSeatsSold === '0' ? '' : genSeatsSold}
                               onChange={(event) => setNumericVal(setGenSeatsSold, event.target.value)}
                             />
                           </div>
@@ -384,7 +385,7 @@ const Final = () => {
                               className="w-[137px] h-[31px] flex flex-col -mt-1"
                               placeholder="Enter Value"
                               id="genSeatsSoldVal"
-                              value={genSeatsSoldVal}
+                              value={genSeatsSoldVal === '0' ? '' : genSeatsSoldVal}
                               onChange={(event) => setNumericVal(setGenSeatsSoldVal, event.target.value)}
                             />
                           </div>
@@ -413,7 +414,7 @@ const Final = () => {
                                   className="w-[137px] h-[31px] flex flex-col -mt-1"
                                   placeholder="Enter Seats"
                                   id="schSeatsSold"
-                                  value={schSeatsSold}
+                                  value={schSeatsSold === '0' ? '' : schSeatsSold}
                                   onChange={(event) => setNumericVal(setSchSeatsSold, event.target.value)}
                                 />
                               </div>
@@ -429,7 +430,7 @@ const Final = () => {
                                   className="w-[137px] h-[31px] flex flex-col -mt-1"
                                   placeholder="Enter Value"
                                   id="schSeatsSoldVal"
-                                  value={schSeatsSoldVal}
+                                  value={schSeatsSoldVal === '0' ? '' : schSeatsSoldVal}
                                   onChange={(event) => setNumericVal(setSchSeatsSoldVal, event.target.value)}
                                 />
                               </div>
