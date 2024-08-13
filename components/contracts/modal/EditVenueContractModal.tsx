@@ -435,6 +435,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                     <div className=" text-primary-input-text font-bold text-sm">Date Issued</div>
                     <DateInput
                       onChange={(value) =>
+                        value &&
                         dealMemoFormData.DateIssued?.toString() !== toISO(value) &&
                         editDealMemoData('DateIssued', value)
                       }
@@ -446,6 +447,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                     <div className=" text-primary-input-text font-bold text-sm">Date Returned</div>
                     <DateInput
                       onChange={(value) =>
+                        value &&
                         dealMemoFormData.DateReturned?.toString() !== toISO(value) &&
                         editDealMemoData('DateReturned', value)
                       }
@@ -547,7 +549,8 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                   <div className=" text-primary-input-text font-bold text-sm mr-2">Signed On</div>
                   <DateInput
                     onChange={(value) => {
-                      formData.SignedDate.toString() !== toISO(value) &&
+                      value &&
+                        formData.SignedDate?.toString() !== toISO(value) &&
                         editContractModalData('SignedDate', value, 'contract');
                     }}
                     position="!-left-24"
@@ -563,7 +566,8 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
               <div className="w-4/5 flex justify-between">
                 <DateInput
                   onChange={(value) => {
-                    formData.ReturnDate.toString() !== toISO(value) &&
+                    value &&
+                      formData.ReturnDate?.toString() !== toISO(value) &&
                       editContractModalData('ReturnDate', value, 'contract');
                   }}
                   value={formData.ReturnDate}
@@ -573,7 +577,8 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
 
                   <DateInput
                     onChange={(value) => {
-                      formData.ReceivedBackDate.toString() !== toISO(value) &&
+                      value &&
+                        formData.ReceivedBackDate?.toString() !== toISO(value) &&
                         editContractModalData('ReceivedBackDate', value, 'contract');
                     }}
                     value={formData.ReceivedBackDate}
