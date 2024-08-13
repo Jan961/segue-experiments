@@ -86,7 +86,7 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
     if (prodCodeRef.current) {
       prodCodeRef.current.select?.();
     }
-  }, [prodCodeRef.current]);
+  }, [prodCodeRef]);
 
   const {
     id,
@@ -212,6 +212,7 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
                   maxlength={10}
                   required
                   disabled={production.isArchived}
+                  ref={prodCodeRef}
                 />
                 {validationErrors.prodCode && <small className="text-red-400">{validationErrors.prodCode}</small>}
               </div>
