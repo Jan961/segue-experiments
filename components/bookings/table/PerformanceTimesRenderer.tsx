@@ -49,7 +49,10 @@ const PerformanceTimesRenderer = ({ data, setValue, eGridCell }: CustomCellRende
         const filteredValue = value.replace(/^\D/, '');
         const valLen = filteredValue.length;
         if (valLen < 3) {
-          if ((name === 'hrs' && parseInt(filteredValue) < 24) || (name === 'min' && parseInt(filteredValue) < 60)) {
+          if (
+            (name === 'hrs' && (parseInt(filteredValue) < 24 || valLen === 0)) ||
+            (name === 'min' && (parseInt(filteredValue) < 60 || valLen === 0))
+          ) {
             newTime[name] = filteredValue;
             prevTimes[arrIndex] = newTime;
           }
@@ -62,8 +65,9 @@ const PerformanceTimesRenderer = ({ data, setValue, eGridCell }: CustomCellRende
     }
   };
 
-  const handleTimeChange = () => {
-    console.log('TIME CHANGE');
+  const handleBlur = () => {
+    console.log('BLURRR');
+
     setPerformanceTimes((prevTimes) => {
       prevTimes.map(({ hrs, min }) => {
         const paddedHrs = hrs.length > 0 ? `${'0'.repeat(2 - hrs.length)}${hrs}` : hrs;
@@ -82,6 +86,25 @@ const PerformanceTimesRenderer = ({ data, setValue, eGridCell }: CustomCellRende
         .join(';'),
     );
   };
+
+  const handleTimeChange = () => {
+    console.log('TIME CHANGE');
+    setPerformanceTimes((prevTimes) => {
+      prevTimes.map(({ hrs, min }) => {
+        const paddedHrs = hrs.length > 0 ? `${'0'.repeat(2 - hrs.length)}${hrs}` : hrs;
+        const paddedMin = min.length > 0 ? `${'0'.repeat(2 - min.length)}${min}` : min;
+        return `${paddedHrs}:${paddedMin}`;
+      });
+      return prevTimes;
+    });
+    setValue(
+      performanceTimes
+        .map(({ hrs, min }) => {
+          return `${hrs}:${min}`;
+        })
+        .join(';'),
+    );
+  };
   return (
     <BaseCellRenderer eGridCell={eGridCell} onFocus={handleOnFocus}>
       {isDisabled ? (
@@ -94,10 +117,11 @@ const PerformanceTimesRenderer = ({ data, setValue, eGridCell }: CustomCellRende
                 key={index}
                 index={index}
                 ref={inputRef}
-                onChange={() => handleTimeChange()}
+                onChange={handleTimeChange}
                 value={time}
                 className="bg-white h-10"
                 onInput={handleInput}
+                onBlur={handleBlur}
               />
             ))}
         </div>

@@ -35,19 +35,6 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
     const hrsRef = useRef(null);
     const minsRef = useRef(null);
 
-    const handleInputChange = (e) => {
-      const { name, value } = e.target;
-
-      const v = value.replace(/^\D/, '');
-      if (v.length < 3) {
-        if (name === 'hrs' && (v === '' || parseInt(value) < 24)) {
-          setTime((prev) => ({ ...prev, [name]: v }));
-        } else if (name === 'min' && (v === '' || parseInt(value) < 60)) {
-          setTime((prev) => ({ ...prev, [name]: v }));
-        }
-      }
-    };
-
     const handleBlur = () => {
       if (isFocused) {
         onChange(time);
@@ -101,7 +88,7 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
           placeholder="hh"
           type="text"
           className="w-8 h-5/6 border-none focus:ring-0 text-center ring-0 p-0"
-          onChange={handleInputChange}
+          onChange={onChange}
           onBlur={onBlur}
           onFocus={(e) => e.target.select()}
           disabled={disabled}
@@ -116,7 +103,7 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
           value={time.min}
           placeholder="mm"
           className="w-8 h-5/6 border-none focus:ring-0 text-center ring-0 p-0"
-          onChange={handleInputChange}
+          onChange={onChange}
           onBlur={onBlur}
           onFocus={(e) => e.target.select()}
           disabled={disabled}
