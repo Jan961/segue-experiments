@@ -57,7 +57,6 @@ const PerformanceTimesRenderer = ({ data, setValue, eGridCell }: CustomCellRende
             prevTimes[arrIndex] = newTime;
           }
         }
-        console.log(prevTimes);
         return prevTimes;
       });
       return { name, value: filteredValue };
@@ -66,8 +65,6 @@ const PerformanceTimesRenderer = ({ data, setValue, eGridCell }: CustomCellRende
     }
   };
   const handleTimeChange = (e) => {
-    console.log(e);
-    console.log('TIME CHANGE');
     setPerformanceTimes((prevTimes) => {
       prevTimes.map(({ hrs, min }) => {
         if (hrs.length === 0) return ``;
@@ -88,8 +85,6 @@ const PerformanceTimesRenderer = ({ data, setValue, eGridCell }: CustomCellRende
     return e;
   };
   const handleBlur = () => {
-    console.log('BLURRR');
-
     setPerformanceTimes((prevTimes) => {
       prevTimes.map(({ hrs, min }) => {
         if (hrs.length === 0) return ``;
