@@ -1,7 +1,7 @@
 import { getTimeInMins } from 'components/bookings/panel/utils/AddNewBooking';
 import Button from 'components/core-ui-lib/Button';
 import Checkbox from 'components/core-ui-lib/Checkbox';
-import LoadingOverlay from 'components/shows/LoadingOverlay';
+import Loader from 'components/core-ui-lib/Loader';
 import TextInput from 'components/core-ui-lib/TextInput';
 import TimeInput from 'components/core-ui-lib/TimeInput';
 import { DEFAULT_GAP_SUGGEST_FORM_STATE } from 'config/AddBooking';
@@ -168,8 +168,9 @@ const Form = ({ onSave }: FormProps) => {
         className="float-right px-4 font-normal mt-2"
         variant="primary"
         text="Get Suggestions"
-       />
-      {loading && <LoadingOverlay />}
+      >
+        {loading && <Loader className="ml-2" iconProps={{ stroke: '#FFF' }} />}
+      </Button>
     </form>
   );
 };
