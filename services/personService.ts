@@ -1,3 +1,6 @@
+import { PersonMinimalDTO } from 'interfaces';
+import prisma from 'lib/prisma';
+import { Person } from 'prisma/generated/prisma-client';
 import { isUndefined } from 'utils';
 
 interface AddressDetails {
@@ -318,4 +321,21 @@ export const preparePersonQueryData = (
   }
 
   return personData;
+};
+
+export const fetchAllMinPersonsList = async (): Promise<PersonMinimalDTO[]> => {
+  const persons: Person[] = await prisma.Person.findMany({
+    select: {
+      PersonFirstName: true,
+      PersonLastName: true,
+      PersonEmail: true,
+    },
+  });
+  console.table(persons);
+  return persons.map((person) => ({
+    id: person.PersonId ?? null,
+    firstName: person.PersonFirstName ?? '',
+    lastName: person.PersonLastName ?? '',
+    email: person.PersonEmail ?? '',
+  }));
 };

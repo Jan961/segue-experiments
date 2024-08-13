@@ -1,27 +1,21 @@
 import { atom } from 'recoil';
 import { DealMemoContractFormData } from '../../interfaces/index';
-export type ContractsFilterState = {
+export type TContractsFilterState = {
   contractText?: string;
   status?: string;
   startDate?: Date;
   endDate?: Date;
-  scrollToDate?: string;
-  scheduleStartDate?: Date;
-  scheduleEndDate?: Date;
-  dealMemoStatusDropDown?: string;
-  contractStatusDropDown?: string;
+  department?: string;
+  person?: number;
 };
 
-export const intialContractsFilterState: ContractsFilterState = {
+export const intialContractsFilterState: TContractsFilterState = {
   contractText: '',
   status: 'all',
   startDate: null,
   endDate: null,
-  scrollToDate: '',
-  scheduleStartDate: null,
-  scheduleEndDate: null,
-  dealMemoStatusDropDown: 'all',
-  contractStatusDropDown: 'all',
+  department: 'all',
+  person: null,
 };
 
 export const contractsFilterState = atom({

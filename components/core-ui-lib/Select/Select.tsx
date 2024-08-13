@@ -15,7 +15,7 @@ import Label from '../Label';
 import classNames from 'classnames';
 import fuseFilter from 'utils/fuseFilter';
 
-export type SelectOption = { text: string; value: string | number; [key: string]: any };
+export type SelectOption = { text: string; value: string | number | boolean; [key: string]: any };
 
 interface CustMultiValueProps extends MultiValueProps {
   data: SelectOption;
@@ -28,7 +28,7 @@ type SelectVariant = 'transparent' | 'colored';
 
 export interface SelectProps extends WithTestId {
   value?: string | number | any[] | undefined | boolean;
-  onChange: (value: string | number | (string | number)[]) => void;
+  onChange: (value: string | number | boolean | (string | number)[]) => void;
   renderOption?: (option: OptionProps) => React.ReactElement;
   customStyles?: Partial<StylesConfig>;
   options: SelectOption[];

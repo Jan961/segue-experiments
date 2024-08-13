@@ -19,8 +19,8 @@ export const dealTypeOptions: SelectOption[] = [
 export const allStatusOptions: SelectOption[] = [{ text: 'All', value: 'all' }, ...statusOptions];
 
 export const booleanOptions = [
-  { text: 'YES', value: 1 },
-  { text: 'NO', value: 2 },
+  { text: 'YES', value: true },
+  { text: 'NO', value: false },
 ];
 
 export const callOptions = [
@@ -248,4 +248,37 @@ export const workTypeOptions = [
   { text: 'Wardrobe', value: 33 },
   { text: 'Wigs', value: 34 },
   { text: 'Writer', value: 35 },
+];
+
+export const paymentTypes = [
+  {
+    text: 'Weekly Payment',
+    value: 'weekly',
+  },
+  {
+    text: 'Total Fee',
+    value: 'once',
+  },
+];
+
+export const contractDepartmentOptions = [
+  {
+    text: 'Artiste',
+    value: 'artiste',
+  },
+  {
+    text: 'Creative',
+    value: 'creative',
+  },
+  {
+    text: 'SM / Tech / Crew',
+    value: 'sm-tech-crew',
+  },
+];
+
+export const contractTemplateOptions = [
+  {
+    text: 'Jendagi Template',
+    value: 1,
+  },
 ];

@@ -1,10 +1,11 @@
-import { Button } from 'components/core-ui-lib';
+import { Button, Label } from 'components/core-ui-lib';
 import PopupModal from 'components/core-ui-lib/PopupModal';
 
 import { ContractPersonDataForm } from '../ContractPersonDataForm';
 import { useState } from 'react';
 import { ContractPreviewDetailsForm } from '../ContractPreviewDetailsDataForm';
 import { noop } from 'utils';
+import ContractDetails from './ContractDetails';
 
 interface BuildNewContractProps {
   openNewPersonContract: boolean;
@@ -55,9 +56,14 @@ export const BuildNewContract = ({ openNewPersonContract, onClose }: BuildNewCon
           Contract Preview
         </div>
       </div>
-      <div className="border-solid border-2 border-primary-navy  rounded p-2">
+      <div className="border-solid border-2 border-primary-navy  rounded p-2 max-h-[70vh] overflow-scroll">
         {mainButtonSelection.name && <ContractPersonDataForm height="h-[70vh]" updateFormData={noop} />}
-        {mainButtonSelection.details && <ContractPersonDataForm height="h-[70vh]" updateFormData={noop} />}
+        {mainButtonSelection.details && (
+          <div className="flex flex-col gap-8 px-16">
+            <Label className="!text-base !font-bold" text="Complete the below to generate the contract" />
+            <ContractDetails onChange={noop} />
+          </div>
+        )}
         {mainButtonSelection.preview && <ContractPreviewDetailsForm height="h-[70vh]" />}
       </div>
 
