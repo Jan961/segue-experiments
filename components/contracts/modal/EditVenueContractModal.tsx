@@ -88,11 +88,6 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
   const [dealMemoCreated, setDealMemoCreated] = useState<boolean>(true);
   const [dealMemoButtonText, setDealMemoButtonText] = useState<string>('Deal Memo');
 
-  useEffect(() => {
-    console.log(dealMemoFormData.DateIssued);
-    console.log(dealMemoFormData.DateReturned);
-  }, [dealMemoFormData]);
-
   const producerList = useMemo(() => {
     const list = {};
     Object.values(users).forEach((listData) => {
@@ -302,7 +297,8 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
     if (
       Object.keys(saveBookingFormData).length > 0 ||
       Object.keys(saveContractFormData).length > 0 ||
-      Object.keys(saveDealMemoFormData).length > 0
+      Object.keys(saveDealMemoFormData).length > 0 ||
+      filesForUpload.length > 0
     ) {
       setConfirmationVariant('cancel');
       setShowConfirmationDialog(true);
@@ -439,7 +435,8 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                     <div className=" text-primary-input-text font-bold text-sm">Date Issued</div>
                     <DateInput
                       onChange={(value) =>
-                        dealMemoFormData.DateIssued.toString() !== toISO(value) && editDealMemoData('DateIssued', value)
+                        dealMemoFormData.DateIssued?.toString() !== toISO(value) &&
+                        editDealMemoData('DateIssued', value)
                       }
                       value={dealMemoFormData.DateIssued}
                     />
@@ -449,7 +446,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                     <div className=" text-primary-input-text font-bold text-sm">Date Returned</div>
                     <DateInput
                       onChange={(value) =>
-                        dealMemoFormData.DateReturned.toString() !== toISO(value) &&
+                        dealMemoFormData.DateReturned?.toString() !== toISO(value) &&
                         editDealMemoData('DateReturned', value)
                       }
                       value={dealMemoFormData.DateReturned}
@@ -480,7 +477,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                   rowData={contractAttatchmentRows}
                   styleProps={contractsStyleProps}
                   testId="tableVenueAttach"
-                  tableHeight={435}
+                  tableHeight={335}
                   onCellClicked={(e) => handleCellClicked(e)}
                 />
               </div>
@@ -550,7 +547,6 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                   <div className=" text-primary-input-text font-bold text-sm mr-2">Signed On</div>
                   <DateInput
                     onChange={(value) => {
-                      console.log(value);
                       formData.SignedDate.toString() !== toISO(value) &&
                         editContractModalData('SignedDate', value, 'contract');
                     }}
