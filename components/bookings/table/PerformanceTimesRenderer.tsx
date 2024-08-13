@@ -9,7 +9,6 @@ const PerformanceTimesRenderer = ({ data, setValue, eGridCell }: CustomCellRende
   const [performanceTimes, setPerformanceTimes] = useState<Time[]>([]);
   const [isDisabled, setIsDisabled] = useState(true);
   const inputRef = useRef(null);
-  console.log(data);
   const handleOnFocus = () => {
     if (document.activeElement !== inputRef.current) {
       inputRef && inputRef?.current?.focus();
@@ -20,7 +19,6 @@ const PerformanceTimesRenderer = ({ data, setValue, eGridCell }: CustomCellRende
     setIsDisabled(!data.perf);
 
     if (data.noPerf) {
-      console.log(data.times);
       const times = data.times?.split(';');
 
       const newTimes = Array(data.noPerf)
@@ -36,7 +34,6 @@ const PerformanceTimesRenderer = ({ data, setValue, eGridCell }: CustomCellRende
         });
 
       setPerformanceTimes(newTimes);
-      console.log(performanceTimes);
     } else {
       setValue('');
       setPerformanceTimes([]);
@@ -44,18 +41,20 @@ const PerformanceTimesRenderer = ({ data, setValue, eGridCell }: CustomCellRende
   }, [data.perf, data.noPerf, data.times, setPerformanceTimes]);
 
   const handleInput = (e) => {
-    console.log(e);
-    console.log('INPUTTTTTT');
     const { name, value, attributes } = e.target;
     try {
-      console.log('setting times');
       setPerformanceTimes((prevTimes) => {
         const arrIndex = parseInt(attributes['data-index'].value);
         const newTime = prevTimes[arrIndex];
-        newTime[name] = value;
-        prevTimes[arrIndex] = newTime;
-        console.log(prevTimes);
-        setValue(prevTimes.map(({ hrs, min }) => `${hrs}:${min}`).join(';'));
+        const filteredValue = value.replace(/^\D/, '');
+        const valLen = filteredValue.length;
+        if (valLen < 3) {
+          if ((name === 'hrs' && parseInt(filteredValue) < 24) || (name === 'min' && parseInt(filteredValue) < 60)) {
+            newTime[name] = filteredValue;
+            prevTimes[arrIndex] = newTime;
+          }
+        }
+
         return prevTimes;
       });
     } catch (exception) {
@@ -63,16 +62,26 @@ const PerformanceTimesRenderer = ({ data, setValue, eGridCell }: CustomCellRende
     }
   };
 
-  const handleTimeChange = (index: number, newTime: Time) => {
-    console.log('time change ');
-    console.log(newTime);
-    const updatedTimes = [...performanceTimes];
-    updatedTimes[index] = newTime;
-
-    setPerformanceTimes(updatedTimes);
-    setValue(updatedTimes.map(({ hrs, min }) => `${hrs}:${min}`).join(';'));
+  const handleTimeChange = () => {
+    console.log('TIME CHANGE');
+    setPerformanceTimes((prevTimes) => {
+      prevTimes.map(({ hrs, min }) => {
+        const paddedHrs = hrs.length > 0 ? `${'0'.repeat(2 - hrs.length)}${hrs}` : hrs;
+        const paddedMin = min.length > 0 ? `${'0'.repeat(2 - min.length)}${min}` : min;
+        return `${paddedHrs}:${paddedMin}`;
+      });
+      return prevTimes;
+    });
+    setValue(
+      performanceTimes
+        .map(({ hrs, min }) => {
+          const paddedHrs = hrs.length > 0 ? `${'0'.repeat(2 - hrs.length)}${hrs}` : hrs;
+          const paddedMin = min.length > 0 ? `${'0'.repeat(2 - min.length)}${min}` : min;
+          return `${paddedHrs}:${paddedMin}`;
+        })
+        .join(';'),
+    );
   };
-  console.log(performanceTimes);
   return (
     <BaseCellRenderer eGridCell={eGridCell} onFocus={handleOnFocus}>
       {isDisabled ? (
@@ -85,7 +94,7 @@ const PerformanceTimesRenderer = ({ data, setValue, eGridCell }: CustomCellRende
                 key={index}
                 index={index}
                 ref={inputRef}
-                onChange={(e) => handleTimeChange(index, e)}
+                onChange={() => handleTimeChange()}
                 value={time}
                 className="bg-white h-10"
                 onInput={handleInput}

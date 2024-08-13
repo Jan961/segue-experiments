@@ -1,7 +1,6 @@
 import { forwardRef, useEffect, useRef, useState } from 'react';
 import Label from '../Label';
 import classNames from 'classnames';
-import { isNullOrEmpty } from 'utils';
 
 export type Time = {
   hrs?: string;
@@ -45,27 +44,6 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
           setTime((prev) => ({ ...prev, [name]: v }));
         } else if (name === 'min' && (v === '' || parseInt(value) < 60)) {
           setTime((prev) => ({ ...prev, [name]: v }));
-        }
-      }
-    };
-
-    const handleInputBlur = (e) => {
-      if (!disabled) {
-        const { name } = e.target;
-        if (name === 'hrs') {
-          minsRef.current.select();
-        }
-        const currValue = time[name];
-
-        // if null, don't change
-        if (isNullOrEmpty(currValue)) {
-          setTime((prev) => ({ ...prev, [name]: '' }));
-        } else {
-          if (currValue.length === 1) {
-            setTime((prev) => ({ ...prev, [name]: `0${currValue}` }));
-          } else {
-            setTime((prev) => ({ ...prev, [name]: `${currValue}` }));
-          }
         }
       }
     };
@@ -124,7 +102,7 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
           type="text"
           className="w-8 h-5/6 border-none focus:ring-0 text-center ring-0 p-0"
           onChange={handleInputChange}
-          onBlur={handleInputBlur}
+          onBlur={onBlur}
           onFocus={(e) => e.target.select()}
           disabled={disabled}
           tabIndex={tabIndexShow ? 0 : 1}
@@ -139,7 +117,7 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
           placeholder="mm"
           className="w-8 h-5/6 border-none focus:ring-0 text-center ring-0 p-0"
           onChange={handleInputChange}
-          onBlur={handleInputBlur}
+          onBlur={onBlur}
           onFocus={(e) => e.target.select()}
           disabled={disabled}
           tabIndex={tabIndexShow ? 0 : 2}
