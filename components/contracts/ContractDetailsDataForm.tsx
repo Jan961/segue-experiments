@@ -2,6 +2,7 @@ import { Checkbox, DateInput, Select, TextInput } from 'components/core-ui-lib';
 import { AddNewPersonInput } from './AddNewPersonInputs';
 import { addNewPersonInputData, agencyDetailsData, emergecnyContactData, salaryDetailsData } from './utils';
 import { booleanOptions } from 'config/contracts';
+import { noop } from 'utils';
 
 interface ContractDetailsProps {
   height: string;
@@ -15,7 +16,7 @@ export const ContractDetailsDataForm = ({ height }: ContractDetailsProps) => {
         {addNewPersonInputData.map((newPersonData) => {
           return (
             <>
-              <AddNewPersonInput newPersonData={newPersonData} />
+              <AddNewPersonInput newPersonData={newPersonData} handleAddpersonData={noop} newPersonForm={undefined} />
             </>
           );
         })}
@@ -197,7 +198,7 @@ export const ContractDetailsDataForm = ({ height }: ContractDetailsProps) => {
         {emergecnyContactData.map((newPersonData) => {
           return (
             <>
-              <AddNewPersonInput newPersonData={newPersonData} />
+              <AddNewPersonInput newPersonData={newPersonData} handleAddpersonData={noop} newPersonForm={undefined} />
             </>
           );
         })}
@@ -207,7 +208,7 @@ export const ContractDetailsDataForm = ({ height }: ContractDetailsProps) => {
         {agencyDetailsData.map((newPersonData) => {
           return (
             <>
-              <AddNewPersonInput newPersonData={newPersonData} />
+              <AddNewPersonInput newPersonData={newPersonData} handleAddpersonData={noop} newPersonForm={undefined} />
             </>
           );
         })}
@@ -252,7 +253,7 @@ export const ContractDetailsDataForm = ({ height }: ContractDetailsProps) => {
         {salaryDetailsData.map((newPersonData) => {
           return (
             <>
-              <AddNewPersonInput newPersonData={newPersonData} />
+              <AddNewPersonInput newPersonData={newPersonData} handleAddpersonData={noop} newPersonForm={undefined} />
             </>
           );
         })}

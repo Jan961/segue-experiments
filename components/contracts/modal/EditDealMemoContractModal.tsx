@@ -36,8 +36,9 @@ import {
   filterPercentage,
   filterPrice,
   filterTechProvision,
- parseAndSortDates } from '../utils';
-import { DealMemoHold, DealMemoTechProvision } from '@prisma/client';
+  parseAndSortDates,
+} from '../utils';
+import { DealMemoHold, DealMemoTechProvision } from 'prisma/generated/prisma-client';
 import { dealMemoInitialState } from 'state/contracts/contractsFilterState';
 import {
   convertTimeToTodayDateFormat,
@@ -512,7 +513,7 @@ export const EditDealMemoContractModal = ({
             />
             <div className=" text-primary-input-text font-bold ml-8 mr-4">Notes</div>
 
-            <TextInput testId="runningNote" className="w-[51vw]" value={productionJumpState.RunningTimeNote} disabled />
+            <TextInput testId="runningNote" className="w-[51vw]" value={productionJumpState.RunningTimeNote} />
           </div>
         </div>
         <div className="flex mt-4">

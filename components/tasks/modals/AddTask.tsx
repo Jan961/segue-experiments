@@ -1,4 +1,4 @@
-import { MasterTask } from '@prisma/client';
+import { MasterTask } from 'prisma/generated/prisma-client';
 import axios from 'axios';
 import { ConfirmationDialog } from 'components/core-ui-lib';
 import Button from 'components/core-ui-lib/Button';

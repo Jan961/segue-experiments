@@ -22,7 +22,7 @@ import { objectify, all } from 'radash';
 import { getDayTypes } from 'services/dayTypeService';
 import { getProductionsWithContent } from 'services/productionService';
 import { getAllContractStatus } from 'services/contractStatus';
-import { DateType } from '@prisma/client';
+import { DateType } from 'prisma/generated/prisma-client';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const ContractsPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const rows = useContractsFilter();

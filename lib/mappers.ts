@@ -18,7 +18,7 @@ import {
   CountryInRegion,
   Region,
   GlobalBookingActivity,
-} from '@prisma/client';
+} from 'prisma/generated/prisma-client';
 import {
   ActivityDTO,
   BookingContactNoteDTO,

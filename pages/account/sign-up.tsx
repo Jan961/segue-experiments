@@ -56,6 +56,7 @@ const DEFAULT_ACCOUNT_DETAILS = {
   postcode: '',
   vatNumber: '',
   currency: 'GBP',
+  agreementChecked: false,
 };
 export type AccountDetails = typeof DEFAULT_ACCOUNT_DETAILS;
 const ACCOUNT_CREATION_FAILED_ERROR = 'Error creating new account';

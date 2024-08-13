@@ -128,7 +128,6 @@ const GlobalActivityView = () => {
         cost: data.Cost,
         notes: data.Notes,
         followUpDt: data.DueByDate,
-        venueIds: data.VenueIds,
       };
 
       const rowIndex = rowData.findIndex((act) => act.id === data.Id);
@@ -157,7 +156,6 @@ const GlobalActivityView = () => {
           Notes: data.notes,
           ProductionId: productionId,
           DueByDate: data.followUpCheck ? data.followUpDt : null,
-          VenueIds: data.venueIds,
           Id: data.id,
         };
 
@@ -189,12 +187,11 @@ const GlobalActivityView = () => {
           return {
             actName: activity.Name,
             actType: globalActivities.activityTypes.find((type) => type.value === activity.ActivityTypeId).text,
-            actDate: activity.Date,
+            actDate: startOfDay(new Date(activity.Date)),
             followUpCheck: activity.FollowUpRequired,
             cost: activity.Cost,
             notes: activity.Notes,
             followUpDt: activity.DueByDate,
-            venueIds: activity.VenueIds,
             id: activity.Id,
           };
         });

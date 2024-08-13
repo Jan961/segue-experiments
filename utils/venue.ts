@@ -1,4 +1,4 @@
-import { Venue, VenueAddress, VenueBarredVenue, VenueContact, VenueRole } from '@prisma/client';
+import { Venue, VenueAddress, VenueBarredVenue, VenueContact, VenueRole } from 'prisma/generated/prisma-client';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import fileInterface from './fileInterface';
 

@@ -1,4 +1,4 @@
-import { DealMemoHold, DealMemoPrice, DealMemoTechProvision, Region } from '@prisma/client';
+import { DealMemoHold, DealMemoPrice, DealMemoTechProvision, Region } from 'prisma/generated/prisma-client';
 
 export type StatusCode = 'C' | 'U' | 'X';
 

@@ -5,12 +5,20 @@ interface AddPersonDataProps {
   first?: string;
   second?: string;
   type?: string;
+  dataFieldFirst?: string;
+  dataFieldSecond?: string;
 }
 interface NewPersonDataProps {
   newPersonData: AddPersonDataProps;
+  handleAddpersonData: (x, y) => void;
+  newPersonForm: any;
 }
 
-export const AddNewPersonInput = ({ newPersonData }: NewPersonDataProps) => {
+export const AddNewPersonInput = ({ newPersonData, handleAddpersonData, newPersonForm }: NewPersonDataProps) => {
+  const handleAddNewPersonForm = (key: string, value) => {
+    handleAddpersonData(key, value);
+  };
+
   return (
     <div className="flex mt-2 items-center">
       {newPersonData.first && (
@@ -20,11 +28,10 @@ export const AddNewPersonInput = ({ newPersonData }: NewPersonDataProps) => {
             {newPersonData.type === 'textInput' && (
               <TextInput
                 className=" text-primary-input-text font-bold w-full"
-                disabled
-                // value={contactsData.phone}
-                // placeholder={
-                //   contactsData.phone ? 'Add details to the Contact Database' : 'Please select from the dropdown above'
-                // }
+                onChange={(value) => {
+                  handleAddNewPersonForm(newPersonData.dataFieldFirst, value.target.value);
+                }}
+                value={newPersonForm ? newPersonForm[newPersonData.dataFieldFirst] : ''}
               />
             )}
             {newPersonData.type === 'select' && (
@@ -37,7 +44,6 @@ export const AddNewPersonInput = ({ newPersonData }: NewPersonDataProps) => {
                 options={booleanOptions}
                 isClearable
                 isSearchable
-                //   value={formData.AdvancePaymentRequired}
               />
             )}
           </div>
@@ -51,11 +57,10 @@ export const AddNewPersonInput = ({ newPersonData }: NewPersonDataProps) => {
             {newPersonData.type === 'textInput' && (
               <TextInput
                 className=" text-primary-input-text font-bold w-full"
-                disabled
-                // value={contactsData.phone}
-                // placeholder={
-                //   contactsData.phone ? 'Add details to the Contact Database' : 'Please select from the dropdown above'
-                // }
+                onChange={(value) => {
+                  handleAddNewPersonForm(newPersonData.dataFieldSecond, value.target.value);
+                }}
+                value={newPersonForm ? newPersonForm[newPersonData.dataFieldSecond] : ''}
               />
             )}
 
@@ -69,7 +74,6 @@ export const AddNewPersonInput = ({ newPersonData }: NewPersonDataProps) => {
                 options={booleanOptions}
                 isClearable
                 isSearchable
-                //   value={formData.AdvancePaymentRequired}
               />
             )}
           </div>

@@ -138,11 +138,41 @@ export const seatKillsData = [
 ];
 
 export const addNewPersonInputData = [
-  { first: 'First Name', second: 'Email Address', type: 'textInput' },
-  { first: 'Last Name', second: 'Landline Number', type: 'textInput' },
-  { first: 'Address', second: 'Mobile Number', type: 'textInput' },
-  { first: ' ', second: 'Full Name as it appears on Passport', type: 'textInput' },
-  { first: ' ', second: 'Passport Number', type: 'select' },
+  {
+    first: 'First Name',
+    second: 'Email Address',
+    type: 'textInput',
+    dataFieldFirst: 'PersonFirstName',
+    dataFieldSecond: 'PersonEmail',
+  },
+  {
+    first: 'Last Name',
+    second: 'Landline Number',
+    type: 'textInput',
+    dataFieldFirst: 'PersonLastName',
+    dataFieldSecond: 'PersonPhone',
+  },
+  {
+    first: 'Address',
+    second: 'Mobile Number',
+    type: 'textInput',
+    dataFieldFirst: 'Address1',
+    dataFieldSecond: 'PersonMobile',
+  },
+  {
+    first: ' ',
+    second: 'Full Name as it appears on Passport',
+    type: 'textInput',
+    dataFieldFirst: 'Address2',
+    dataFieldSecond: 'PersonPassportName',
+  },
+  {
+    first: ' ',
+    second: 'Passport Number',
+    type: 'textInput',
+    dataFieldFirst: 'Address3',
+    dataFieldSecond: 'passportNumber',
+  },
 ];
 
 export const emergecnyContactData = [

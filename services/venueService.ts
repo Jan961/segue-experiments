@@ -1,4 +1,4 @@
-import { Venue, VenueAddress, VenueBarredVenue, VenueContact, VenueVenue } from '@prisma/client';
+import { Venue, VenueAddress, VenueBarredVenue, VenueContact, VenueVenue } from 'prisma/generated/prisma-client';
 import prisma from 'lib/prisma';
 import { omit } from 'radash';
 
