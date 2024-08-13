@@ -49,8 +49,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   const production: Partial<ProductionDTO> = mapToPrismaFields(req.body);
   const { ShowId, Image, ReportCurrencyCode, ProdCoId } = production;
 
-  console.log({ imageValue: Image, udv: isNullOrUndefined(Image) });
-
   const email = await getEmailFromReq(req);
   const access = await checkAccess(email, { ShowId });
   if (!access) return res.status(401).end();
