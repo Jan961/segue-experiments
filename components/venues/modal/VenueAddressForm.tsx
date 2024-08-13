@@ -238,7 +238,7 @@ const VenueAddressForm = ({
         <label className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
           <div className="flex gap-x-1">
             <div className="flex gap-x-1">
-              <Label required text="Country" variant="md" />
+              <p className="text-primary-input-text">Country</p>
             </div>
             <div className="mt-1">
               <Tooltip
