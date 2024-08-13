@@ -129,7 +129,7 @@ const GapSuggest = ({ startDate, endDate, productionId, onOkClick = () => null }
         <Form onSave={getSuggestions} />
       </div>
       {rows?.length > 0 && (
-        <div className="bg-red-500">
+        <div>
           <div className="block">
             <div className="text-md my-2">Check the box of venues you wish to remove from this list.</div>
             <div className="w-full overflow-hidden flex flex-col" style={{ maxHeight: 'calc(100vh - 400px)' }}>
