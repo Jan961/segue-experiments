@@ -9,7 +9,7 @@ export type Time = {
 };
 
 export interface TimeInputProps {
-  onChange: (e: any) => void;
+  onChange: (e: any) => any;
   onBlur?: (e: any) => void;
   onInput?: (e: any) => { name: string; value: string };
   label?: string;
@@ -53,8 +53,16 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
       }
     };
 
+    const handleChange = (e) => {
+      onChange(e);
+      const { name, value } = e.target;
+
+      setTime((prev) => ({ ...prev, [name]: value }));
+    };
+
     const handleInputChange = (e) => {
       const { name, value } = onInput(e);
+      console.log(value);
       setTime((prev) => ({ ...prev, [name]: value }));
     };
 
@@ -93,7 +101,7 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
           placeholder="hh"
           type="text"
           className="w-8 h-5/6 border-none focus:ring-0 text-center ring-0 p-0"
-          onChange={onChange}
+          onChange={handleChange}
           onBlur={onBlur}
           onFocus={(e) => e.target.select()}
           disabled={disabled}
@@ -108,7 +116,7 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
           value={time.min}
           placeholder="mm"
           className="w-8 h-5/6 border-none focus:ring-0 text-center ring-0 p-0"
-          onChange={onChange}
+          onChange={handleChange}
           onBlur={onBlur}
           onFocus={(e) => e.target.select()}
           disabled={disabled}

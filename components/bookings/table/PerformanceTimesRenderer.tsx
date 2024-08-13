@@ -65,7 +65,28 @@ const PerformanceTimesRenderer = ({ data, setValue, eGridCell }: CustomCellRende
       console.log(exception);
     }
   };
+  const handleTimeChange = (e) => {
+    console.log(e);
+    console.log('TIME CHANGE');
+    setPerformanceTimes((prevTimes) => {
+      prevTimes.map(({ hrs, min }) => {
+        if (hrs.length === 0) return ``;
+        const paddedHrs = hrs.length > 0 ? `${'0'.repeat(2 - hrs.length)}${hrs}` : hrs;
+        const paddedMin = min.length > 0 ? `${'0'.repeat(2 - min.length)}${min}` : min;
+        return `${paddedHrs}:${paddedMin}`;
+      });
 
+      return prevTimes;
+    });
+    setValue(
+      performanceTimes
+        .map(({ hrs, min }) => {
+          return `${hrs}:${min}`;
+        })
+        .join(';'),
+    );
+    return e;
+  };
   const handleBlur = () => {
     console.log('BLURRR');
 
@@ -90,25 +111,6 @@ const PerformanceTimesRenderer = ({ data, setValue, eGridCell }: CustomCellRende
     );
   };
 
-  const handleTimeChange = () => {
-    console.log('TIME CHANGE');
-    setPerformanceTimes((prevTimes) => {
-      prevTimes.map(({ hrs, min }) => {
-        if (hrs.length === 0) return ``;
-        const paddedHrs = hrs.length > 0 ? `${'0'.repeat(2 - hrs.length)}${hrs}` : hrs;
-        const paddedMin = min.length > 0 ? `${'0'.repeat(2 - min.length)}${min}` : min;
-        return `${paddedHrs}:${paddedMin}`;
-      });
-      return prevTimes;
-    });
-    setValue(
-      performanceTimes
-        .map(({ hrs, min }) => {
-          return `${hrs}:${min}`;
-        })
-        .join(';'),
-    );
-  };
   return (
     <BaseCellRenderer eGridCell={eGridCell} onFocus={handleOnFocus}>
       {isDisabled ? (
