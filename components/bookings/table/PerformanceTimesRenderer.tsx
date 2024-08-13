@@ -70,6 +70,7 @@ const PerformanceTimesRenderer = ({ data, setValue, eGridCell }: CustomCellRende
 
     setPerformanceTimes((prevTimes) => {
       prevTimes.map(({ hrs, min }) => {
+        if (hrs.length === 0) return ``;
         const paddedHrs = hrs.length > 0 ? `${'0'.repeat(2 - hrs.length)}${hrs}` : hrs;
         const paddedMin = min.length > 0 ? `${'0'.repeat(2 - min.length)}${min}` : min;
         return `${paddedHrs}:${paddedMin}`;
@@ -79,6 +80,7 @@ const PerformanceTimesRenderer = ({ data, setValue, eGridCell }: CustomCellRende
     setValue(
       performanceTimes
         .map(({ hrs, min }) => {
+          if (hrs.length === 0) return ``;
           const paddedHrs = hrs.length > 0 ? `${'0'.repeat(2 - hrs.length)}${hrs}` : hrs;
           const paddedMin = min.length > 0 ? `${'0'.repeat(2 - min.length)}${min}` : min;
           return `${paddedHrs}:${paddedMin}`;
@@ -91,6 +93,7 @@ const PerformanceTimesRenderer = ({ data, setValue, eGridCell }: CustomCellRende
     console.log('TIME CHANGE');
     setPerformanceTimes((prevTimes) => {
       prevTimes.map(({ hrs, min }) => {
+        if (hrs.length === 0) return ``;
         const paddedHrs = hrs.length > 0 ? `${'0'.repeat(2 - hrs.length)}${hrs}` : hrs;
         const paddedMin = min.length > 0 ? `${'0'.repeat(2 - min.length)}${min}` : min;
         return `${paddedHrs}:${paddedMin}`;
