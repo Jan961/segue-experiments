@@ -32,6 +32,7 @@ const GapSuggest = ({ startDate, endDate, productionId, onOkClick = () => null }
   const bookingDict = useRecoilValue(bookingState);
   const { rows: bookings } = useRecoilValue(rowsSelector);
   const [rows, setRows] = useState(null);
+  const [rowsReturned, setRowsReturned] = useState<boolean>(false);
   const [selectedVenueIds, setSelectedVenueIds] = useState<number[]>([]);
   const [barringCheckContext, setBarringCheckContext] = useState<number | null>(null);
   const tableRef = useRef(null);
@@ -74,10 +75,12 @@ const GapSuggest = ({ startDate, endDate, productionId, onOkClick = () => null }
         setSelectedVenueIds([]);
         setRows(response.data?.VenueInfo);
         onSuccess(response.data);
+        setRowsReturned(true);
       }
     } catch (error) {
       onError(error);
       setRows([]);
+      setRowsReturned(true);
     }
   };
 
@@ -125,40 +128,44 @@ const GapSuggest = ({ startDate, endDate, productionId, onOkClick = () => null }
       <div className="flex flex-col">
         <Form onSave={getSuggestions} />
       </div>
-      {rows?.length && (
-        <div className="block">
-          <div className="text-md my-2">Check the box of venues you wish to remove from this list.</div>
-          <div className="w-full overflow-hidden flex flex-col" style={{ maxHeight: 'calc(100vh - 400px)' }}>
-            <Table
-              testId="gap-suggest-table"
-              onRowSelected={onRowSelected}
-              ref={tableRef}
-              columnDefs={gapSuggestColumnDefs}
-              onCellClicked={onCellClicked}
-              rowData={filteredRows?.slice(0, 30)}
-              styleProps={styleProps}
-              gridOptions={gapSuggestTableOptions}
+      {rows?.length > 0 && (
+        <div className="bg-red-500">
+          <div className="block">
+            <div className="text-md my-2">Check the box of venues you wish to remove from this list.</div>
+            <div className="w-full overflow-hidden flex flex-col" style={{ maxHeight: 'calc(100vh - 400px)' }}>
+              <Table
+                testId="gap-suggest-table"
+                onRowSelected={onRowSelected}
+                ref={tableRef}
+                columnDefs={gapSuggestColumnDefs}
+                onCellClicked={onCellClicked}
+                rowData={filteredRows?.slice(0, 30)}
+                styleProps={styleProps}
+                gridOptions={gapSuggestTableOptions}
+              />
+            </div>
+          </div>
+
+          <div className="flex gap-2 justify-end items-center mt-3">
+            <Button
+              onClick={exportTableData}
+              className="float-right px-4 w-33 font-normal"
+              variant="primary"
+              text="Export"
+              iconProps={{ className: 'h-4 w-3' }}
+              sufixIconName="excel"
+            />
+            <Button
+              onClick={onOkClick}
+              className="float-right px-4 font-normal w-33 text-center"
+              variant="primary"
+              text="OK"
             />
           </div>
         </div>
       )}
-      {rows?.length && (
-        <div className="flex gap-2 justify-end items-center mt-3">
-          <Button
-            onClick={exportTableData}
-            className="float-right px-4 w-33 font-normal"
-            variant="primary"
-            text="Export"
-            iconProps={{ className: 'h-4 w-3' }}
-            sufixIconName="excel"
-          />
-          <Button
-            onClick={onOkClick}
-            className="float-right px-4 font-normal w-33 text-center"
-            variant="primary"
-            text="OK"
-          />
-        </div>
+      {rows?.length === 0 && rowsReturned && (
+        <div className="absolute left-[50%] bottom-5 -translate-x-1/2">No venues fit the suggestion criteria.</div>
       )}
       {barringCheckContext && (
         <BarringCheck
