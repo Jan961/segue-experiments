@@ -112,7 +112,6 @@ export default function PreviewBookingDetails({
           rowsWithUniqueVenue.push(...nextRowToUpdate);
         }
 
-        // rowsWithUniqueVenue contains the rowbefore, the row being edited, and the row after
         const payload = rowsWithUniqueVenue
           .filter((row) => row.status !== 'X')
           .map((row) => ({
