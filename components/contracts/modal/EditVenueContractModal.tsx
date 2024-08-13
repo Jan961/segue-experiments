@@ -88,6 +88,11 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
   const [dealMemoCreated, setDealMemoCreated] = useState<boolean>(true);
   const [dealMemoButtonText, setDealMemoButtonText] = useState<string>('Deal Memo');
 
+  useEffect(() => {
+    console.log(dealMemoFormData.DateIssued);
+    console.log(dealMemoFormData.DateReturned);
+  }, [dealMemoFormData]);
+
   const producerList = useMemo(() => {
     const list = {};
     Object.values(users).forEach((listData) => {
@@ -294,7 +299,11 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
     if (cancel) {
       onClose();
     }
-    if (Object.keys(saveBookingFormData).length > 0 || Object.keys(saveContractFormData).length > 0) {
+    if (
+      Object.keys(saveBookingFormData).length > 0 ||
+      Object.keys(saveContractFormData).length > 0 ||
+      Object.keys(saveDealMemoFormData).length > 0
+    ) {
       setConfirmationVariant('cancel');
       setShowConfirmationDialog(true);
     } else {
@@ -425,11 +434,13 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                   isSearchable
                   placeholder="Select User"
                 />
-                <div className="flex items-center mt-6 justify-between px-3">
+                <div className="flex items-center mt-6 justify-between px-3 select-none">
                   <div>
                     <div className=" text-primary-input-text font-bold text-sm">Date Issued</div>
                     <DateInput
-                      onChange={(value) => editDealMemoData('DateIssued', value)}
+                      onChange={(value) =>
+                        dealMemoFormData.DateIssued.toString() !== toISO(value) && editDealMemoData('DateIssued', value)
+                      }
                       value={dealMemoFormData.DateIssued}
                     />
                   </div>
@@ -437,7 +448,10 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                   <div>
                     <div className=" text-primary-input-text font-bold text-sm">Date Returned</div>
                     <DateInput
-                      onChange={(value) => editDealMemoData('DateReturned', value)}
+                      onChange={(value) =>
+                        dealMemoFormData.DateReturned.toString() !== toISO(value) &&
+                        editDealMemoData('DateReturned', value)
+                      }
                       value={dealMemoFormData.DateReturned}
                     />
                   </div>
@@ -535,10 +549,11 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                 <div className="flex items-center">
                   <div className=" text-primary-input-text font-bold text-sm mr-2">Signed On</div>
                   <DateInput
-                    onChange={(value) =>
+                    onChange={(value) => {
+                      console.log(value);
                       formData.SignedDate.toString() !== toISO(value) &&
-                      editContractModalData('SignedDate', value, 'contract')
-                    }
+                        editContractModalData('SignedDate', value, 'contract');
+                    }}
                     position="!-left-24"
                     value={formData.SignedDate}
                   />
