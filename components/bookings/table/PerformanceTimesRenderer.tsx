@@ -43,11 +43,11 @@ const PerformanceTimesRenderer = ({ data, setValue, eGridCell }: CustomCellRende
   const handleInput = (e) => {
     const { name, value, attributes } = e.target;
     try {
+      const arrIndex = parseInt(attributes['data-index'].value);
+      const filteredValue = value.replace(/^\D/, '');
+      const valLen = filteredValue.length;
       setPerformanceTimes((prevTimes) => {
-        const arrIndex = parseInt(attributes['data-index'].value);
         const newTime = prevTimes[arrIndex];
-        const filteredValue = value.replace(/^\D/, '');
-        const valLen = filteredValue.length;
         if (valLen < 3) {
           if (
             (name === 'hrs' && (parseInt(filteredValue) < 24 || valLen === 0)) ||
@@ -57,9 +57,10 @@ const PerformanceTimesRenderer = ({ data, setValue, eGridCell }: CustomCellRende
             prevTimes[arrIndex] = newTime;
           }
         }
-
+        console.log(prevTimes);
         return prevTimes;
       });
+      return { name, value: filteredValue };
     } catch (exception) {
       console.log(exception);
     }

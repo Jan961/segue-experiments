@@ -11,7 +11,7 @@ export type Time = {
 export interface TimeInputProps {
   onChange: (e: any) => void;
   onBlur?: (e: any) => void;
-  onInput?: (e: any) => void;
+  onInput?: (e: any) => { name: string; value: string };
   label?: string;
   value: string | Time;
   name?: string; // Also ID
@@ -53,6 +53,11 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
       }
     };
 
+    const handleInputChange = (e) => {
+      const { name, value } = onInput(e);
+      setTime((prev) => ({ ...prev, [name]: value }));
+    };
+
     useEffect(() => {
       if (value) {
         if (isOfTypTime(value)) {
@@ -77,7 +82,7 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
         onFocus={handleFocus}
         onBlur={handleBlur}
         className={classNames(baseClass, className)}
-        tabIndex={-1} // Make the div focusable
+        //  tabIndex={-1} // Make the div focusable
       >
         <input
           data-testid="hourInput"
@@ -93,7 +98,7 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
           onFocus={(e) => e.target.select()}
           disabled={disabled}
           tabIndex={tabIndexShow ? 0 : 1}
-          onInput={onInput}
+          onInput={handleInputChange}
         />
         <span className="">:</span>
         <input
@@ -110,7 +115,7 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
           tabIndex={tabIndexShow ? 0 : 2}
           onKeyDown={handleMinKeyDown}
           data-index={index}
-          onInput={onInput}
+          onInput={handleInputChange}
         />
       </div>
     );
