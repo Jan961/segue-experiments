@@ -120,7 +120,7 @@ const MainVenueForm = ({
           <Select
             testId="main-venue-family"
             name="venueFamily"
-            placeholder="Venue Family Dropdown"
+            placeholder="Select Venue Family"
             className="w-[364px] font-bold"
             onChange={(value) => handleInputChange('venueFamily', value)}
             options={venueFamilyOptionList}
