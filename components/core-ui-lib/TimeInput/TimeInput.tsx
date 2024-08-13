@@ -77,7 +77,7 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
         onFocus={handleFocus}
         onBlur={handleBlur}
         className={classNames(baseClass, className)}
-        //  tabIndex={-1} // Make the div focusable
+        tabIndex={-1} // Make the div focusable
       >
         <input
           data-testid="hourInput"

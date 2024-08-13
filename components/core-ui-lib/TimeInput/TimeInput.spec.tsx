@@ -12,7 +12,7 @@ describe('TimeInput Component', () => {
 
   test('updates hour and minute inputs correctly', () => {
     const onChange = jest.fn();
-    render(<TimeInput value={{ hrs: '10', min: '20' }} onChange={onChange} />);
+    render(<TimeInput value={{ hrs: '11', min: '20' }} onChange={onChange} />);
 
     const hourInput = screen.getByTestId('hourInput') as HTMLInputElement;
     const minInput = screen.getByTestId('minInput') as HTMLInputElement;
