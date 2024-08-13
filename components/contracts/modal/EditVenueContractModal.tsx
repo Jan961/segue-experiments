@@ -54,6 +54,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
     ...initialEditContractFormData,
     ...selectedTableCell.contract,
   });
+  const [dealMemoFormData, setDealMemoFormData] = useState<Partial<DealMemoContractFormData>>({});
   const [demoModalData, setDemoModalData] = useState<Partial<DealMemoContractFormData>>({});
   const [modalTitle, setModalTitle] = useState<string>(
     `${productionJumpState.ShowCode + productionJumpState.Code} ${productionJumpState.ShowName} | ${
@@ -87,10 +88,6 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
   const [dealMemoCreated, setDealMemoCreated] = useState<boolean>(true);
   const [dealMemoButtonText, setDealMemoButtonText] = useState<string>('Deal Memo');
 
-  useEffect(() => {
-    console.log(demoModalData);
-  }, [demoModalData]);
-
   const producerList = useMemo(() => {
     const list = {};
     Object.values(users).forEach((listData) => {
@@ -116,6 +113,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
     setDealHoldType(getHoldType.data as DealMemoHoldType);
     if (demoModalData.data && demoModalData.data.BookingId) {
       setDemoModalData(demoModalData.data as unknown as DealMemoContractFormData);
+      setDealMemoFormData(demoModalData.data as unknown as DealMemoContractFormData);
     }
     if (selectedTableCell.contract && selectedTableCell.contract.venueId) {
       const venueData = await axios.get(`/api/venue/${selectedTableCell.contract.venueId}`);
@@ -205,9 +203,15 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
     if (type === 'contract') {
       setSaveContractFormData({ ...saveContractFormData, [key]: value });
     }
-    if (type === 'dealMemo') {
-      setSaveDealMemoFormData({ ...saveDealMemoFormData, [key]: value });
-    }
+  };
+
+  const editDealMemoData = async (key: string, value) => {
+    const updatedDealMemoFormData = {
+      ...dealMemoFormData,
+      [key]: value,
+    };
+    setDealMemoFormData(updatedDealMemoFormData);
+    setSaveDealMemoFormData({ ...saveDealMemoFormData, [key]: value });
   };
 
   const handleFormData = async () => {
@@ -216,8 +220,6 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
       const contractData = Object.keys(saveContractFormData).length > 0;
       const dealMemoData = Object.keys(saveDealMemoFormData).length > 0;
       if (contractData) {
-        console.log('contractData', contractData);
-        console.log('saveContractFormData', saveContractFormData);
         await fetchData({
           url: `/api/contracts/update/venueContract/${selectedTableCell.contract.Id}`,
           method: 'PATCH',
@@ -234,8 +236,6 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
       }
 
       if (dealMemoData) {
-        console.log('dealMemoData', dealMemoData);
-        console.log('saveDealMemoFormData', saveDealMemoFormData);
         await fetchData({
           url: `/api/contracts/update/dealMemo/${selectedTableCell.contract.Id}`,
           method: 'PATCH',
@@ -398,16 +398,16 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                   options={statusOptions}
                   className="bg-primary-white w-full"
                   placeholder="Select Deal Memo Status"
-                  onChange={(value) => editContractModalData('Status', value, 'dealMemo')}
-                  value={demoModalData.Status}
+                  onChange={(value) => editDealMemoData('Status', value)}
+                  value={dealMemoFormData.Status}
                   isClearable
                   isSearchable
                 />
 
                 <div className=" text-primary-input-text font-bold text-sm mt-6">Completed By</div>
                 <Select
-                  onChange={(value) => editContractModalData('CompletedBy', value, 'dealMemo')}
-                  value={demoModalData.CompletedBy}
+                  onChange={(value) => editDealMemoData('CompletedBy', value)}
+                  value={dealMemoFormData.CompletedBy}
                   className="bg-primary-white w-full"
                   options={[...userList]}
                   isClearable
@@ -417,8 +417,8 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
 
                 <div className=" text-primary-input-text font-bold text-sm mt-6">Approved By</div>
                 <Select
-                  onChange={(value) => editContractModalData('ApprovedBy', value, 'dealMemo')}
-                  value={demoModalData.ApprovedBy}
+                  onChange={(value) => editDealMemoData('ApprovedBy', value)}
+                  value={dealMemoFormData.ApprovedBy}
                   className="bg-primary-white w-full"
                   options={[...userList]}
                   isClearable
@@ -429,24 +429,26 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                   <div>
                     <div className=" text-primary-input-text font-bold text-sm">Date Issued</div>
                     <DateInput
-                      onChange={(value) => editContractModalData('DateIssued', value, 'dealMemo')}
-                      value={demoModalData.DateIssued}
+                      onChange={(value) => editDealMemoData('DateIssued', value)}
+                      value={dealMemoFormData.DateIssued}
                     />
                   </div>
 
                   <div>
                     <div className=" text-primary-input-text font-bold text-sm">Date Returned</div>
                     <DateInput
-                      onChange={() => {
-                        return null;
-                      }}
-                      value={formData.SignedDate}
+                      onChange={(value) => editDealMemoData('DateReturned', value)}
+                      value={dealMemoFormData.DateReturned}
                     />
                   </div>
                 </div>
 
                 <div className=" text-primary-input-text font-bold text-sm mt-6">Notes</div>
-                <TextArea className="h-[125px] w-[400px]" value="" />
+                <TextArea
+                  onChange={(e) => editDealMemoData('Notes', e.target.value)}
+                  className="h-[125px] w-[400px]"
+                  value={dealMemoFormData.Notes}
+                />
               </div>
             </div>
             <div className="flex flex-col gap-y-2">

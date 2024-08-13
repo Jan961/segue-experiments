@@ -779,7 +779,7 @@ export interface DealMemoContractFormData {
   CompletedBy?: string;
   ApprovedBy?: string;
   DateReturned?: Date;
-  DeMoNotes?: string;
+  Notes?: string;
 }
 
 export interface DealMemoHoldType {

@@ -10,14 +10,17 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const access = await checkAccess(email);
     if (!access) return res.status(401).end();
 
-    console.log('1');
-
     const updateResult = await prisma.dealMemo.update({
       where: {
         BookingId,
       },
       data: {
         Status: req.body?.Status,
+        CompletedBy: req.body?.CompletedBy,
+        ApprovedBy: req.body?.ApprovedBy,
+        DateIssued: req.body?.DateIssued,
+        DateReturned: req.body?.DateReturned,
+        Notes: req.body?.Notes,
       },
     });
 
