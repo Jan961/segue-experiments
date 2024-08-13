@@ -110,8 +110,9 @@ export const TechSpecTable = ({ venueId, setFilesToSend, setFilesToDelete }: Tec
           }}
         />
       </div>
-
-      <Table columnDefs={attachmentsColDefs} rowData={rowData} onCellClicked={handleCellClick} />
+      {rowData.length > 0 && (
+        <Table columnDefs={attachmentsColDefs} rowData={rowData} onCellClicked={handleCellClick} />
+      )}
     </div>
   );
 };

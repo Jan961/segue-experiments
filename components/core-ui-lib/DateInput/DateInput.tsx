@@ -4,7 +4,6 @@ import TextInput from '../TextInput';
 import React, { createRef, forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import moment from 'moment';
 import { convertLocalDateToUTC } from 'services/dateService';
-import { shortDateRegex } from 'utils/regexUtils';
 import Label from '../Label';
 
 interface DateInputProps {
@@ -99,12 +98,6 @@ export default forwardRef<Ref, DateInputProps>(function DateInput(
       setInputValue('');
     }
   };
-
-  useEffect(() => {
-    if (inputValue && inputValue.match(shortDateRegex)) {
-      inputRef?.current?.select();
-    }
-  }, [inputValue]);
 
   const handleInputFocus = () => {
     inputRef?.current?.select();
