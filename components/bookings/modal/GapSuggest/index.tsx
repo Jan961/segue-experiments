@@ -165,7 +165,9 @@ const GapSuggest = ({ startDate, endDate, productionId, onOkClick = () => null }
         </div>
       )}
       {rows?.length === 0 && rowsReturned && (
-        <div className="absolute left-[50%] bottom-5 -translate-x-1/2">No venues fit the suggestion criteria.</div>
+        <div className="absolute left-[50%] bottom-5 -translate-x-1/2 text-primary-red">
+          No venues to suggest. Please widen Search Criteria.
+        </div>
       )}
       {barringCheckContext && (
         <BarringCheck
