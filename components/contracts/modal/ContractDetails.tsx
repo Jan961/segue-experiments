@@ -39,13 +39,45 @@ const defaultContractDetails = {
   customClause: '',
 };
 
+interface IRehearsalVenueDetails{
+  townCity: string;
+  venue: string | null;
+  notes: string;
+};
+
+interface IContractDetails {
+  currency: string | null;
+  firstDayOfWork: string | null;
+  lastDayOfWork: string | null;
+  specificAvailabilityNotes: string;
+  publicityEventNotes: string;
+  publicityEventDate: string | null;
+  requiredAtSpecificPublicityEvents: boolean | null;
+  rehearsalVenue: IRehearsalVenueDetails;
+  isAccomodationProvided: boolean;
+  accomodationNotes: string;
+  isTransportProvided: boolean;
+  transportNotes: string;
+  isNominatedDriver: boolean;
+  nominatedDriverNotes: string;
+  paymentType: string | null;
+  weeklyPayDetails: string | null;
+  totalPayDetails: string | null;
+  paymentBreakdownList: TPaymentBreakdown[];
+  cancellationFee: number;
+  cancellationFeeNotes: string;
+  includeAdditionalClauses: boolean;
+  additionalClause: string | null;
+  customClause: string;
+};
+
 interface ContractDetailsProps {
   contract: any;
   onChange?: (data: any) => void;
 }
 
 const ContractDetails = ({ contract = {}, onChange = noop }: ContractDetailsProps) => {
-  const [contractDetails, setContractDetails] = useState({ ...defaultContractDetails, ...contract });
+  const [contractDetails, setContractDetails] = useState<IContractDetails>({ ...defaultContractDetails, ...contract });
   const {
     currency,
     firstDayOfWork,
