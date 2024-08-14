@@ -6,6 +6,7 @@ const JendagiContract = () => {
     background-color: #fff;
     padding: 40px;
     width: 50%;
+    min-width: 700px;
     font-family: 'Times New Roman', Times, serif;
 
     .title-container {
