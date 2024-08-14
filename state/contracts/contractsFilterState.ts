@@ -5,8 +5,12 @@ export type TContractsFilterState = {
   status?: string;
   startDate?: Date;
   endDate?: Date;
-  department?: string;
   person?: number;
+  department?: string;
+  scheduleStartDate?: Date;
+  scheduleEndDate?: Date;
+  dealMemoStatusDropDown?: string;
+  contractStatusDropDown?: string;
 };
 
 export const intialContractsFilterState: TContractsFilterState = {
@@ -16,6 +20,10 @@ export const intialContractsFilterState: TContractsFilterState = {
   endDate: null,
   department: 'all',
   person: null,
+  scheduleEndDate: null,
+  scheduleStartDate: null,
+  dealMemoStatusDropDown: 'all',
+  contractStatusDropDown: 'all',
 };
 
 export const contractsFilterState = atom({
