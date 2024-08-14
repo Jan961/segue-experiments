@@ -15,8 +15,8 @@ import { SalesComp, SelectedBooking } from 'components/global/salesTable/utils/s
 import { productionJumpState } from 'state/booking/productionJumpState';
 import ExportModal from 'components/core-ui-lib/ExportModal';
 import { exportToExcel, exportToPDF } from 'utils/export';
-import { venueOptionsSelector } from 'state/booking/selectors/venueOptionsSelector';
 import axios from 'axios';
+import { venueHistoryOptionsSelector } from '../../../state/booking/selectors/venueHistoryOptionsSelector';
 
 interface VenueHistoryProps {
   visible: boolean;
@@ -56,7 +56,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
   const handleModalCancel = () => onCancel?.();
   const [venueDesc, setVenueDesc] = useState<string>('');
 
-  const venueOptions = useRecoilValue(venueOptionsSelector([]));
+  const venueOptions = useRecoilValue(venueHistoryOptionsSelector([]));
 
   useEffect(() => {
     setShowVenueSelect(visible);
