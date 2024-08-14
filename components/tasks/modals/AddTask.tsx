@@ -567,7 +567,7 @@ const AddTask = ({
           )}
           {!isRecurring && (
             <div className="flex ml-2">
-              <Label className="!text-secondary" text="To" />
+              <Label className="!text-secondary mr-2" text="To" />
               <Select
                 onChange={(value) => handleOnChange({ target: { id: 'TaskRepeatToWeekNum', value } })}
                 value={inputs?.TaskRepeatToWeekNum}
