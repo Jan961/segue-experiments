@@ -5,6 +5,8 @@ const JendagiContract = () => {
     height: fit-content;
     background-color: #fff;
     padding: 40px;
+    width: 50%;
+    font-family: 'Times New Roman', Times, serif;
 
     .title-container {
       padding-bottom: 40px;
@@ -44,11 +46,22 @@ const JendagiContract = () => {
       font-weight: bold;
     }
 
+    .details {
+      margin-top: 20px;
+    }
+
+    .details p {
+      margin-bottom: 20px;
+    }
+
     .details-title {
       display: flex;
       column-gap: 45px;
+    }
+
+    .details-subsection {
+      margin-left: 60px;
       margin-top: 20px;
-      margin-bottom: 20px;
     }
 
     ul {
@@ -57,7 +70,6 @@ const JendagiContract = () => {
     }
 
     ul li {
-      margin-bottom: 10px;
       position: relative;
       padding-left: 15px;
     }
@@ -356,7 +368,7 @@ const JendagiContract = () => {
           <strong>NOW IT IS HEREBY AGREED</strong> as follows:{' '}
         </p>
 
-        <div>
+        <div className="details">
           <div className="details-title">
             <strong>A.</strong>
             <strong>ENGAGEMENT</strong>
@@ -393,7 +405,7 @@ const JendagiContract = () => {
           </div>
         </div>
 
-        <div>
+        <div className="details">
           <div className="details-title">
             <strong>B.</strong>
             <strong>COMPENSATION DETAILS</strong>
@@ -414,7 +426,7 @@ const JendagiContract = () => {
           </div>
         </div>
 
-        <div>
+        <div className="details">
           <div className="details-title">
             <strong>C.</strong>
             <strong>CREDIT</strong>
@@ -427,7 +439,7 @@ const JendagiContract = () => {
           </div>
         </div>
 
-        <div>
+        <div className="details">
           <div className="details-title">
             <strong>D.</strong>
             <strong>PUBLICITY</strong>
@@ -447,7 +459,7 @@ const JendagiContract = () => {
           </div>
         </div>
 
-        <div>
+        <div className="details">
           <div className="details-title">
             <strong>E.</strong>
             <strong>THE CONTRACTOR ’S WARRANTIES AND UNDERTAKINGS</strong>
@@ -527,7 +539,7 @@ const JendagiContract = () => {
                 of, these Health and Safety policies or industry best practice regarding Health and Safety.
               </li>
               <li>
-                o accept full responsibility for all of The Producer’s personal property and guard against loss of or
+                to accept full responsibility for all of The Producer’s personal property and guard against loss of or
                 damage to such property. The Contractor acknowledges that The Producer shall have no responsibility for
                 any loss or damage thereto The Contractor ’s personal property unless prior approval has been sought and
                 granted for its use on the production.
@@ -544,6 +556,230 @@ const JendagiContract = () => {
               </li>
             </ul>
           </div>
+        </div>
+
+        <div className="details">
+          <div className="details-title">
+            <strong>E.</strong>
+            <strong>ABSENCE</strong>
+          </div>
+
+          <div className="details-subsection">
+            <strong>1.Notification</strong>
+          </div>
+          <p>
+            If The Contractor is unable to attend rehearsals or performances, they must advise The Producer as soon as
+            possible for cover to be arranged. The Contractor should let The Producer know as soon as possible on each
+            day of a continued absence (unless The Producer already knows how long The Contractor shall be absent). The
+            Contractor must also inform The Producer where and how they shall be able to contact The Contractor during
+            the absence.{' '}
+          </p>
+
+          <div className="details-subsection">
+            <strong>2.Illness and Injury</strong>
+            <div className="details-subsection">
+              <strong>i. Certificates</strong>
+            </div>
+          </div>
+          <p>
+            As soon as practicable The Contractor should provide The Producer with a self-certificate indicating the
+            nature of illness or injury and the likely date of their return. In any event, if the absence is longer than
+            seven days, The Contractor must provide The Producer with a doctor’s certificate. If at any time The
+            Producer wants The Contractor to see a doctor, then provided that The Producer pays the costs, The
+            Contractor agrees to be examined by them.
+          </p>
+
+          <div className="details-subsection">
+            <div className="details-subsection">
+              <strong>ii. Payment During Absence – Initial rehearsals</strong>
+            </div>
+          </div>
+          <p>
+            If The Contractor is absent from work in the rehearsal period as a result of illness or injury, and provided
+            that they have followed the procedure above, The Producer shall continue to pay The Contractor at 1/6
+            (one-sixth) of their basic rehearsal salary for each day of absence to a maximum of three days in each
+            absence period.
+          </p>
+          <p>
+            This rate shall be payable for a maximum of 24 days (four weeks) of absence in each twelve-month period
+            (pro-rated for shorter contracts) running from the date of The Contractor ’s first attendance. If The
+            Contractor reaches the maximum number of days of absence, then the right to terminate as set out below shall
+            apply. However, in advance of that, if it becomes impossible for The Contractor to return to work because of
+            the number of rehearsals missed then the contract shall be terminated by The Producer when that point is
+            reached. Alternatively, if The Contractor returns to work and it becomes clear to The Producer that The
+            Contractor will be unable to work effectively on The Production because of the time missed or the illness or
+            injury persisting, then The Producer will be entitled to end the contract at that time with no notice due.
+          </p>
+          <p>
+            In no event, however, shall The Contractor be entitled to more weeks of paid absence than the number of
+            weeks for which they have been employed.
+          </p>
+
+          <div className="details-subsection">
+            <div className="details-subsection">
+              <strong>iii. Payment during absence – Performance</strong>
+            </div>
+          </div>
+          <p>
+            If The Contractor is absent from work after their first paid performance as a result of illness. or injury
+            and provided they have followed the procedure above, The Contractor shall continue to be paid on a pro-rata
+            basis of their basic performance salary (inclusive of any contractual responsibility payments due to The
+            Contractor), capped at pro-rata of The Contractor’s Ceiling Salary, for each performance missed.
+          </p>
+          <p>
+            This rate shall be payable for a maximum of 24 days (four weeks) of absence in each twelve-month period
+            (pro-rated for shorter contracts) running from the date of The Contractor’s first rehearsal. If The
+            Contractor reaches the maximum number of days, the right to terminate the Contract as set out below can be
+            exercised. However, any absence payments made during the rehearsal periods for illness or injury will be
+            deducted from the total allowances.
+          </p>
+          <p>
+            In the exceptional circumstance when The Contractor is too ill to attend some calls in a day, but well
+            enough to attend others, they shall be paid a combination of full pay and illness pay. This shall be
+            proportional to the calls that The Contractor did attend in relation to those for which they were called,
+            calculated in units of fifteen minutes.
+          </p>
+
+          <div className="details-subsection">
+            <div className="details-subsection">
+              <strong>iv. Ongoing absence</strong>
+            </div>
+          </div>
+          <p>
+            In the event that The Contractor is absent from work as a result of illness or injury for more than the 24
+            (twenty four) days (pro-rated for shorter contracts) for which payment is made as above, The Producer may
+            either continue to pay The Contractor’s basic performance salary (exclusive of any contractual
+            responsibility payments due to The Contractor), or give The Contractor written notice of the termination of
+            their Contract. If The Producer does not terminate The Contractor ‘s Contract, The Producer shall continue
+            to pay to The Contractor their basic performance salary without prejudice to The Producer’s right to
+            terminate The Contractor’s Contract, should absence through illness or injury continue.
+          </p>
+
+          <div className="details-subsection">
+            <div className="details-subsection">
+              <strong>v. Statutory Sick Pay (SSP)</strong>
+            </div>
+          </div>
+          <p>
+            The payments described above in relation to absence from rehearsals and performances due to illness or
+            injury shall be deemed to be inclusive of any SSP that The Contractor may be entitled to receive. For the
+            avoidance of doubt, The Contractor is not entitled to SSP in addition to the payments set out in above, save
+            that once the payments above have ceased any remaining entitlement to SSP shall be payable.
+          </p>
+
+          <div className="details-subsection">
+            <div className="details-subsection">
+              <strong>vi. Treatment Costs</strong>
+            </div>
+          </div>
+          <p>
+            The Contractor must consult with The Producer and receive The Producer’s approval in advance of any
+            treatment being carried out. The Producer has the right of approval of the healthcare provider, the type of
+            treatment. (including whether treatment is to be provided privately or by the NHS) and any costs of the
+            treatment.
+          </p>
+          <p>
+            In the highly unlikely event of The Producer electing to meet the costs of treatment; only where their prior
+            approval has been given of the healthcare provider, the type of treatment and of any costs if applicable,
+            may treatment be booked. The Contractor must provide The Producer with full information relating to
+            treatment, including details of any ongoing treatment where applicable.{' '}
+          </p>
+          <p>
+            Where it is the opinion (given in writing) of The Contractor ‘s medical professional (e.g. (but not limited
+            to) physician, dentist, chiropractor, physiotherapist or osteopath) that treatment needs to continue after
+            the end of the Contract with The Producer, The Producer will not pay ongoing treatment once The Contractor
+            has ceased to be employed.
+          </p>
+          <p>
+            The Producer may, in the interests of The Production and, at The Producer’s sole discretion, elect to meet
+            the cost of any treatment required. This does not, in any way, indicate The Producer’s responsibility or
+            liability for the injury nor create an ongoing liability to pay for such treatment.
+          </p>
+        </div>
+
+        <div className="details">
+          <div className="details-title">
+            <strong>G.</strong>
+            <strong>CONSENTS</strong>
+          </div>
+          <p>
+            The Contractor hereby grants the company the right, without making additional payment, to record their
+            performance for archival purposes. Furthermore, The Contractor will allow The Producer at no cost to arrange
+            television or radio performances of excerpts of the Production for publicity purposes, provided the excerpts
+            are limited to a broadcast length of not more than fifteen minutes.
+          </p>
+        </div>
+
+        <div className="details">
+          <div className="details-title">
+            <strong>H.</strong>
+            <strong>FORCE MAJEURE</strong>
+          </div>
+          <p>
+            In an event of Force Majeure, where rehearsal or performance spaces become unavailable, this contract may
+            immediately be suspended, and no payments shall be due between the start and end of the event causing
+            suspension. If The Producer (the affected party) is prevented or hindered from complying with any of its
+            obligations under this agreement by a force majeure event (as defined below) it shall, as soon as reasonably
+            practicable, give notice to the other party giving details of the force majeure event and, where possible, a
+            reasonable estimate of the period during which the affected party expects the force majeure event to
+            continue. The affected party shall also give notice to the other party promptly after the force majeure
+            event ceases to affect its performance. During a force majeure event no payments shall be due by The
+            Producer to The Contractor. Provided that, as soon as was practicable, the affected party has given notice
+            of the force majeure event, the affected party shall not be liable for the consequences of any delay in
+            performing or failure to perform any of its obligations under this agreement to the extent that such delay
+            or failure is caused by the force majeure event.
+          </p>
+          <p>
+            The parties shall use all reasonable endeavours to mitigate the effect of any force majeure event, but if
+            any force majeure event continues for more than three months, either party shall be entitled to terminate
+            this agreement on giving notice to the other party with immediate effect. For the purposes of this clause, a
+            force majeure event constitutes any event beyond the reasonable control of the affected party including,
+            without limitation, strikes, lock-outs, labour disputes, acts of god, war, riots, civil commotion, malicious
+            damage, any form of governmental intervention, royal demise, order, rule, regulation or direction,
+            pandemics, mass infections or threat of mass infections, closure of venues (by Government decree or
+            otherwise) times of national emergency, accident, breakdown of plant or machine, red weather warnings, fire,
+            flood, storm, other natural disaster or for any other reason not listed but resulting, directly or
+            indirectly, in an inability to perform their obligations.
+          </p>
+        </div>
+
+        <div className="details">
+          <div className="details-title">
+            <strong>I.</strong>
+            <strong>ENTIRE AGREEMENT</strong>
+          </div>
+          <p>
+            This Agreement constitutes the entire understanding between the parties and replaces all prior
+            understandings and agreements between the parties in respect of the subject matter of this Agreement and may
+            not be modified orally.
+          </p>
+          <p>
+            The parties agree that this Agreement may be signed in counterparts, all of which, taken together, shall be
+            deemed an original. Executed copies of this Agreement transmitted electronically in Portable Document Format
+            (PDF) shall be treated as originals, fully binding and with full legal force and effect and the parties
+            waive any rights they may have to object to such treatment.
+          </p>
+          <p>
+            The waiver by any party hereto of the breach of any one or more of the provisions of this Agreement shall
+            not be construed to be a waiver or consent by such party to any prior or subsequent breaches by the other
+            party of the same or any other provision of this Agreement.
+          </p>
+          <p>
+            In the event of a dispute between parties which cannot be resolved internally, the dispute shall be
+            presented to the President of UK Theatre who will convene an independent panel and its decision will be
+            final.
+          </p>
+          <p>
+            The Producer shall have the right to assign all or any part of its rights hereunder to any person, firm or
+            corporation, provided (i) such assignee assumes the obligations of The Producer hereunder, and (ii) The
+            Contractor consents to such assignment, such consent not to be unreasonably withheld or refused. The
+            Producer shall remain fully liable for all of its obligations hereunder in the event of any such assignment.
+            The Contractor shall not have the right to assign any of their obligations hereunder.
+          </p>
+          <p>
+            This contract is governed by Scots law. Both parties hereby prorogate the jurisdiction of the Sheriffdom at
+            Glasgow and Strathkelvin
+          </p>
         </div>
       </div>
     </Container>

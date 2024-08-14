@@ -6,7 +6,7 @@ interface ContractPreviewDetailsFormProps {
 export const ContractPreviewDetailsForm = ({ height }: ContractPreviewDetailsFormProps) => {
   return (
     <>
-      <div className={`h-[${height}] w-[82vw]`}>
+      <div className={`h-[${height}] w-[82vw] justify-center flex`}>
         <JendagiContract />
       </div>
     </>
