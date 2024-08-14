@@ -64,6 +64,15 @@ const JendagiContract = () => {
       margin-top: 20px;
     }
 
+    .footer div {
+      margin-bottom: 15px;
+    }
+
+    .footer img {
+      width: 20%;
+      height: 20%;
+    }
+
     ul {
       list-style-type: none;
       padding-left: 20px;
@@ -363,7 +372,6 @@ const JendagiContract = () => {
           The Producer’s production (“the Production”) of the dramatic work as detailed at clause 4 of the foregoing
           schedule, on the terms and subject to the conditions set out in this Agreement.
         </p>
-
         <p>
           <strong>NOW IT IS HEREBY AGREED</strong> as follows:{' '}
         </p>
@@ -780,6 +788,44 @@ const JendagiContract = () => {
             This contract is governed by Scots law. Both parties hereby prorogate the jurisdiction of the Sheriffdom at
             Glasgow and Strathkelvin
           </p>
+        </div>
+      </div>
+
+      <div className="footer">
+        <div>
+          <strong>SIGNED</strong> by
+        </div>
+
+        <div>
+          <strong>Robert C Kelly</strong>
+        </div>
+
+        <img src="/segue/contracts/rcksignature.jpg" alt="RCK Signature" />
+
+        <div>
+          <p>
+            <strong>for and on behalf of</strong>
+          </p>
+          <p>
+            <strong>PRODUCTION COMPANY</strong>
+          </p>
+          <p>
+            <strong>DATE IS AS PER SCHEDULE CLAUSE 1</strong>
+          </p>
+        </div>
+        <div>
+          <strong>SIGNED</strong> by
+        </div>
+        <div>
+          <div>
+            <strong>THE CONTRACTOR</strong> _________________________________________________{' '}
+          </div>
+          <div>
+            <strong>NAME</strong> _________________________________________________{' '}
+          </div>
+          <div>
+            <strong>DATE</strong> _________________________________________________{' '}
+          </div>
         </div>
       </div>
     </Container>
