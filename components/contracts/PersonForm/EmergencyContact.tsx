@@ -16,27 +16,14 @@ const defaultEmergencyContactData = {
   mobileNumber: '',
 };
 
-interface EmergencyContact {
-  firstName: string;
-  lastName: string;
-  address1: string;
-  address2?: string;
-  address3?: string;
-  town: string;
-  postcode: string;
-  country: number | null;
-  email: string;
-  landline: string;
-  mobileNumber: string;
-}
-
 interface Props {
+  emergencyContact?: Partial<EmergencyContact>;
   countryOptionList: SelectOption[];
   onChange: (data: EmergencyContact) => void;
 }
 
-const EmergencyContactForm = ({ countryOptionList = [], onChange }: Props) => {
-  const [contact, setContact] = useState<EmergencyContact>(defaultEmergencyContactData);
+const EmergencyContactForm = ({ emergencyContact = {}, countryOptionList = [], onChange }: Props) => {
+  const [contact, setContact] = useState<EmergencyContact>({ ...defaultEmergencyContactData, ...emergencyContact });
   const { firstName, lastName, email, mobileNumber, landline, address1, address2, address3, town, postcode, country } =
     contact;
   const handleChange = useCallback(
@@ -145,6 +132,8 @@ const EmergencyContactForm = ({ countryOptionList = [], onChange }: Props) => {
             onChange={(value) => handleChange('country', value as number)}
             options={countryOptionList}
             value={country}
+            isSearchable
+            isClearable
           />
         </div>
       </div>

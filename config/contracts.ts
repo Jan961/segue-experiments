@@ -204,11 +204,11 @@ export const initialEditDemoFormData = {
 export const salaryPaidToOptions = [
   {
     text: 'Agent',
-    value: 'agent',
+    value: 'A',
   },
   {
     text: 'Company Member',
-    value: 'companyMember',
+    value: 'C',
   },
 ];
 

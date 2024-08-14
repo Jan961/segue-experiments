@@ -6,11 +6,12 @@ import { getAccountIdFromReq, getUsers } from 'services/userService';
 import CompanyContractFilters from 'components/contracts/ContractFilters';
 import CompanyContractsTable from 'components/contracts/table/CompanyContractsTable';
 import { getAllVenuesMin, getUniqueVenueCountrylist } from 'services/venueService';
-import { objectify } from 'radash';
+import { all, objectify } from 'radash';
 import { intialContractsFilterState } from 'state/contracts/contractsFilterState';
 import { fetchAllMinPersonsList } from 'services/personService';
-import { PersonMinimalDTO } from 'interfaces';
+import { PersonMinimalDTO, StandardClauseDTO, UserDto } from 'interfaces';
 import { getAllCurrencylist } from 'services/productionService';
+import { fetchAllStandardClauses } from 'services/contracts';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const ContractsPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
@@ -31,11 +32,19 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const accountId = await getAccountIdFromReq(ctx.req);
   const productionJump = await getProductionJumpState(ctx, `contracts/company-contracts`, accountId);
   const ProductionId = productionJump.selected;
-  const users = await getUsers(accountId);
-  const countryList = await getUniqueVenueCountrylist();
-  const venues = await getAllVenuesMin();
-  const personsList = await fetchAllMinPersonsList();
-  const currencyList = await getAllCurrencylist();
+  const [users, countryList, venues, personsList, currencyList, standardClauses] = await all([
+    getUsers(accountId),
+    getUniqueVenueCountrylist(),
+    getAllVenuesMin(),
+    fetchAllMinPersonsList(),
+    getAllCurrencylist(),
+    fetchAllStandardClauses(),
+  ]);
+  const standardClause = objectify(
+    standardClauses,
+    (c: StandardClauseDTO) => c.id,
+    (c) => c,
+  );
   const venue = objectify(
     venues,
     (v) => v.Id,
@@ -60,7 +69,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       currencyList,
     },
     account: {
-      user: { users: objectify(users, (user) => user.Id) },
+      user: { users: objectify(users, (user: UserDto) => user.Id) },
     },
     contracts: {
       venue,
@@ -69,6 +78,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
         department: department ?? 'all',
       },
       person,
+      standardClause,
     },
   };
 

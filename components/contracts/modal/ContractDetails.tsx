@@ -40,11 +40,12 @@ const defaultContractDetails = {
 };
 
 interface ContractDetailsProps {
+  contract: any;
   onChange?: (data: any) => void;
 }
 
-const ContractDetails = ({ onChange = noop }: ContractDetailsProps) => {
-  const [contractDetails, setContractDetails] = useState(defaultContractDetails);
+const ContractDetails = ({ contract = {}, onChange = noop }: ContractDetailsProps) => {
+  const [contractDetails, setContractDetails] = useState({ ...defaultContractDetails, ...contract });
   const {
     currency,
     firstDayOfWork,
@@ -72,6 +73,7 @@ const ContractDetails = ({ onChange = noop }: ContractDetailsProps) => {
   const currencyList = useRecoilValue(currencyListState);
   const currencyOptions = useMemo(() => transformToOptions(currencyList, 'name', 'code'), [currencyList]);
   const currencySymbol = useMemo(() => '£', [currency]);
+
   const handleChange = useCallback(
     (key: string, value: number | string | boolean | TPaymentBreakdown[]) => {
       const updatedData = { ...contractDetails, [key]: value };
@@ -80,6 +82,7 @@ const ContractDetails = ({ onChange = noop }: ContractDetailsProps) => {
     },
     [onChange, contractDetails],
   );
+
   const onRehearsalVenueChange = useCallback(
     (key: string, value: number | string | boolean | null) => {
       const updatedRehearsalVenue = {
@@ -88,9 +91,11 @@ const ContractDetails = ({ onChange = noop }: ContractDetailsProps) => {
       };
       const updatedData = { ...contractDetails, rehearsalVenue: updatedRehearsalVenue };
       setContractDetails(updatedData);
+      onChange(updatedData);
     },
     [rehearsalVenue, contractDetails, setContractDetails],
   );
+
   return (
     <form className="flex flex-col gap-4 mb-7">
       <div className="flex items-center gap-2">
@@ -101,6 +106,7 @@ const ContractDetails = ({ onChange = noop }: ContractDetailsProps) => {
           value={currency}
           onChange={(value) => handleChange('currency', value as string)}
           options={currencyOptions}
+          isSearchable
         />
       </div>
       <div className="flex items-center gap-2">

@@ -33,7 +33,7 @@ export const prepareOrganisationQueryData = (orgDetails, contactPersonId) => {
         disconnect: true,
       };
     } else {
-      organisationData.OrgContactPersonId = {
+      organisationData.Person_Organisation_OrgContactPersonIdToPerson = {
         connect: { PersonId: contactPersonId },
       };
     }
@@ -111,10 +111,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const agencyPersonData = preparePersonQueryData(omit(agencyDetails, [...addressFields, ...organisationFields]));
         const agencyPerson = await tx.person.create({
           data: {
-            ...agencyPersonAddressData,
+            ...agencyPersonData,
             Address: {
               create: {
-                ...agencyPersonData,
+                ...agencyPersonAddressData,
               },
             },
           },
@@ -168,7 +168,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       );
       const mainPerson = await tx.person.create({
         data: {
-          personData,
+          ...personData,
           Address: {
             create: personAddressData,
           },
@@ -187,7 +187,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return mainPerson;
     });
 
-    res.status(201).json(result);
+    res.status(200).json(result);
   } catch (error) {
     console.error(error);
     if (error instanceof yup.ValidationError) {

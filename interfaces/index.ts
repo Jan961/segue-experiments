@@ -291,6 +291,11 @@ export type ProductionDTO = {
   ConversionRateList?: ConversionRateDTO[];
 };
 
+export type StandardClauseDTO = {
+  id: number;
+  text: string;
+};
+
 export type PersonMinimalDTO = {
   id: number;
   firstName: string;

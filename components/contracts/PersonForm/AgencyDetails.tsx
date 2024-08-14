@@ -20,13 +20,14 @@ const defaultAgencyDetails = {
 };
 
 interface AgencyDetailsProps {
+  details?: Partial<AgencyDetails>;
   disabled: boolean;
   onChange: (data: any) => void;
   countryOptionList: SelectOption[];
 }
 
-const AgencyDetails = ({ countryOptionList, onChange = noop, disabled = false }: AgencyDetailsProps) => {
-  const [agencyDetails, setAgencyDetails] = useState(defaultAgencyDetails);
+const AgencyDetails = ({ details, countryOptionList, onChange = noop, disabled = false }: AgencyDetailsProps) => {
+  const [agencyDetails, setAgencyDetails] = useState<AgencyDetails>({ ...defaultAgencyDetails, ...details });
   const {
     firstName,
     lastName,

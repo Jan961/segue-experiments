@@ -108,3 +108,37 @@ export const isUndefined = (value: unknown): boolean => value === undefined;
 export const isNullOrUndefined = (value: unknown): boolean => isNull(value) || isUndefined(value);
 
 export const noop = () => null;
+
+export const insertAtPos = <T>(array: T[], element: T, position: number): T[] => {
+  // Ensure the position is within bounds
+  if (position < 0) {
+    position = 0;
+  } else if (position > array.length) {
+    position = array.length;
+  }
+
+  // Insert the element at the specified position
+  return [...array.slice(0, position), element, ...array.slice(position)];
+};
+
+export const removeAtPos = <T>(array: T[], position: number): T[] => {
+  // Ensure the position is within bounds
+  if (position < 0 || position >= array.length) {
+    // If the position is out of bounds, return the original array
+    return array;
+  }
+
+  // Remove the element at the specified position
+  return [...array.slice(0, position), ...array.slice(position + 1)];
+};
+
+export const replaceAtPos = <T>(array: T[], element: T, position: number): T[] => {
+  // Ensure the position is within bounds
+  if (position < 0 || position >= array.length) {
+    // If the position is out of bounds, return the original array
+    return array;
+  }
+
+  // Replace the element at the specified position
+  return [...array.slice(0, position), element, ...array.slice(position + 1)];
+};

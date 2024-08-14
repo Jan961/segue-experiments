@@ -4,10 +4,13 @@ import { useCallback, useMemo, useState } from 'react';
 import { ContractNewPersonModal } from './ContractNewPersonModal';
 import { BuildNewContract } from './BuildNewContract';
 import { transformToOptions } from 'utils';
-import { useRecoilValue } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import { contractDepartmentOptions, contractTemplateOptions } from 'config/contracts';
 import { personState } from 'state/contracts/PersonState';
+import axios from 'axios';
+import { objectify } from 'radash';
+import { PersonMinimalDTO } from 'interfaces';
 
 const defaultContractSchedule = {
   production: null,
@@ -19,7 +22,7 @@ const defaultContractSchedule = {
 
 export const ContractScheduleModal = ({ openContract, onClose }: { openContract: boolean; onClose: () => void }) => {
   const { productions } = useRecoilValue(productionJumpState);
-  const personMap = useRecoilValue(personState);
+  const [personMap, setPersonMap] = useRecoilState(personState);
   const personOptions = useMemo(
     () =>
       transformToOptions(Object.values(personMap), null, 'id', ({ firstName, lastName }) => `${firstName} ${lastName}`),
@@ -32,15 +35,32 @@ export const ContractScheduleModal = ({ openContract, onClose }: { openContract:
   );
   const [openNewPersonContract, setOpenNewPersonContract] = useState(false);
   const [openNewBuildContract, setOpenNewBuildContract] = useState(false);
-  const [contractSchedule, setContractSchedule] = useState(defaultContractSchedule);
+  const [contractSchedule, setContractSchedule] = useState<ContractSchedule>(defaultContractSchedule);
   const { production, department, role, personId, templateId } = contractSchedule;
   const handleChange = useCallback(
     (key: string, value: number | string | boolean | null) => {
       const updatedData = { ...contractSchedule, [key]: value };
       setContractSchedule(updatedData);
+      console.log('Contract', updatedData);
     },
     [contractSchedule, setContractSchedule],
   );
+  const onCloseCreateNewPerson = useCallback(
+    async (saveStatus = false) => {
+      setOpenNewPersonContract(false);
+      if (saveStatus) {
+        const personsMinList: PersonMinimalDTO[] = await axios.get('/api/person/list');
+        const idToPersonMap = objectify(
+          personsMinList ?? [],
+          (p) => p.id,
+          (p) => p,
+        );
+        setPersonMap(idToPersonMap);
+      }
+    },
+    [setOpenNewPersonContract, setPersonMap],
+  );
+
   return (
     <PopupModal
       show={openContract}
@@ -71,6 +91,7 @@ export const ContractScheduleModal = ({ openContract, onClose }: { openContract:
         </div>
         <div className="flex justify-end mr-2">
           <Button
+            disabled={!production}
             className="w-33"
             variant="secondary"
             text="Add New Person"
@@ -80,6 +101,7 @@ export const ContractScheduleModal = ({ openContract, onClose }: { openContract:
         <div className="flex items-center mt-4 w-full">
           <div className=" text-primary-input-text mr-4">Role</div>
           <TextInput
+            disabled={!production}
             id="venueText"
             className="w-full ml-3"
             value={role}
@@ -89,6 +111,7 @@ export const ContractScheduleModal = ({ openContract, onClose }: { openContract:
         <div className="flex mt-4">
           <div className=" text-primary-input-text mr-4">Department</div>
           <Select
+            disabled={!production}
             onChange={(value) => handleChange('department', value as number)}
             value={department}
             className="bg-primary-white"
@@ -116,6 +139,7 @@ export const ContractScheduleModal = ({ openContract, onClose }: { openContract:
         </div>
         <div className="flex justify-end mr-2">
           <Button
+            disabled={!production}
             className="text-sm leading-8"
             text="Start Building Contract"
             onClick={() => setOpenNewBuildContract(true)}
@@ -123,13 +147,14 @@ export const ContractScheduleModal = ({ openContract, onClose }: { openContract:
         </div>
       </div>
       {openNewPersonContract && (
-        <ContractNewPersonModal
-          openNewPersonContract={openNewPersonContract}
-          onClose={() => setOpenNewPersonContract(false)}
-        />
+        <ContractNewPersonModal openNewPersonContract={openNewPersonContract} onClose={onCloseCreateNewPerson} />
       )}
       {openNewBuildContract && (
-        <BuildNewContract openNewPersonContract={openNewBuildContract} onClose={() => setOpenNewBuildContract(false)} />
+        <BuildNewContract
+          contractSchedule={contractSchedule}
+          openNewPersonContract={openNewBuildContract}
+          onClose={() => setOpenNewBuildContract(false)}
+        />
       )}
     </PopupModal>
   );

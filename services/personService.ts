@@ -326,12 +326,12 @@ export const preparePersonQueryData = (
 export const fetchAllMinPersonsList = async (): Promise<PersonMinimalDTO[]> => {
   const persons: Person[] = await prisma.Person.findMany({
     select: {
+      PersonId: true,
       PersonFirstName: true,
       PersonLastName: true,
       PersonEmail: true,
     },
   });
-  console.table(persons);
   return persons.map((person) => ({
     id: person.PersonId ?? null,
     firstName: person.PersonFirstName ?? '',

@@ -14,24 +14,15 @@ const defaultBankAccount = {
   country: null,
 };
 
-interface BankAccount {
-  paidTo: string | null;
-  accountName: string;
-  accountNumber: string;
-  sortCode: string;
-  swift?: string;
-  iban?: string;
-  country: number | null;
-}
-
 interface Props {
+  details?: Partial<BankAccount>;
   accountType: string;
   countryOptionList: SelectOption[];
   onChange: (data: BankAccount) => void;
 }
 
-const SalaryDetailsForm = ({ countryOptionList, onChange, accountType = 'Salary' }: Props) => {
-  const [formData, setFormData] = useState<BankAccount>(defaultBankAccount);
+const SalaryDetailsForm = ({ details, countryOptionList, onChange, accountType = 'Salary' }: Props) => {
+  const [formData, setFormData] = useState<BankAccount>({ ...defaultBankAccount, ...details });
   const { paidTo, accountName, accountNumber, sortCode, swift, iban, country } = formData;
   const handleChange = useCallback(
     (key: string, value: number | string | null) => {
@@ -89,6 +80,7 @@ const SalaryDetailsForm = ({ countryOptionList, onChange, accountType = 'Salary'
             className=" text-primary-input-text font-bold w-full"
             onChange={(e) => handleChange('accountNumber', e.target.value)}
             value={accountNumber}
+            max={8}
           />
         </div>
       </div>
@@ -101,6 +93,7 @@ const SalaryDetailsForm = ({ countryOptionList, onChange, accountType = 'Salary'
             className=" text-primary-input-text font-bold w-full"
             onChange={(e) => handleChange('swift', e.target.value)}
             value={swift}
+            max={11}
           />
         </div>
       </div>
@@ -113,6 +106,7 @@ const SalaryDetailsForm = ({ countryOptionList, onChange, accountType = 'Salary'
             className=" text-primary-input-text font-bold w-full"
             onChange={(e) => handleChange('iban', e.target.value)}
             value={iban}
+            max={34}
           />
         </div>
       </div>
@@ -126,6 +120,8 @@ const SalaryDetailsForm = ({ countryOptionList, onChange, accountType = 'Salary'
             onChange={(value) => handleChange('country', value as number)}
             options={countryOptionList}
             value={country}
+            isSearchable
+            isClearable
           />
         </div>
       </div>

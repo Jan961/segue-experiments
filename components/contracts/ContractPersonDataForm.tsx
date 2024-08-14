@@ -10,13 +10,31 @@ import PersonalDetails from './PersonForm/PersonalDetails';
 import AccountDetailsForm from './PersonForm/AccountDetailsForm';
 import EmergencyContact from './PersonForm/EmergencyContact';
 
+const defaultContractDetails = {
+  personDetails: {},
+  emergencyContact1: {},
+  emergencyContact2: {},
+  agencyDetails: {},
+  salaryAccountDetails: {},
+  expenseAccountDetails: {},
+};
+
 interface ContractPersonDataFormProps {
+  person?: any;
   height: string;
   updateFormData: (data: any) => void;
 }
 
-export const ContractPersonDataForm = ({ height, updateFormData }: ContractPersonDataFormProps) => {
-  const [personData, setPersonData] = useState({});
+export const ContractPersonDataForm = ({ person = {}, height, updateFormData }: ContractPersonDataFormProps) => {
+  const [personData, setPersonData] = useState({ ...defaultContractDetails, ...person });
+  const {
+    personDetails,
+    emergencyContact1,
+    emergencyContact2,
+    agencyDetails,
+    salaryAccountDetails,
+    expenseAccountDetails,
+  } = personData;
   const [hideAgencyDetails, setHideAgencyDetails] = useState(false);
   const countryList = useRecoilValue(countryState) || [];
   const { users = [] } = useRecoilValue(userState);
@@ -39,6 +57,7 @@ export const ContractPersonDataForm = ({ height, updateFormData }: ContractPerso
         [key]: data,
       };
       setPersonData(updatedFormData);
+      console.log('updatedForm', updatedFormData);
       updateFormData?.(updatedFormData);
     },
     [personData, updateFormData, setPersonData],
@@ -49,6 +68,7 @@ export const ContractPersonDataForm = ({ height, updateFormData }: ContractPerso
       <div className={`${height} w-[82vw] overflow-y-scroll`}>
         <div className="text-xl text-primary-navy font-bold mb-3">Person Details</div>
         <PersonalDetails
+          details={personDetails}
           countryOptionList={countryOptionList}
           booleanOptions={booleanOptions}
           userOptionList={userOptionList}
@@ -58,6 +78,7 @@ export const ContractPersonDataForm = ({ height, updateFormData }: ContractPerso
           <div>
             <h3 className="text-xl text-primary-navy font-bold mb-3">Emergency Contact 1</h3>
             <EmergencyContact
+              emergencyContact={emergencyContact1}
               countryOptionList={countryOptionList}
               onChange={(data) => onChange('emergencyContact1', data)}
             />
@@ -65,6 +86,7 @@ export const ContractPersonDataForm = ({ height, updateFormData }: ContractPerso
           <div>
             <h3 className="text-xl text-primary-navy font-bold mb-3">Emergency Contact 2</h3>
             <EmergencyContact
+              emergencyContact={emergencyContact2}
               countryOptionList={countryOptionList}
               onChange={(data) => onChange('emergencyContact2', data)}
             />
@@ -81,6 +103,7 @@ export const ContractPersonDataForm = ({ height, updateFormData }: ContractPerso
           />
         </div>
         <AgencyDetails
+          details={agencyDetails}
           disabled={hideAgencyDetails}
           countryOptionList={countryOptionList}
           onChange={(data) => onChange('agencyDetails', data)}
@@ -90,6 +113,7 @@ export const ContractPersonDataForm = ({ height, updateFormData }: ContractPerso
           <div>
             <h3 className="text-base text-primary-navy font-bold mb-3">Salary</h3>
             <AccountDetailsForm
+              details={salaryAccountDetails}
               accountType="Salary"
               countryOptionList={countryOptionList}
               onChange={(data) => onChange('salaryAccountDetails', data)}
@@ -98,6 +122,7 @@ export const ContractPersonDataForm = ({ height, updateFormData }: ContractPerso
           <div>
             <h3 className="text-base text-primary-navy font-bold mb-3">Expenses</h3>
             <AccountDetailsForm
+              details={expenseAccountDetails}
               accountType="Expenses"
               countryOptionList={countryOptionList}
               onChange={(data) => onChange('expenseAccountDetails', data)}

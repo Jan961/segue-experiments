@@ -1,25 +1,53 @@
-import { Button, Label } from 'components/core-ui-lib';
+import { Button, Label, notify } from 'components/core-ui-lib';
 import PopupModal from 'components/core-ui-lib/PopupModal';
 
 import { ContractPersonDataForm } from '../ContractPersonDataForm';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { ContractPreviewDetailsForm } from '../ContractPreviewDetailsDataForm';
 import { noop } from 'utils';
 import ContractDetails from './ContractDetails';
+import axios from 'axios';
+import LoadingOverlay from 'components/shows/LoadingOverlay';
 
 interface BuildNewContractProps {
+  contractSchedule: Partial<ContractSchedule>;
   openNewPersonContract: boolean;
   onClose: () => void;
 }
 
-export const BuildNewContract = ({ openNewPersonContract, onClose }: BuildNewContractProps) => {
+export const BuildNewContract = ({ openNewPersonContract, contractSchedule, onClose }: BuildNewContractProps) => {
   const [mainButtonSelection, setMainButtonSelection] = useState({ name: true, details: false, preview: false });
+  const [contractPerson, setContractPerson] = useState(null);
+  const [contractDetails, setContractDetails] = useState({});
+  const [loading, setLoading] = useState(false);
+  const fetchPersonDetails = useCallback(
+    async (id: number, signal: any) => {
+      setLoading(true);
+      const response = await axios.get('/api/person/' + id, { signal });
+      setContractPerson(response.data);
+      setLoading(false);
+    },
+    [setContractPerson],
+  );
+
+  useEffect(() => {
+    const abortController = new AbortController();
+    if (contractSchedule.personId) {
+      notify.promise(fetchPersonDetails(contractSchedule.personId, abortController.signal), {
+        loading: 'Loading...',
+        success: 'Success',
+        error: 'Error',
+      });
+    }
+    return () => abortController.abort();
+  }, [contractSchedule.personId]);
 
   const handleButtons = (key: string) => {
     const buttons = { name: false, details: false, preview: false };
     buttons[key] = true;
     setMainButtonSelection(buttons);
   };
+
   return (
     <PopupModal
       show={openNewPersonContract}
@@ -57,11 +85,18 @@ export const BuildNewContract = ({ openNewPersonContract, onClose }: BuildNewCon
         </div>
       </div>
       <div className="border-solid border-2 border-primary-navy  rounded p-2 max-h-[70vh] overflow-scroll">
-        {mainButtonSelection.name && <ContractPersonDataForm height="h-[70vh]" updateFormData={noop} />}
+        {loading && (
+          <div className="w-full h-96">
+            <LoadingOverlay />
+          </div>
+        )}
+        {mainButtonSelection.name && contractPerson && (
+          <ContractPersonDataForm person={contractPerson} height="h-[70vh]" updateFormData={noop} />
+        )}
         {mainButtonSelection.details && (
           <div className="flex flex-col gap-8 px-16">
             <Label className="!text-base !font-bold" text="Complete the below to generate the contract" />
-            <ContractDetails onChange={noop} />
+            <ContractDetails contract={contractDetails} onChange={setContractDetails} />
           </div>
         )}
         {mainButtonSelection.preview && <ContractPreviewDetailsForm height="h-[70vh]" />}
