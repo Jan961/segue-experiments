@@ -221,6 +221,7 @@ export default function NewBookingDetailsView({
           fromDate: firstRow.data.dateAsISOString,
           toDate: lastRow.data.dateAsISOString,
           productionId: production.Id,
+          runTag: firstRow.data.runTag,
         });
         if (!isNullOrEmpty(response.data)) {
           updateBookingConflicts(response.data);
