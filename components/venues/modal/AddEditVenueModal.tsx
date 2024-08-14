@@ -28,6 +28,7 @@ interface AddEditVenueModalProps {
   venue?: UiTransformedVenue;
   onClose: (isSuccess?: boolean) => void;
   fetchVenues: (payload?: any) => Promise<void>;
+  setIsLoading: (bool: boolean) => void;
 }
 
 export default function AddEditVenueModal({
@@ -38,6 +39,7 @@ export default function AddEditVenueModal({
   countryOptions,
   onClose,
   fetchVenues,
+  setIsLoading,
 }: AddEditVenueModalProps) {
   const [formData, setFormData] = useState({ ...initialVenueState, ...(venue || {}) });
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
@@ -81,13 +83,15 @@ export default function AddEditVenueModal({
 
   const handleSaveAndClose = async () => {
     setIsSaving(true);
+    setIsLoading(true);
     const isValid = await validateVenue(formData);
     if (isValid) {
       const apiResponse = formData.id ? await updateVenue(formData) : await createVenue(formData);
-      await saveFiles(apiResponse);
       await deleteFiles();
+      await saveFiles(apiResponse);
     }
     await fetchVenues();
+    setIsLoading(false);
     setIsSaving(false);
   };
 
