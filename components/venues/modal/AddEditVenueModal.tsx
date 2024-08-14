@@ -63,7 +63,7 @@ export default function AddEditVenueModal({
 
   const createVenue = async (venue: UiTransformedVenue) => {
     try {
-      const data = await axios.post('/api/venue/create', venue, { cancelToken });
+      const { data } = await axios.post('/api/venue/create', venue, { cancelToken });
       onClose(true);
       return data;
     } catch (e) {
@@ -73,7 +73,7 @@ export default function AddEditVenueModal({
 
   const updateVenue = async (venue: UiTransformedVenue) => {
     try {
-      const data = await axios.post('/api/venue/update/' + venue.id, venue, { cancelToken });
+      const { data } = await axios.post('/api/venue/update/' + venue.id, venue, { cancelToken });
       onClose(true);
       return data;
     } catch (e) {
@@ -151,7 +151,7 @@ export default function AddEditVenueModal({
       if (!isNullOrEmpty(response)) {
         const fileRec = {
           FileId: response.data.id,
-          VenueId: venueResponse.data.Id,
+          VenueId: venueResponse.Id,
           Description: 'Tech Spec',
         };
         await axios.post('/api/venue/techSpecs/create', fileRec);

@@ -43,9 +43,11 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
   const [venues, setVenues] = useState([]);
   const [editVenueContext, setEditVenueContext] = useState<UiTransformedVenue>(null);
   const { productionId, town, country, search } = filters;
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
   const filterVenues = useMemo(() => debounce({ delay: 1000 }, (payload) => fetchVenues(payload)), []);
   const townOptions = useMemo(() => venueTownList.map(({ Town }) => ({ text: Town, value: Town })), [venueTownList]);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+
   const fetchVenues = useCallback(async (payload) => {
     const { productionId, town, country, searchQuery } = payload || {};
     if (!(productionId || town || country || searchQuery)) {
@@ -54,9 +56,7 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
     }
     setVenues(null);
     try {
-      const { data } = await axios.post('/api/venue/list', {
-        ...payload,
-      });
+      const { data } = await axios.post('/api/venue/list', { ...payload });
       const venusList = transformVenues(data);
       setVenues(venusList);
     } catch (err) {
@@ -88,13 +88,12 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
 
   const onModalClose = useCallback(
     (isSuccess?: boolean) => {
-      if (isSuccess) {
-        refreshTable();
-      }
+      if (isSuccess) refreshTable();
       setEditVenueContext(null);
     },
     [refreshTable, setEditVenueContext],
   );
+
   return (
     <>
       {isLoading && (
@@ -154,13 +153,17 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const venueTownList = results[1].status === 'fulfilled' ? results[1].value : [];
   const venueCountryOptionList: SelectOption[] =
     results[2].status === 'fulfilled' ? transformToOptions(results[2].value, 'Name', 'Id') : [];
+
   const venueCurrencyOptionList: SelectOption[] =
     results[3].status === 'fulfilled'
       ? transformToOptions(results[3].value, null, 'Code', (item) => item.Code + ' ' + item.Name)
       : [];
+
   const venueFamilyOptionList: SelectOption[] =
     results[4].status === 'fulfilled' ? transformToOptions(results[4].value, 'Name', 'Id') : [];
+
   const venues = results[5].status === 'fulfilled' ? results[5].value : [];
+
   const venue = objectify(
     venues,
     (v) => v.Id,
