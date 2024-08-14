@@ -16,7 +16,7 @@ export const DeleteRecurringPopup = ({ visible, onClose, onSubmit }: DeleteRecur
   const createOptions = () => {
     const dropDownText = [
       'Delete this occurrence only',
-      'Delete this and all future occurrence of this task',
+      'Delete this and all future occurrences of this task',
       'Delete every occurrence of this task',
     ];
     const dropDownOptions: SelectOption[] = [];
@@ -44,6 +44,7 @@ export const DeleteRecurringPopup = ({ visible, onClose, onSubmit }: DeleteRecur
           onChange={(option: number) => {
             setSelectedOption(option);
           }}
+          placeholder="Please select..."
         />
 
         <div className="flex mt-2">
