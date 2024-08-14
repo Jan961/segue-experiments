@@ -53,9 +53,7 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
       }
     };
 
-    const handleChange = (e) => {
-      onChange(e);
-      const { name, value } = e.target;
+    const filterTimeInput = (name, value) => {
       if (value.length < 3) {
         if (
           (name === 'hrs' && (parseInt(value) < 24 || value.length === 0)) ||
@@ -66,16 +64,15 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
       }
     };
 
+    const handleChange = (e) => {
+      onChange(e);
+      const { name, value } = e.target;
+      filterTimeInput(name, value);
+    };
+
     const handleInputChange = (e) => {
       const { name, value } = onInput(e);
-      if (value.length < 3) {
-        if (
-          (name === 'hrs' && (parseInt(value) < 24 || value.length === 0)) ||
-          (name === 'min' && (parseInt(value) < 60 || value.length === 0))
-        ) {
-          setTime((prev) => ({ ...prev, [name]: value }));
-        }
-      }
+      filterTimeInput(name, value);
     };
 
     useEffect(() => {

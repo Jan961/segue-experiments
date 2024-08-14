@@ -46,6 +46,7 @@ const PerformanceTimesRenderer = ({ data, setValue, eGridCell }: CustomCellRende
       const arrIndex = parseInt(attributes['data-index'].value);
       const filteredValue = value.replace(/^\D/, '');
       const valLen = filteredValue.length;
+
       setPerformanceTimes((prevTimes) => {
         const newTime = prevTimes[arrIndex];
         if (valLen < 3) {
@@ -59,22 +60,13 @@ const PerformanceTimesRenderer = ({ data, setValue, eGridCell }: CustomCellRende
         }
         return prevTimes;
       });
+
       return { name, value: filteredValue };
     } catch (exception) {
       console.log(exception);
     }
   };
   const handleTimeChange = (e) => {
-    setPerformanceTimes((prevTimes) => {
-      prevTimes.map(({ hrs, min }) => {
-        if (hrs.length === 0) return ``;
-        const paddedHrs = hrs.length > 0 ? `${'0'.repeat(2 - hrs.length)}${hrs}` : hrs;
-        const paddedMin = min.length > 0 ? `${'0'.repeat(2 - min.length)}${min}` : min;
-        return `${paddedHrs}:${paddedMin}`;
-      });
-
-      return prevTimes;
-    });
     setValue(
       performanceTimes
         .map(({ hrs, min }) => {
@@ -84,16 +76,8 @@ const PerformanceTimesRenderer = ({ data, setValue, eGridCell }: CustomCellRende
     );
     return e;
   };
+
   const handleBlur = () => {
-    setPerformanceTimes((prevTimes) => {
-      prevTimes.map(({ hrs, min }) => {
-        if (hrs.length === 0) return ``;
-        const paddedHrs = hrs.length > 0 ? `${'0'.repeat(2 - hrs.length)}${hrs}` : hrs;
-        const paddedMin = min.length > 0 ? `${'0'.repeat(2 - min.length)}${min}` : min;
-        return `${paddedHrs}:${paddedMin}`;
-      });
-      return prevTimes;
-    });
     setValue(
       performanceTimes
         .map(({ hrs, min }) => {
