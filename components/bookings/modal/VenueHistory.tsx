@@ -16,7 +16,7 @@ import { productionJumpState } from 'state/booking/productionJumpState';
 import ExportModal from 'components/core-ui-lib/ExportModal';
 import { exportToExcel, exportToPDF } from 'utils/export';
 import axios from 'axios';
-import { venueHistoryOptionsSelector } from '../../../state/booking/selectors/venueHistoryOptionsSelector';
+import { venueHistoryOptionsSelector } from 'state/booking/selectors/venueHistoryOptionsSelector';
 
 interface VenueHistoryProps {
   visible: boolean;
