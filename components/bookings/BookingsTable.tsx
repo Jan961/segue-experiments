@@ -120,9 +120,7 @@ export default function BookingsTable({ rowData, tableRef }: BookingsTableProps)
 
   useEffect(() => {
     if (rowData) {
-      console.log(rowData);
       let formattedRows = formatRowsForPencilledBookings(rowData);
-      console.log(formattedRows);
       formattedRows = formatRowsForMultipeBookingsAtSameVenue(formattedRows);
       setRows(formattedRows);
     }
@@ -138,7 +136,6 @@ export default function BookingsTable({ rowData, tableRef }: BookingsTableProps)
   if (bookingColumDefs.length > 0) {
     bookingColumDefs[0].sortable = currentProduction === undefined;
   }
-  console.log(rows);
   return (
     <>
       <div className="w-full h-[calc(100%-140px)]">

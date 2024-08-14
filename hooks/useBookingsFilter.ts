@@ -16,7 +16,6 @@ const useBookingFilter = () => {
     const archivedProductionIds = productions
       .filter((production) => production.IsArchived)
       .map((production) => production.Id);
-    console.log(rows);
     let filteredRowList = rows.filter(({ dateTime, status, productionId }) => {
       if (!productionId || (!includeArchived && archivedProductionIds.includes(productionId))) {
         return false;

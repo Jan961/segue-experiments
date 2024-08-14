@@ -114,7 +114,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
             b.isRehearsal === u.isRehearsal &&
             b.isGetInFitUp === u.isGetInFitUp,
         );
-        console.log('CAN UPDATE', canUpdate);
         const bookingType = getBookngType(u);
         const formatted = canUpdate ? formatExistingBookingToPrisma(u) : formatNewBookingToPrisma(u);
         canUpdate
@@ -126,7 +125,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     // for a run of dates, we can have only one booking but multiple performances
     // so we can use the first performance/isBooking row from updated for that
     const performances = updated.filter(({ isBooking }) => isBooking);
-    console.log(performances);
     if (!isNullOrEmpty(performances)) {
       const formattedPerformances = mapNewBookingToPrismaFields(performances);
       const bookingToInsert = formattedPerformances.reduce((acc, item, index) => {
@@ -137,7 +135,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         }
         return acc;
       }, {} as Partial<AddBookingsParams>);
-      console.log(bookingToInsert);
       rowsMap.booking.rowsToInsert.push(bookingToInsert);
     }
 
@@ -149,8 +146,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       rowsToDelete.forEach((rowToDelete) => {
         switch (type) {
           case 'booking':
-            console.log('Row to del');
-            console.log(rowToDelete);
             deletePromises.push(deleteBookingById(rowToDelete.id));
             break;
           case 'rehearsal':
@@ -168,8 +163,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       rowsToUpdate.forEach((rowToUpdate) => {
         switch (type) {
           case 'booking': {
-            console.log('Row to update');
-            console.log(rowToUpdate);
             promises.push(updateBooking(rowToUpdate));
             break;
           }
@@ -187,8 +180,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       rowsToInsert.forEach((rowToInsert) => {
         switch (type) {
           case 'booking':
-            console.log('Row to insert');
-            console.log(rowToInsert);
             promises.push(createNewBooking(rowToInsert));
             break;
           case 'rehearsal':
@@ -202,8 +193,8 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         }
       });
     }
-    console.log(promises);
-    console.log(await Promise.allSettled(promises));
+
+    await Promise.allSettled(promises);
 
     res.status(200).json('Success');
   } catch (err) {

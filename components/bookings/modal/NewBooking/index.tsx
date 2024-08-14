@@ -170,7 +170,6 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
     try {
       const runTag = state.form.isRunOfDates ? state.booking[0].runTag : nanoid(8);
       const bookingsUpdatedWithRunTag = state.bookingUpdates.map((b) => (!b.runTag ? { ...b, runTag } : b));
-      console.log('sending the update');
       const { data: updated } = await axios.post(
         `${state.form.isRunOfDates ? '/api/bookings/update-run-of-dates' : '/api/bookings/update'}`,
         {

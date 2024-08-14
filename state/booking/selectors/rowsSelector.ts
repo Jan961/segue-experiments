@@ -24,7 +24,6 @@ export const rowsSelector = selector({
   get: ({ get }) => {
     const rehearsals = get(rehearsalState);
     const bookings = get(bookingState);
-    console.log(bookings);
     const getInFitUp = get(getInFitUpState);
     const performanceDict = get(performanceState);
     const other = get(otherState);
