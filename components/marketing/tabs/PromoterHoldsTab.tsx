@@ -17,6 +17,7 @@ import { exportExcelReport } from 'components/bookings/modal/request';
 import { notify } from 'components/core-ui-lib';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import axios from 'axios';
+import { dateTimeToTime } from 'services/dateService';
 
 interface PromotorHoldsTabProps {
   bookingId: string;
@@ -72,10 +73,7 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
       const response = await axios.get(`/api/marketing/promoterHolds/${bookingId}`);
       const promData = response.data;
 
-      if (
-        (promData.allocations && Array.isArray(promData.allocations) && promData.allocations.length > 0) ||
-        Array.isArray(promData.holds)
-      ) {
+      if ((promData.allocations && Array.isArray(promData.allocations)) || Array.isArray(promData.holds)) {
         setHoldList(promData.holds);
 
         setAllocRows(
@@ -220,6 +218,9 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
 
           <div className="my-5">
             {holdList.map((holdRec, index) => {
+              const date = formatInputDate(holdRec.info.Date);
+              const time = isNullOrEmpty(holdRec.info.Time) ? '-' : dateTimeToTime(holdRec.info.Date);
+
               return (
                 <div key={index}>
                   <Icon
@@ -231,7 +232,7 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
                   />
                   <div className="w-[1045px] bg-white mb-1 rounded-md border border-primary-border">
                     <div className="text-base text-primary-navy font-bold ml-2">
-                      {formatInputDate(holdRec.info.Date)} | {holdRec.info.Time.substring(0, 5)} | Seats Allocated:{' '}
+                      {date} | {time} | Seats Allocated:{' '}
                       {holdRec.totalAllocated > holdRec.totalAvailable ? (
                         <span className="text-primary-red">
                           {holdRec.totalAllocated} / {holdRec.totalAvailable}
