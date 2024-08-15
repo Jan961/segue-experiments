@@ -114,7 +114,12 @@ export const BuildNewContract = ({ openNewPersonContract, contractSchedule, onCl
           </div>
         )}
         {mainButtonSelection.preview && (
-          <ContractPreviewDetailsForm contractPerson={contractPerson} height="h-[70vh]" />
+          <ContractPreviewDetailsForm
+            contractPerson={contractPerson}
+            contractSchedule={contractSchedule}
+            contractDetails={contractDetails}
+            height="h-[70vh]"
+          />
         )}
       </div>
 

@@ -1,117 +1,165 @@
 import styled from 'styled-components';
 import { dateToSimple } from 'services/dateService';
+import { IContractSchedule, IContractDetails } from './types';
+import { useState } from 'react';
+import { defaultPaymentBreakdown } from './contractDetails/PaymentBreakdown';
+import { defaultPublicityEventDetails } from './modal/PublicityEventDetails';
 
 interface JendagiContractProps {
   contractPerson: any;
+  contractSchedule: Partial<IContractSchedule>;
+  contractDetails: Partial<IContractDetails>;
 }
 
-const JendagiContract = ({ contractPerson }: JendagiContractProps) => {
-  const Container = styled.div`
-    height: fit-content;
-    background-color: #fff;
-    padding: 40px;
-    width: 50%;
-    min-width: 700px;
-    font-family: 'Times New Roman', Times, serif;
+const defaultContractDetails = {
+  currency: null,
+  firstDayOfWork: null,
+  lastDayOfWork: null,
+  specificAvailabilityNotes: '',
+  publicityEventList: [defaultPublicityEventDetails],
+  rehearsalVenue: {
+    townCity: '',
+    venue: null,
+    notes: '',
+  },
+  isAccomodationProvided: false,
+  accomodationNotes: '',
+  isTransportProvided: false,
+  transportNotes: '',
+  isNominatedDriver: false,
+  nominatedDriverNotes: '',
+  paymentType: null,
+  weeklyPayDetails: null,
+  totalPayDetails: null,
+  paymentBreakdownList: [defaultPaymentBreakdown],
+  cancellationFee: 0,
+  cancellationFeeNotes: '',
+  includeAdditionalClauses: false,
+  additionalClause: null,
+  customClauseList: [''],
+};
 
-    .title-container {
-      padding-bottom: 40px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-    }
+const Container = styled.div`
+  height: fit-content;
+  background-color: #fff;
+  padding: 40px;
+  width: 50%;
+  min-width: 700px;
+  font-family: 'Times New Roman', Times, serif;
 
-    .toursummary-container {
-      display: flex;
-      flex-direction: column;
-      margin-bottom: 700px;
-    }
+  .title-container {
+    padding-bottom: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 0 auto;
-      margin-bottom: 400px;
-    }
+  .toursummary-container {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 700px;
+  }
 
-    table,
-    th,
-    td {
-      border: 1px solid black;
-    }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0 auto;
+    margin-bottom: 400px;
+  }
 
-    th,
-    td {
-      padding: 5px;
-      text-align: left;
-    }
+  table,
+  th,
+  td {
+    border: 1px solid black;
+  }
 
-    .highlight {
-      color: red;
-      font-weight: bold;
-    }
+  th,
+  td {
+    padding: 5px;
+    text-align: left;
+  }
 
-    .details {
-      margin-top: 20px;
-    }
+  .highlight {
+    color: red;
+    font-weight: bold;
+  }
 
-    .details p {
-      margin-bottom: 20px;
-    }
+  .details {
+    margin-top: 20px;
+  }
 
-    .details-title {
-      display: flex;
-      column-gap: 45px;
-    }
+  .details p {
+    margin-bottom: 20px;
+  }
 
-    .details-subsection {
-      margin-left: 60px;
-      margin-top: 20px;
-    }
+  .details-title {
+    display: flex;
+    column-gap: 45px;
+  }
 
-    .footer div {
-      margin-bottom: 15px;
-    }
+  .details-subsection {
+    margin-left: 60px;
+    margin-top: 20px;
+  }
 
-    .footer img {
-      width: 20%;
-      height: 20%;
-    }
+  .footer div {
+    margin-bottom: 15px;
+  }
 
-    ul {
-      list-style-type: none;
-      padding-left: 20px;
-    }
+  .footer img {
+    width: 20%;
+    height: 20%;
+  }
 
-    ul li {
-      position: relative;
-      padding-left: 15px;
-    }
+  ul {
+    list-style-type: none;
+    padding-left: 20px;
+  }
 
-    ul li::before {
-      content: '-';
-      position: absolute;
-      left: 0;
-      color: black;
-    }
-  `;
+  ul li {
+    position: relative;
+    padding-left: 15px;
+  }
+
+  ul li::before {
+    content: '-';
+    position: absolute;
+    left: 0;
+    color: black;
+  }
+`;
+
+const JendagiContract = ({ contractPerson, contractSchedule, contractDetails }: JendagiContractProps) => {
+  const [personState] = useState({ ...contractPerson });
+  const [scheduleState] = useState<Partial<IContractSchedule>>({ ...contractSchedule });
+  const [detailsState] = useState<Partial<IContractDetails>>({ ...defaultContractDetails, ...contractDetails });
 
   console.log('contractperson in jendagicontract:', contractPerson);
+  console.log('contractdetails in jendagicontract:', detailsState);
   const {
     personDetails,
     // emergencyContact1,
     // emergencyContact2,
-    // agencyDetails,
+    agencyDetails,
     // salaryAccountDetails,
     // expenseAccountDetails,
-  } = contractPerson;
+  } = personState;
+
+  const {
+    // production,
+    department,
+    role,
+    // personId,
+    // templateId,
+  } = scheduleState;
+
   const currentDate = dateToSimple(new Date().toISOString());
 
   return (
     <Container>
       <div className="title-container">
-        <strong>!DEPARTMENT! CONTRACT SCHEDULE</strong>
+        <strong>{department} - CONTRACT SCHEDULE</strong>
         <span>THIS SCHEDULE SHALL BE DEEMED ANNEXED</span>
         <span>AND FORMS PART OF THE CONTRACT BELOW</span>
       </div>
@@ -124,18 +172,37 @@ const JendagiContract = ({ contractPerson }: JendagiContractProps) => {
         </tr>
         <tr>
           <td>2</td>
-          <td>!DEPARTMENT! NAME/ADDRESS</td>
+          <td>{department} - NAME/ADDRESS</td>
           <td>
-            {personDetails.firstName + ' ' + personDetails.lastName}, {personDetails.address1}
-            {personDetails.address2}, {personDetails.town}, {personDetails.postcode}, {personDetails.country}
+            {[
+              personDetails.firstName + ' ' + personDetails.lastName,
+              personDetails.address1,
+              personDetails.address2,
+              personDetails.town,
+              personDetails.postcode,
+              personDetails.country,
+            ]
+              .filter((detail) => detail)
+              .join(', ')}
           </td>
         </tr>
         <tr>
           <td>3</td>
           <td>AGENT NAME/ADDRESS</td>
           <td>
-            Either N/A or !AGENT FIRSTNAME LASTNAME, AGENCY NAME, AGENCY ADDRESS, AGENCY TOWN, AGENCY POSTCODE, AGENCY
-            COUNTRY!
+            {agencyDetails
+              ? [
+                  agencyDetails.firstName + ' ' + agencyDetails.lastName,
+                  agencyDetails.agencyName,
+                  agencyDetails.address1,
+                  agencyDetails.address2,
+                  agencyDetails.town,
+                  agencyDetails.postcode,
+                  agencyDetails.country,
+                ]
+                  .filter((detail) => detail)
+                  .join(', ')
+              : 'N/A'}
           </td>
         </tr>
         <tr>
@@ -146,12 +213,12 @@ const JendagiContract = ({ contractPerson }: JendagiContractProps) => {
         <tr>
           <td>5</td>
           <td>ENGAGED AS</td>
-          <td>!ROLE!</td>
+          <td>{role}</td>
         </tr>
         <tr>
           <td>6</td>
           <td>FIRST DAY OF WORK</td>
-          <td>On or around !FIRST DAY OF WORK!</td>
+          <td>On or around {dateToSimple(detailsState.firstDayOfWork)}</td>
         </tr>
         <tr>
           <td>7</td>
