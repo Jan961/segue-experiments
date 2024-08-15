@@ -13,7 +13,6 @@ import { productionJumpState } from 'state/booking/productionJumpState';
 import Select from 'components/core-ui-lib/Select';
 import ProductionOption from 'components/global/nav/ProductionOption';
 import Checkbox from 'components/core-ui-lib/Checkbox';
-import { ConfirmationDialog } from 'components/core-ui-lib';
 import ExistingTasks from './ExistingTasks';
 import { isNullOrEmpty } from 'utils';
 import { useRouter } from 'next/router';
@@ -37,7 +36,6 @@ const ProductionTaskList = ({ visible, onClose, productionId, isMaster = false }
   const styleProps = { headerColor: tileColors.tasks };
   const [rowData, setRowData] = useState([]);
   const [loading, setLoading] = useState<boolean>(false);
-  const [confirm, setConfirm] = useState<boolean>(false);
   const [productionJump, setProductionJump] = useRecoilState(productionJumpState);
   const [selected, setSelected] = useState(null);
   const [includeArchived, setIncludeArchived] = useState<boolean>(productionJump?.includeArchived || false);
@@ -199,15 +197,6 @@ const ProductionTaskList = ({ visible, onClose, productionId, isMaster = false }
     onClose();
   };
 
-  const handleCancel = () => {
-    if (selectedRows.length > 0) {
-      setConfirm(true);
-    } else {
-      setConfirm(false);
-      onClose();
-    }
-  };
-
   return (
     <PopupModal
       show={visible}
@@ -256,7 +245,7 @@ const ProductionTaskList = ({ visible, onClose, productionId, isMaster = false }
           variant="secondary"
           text="Cancel"
           className="w-[132px] mr-3"
-          onClick={handleCancel}
+          onClick={handleClose}
           testId="btn-task-cancel"
         />
         <Button
@@ -267,17 +256,6 @@ const ProductionTaskList = ({ visible, onClose, productionId, isMaster = false }
           testId="btn-task-save"
         />
       </div>
-      <ConfirmationDialog
-        variant="delete"
-        show={confirm}
-        onYesClick={handleClose}
-        content={{
-          question: 'Are you sure you want to cancel?',
-          warning: 'Any unsaved changes may be lost.',
-        }}
-        onNoClick={() => setConfirm(false)}
-        hasOverlay={false}
-      />
       <ExistingTasks
         visible={showExistingTaskModal}
         onCancel={() => {
