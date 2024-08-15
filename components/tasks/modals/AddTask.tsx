@@ -180,6 +180,7 @@ const AddTask = ({
     }
 
     let { id, value, checked } = e.target;
+    const stringValue = value;
     if (
       [
         'AssignedToUserId',
@@ -195,6 +196,14 @@ const AddTask = ({
 
     if (checked != null) {
       setIsRecurring(checked);
+    }
+    if (id === 'StartByWeekNum') {
+      const weekSelectArr = ['CompleteByWeekNum', 'TaskRepeatFromWeekNum', 'TaskRepeatToWeekNum'];
+      for (const week in weekSelectArr) {
+        if (inputs[week] < value) {
+          inputs[week] = stringValue;
+        }
+      }
     }
 
     if (id === 'RepeatInterval' && checked) {
@@ -433,7 +442,6 @@ const AddTask = ({
       handleClose();
     }
   };
-
   return (
     <PopupModal
       show={visible}
@@ -484,11 +492,14 @@ const AddTask = ({
             <Select
               onChange={(value) => handleOnChange({ target: { id: 'CompleteByWeekNum', value } })}
               value={inputs?.CompleteByWeekNum}
-              options={getWeekOptions(production, isMasterTask, !isMasterTask)}
+              options={getWeekOptions(production, isMasterTask, !isMasterTask).filter(
+                (option) => option.value >= inputs.StartByWeekNum,
+              )}
               placeholder="Week No."
               className="w-52"
               isSearchable={true}
               testId="sel-task-complete-week"
+              key={inputs?.CompleteByWeekNum}
             />
           </div>
         </div>
@@ -558,11 +569,14 @@ const AddTask = ({
               <Select
                 onChange={(value) => handleOnChange({ target: { id: 'TaskRepeatFromWeekNum', value } })}
                 value={inputs?.TaskRepeatFromWeekNum}
-                options={getWeekOptions(production, isMasterTask, false)}
+                options={getWeekOptions(production, isMasterTask, false).filter(
+                  (option) => option.value >= inputs.StartByWeekNum,
+                )}
                 className="w-32"
                 placeholder="Week No."
                 isSearchable={true}
                 testId="sel-task-repeat-from"
+                key={inputs?.TaskRepeatFromWeekNum}
               />
             </div>
           )}
@@ -572,11 +586,14 @@ const AddTask = ({
               <Select
                 onChange={(value) => handleOnChange({ target: { id: 'TaskRepeatToWeekNum', value } })}
                 value={inputs?.TaskRepeatToWeekNum}
-                options={getWeekOptions(production, isMasterTask, false)}
+                options={getWeekOptions(production, isMasterTask, false).filter(
+                  (option) => option.value >= inputs.StartByWeekNum,
+                )}
                 placeholder="Week No."
                 className="w-32"
                 isSearchable={true}
                 testId="sel-task-repeat-to"
+                key={inputs?.TaskRepeatToWeekNum}
               />
             </div>
           )}
