@@ -217,11 +217,12 @@ export default function NewBookingDetailsView({
         .getApi()
         .getDisplayedRowAtIndex(tableRef.current.getApi().getDisplayedRowCount() - 1);
       try {
+        const runTag = firstRow?.data?.runTag || '';
         const response = await axios.post('/api/bookings/conflict', {
           fromDate: firstRow.data.dateAsISOString,
           toDate: lastRow.data.dateAsISOString,
           productionId: production.Id,
-          runTag: firstRow.data.runTag,
+          runTag,
         });
         if (!isNullOrEmpty(response.data)) {
           updateBookingConflicts(response.data);
