@@ -129,7 +129,7 @@ const UploadModal: React.FC<UploadModalProps> = ({
     }
 
     if (maxFiles && files.length + selectedFiles.length > maxFiles) {
-      setError(`You can upload up to ${maxFiles} files.`);
+      setError(maxFiles === 1 ? 'You can upload 1 file' : `You can upload up to ${maxFiles} files.`);
       setSelectedFiles(selectedFiles);
       setIsUploading(false);
       if (hiddenFileInput.current) {
