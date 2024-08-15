@@ -78,6 +78,15 @@ interface IRehearsalVenueDetails {
   notes: string;
 }
 
+interface IWeeklyPayDetails {
+  performanceFee?: number;
+  performanceHolidayPay?: number;
+  rehearsalFee?: number;
+  rehearsalHolidayPay?: number;
+  subsNotes?: string;
+  touringAllowance?: number;
+}
+
 interface IContractDetails {
   currency: string | null;
   firstDayOfWork: string | null;
@@ -92,7 +101,7 @@ interface IContractDetails {
   isNominatedDriver: boolean;
   nominatedDriverNotes: string;
   paymentType: string | null;
-  weeklyPayDetails: string | null;
+  weeklyPayDetails: IWeeklyPayDetails;
   totalPayDetails: string | null;
   paymentBreakdownList: TPaymentBreakdown[];
   cancellationFee: number;

@@ -6,6 +6,8 @@ import { defaultPaymentBreakdown } from './contractDetails/PaymentBreakdown';
 import { defaultPublicityEventDetails } from './modal/PublicityEventDetails';
 import { useRecoilValue } from 'recoil';
 import { contractsVenueState } from 'state/contracts/contractsVenueState';
+import { currencyListState } from 'state/productions/currencyState';
+import charCodeToCurrency from 'utils/charCodeToCurrency';
 
 interface JendagiContractProps {
   contractPerson: any;
@@ -137,6 +139,7 @@ const JendagiContract = ({ contractPerson, contractSchedule, contractDetails }: 
   const [scheduleState] = useState<Partial<IContractSchedule>>({ ...contractSchedule });
   const [detailsState] = useState<Partial<IContractDetails>>({ ...defaultContractDetails, ...contractDetails });
   const venueMap = useRecoilValue(contractsVenueState);
+  const currencyList = useRecoilValue(currencyListState);
 
   console.log('contractperson in jendagicontract:', contractPerson);
   console.log('contractdetails in jendagicontract:', detailsState);
@@ -153,6 +156,12 @@ const JendagiContract = ({ contractPerson, contractSchedule, contractDetails }: 
 
   const getVenueNameFromId = (venueId) => {
     return Object.values(venueMap).find((venue) => venue.Id === venueId).Name;
+  };
+
+  const getCurrencySymbolFromCode = (currencyCode) => {
+    return charCodeToCurrency(
+      Object.values(currencyList).find((currency) => currency.code === currencyCode).symbolUnicode,
+    );
   };
 
   return (
@@ -239,9 +248,30 @@ const JendagiContract = ({ contractPerson, contractSchedule, contractDetails }: 
           <td>9</td>
           <td>REHEARSAL SALARY</td>
           <td>
-            Either !CONTRACT CURRENCY + REHEARSAL SALARY! buyout per week plus !CONTRACT CURRENCY + REHEARSAL HOLIDAY
-            PAY! per week holiday pay, to include any and all additional payments. Pro-rated for part weeks OR ‘Included
-            in Total Fee’
+            {detailsState.paymentType === 'W' ? (
+              <>
+                {detailsState.weeklyPayDetails ? (
+                  <>
+                    {(detailsState.currency && getCurrencySymbolFromCode(detailsState.currency)) +
+                      detailsState.weeklyPayDetails.rehearsalFee}
+                  </>
+                ) : (
+                  'N/A'
+                )}{' '}
+                buyout per week plus{' '}
+                {detailsState.weeklyPayDetails ? (
+                  <>
+                    {(detailsState.currency && getCurrencySymbolFromCode(detailsState.currency)) +
+                      detailsState.weeklyPayDetails.rehearsalHolidayPay}
+                  </>
+                ) : (
+                  'N/A'
+                )}{' '}
+                per week holiday pay, to include any and all additional payments. Pro-rated for part weeks.
+              </>
+            ) : (
+              'Included in Total Fee'
+            )}
           </td>
         </tr>
         <tr>
