@@ -39,7 +39,7 @@ export default async function handle(req, res) {
       const sale = await prisma.Sale.findFirst({
         where: {
           SaleSetId: SetId,
-          SaleSaleTypeId: 1,
+          SaleSaleTypeId: 3,
         },
         select: {
           SaleId: true,

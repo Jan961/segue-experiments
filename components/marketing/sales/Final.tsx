@@ -343,10 +343,7 @@ const Final = () => {
           ) : (
             <div className="flex flex-row">
               <div className="flex flex-col">
-                <div
-                  className={`w-[900px] h-auto'
-                    } bg-primary-green/[0.30] rounded-xl mt-5 p-4`}
-                >
+                <div className="w-[900px] h-auto bg-primary-green/[0.30] rounded-xl mt-5 p-4">
                   <div className="flex flex-row">
                     <div className="flex flex-col">
                       <div className="flex flex-row">
@@ -393,9 +390,9 @@ const Final = () => {
                       </div>
 
                       {hasSchoolsSales && (
-                        <div>
+                        <div className="mt-5">
                           <div className="flex flex-row">
-                            <div className="leading-6 text-xl text-primary-input-text font-bold mt-5">School</div>
+                            <div className="leading-6 text-xl text-primary-input-text font-bold">School</div>
                           </div>
 
                           {schoolWarning && (
@@ -408,7 +405,7 @@ const Final = () => {
                             <div className="flex flex-col mr-[20px]">
                               <div className="flex flex-row mt-4">
                                 <div className="flex flex-col">
-                                  <div className="text-primary-dark-blue base font-bold mr-[52px]">Seats Sold</div>
+                                  <div className="text-primary-dark-blue base font-bold mr-[10px]">Seats Sold</div>
                                 </div>
                                 <TextInput
                                   className="w-[137px] h-[31px] flex flex-col -mt-1"
@@ -423,8 +420,8 @@ const Final = () => {
                             <div className="flex flex-col">
                               <div className="flex flex-row mt-4 items-center">
                                 <div className="flex flex-row items-center mr-[20px]">
-                                  <div className="text-primary-dark-blue base font-bold">Value</div>
-                                  <div className="ml-10 -mr-3">{currency.symbol}</div>
+                                  <div className="text-primary-dark-blue base font-bold ml-[10px]">Value</div>
+                                  <div className="ml-5 -mr-3">{currency.symbol}</div>
                                 </div>
                                 <TextInput
                                   className="w-[137px] h-[31px] flex flex-col -mt-1"
@@ -462,9 +459,9 @@ const Final = () => {
                     </div>
                   </div>
 
-                  <div className="flex flex-row">
+                  <div className="flex flex-row mt-5">
                     <div className="flex flex-col">
-                      <div className="leading-6 text-base text-primary-input-text font-bold -mt-[45px]">
+                      <div className="leading-6 text-base text-primary-input-text font-bold">
                         I confirm these are the final figures for the above production venue / date, as agreed by all
                         parties.
                       </div>
@@ -476,14 +473,14 @@ const Final = () => {
                         name="userConfirmed"
                         checked={userConfirmed}
                         onChange={() => markUserConfirmed(!userConfirmed)}
-                        className="w-[19px] h-[19px] ml-5 -mt-10"
+                        className="w-[19px] h-[19px] ml-5"
                       />
                     </div>
                   </div>
 
-                  <div className="flex flex-row">
+                  <div className="flex flex-row mt-3">
                     <TextInput
-                      className="w-[364px] h-[31px] flex flex-col -mt-[12px]"
+                      className="w-[364px] h-[31px] flex flex-col"
                       id="currentUser"
                       value={confirmedUser}
                       disabled={true}
@@ -507,7 +504,7 @@ const Final = () => {
 
                 {showDiscrepancyNotes && (
                   <div>
-                    <div className="leading-6 text-xl text-primary-red font-bold -mt-5 flex-row">
+                    <div className="leading-6 text-xl text-primary-red font-bold mt-5 flex-row">
                       Sales Discrepancy Notes
                     </div>
                     <TextArea
