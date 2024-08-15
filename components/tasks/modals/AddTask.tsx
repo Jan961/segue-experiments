@@ -437,6 +437,7 @@ const AddTask = ({
     <PopupModal
       show={visible}
       onClose={handleCancel}
+      hasOverlay={showConfirmationDialog || showRecurringConfirmation || showRecurringDelete || showSingleDelete}
       title={inputs.Id ? 'Edit Task' : 'Create New Task'}
       titleClass="text-primary-navy text-xl mb-4"
     >

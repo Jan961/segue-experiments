@@ -137,7 +137,13 @@ const MasterTaskList = ({ visible, onClose, productionId }: MasterTaskListProps)
   };
 
   return (
-    <PopupModal show={visible} onClose={onClose} title="Add Master Task" titleClass="text-primary-navy text-xl mb-2">
+    <PopupModal
+      show={visible}
+      onClose={onClose}
+      title="Add Master Task"
+      titleClass="text-primary-navy text-xl mb-2"
+      hasOverlay={showExistingTaskModal || confirm}
+    >
       <div className=" w-[750px] lg:w-[1386px] h-[606px] flex flex-col ">
         {loading && <LoadingOverlay />}
         <Table
@@ -174,7 +180,6 @@ const MasterTaskList = ({ visible, onClose, productionId }: MasterTaskListProps)
           warning: 'Any unsaved changes may be lost.',
         }}
         onNoClick={() => setConfirm(false)}
-        hasOverlay={true}
       />
       <ExistingTasks
         visible={showExistingTaskModal}
