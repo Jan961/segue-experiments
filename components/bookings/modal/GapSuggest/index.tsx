@@ -11,6 +11,7 @@ import { rowsSelector } from 'state/booking/selectors/rowsSelector';
 import Form from './Form';
 import { formatMinutes } from 'utils/booking';
 import BarringCheck from './BarringCheck';
+import { isNull } from 'utils';
 
 type GapSuggestProps = {
   startDate: string;
@@ -125,40 +126,47 @@ const GapSuggest = ({ startDate, endDate, productionId, onOkClick = () => null }
       <div className="flex flex-col">
         <Form onSave={getSuggestions} />
       </div>
-      {rows?.length && (
-        <div className="block">
-          <div className="text-md my-2">Check the box of venues you wish to remove from this list.</div>
-          <div className="w-full overflow-hidden flex flex-col" style={{ maxHeight: 'calc(100vh - 400px)' }}>
-            <Table
-              testId="gap-suggest-table"
-              onRowSelected={onRowSelected}
-              ref={tableRef}
-              columnDefs={gapSuggestColumnDefs}
-              onCellClicked={onCellClicked}
-              rowData={filteredRows?.slice(0, 30)}
-              styleProps={styleProps}
-              gridOptions={gapSuggestTableOptions}
+      {rows?.length > 0 ? (
+        <div>
+          <div className="block">
+            <div className="text-md my-2">Check the box of venues you wish to remove from this list.</div>
+            <div className="w-full overflow-hidden flex flex-col" style={{ maxHeight: 'calc(100vh - 400px)' }}>
+              <Table
+                testId="gap-suggest-table"
+                onRowSelected={onRowSelected}
+                ref={tableRef}
+                columnDefs={gapSuggestColumnDefs}
+                onCellClicked={onCellClicked}
+                rowData={filteredRows?.slice(0, 30)}
+                styleProps={styleProps}
+                gridOptions={gapSuggestTableOptions}
+              />
+            </div>
+          </div>
+
+          <div className="flex gap-2 justify-end items-center mt-3">
+            <Button
+              onClick={exportTableData}
+              className="float-right px-4 w-33 font-normal"
+              variant="primary"
+              text="Export"
+              iconProps={{ className: 'h-4 w-3' }}
+              sufixIconName="excel"
+            />
+            <Button
+              onClick={onOkClick}
+              className="float-right px-4 font-normal w-33 text-center"
+              variant="primary"
+              text="OK"
             />
           </div>
         </div>
-      )}
-      {rows?.length && (
-        <div className="flex gap-2 justify-end items-center mt-3">
-          <Button
-            onClick={exportTableData}
-            className="float-right px-4 w-33 font-normal"
-            variant="primary"
-            text="Export"
-            iconProps={{ className: 'h-4 w-3' }}
-            sufixIconName="excel"
-          />
-          <Button
-            onClick={onOkClick}
-            className="float-right px-4 font-normal w-33 text-center"
-            variant="primary"
-            text="OK"
-          />
-        </div>
+      ) : (
+        !isNull(rows) && (
+          <div className="absolute left-1/2 bottom-5 -translate-x-1/2 text-primary-red">
+            No venues to suggest. Please widen Search Criteria.
+          </div>
+        )
       )}
       {barringCheckContext && (
         <BarringCheck
