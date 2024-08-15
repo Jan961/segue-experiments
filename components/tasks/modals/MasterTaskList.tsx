@@ -100,6 +100,13 @@ const MasterTaskList = ({ visible, onClose, productionId }: MasterTaskListProps)
     onClose();
   };
 
+  const onRowClicked = (event) => {
+    if (event.event.target.type !== 'checkbox') {
+      // Prevent selection if the click is not on a checkbox
+      event.node.setSelected(!event.node.isSelected());
+    }
+  };
+
   const createTasks = async () => {
     setLoading(true);
     try {
@@ -133,9 +140,13 @@ const MasterTaskList = ({ visible, onClose, productionId }: MasterTaskListProps)
           columnDefs={columnDefs}
           rowData={rowData}
           styleProps={styleProps}
+          onRowClicked={onRowClicked}
           rowSelection="multiple"
           onSelectionChanged={onSelectionChanged}
           testId="table-add-from-master"
+          gridOptions={{
+            suppressRowClickSelection: true,
+          }}
         />
       </div>
       <div className="flex mt-4 justify-end">
