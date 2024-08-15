@@ -53,7 +53,13 @@ export default function TasksTable({
     try {
       setIsLoading(true);
 
-      const updatedTask = { ...task, Progress: parseInt(task.Progress), Notes: task.Notes };
+      const Progress = parseInt(task.Progress);
+      const updatedTask = {
+        ...task,
+        Progress,
+        Notes: task.Notes,
+        ...(Progress === 100 && { TaskCompletedDate: new Date() }),
+      };
       const updatedRowData = rowData.map((row) => {
         if (row.Id === task.Id) return updatedTask;
         return row;
@@ -61,7 +67,7 @@ export default function TasksTable({
       setIsLoading(false);
       setRows(updatedRowData);
 
-      await axios.post(`/api/tasks/${task.PRTId ? 'update/single' : 'update'}`, updatedTask);
+      await axios.post(`/api/tasks/${task.PRTId ? 'update/recurring' : 'update/single'}`, updatedTask);
       await updateTableData();
     } catch (error) {
       console.log(error);

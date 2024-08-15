@@ -117,13 +117,14 @@ const AddTask = ({
     useRecoilValue(currentProductionSelector) || productionList.find((item) => item.Id === productionId);
   useEffect(() => {
     setInputs(task);
+    if (isNullOrEmpty(task?.Id)) setIsRecurring(true);
   }, [task]);
 
   const [status, setStatus] = useState({ submitted: true, submitting: false });
   const [loading, setLoading] = useState<boolean>(false);
   const [isCloned, setIsCloned] = useState<boolean>(false);
   const [isChecked, setIsChecked] = useState<boolean>(false);
-  const [isRecurring, setIsRecurring] = useState<boolean>(false);
+  const [isRecurring, setIsRecurring] = useState<boolean>(true);
   const [showRecurringConfirmation, setShowRecurringConfirmation] = useState<boolean>(false);
   const [taskRecurringInfo, setTaskRecurringInfo] = useState(null);
   const [showRecurringDelete, setShowRecurringDelete] = useState<boolean>(false);
@@ -551,7 +552,7 @@ const AddTask = ({
               />
             </div>
           )}
-          {!isRecurring && (
+          {!isRecurring && inputs.RepeatInterval && (
             <div className="flex ml-2">
               <Label className="!text-secondary pr-2" text="From" />
               <Select
@@ -565,7 +566,7 @@ const AddTask = ({
               />
             </div>
           )}
-          {!isRecurring && (
+          {!isRecurring && inputs.RepeatInterval && (
             <div className="flex ml-2">
               <Label className="!text-secondary" text="To" />
               <Select
