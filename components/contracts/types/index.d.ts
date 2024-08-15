@@ -87,6 +87,12 @@ interface IWeeklyPayDetails {
   touringAllowance?: number;
 }
 
+interface ITotalPayDetails {
+  feeNotes: string;
+  totalFee: number;
+  totalHolidayPay: number;
+}
+
 interface IContractDetails {
   currency: string | null;
   firstDayOfWork: string | null;
@@ -102,7 +108,7 @@ interface IContractDetails {
   nominatedDriverNotes: string;
   paymentType: string | null;
   weeklyPayDetails: IWeeklyPayDetails;
-  totalPayDetails: string | null;
+  totalPayDetails: ITotalPayDetails;
   paymentBreakdownList: TPaymentBreakdown[];
   cancellationFee: number;
   cancellationFeeNotes: string;

@@ -260,7 +260,7 @@ const ContractDetails = ({ contract = {}, onChange = noop }: ContractDetailsProp
         </div>
         <Label className="!font-bold text-sm" text="If YES, Notes" />
         <TextInput
-          disabled={!isTransportProvided}
+          disabled={!isNominatedDriver}
           testId="contract-details-nominated-driver-notes"
           placeholder="Driver Notes"
           value={nominatedDriverNotes}
