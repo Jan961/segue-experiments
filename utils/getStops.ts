@@ -11,7 +11,7 @@ export const getStops = (bookingDict: BookingState, performanceDict: Performance
 
   return Object.keys(bookingsByProduction).reduce((map, productionId) => {
     const grouped = bookingsByProduction[productionId]?.reduce(
-      (acc, { VenueId, Date: BookingDate, PerformanceIds }) => {
+      (acc, { VenueId, Date: BookingDate, PerformanceIds, StatusCode }) => {
         let lastPerformanceDate = new Date(BookingDate);
         PerformanceIds.forEach((performanceId: number) => {
           const performanceDate = getKey(performanceDict[performanceId]?.Date);
@@ -20,7 +20,9 @@ export const getStops = (bookingDict: BookingState, performanceDict: Performance
           }
         });
         BookingDate = lastPerformanceDate?.toISOString();
-        (acc[BookingDate] = acc[BookingDate] || []).push(VenueId);
+        if (StatusCode !== 'X') {
+          (acc[BookingDate] = acc[BookingDate] || []).push(VenueId);
+        }
         return acc;
       },
       {},
