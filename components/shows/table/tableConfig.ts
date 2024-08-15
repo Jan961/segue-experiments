@@ -5,6 +5,7 @@ import ShowNameAndCodeRenderer from './ShowNameAndCodeRenderer';
 import { ICellRendererParams } from 'ag-grid-community';
 import React from 'react';
 import CurrencyExchangeRenderer from './CurrencyExchangeRenderer';
+import CheckboxRenderer from 'components/core-ui-lib/Table/renderers/CheckboxRenderer';
 
 export const generateChildCol = (
   headerName: string,
@@ -78,7 +79,7 @@ export const showsTableConfig = [
     field: 'IsArchived',
     width: 92,
     maxWidth: 92,
-    cellRenderer: TableCheckboxRenderer,
+    cellRenderer: CheckboxRenderer,
     cellStyle: {
       display: 'flex',
       justifyContent: 'center',
@@ -107,9 +108,18 @@ export const showsTableConfig = [
     field: 'Id',
     width: 70,
     cellRenderer: ButtonRenderer,
-    cellRendererParams: {
-      buttonText: 'Delete',
-      variant: 'tertiary',
+    cellRendererParams: (params) => {
+      return {
+        buttonText: 'Delete',
+        variant: 'tertiary',
+        ...(params.data.productions.length > 0 && {
+          disabled: true,
+          tpActive: true,
+          body: 'Please delete all Productions before deleting a Show',
+          position: 'right',
+          width: 'w-36',
+        }),
+      };
     },
     cellStyle: {
       paddingRight: '0.5em',
