@@ -180,7 +180,6 @@ const AddTask = ({
     }
 
     let { id, value, checked } = e.target;
-    const stringValue = value;
     if (
       [
         'AssignedToUserId',
@@ -201,7 +200,7 @@ const AddTask = ({
       const weekSelectArr = ['CompleteByWeekNum', 'TaskRepeatFromWeekNum', 'TaskRepeatToWeekNum'];
       for (const week in weekSelectArr) {
         if (inputs[week] < value) {
-          inputs[week] = stringValue;
+          inputs[week] = value;
         }
       }
     }
