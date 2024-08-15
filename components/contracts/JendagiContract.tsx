@@ -4,6 +4,8 @@ import { IContractSchedule, IContractDetails } from './types';
 import { useState } from 'react';
 import { defaultPaymentBreakdown } from './contractDetails/PaymentBreakdown';
 import { defaultPublicityEventDetails } from './modal/PublicityEventDetails';
+import { useRecoilValue } from 'recoil';
+import { contractsVenueState } from 'state/contracts/contractsVenueState';
 
 interface JendagiContractProps {
   contractPerson: any;
@@ -134,6 +136,7 @@ const JendagiContract = ({ contractPerson, contractSchedule, contractDetails }: 
   const [personState] = useState({ ...contractPerson });
   const [scheduleState] = useState<Partial<IContractSchedule>>({ ...contractSchedule });
   const [detailsState] = useState<Partial<IContractDetails>>({ ...defaultContractDetails, ...contractDetails });
+  const venueMap = useRecoilValue(contractsVenueState);
 
   console.log('contractperson in jendagicontract:', contractPerson);
   console.log('contractdetails in jendagicontract:', detailsState);
@@ -146,20 +149,16 @@ const JendagiContract = ({ contractPerson, contractSchedule, contractDetails }: 
     // expenseAccountDetails,
   } = personState;
 
-  const {
-    // production,
-    department,
-    role,
-    // personId,
-    // templateId,
-  } = scheduleState;
-
   const currentDate = dateToSimple(new Date().toISOString());
+
+  const getVenueNameFromId = (venueId) => {
+    return Object.values(venueMap).find((venue) => venue.Id === venueId).Name;
+  };
 
   return (
     <Container>
       <div className="title-container">
-        <strong>{department} - CONTRACT SCHEDULE</strong>
+        <strong>{scheduleState.department} - CONTRACT SCHEDULE</strong>
         <span>THIS SCHEDULE SHALL BE DEEMED ANNEXED</span>
         <span>AND FORMS PART OF THE CONTRACT BELOW</span>
       </div>
@@ -172,7 +171,7 @@ const JendagiContract = ({ contractPerson, contractSchedule, contractDetails }: 
         </tr>
         <tr>
           <td>2</td>
-          <td>{department} - NAME/ADDRESS</td>
+          <td>{scheduleState.department} - NAME/ADDRESS</td>
           <td>
             {[
               personDetails.firstName + ' ' + personDetails.lastName,
@@ -213,7 +212,7 @@ const JendagiContract = ({ contractPerson, contractSchedule, contractDetails }: 
         <tr>
           <td>5</td>
           <td>ENGAGED AS</td>
-          <td>{role}</td>
+          <td>{scheduleState.role}</td>
         </tr>
         <tr>
           <td>6</td>
@@ -223,12 +222,18 @@ const JendagiContract = ({ contractPerson, contractSchedule, contractDetails }: 
         <tr>
           <td>7</td>
           <td>REHEARSAL TOWN/CITY</td>
-          <td>!REHEARSAL TOWN / CITY!</td>
+          <td>{detailsState.rehearsalVenue.townCity ? detailsState.rehearsalVenue.townCity : 'N/A'}</td>
         </tr>
         <tr>
           <td>8</td>
           <td>REHEARSAL VENUES</td>
-          <td>Likely to be !REHEARSAL VENUE + REHEARSAL VENUE NOTES!</td>
+          <td>
+            {detailsState.rehearsalVenue.venue
+              ? 'Likely to be ' +
+                getVenueNameFromId(detailsState.rehearsalVenue.venue) +
+                (detailsState.rehearsalVenue.notes !== '' ? ' - ' + detailsState.rehearsalVenue.notes : '')
+              : 'N/A'}
+          </td>
         </tr>
         <tr>
           <td>9</td>
