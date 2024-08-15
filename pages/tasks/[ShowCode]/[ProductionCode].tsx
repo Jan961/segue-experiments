@@ -20,7 +20,8 @@ import { intialTasksState, tasksfilterState } from 'state/tasks/tasksFilterState
 import MasterTaskList from 'components/tasks/modals/MasterTaskList';
 import ProductionTaskList from 'components/tasks/modals/ProductionTaskList';
 import { productionJumpState } from 'state/booking/productionJumpState';
-import Spinner from '../../../components/core-ui-lib/Spinner';
+import Spinner from 'components/core-ui-lib/Spinner';
+import { isNullOrEmpty } from 'utils';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
@@ -57,14 +58,14 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
   };
 
   const isFilterMatchingInitialState = () => {
-    const { assignee, endDueDate, startDueDate, status, taskText } = filter;
-
+    const { assignee, endDueDate, startDueDate, status, taskText, production } = filter;
     return (
       assignee === intialTasksState.assignee &&
       endDueDate === intialTasksState.endDueDate &&
       startDueDate === intialTasksState.startDueDate &&
       status === intialTasksState.status &&
-      taskText === intialTasksState.taskText
+      taskText === intialTasksState.taskText &&
+      !isNullOrEmpty(production)
     );
   };
 
