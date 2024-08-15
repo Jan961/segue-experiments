@@ -42,7 +42,6 @@ export const ContractScheduleModal = ({ openContract, onClose }: { openContract:
     (key: string, value: number | string | boolean | null) => {
       const updatedData = { ...contractSchedule, [key]: value };
       setContractSchedule(updatedData);
-      console.log('Contract', updatedData);
     },
     [contractSchedule, setContractSchedule],
   );

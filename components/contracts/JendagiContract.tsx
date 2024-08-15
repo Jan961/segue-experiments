@@ -6,6 +6,7 @@ import { useRecoilValue } from 'recoil';
 import { contractsVenueState } from 'state/contracts/contractsVenueState';
 import { currencyListState } from 'state/productions/currencyState';
 import charCodeToCurrency from 'utils/charCodeToCurrency';
+import { productionJumpState } from 'state/booking/productionJumpState';
 
 interface JendagiContractProps {
   contractPerson: any;
@@ -133,23 +134,15 @@ const Container = styled.div`
 `;
 
 const JendagiContract = ({ contractPerson, contractSchedule, contractDetails }: JendagiContractProps) => {
+  const { productions } = useRecoilValue(productionJumpState);
   const [personState] = useState({ ...contractPerson });
   const [scheduleState] = useState<Partial<IContractSchedule>>({ ...contractSchedule });
   const [detailsState] = useState<Partial<IContractDetails>>({ ...defaultContractDetails, ...contractDetails });
   const venueMap = useRecoilValue(contractsVenueState);
   const currencyList = useRecoilValue(currencyListState);
 
-  console.log('contractperson in jendagicontract:', contractPerson);
-  console.log('contractdetails in jendagicontract:', detailsState);
   console.log(contractSchedule);
-  const {
-    personDetails,
-    // emergencyContact1,
-    // emergencyContact2,
-    agencyDetails,
-    // salaryAccountDetails,
-    // expenseAccountDetails,
-  } = personState;
+  const { personDetails, agencyDetails } = personState;
 
   const currentDate = dateToSimple(new Date().toISOString());
 
@@ -187,6 +180,13 @@ const JendagiContract = ({ contractPerson, contractSchedule, contractDetails }: 
         list.notes
       );
     });
+  };
+
+  const getShowNameFromId = (id) => {
+    const result = productions.find((prod) => {
+      return prod.Id === id;
+    });
+    return result.ShowName;
   };
 
   return (
@@ -241,7 +241,7 @@ const JendagiContract = ({ contractPerson, contractSchedule, contractDetails }: 
         <tr>
           <td>4</td>
           <td>The PRODUCTION</td>
-          <td>!SHOWNAME!</td>
+          <td>{getShowNameFromId(scheduleState.production)}</td>
         </tr>
         <tr>
           <td>5</td>
