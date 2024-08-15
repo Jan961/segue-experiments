@@ -102,7 +102,6 @@ const MasterTaskList = ({ visible, onClose, productionId }: MasterTaskListProps)
 
   const onRowClicked = (event) => {
     if (event.event.target.type !== 'checkbox') {
-      // Prevent selection if the click is not on a checkbox
       event.node.setSelected(!event.node.isSelected());
     }
   };

@@ -140,6 +140,12 @@ const ProductionTaskList = ({ visible, onClose, productionId, isMaster = false }
     fetchTasks();
   }, [selected]);
 
+  const onRowClicked = (event) => {
+    if (event.event.target.type !== 'checkbox') {
+      event.node.setSelected(!event.node.isSelected());
+    }
+  };
+
   const createTasks = async () => {
     setLoading(true);
     try {
@@ -237,7 +243,11 @@ const ProductionTaskList = ({ visible, onClose, productionId, isMaster = false }
           styleProps={styleProps}
           rowSelection="multiple"
           onSelectionChanged={onSelectionChanged}
+          onRowClicked={onRowClicked}
           testId="table-prod-tasks"
+          gridOptions={{
+            suppressRowClickSelection: true,
+          }}
         />
       </div>
       <div className="flex mt-4 justify-end">
