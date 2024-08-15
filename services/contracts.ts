@@ -8,3 +8,14 @@ export const fetchAllStandardClauses = async () => {
     title: StdClauseTitle,
   }));
 };
+
+export const fetchAllContracts = async (productionId?: number) => {
+  const contracts = await prisma.ACCContracts.findMany({
+    where: {
+      ...(productionId && {
+        ProductionId: productionId,
+      }),
+    },
+  });
+  return contracts.map();
+};

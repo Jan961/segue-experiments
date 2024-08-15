@@ -78,7 +78,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     contracts: {
       filters: {
         ...intialContractsFilterState,
-        department: department ?? 'all',
+        department: department ? parseInt(department, 10) : -1,
       },
       venue,
       person,

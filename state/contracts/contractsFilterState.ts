@@ -6,7 +6,7 @@ export type TContractsFilterState = {
   startDate?: Date;
   endDate?: Date;
   person?: number;
-  department?: string;
+  department?: number;
   scheduleStartDate?: Date;
   scheduleEndDate?: Date;
   dealMemoStatusDropDown?: string;

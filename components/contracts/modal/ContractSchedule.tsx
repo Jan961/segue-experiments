@@ -113,7 +113,7 @@ export const ContractScheduleModal = ({ openContract, onClose }: { openContract:
           <div className=" text-primary-input-text mr-4">Department</div>
           <Select
             disabled={!production}
-            onChange={(value) => handleChange('department', value as number)}
+            onChange={(value) => handleChange('department', parseInt(value as string, 10))}
             value={department}
             className="bg-primary-white"
             placeholder="Please select department"

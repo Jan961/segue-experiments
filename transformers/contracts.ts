@@ -151,3 +151,64 @@ export const transformAccountDetails = (accountData: any): AccountDetails => {
     country: accountData.PersonPaymentBankCountryId || null,
   };
 };
+
+export const transformContractDetails = (contract: any) => {
+  return {
+    currency: contract.CurrencyCode,
+    firstDayOfWork: contract.FirstDay?.toISOString() || null,
+    lastDayOfWork: contract.LastDay?.toISOString() || null,
+    specificAvailabilityNotes: contract.Availability || null,
+    publicityEventList: contract.ACCPubEvent.map((event: any) => ({
+      isRequired: true, // Assuming all events are required; adjust as needed
+      date: event.Date?.toISOString() || null,
+      notes: event.Notes || null,
+    })),
+    rehearsalVenue: {
+      townCity: contract.RehearsalLocation || null,
+      venue: contract.RehearsalVenueId || null,
+      notes: contract.RehearsalVenueNotes || null,
+    },
+    isAccomodationProvided: contract.IsAccomProvided || false,
+    accomodationNotes: contract.AccomNotes || null,
+    isTransportProvided: contract.IsTransportProvided || false,
+    transportNotes: contract.TransportNotes || null,
+    isNominatedDriver: contract.IsNominatedDriver || false,
+    nominatedDriverNotes: contract.NominatedDriverNotes || null,
+    paymentType: contract.PaymentType || null,
+    weeklyPayDetails: {
+      rehearsalFee: contract.WeeklyRehFee || null,
+      rehearsalHolidayPay: contract.WeeklyRehHolPay || null,
+      performanceFee: contract.WeeklyPerfFee || null,
+      performanceHolidayPay: contract.WeeklyPerfHolPay || null,
+      touringAllowance: contract.WeeklySubs || null,
+      subsNotes: contract.WeeklySubsNotes || null,
+    },
+    totalPayDetails: {
+      totalFee: contract.TotalFee || null,
+      totalHolidayPay: contract.TotalHolPay || null,
+      feeNotes: contract.TotalFeeNotes || null,
+    },
+    paymentBreakdownList: contract.ACCPayment.map((payment: any) => ({
+      date: payment.Date?.toISOString() || null,
+      amount: payment.Amount || null,
+      notes: payment.Notes || null,
+    })),
+    cancellationFee: contract.CancelFee || null,
+    cancellationFeeNotes: contract.CancelFeeNotes || null,
+    includeAdditionalClauses: !!contract.ACCClause.length, // Assuming any clause means additional clauses were included
+    additionalClause: contract.ACCClause.map((clause: any) => clause.StdClauseId).filter((id: any) => id !== null),
+    customClauseList: contract.ACCClause.map((clause: any) => clause.Text).filter((text: any) => text !== null),
+    includeClauses: !!contract.ACCClause.length,
+  };
+};
+
+export const transformContractResponse = (contract: any) => {
+  return {
+    production: contract.ProductionId,
+    department: contract.ACCCDeptId,
+    role: contract.RoleName,
+    personId: contract.PersonId,
+    templateId: null, // Assuming templateId is not stored directly in the contract, set as null or retrieve if applicable
+    contractDetails: transformContractDetails(contract),
+  };
+};
