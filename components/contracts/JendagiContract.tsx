@@ -1,6 +1,11 @@
 import styled from 'styled-components';
+import { dateToSimple } from 'services/dateService';
 
-const JendagiContract = () => {
+interface JendagiContractProps {
+  contractPerson: any;
+}
+
+const JendagiContract = ({ contractPerson }: JendagiContractProps) => {
   const Container = styled.div`
     height: fit-content;
     background-color: #fff;
@@ -92,10 +97,21 @@ const JendagiContract = () => {
     }
   `;
 
+  console.log('contractperson in jendagicontract:', contractPerson);
+  const {
+    personDetails,
+    // emergencyContact1,
+    // emergencyContact2,
+    // agencyDetails,
+    // salaryAccountDetails,
+    // expenseAccountDetails,
+  } = contractPerson;
+  const currentDate = dateToSimple(new Date().toISOString());
+
   return (
     <Container>
       <div className="title-container">
-        <strong>DEPARTMENT CONTRACT SCHEDULE</strong>
+        <strong>!DEPARTMENT! CONTRACT SCHEDULE</strong>
         <span>THIS SCHEDULE SHALL BE DEEMED ANNEXED</span>
         <span>AND FORMS PART OF THE CONTRACT BELOW</span>
       </div>
@@ -104,88 +120,91 @@ const JendagiContract = () => {
         <tr>
           <td>1</td>
           <td>DOCUMENT ISSUE DATE</td>
-          <td>DATE OF PDF EXPORT</td>
+          <td>{currentDate}</td>
         </tr>
         <tr>
           <td>2</td>
-          <td>“DEPARTMENT” NAME/ADDRESS</td>
-          <td>&lt;PERSON NAME, PERSON ADDRESS, PERSON TOWN, PERSON POSTCODE, PERSON COUNTRY&gt;</td>
+          <td>!DEPARTMENT! NAME/ADDRESS</td>
+          <td>
+            {personDetails.firstName + ' ' + personDetails.lastName}, {personDetails.address1}
+            {personDetails.address2}, {personDetails.town}, {personDetails.postcode}, {personDetails.country}
+          </td>
         </tr>
         <tr>
           <td>3</td>
           <td>AGENT NAME/ADDRESS</td>
           <td>
-            Either N/A or &lt;AGENT FIRSTNAME LASTNAME, AGENCY NAME, AGENCY ADDRESS, AGENCY TOWN, AGENCY POSTCODE,
-            AGENCY COUNTRY&gt;
+            Either N/A or !AGENT FIRSTNAME LASTNAME, AGENCY NAME, AGENCY ADDRESS, AGENCY TOWN, AGENCY POSTCODE, AGENCY
+            COUNTRY!
           </td>
         </tr>
         <tr>
           <td>4</td>
           <td>The PRODUCTION</td>
-          <td>&lt;SHOWNAME&gt;</td>
+          <td>!SHOWNAME!</td>
         </tr>
         <tr>
           <td>5</td>
           <td>ENGAGED AS</td>
-          <td>&lt;ROLE&gt;</td>
+          <td>!ROLE!</td>
         </tr>
         <tr>
           <td>6</td>
           <td>FIRST DAY OF WORK</td>
-          <td>On or around &lt;FIRST DAY OF WORK&gt;</td>
+          <td>On or around !FIRST DAY OF WORK!</td>
         </tr>
         <tr>
           <td>7</td>
           <td>REHEARSAL TOWN/CITY</td>
-          <td>Likely to be &lt;REHEARSAL TOWN / CITY&gt;</td>
+          <td>!REHEARSAL TOWN / CITY!</td>
         </tr>
         <tr>
           <td>8</td>
           <td>REHEARSAL VENUES</td>
-          <td>Likely to be &lt;REHEARSAL VENUE + REHEARSAL VENUE NOTES&gt;</td>
+          <td>Likely to be !REHEARSAL VENUE + REHEARSAL VENUE NOTES!</td>
         </tr>
         <tr>
           <td>9</td>
           <td>REHEARSAL SALARY</td>
           <td>
-            Either &lt;CONTRACT CURRENCY&gt;&lt;REHEARSAL SALARY&gt; buyout per week plus &lt;CONTRACT
-            CURRENCY&gt;&lt;REHEARSAL HOLIDAY PAY&gt; per week holiday pay, to include any and all additional payments.
-            Pro-rated for part weeks OR ‘Included in Total Fee’
+            Either !CONTRACT CURRENCY + REHEARSAL SALARY! buyout per week plus !CONTRACT CURRENCY + REHEARSAL HOLIDAY
+            PAY! per week holiday pay, to include any and all additional payments. Pro-rated for part weeks OR ‘Included
+            in Total Fee’
           </td>
         </tr>
         <tr>
           <td>10</td>
           <td>FIRST PAID PERFORMANCE DATE</td>
-          <td>On or around &lt;FIRST PERFORMANCE DATE&gt;</td>
+          <td>On or around !FIRST PERFORMANCE DATE!</td>
         </tr>
         <tr>
           <td>11</td>
           <td>NORMAL PLACE OF WORK</td>
           <td>
-            At 8/ as required and [Either &lt;VENUE&gt; if all performance bookings are at the same venue or ‘On Tour’]
+            At 8] as required and at [Either !VENUE! if all performance bookings are at the same venue or ‘On Tour’]
           </td>
         </tr>
         <tr>
           <td>12</td>
           <td>END DATE</td>
-          <td>&lt;END DATE&gt;, or upon issue of two weeks’ notice by producer, whichever shall come first.</td>
+          <td>!END DATE!, or upon issue of two weeks’ notice by producer, whichever shall come first.</td>
         </tr>
         <tr>
           <td>13</td>
           <td>NOMINATED DRIVER STATUS</td>
-          <td>N/A or &lt;DRIVER NOTES FIELD&gt;</td>
+          <td>N/A or !DRIVER NOTES FIELD!</td>
         </tr>
         <tr>
           <td>14</td>
-          <td>[Either ‘PERFORMANCE FEE’ if weekly ‘payments’ selected, or ‘TOTAL FEE’ if ‘total fee’ selected]</td>
+          <td>[Either ‘PERFORMANCE FEE’ if ‘weekly payments’ selected, or ‘TOTAL FEE’ if ‘total fee’ selected]</td>
           <td>
-            Either &lt;CONTRACT CURRENCY&gt;&lt;PERFORMANCE SALARY&gt; buyout plus &lt;CONTRACT
-            CURRENCY&gt;&lt;PERFORMANCE HOLIDAY PAY&gt; holiday pay per performance week. Performance fee will be
-            pro-rated for part weeks and for part rehearsal / part performance weeks.
+            Either !CONTRACT CURRENCY + PERFORMANCE SALARY! buyout plus !CONTRACT CURRENCY + PERFORMANCE HOLIDAY PAY!
+            holiday pay per performance week.
+            <br />
+            Performance fee will be pro-rated for part weeks and for part rehearsal / part performance weeks.
             <br />
             or <br />
-            &lt;CONTRACT CURRENCY&gt;&lt;TOTAL FEE&gt; plus &lt;CONTRACT CURRENCY&gt;&lt;TOTAL FEE HOLIDAY
-            PAY&gt;&lt;HOLIDAY PAY NOTES FIELD&gt;
+            !CONTRACT CURRENCY + TOTAL FEE! plus !CONTRACT CURRENCY + TOTAL FEE HOLIDAY PAY!!HOLIDAY PAY NOTES FIELD!
             <br />
             <br />
             Payments are fully inclusive of (but not restricted to) overtime / additional performances / travel and
@@ -198,62 +217,62 @@ const JendagiContract = () => {
         <tr>
           <td>15</td>
           <td>TOURING ALLOWANCE</td>
-          <td>Either N/A or &lt;WEEKLY TOURING ALLOWANCE + TOURING ALLOWANCE NOTES&gt;</td>
+          <td>[Either N/A or !WEEKLY TOURING ALLOWANCE + TOURING ALLOWANCE NOTES!]</td>
         </tr>
         <tr>
           <td>16</td>
           <td>PAYMENTS</td>
           <td>
-            Either Payments of rehearsal salary and performance fee will be made weekly to a nominated bank account,
-            following receipt of an invoice. Invoices should be submitted in advance OR &lt;TOTAL FEE PAYMENTS NOTES
-            FIELD&gt;
+            [Either Payments of rehearsal salary and performance fee will be made weekly to a nominated bank account,
+            following receipt of an invoice. Invoices should be submitted in advance OR !TOTAL FEE PAYMENTS NOTES
+            FIELD!]
             <br />
             <br />
-            <span className="highlight">[If payment breakdown dates are selected:]</span>
+            <span>[If payment breakdown dates are selected -</span>
             <br />
             Please note: this clause is not contractual; it is a guide only. Dates and exact payment breakdown may
             differ:
             <br />
-            &lt;DAY, DD/MM/YY: CONTRACT CURRENCY+AMOUNT&gt;
+            !DAY, DD/MM/YY: CONTRACT CURRENCY+AMOUNT!
             <br />
-            &lt;DAY, DD/MM/YY: CONTRACT CURRENCY+AMOUNT&gt;
+            !DAY, DD/MM/YY: CONTRACT CURRENCY+AMOUNT!
             <br />
             <br />
-            Holidays may be declared by &lt;PRODUCTION COMPANY&gt;. Holiday pay shall be accrued and paid during
-            declared holidays. Any outstanding holiday pay will be paid at the end of the contract. Holiday pay shall be
-            at the rate stated in Clause 14.
+            Holidays may be declared by !PRODUCTION COMPANY!. Holiday pay shall be accrued and paid during declared
+            holidays. Any outstanding holiday pay will be paid at the end of the contract. Holiday pay shall be at the
+            rate stated in Clause 14.
           </td>
         </tr>
         <tr>
           <td>17</td>
           <td>ACCOMMODATION</td>
           <td>
-            <span className="highlight">
+            <span>
               [If Accommodation provided Yes/No, is NO then ‘The Contractor is responsible for arranging and paying for
-              their own accommodation throughout.’]
+              their own accommodation throughout.’
             </span>
             <br />
             <br />
-            If YES then &lt;ACCOMMODATION NOTES FIELD&gt;
+            If YES then !ACCOMMODATION NOTES FIELD!]
           </td>
         </tr>
         <tr>
           <td>18</td>
           <td>TRANSPORT</td>
           <td>
-            <span className="highlight">
+            <span>
               [If Transport provided Yes/No, is NO then ‘The Contractor is responsible for arranging and paying for
-              their own transport throughout.’]
+              their own transport throughout.’
             </span>
             <br />
             <br />
-            If YES then &lt;TRANSPORT NOTES FIELD&gt;
+            If YES then !TRANSPORT NOTES FIELD!]
           </td>
         </tr>
         <tr>
           <td>19</td>
           <td>
-            <span className="highlight">“DEPARTMENT”</span> AVAILABILITY
+            <span>!DEPARTMENT!</span> AVAILABILITY
           </td>
           <td>
             The Contractor shall make themselves available on such dates and times as the producer may reasonably
@@ -267,20 +286,20 @@ const JendagiContract = () => {
             be required to attend these if advised by the CSM or the Producer
             <br />
             <br />
-            &lt;AVAILABILITY NOTES FIELD&gt;
+            !AVAILABILITY NOTES FIELD!
           </td>
         </tr>
         <tr>
           <td>20</td>
           <td>PUBLICITY AND SPONSORSHIP</td>
           <td>
-            <span className="highlight">[If Required at publicity events is checked, then]</span>
+            <span>[If Required at publicity events is checked, then</span>
             <br />
             The Contractor will be required to attend the following events:
             <br />
-            &lt;DAY, DD/MM/YY: NOTES&gt;
+            !DAY, DD/MM/YY: NOTES!
             <br />
-            &lt;DAY, DD/MM/YY: NOTES&gt;
+            !DAY, DD/MM/YY: NOTES!
             <br />
             <br />
             It is a condition of our contracts that the Contractor is available for such press interviews as the
@@ -300,7 +319,7 @@ const JendagiContract = () => {
         <tr>
           <td>21</td>
           <td>DRIVING COMPANY VEHICLES</td>
-          <td>YES/NO</td>
+          <td>!YES/NO!</td>
         </tr>
         <tr>
           <td>22</td>
@@ -323,34 +342,53 @@ const JendagiContract = () => {
           <td>ADDITIONAL CLAUSES</td>
           <td>
             [If NO is selected for ‘Included additional clauses?’ then ‘N/A’ if YES the included any selected clauses
-            plus ‘CUSTOM CLAUSES’ COVID-19 ADDITIONAL CLAUSES: The following clauses are to clarify the situation if it
-            becomes difficult or impossible to perform the show directly as a result of, or due to the knock-on effects
-            of, a pandemic type illness, COVID-19, or any variant thereof. Throughout this contract where “Covid 19” is
-            mentioned this shall be read to mean any widespread or pandemic type of illness. i] Producer may move show
-            start date if venues become unavailable or if performance commencement becomes unviable because of issues
-            surrounding COVID-19. The start date be moved by up to 25% of the total contractual weeks. If the production
-            fails to open within 6 weeks of original date then the Contractor may resile from contract. ii] Producer may
-            specify unpaid weeks out with 4 weeks’ notice. These may be up to 1/6th of the total number of contractual
-            weeks. iii] Producer may declare paid holidays with 3 weeks’ notice. iv] if, after the contract is signed,
-            The Producer terminates the agreement prior to opening the show because the production is no longer viable
-            due to issues created by COVID-19, either two weeks’ notice shall be given and worked or if closure is
-            immediate then a one-off payment of CONTRACT CURRENCY + CANCELLATION FEE shall be made in lieu of all sums
-            due. The viability of the show will be a matter for the sole determination of the Producer. If performances
-            have been given under this contract by the time of cancellation, then the Contractor shall receive their
-            performance fee for those performances, and then a cancellation fee of CONTRACT CURRENCY + CANCELLATION FEE
-            less any performance fees given. v] The Contractor must have received all doses of a UK or Irish Government
-            approved Covid 19 vaccination (and, if appropriate, booster injections) prior to signing this contract. The
-            Contractor shall display upon Producer’s demand proof of vaccination status. If the Contractor is medically
-            exempt from receiving the vaccine, the Producer must be notified prior to the signing of this contract, be
-            agreeable in writing to the Contractor not being vaccinated or the contract shall be void. vi] By signing
-            this contract the Contractor agrees to undertake Covid testing, and mask wearing as deemed necessary by the
-            producer.]
+            plus !CUSTOM CLAUSES!
+            <br />
+            COVID-19 ADDITIONAL CLAUSES:
+            <br />
+            The following clauses are to clarify the situation if it becomes difficult or impossible to perform the show
+            directly as a result of, or due to the knock-on effects of, a pandemic type illness, COVID-19, or any
+            variant thereof. Throughout this contract where “Covid 19” is mentioned this shall be read to mean any
+            widespread or pandemic type of illness.
+            <br />
+            <br />
+            i]&ensp;&ensp;&ensp;Producer may move show start date if venues become unavailable or if performance
+            commencement becomes unviable because of issues surrounding COVID-19. The start date be moved by up to 25%
+            of the total contractual weeks. If the production fails to open within 6 weeks of original date then the
+            Contractor may resile from contract.
+            <br />
+            <br />
+            ii]&ensp;&ensp;&ensp;Producer may specify unpaid weeks out with 4 weeks’ notice. These may be up to 1/6th of
+            the total number of contractual weeks.
+            <br />
+            <br />
+            iii]&ensp;&ensp;&ensp;Producer may declare paid holidays with 3 weeks’ notice.
+            <br />
+            <br />
+            iv] if, after the contract is signed, The Producer terminates the agreement prior to opening the show
+            because the production is no longer viable due to issues created by COVID-19, either two weeks’ notice shall
+            be given and worked or if closure is immediate then a one-off payment of !CONTRACT CURRENCY + CANCELLATION
+            FEE! shall be made in lieu of all sums due. The viability of the show will be a matter for the sole
+            determination of the Producer. If performances have been given under this contract by the time of
+            cancellation, then the Contractor shall receive their performance fee for those performances, and then a
+            cancellation fee of !CONTRACT CURRENCY + CANCELLATION FEE! less any performance fees given.
+            <br />
+            <br />
+            v] The Contractor must have received all doses of a UK or Irish Government approved Covid 19 vaccination
+            (and, if appropriate, booster injections) prior to signing this contract. The Contractor shall display upon
+            Producer’s demand proof of vaccination status. If the Contractor is medically exempt from receiving the
+            vaccine, the Producer must be notified prior to the signing of this contract, be agreeable in writing to the
+            Contractor not being vaccinated or the contract shall be void.
+            <br />
+            <br />
+            vi] By signing this contract the Contractor agrees to undertake Covid testing, and mask wearing as deemed
+            necessary by the producer.]
           </td>
         </tr>
         <tr>
           <td>25</td>
           <td>MANAGER OR PRODUCER</td>
-          <td>PRODUCTION COMPANY</td>
+          <td>!PRODUCTION COMPANY!</td>
         </tr>
       </table>
 

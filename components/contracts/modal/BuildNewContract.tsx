@@ -26,6 +26,7 @@ export const BuildNewContract = ({ openNewPersonContract, contractSchedule, onCl
       setLoading(true);
       const response = await axios.get('/api/person/' + id, { signal });
       setContractPerson(response.data);
+      console.log(response.data);
       setLoading(false);
     },
     [setContractPerson],
@@ -112,7 +113,9 @@ export const BuildNewContract = ({ openNewPersonContract, contractSchedule, onCl
             <ContractDetails contract={contractDetails} onChange={setContractDetails} />
           </div>
         )}
-        {mainButtonSelection.preview && <ContractPreviewDetailsForm height="h-[70vh]" />}
+        {mainButtonSelection.preview && (
+          <ContractPreviewDetailsForm contractPerson={contractPerson} height="h-[70vh]" />
+        )}
       </div>
 
       <div className="w-full mt-4 flex justify-end items-center">
