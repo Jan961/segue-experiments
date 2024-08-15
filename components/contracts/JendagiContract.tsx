@@ -38,7 +38,7 @@ const defaultContractDetails = {
   cancellationFeeNotes: '',
   includeAdditionalClauses: false,
   additionalClause: null,
-  customClauseList: [''],
+  customClauseList: null,
 };
 
 const Container = styled.div`
@@ -164,9 +164,7 @@ const JendagiContract = ({ contractPerson, contractSchedule, contractDetails }: 
   };
 
   const formatPayment = (payment) => {
-    return (
-      (detailsState.currency ? getCurrencySymbolFromCode(detailsState.currency) : '') + (payment || 'N/A')
-    );
+    return (detailsState.currency ? getCurrencySymbolFromCode(detailsState.currency) : '') + (payment || 'N/A');
   };
 
   const filterPaymentBreakdownList = (breakdownArray) => {
@@ -490,48 +488,10 @@ const JendagiContract = ({ contractPerson, contractSchedule, contractDetails }: 
           <td>24</td>
           <td>ADDITIONAL CLAUSES</td>
           <td>
-            [If NO is selected for ‘Included additional clauses?’ then ‘N/A’ if YES the included any selected clauses
-            plus !CUSTOM CLAUSES!
-            <br />
-            COVID-19 ADDITIONAL CLAUSES:
-            <br />
-            The following clauses are to clarify the situation if it becomes difficult or impossible to perform the show
-            directly as a result of, or due to the knock-on effects of, a pandemic type illness, COVID-19, or any
-            variant thereof. Throughout this contract where “Covid 19” is mentioned this shall be read to mean any
-            widespread or pandemic type of illness.
-            <br />
-            <br />
-            i]&ensp;&ensp;&ensp;Producer may move show start date if venues become unavailable or if performance
-            commencement becomes unviable because of issues surrounding COVID-19. The start date be moved by up to 25%
-            of the total contractual weeks. If the production fails to open within 6 weeks of original date then the
-            Contractor may resile from contract.
-            <br />
-            <br />
-            ii]&ensp;&ensp;&ensp;Producer may specify unpaid weeks out with 4 weeks’ notice. These may be up to 1/6th of
-            the total number of contractual weeks.
-            <br />
-            <br />
-            iii]&ensp;&ensp;&ensp;Producer may declare paid holidays with 3 weeks’ notice.
-            <br />
-            <br />
-            iv] if, after the contract is signed, The Producer terminates the agreement prior to opening the show
-            because the production is no longer viable due to issues created by COVID-19, either two weeks’ notice shall
-            be given and worked or if closure is immediate then a one-off payment of !CONTRACT CURRENCY + CANCELLATION
-            FEE! shall be made in lieu of all sums due. The viability of the show will be a matter for the sole
-            determination of the Producer. If performances have been given under this contract by the time of
-            cancellation, then the Contractor shall receive their performance fee for those performances, and then a
-            cancellation fee of !CONTRACT CURRENCY + CANCELLATION FEE! less any performance fees given.
-            <br />
-            <br />
-            v] The Contractor must have received all doses of a UK or Irish Government approved Covid 19 vaccination
-            (and, if appropriate, booster injections) prior to signing this contract. The Contractor shall display upon
-            Producer’s demand proof of vaccination status. If the Contractor is medically exempt from receiving the
-            vaccine, the Producer must be notified prior to the signing of this contract, be agreeable in writing to the
-            Contractor not being vaccinated or the contract shall be void.
-            <br />
-            <br />
-            vi] By signing this contract the Contractor agrees to undertake Covid testing, and mask wearing as deemed
-            necessary by the producer.]
+            {detailsState.includeAdditionalClauses
+              ? detailsState.customClauseList &&
+                detailsState.customClauseList.map((item, index) => <div key={index}>{item}</div>)
+              : 'N/A'}
           </td>
         </tr>
         <tr>

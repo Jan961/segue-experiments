@@ -354,7 +354,7 @@ const ContractDetails = ({ contract = {}, onChange = noop }: ContractDetailsProp
             testId="contract-details-is-nominated-driver"
             placeholder="Yes | No"
             value={includeAdditionalClauses}
-            onChange={(value) => handleChange('includeClauses', value as boolean)}
+            onChange={(value) => handleChange('includeAdditionalClauses', value as boolean)}
             options={booleanOptions}
           />
         </div>
