@@ -92,13 +92,13 @@ export default function PreviewBookingDetails({
           return acc;
         }, []);
 
-        const previousRowToUpdate = previousDates?.findLast(
+        const previousRowToUpdate = previousDates?.filter(
           ({ venueId, bookingStatus }) =>
             !!venueId &&
             typeof venueId === 'number' &&
             (bookingStatus === 'Confirmed' || bookingStatus === 'Pencilled'),
         );
-        const nextRowToUpdate = futureDates?.find(
+        const nextRowToUpdate = futureDates?.filter(
           ({ venueId, bookingStatus }) =>
             !!venueId &&
             typeof venueId === 'number' &&
@@ -106,15 +106,19 @@ export default function PreviewBookingDetails({
         );
 
         if (previousRowToUpdate) {
-          rowsWithUniqueVenue.unshift(previousRowToUpdate);
+          rowsWithUniqueVenue.unshift(...previousRowToUpdate);
         }
         if (nextRowToUpdate) {
-          rowsWithUniqueVenue.push(nextRowToUpdate);
+          rowsWithUniqueVenue.push(...nextRowToUpdate);
         }
 
-        const payload = rowsWithUniqueVenue.map((row) => {
-          return { Date: row.dateTime || row.dateAsISOString, Ids: [row.venueId || row.item?.venue] };
-        });
+        const payload = rowsWithUniqueVenue
+          .filter((row) => row.status !== 'X')
+          .map((row) => ({
+            Date: row.dateTime || row.dateAsISOString,
+            Ids: [row.venueId || row.item?.venue],
+          }));
+
         fetchMileageforVenues(payload, [...previousDates, ...newDates, ...futureDates]);
       }
     }
