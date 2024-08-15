@@ -19,7 +19,7 @@ interface WeeklyPayDetailsProps {
 const WeeklyPayDetails = ({ onChange = noop, currencySymbol = '£' }: WeeklyPayDetailsProps) => {
   const [weeklyPayDetails, setWeeklyPayDetails] = useState(defaultWeeklyPayDetails);
   const { rehearsalFee, rehearsalHolidayPay, performanceFee, performanceHolidayPay, touringAllowance, subsNotes } =
-    defaultWeeklyPayDetails;
+    weeklyPayDetails;
   const handleChange = useCallback(
     (key: string, value: number | string | boolean | null) => {
       const updatedData = { ...weeklyPayDetails, [key]: value };
@@ -38,7 +38,8 @@ const WeeklyPayDetails = ({ onChange = noop, currencySymbol = '£' }: WeeklyPayD
             testId="contract-details-first-day-work"
             placeholder="00.00"
             value={rehearsalFee}
-            onChange={(event) => handleChange('rehearsalFee', event.target.value)}
+            type="number"
+            onChange={(event) => handleChange('rehearsalFee', parseInt(event.target.value, 10))}
           />
         </div>
       </div>
@@ -49,8 +50,9 @@ const WeeklyPayDetails = ({ onChange = noop, currencySymbol = '£' }: WeeklyPayD
           <TextInput
             testId="contract-details-first-day-work"
             placeholder="00.00"
+            type="number"
             value={rehearsalHolidayPay}
-            onChange={(event) => handleChange('rehearsalHolidayPay', event.target.value)}
+            onChange={(event) => handleChange('rehearsalHolidayPay', parseInt(event.target.value, 10))}
           />
         </div>
       </div>
@@ -61,8 +63,9 @@ const WeeklyPayDetails = ({ onChange = noop, currencySymbol = '£' }: WeeklyPayD
           <TextInput
             testId="contract-details-first-day-work"
             placeholder="00.00"
+            type="number"
             value={performanceFee}
-            onChange={(event) => handleChange('performanceFee', event.target.value)}
+            onChange={(event) => handleChange('performanceFee', parseInt(event.target.value, 10))}
           />
         </div>
       </div>
@@ -73,8 +76,9 @@ const WeeklyPayDetails = ({ onChange = noop, currencySymbol = '£' }: WeeklyPayD
           <TextInput
             testId="contract-details-first-day-work"
             placeholder="00.00"
+            type="number"
             value={performanceHolidayPay}
-            onChange={(event) => handleChange('performanceHolidayPay', event.target.value)}
+            onChange={(event) => handleChange('performanceHolidayPay', parseInt(event.target.value, 10))}
           />
         </div>
       </div>
@@ -86,14 +90,15 @@ const WeeklyPayDetails = ({ onChange = noop, currencySymbol = '£' }: WeeklyPayD
             <TextInput
               testId="contract-details-first-day-work"
               placeholder="00.00"
+              type="number"
               value={touringAllowance}
-              onChange={(event) => handleChange('touringAllowance', event.target.value)}
+              onChange={(event) => handleChange('touringAllowance', parseInt(event.target.value, 10))}
             />
             <TextInput
               testId="contract-details-first-day-work"
               placeholder="Subs Notes"
               value={subsNotes}
-              onChange={(event) => handleChange('touringAllowance', event.target.value)}
+              onChange={(event) => handleChange('subsNotes', event.target.value)}
             />
           </div>
         </div>

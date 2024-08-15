@@ -43,8 +43,9 @@ const PaymentBreakdown = ({ breakdown, currencySymbol = '£', onChange = noop }:
         <Label className="text-sm" text={currencySymbol} />
         <TextInput
           placeholder="00.00"
+          type="number"
           value={amount}
-          onChange={(event) => handleChange('amount', event.target.value)}
+          onChange={(event) => handleChange('amount', parseInt(event.target.value, 10))}
         />
       </div>
       <TextInput

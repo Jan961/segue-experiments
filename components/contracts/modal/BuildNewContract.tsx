@@ -49,6 +49,18 @@ export const BuildNewContract = ({ openNewPersonContract, contractSchedule, onCl
     setMainButtonSelection(buttons);
   };
 
+  const onSave = async () => {
+    try {
+      const response = await axios.post('/api/contracts/create', { ...contractSchedule, contractDetails });
+      console.log('====', response);
+      notify.success('Contract created successfully');
+      onClose();
+    } catch (error) {
+      console.log(error);
+      notify.error('Error Creating contract details');
+    }
+  };
+
   return (
     <PopupModal
       show={openNewPersonContract}
@@ -105,7 +117,7 @@ export const BuildNewContract = ({ openNewPersonContract, contractSchedule, onCl
 
       <div className="w-full mt-4 flex justify-end items-center">
         <Button className="w-33" variant="secondary" text="Cancel" onClick={onClose} />
-        <Button className="ml-4 w-33" variant="primary" text="Save and Return to Contracts" onClick={onClose} />
+        <Button className="ml-4 w-33" variant="primary" text="Save and Return to Contracts" onClick={onSave} />
       </div>
     </PopupModal>
   );

@@ -15,7 +15,7 @@ interface TotalPayDetailsProps {
 
 const TotalPayDetails = ({ onChange = noop, currencySymbol = '£' }: TotalPayDetailsProps) => {
   const [totalPayDetails, setTotalPayDetails] = useState(defaultTotalPayDetails);
-  const { totalFee, totalHolidayPay, feeNotes } = defaultTotalPayDetails;
+  const { totalFee, totalHolidayPay, feeNotes } = totalPayDetails;
   const handleChange = useCallback(
     (key: string, value: number | string | boolean | null) => {
       const updatedData = { ...totalPayDetails, [key]: value };
@@ -34,7 +34,7 @@ const TotalPayDetails = ({ onChange = noop, currencySymbol = '£' }: TotalPayDet
             testId="contract-details-first-day-work"
             placeholder="00.00"
             value={totalFee}
-            onChange={(event) => handleChange('totalFee', event.target.value)}
+            onChange={(event) => handleChange('totalFee', parseInt(event.target.value || '0', 10))}
           />
         </div>
       </div>
@@ -46,7 +46,7 @@ const TotalPayDetails = ({ onChange = noop, currencySymbol = '£' }: TotalPayDet
             testId="contract-details-first-day-work"
             placeholder="00.00"
             value={totalHolidayPay}
-            onChange={(event) => handleChange('totalHolidayPay', event.target.value)}
+            onChange={(event) => handleChange('totalHolidayPay', parseInt(event.target.value || '0', 10))}
           />
         </div>
       </div>
@@ -56,7 +56,7 @@ const TotalPayDetails = ({ onChange = noop, currencySymbol = '£' }: TotalPayDet
           testId="contract-details-first-day-work"
           placeholder="00.00"
           value={feeNotes}
-          onChange={(event) => handleChange('feeNotes', event.target.value)}
+          onChange={(event) => handleChange('feeNotes', parseInt(event.target.value || '0', 10))}
         />
       </div>
     </div>

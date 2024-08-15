@@ -253,26 +253,26 @@ export const workTypeOptions = [
 export const paymentTypes = [
   {
     text: 'Weekly Payment',
-    value: 'weekly',
+    value: 'W',
   },
   {
     text: 'Total Fee',
-    value: 'once',
+    value: 'O',
   },
 ];
 
 export const contractDepartmentOptions = [
   {
     text: 'Artiste',
-    value: 'artiste',
+    value: 1,
   },
   {
     text: 'Creative',
-    value: 'creative',
+    value: 2,
   },
   {
     text: 'SM / Tech / Crew',
-    value: 'sm-tech-crew',
+    value: 3,
   },
 ];
 

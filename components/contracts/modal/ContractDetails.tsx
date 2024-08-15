@@ -304,7 +304,7 @@ const ContractDetails = ({ contract = {}, onChange = noop }: ContractDetailsProp
             testId="contract-details-is-nominated-driver"
             placeholder="Please Select Payment Type"
             value={paymentType}
-            onChange={(value) => handleChange('paymentType', value as boolean)}
+            onChange={(value) => handleChange('paymentType', value as string)}
             options={paymentTypes}
           />
         </div>
@@ -363,8 +363,9 @@ const ContractDetails = ({ contract = {}, onChange = noop }: ContractDetailsProp
               <Label className="text-sm" text={currencySymbol} />
               <TextInput
                 placeholder="00.00"
+                type="number"
                 value={cancellationFee}
-                onChange={(event) => handleChange('cancellationFee', event.target.value)}
+                onChange={(event) => handleChange('cancellationFee', parseInt(event.target.value, 10))}
               />
             </div>
             <TextInput
