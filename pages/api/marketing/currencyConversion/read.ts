@@ -21,8 +21,8 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       const currencyConversion = await prisma.conversionRate.findFirst({
         where: {
           ProductionId: parseInt(productionId.toString()),
-          FromCurrencyCode: productionSymbol,
-          ToCurrencyCode: bookingSymbol,
+          FromCurrencyCode: bookingSymbol,
+          ToCurrencyCode: productionSymbol,
         },
         select: {
           Rate: true,
