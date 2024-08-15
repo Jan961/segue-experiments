@@ -300,7 +300,7 @@ const JendagiContract = ({ contractPerson, contractSchedule, contractDetails }: 
           <td>END DATE</td>
           <td>
             {contractDetails.lastDayOfWork
-              ? contractDetails.lastDayOfWork +
+              ? dateToSimple(contractDetails.lastDayOfWork) +
                 ' ' +
                 'or upon issue of two weeks’ notice by producer, whichever shall come first.'
               : 'N/A'}
