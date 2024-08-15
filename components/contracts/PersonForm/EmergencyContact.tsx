@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react';
 import { Select, TextInput } from 'components/core-ui-lib';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
+import { EmergencyContact } from '../types';
 
 const defaultEmergencyContactData = {
   firstName: '',

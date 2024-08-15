@@ -3,6 +3,7 @@ import { DateInput, Icon, Select, TextInput } from 'components/core-ui-lib';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import { workTypeOptions } from 'config/contracts';
 import { insertAtPos, removeAtPos, replaceAtPos } from 'utils';
+import { PersonDetails } from '../types';
 
 const defaultPersonDetails = {
   firstName: '',

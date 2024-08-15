@@ -11,6 +11,7 @@ import { personState } from 'state/contracts/PersonState';
 import axios from 'axios';
 import { objectify } from 'radash';
 import { PersonMinimalDTO } from 'interfaces';
+import { IContractSchedule } from '../types';
 
 const defaultContractSchedule = {
   production: null,
@@ -35,7 +36,7 @@ export const ContractScheduleModal = ({ openContract, onClose }: { openContract:
   );
   const [openNewPersonContract, setOpenNewPersonContract] = useState(false);
   const [openNewBuildContract, setOpenNewBuildContract] = useState(false);
-  const [contractSchedule, setContractSchedule] = useState<ContractSchedule>(defaultContractSchedule);
+  const [contractSchedule, setContractSchedule] = useState<IContractSchedule>(defaultContractSchedule);
   const { production, department, role, personId, templateId } = contractSchedule;
   const handleChange = useCallback(
     (key: string, value: number | string | boolean | null) => {

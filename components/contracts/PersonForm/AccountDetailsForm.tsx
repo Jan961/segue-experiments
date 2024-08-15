@@ -3,6 +3,7 @@ import { RadioGroup, Select, TextInput } from 'components/core-ui-lib';
 import { Direction } from 'components/core-ui-lib/RadioGroup/RadioGroup';
 import { salaryPaidToOptions } from 'config/contracts';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
+import { BankAccount } from '../types';
 
 const defaultBankAccount = {
   paidTo: '',

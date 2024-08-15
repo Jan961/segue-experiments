@@ -294,6 +294,7 @@ export type ProductionDTO = {
 export type StandardClauseDTO = {
   id: number;
   text: string;
+  title: string;
 };
 
 export type PersonMinimalDTO = {

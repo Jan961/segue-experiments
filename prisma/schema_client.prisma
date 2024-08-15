@@ -1173,6 +1173,9 @@ model Person {
   PersonExpensesSWIFTBIC                               String?            @db.VarChar(11)
   PersonExpensesIBAN                                   String?            @db.VarChar(34)
   PersonExpensesBankCountryId                          Int?
+  PersonPaymentAccountName                             String?            @db.VarChar(80)
+  PersonExpensesAccountName                            String?            @db.VarChar(80)
+  PersonLastModified                                   DateTime?          @db.DateTime(0)
   ACCContract                                          ACCContract[]
   Organisation_Organisation_OrgContactPersonIdToPerson Organisation[]     @relation("Organisation_OrgContactPersonIdToPerson")
   Address                                              Address?           @relation(fields: [PersonAddressId], references: [AddressId], onDelete: Cascade, map: "Address_Person")
@@ -1268,9 +1271,10 @@ model ACCPubEvent {
 }
 
 model ACCStandardClause {
-  Id        Int         @id @default(autoincrement()) @map("StdClauseId")
-  Text      String?     @map("StdClauseText") @db.LongText
-  ACCClause ACCClause[]
+  Id             Int         @id @default(autoincrement()) @map("StdClauseId")
+  StdClauseTitle String      @db.VarChar(100)
+  Text           String?     @map("StdClauseText") @db.LongText
+  ACCClause      ACCClause[]
 }
 
 model PersonPerson {
@@ -1621,7 +1625,7 @@ view SalesView {
   VenueCurrencySymbolUnicode  String?   @db.VarChar(30)
   ConversionToCurrencyCode    String?   @db.VarChar(3)
   ConversionRate              Decimal?  @db.Decimal(8, 4)
-  SetId                       Int       @default(0)
+  SetId                       Int      @default(0)
   SetSalesFiguresDate         DateTime? @db.Date
   SetBookingWeekNum           Int?      @db.SmallInt
   SetProductionWeekDate       DateTime? @db.Date
@@ -1633,7 +1637,7 @@ view SalesView {
   SetSingleSeats              Boolean?  @default(dbgenerated("(b'0')")) @db.Bit(1)
   SetBrochureReleased         Boolean?  @default(dbgenerated("(b'0')")) @db.Bit(1)
   SetIsCopy                   Boolean?  @default(dbgenerated("(b'0')")) @db.Bit(1)
-  SaleTypeName                String    @db.VarChar(45)
+  SaleTypeName                String   @db.VarChar(45)
   Seats                       Decimal?  @db.Decimal(32, 0)
   Value                       Decimal?  @db.Decimal(32, 2)
   TotalCapacity               Float?

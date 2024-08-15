@@ -8,9 +8,10 @@ import { noop } from 'utils';
 import ContractDetails from './ContractDetails';
 import axios from 'axios';
 import LoadingOverlay from 'components/shows/LoadingOverlay';
+import { IContractSchedule } from '../types';
 
 interface BuildNewContractProps {
-  contractSchedule: Partial<ContractSchedule>;
+  contractSchedule: Partial<IContractSchedule>;
   openNewPersonContract: boolean;
   onClose: () => void;
 }

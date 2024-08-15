@@ -11,6 +11,7 @@ export type TContractsFilterState = {
   scheduleEndDate?: Date;
   dealMemoStatusDropDown?: string;
   contractStatusDropDown?: string;
+  scrollToDate?: string;
 };
 
 export const intialContractsFilterState: TContractsFilterState = {
@@ -24,6 +25,7 @@ export const intialContractsFilterState: TContractsFilterState = {
   scheduleStartDate: null,
   dealMemoStatusDropDown: 'all',
   contractStatusDropDown: 'all',
+  scrollToDate: '',
 };
 
 export const contractsFilterState = atom({

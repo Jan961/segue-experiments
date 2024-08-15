@@ -1,22 +1,23 @@
 import { useCallback, useMemo, useState } from 'react';
-import { DateInput, Label, Select, TextInput } from 'components/core-ui-lib';
+import { DateInput, Icon, Label, Select, TextInput } from 'components/core-ui-lib';
 import { booleanOptions, paymentTypes } from 'config/contracts';
-import { noop, transformToOptions } from 'utils';
+import { insertAtPos, noop, removeAtPos, replaceAtPos, transformToOptions } from 'utils';
 import WeeklyPayDetails from '../contractDetails/WeeklyPayDetails';
 import TotalPayDetails from '../contractDetails/TotalPayDetails';
 import PaymentBreakdown, { TPaymentBreakdown, defaultPaymentBreakdown } from '../contractDetails/PaymentBreakdown';
 import { replace } from 'radash';
 import { useRecoilValue } from 'recoil';
 import { currencyListState } from 'state/productions/currencyState';
+import PublicityEventDetails, { IPublicityEventDetails, defaultPublicityEventDetails } from './PublicityEventDetails';
+import { contractsVenueState } from 'state/contracts/contractsVenueState';
+import { standardClauseState } from 'state/contracts/standardClauseState';
 
 const defaultContractDetails = {
   currency: null,
   firstDayOfWork: null,
   lastDayOfWork: null,
   specificAvailabilityNotes: '',
-  publicityEventNotes: '',
-  publicityEventDate: null,
-  requiredAtSpecificPublicityEvents: null,
+  publicityEventList: [defaultPublicityEventDetails],
   rehearsalVenue: {
     townCity: '',
     venue: null,
@@ -36,23 +37,21 @@ const defaultContractDetails = {
   cancellationFeeNotes: '',
   includeAdditionalClauses: false,
   additionalClause: null,
-  customClause: '',
+  customClauseList: [''],
 };
 
-interface IRehearsalVenueDetails{
+interface IRehearsalVenueDetails {
   townCity: string;
   venue: string | null;
   notes: string;
-};
+}
 
 interface IContractDetails {
   currency: string | null;
   firstDayOfWork: string | null;
   lastDayOfWork: string | null;
   specificAvailabilityNotes: string;
-  publicityEventNotes: string;
-  publicityEventDate: string | null;
-  requiredAtSpecificPublicityEvents: boolean | null;
+  publicityEventList: IPublicityEventDetails[];
   rehearsalVenue: IRehearsalVenueDetails;
   isAccomodationProvided: boolean;
   accomodationNotes: string;
@@ -68,8 +67,8 @@ interface IContractDetails {
   cancellationFeeNotes: string;
   includeAdditionalClauses: boolean;
   additionalClause: string | null;
-  customClause: string;
-};
+  customClauseList: string[];
+}
 
 interface ContractDetailsProps {
   contract: any;
@@ -78,14 +77,19 @@ interface ContractDetailsProps {
 
 const ContractDetails = ({ contract = {}, onChange = noop }: ContractDetailsProps) => {
   const [contractDetails, setContractDetails] = useState<IContractDetails>({ ...defaultContractDetails, ...contract });
+  const venueMap = useRecoilValue(contractsVenueState);
+  const stdClauseMap = useRecoilValue(standardClauseState);
+  const venueOptions = useMemo(
+    () => transformToOptions(Object.values(venueMap), null, 'Id', (v) => `${v.Code} ${v.Name}`),
+    [venueMap],
+  );
+  const clauseOptions = useMemo(() => transformToOptions(Object.values(stdClauseMap), 'title', 'id'), [stdClauseMap]);
   const {
     currency,
     firstDayOfWork,
     lastDayOfWork,
     specificAvailabilityNotes,
-    publicityEventNotes,
-    publicityEventDate,
-    requiredAtSpecificPublicityEvents,
+    publicityEventList = [],
     rehearsalVenue,
     isAccomodationProvided,
     accomodationNotes,
@@ -99,7 +103,7 @@ const ContractDetails = ({ contract = {}, onChange = noop }: ContractDetailsProp
     cancellationFeeNotes,
     includeAdditionalClauses,
     additionalClause,
-    customClause,
+    customClauseList,
   } = contractDetails;
   const { townCity, notes, venue } = rehearsalVenue;
   const currencyList = useRecoilValue(currencyListState);
@@ -107,7 +111,7 @@ const ContractDetails = ({ contract = {}, onChange = noop }: ContractDetailsProp
   const currencySymbol = useMemo(() => '£', [currency]);
 
   const handleChange = useCallback(
-    (key: string, value: number | string | boolean | TPaymentBreakdown[]) => {
+    (key: string, value: number | string | boolean | string[] | TPaymentBreakdown[] | IPublicityEventDetails[]) => {
       const updatedData = { ...contractDetails, [key]: value };
       setContractDetails(updatedData);
       onChange(updatedData);
@@ -168,40 +172,43 @@ const ContractDetails = ({ contract = {}, onChange = noop }: ContractDetailsProp
           onChange={(event) => handleChange('specificAvailabilityNotes', event.target.value)}
         />
       </div>
-      <div className="flex items-start gap-4">
-        <div className="flex items-start gap-2">
-          <Label className="!font-bold text-sm w-36" text="Required at Specific Publicity Events" />
-          <Select
-            testId="contract-details-currency"
-            placeholder="Yes | No"
-            value={requiredAtSpecificPublicityEvents}
-            onChange={(value) => handleChange('requiredAtSpecificPublicityEvents', value as boolean)}
-            options={booleanOptions}
-          />
+      <div className="flex flex-row gap-2">
+        <Label className="!font-bold text-sm w-36" text="Required at Specific Publicity Events" />
+        <div className="flex flex-col gap-2">
+          {publicityEventList.map((publicityEvent, i) => (
+            <div key={i} className="flex gap-2 items-center">
+              <PublicityEventDetails
+                details={publicityEvent}
+                onChange={(details) => handleChange('publicityEventList', replaceAtPos(publicityEventList, details, i))}
+              />
+              <div
+                className="cursor-pointer"
+                onClick={() =>
+                  handleChange(
+                    'publicityEventList',
+                    insertAtPos(publicityEventList, defaultPublicityEventDetails, i + 1),
+                  )
+                }
+              >
+                <Icon iconName="plus-circle-solid" />
+              </div>
+              {i > 0 && (
+                <div
+                  className="cursor-pointer"
+                  onClick={() => handleChange('publicityEventList', removeAtPos(publicityEventList, i))}
+                >
+                  <Icon iconName="minus-circle-solid" />
+                </div>
+              )}
+            </div>
+          ))}
         </div>
-        <div className="flex items-center gap-2">
-          <Label className="!font-bold text-sm" text="If YES, " />
-          <DateInput
-            disabled={!requiredAtSpecificPublicityEvents}
-            testId="contract-details-publicity-event-date"
-            placeholder="DD/MM/YY"
-            value={publicityEventDate}
-            onChange={(value) => handleChange('publicityEventDate', value?.toISOString?.() || '')}
-          />
-        </div>
-        <TextInput
-          disabled={!requiredAtSpecificPublicityEvents}
-          testId="contract-details-publicity-event-notes"
-          placeholder="Publicity Event Notes"
-          className="flex-1"
-          value={publicityEventNotes}
-          onChange={(event) => handleChange('publicityEventNotes', event.target.value)}
-        />
       </div>
       <div className="flex items-start gap-2">
         <Label className="!font-bold text-sm w-36" text="Rehearsal Venue" />
         <div className="flex flex-col gap-2">
           <TextInput
+            className="w-96"
             testId="contract-details-rehearsal-venue-town-city"
             placeholder="Enter Town/City"
             value={townCity}
@@ -209,12 +216,16 @@ const ContractDetails = ({ contract = {}, onChange = noop }: ContractDetailsProp
           />
           <Select
             testId="contract-details-rehearsal-venue-id"
+            className="w-96"
             placeholder="Select Venue"
             value={venue}
             onChange={(value) => onRehearsalVenueChange('venue', value as number)}
-            options={[]}
+            options={venueOptions}
+            isSearchable
+            isClearable
           />
           <TextInput
+            className="w-96"
             testId="contract-details-rehearsal-venue-notes"
             placeholder="Rehearsal Venue Notes"
             value={notes}
@@ -285,7 +296,7 @@ const ContractDetails = ({ contract = {}, onChange = noop }: ContractDetailsProp
           onChange={(event) => handleChange('nominatedDriverNotes', event.target.value)}
         />
       </div>
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-4">
         <div className="text-xl text-primary-navy font-bold mb-3 uppercase">Payment Details</div>
         <div className="flex items-center gap-2">
           <Label className="!font-bold text-sm w-52" text="Type of Payment" />
@@ -307,21 +318,43 @@ const ContractDetails = ({ contract = {}, onChange = noop }: ContractDetailsProp
             <TotalPayDetails onChange={(value) => handleChange('totalPayDetails', value as boolean)} />
           </div>
         </div>
-        <div className="flex items-start gap-4 w-full">
+        <div className="flex items-start grow gap-4 w-full">
           <Label className="!font-bold w-36" text="Payment Breakdown" />
-          {paymentBreakdownList.map((paymentBreakdown, i) => (
-            <PaymentBreakdown
-              key={i}
-              breakdown={paymentBreakdown}
-              currencySymbol={currencySymbol}
-              onChange={(change) =>
-                handleChange(
-                  'paymentBreakdownList',
-                  replace(paymentBreakdownList, change, (_, idx) => idx === i) as TPaymentBreakdown[],
-                )
-              }
-            />
-          ))}
+          <div className="flex flex-col gap-2">
+            {paymentBreakdownList.map((paymentBreakdown, i) => (
+              <div key={i} className="flex w-full items-center gap-2">
+                <PaymentBreakdown
+                  breakdown={paymentBreakdown}
+                  currencySymbol={currencySymbol}
+                  onChange={(change) =>
+                    handleChange(
+                      'paymentBreakdownList',
+                      replace(paymentBreakdownList, change, (_, idx) => idx === i) as TPaymentBreakdown[],
+                    )
+                  }
+                />
+                <div
+                  className="cursor-pointer"
+                  onClick={() =>
+                    handleChange(
+                      'paymentBreakdownList',
+                      insertAtPos(paymentBreakdownList, defaultPaymentBreakdown, i + 1),
+                    )
+                  }
+                >
+                  <Icon iconName="plus-circle-solid" />
+                </div>
+                {i > 0 && (
+                  <div
+                    className="cursor-pointer"
+                    onClick={() => handleChange('paymentBreakdownList', removeAtPos(paymentBreakdownList, i))}
+                  >
+                    <Icon iconName="minus-circle-solid" />
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
         <div className="flex items-start gap-4 w-full">
           <Label className="!font-bold w-36" text="Cancellation Fee" />
@@ -362,15 +395,39 @@ const ContractDetails = ({ contract = {}, onChange = noop }: ContractDetailsProp
               placeholder="Please Select a Clause"
               value={additionalClause}
               onChange={(value) => handleChange('additionalClause', value as number)}
-              options={[]}
+              options={clauseOptions}
             />
-            <TextInput
-              className="grow"
-              inputClassName="grow"
-              placeholder="Custom Clause"
-              value={customClause}
-              onChange={(event) => handleChange('customClause', event.target.value)}
-            />
+            <div className="flex flex-col gap-2">
+              {customClauseList.map((customClause, i) => (
+                <div key={i} className="flex items-center gap-2">
+                  <TextInput
+                    className="grow"
+                    inputClassName="grow"
+                    placeholder="Custom Clause"
+                    value={customClause}
+                    onChange={(event) =>
+                      handleChange('customClauseList', replaceAtPos(customClauseList, event.target.value as string, i))
+                    }
+                  />
+                  {i === 0 && (
+                    <div
+                      className="cursor-pointer"
+                      onClick={() => handleChange('customClauseList', insertAtPos(customClauseList, '', i + 1))}
+                    >
+                      <Icon iconName="plus-circle-solid" />
+                    </div>
+                  )}
+                  {i > 0 && (
+                    <div
+                      className="cursor-pointer"
+                      onClick={() => handleChange('customClauseList', removeAtPos(customClauseList, i))}
+                    >
+                      <Icon iconName="minus-circle-solid" />
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>

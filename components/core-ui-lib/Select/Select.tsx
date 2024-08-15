@@ -28,7 +28,7 @@ type SelectVariant = 'transparent' | 'colored';
 
 export interface SelectProps extends WithTestId {
   value?: string | number | any[] | undefined | boolean;
-  onChange: (value: string | number | boolean | (string | number)[]) => void;
+  onChange: (value: string | number | boolean | (string | number | boolean)[]) => void;
   renderOption?: (option: OptionProps) => React.ReactElement;
   customStyles?: Partial<StylesConfig>;
   options: SelectOption[];
