@@ -20,6 +20,7 @@ import { intialTasksState, tasksfilterState } from 'state/tasks/tasksFilterState
 import MasterTaskList from 'components/tasks/modals/MasterTaskList';
 import ProductionTaskList from 'components/tasks/modals/ProductionTaskList';
 import { productionJumpState } from 'state/booking/productionJumpState';
+import Spinner from '../../../components/core-ui-lib/Spinner';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
@@ -48,6 +49,7 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
   const [showNewProduction, setShowNewProduction] = useState<boolean>(false);
   const [isMasterTaskList, setIsMasterTaskList] = useState<boolean>(false);
   const [isProductionTaskList, setIsProductionTaskList] = useState<boolean>(false);
+  const [isShowSpinner, setIsShowSpinner] = useState<boolean>(false);
 
   const { selected: ProductionId } = useRecoilValue(productionJumpState);
   const handleShowTask = () => {
@@ -107,46 +109,58 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
   };
   const currentProductionObj = useRecoilValue(productionJumpState).productions.find((item) => item.Id === ProductionId);
   return (
-    <Layout title="Tasks | Segue" flush>
-      <div className="mb-8">
-        <Filters usersList={usersList} handleShowTask={handleModalConditions} />
-      </div>
-      {filteredProductions.length === 0 ? (
-        <TasksTable rowData={[]} />
-      ) : (
-        filteredProductions.map((production) => {
-          const columnDefs = getColumnDefs(usersList, currentProductionObj);
-          return (
-            <div key={production.Id} className="mb-10">
-              <TasksTable
-                tableHeight={filteredProductions.length > 1}
-                rowData={production.Tasks}
-                columnDefs={columnDefs}
-                productionId={production.Id}
-                showAddTask={showAddTask}
-                handleShowTask={handleShowTask}
-              />
-            </div>
-          );
-        })
+    <>
+      {' '}
+      {isShowSpinner && (
+        <div
+          data-testid="tasks-page-spinner"
+          className="inset-0 absolute bg-white bg-opacity-50 z-50 flex justify-center items-center"
+        >
+          <Spinner size="lg" />
+        </div>
       )}
-      <NewProductionEmpty
-        visible={showEmptyProductionModal}
-        onClose={handleShowEmptyProduction}
-        handleSubmit={handleNewProductionTaskSubmit}
-      />
-      <NewProductionTask
-        visible={showNewProduction}
-        onClose={handleNewProductionTaskModal}
-        handleNewProductionTaskSubmit={handleNewProductionTaskSubmit}
-      />
-      <MasterTaskList visible={isMasterTaskList} onClose={handleMasterListClose} productionId={ProductionId} />
-      <ProductionTaskList
-        visible={isProductionTaskList}
-        onClose={handleProductionListClose}
-        productionId={ProductionId}
-      />
-    </Layout>
+      <Layout title="Tasks | Segue" flush>
+        <div className="mb-8">
+          <Filters usersList={usersList} handleShowTask={handleModalConditions} />
+        </div>
+        {filteredProductions.length === 0 ? (
+          <TasksTable rowData={[]} />
+        ) : (
+          filteredProductions.map((production) => {
+            const columnDefs = getColumnDefs(usersList, currentProductionObj);
+            return (
+              <div key={production.Id} className="mb-10">
+                <TasksTable
+                  tableHeight={filteredProductions.length > 1}
+                  rowData={production.Tasks}
+                  columnDefs={columnDefs}
+                  productionId={production.Id}
+                  showAddTask={showAddTask}
+                  handleShowTask={handleShowTask}
+                  setIsShowSpinner={setIsShowSpinner}
+                />
+              </div>
+            );
+          })
+        )}
+        <NewProductionEmpty
+          visible={showEmptyProductionModal}
+          onClose={handleShowEmptyProduction}
+          handleSubmit={handleNewProductionTaskSubmit}
+        />
+        <NewProductionTask
+          visible={showNewProduction}
+          onClose={handleNewProductionTaskModal}
+          handleNewProductionTaskSubmit={handleNewProductionTaskSubmit}
+        />
+        <MasterTaskList visible={isMasterTaskList} onClose={handleMasterListClose} productionId={ProductionId} />
+        <ProductionTaskList
+          visible={isProductionTaskList}
+          onClose={handleProductionListClose}
+          productionId={ProductionId}
+        />
+      </Layout>
+    </>
   );
 };
 

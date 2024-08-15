@@ -11,15 +11,16 @@ import { ProductionsWithTasks } from 'state/tasks/productionState';
 import { objectify } from 'radash';
 import { useRecoilValue } from 'recoil';
 import { userState } from 'state/account/userState';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { getColumnDefs } from 'components/tasks/tableConfig';
 import { mapToProductionTasksDTO } from 'mappers/tasks';
 import { productionJumpState } from 'state/booking/productionJumpState';
+import Spinner from '../../components/core-ui-lib/Spinner';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const { filteredProductions } = useTasksFilter();
-
+  const [isShowSpinner, setIsShowSpinner] = useState<boolean>(false);
   const { users } = useRecoilValue(userState);
 
   const usersList = useMemo(
@@ -38,31 +39,42 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
   }
   const currentProductionObjList = useRecoilValue(productionJumpState).productions;
   return (
-    <Layout title="Tasks | Segue" flush>
-      <div className="mb-8">
-        <Filters usersList={usersList} />
-      </div>
-      {filteredProductions.length === 0 ? (
-        <TasksTable rowData={[]} />
-      ) : (
-        filteredProductions.map((production) => {
-          const columnDefs = getColumnDefs(
-            usersList,
-            currentProductionObjList.find((item) => item.Id === production.Id),
-          );
-          return (
-            <div key={production.Id} className="mb-10">
-              <TasksTable
-                tableHeight={filteredProductions.length > 1}
-                rowData={production.Tasks}
-                columnDefs={columnDefs}
-                productionId={production.Id}
-              />
-            </div>
-          );
-        })
+    <>
+      {isShowSpinner && (
+        <div
+          data-testid="tasks-page-spinner"
+          className="inset-0 absolute bg-white bg-opacity-50 z-50 flex justify-center items-center"
+        >
+          <Spinner size="lg" />
+        </div>
       )}
-    </Layout>
+      <Layout title="Tasks | Segue" flush>
+        <div className="mb-8">
+          <Filters usersList={usersList} />
+        </div>
+        {filteredProductions.length === 0 ? (
+          <TasksTable rowData={[]} />
+        ) : (
+          filteredProductions.map((production) => {
+            const columnDefs = getColumnDefs(
+              usersList,
+              currentProductionObjList.find((item) => item.Id === production.Id),
+            );
+            return (
+              <div key={production.Id} className="mb-10">
+                <TasksTable
+                  tableHeight={filteredProductions.length > 1}
+                  rowData={production.Tasks}
+                  columnDefs={columnDefs}
+                  productionId={production.Id}
+                  setIsShowSpinner={setIsShowSpinner}
+                />
+              </div>
+            );
+          })
+        )}
+      </Layout>
+    </>
   );
 };
 
