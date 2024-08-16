@@ -71,3 +71,48 @@ export interface IContractSchedule {
   personId: number | null;
   templateId: number | null;
 }
+
+interface IRehearsalVenueDetails {
+  townCity: string;
+  venue: string | null;
+  notes: string;
+}
+
+interface IWeeklyPayDetails {
+  performanceFee?: number;
+  performanceHolidayPay?: number;
+  rehearsalFee?: number;
+  rehearsalHolidayPay?: number;
+  subsNotes?: string;
+  touringAllowance?: number;
+}
+
+interface ITotalPayDetails {
+  feeNotes: string;
+  totalFee: number;
+  totalHolidayPay: number;
+}
+
+interface IContractDetails {
+  currency: string | null;
+  firstDayOfWork: string | null;
+  lastDayOfWork: string | null;
+  specificAvailabilityNotes: string;
+  publicityEventList: IPublicityEventDetails[];
+  rehearsalVenue: IRehearsalVenueDetails;
+  isAccomodationProvided: boolean;
+  accomodationNotes: string;
+  isTransportProvided: boolean;
+  transportNotes: string;
+  isNominatedDriver: boolean;
+  nominatedDriverNotes: string;
+  paymentType: string | null;
+  weeklyPayDetails: IWeeklyPayDetails;
+  totalPayDetails: ITotalPayDetails;
+  paymentBreakdownList: TPaymentBreakdown[];
+  cancellationFee: number;
+  cancellationFeeNotes: string;
+  includeAdditionalClauses: boolean;
+  additionalClause: string | null;
+  customClauseList: string[];
+}

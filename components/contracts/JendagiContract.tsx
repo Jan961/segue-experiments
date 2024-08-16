@@ -1,101 +1,198 @@
 import styled from 'styled-components';
+import { dateToSimple } from 'services/dateService';
+import { IContractSchedule, IContractDetails } from './types';
+import { useState } from 'react';
+import { useRecoilValue } from 'recoil';
+import { contractsVenueState } from 'state/contracts/contractsVenueState';
+import { currencyListState } from 'state/productions/currencyState';
+import charCodeToCurrency from 'utils/charCodeToCurrency';
+import { productionJumpState } from 'state/booking/productionJumpState';
 
-const JendagiContract = () => {
-  const Container = styled.div`
-    height: fit-content;
-    background-color: #fff;
-    padding: 40px;
-    width: 50%;
-    min-width: 700px;
-    font-family: 'Times New Roman', Times, serif;
+interface JendagiContractProps {
+  contractPerson: any;
+  contractSchedule: Partial<IContractSchedule>;
+  contractDetails: Partial<IContractDetails>;
+}
 
-    .title-container {
-      padding-bottom: 40px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-    }
+const defaultContractDetails = {
+  currency: null,
+  firstDayOfWork: null,
+  lastDayOfWork: null,
+  specificAvailabilityNotes: '',
+  publicityEventList: null,
+  rehearsalVenue: {
+    townCity: '',
+    venue: null,
+    notes: '',
+  },
+  isAccomodationProvided: false,
+  accomodationNotes: '',
+  isTransportProvided: false,
+  transportNotes: '',
+  isNominatedDriver: false,
+  nominatedDriverNotes: '',
+  paymentType: null,
+  weeklyPayDetails: null,
+  totalPayDetails: null,
+  paymentBreakdownList: null,
+  cancellationFee: 0,
+  cancellationFeeNotes: '',
+  includeAdditionalClauses: false,
+  additionalClause: null,
+  customClauseList: null,
+};
 
-    .toursummary-container {
-      display: flex;
-      flex-direction: column;
-      margin-bottom: 700px;
-    }
+const Container = styled.div`
+  height: fit-content;
+  background-color: #fff;
+  padding: 40px;
+  width: 50%;
+  min-width: 700px;
+  font-family: 'Times New Roman', Times, serif;
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 0 auto;
-      margin-bottom: 400px;
-    }
+  .title-container {
+    padding-bottom: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
 
-    table,
-    th,
-    td {
-      border: 1px solid black;
-    }
+  .toursummary-container {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 100px;
+  }
 
-    th,
-    td {
-      padding: 5px;
-      text-align: left;
-    }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0 auto;
+    margin-bottom: 100px;
+  }
 
-    .highlight {
-      color: red;
-      font-weight: bold;
-    }
+  table,
+  th,
+  td {
+    border: 1px solid black;
+  }
 
-    .details {
-      margin-top: 20px;
-    }
+  th,
+  td {
+    padding: 5px;
+    text-align: left;
+  }
 
-    .details p {
-      margin-bottom: 20px;
-    }
+  .highlight {
+    color: red;
+    font-weight: bold;
+  }
 
-    .details-title {
-      display: flex;
-      column-gap: 45px;
-    }
+  .details {
+    margin-top: 20px;
+  }
 
-    .details-subsection {
-      margin-left: 60px;
-      margin-top: 20px;
-    }
+  .details p {
+    margin-bottom: 20px;
+  }
 
-    .footer div {
-      margin-bottom: 15px;
-    }
+  .details-title {
+    display: flex;
+    column-gap: 45px;
+  }
 
-    .footer img {
-      width: 20%;
-      height: 20%;
-    }
+  .details-subsection {
+    margin-left: 60px;
+    margin-top: 20px;
+  }
 
-    ul {
-      list-style-type: none;
-      padding-left: 20px;
-    }
+  .footer div {
+    margin-bottom: 15px;
+  }
 
-    ul li {
-      position: relative;
-      padding-left: 15px;
-    }
+  .footer img {
+    width: 20%;
+    height: 20%;
+  }
 
-    ul li::before {
-      content: '-';
-      position: absolute;
-      left: 0;
-      color: black;
-    }
-  `;
+  ul {
+    list-style-type: none;
+    padding-left: 20px;
+  }
+
+  ul li {
+    position: relative;
+    padding-left: 15px;
+  }
+
+  ul li::before {
+    content: '-';
+    position: absolute;
+    left: 0;
+    color: black;
+  }
+`;
+
+const JendagiContract = ({ contractPerson, contractSchedule, contractDetails }: JendagiContractProps) => {
+  const { productions } = useRecoilValue(productionJumpState);
+  const [personState] = useState({ ...contractPerson });
+  const [scheduleState] = useState<Partial<IContractSchedule>>({ ...contractSchedule });
+  const [detailsState] = useState<Partial<IContractDetails>>({ ...defaultContractDetails, ...contractDetails });
+  const venueMap = useRecoilValue(contractsVenueState);
+  const currencyList = useRecoilValue(currencyListState);
+
+  console.log(contractSchedule);
+  const { personDetails, agencyDetails } = personState;
+
+  const currentDate = dateToSimple(new Date().toISOString());
+
+  const getVenueNameFromId = (venueId) => {
+    return Object.values(venueMap).find((venue) => venue.Id === venueId).Name;
+  };
+
+  const getCurrencySymbolFromCode = (currencyCode) => {
+    return charCodeToCurrency(
+      Object.values(currencyList).find((currency) => currency.code === currencyCode).symbolUnicode,
+    );
+  };
+
+  const formatPayment = (payment) => {
+    return (detailsState.currency ? getCurrencySymbolFromCode(detailsState.currency) : '') + (payment || 'N/A');
+  };
+
+  const filterPaymentBreakdownList = (breakdownArray) => {
+    return breakdownArray.map((list) => {
+      return (
+        dateToSimple(list.date) +
+        ': ' +
+        (detailsState.currency ? getCurrencySymbolFromCode(detailsState.currency) : '') +
+        String(list.amount)
+      );
+    });
+  };
+
+  const filterPublicityEventList = (publicityArray) => {
+    return publicityArray.map((list) => {
+      return (
+        dateToSimple(list.date) +
+        ': ' +
+        (detailsState.currency ? getCurrencySymbolFromCode(detailsState.currency) : '') +
+        list.notes
+      );
+    });
+  };
+
+  const getShowNameFromId = (id) => {
+    const result = productions.find((prod) => {
+      return prod.Id === id;
+    });
+    return result.ShowName;
+  };
 
   return (
     <Container>
       <div className="title-container">
-        <strong>DEPARTMENT CONTRACT SCHEDULE</strong>
+        <strong>{scheduleState.department} - CONTRACT SCHEDULE</strong>
         <span>THIS SCHEDULE SHALL BE DEEMED ANNEXED</span>
         <span>AND FORMS PART OF THE CONTRACT BELOW</span>
       </div>
@@ -104,93 +201,142 @@ const JendagiContract = () => {
         <tr>
           <td>1</td>
           <td>DOCUMENT ISSUE DATE</td>
-          <td>DATE OF PDF EXPORT</td>
+          <td>{currentDate}</td>
         </tr>
         <tr>
           <td>2</td>
-          <td>“DEPARTMENT” NAME/ADDRESS</td>
-          <td>&lt;PERSON NAME, PERSON ADDRESS, PERSON TOWN, PERSON POSTCODE, PERSON COUNTRY&gt;</td>
+          <td>{scheduleState.department} - NAME/ADDRESS</td>
+          <td>
+            {[
+              personDetails.firstName + ' ' + personDetails.lastName,
+              personDetails.address1,
+              personDetails.address2,
+              personDetails.town,
+              personDetails.postcode,
+              personDetails.country,
+            ]
+              .filter((detail) => detail)
+              .join(', ')}
+          </td>
         </tr>
         <tr>
           <td>3</td>
           <td>AGENT NAME/ADDRESS</td>
           <td>
-            Either N/A or &lt;AGENT FIRSTNAME LASTNAME, AGENCY NAME, AGENCY ADDRESS, AGENCY TOWN, AGENCY POSTCODE,
-            AGENCY COUNTRY&gt;
+            {agencyDetails
+              ? [
+                  agencyDetails.firstName + ' ' + agencyDetails.lastName,
+                  agencyDetails.agencyName,
+                  agencyDetails.address1,
+                  agencyDetails.address2,
+                  agencyDetails.town,
+                  agencyDetails.postcode,
+                  agencyDetails.country,
+                ]
+                  .filter((detail) => detail)
+                  .join(', ')
+              : 'N/A'}
           </td>
         </tr>
         <tr>
           <td>4</td>
           <td>The PRODUCTION</td>
-          <td>&lt;SHOWNAME&gt;</td>
+          <td>{getShowNameFromId(scheduleState.production)}</td>
         </tr>
         <tr>
           <td>5</td>
           <td>ENGAGED AS</td>
-          <td>&lt;ROLE&gt;</td>
+          <td>{scheduleState.role}</td>
         </tr>
         <tr>
           <td>6</td>
           <td>FIRST DAY OF WORK</td>
-          <td>On or around &lt;FIRST DAY OF WORK&gt;</td>
+          <td>{detailsState.firstDayOfWork ? 'On or around ' + dateToSimple(detailsState.firstDayOfWork) : 'N/A'}</td>
         </tr>
         <tr>
           <td>7</td>
           <td>REHEARSAL TOWN/CITY</td>
-          <td>Likely to be &lt;REHEARSAL TOWN / CITY&gt;</td>
+          <td>{detailsState.rehearsalVenue.townCity ? detailsState.rehearsalVenue.townCity : 'N/A'}</td>
         </tr>
         <tr>
           <td>8</td>
           <td>REHEARSAL VENUES</td>
-          <td>Likely to be &lt;REHEARSAL VENUE + REHEARSAL VENUE NOTES&gt;</td>
+          <td>
+            {detailsState.rehearsalVenue.venue
+              ? 'Likely to be ' +
+                getVenueNameFromId(detailsState.rehearsalVenue.venue) +
+                (detailsState.rehearsalVenue.notes !== '' ? ' - ' + detailsState.rehearsalVenue.notes : '')
+              : 'N/A'}
+          </td>
         </tr>
         <tr>
           <td>9</td>
           <td>REHEARSAL SALARY</td>
           <td>
-            Either &lt;CONTRACT CURRENCY&gt;&lt;REHEARSAL SALARY&gt; buyout per week plus &lt;CONTRACT
-            CURRENCY&gt;&lt;REHEARSAL HOLIDAY PAY&gt; per week holiday pay, to include any and all additional payments.
-            Pro-rated for part weeks OR ‘Included in Total Fee’
+            {detailsState.paymentType
+              ? detailsState.paymentType === 'W'
+                ? formatPayment(detailsState.weeklyPayDetails?.rehearsalFee) +
+                  ' buyout per week plus ' +
+                  formatPayment(detailsState.weeklyPayDetails?.rehearsalHolidayPay) +
+                  ' per week holiday pay, to include any and all additional payments. Pro-rated for part weeks.'
+                : 'Included in Total Fee'
+              : 'N/A'}
           </td>
         </tr>
         <tr>
           <td>10</td>
           <td>FIRST PAID PERFORMANCE DATE</td>
-          <td>On or around &lt;FIRST PERFORMANCE DATE&gt;</td>
+          <td>On or around !FIRST PERFORMANCE DATE!</td>
         </tr>
         <tr>
           <td>11</td>
           <td>NORMAL PLACE OF WORK</td>
           <td>
-            At 8/ as required and [Either &lt;VENUE&gt; if all performance bookings are at the same venue or ‘On Tour’]
+            At 8] as required and at [Either !VENUE! if all performance bookings are at the same venue or ‘On Tour’]
           </td>
         </tr>
         <tr>
           <td>12</td>
           <td>END DATE</td>
-          <td>&lt;END DATE&gt;, or upon issue of two weeks’ notice by producer, whichever shall come first.</td>
+          <td>
+            {contractDetails.lastDayOfWork
+              ? dateToSimple(contractDetails.lastDayOfWork) +
+                ' ' +
+                'or upon issue of two weeks’ notice by producer, whichever shall come first.'
+              : 'N/A'}
+          </td>
         </tr>
         <tr>
           <td>13</td>
           <td>NOMINATED DRIVER STATUS</td>
-          <td>N/A or &lt;DRIVER NOTES FIELD&gt;</td>
+          <td>{contractDetails.isNominatedDriver ? contractDetails.nominatedDriverNotes : 'N/A'}</td>
         </tr>
         <tr>
           <td>14</td>
-          <td>[Either ‘PERFORMANCE FEE’ if weekly ‘payments’ selected, or ‘TOTAL FEE’ if ‘total fee’ selected]</td>
           <td>
-            Either &lt;CONTRACT CURRENCY&gt;&lt;PERFORMANCE SALARY&gt; buyout plus &lt;CONTRACT
-            CURRENCY&gt;&lt;PERFORMANCE HOLIDAY PAY&gt; holiday pay per performance week. Performance fee will be
-            pro-rated for part weeks and for part rehearsal / part performance weeks.
-            <br />
-            or <br />
-            &lt;CONTRACT CURRENCY&gt;&lt;TOTAL FEE&gt; plus &lt;CONTRACT CURRENCY&gt;&lt;TOTAL FEE HOLIDAY
-            PAY&gt;&lt;HOLIDAY PAY NOTES FIELD&gt;
+            {detailsState.paymentType
+              ? detailsState.paymentType === 'W'
+                ? 'PERFORMANCE FEE'
+                : 'TOTAL FEE'
+              : ' PERFORMANCE/TOTAL FEE '}
+          </td>
+          <td>
+            {detailsState.paymentType
+              ? detailsState.paymentType === 'W'
+                ? formatPayment(detailsState.weeklyPayDetails?.performanceFee) +
+                  ' buyout plus ' +
+                  formatPayment(detailsState.weeklyPayDetails?.performanceHolidayPay) +
+                  ' holiday pay per performance week. Performance fee will be pro-rated for part weeks and for part rehearsal / part performance weeks.'
+                : formatPayment(detailsState.totalPayDetails?.totalFee) +
+                  ' plus ' +
+                  formatPayment(detailsState.totalPayDetails?.totalHolidayPay) +
+                  ' ' +
+                  detailsState.totalPayDetails?.feeNotes
+              : 'N/A'}
             <br />
             <br />
             Payments are fully inclusive of (but not restricted to) overtime / additional performances / travel and
             accommodation except as detailed at clause 17/18.
-            <br />
             <br />
             You must advise prior to signing this contract if you are VAT registered.
           </td>
@@ -198,62 +344,75 @@ const JendagiContract = () => {
         <tr>
           <td>15</td>
           <td>TOURING ALLOWANCE</td>
-          <td>Either N/A or &lt;WEEKLY TOURING ALLOWANCE + TOURING ALLOWANCE NOTES&gt;</td>
+          <td>
+            {detailsState.weeklyPayDetails?.touringAllowance
+              ? formatPayment(detailsState.weeklyPayDetails.touringAllowance) +
+                ' ' +
+                detailsState.weeklyPayDetails.subsNotes
+              : 'N/A'}
+          </td>
         </tr>
         <tr>
           <td>16</td>
           <td>PAYMENTS</td>
           <td>
-            Either Payments of rehearsal salary and performance fee will be made weekly to a nominated bank account,
-            following receipt of an invoice. Invoices should be submitted in advance OR &lt;TOTAL FEE PAYMENTS NOTES
-            FIELD&gt;
-            <br />
-            <br />
-            <span className="highlight">[If payment breakdown dates are selected:]</span>
-            <br />
-            Please note: this clause is not contractual; it is a guide only. Dates and exact payment breakdown may
-            differ:
-            <br />
-            &lt;DAY, DD/MM/YY: CONTRACT CURRENCY+AMOUNT&gt;
-            <br />
-            &lt;DAY, DD/MM/YY: CONTRACT CURRENCY+AMOUNT&gt;
-            <br />
-            <br />
-            Holidays may be declared by &lt;PRODUCTION COMPANY&gt;. Holiday pay shall be accrued and paid during
-            declared holidays. Any outstanding holiday pay will be paid at the end of the contract. Holiday pay shall be
-            at the rate stated in Clause 14.
+            {detailsState.paymentType && (
+              <>
+                {detailsState.paymentType === 'W' ? (
+                  <>
+                    Payments of rehearsal salary and performance fee will be made weekly to a nominated bank account,
+                    following receipt of an invoice. Invoices should be submitted in advance.
+                    <br />
+                    <br />
+                  </>
+                ) : detailsState.totalPayDetails?.feeNotes ? (
+                  <>
+                    detailsState.totalPayDetails.feeNotes
+                    <br />
+                  </>
+                ) : (
+                  ''
+                )}
+              </>
+            )}
+            {detailsState.paymentBreakdownList && (
+              <>
+                Please note: this clause is not contractual; it is a guide only. Dates and exact payment breakdown may
+                differ.
+                {filterPaymentBreakdownList(detailsState.paymentBreakdownList).map((item, index) => (
+                  <div key={index}>{item}</div>
+                ))}
+                <br />
+                <br />
+              </>
+            )}
+            Holidays may be declared by !PRODUCTION COMPANY!. Holiday pay shall be accrued and paid during declared
+            holidays. Any outstanding holiday pay will be paid at the end of the contract. Holiday pay shall be at the
+            rate stated in Clause 14.
           </td>
         </tr>
         <tr>
           <td>17</td>
           <td>ACCOMMODATION</td>
           <td>
-            <span className="highlight">
-              [If Accommodation provided Yes/No, is NO then ‘The Contractor is responsible for arranging and paying for
-              their own accommodation throughout.’]
-            </span>
-            <br />
-            <br />
-            If YES then &lt;ACCOMMODATION NOTES FIELD&gt;
+            {detailsState.isAccomodationProvided
+              ? detailsState.accomodationNotes ?? ''
+              : 'The Contractor is responsible for arranging and paying for their own accommodation throughout'}
           </td>
         </tr>
         <tr>
           <td>18</td>
           <td>TRANSPORT</td>
           <td>
-            <span className="highlight">
-              [If Transport provided Yes/No, is NO then ‘The Contractor is responsible for arranging and paying for
-              their own transport throughout.’]
-            </span>
-            <br />
-            <br />
-            If YES then &lt;TRANSPORT NOTES FIELD&gt;
+            {detailsState.isTransportProvided
+              ? detailsState.transportNotes ?? ''
+              : 'The Contractor is responsible for arranging and paying for their own transport throughout.'}
           </td>
         </tr>
         <tr>
           <td>19</td>
           <td>
-            <span className="highlight">“DEPARTMENT”</span> AVAILABILITY
+            <span>{scheduleState.department}</span> AVAILABILITY
           </td>
           <td>
             The Contractor shall make themselves available on such dates and times as the producer may reasonably
@@ -264,25 +423,32 @@ const JendagiContract = () => {
             <br />
             <br />
             Additional rehearsals or technical sessions may be scheduled throughout the contract and the Contractor will
-            be required to attend these if advised by the CSM or the Producer
-            <br />
-            <br />
-            &lt;AVAILABILITY NOTES FIELD&gt;
+            be required to attend these if advised by the CSM or the Producer.
+            {detailsState.specificAvailabilityNotes ? (
+              <>
+                <br />
+                <br />
+                {detailsState.specificAvailabilityNotes}
+              </>
+            ) : (
+              ''
+            )}
           </td>
         </tr>
         <tr>
           <td>20</td>
           <td>PUBLICITY AND SPONSORSHIP</td>
           <td>
-            <span className="highlight">[If Required at publicity events is checked, then]</span>
-            <br />
-            The Contractor will be required to attend the following events:
-            <br />
-            &lt;DAY, DD/MM/YY: NOTES&gt;
-            <br />
-            &lt;DAY, DD/MM/YY: NOTES&gt;
-            <br />
-            <br />
+            {detailsState.publicityEventList && (
+              <>
+                The Contractor will be required to attend the following events:
+                {filterPublicityEventList(detailsState.publicityEventList).map((item, index) => (
+                  <div key={index}>{item}</div>
+                ))}
+                <br />
+                <br />
+              </>
+            )}
             It is a condition of our contracts that the Contractor is available for such press interviews as the
             management deem reasonable. The Contractor shall promote the show at every press opportunity they have
             (whether specifically for this show or otherwise) from the date of the first public announcement of
@@ -300,7 +466,7 @@ const JendagiContract = () => {
         <tr>
           <td>21</td>
           <td>DRIVING COMPANY VEHICLES</td>
-          <td>YES/NO</td>
+          <td>!YES/NO!</td>
         </tr>
         <tr>
           <td>22</td>
@@ -322,35 +488,16 @@ const JendagiContract = () => {
           <td>24</td>
           <td>ADDITIONAL CLAUSES</td>
           <td>
-            [If NO is selected for ‘Included additional clauses?’ then ‘N/A’ if YES the included any selected clauses
-            plus ‘CUSTOM CLAUSES’ COVID-19 ADDITIONAL CLAUSES: The following clauses are to clarify the situation if it
-            becomes difficult or impossible to perform the show directly as a result of, or due to the knock-on effects
-            of, a pandemic type illness, COVID-19, or any variant thereof. Throughout this contract where “Covid 19” is
-            mentioned this shall be read to mean any widespread or pandemic type of illness. i] Producer may move show
-            start date if venues become unavailable or if performance commencement becomes unviable because of issues
-            surrounding COVID-19. The start date be moved by up to 25% of the total contractual weeks. If the production
-            fails to open within 6 weeks of original date then the Contractor may resile from contract. ii] Producer may
-            specify unpaid weeks out with 4 weeks’ notice. These may be up to 1/6th of the total number of contractual
-            weeks. iii] Producer may declare paid holidays with 3 weeks’ notice. iv] if, after the contract is signed,
-            The Producer terminates the agreement prior to opening the show because the production is no longer viable
-            due to issues created by COVID-19, either two weeks’ notice shall be given and worked or if closure is
-            immediate then a one-off payment of CONTRACT CURRENCY + CANCELLATION FEE shall be made in lieu of all sums
-            due. The viability of the show will be a matter for the sole determination of the Producer. If performances
-            have been given under this contract by the time of cancellation, then the Contractor shall receive their
-            performance fee for those performances, and then a cancellation fee of CONTRACT CURRENCY + CANCELLATION FEE
-            less any performance fees given. v] The Contractor must have received all doses of a UK or Irish Government
-            approved Covid 19 vaccination (and, if appropriate, booster injections) prior to signing this contract. The
-            Contractor shall display upon Producer’s demand proof of vaccination status. If the Contractor is medically
-            exempt from receiving the vaccine, the Producer must be notified prior to the signing of this contract, be
-            agreeable in writing to the Contractor not being vaccinated or the contract shall be void. vi] By signing
-            this contract the Contractor agrees to undertake Covid testing, and mask wearing as deemed necessary by the
-            producer.]
+            {detailsState.includeAdditionalClauses
+              ? detailsState.customClauseList &&
+                detailsState.customClauseList.map((item, index) => <div key={index}>{item}</div>)
+              : 'N/A'}
           </td>
         </tr>
         <tr>
           <td>25</td>
           <td>MANAGER OR PRODUCER</td>
-          <td>PRODUCTION COMPANY</td>
+          <td>!PRODUCTION COMPANY!</td>
         </tr>
       </table>
 
@@ -358,10 +505,7 @@ const JendagiContract = () => {
         <u>
           <strong>All dates and performance times remain subject to change at any time.</strong>
         </u>
-        <div>
-          INSERT export of ‘Tour summary’ with the following columns: Day | Date | Week | Venue/Details | Perfs/Day |
-          Perf 1 Time | Perf 2 Time | Perf 3 Time | (etc)
-        </div>
+        <div>INSERT PDF of Tour Summary</div>
         <u>
           <strong>All dates and performance times remain subject to change at any time.</strong>
         </u>

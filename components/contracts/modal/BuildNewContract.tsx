@@ -118,7 +118,14 @@ export const BuildNewContract = ({ openNewPersonContract, contractSchedule, onCl
             <ContractDetails contract={contractDetails} onChange={setContractDetails} />
           </div>
         )}
-        {mainButtonSelection.preview && <ContractPreviewDetailsForm height="h-[70vh]" />}
+        {mainButtonSelection.preview && (
+          <ContractPreviewDetailsForm
+            contractPerson={contractPerson}
+            contractSchedule={contractSchedule}
+            contractDetails={contractDetails}
+            height="h-[70vh]"
+          />
+        )}
       </div>
 
       <div className="w-full mt-4 flex justify-end items-center">

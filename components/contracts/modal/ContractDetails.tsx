@@ -11,6 +11,7 @@ import { currencyListState } from 'state/productions/currencyState';
 import PublicityEventDetails, { IPublicityEventDetails, defaultPublicityEventDetails } from './PublicityEventDetails';
 import { contractsVenueState } from 'state/contracts/contractsVenueState';
 import { standardClauseState } from 'state/contracts/standardClauseState';
+import { IContractDetails } from '../types';
 
 const defaultContractDetails = {
   currency: null,
@@ -39,36 +40,6 @@ const defaultContractDetails = {
   additionalClause: null,
   customClauseList: [''],
 };
-
-interface IRehearsalVenueDetails {
-  townCity: string;
-  venue: string | null;
-  notes: string;
-}
-
-interface IContractDetails {
-  currency: string | null;
-  firstDayOfWork: string | null;
-  lastDayOfWork: string | null;
-  specificAvailabilityNotes: string;
-  publicityEventList: IPublicityEventDetails[];
-  rehearsalVenue: IRehearsalVenueDetails;
-  isAccomodationProvided: boolean;
-  accomodationNotes: string;
-  isTransportProvided: boolean;
-  transportNotes: string;
-  isNominatedDriver: boolean;
-  nominatedDriverNotes: string;
-  paymentType: string | null;
-  weeklyPayDetails: string | null;
-  totalPayDetails: string | null;
-  paymentBreakdownList: TPaymentBreakdown[];
-  cancellationFee: number;
-  cancellationFeeNotes: string;
-  includeAdditionalClauses: boolean;
-  additionalClause: string | null;
-  customClauseList: string[];
-}
 
 interface ContractDetailsProps {
   contract: any;
@@ -290,7 +261,7 @@ const ContractDetails = ({ contract = {}, onChange = noop }: ContractDetailsProp
         </div>
         <Label className="!font-bold text-sm" text="If YES, Notes" />
         <TextInput
-          disabled={!isTransportProvided}
+          disabled={!isNominatedDriver}
           testId="contract-details-nominated-driver-notes"
           placeholder="Driver Notes"
           value={nominatedDriverNotes}
@@ -384,7 +355,7 @@ const ContractDetails = ({ contract = {}, onChange = noop }: ContractDetailsProp
             testId="contract-details-is-nominated-driver"
             placeholder="Yes | No"
             value={includeAdditionalClauses}
-            onChange={(value) => handleChange('includeClauses', value as boolean)}
+            onChange={(value) => handleChange('includeAdditionalClauses', value as boolean)}
             options={booleanOptions}
           />
         </div>
