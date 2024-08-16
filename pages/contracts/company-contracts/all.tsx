@@ -19,7 +19,6 @@ import { companyContractSelector } from 'state/contracts/selectors/companyContra
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const ContractsPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const rows = useRecoilValue(companyContractSelector);
-  console.log('====', rows);
   return (
     <Layout title="Contracts | Segue" flush>
       <div className="mb-8">
@@ -49,6 +48,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       fetchDepartmentList(),
       fetchAllContracts(),
     ]);
+  console.table(contractList);
   const department = objectify(
     departmentList,
     (d: IContractDepartment) => d.id,

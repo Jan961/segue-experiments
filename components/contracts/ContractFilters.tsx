@@ -39,7 +39,7 @@ const ContractFilters = () => {
 
   return (
     <div className="w-full flex flex-col gap-2">
-      <div className="px-4">
+      <div className="px-4 w-full">
         <GlobalToolbar
           searchFilter={filter.contractText}
           setSearchFilter={(contractText) => setFilter({ contractText })}
@@ -50,7 +50,7 @@ const ContractFilters = () => {
             id="contractText"
             disabled={!productionId}
             placeholder="Search contracts..."
-            className=""
+            className="w-full"
             iconName="search"
             value={filter.contractText}
             onChange={onChange}

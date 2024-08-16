@@ -8,14 +8,6 @@ export const statusOptions: SelectOption[] = [
   { text: 'None', value: 'NONE' },
 ];
 
-export const statusToBgColorMap = {
-  CSAR: '#FFE606', // yellow
-  U: '#FF7E07', // orange
-  X: '#ED1111', // red
-  CSAF: '#10841C', // green
-  NONE: 'white',
-};
-
 export const dealTypeOptions: SelectOption[] = [
   { text: 'None', value: 'NULL' },
   { text: 'Split', value: 'SPLT' },
@@ -292,25 +284,41 @@ export const contractTemplateOptions = [
   },
 ];
 
+export enum CompanyContractStatus {
+  NotYetIssued = 'CNI',
+  Issued = 'CI',
+  QuestionsRaised = 'CIQR',
+  SignedAndReturned = 'CSR',
+  Overdue = 'CO',
+}
+
 export const companyContractStatusOptions = [
   {
     text: 'Not Yet Issued',
-    value: 'CNI',
+    value: CompanyContractStatus.NotYetIssued,
   },
   {
     text: 'Issued',
-    value: 'CI',
+    value: CompanyContractStatus.Issued,
   },
   {
     text: 'Questions Raised',
-    value: 'CIQR',
+    value: CompanyContractStatus.QuestionsRaised,
   },
   {
     text: 'Signed and Returned',
-    value: 'CSR',
+    value: CompanyContractStatus.SignedAndReturned,
   },
   {
     text: 'Overdue',
-    value: 'CO',
+    value: CompanyContractStatus.Overdue,
   },
 ];
+
+export const statusToBgColorMap = {
+  [CompanyContractStatus.NotYetIssued]: 'white',
+  [CompanyContractStatus.Issued]: '#FFE606',
+  [CompanyContractStatus.QuestionsRaised]: '#FF7E07',
+  [CompanyContractStatus.SignedAndReturned]: '#10841C',
+  [CompanyContractStatus.Overdue]: '#ED1111',
+};

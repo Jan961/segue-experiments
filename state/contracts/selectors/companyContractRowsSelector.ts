@@ -9,7 +9,7 @@ export const companyContractSelector = selector({
     const contractsLookUp = get(contractListState);
     const filters = get(contractsFilterState);
     const { status, person, startDate, endDate, department, contractText } = filters;
-    console.log('====status===', status);
+    console.log('===', status, contractsLookUp);
     return Object.values(contractsLookUp).filter((contract) => {
       return (
         (!person || person === contract.personId) &&
