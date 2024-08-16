@@ -104,7 +104,6 @@ export const ProductionJumpMenu: React.FC<ProductionJumpMenuProps> = ({ showArch
       <Select
         testId="pjm-production-selector"
         className="border-0 !shadow-none w-[420px]"
-        key={includeArchived ? 'include-archived' : 'exclude-archived'}
         value={selected}
         label="Production"
         placeholder="Please select a Production"
