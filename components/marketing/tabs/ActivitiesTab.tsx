@@ -572,7 +572,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
 
           <div
             className={classNames(
-              'flex flex-col w-[487px] h-[69px] bg-primary-green/[0.30] rounded-xl px-2 float-right',
+              'flex flex-col w-[487px] h-[69px] bg-primary-green/[0.30] rounded-xl px-2',
               actRowData.length === 0 ? '-mt-64' : 'mt-5',
             )}
           >
