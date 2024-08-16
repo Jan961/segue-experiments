@@ -70,6 +70,7 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
   const [formData, setFormData] = useState(production || defaultProductionFormData);
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+
   const currencyListOptions = useMemo(
     () => transformToOptions(currencyList, null, 'code', ({ code, name }) => `${code} | ${name}`),
     [currencyList],
@@ -179,7 +180,7 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
         <div className="flex items-end gap-6 col-span-3 row-start-3">
           <div
             className={classNames('flex items-center gap-4 col-span-5', {
-              'opacity-30 pointer-events-none cursor-not-allowed': production.isArchived,
+              'opacity-30 pointer-events-none cursor-not-allowed': isArchived,
             })}
           >
             <div
@@ -211,7 +212,7 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
                   error={validationErrors?.prodCode}
                   maxlength={10}
                   required
-                  disabled={production.isArchived}
+                  disabled={isArchived}
                   ref={prodCodeRef}
                 />
                 {validationErrors.prodCode && <small className="text-red-400">{validationErrors.prodCode}</small>}
@@ -254,7 +255,7 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
               from: rehearsalDateBlock?.StartDate ? new Date(rehearsalDateBlock?.StartDate) : null,
               to: rehearsalDateBlock?.EndDate ? new Date(rehearsalDateBlock?.EndDate) : null,
             }}
-            disabled={production.isArchived}
+            disabled={isArchived}
           />
         </div>
         <div className="flex-col">
@@ -273,7 +274,7 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
                   from: productionDateBlock?.StartDate ? new Date(productionDateBlock?.StartDate) : null,
                   to: productionDateBlock?.EndDate ? new Date(productionDateBlock?.EndDate) : null,
                 }}
-                disabled={production.isArchived}
+                disabled={isArchived}
               />
               {validationErrors.productionDateBlock && (
                 <small className="text-red-400">{validationErrors.productionDateBlock}</small>
@@ -293,7 +294,7 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
                 value={region}
                 isMulti={true}
                 renderOption={(option) => <CustomOption option={option} isMulti={true} />}
-                disabled={production.isArchived}
+                disabled={isArchived}
               />
               {validationErrors.region && <small className="text-red-400">{validationErrors.region}</small>}
             </div>
@@ -310,7 +311,7 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
                 options={currencyListOptions}
                 value={currency}
                 isSearchable
-                disabled={production.isArchived}
+                disabled={isArchived}
               />
               {validationErrors.currency && <small className="text-red-400">{validationErrors.currency}</small>}
             </div>
@@ -326,7 +327,7 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
                 onChange={(value) => onChange('company', value as string)}
                 options={productionCompanyOptions}
                 value={company}
-                disabled={production.isArchived}
+                disabled={isArchived}
               />
               {validationErrors.company && <small className="text-red-400">{validationErrors.company}</small>}
             </div>
@@ -341,7 +342,7 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
             type="string"
             onChange={(e) => onChange('email', e.target.value)}
             value={email}
-            disabled={production.isArchived}
+            disabled={isArchived}
           />
         </div>
         <div className="flex items-center">
@@ -352,7 +353,7 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
             onChange={(value) => onChange('frequency', value as string)}
             options={SALES_FIG_OPTIONS}
             value={frequency}
-            disabled={production.isArchived}
+            disabled={isArchived}
           />
         </div>
         <div className="flex items-center">
@@ -361,7 +362,7 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
             className="w-28 placeholder-primary"
             onChange={({ hrs, min }) => onChange('runningTime', `${hrs || ''}:${min || ''}`)}
             value={runningTime}
-            disabled={production.isArchived}
+            disabled={isArchived}
           />
         </div>
         <div className="flex items-center">
@@ -373,7 +374,7 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
             type="string"
             onChange={(e) => onChange('runningTimeNote', e.target.value)}
             value={runningTimeNote}
-            disabled={production.isArchived}
+            disabled={isArchived}
           />
         </div>
         <div className="flex items-center ml-1 float-end justify-end">
