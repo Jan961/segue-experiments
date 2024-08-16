@@ -11,6 +11,7 @@ import { ProductionTaskDTO } from 'interfaces';
 import { useRouter } from 'next/router';
 import AddTask from './modals/AddTask';
 import { isNullOrEmpty } from 'utils';
+import moment from 'moment/moment';
 
 interface TasksTableProps {
   rowData?: any;
@@ -61,7 +62,7 @@ export default function TasksTable({
         ...task,
         Progress: progress,
         Notes: task.Notes,
-        ...(progress === 100 && { TaskCompletedDate: new Date() }),
+        ...(progress === 100 && { TaskCompletedDate: moment.utc(new Date(), 'DD/MM/YY').toString() }),
       };
       const updatedRowData = rowData.map((row) => {
         if (row.Id === task.Id) return updatedTask;
