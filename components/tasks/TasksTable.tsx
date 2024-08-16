@@ -53,12 +53,12 @@ export default function TasksTable({
     try {
       setIsLoading(true);
 
-      const Progress = parseInt(task.Progress);
+      const progress = parseInt(task.Progress);
       const updatedTask = {
         ...task,
-        Progress,
+        Progress: progress,
         Notes: task.Notes,
-        ...(Progress === 100 && { TaskCompletedDate: new Date() }),
+        ...(progress === 100 && { TaskCompletedDate: new Date() }),
       };
       const updatedRowData = rowData.map((row) => {
         if (row.Id === task.Id) return updatedTask;
