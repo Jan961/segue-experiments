@@ -5,6 +5,7 @@ import { getProductionsAndTasks } from 'services/productionService';
 import { getAccountId, getEmailFromReq } from 'services/userService';
 import { ProductionsWithTasks } from 'state/tasks/productionState';
 import { isNullOrEmpty } from 'utils';
+import { sortProductionTasksByDueAndAlpha } from 'utils/tasks';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -29,7 +30,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       return { ...production, Tasks: taskList };
     });
 
-    res.status(200).json(compressedTasks);
+    res.status(200).json(sortProductionTasksByDueAndAlpha(compressedTasks));
   } catch (err) {
     await loggingService.logError(err);
     console.log(err);
