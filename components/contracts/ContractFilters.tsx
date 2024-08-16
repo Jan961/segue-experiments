@@ -61,7 +61,7 @@ const ContractFilters = () => {
         <div className="px-4 flex items-center gap-4 flex-wrap  py-1">
           <Label className="!text-base text-primary-input-text !font-bold" text="Name" />
           <Select
-            onChange={(value) => onChange({ target: { id: 'name', value } })}
+            onChange={(value) => onChange({ target: { id: 'person', value } })}
             className="bg-primary-white w-72"
             value={filter.person}
             disabled={!productionId}
@@ -77,7 +77,7 @@ const ContractFilters = () => {
             value={filter.department}
             disabled={!productionId}
             placeholder="Contract Status"
-            options={contractDepartmentOptions}
+            options={[{ text: 'All', value: -1 }, ...contractDepartmentOptions]}
             isClearable
             isSearchable
           />

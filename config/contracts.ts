@@ -8,6 +8,14 @@ export const statusOptions: SelectOption[] = [
   { text: 'None', value: 'NONE' },
 ];
 
+export const statusToBgColorMap = {
+  CSAR: '#FFE606', // yellow
+  U: '#FF7E07', // orange
+  X: '#ED1111', // red
+  CSAF: '#10841C', // green
+  NONE: 'white',
+};
+
 export const dealTypeOptions: SelectOption[] = [
   { text: 'None', value: 'NULL' },
   { text: 'Split', value: 'SPLT' },

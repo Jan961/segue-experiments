@@ -19,7 +19,7 @@ export const intialContractsFilterState: TContractsFilterState = {
   status: 'all',
   startDate: null,
   endDate: null,
-  department: 'all',
+  department: -1,
   person: null,
   scheduleEndDate: null,
   scheduleStartDate: null,

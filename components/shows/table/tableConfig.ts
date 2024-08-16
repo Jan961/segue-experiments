@@ -95,9 +95,6 @@ export const showsTableConfig = [
       buttonText: 'Save',
       variant: 'primary',
     },
-    cellStyle: {
-      paddingLeft: '0.75em',
-    },
     resizable: false,
     width: 60,
     headerClass: 'text-center',

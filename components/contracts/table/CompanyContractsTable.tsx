@@ -1,62 +1,52 @@
 import Table from 'components/core-ui-lib/Table';
-import { contractsStyleProps, companyContractsColumnDefs } from 'components/contracts/tableConfig';
-import { useEffect, useRef, useState } from 'react';
-import { useRecoilState } from 'recoil';
-import { formatRowsForMultipeBookingsAtSameVenue, formatRowsForPencilledBookings } from '../../bookings/utils';
-import { ContractTableRowType } from 'interfaces';
-import EditVenueContractModal from '../modal/EditVenueContractModal';
-import { addEditContractsState } from '../../../state/contracts/contractsState';
-import { RowDoubleClickedEvent } from 'ag-grid-community';
+import { contractsStyleProps, getCompanyContractsColumnDefs } from 'components/contracts/tableConfig';
+import { useMemo, useRef } from 'react';
+import { IContractSummary } from 'interfaces/contracts';
+import { userState } from 'state/account/userState';
+import { transformToOptions } from 'utils';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { contractListState } from 'state/contracts/contractsListState';
 
 interface ContractsTableProps {
-  rowData?: ContractTableRowType[];
+  rowData?: IContractSummary[];
 }
 
-export default function CompanyContractsTable({ rowData }: ContractsTableProps) {
+export default function CompanyContractsTable({ rowData = [] }: ContractsTableProps) {
   const tableRef = useRef(null);
-  const [editContractData, setEditContractData] = useRecoilState(addEditContractsState);
-  const [rows, setRows] = useState([]);
-  const gridOptions = {
-    getRowStyle: (params) => {
-      return params.data.status === 'U' ? { fontStyle: 'italic' } : '';
-    },
-  };
+  const { users } = useRecoilValue(userState);
+  const [contracts, setContracts] = useRecoilState(contractListState);
+  const userOptionList = useMemo(
+    () =>
+      transformToOptions(
+        Object.values(users),
+        null,
+        'Id',
+        ({ FirstName = '', LastName = '' }) => `${FirstName} ${LastName}`,
+      ),
+    [users],
+  );
+  const columnDefs = useMemo(() => getCompanyContractsColumnDefs(userOptionList), [userOptionList]);
 
-  useEffect(() => {
-    if (rowData) {
-      let formattedRows = formatRowsForPencilledBookings(rowData);
-      formattedRows = formatRowsForMultipeBookingsAtSameVenue(formattedRows);
-
-      setRows(formattedRows);
-    }
-  }, [rowData]);
-
-  const handleRowDoubleClicked = (e: RowDoubleClickedEvent) => {
-    setEditContractData({
-      visible: true,
-      contract: e.data,
-    });
-  };
-
-  const handleClose = () => {
-    setEditContractData({
-      visible: false,
-    });
+  const onCellValueChange = async (e) => {
+    const contract = e.data;
+    const updatedContract = {
+      ...(contracts[contract.Id] || {}),
+      ...(contract || {}),
+    };
+    setContracts({ ...contracts, [contract.Id]: updatedContract });
   };
 
   return (
     <>
       <div className="w-full h-[calc(100%-140px)]">
         <Table
-          columnDefs={companyContractsColumnDefs}
-          rowData={rows}
+          columnDefs={columnDefs}
+          rowData={rowData}
           styleProps={contractsStyleProps}
-          gridOptions={gridOptions}
           ref={tableRef}
-          onRowDoubleClicked={handleRowDoubleClicked}
+          onCellValueChange={onCellValueChange}
         />
       </div>
-      {editContractData.visible && <EditVenueContractModal {...editContractData} onClose={handleClose} />}
     </>
   );
 }

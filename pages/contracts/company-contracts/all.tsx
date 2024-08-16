@@ -3,7 +3,6 @@ import Layout from 'components/Layout';
 import { InitialState } from 'lib/recoil';
 import { getProductionJumpState } from 'utils/getProductionJumpState';
 import { getAccountIdFromReq, getUsers } from 'services/userService';
-import useContractsFilter from 'hooks/useContractsFilter';
 import ContractFilters from 'components/contracts/ContractFilters';
 import CompanyContractsTable from 'components/contracts/table/CompanyContractsTable';
 import { getAllVenuesMin, getUniqueVenueCountrylist } from 'services/venueService';
@@ -12,12 +11,15 @@ import { fetchAllMinPersonsList } from 'services/personService';
 import { all, objectify } from 'radash';
 import { PersonMinimalDTO, StandardClauseDTO, UserDto } from 'interfaces';
 import { getAllCurrencylist } from 'services/productionService';
-import { fetchAllStandardClauses } from 'services/contracts';
+import { fetchAllContracts, fetchAllStandardClauses, fetchDepartmentList } from 'services/contracts';
+import { IContractDepartment, IContractSummary } from 'interfaces/contracts';
+import { useRecoilValue } from 'recoil';
+import { companyContractSelector } from 'state/contracts/selectors/companyContractRowsSelector';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const ContractsPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-  const rows = useContractsFilter();
-
+  const rows = useRecoilValue(companyContractSelector);
+  console.log('====', rows);
   return (
     <Layout title="Contracts | Segue" flush>
       <div className="mb-8">
@@ -31,19 +33,32 @@ const ContractsPage = (props: InferGetServerSidePropsType<typeof getServerSidePr
 export default ContractsPage;
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const department = ctx.query.d as string;
+  const departmentId = ctx.query.d as string;
   const accountId = await getAccountIdFromReq(ctx.req);
   const productionJump = await getProductionJumpState(ctx, 'contracts/company-contracts', accountId);
   const ProductionId = -1;
   productionJump.selected = -1;
-  const [users, countryList, venues, personsList, currencyList, standardClauses] = await all([
-    getUsers(accountId),
-    getUniqueVenueCountrylist(),
-    getAllVenuesMin(),
-    fetchAllMinPersonsList(),
-    getAllCurrencylist(),
-    fetchAllStandardClauses(),
-  ]);
+  const [users, countryList, venues, personsList, currencyList, standardClauses, departmentList, contractList] =
+    await all([
+      getUsers(accountId),
+      getUniqueVenueCountrylist(),
+      getAllVenuesMin(),
+      fetchAllMinPersonsList(),
+      getAllCurrencylist(),
+      fetchAllStandardClauses(),
+      fetchDepartmentList(),
+      fetchAllContracts(),
+    ]);
+  const department = objectify(
+    departmentList,
+    (d: IContractDepartment) => d.id,
+    (d) => d,
+  );
+  const contract = objectify(
+    contractList,
+    (d: IContractSummary) => d.id,
+    (d) => d,
+  );
   const standardClause = objectify(
     standardClauses,
     (c: StandardClauseDTO) => c.id,
@@ -78,11 +93,13 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     contracts: {
       filters: {
         ...intialContractsFilterState,
-        department: department ? parseInt(department, 10) : -1,
+        department: department ? parseInt(departmentId, 10) : -1,
       },
       venue,
       person,
       standardClause,
+      contract,
+      department,
     },
   };
 

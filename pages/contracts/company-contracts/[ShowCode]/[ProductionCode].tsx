@@ -11,7 +11,8 @@ import { intialContractsFilterState } from 'state/contracts/contractsFilterState
 import { fetchAllMinPersonsList } from 'services/personService';
 import { PersonMinimalDTO, StandardClauseDTO, UserDto } from 'interfaces';
 import { getAllCurrencylist } from 'services/productionService';
-import { fetchAllStandardClauses } from 'services/contracts';
+import { fetchAllContracts, fetchAllStandardClauses, fetchDepartmentList } from 'services/contracts';
+import { IContractDepartment, IContractSummary } from 'interfaces/contracts';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const ContractsPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
@@ -28,18 +29,31 @@ const ContractsPage = (props: InferGetServerSidePropsType<typeof getServerSidePr
 export default ContractsPage;
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const department = ctx.query.d as string;
+  const departmentId = ctx.query.d as string;
   const accountId = await getAccountIdFromReq(ctx.req);
   const productionJump = await getProductionJumpState(ctx, `contracts/company-contracts`, accountId);
   const ProductionId = productionJump.selected;
-  const [users, countryList, venues, personsList, currencyList, standardClauses] = await all([
-    getUsers(accountId),
-    getUniqueVenueCountrylist(),
-    getAllVenuesMin(),
-    fetchAllMinPersonsList(),
-    getAllCurrencylist(),
-    fetchAllStandardClauses(),
-  ]);
+  const [users, countryList, venues, personsList, currencyList, standardClauses, departmentList, contractList] =
+    await all([
+      getUsers(accountId),
+      getUniqueVenueCountrylist(),
+      getAllVenuesMin(),
+      fetchAllMinPersonsList(),
+      getAllCurrencylist(),
+      fetchAllStandardClauses(),
+      fetchDepartmentList(),
+      fetchAllContracts(ProductionId),
+    ]);
+  const department = objectify(
+    departmentList,
+    (d: IContractDepartment) => d.id,
+    (d) => d,
+  );
+  const contract = objectify(
+    contractList,
+    (d: IContractSummary) => d.id,
+    (d) => d,
+  );
   const standardClause = objectify(
     standardClauses,
     (c: StandardClauseDTO) => c.id,
@@ -75,13 +89,14 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       venue,
       filters: {
         ...intialContractsFilterState,
-        department: department ? parseInt(department, 10) : -1,
+        department: department ? parseInt(departmentId, 10) : -1,
       },
       person,
       standardClause,
+      contract,
+      department,
     },
   };
-
   return {
     props: {
       ProductionId,
