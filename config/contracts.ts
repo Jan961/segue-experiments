@@ -24,6 +24,7 @@ export const dealTypeOptions: SelectOption[] = [
   { text: 'Call multiple', value: 'CM' },
   { text: 'First Call Against Split', value: 'FCAS' },
 ];
+
 export const allStatusOptions: SelectOption[] = [{ text: 'All', value: 'all' }, ...statusOptions];
 
 export const booleanOptions = [
@@ -288,5 +289,28 @@ export const contractTemplateOptions = [
   {
     text: 'Jendagi Template',
     value: 1,
+  },
+];
+
+export const companyContractStatusOptions = [
+  {
+    text: 'Not Yet Issued',
+    value: 'CNI',
+  },
+  {
+    text: 'Issued',
+    value: 'CI',
+  },
+  {
+    text: 'Questions Raised',
+    value: 'CIQR',
+  },
+  {
+    text: 'Signed and Returned',
+    value: 'CSR',
+  },
+  {
+    text: 'Overdue',
+    value: 'CO',
   },
 ];

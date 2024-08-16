@@ -65,8 +65,8 @@ export interface PersonDetails {
 }
 
 export interface IContractSchedule {
-  production: string | null;
-  department: string | null;
+  production: number | null;
+  department: number | null;
   role: string;
   personId: number | null;
   templateId: number | null;

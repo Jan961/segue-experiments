@@ -38,14 +38,16 @@ export const ContractScheduleModal = ({ openContract, onClose }: { openContract:
   const [openNewBuildContract, setOpenNewBuildContract] = useState(false);
   const [contractSchedule, setContractSchedule] = useState<IContractSchedule>(defaultContractSchedule);
   const { production, department, role, personId, templateId } = contractSchedule;
+
   const handleChange = useCallback(
     (key: string, value: number | string | boolean | null) => {
       const updatedData = { ...contractSchedule, [key]: value };
       setContractSchedule(updatedData);
-      console.log('Contract', updatedData);
+      console.log('Contract', updatedData, typeof updatedData.department);
     },
     [contractSchedule, setContractSchedule],
   );
+
   const onCloseCreateNewPerson = useCallback(
     async (saveStatus = false) => {
       setOpenNewPersonContract(false);
@@ -154,7 +156,10 @@ export const ContractScheduleModal = ({ openContract, onClose }: { openContract:
         <BuildNewContract
           contractSchedule={contractSchedule}
           openNewPersonContract={openNewBuildContract}
-          onClose={() => setOpenNewBuildContract(false)}
+          onClose={() => {
+            setOpenNewBuildContract(false);
+            onClose?.();
+          }}
         />
       )}
     </PopupModal>

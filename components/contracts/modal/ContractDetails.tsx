@@ -138,6 +138,7 @@ const ContractDetails = ({ contract = {}, onChange = noop }: ContractDetailsProp
         <Label className="w-36 !font-bold text-sm" text="Currency for contract" />
         <Select
           testId="contract-details-currency"
+          className="w-96"
           placeholder="Select Currency"
           value={currency}
           onChange={(value) => handleChange('currency', value as string)}

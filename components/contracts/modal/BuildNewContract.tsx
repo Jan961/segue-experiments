@@ -9,6 +9,8 @@ import ContractDetails from './ContractDetails';
 import axios from 'axios';
 import LoadingOverlay from 'components/shows/LoadingOverlay';
 import { IContractSchedule } from '../types';
+import useAxiosCancelToken from 'hooks/useCancelToken';
+import { useRouter } from 'next/router';
 
 interface BuildNewContractProps {
   contractSchedule: Partial<IContractSchedule>;
@@ -21,26 +23,27 @@ export const BuildNewContract = ({ openNewPersonContract, contractSchedule, onCl
   const [contractPerson, setContractPerson] = useState(null);
   const [contractDetails, setContractDetails] = useState({});
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
+  const cancelToken = useAxiosCancelToken();
   const fetchPersonDetails = useCallback(
-    async (id: number, signal: any) => {
+    async (id: number) => {
       setLoading(true);
-      const response = await axios.get('/api/person/' + id, { signal });
-      setContractPerson(response.data);
+      try {
+        const response = await axios.get('/api/person/' + id, { cancelToken });
+        setContractPerson(response.data);
+      } catch (error) {
+        onClose();
+        notify.error('Error fetching person details. Please try again');
+      }
       setLoading(false);
     },
     [setContractPerson],
   );
 
   useEffect(() => {
-    const abortController = new AbortController();
     if (contractSchedule.personId) {
-      notify.promise(fetchPersonDetails(contractSchedule.personId, abortController.signal), {
-        loading: 'Loading...',
-        success: 'Success',
-        error: 'Error',
-      });
+      fetchPersonDetails(contractSchedule.personId);
     }
-    return () => abortController.abort();
   }, [contractSchedule.personId]);
 
   const handleButtons = (key: string) => {
@@ -51,13 +54,16 @@ export const BuildNewContract = ({ openNewPersonContract, contractSchedule, onCl
 
   const onSave = async () => {
     try {
-      const response = await axios.post('/api/contracts/create', { ...contractSchedule, contractDetails });
-      console.log('====', response);
-      notify.success('Contract created successfully');
+      const promise = axios.post('/api/contracts/create', { ...contractSchedule, contractDetails });
+      notify.promise(promise, {
+        loading: 'Saving Contract...',
+        success: 'Contracted saved successfully',
+        error: 'Error saving contract',
+      });
+      router.replace(router.asPath);
       onClose();
     } catch (error) {
       console.log(error);
-      notify.error('Error Creating contract details');
     }
   };
 

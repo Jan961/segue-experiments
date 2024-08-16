@@ -6,12 +6,12 @@ import ContractsDateFilter from './ContractsDateFilter';
 import TextInput from 'components/core-ui-lib/TextInput';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { contractsFilterState, intialContractsFilterState } from 'state/contracts/contractsFilterState';
-import { allStatusOptions, contractDepartmentOptions } from 'config/contracts';
+import { companyContractStatusOptions, contractDepartmentOptions } from 'config/contracts';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import { ContractScheduleModal } from './modal/ContractSchedule';
 import { Label } from 'components/core-ui-lib';
 import { personState } from 'state/contracts/PersonState';
-import { transformToOptions } from 'utils';
+import { getAllOptions, transformToOptions } from 'utils';
 
 const ContractFilters = () => {
   const [filter, setFilter] = useRecoilState(contractsFilterState);
@@ -76,7 +76,7 @@ const ContractFilters = () => {
             className="bg-white w-80"
             value={filter.department}
             disabled={!productionId}
-            placeholder="Contract Status"
+            placeholder="Department"
             options={[{ text: 'All', value: -1 }, ...contractDepartmentOptions]}
             isClearable
             isSearchable
@@ -93,7 +93,7 @@ const ContractFilters = () => {
             value={filter.status}
             disabled={!productionId}
             placeholder="Contract Status"
-            options={allStatusOptions}
+            options={getAllOptions(companyContractStatusOptions)}
             isClearable
             isSearchable
           />
