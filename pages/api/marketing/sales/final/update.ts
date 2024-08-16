@@ -8,33 +8,57 @@ export default async function handle(req, res) {
     const salesUpdates = [];
 
     if (!isNullOrEmpty(general)) {
-      salesUpdates.push(
-        prisma.Sale.updateMany({
-          where: {
-            SaleSetId: SetId,
-            SaleSaleTypeId: 1,
-          },
-          data: {
-            SaleSeats: general.seatsSold,
-            SaleValue: general.seatsSoldVal,
-          },
-        }),
-      );
+      // get saleId
+      const sale = await prisma.Sale.findFirst({
+        where: {
+          SaleSetId: SetId,
+          SaleSaleTypeId: 1,
+        },
+        select: {
+          SaleId: true,
+        },
+      });
+
+      if (!isNullOrEmpty(sale)) {
+        salesUpdates.push(
+          prisma.Sale.update({
+            where: {
+              SaleId: sale.SaleId,
+            },
+            data: {
+              SaleSeats: general.seatsSold,
+              SaleValue: general.seatsSoldVal,
+            },
+          }),
+        );
+      }
     }
 
     if (!isNullOrEmpty(schools)) {
-      salesUpdates.push(
-        prisma.Sale.updateMany({
-          where: {
-            SaleSetId: SetId,
-            SaleSaleTypeId: 3,
-          },
-          data: {
-            SaleSeats: schools.seatsSold,
-            SaleValue: schools.seatsSoldVal,
-          },
-        }),
-      );
+      // get saleId
+      const sale = await prisma.Sale.findFirst({
+        where: {
+          SaleSetId: SetId,
+          SaleSaleTypeId: 3,
+        },
+        select: {
+          SaleId: true,
+        },
+      });
+
+      if (!isNullOrEmpty(sale)) {
+        salesUpdates.push(
+          prisma.Sale.update({
+            where: {
+              SaleId: sale.SaleId,
+            },
+            data: {
+              SaleSeats: schools.seatsSold,
+              SaleValue: schools.seatsSoldVal,
+            },
+          }),
+        );
+      }
     }
 
     await prisma.$transaction(salesUpdates);
