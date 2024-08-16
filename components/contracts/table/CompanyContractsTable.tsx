@@ -1,20 +1,25 @@
 import Table from 'components/core-ui-lib/Table';
 import { contractsStyleProps, getCompanyContractsColumnDefs } from 'components/contracts/tableConfig';
-import { useMemo, useRef } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { IContractSummary } from 'interfaces/contracts';
 import { userState } from 'state/account/userState';
 import { transformToOptions } from 'utils';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { contractListState } from 'state/contracts/contractsListState';
+import NotesPopup from 'components/NotesPopup';
+import { notify } from 'components/core-ui-lib';
+import useAxiosCancelToken from 'hooks/useCancelToken';
+import axios from 'axios';
 
 interface ContractsTableProps {
   rowData?: IContractSummary[];
 }
-
+const defaultNotesPopupContext = { visible: false, contract: null };
 export default function CompanyContractsTable({ rowData = [] }: ContractsTableProps) {
   const tableRef = useRef(null);
   const { users } = useRecoilValue(userState);
   const [contracts, setContracts] = useRecoilState(contractListState);
+  const [notesPopupContext, setNotesPopupContext] = useState(defaultNotesPopupContext);
   const userOptionList = useMemo(
     () =>
       transformToOptions(
@@ -26,6 +31,13 @@ export default function CompanyContractsTable({ rowData = [] }: ContractsTablePr
     [users],
   );
   const columnDefs = useMemo(() => getCompanyContractsColumnDefs(userOptionList), [userOptionList]);
+  const cancelToken = useAxiosCancelToken();
+
+  const handleCellClick = (e) => {
+    if (e.column.colId === 'notes') {
+      setNotesPopupContext({ visible: true, contract: e.data });
+    }
+  };
 
   const onCellValueChange = async (e) => {
     const contract = e.data;
@@ -36,6 +48,27 @@ export default function CompanyContractsTable({ rowData = [] }: ContractsTablePr
     setContracts({ ...contracts, [contract.Id]: updatedContract });
   };
 
+  const updateContract = useCallback(
+    async (id: number, contract: Partial<IContractSummary>, callback?: () => void) => {
+      try {
+        await axios.post(`/api/company-contracts/update/${id}`, contract, { cancelToken });
+        setContracts({ ...contracts, [id]: { ...contracts[id], ...contract } });
+        callback?.();
+      } catch (error) {
+        notify.error('Error updating contract');
+      }
+    },
+    [cancelToken, setContracts, contracts],
+  );
+
+  const handleSaveNote = useCallback(
+    (notes: string) => {
+      const contract = notesPopupContext.contract;
+      updateContract(contract.id, { notes }, () => setNotesPopupContext(defaultNotesPopupContext));
+    },
+    [updateContract, notesPopupContext],
+  );
+
   return (
     <>
       <div className="w-full h-[calc(100%-140px)]">
@@ -45,7 +78,19 @@ export default function CompanyContractsTable({ rowData = [] }: ContractsTablePr
           styleProps={contractsStyleProps}
           ref={tableRef}
           onCellValueChange={onCellValueChange}
+          onCellClicked={handleCellClick}
         />
+        {notesPopupContext.visible && (
+          <NotesPopup
+            show={notesPopupContext.visible}
+            notes={notesPopupContext.contract?.notes || ''}
+            title={`${notesPopupContext.contract?.firstName || ''} | ${notesPopupContext.contract?.lastName || ''} | ${
+              notesPopupContext?.contract.role || ''
+            }`}
+            onSave={handleSaveNote}
+            onCancel={() => setNotesPopupContext(defaultNotesPopupContext)}
+          />
+        )}
       </div>
     </>
   );

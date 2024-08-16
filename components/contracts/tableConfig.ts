@@ -4,7 +4,6 @@ import VenueColumnRenderer from './table/VenueColumnRenderer';
 import DateColumnRenderer from './table/DateColumnRenderer';
 import { tileColors } from 'config/global';
 import InputRenderer from 'components/global/salesTable/renderers/InputRenderer';
-import NoteColumnRenderer from 'components/bookings/table/NoteColumnRenderer';
 import DefaultTextRenderer from 'components/core-ui-lib/Table/renderers/DefaultTextRenderer';
 import formatInputDate from 'utils/dateInputFormat';
 import { getTimeFromDateAndTime } from 'services/dateService';
@@ -12,6 +11,7 @@ import ButtonRenderer from 'components/core-ui-lib/Table/renderers/ButtonRendere
 import IconRowRenderer from 'components/global/salesTable/renderers/IconRowRenderer';
 import SelectCellRenderer from 'components/core-ui-lib/Table/renderers/SelectCellRenderer';
 import { statusOptions, statusToBgColorMap } from 'config/contracts';
+import NotesRenderer from 'components/tasks/NotesRenderer';
 
 export const contractsStyleProps = { headerColor: tileColors.contracts };
 
@@ -179,7 +179,7 @@ export const getCompanyContractsColumnDefs = (userList = []) => [
   {
     headerName: '',
     field: 'notes',
-    cellRenderer: NoteColumnRenderer,
+    cellRenderer: NotesRenderer,
     headerClass: ['bgOrangeTextWhite'],
     cellRendererParams: {
       tpActive: true,
