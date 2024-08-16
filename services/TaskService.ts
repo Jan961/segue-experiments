@@ -1,5 +1,6 @@
 import prisma from 'lib/prisma';
 import { addDurationToDate, addOneMonth, calculateWeekNumber } from './dateService';
+import { sortTasksByDueAndAlpha } from 'utils/tasks';
 
 export const getMasterTasksList = async (AccountId: number) => {
   const masterTaskList = await prisma.MasterTask.findMany({
@@ -21,14 +22,16 @@ export const getMasterTasksList = async (AccountId: number) => {
     },
   });
 
-  return masterTaskList.map((task) => {
-    return {
-      ...task,
-      RepeatInterval: task?.MasterTaskRepeat?.Interval || null,
-      TaskRepeatFromWeekNum: task?.MasterTaskRepeat?.FromWeekNum || null,
-      TaskRepeatToWeekNum: task?.MasterTaskRepeat?.ToWeekNum || null,
-    };
-  });
+  return sortTasksByDueAndAlpha(
+    masterTaskList.map((task) => {
+      return {
+        ...task,
+        RepeatInterval: task?.MasterTaskRepeat?.Interval || null,
+        TaskRepeatFromWeekNum: task?.MasterTaskRepeat?.FromWeekNum || null,
+        TaskRepeatToWeekNum: task?.MasterTaskRepeat?.ToWeekNum || null,
+      };
+    }),
+  );
 };
 
 export const getMaxTaskCode = async () => {

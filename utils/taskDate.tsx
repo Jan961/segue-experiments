@@ -59,7 +59,9 @@ export const getWeekOptions = (production, isMasterTask: boolean, appendDate: bo
       } else if (week >= 0 && week < numTourWeeks) {
         return formatWeekOption(week + 1, appendDate ? formatShortDateUK(weeklyDate) : '');
       } else {
-        const optionOutput = `EOT+${week + 1 - numTourWeeks} ${appendDate ? '|' + formatShortDateUK(weeklyDate) : ''} `;
+        const optionOutput = `EOT+${week + 1 - numTourWeeks} ${
+          appendDate ? '| ' + formatShortDateUK(weeklyDate) : ''
+        } `;
         return { text: optionOutput, value: week + 1 };
       }
     });
