@@ -23,6 +23,7 @@ import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import { getAllCurrencyList } from 'services/currencyService';
 import { UiTransformedVenue, transformVenues } from 'utils/venue';
 import { initialVenueState } from 'config/venue';
+import Spinner from 'components/core-ui-lib/Spinner';
 
 export type VenueFilters = {
   venueId: string;
@@ -42,8 +43,11 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
   const [venues, setVenues] = useState([]);
   const [editVenueContext, setEditVenueContext] = useState<UiTransformedVenue>(null);
   const { productionId, town, country, search } = filters;
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
   const filterVenues = useMemo(() => debounce({ delay: 1000 }, (payload) => fetchVenues(payload)), []);
   const townOptions = useMemo(() => venueTownList.map(({ Town }) => ({ text: Town, value: Town })), [venueTownList]);
+
   const fetchVenues = useCallback(async (payload) => {
     const { productionId, town, country, searchQuery } = payload || {};
     if (!(productionId || town || country || searchQuery)) {
@@ -52,9 +56,7 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
     }
     setVenues(null);
     try {
-      const { data } = await axios.post('/api/venue/list', {
-        ...payload,
-      });
+      const { data } = await axios.post('/api/venue/list', { ...payload });
       const venusList = transformVenues(data);
       setVenues(venusList);
     } catch (err) {
@@ -86,15 +88,22 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
 
   const onModalClose = useCallback(
     (isSuccess?: boolean) => {
-      if (isSuccess) {
-        refreshTable();
-      }
+      if (isSuccess) refreshTable();
       setEditVenueContext(null);
     },
     [refreshTable, setEditVenueContext],
   );
+
   return (
     <>
+      {isLoading && (
+        <div
+          data-testid="tech-specs-page-spinner"
+          className="inset-0 absolute bg-white bg-opacity-50 z-50 flex justify-center items-center"
+        >
+          <Spinner size="lg" />
+        </div>
+      )}
       <Layout title="Venues | Segue" flush>
         <div className="max-w-5xl mx-auto">
           <div className="mb-4">
@@ -118,6 +127,7 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
           visible={!!editVenueContext}
           onClose={onModalClose}
           fetchVenues={fetchVenues}
+          setIsLoading={setIsLoading}
         />
       )}
     </>
@@ -143,13 +153,17 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const venueTownList = results[1].status === 'fulfilled' ? results[1].value : [];
   const venueCountryOptionList: SelectOption[] =
     results[2].status === 'fulfilled' ? transformToOptions(results[2].value, 'Name', 'Id') : [];
+
   const venueCurrencyOptionList: SelectOption[] =
     results[3].status === 'fulfilled'
       ? transformToOptions(results[3].value, null, 'Code', (item) => item.Code + ' ' + item.Name)
       : [];
+
   const venueFamilyOptionList: SelectOption[] =
     results[4].status === 'fulfilled' ? transformToOptions(results[4].value, 'Name', 'Id') : [];
+
   const venues = results[5].status === 'fulfilled' ? results[5].value : [];
+
   const venue = objectify(
     venues,
     (v) => v.Id,

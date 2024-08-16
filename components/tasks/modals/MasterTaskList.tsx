@@ -7,7 +7,6 @@ import { userState } from 'state/account/userState';
 import { useEffect, useMemo, useState } from 'react';
 import { tileColors } from 'config/global';
 import axios from 'axios';
-import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import Loader from 'components/core-ui-lib/Loader';
 import { isNullOrEmpty } from 'utils';
 import ExistingTasks from './ExistingTasks';
@@ -32,7 +31,6 @@ const MasterTaskList = ({ visible, onClose, productionId }: MasterTaskListProps)
 
   const styleProps = { headerColor: tileColors.tasks };
   const [rowData, setRowData] = useState([]);
-  const [confirm, setConfirm] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [showExistingTaskModal, setShowExistingTaskModal] = useState<boolean>(false);
   const [duplicateTasks, setDuplicateTasks] = useState([]);
@@ -102,12 +100,9 @@ const MasterTaskList = ({ visible, onClose, productionId }: MasterTaskListProps)
     onClose();
   };
 
-  const handleCancel = () => {
-    if (selectedRows.length > 0) {
-      setConfirm(true);
-    } else {
-      setConfirm(false);
-      onClose();
+  const onRowClicked = (event) => {
+    if (event.event.target.type !== 'checkbox') {
+      event.node.setSelected(!event.node.isSelected());
     }
   };
 
@@ -144,9 +139,13 @@ const MasterTaskList = ({ visible, onClose, productionId }: MasterTaskListProps)
           columnDefs={columnDefs}
           rowData={rowData}
           styleProps={styleProps}
+          onRowClicked={onRowClicked}
           rowSelection="multiple"
           onSelectionChanged={onSelectionChanged}
           testId="table-add-from-master"
+          gridOptions={{
+            suppressRowClickSelection: true,
+          }}
         />
       </div>
       <div className="flex mt-4 justify-end">
@@ -154,7 +153,7 @@ const MasterTaskList = ({ visible, onClose, productionId }: MasterTaskListProps)
           variant="secondary"
           text="Cancel"
           className="w-[132px] mr-3"
-          onClick={handleCancel}
+          onClick={handleClose}
           testId="btn-master-cancel"
         />
         <Button
@@ -165,17 +164,6 @@ const MasterTaskList = ({ visible, onClose, productionId }: MasterTaskListProps)
           testId="btn-master-add-from"
         />
       </div>
-      <ConfirmationDialog
-        variant="delete"
-        show={confirm}
-        onYesClick={handleClose}
-        content={{
-          question: 'Are you sure you want to cancel?',
-          warning: 'Any unsaved changes may be lost.',
-        }}
-        onNoClick={() => setConfirm(false)}
-        hasOverlay={true}
-      />
       <ExistingTasks
         visible={showExistingTaskModal}
         onCancel={() => {

@@ -136,7 +136,6 @@ export default function BookingsTable({ rowData, tableRef }: BookingsTableProps)
   if (bookingColumDefs.length > 0) {
     bookingColumDefs[0].sortable = currentProduction === undefined;
   }
-
   return (
     <>
       <div className="w-full h-[calc(100%-140px)]">
