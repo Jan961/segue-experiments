@@ -181,7 +181,6 @@ const GlobalActivityView = () => {
         const globalActivities = response.data as GlobalActivitiesResponse;
 
         setActivityTypes(globalActivities.activityTypes);
-        setColDefs(globalActivityColDefs(toggleModal, currency.symbol));
 
         const globalRows = globalActivities.activities.map((activity) => {
           return {
@@ -213,6 +212,7 @@ const GlobalActivityView = () => {
     setLoading(true);
     getGlobalActivities();
     getTourWeeks(productionId);
+    setColDefs(globalActivityColDefs(toggleModal, currency.symbol));
   }, [productionId]);
 
   useEffect(() => {
