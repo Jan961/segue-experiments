@@ -168,6 +168,7 @@ export default function ActivityModal({
           <TextInput
             className="w-full mb-4"
             placeholder="Enter Activity Name"
+            data-testid="enter-activity-name"
             id="activityName"
             value={actName}
             onChange={(event) => setActName(event.target.value)}
@@ -175,6 +176,7 @@ export default function ActivityModal({
 
           <Select
             className={classNames('w-full !border-0 text-primary-input-text', error ? 'mb-2' : 'mb-4')}
+            testId="select-activity-type"
             options={activityTypes}
             value={actType}
             onChange={(value) => changeActivityType(value)}
@@ -192,6 +194,7 @@ export default function ActivityModal({
                 onChange={(value) => setActDate(value)}
                 value={actDate}
                 label="Date"
+                testId="new-activity-date"
                 inputClass="!border-0 !shadow-none"
                 labelClassName="text-primary-input-text"
               />
@@ -236,6 +239,7 @@ export default function ActivityModal({
                 <div className="flex flex-col">
                   <TextInput
                     className="w-full mb-4"
+                    data-testid="company-cost"
                     placeholder="00.00"
                     id="companyCost"
                     value={companyCost}
@@ -254,6 +258,7 @@ export default function ActivityModal({
                 <div className="flex flex-col">
                   <TextInput
                     className="w-full mb-4"
+                    data-testid="venue-cost"
                     placeholder="00.00"
                     id="venueCost"
                     value={venueCost}
@@ -267,6 +272,7 @@ export default function ActivityModal({
           <div className="text-base font-bold text-primary-input-text">Notes</div>
           <TextArea
             className="mt-2 h-[162px] w-full"
+            testId="activity-notes"
             value={actNotes}
             placeholder="Notes Field"
             onChange={(e) => setActNotes(e.target.value)}
