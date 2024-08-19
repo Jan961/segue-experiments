@@ -19,7 +19,7 @@ interface VenueBarringFormProps {
 const VenueBarringForm = ({ venue, onChange, validationErrors, updateValidationErrrors }: VenueBarringFormProps) => {
   const [formData, setFormData] = useState<Partial<UiTransformedVenue>>({ ...initialVenueBarringRules, ...venue });
   const [barredVenueTableRows, setBarredVenueTableRows] = useState<UiBarredVenue[]>(venue?.barredVenues || []);
-  const venueOptions = useRecoilValue(venueOptionsSelector([]));
+  const venueOptions = useRecoilValue(venueOptionsSelector([venue?.id]));
   const [selectedVenueIds, setSelectedVenueIds] = useState<number[]>(
     venue?.barredVenues.map((venue) => venue.barredVenueId) || [],
   );
