@@ -59,7 +59,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     );
     const expensesAccountDetails = {
       paidTo: person.PersonExpensesTo || null,
-      accountName: '',
+      accountName: person.PersonExpensesAccountName || '',
       accountNumber: person.PersonExpensesAccount || '',
       sortCode: person.PersonExpensesSortCode || '',
       swift: person.PersonExpensesSWIFTBIC || '',

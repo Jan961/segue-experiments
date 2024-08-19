@@ -69,6 +69,7 @@ export const ContractScheduleModal = ({ openContract, onClose }: { openContract:
       title="Contract Schedule"
       titleClass="text-xl text-primary-navy font-bold -mt-2"
       onClose={onClose}
+      hasOverflow={openNewPersonContract || openNewBuildContract}
     >
       <div className="w-[430px] h-auto">
         <Select

@@ -5,28 +5,29 @@ import { countryState } from 'state/global/countryState';
 import { transformToOptions } from 'utils';
 import { userState } from 'state/account/userState';
 import { Checkbox } from 'components/core-ui-lib';
-import AgencyDetails from './PersonForm/AgencyDetails';
-import PersonalDetails from './PersonForm/PersonalDetails';
-import AccountDetailsForm from './PersonForm/AccountDetailsForm';
-import EmergencyContact from './PersonForm/EmergencyContact';
+import AgencyDetails, { defaultAgencyDetails } from './PersonForm/AgencyDetails';
+import PersonalDetails, { defaultPersonDetails } from './PersonForm/PersonalDetails';
+import AccountDetailsForm, { defaultBankAccount } from './PersonForm/AccountDetailsForm';
+import EmergencyContact, { defaultEmergencyContactData } from './PersonForm/EmergencyContact';
+import { IPerson } from './types';
 
 const defaultContractDetails = {
-  personDetails: {},
-  emergencyContact1: {},
-  emergencyContact2: {},
-  agencyDetails: {},
-  salaryAccountDetails: {},
-  expenseAccountDetails: {},
+  personDetails: defaultPersonDetails,
+  emergencyContact1: defaultEmergencyContactData,
+  emergencyContact2: defaultEmergencyContactData,
+  agencyDetails: defaultAgencyDetails,
+  salaryAccountDetails: defaultBankAccount,
+  expenseAccountDetails: defaultBankAccount,
 };
 
 interface ContractPersonDataFormProps {
-  person?: any;
+  person?: Partial<IPerson>;
   height: string;
-  updateFormData: (data: any) => void;
+  updateFormData: (data: Partial<IPerson>) => void;
 }
 
 export const ContractPersonDataForm = ({ person = {}, height, updateFormData }: ContractPersonDataFormProps) => {
-  const [personData, setPersonData] = useState({ ...defaultContractDetails, ...person });
+  const [personData, setPersonData] = useState<IPerson>({ ...defaultContractDetails, ...person });
   const {
     personDetails,
     emergencyContact1,
@@ -57,7 +58,6 @@ export const ContractPersonDataForm = ({ person = {}, height, updateFormData }: 
         [key]: data,
       };
       setPersonData(updatedFormData);
-      console.log('updatedForm', updatedFormData);
       updateFormData?.(updatedFormData);
     },
     [personData, updateFormData, setPersonData],

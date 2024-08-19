@@ -85,7 +85,8 @@ interface OrganisationDetails {
   email: string | null;
   landline: string | null;
   address1: string | null;
-  address2: string | null;
+  address2?: string | null;
+  address3?: string | null;
   name: string | null;
   mobileNumber: string | null;
   website: string | null;
@@ -108,6 +109,7 @@ export const transformOrganisationDetails = (organisationData: any): Organisatio
     landline: contactPerson?.PersonPhone || null,
     address1: contactPerson?.Address?.Address1 || null,
     address2: contactPerson?.Address?.Address2 || null,
+    address3: contactPerson?.Address?.Address3 || null,
     name: organisationData.OrgName || null,
     mobileNumber: contactPerson?.PersonMobile || null,
     website: organisationData.OrgWebsite || null,
@@ -143,7 +145,7 @@ export const transformAccountDetails = (accountData: any): AccountDetails => {
 
   return {
     paidTo: accountData.PersonPaymentTo || '',
-    accountName: '',
+    accountName: accountData.PersonPaymentAccountName || '',
     accountNumber: accountData.PersonPaymentAccount || '',
     sortCode: accountData.PersonPaymentSortCode || '',
     swift: accountData.PersonPaymentSWIFTBIC || '',
@@ -208,7 +210,7 @@ export const transformContractResponse = (contract: any) => {
     department: contract.ACCCDeptId,
     role: contract.RoleName,
     personId: contract.PersonId,
-    templateId: null,
+    templateId: 1,
     contractDetails: transformContractDetails(contract),
   };
 };

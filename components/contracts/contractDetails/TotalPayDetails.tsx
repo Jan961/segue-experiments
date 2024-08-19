@@ -15,12 +15,18 @@ interface ITotalPayDetails {
 }
 
 interface TotalPayDetailsProps {
+  testId?: string;
   details?: Partial<ITotalPayDetails>;
   onChange: (data: any) => void;
   currencySymbol?: string;
 }
 
-const TotalPayDetails = ({ onChange = noop, currencySymbol = '£', details = {} }: TotalPayDetailsProps) => {
+const TotalPayDetails = ({
+  onChange = noop,
+  currencySymbol = '£',
+  details = {},
+  testId = 'total-pay-details',
+}: TotalPayDetailsProps) => {
   const [totalPayDetails, setTotalPayDetails] = useState<ITotalPayDetails>({ ...defaultTotalPayDetails, ...details });
   const { totalFee, totalHolidayPay, feeNotes } = totalPayDetails;
   const handleChange = useCallback(
@@ -38,8 +44,9 @@ const TotalPayDetails = ({ onChange = noop, currencySymbol = '£', details = {} 
         <div className="flex items-center">
           <Label className="text-sm" text={currencySymbol} />
           <TextInput
-            testId="contract-details-first-day-work"
+            testId={`${testId}-total-fee`}
             placeholder="00.00"
+            type="number"
             value={totalFee}
             onChange={(event) => handleChange('totalFee', parseInt(event.target.value || '0', 10))}
           />
@@ -50,8 +57,9 @@ const TotalPayDetails = ({ onChange = noop, currencySymbol = '£', details = {} 
         <div className="flex items-center">
           <Label className="text-sm" text={currencySymbol} />
           <TextInput
-            testId="contract-details-first-day-work"
+            testId={`${testId}-total-hol-pay`}
             placeholder="00.00"
+            type="number"
             value={totalHolidayPay}
             onChange={(event) => handleChange('totalHolidayPay', parseInt(event.target.value || '0', 10))}
           />
@@ -60,8 +68,8 @@ const TotalPayDetails = ({ onChange = noop, currencySymbol = '£', details = {} 
       <div className="flex items-center gap-4">
         <Label className="w-56 text-sm" text="Fee Notes" />
         <TextInput
-          testId="contract-details-first-day-work"
-          placeholder="00.00"
+          testId={`${testId}-fee-notes`}
+          placeholder="Fee Notes"
           value={feeNotes}
           onChange={(event) => handleChange('feeNotes', parseInt(event.target.value || '0', 10))}
         />

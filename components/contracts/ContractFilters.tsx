@@ -11,7 +11,7 @@ import { productionJumpState } from 'state/booking/productionJumpState';
 import { ContractScheduleModal } from './modal/ContractSchedule';
 import { Label } from 'components/core-ui-lib';
 import { personState } from 'state/contracts/PersonState';
-import { getAllOptions, transformToOptions } from 'utils';
+import { getAllOptions, noop, transformToOptions } from 'utils';
 
 const ContractFilters = () => {
   const [filter, setFilter] = useRecoilState(contractsFilterState);
@@ -102,7 +102,7 @@ const ContractFilters = () => {
         </div>
         <div className="flex">
           <Button className="text-sm leading-8" text="Start New Contract" onClick={openContractSchedule} />
-          <Button className="text-sm leading-8 ml-4" text="View / Edit Contract Templates" onClick={console.log} />
+          <Button className="text-sm leading-8 ml-4" text="View / Edit Contract Templates" onClick={noop} />
         </div>
       </div>
       {openContract && <ContractScheduleModal openContract={openContract} onClose={() => setOpenContract(false)} />}

@@ -13,15 +13,18 @@ import { PersonMinimalDTO, StandardClauseDTO, UserDto } from 'interfaces';
 import { getAllCurrencylist } from 'services/productionService';
 import { fetchAllContracts, fetchAllStandardClauses, fetchDepartmentList } from 'services/contracts';
 import { IContractDepartment, IContractSummary } from 'interfaces/contracts';
+import { companyContractSelector } from 'state/contracts/selectors/companyContractRowsSelector';
+import { useRecoilValue } from 'recoil';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const ContractsPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  const rows = useRecoilValue(companyContractSelector);
   return (
     <Layout title="Contracts | Segue" flush>
       <div className="mb-8">
         <CompanyContractFilters />
       </div>
-      <CompanyContractsTable rowData={[]} />
+      <CompanyContractsTable rowData={rows} />
     </Layout>
   );
 };
@@ -44,7 +47,6 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       fetchDepartmentList(),
       fetchAllContracts(ProductionId),
     ]);
-  console.table(contractList);
   const department = objectify(
     departmentList,
     (d: IContractDepartment) => d.id,

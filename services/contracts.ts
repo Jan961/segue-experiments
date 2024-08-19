@@ -72,179 +72,67 @@ export const fetchAllContracts = async (productionId?: number): Promise<IContrac
 export const prepareContractUpdateData = (data: any) => {
   const updateData: any = {};
 
-  // Check each field and add to updateData if defined
-  if (!isUndefined(data.roleName)) {
-    updateData.RoleName = data.roleName;
-  }
+  const fieldMappings = [
+    { key: 'roleName', updateKey: 'RoleName' },
+    { key: 'contractStatus', updateKey: 'ContractStatus' },
+    { key: 'completedByAccUserId', updateKey: 'CompletedByAccUserId' },
+    { key: 'checkedByAccUserId', updateKey: 'CheckedByAccUserId' },
+    { key: 'dateIssued', updateKey: 'DateIssued', isDate: true },
+    { key: 'dateReturned', updateKey: 'DateReturned', isDate: true },
+    { key: 'notes', updateKey: 'Notes' },
+    { key: 'firstDay', updateKey: 'FirstDay', isDate: true },
+    { key: 'lastDay', updateKey: 'LastDay', isDate: true },
+    { key: 'availability', updateKey: 'Availability' },
+    { key: 'rehearsalLocation', updateKey: 'RehearsalLocation' },
+    { key: 'rehearsalVenueNotes', updateKey: 'RehearsalVenueNotes' },
+    { key: 'isAccomProvided', updateKey: 'IsAccomProvided' },
+    { key: 'accomNotes', updateKey: 'AccomNotes' },
+    { key: 'isTransportProvided', updateKey: 'IsTransportProvided' },
+    { key: 'transportNotes', updateKey: 'TransportNotes' },
+    { key: 'isNominatedDriver', updateKey: 'IsNominatedDriver' },
+    { key: 'nominatedDriverNotes', updateKey: 'NominatedDriverNotes' },
+    { key: 'paymentType', updateKey: 'PaymentType' },
+    { key: 'weeklyRehFee', updateKey: 'WeeklyRehFee' },
+    { key: 'weeklyRehHolPay', updateKey: 'WeeklyRehHolPay' },
+    { key: 'weeklyPerfFee', updateKey: 'WeeklyPerfFee' },
+    { key: 'weeklyPerfHolPay', updateKey: 'WeeklyPerfHolPay' },
+    { key: 'weeklySubs', updateKey: 'WeeklySubs' },
+    { key: 'weeklySubsNotes', updateKey: 'WeeklySubsNotes' },
+    { key: 'totalFee', updateKey: 'TotalFee' },
+    { key: 'totalHolPay', updateKey: 'TotalHolPay' },
+    { key: 'totalFeeNotes', updateKey: 'TotalFeeNotes' },
+    { key: 'cancelFee', updateKey: 'CancelFee' },
+    // Foreign key connections
+    { key: 'departmentId', updateKey: 'ACCDepartment', isForeignKey: true, foreignKeyId: 'ACCDeptId' },
+    { key: 'personId', updateKey: 'Person', isForeignKey: true, foreignKeyId: 'PersonId' },
+    { key: 'productionId', updateKey: 'Production', isForeignKey: true, foreignKeyId: 'Id' },
+    { key: 'currency', updateKey: 'Currency', isForeignKey: true, foreignKeyId: 'Code' },
+    { key: 'venueId', updateKey: 'Venue', isForeignKey: true, foreignKeyId: 'Id' },
+    {
+      key: 'checkedBy',
+      updateKey: 'AccountUser_ACCContract_ACCCCheckedByAccUserIdToAccountUser',
+      isForeignKey: true,
+      foreignKeyId: 'Id',
+    },
+    {
+      key: 'completedBy',
+      updateKey: 'AccountUser_ACCContract_ACCCCompletedByAccUserIdToAccountUser',
+      isForeignKey: true,
+      foreignKeyId: 'Id',
+    },
+  ];
 
-  if (!isUndefined(data.contractStatus)) {
-    updateData.ContractStatus = data.contractStatus;
-  }
-
-  if (!isUndefined(data.completedByAccUserId)) {
-    updateData.CompletedByAccUserId = data.completedByAccUserId;
-  }
-
-  if (!isUndefined(data.checkedByAccUserId)) {
-    updateData.CheckedByAccUserId = data.checkedByAccUserId;
-  }
-
-  if (!isUndefined(data.dateIssued)) {
-    updateData.DateIssued = data.dateIssued ? new Date(data.dateIssued) : null;
-  }
-
-  if (!isUndefined(data.dateReturned)) {
-    updateData.DateReturned = data.dateReturned ? new Date(data.dateReturned) : null;
-  }
-
-  if (!isUndefined(data.notes)) {
-    updateData.Notes = data.notes;
-  }
-
-  if (!isUndefined(data.firstDay)) {
-    updateData.FirstDay = data.firstDay ? new Date(data.firstDay) : null;
-  }
-
-  if (!isUndefined(data.lastDay)) {
-    updateData.LastDay = data.lastDay ? new Date(data.lastDay) : null;
-  }
-
-  if (!isUndefined(data.availability)) {
-    updateData.Availability = data.availability;
-  }
-
-  if (!isUndefined(data.rehearsalLocation)) {
-    updateData.RehearsalLocation = data.rehearsalLocation;
-  }
-
-  if (!isUndefined(data.rehearsalVenueNotes)) {
-    updateData.RehearsalVenueNotes = data.rehearsalVenueNotes;
-  }
-
-  if (!isUndefined(data.isAccomProvided)) {
-    updateData.IsAccomProvided = data.isAccomProvided;
-  }
-
-  if (!isUndefined(data.accomNotes)) {
-    updateData.AccomNotes = data.accomNotes;
-  }
-
-  if (!isUndefined(data.isTransportProvided)) {
-    updateData.IsTransportProvided = data.isTransportProvided;
-  }
-
-  if (!isUndefined(data.transportNotes)) {
-    updateData.TransportNotes = data.transportNotes;
-  }
-
-  if (!isUndefined(data.isNominatedDriver)) {
-    updateData.IsNominatedDriver = data.isNominatedDriver;
-  }
-
-  if (!isUndefined(data.nominatedDriverNotes)) {
-    updateData.NominatedDriverNotes = data.nominatedDriverNotes;
-  }
-
-  if (!isUndefined(data.paymentType)) {
-    updateData.PaymentType = data.paymentType;
-  }
-
-  if (!isUndefined(data.weeklyRehFee)) {
-    updateData.WeeklyRehFee = data.weeklyRehFee;
-  }
-
-  if (!isUndefined(data.weeklyRehHolPay)) {
-    updateData.WeeklyRehHolPay = data.weeklyRehHolPay;
-  }
-
-  if (!isUndefined(data.weeklyPerfFee)) {
-    updateData.WeeklyPerfFee = data.weeklyPerfFee;
-  }
-
-  if (!isUndefined(data.weeklyPerfHolPay)) {
-    updateData.WeeklyPerfHolPay = data.weeklyPerfHolPay;
-  }
-
-  if (!isUndefined(data.weeklySubs)) {
-    updateData.WeeklySubs = data.weeklySubs;
-  }
-
-  if (!isUndefined(data.weeklySubsNotes)) {
-    updateData.WeeklySubsNotes = data.weeklySubsNotes;
-  }
-
-  if (!isUndefined(data.totalFee)) {
-    updateData.TotalFee = data.totalFee;
-  }
-
-  if (!isUndefined(data.totalHolPay)) {
-    updateData.TotalHolPay = data.totalHolPay;
-  }
-
-  if (!isUndefined(data.totalFeeNotes)) {
-    updateData.TotalFeeNotes = data.totalFeeNotes;
-  }
-
-  if (!isUndefined(data.cancelFee)) {
-    updateData.CancelFee = data.cancelFee;
-  }
-
-  // Handling foreign key connections
-  if (!isUndefined(data.departmentId)) {
-    if (data.departmentId === null) {
-      updateData.ACCDepartment = { disconnect: true };
-    } else {
-      updateData.ACCDepartment = { connect: { ACCDeptId: data.departmentId } };
+  fieldMappings.forEach(({ key, updateKey, isDate, isForeignKey, foreignKeyId }) => {
+    if (!isUndefined(data[key])) {
+      if (isDate) {
+        updateData[updateKey] = data[key] ? new Date(data[key]) : null;
+      } else if (isForeignKey) {
+        updateData[updateKey] = data[key] === null ? { disconnect: true } : { connect: { [foreignKeyId]: data[key] } };
+      } else {
+        updateData[updateKey] = data[key];
+      }
     }
-  }
-
-  if (!isUndefined(data.personId)) {
-    if (data.personId === null) {
-      updateData.Person = { disconnect: true };
-    } else {
-      updateData.Person = { connect: { PersonId: data.personId } };
-    }
-  }
-
-  if (!isUndefined(data.productionId)) {
-    if (data.productionId === null) {
-      updateData.Production = { disconnect: true };
-    } else {
-      updateData.Production = { connect: { Id: data.productionId } };
-    }
-  }
-
-  if (!isUndefined(data.currency)) {
-    if (data.currency === null) {
-      updateData.Currency = { disconnect: true };
-    } else {
-      updateData.Currency = { connect: { Code: data.currency } };
-    }
-  }
-
-  if (!isUndefined(data.venueId)) {
-    if (data.venueId === null) {
-      updateData.Venue = { disconnect: true };
-    } else {
-      updateData.Venue = { connect: { Id: data.venueId } };
-    }
-  }
-
-  if (!isUndefined(data.checkedBy)) {
-    if (data.venueId === null) {
-      updateData.AccountUser_ACCContract_ACCCCheckedByAccUserIdToAccountUser = { disconnect: true };
-    } else {
-      updateData.AccountUser_ACCContract_ACCCCheckedByAccUserIdToAccountUser = { connect: { Id: data.checkedBy } };
-    }
-  }
-
-  if (!isUndefined(data.completedBy)) {
-    if (data.venueId === null) {
-      updateData.AccountUser_ACCContract_ACCCCompletedByAccUserIdToAccountUser = { disconnect: true };
-    } else {
-      updateData.AccountUser_ACCContract_ACCCCompletedByAccUserIdToAccountUser = { connect: { Id: data.completedBy } };
-    }
-  }
+  });
 
   return updateData;
 };

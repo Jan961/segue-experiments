@@ -21,12 +21,18 @@ interface IWeeklyPayDetails {
 }
 
 interface WeeklyPayDetailsProps {
+  testId?: string;
   details?: Partial<IWeeklyPayDetails>;
   onChange: (data: any) => void;
   currencySymbol?: string;
 }
 
-const WeeklyPayDetails = ({ onChange = noop, currencySymbol = '£', details = {} }: WeeklyPayDetailsProps) => {
+const WeeklyPayDetails = ({
+  onChange = noop,
+  currencySymbol = '£',
+  details = {},
+  testId = 'weekly-payment',
+}: WeeklyPayDetailsProps) => {
   const [weeklyPayDetails, setWeeklyPayDetails] = useState<IWeeklyPayDetails>({
     ...defaultWeeklyPayDetails,
     ...details,
@@ -48,7 +54,7 @@ const WeeklyPayDetails = ({ onChange = noop, currencySymbol = '£', details = {}
         <div className="flex items-center">
           <Label className="text-sm" text={currencySymbol} />
           <TextInput
-            testId="contract-details-first-day-work"
+            testId={`${testId}-reh-fee`}
             placeholder="00.00"
             value={rehearsalFee}
             type="number"
@@ -61,7 +67,7 @@ const WeeklyPayDetails = ({ onChange = noop, currencySymbol = '£', details = {}
         <div className="flex items-center">
           <Label className="text-sm" text={currencySymbol} />
           <TextInput
-            testId="contract-details-first-day-work"
+            testId={`${testId}-reh-hol-pay`}
             placeholder="00.00"
             type="number"
             value={rehearsalHolidayPay}
@@ -74,7 +80,7 @@ const WeeklyPayDetails = ({ onChange = noop, currencySymbol = '£', details = {}
         <div className="flex items-center">
           <Label className="text-sm" text={currencySymbol} />
           <TextInput
-            testId="contract-details-first-day-work"
+            testId={`${testId}-perf-fee`}
             placeholder="00.00"
             type="number"
             value={performanceFee}
@@ -87,7 +93,7 @@ const WeeklyPayDetails = ({ onChange = noop, currencySymbol = '£', details = {}
         <div className="flex items-center">
           <Label className="text-sm" text={currencySymbol} />
           <TextInput
-            testId="contract-details-first-day-work"
+            testId={`${testId}-perf-hol-fee`}
             placeholder="00.00"
             type="number"
             value={performanceHolidayPay}
@@ -101,14 +107,14 @@ const WeeklyPayDetails = ({ onChange = noop, currencySymbol = '£', details = {}
           <Label className="text-sm" text={currencySymbol} />
           <div className="flex flex-col gap-2">
             <TextInput
-              testId="contract-details-first-day-work"
+              testId={`${testId}-touring-allowance`}
               placeholder="00.00"
               type="number"
               value={touringAllowance}
               onChange={(event) => handleChange('touringAllowance', parseInt(event.target.value, 10))}
             />
             <TextInput
-              testId="contract-details-first-day-work"
+              testId={`${testId}-subs-notes`}
               placeholder="Subs Notes"
               value={subsNotes}
               onChange={(event) => handleChange('subsNotes', event.target.value)}

@@ -5,7 +5,7 @@ import { salaryPaidToOptions } from 'config/contracts';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import { BankAccount } from '../types';
 
-const defaultBankAccount = {
+export const defaultBankAccount = {
   paidTo: '',
   accountName: '',
   accountNumber: '',

@@ -3,7 +3,7 @@ import { Select, TextInput } from 'components/core-ui-lib';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import { EmergencyContact } from '../types';
 
-const defaultEmergencyContactData = {
+export const defaultEmergencyContactData = {
   firstName: '',
   lastName: '',
   address1: '',

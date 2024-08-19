@@ -152,6 +152,7 @@ const ContractDetails = ({ contract = {}, onChange = noop }: ContractDetailsProp
           {publicityEventList.map((publicityEvent, i) => (
             <div key={i} className="flex gap-2 items-center">
               <PublicityEventDetails
+                testId={`contract-details-publicity-event-${i}`}
                 details={publicityEvent}
                 onChange={(details) => handleChange('publicityEventList', replaceAtPos(publicityEventList, details, i))}
               />
@@ -275,7 +276,7 @@ const ContractDetails = ({ contract = {}, onChange = noop }: ContractDetailsProp
         <div className="flex items-center gap-2">
           <Label className="!font-bold text-sm w-52" text="Type of Payment" />
           <Select
-            testId="contract-details-is-nominated-driver"
+            testId="contract-details-payment-type"
             placeholder="Please Select Payment Type"
             value={paymentType}
             onChange={(value) => handleChange('paymentType', value as string)}
@@ -286,6 +287,7 @@ const ContractDetails = ({ contract = {}, onChange = noop }: ContractDetailsProp
           <div className="flex flex-col gap-4">
             <Label className="!font-bold text-sm w-52" text="If Weekly payment:" />
             <WeeklyPayDetails
+              testId="contract-details-weekly-payment"
               details={weeklyPayDetails}
               onChange={(value) => handleChange('weeklyPayDetails', value as boolean)}
             />
@@ -293,6 +295,7 @@ const ContractDetails = ({ contract = {}, onChange = noop }: ContractDetailsProp
           <div className="flex flex-col gap-4">
             <Label className="!font-bold text-sm w-52" text="If Total Pay:" />
             <TotalPayDetails
+              testId="contract-details-total-payment"
               details={totalPayDetails}
               onChange={(value) => handleChange('totalPayDetails', value as boolean)}
             />
@@ -304,6 +307,7 @@ const ContractDetails = ({ contract = {}, onChange = noop }: ContractDetailsProp
             {paymentBreakdownList.map((paymentBreakdown, i) => (
               <div key={i} className="flex w-full items-center gap-2">
                 <PaymentBreakdown
+                  testId={`payment-breakdown-${i}`}
                   breakdown={paymentBreakdown}
                   currencySymbol={currencySymbol}
                   onChange={(change) =>
@@ -342,6 +346,7 @@ const ContractDetails = ({ contract = {}, onChange = noop }: ContractDetailsProp
             <div className="flex items-center">
               <Label className="text-sm" text={currencySymbol} />
               <TextInput
+                testId="contract-details-cancellation-fee"
                 placeholder="00.00"
                 type="number"
                 value={cancellationFee}
@@ -349,6 +354,7 @@ const ContractDetails = ({ contract = {}, onChange = noop }: ContractDetailsProp
               />
             </div>
             <TextInput
+              testId="contract-details-cancellation-fee-notes"
               className="grow"
               inputClassName="grow"
               placeholder="Cancellation Payment Notes"
@@ -360,7 +366,7 @@ const ContractDetails = ({ contract = {}, onChange = noop }: ContractDetailsProp
         <div className="flex -items-center gap-2">
           <Label className="w-60 !font-bold" text="Include Additional Clauses in Contract?" />
           <Select
-            testId="contract-details-is-nominated-driver"
+            testId="contract-details-include-additional-Clauses"
             placeholder="Yes | No"
             value={includeAdditionalClauses}
             onChange={(value) => handleChange('includeAdditionalClauses', value as boolean)}
@@ -372,7 +378,7 @@ const ContractDetails = ({ contract = {}, onChange = noop }: ContractDetailsProp
           <div className="flex flex-col gap-2 w-full">
             <Select
               className="w-60"
-              testId="contract-details-is-nominated-driver"
+              testId="contract-details-additional-clause"
               placeholder="Please Select a Clause"
               value={additionalClause}
               onChange={(value) => handleChange('additionalClause', value as number)}
@@ -382,6 +388,7 @@ const ContractDetails = ({ contract = {}, onChange = noop }: ContractDetailsProp
               {customClauseList.map((customClause, i) => (
                 <div key={i} className="flex items-center gap-2">
                   <TextInput
+                    testId={`contrat-details-custom-clause-${i}`}
                     className="grow"
                     inputClassName="grow"
                     placeholder="Custom Clause"
@@ -390,22 +397,17 @@ const ContractDetails = ({ contract = {}, onChange = noop }: ContractDetailsProp
                       handleChange('customClauseList', replaceAtPos(customClauseList, event.target.value as string, i))
                     }
                   />
-                  {i === 0 && (
-                    <div
-                      className="cursor-pointer"
-                      onClick={() => handleChange('customClauseList', insertAtPos(customClauseList, '', i + 1))}
-                    >
-                      <Icon iconName="plus-circle-solid" />
-                    </div>
-                  )}
-                  {i > 0 && (
-                    <div
-                      className="cursor-pointer"
-                      onClick={() => handleChange('customClauseList', removeAtPos(customClauseList, i))}
-                    >
-                      <Icon iconName="minus-circle-solid" />
-                    </div>
-                  )}
+                  <div
+                    className="cursor-pointer"
+                    onClick={() =>
+                      handleChange(
+                        'customClauseList',
+                        i === 0 ? insertAtPos(customClauseList, '', i + 1) : removeAtPos(customClauseList, i),
+                      )
+                    }
+                  >
+                    <Icon iconName={i === 0 ? 'plus-circle-solid' : 'minus-circle-solid'} />
+                  </div>
                 </div>
               ))}
             </div>

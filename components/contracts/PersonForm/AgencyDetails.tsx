@@ -4,7 +4,7 @@ import { Select, TextInput } from 'components/core-ui-lib';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import { IAgencyDetails } from '../types';
 
-const defaultAgencyDetails = {
+export const defaultAgencyDetails = {
   firstName: '',
   lastName: '',
   email: '',

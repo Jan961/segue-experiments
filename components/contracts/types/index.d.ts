@@ -1,4 +1,5 @@
 export interface BankAccount {
+  accountName: string;
   paidTo: string | null;
   accountName: string;
   accountNumber: string;
@@ -38,7 +39,7 @@ export interface EmergencyContact {
   mobileNumber: string;
 }
 
-export interface PersonDetails {
+export interface IPersonDetails {
   firstName: string;
   lastName: string;
   email: string;
@@ -62,6 +63,15 @@ export interface PersonDetails {
   healthDetails: string;
   otherWorkTypes: string[];
   notes: string;
+}
+
+export interface IPerson {
+  personDetails?: IPersonDetails;
+  emergencyContact1?: EmergencyContact;
+  emergencyContact2?: EmergencyContact;
+  agencyDetails?: AgencyDetails;
+  salaryAccountDetails?: BankAccount;
+  expenseAccountDetails?: BankAccount;
 }
 
 export interface IContractSchedule {

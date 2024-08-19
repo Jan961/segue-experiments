@@ -15,16 +15,18 @@ export interface IPublicityEventDetails {
 }
 
 interface PublicityEventDetailsProps {
+  testId?: string;
   details: IPublicityEventDetails;
   onChange: (data: IPublicityEventDetails) => void;
 }
 
-const PublicityEventDetails: FC<PublicityEventDetailsProps> = ({ details, onChange }) => {
+const PublicityEventDetails: FC<PublicityEventDetailsProps> = ({ details, testId = 'publicity-event', onChange }) => {
   const [eventDetails, setEventDetails] = useState<IPublicityEventDetails>({
     ...defaultPublicityEventDetails,
     ...details,
   });
   const { isRequired, date, notes } = eventDetails;
+
   const handleChange = useCallback(
     (key: string, value: number | string | boolean | null) => {
       const updatedData = { ...eventDetails, [key]: value };
@@ -33,11 +35,12 @@ const PublicityEventDetails: FC<PublicityEventDetailsProps> = ({ details, onChan
     },
     [onChange, eventDetails, setEventDetails],
   );
+
   return (
     <div className="flex items-start gap-4">
       <div className="flex items-start gap-2">
         <Select
-          testId="contract-details-currency"
+          testId={`${testId}-is-required`}
           placeholder="Yes | No"
           value={isRequired}
           onChange={(value) => handleChange('isRequired', value as boolean)}
@@ -48,7 +51,7 @@ const PublicityEventDetails: FC<PublicityEventDetailsProps> = ({ details, onChan
         <Label className="!font-bold text-sm" text="If YES, " />
         <DateInput
           disabled={!isRequired}
-          testId="contract-details-publicity-event-date"
+          testId={`${testId}-date`}
           placeholder="DD/MM/YY"
           value={date}
           onChange={(value) => handleChange('date', value?.toISOString?.() || '')}
@@ -56,7 +59,7 @@ const PublicityEventDetails: FC<PublicityEventDetailsProps> = ({ details, onChan
       </div>
       <TextInput
         disabled={!isRequired}
-        testId="contract-details-publicity-event-notes"
+        testId={`${testId}-notes`}
         placeholder="Publicity Event Notes"
         className="flex-1"
         value={notes}

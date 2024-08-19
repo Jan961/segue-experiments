@@ -48,7 +48,6 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       fetchDepartmentList(),
       fetchAllContracts(),
     ]);
-  console.table(contractList);
   const department = objectify(
     departmentList,
     (d: IContractDepartment) => d.id,

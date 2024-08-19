@@ -3,9 +3,9 @@ import { DateInput, Icon, Select, TextInput } from 'components/core-ui-lib';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import { workTypeOptions } from 'config/contracts';
 import { insertAtPos, removeAtPos, replaceAtPos } from 'utils';
-import { PersonDetails } from '../types';
+import { IPersonDetails } from '../types';
 
-const defaultPersonDetails = {
+export const defaultPersonDetails = {
   firstName: '',
   lastName: '',
   email: '',
@@ -35,8 +35,8 @@ interface PersonalDetailsProps {
   countryOptionList: SelectOption[];
   booleanOptions: SelectOption[];
   userOptionList: SelectOption[];
-  details: Partial<PersonDetails>;
-  onChange: (data: PersonDetails) => void;
+  details: Partial<IPersonDetails>;
+  onChange: (data: IPersonDetails) => void;
 }
 
 const PersonalDetails = ({
@@ -46,7 +46,7 @@ const PersonalDetails = ({
   details = {},
   onChange,
 }: PersonalDetailsProps) => {
-  const [formData, setFormData] = useState<PersonDetails>({ ...defaultPersonDetails, ...details });
+  const [formData, setFormData] = useState<IPersonDetails>({ ...defaultPersonDetails, ...details });
   const {
     firstName,
     lastName,

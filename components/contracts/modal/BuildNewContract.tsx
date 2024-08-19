@@ -136,7 +136,7 @@ export const BuildNewContract = ({
           </div>
         )}
         {mainButtonSelection.name && contractPerson && (
-          <ContractPersonDataForm person={contractPerson} height="h-[70vh]" updateFormData={noop} />
+          <ContractPersonDataForm person={contractPerson} height="h-[70vh]" updateFormData={setContractPerson} />
         )}
         {mainButtonSelection.details && (
           <div className="flex flex-col gap-8 px-16">

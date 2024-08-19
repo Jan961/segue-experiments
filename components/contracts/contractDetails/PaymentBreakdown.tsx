@@ -15,12 +15,18 @@ export type TPaymentBreakdown = {
 };
 
 interface PaymentBreakdownProps {
+  testId?: string;
   breakdown: TPaymentBreakdown;
   currencySymbol: string;
   onChange: (data: TPaymentBreakdown) => void;
 }
 
-const PaymentBreakdown = ({ breakdown, currencySymbol = '£', onChange = noop }: PaymentBreakdownProps) => {
+const PaymentBreakdown = ({
+  breakdown,
+  currencySymbol = '£',
+  onChange = noop,
+  testId = 'payment-breakdown',
+}: PaymentBreakdownProps) => {
   const [payment, setPayment] = useState({ ...defaultPaymentBreakdown, ...breakdown });
   const { date, amount, notes } = payment;
   const handleChange = useCallback(
@@ -34,7 +40,7 @@ const PaymentBreakdown = ({ breakdown, currencySymbol = '£', onChange = noop }:
   return (
     <div className="flex items-center w-full gap-4">
       <DateInput
-        testId="contract-details-publicity-event-date"
+        testId={`${testId}-date`}
         placeholder="DD/MM/YY"
         value={date}
         onChange={(value) => handleChange('date', value?.toISOString?.() || '')}
@@ -42,6 +48,7 @@ const PaymentBreakdown = ({ breakdown, currencySymbol = '£', onChange = noop }:
       <div className="flex items-center">
         <Label className="text-sm" text={currencySymbol} />
         <TextInput
+          testId={`${testId}-amount`}
           placeholder="00.00"
           type="number"
           value={amount}
@@ -49,6 +56,7 @@ const PaymentBreakdown = ({ breakdown, currencySymbol = '£', onChange = noop }:
         />
       </div>
       <TextInput
+        testId={`${testId}-payment-notes`}
         className="grow"
         inputClassName="grow"
         placeholder="Payment Notes"
