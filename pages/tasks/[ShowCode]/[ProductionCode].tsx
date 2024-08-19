@@ -54,8 +54,6 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
   const [isShowSpinner, setIsShowSpinner] = useState<boolean>(false);
   const filterMatchingInitial = useMemo(() => {
     const { assignee, endDueDate, startDueDate, status, taskText, production } = filter;
-    console.log(filter);
-    console.log(production);
     return (
       assignee === intialTasksState.assignee &&
       endDueDate === intialTasksState.endDueDate &&
@@ -103,13 +101,11 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
   };
 
   const handleMasterListClose = async (_val: string) => {
-    console.log('closed');
     await router.replace(router.asPath);
     setIsMasterTaskList(false);
   };
 
   const handleProductionListClose = async (_val: string) => {
-    console.log('closed');
     await router.replace(router.asPath);
     setIsProductionTaskList(false);
     setIsMasterTaskList(false);
