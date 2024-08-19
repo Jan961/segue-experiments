@@ -1,6 +1,6 @@
 import Table from 'components/core-ui-lib/Table';
 import { contractsStyleProps, getCompanyContractsColumnDefs } from 'components/contracts/tableConfig';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { IContractSummary } from 'interfaces/contracts';
 import { userState } from 'state/account/userState';
 import { transformToOptions } from 'utils';
@@ -10,16 +10,32 @@ import NotesPopup from 'components/NotesPopup';
 import { notify } from 'components/core-ui-lib';
 import useAxiosCancelToken from 'hooks/useCancelToken';
 import axios from 'axios';
+import { BuildNewContract, BuildNewContractProps } from '../modal/BuildNewContract';
+import { defaultContractSchedule } from '../modal/ContractSchedule';
 
 interface ContractsTableProps {
   rowData?: IContractSummary[];
 }
 const defaultNotesPopupContext = { visible: false, contract: null };
+const defaultEditContractState = {
+  visible: false,
+  contractId: null,
+  personId: null,
+  contractSchedule: defaultContractSchedule,
+};
+
 export default function CompanyContractsTable({ rowData = [] }: ContractsTableProps) {
   const tableRef = useRef(null);
   const { users } = useRecoilValue(userState);
   const [contracts, setContracts] = useRecoilState(contractListState);
   const [notesPopupContext, setNotesPopupContext] = useState(defaultNotesPopupContext);
+  const [rows, setRows] = useState(rowData);
+  const [editContract, setEditContract] = useState<Partial<BuildNewContractProps>>(defaultEditContractState);
+
+  useEffect(() => {
+    setRows(rowData);
+  }, [rowData]);
+
   const userOptionList = useMemo(
     () =>
       transformToOptions(
@@ -36,6 +52,20 @@ export default function CompanyContractsTable({ rowData = [] }: ContractsTablePr
   const handleCellClick = (e) => {
     if (e.column.colId === 'notes') {
       setNotesPopupContext({ visible: true, contract: e.data });
+    }
+    if (e.column.colId === 'edit') {
+      const { departmentId, productionId, personId, role, id } = e.data;
+      setEditContract({
+        visible: true,
+        contractId: id,
+        contractSchedule: {
+          role,
+          production: productionId,
+          department: departmentId,
+          personId,
+          templateId: 1,
+        },
+      });
     }
   };
 
@@ -69,14 +99,18 @@ export default function CompanyContractsTable({ rowData = [] }: ContractsTablePr
     [updateContract, notesPopupContext],
   );
 
+  const closeEditContractModal = useCallback(() => {
+    setEditContract(defaultEditContractState);
+  }, []);
+
   return (
     <>
       <div className="w-full h-[calc(100%-140px)]">
         <Table
           columnDefs={columnDefs}
-          rowData={rowData}
-          styleProps={contractsStyleProps}
+          rowData={rows}
           ref={tableRef}
+          styleProps={contractsStyleProps}
           onCellValueChange={onCellValueChange}
           onCellClicked={handleCellClick}
         />
@@ -90,6 +124,9 @@ export default function CompanyContractsTable({ rowData = [] }: ContractsTablePr
             onSave={handleSaveNote}
             onCancel={() => setNotesPopupContext(defaultNotesPopupContext)}
           />
+        )}
+        {editContract.visible && (
+          <BuildNewContract {...editContract} visible={editContract?.visible} onClose={closeEditContractModal} isEdit />
         )}
       </div>
     </>

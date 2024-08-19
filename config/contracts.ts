@@ -292,6 +292,14 @@ export enum CompanyContractStatus {
   Overdue = 'CO',
 }
 
+export const companyContractStatusOrder = {
+  [CompanyContractStatus.Overdue]: 1,
+  [CompanyContractStatus.QuestionsRaised]: 2,
+  [CompanyContractStatus.Issued]: 3,
+  [CompanyContractStatus.NotYetIssued]: 4,
+  [CompanyContractStatus.SignedAndReturned]: 5,
+};
+
 export const companyContractStatusOptions = [
   {
     text: 'Not Yet Issued',

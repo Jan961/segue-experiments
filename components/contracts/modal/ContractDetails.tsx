@@ -75,6 +75,8 @@ const ContractDetails = ({ contract = {}, onChange = noop }: ContractDetailsProp
     includeAdditionalClauses,
     additionalClause,
     customClauseList,
+    weeklyPayDetails,
+    totalPayDetails,
   } = contractDetails;
   const { townCity, notes, venue } = rehearsalVenue;
   const currencyList = useRecoilValue(currencyListState);
@@ -283,11 +285,17 @@ const ContractDetails = ({ contract = {}, onChange = noop }: ContractDetailsProp
         <div className="flex gap-14">
           <div className="flex flex-col gap-4">
             <Label className="!font-bold text-sm w-52" text="If Weekly payment:" />
-            <WeeklyPayDetails onChange={(value) => handleChange('weeklyPayDetails', value as boolean)} />
+            <WeeklyPayDetails
+              details={weeklyPayDetails}
+              onChange={(value) => handleChange('weeklyPayDetails', value as boolean)}
+            />
           </div>
           <div className="flex flex-col gap-4">
             <Label className="!font-bold text-sm w-52" text="If Total Pay:" />
-            <TotalPayDetails onChange={(value) => handleChange('totalPayDetails', value as boolean)} />
+            <TotalPayDetails
+              details={totalPayDetails}
+              onChange={(value) => handleChange('totalPayDetails', value as boolean)}
+            />
           </div>
         </div>
         <div className="flex items-start grow gap-4 w-full">

@@ -11,13 +11,26 @@ const defaultWeeklyPayDetails = {
   subsNotes: '',
 };
 
+interface IWeeklyPayDetails {
+  rehearsalFee: number;
+  rehearsalHolidayPay: number;
+  performanceFee: number;
+  performanceHolidayPay: number;
+  touringAllowance: number;
+  subsNotes: string;
+}
+
 interface WeeklyPayDetailsProps {
+  details?: Partial<IWeeklyPayDetails>;
   onChange: (data: any) => void;
   currencySymbol?: string;
 }
 
-const WeeklyPayDetails = ({ onChange = noop, currencySymbol = '£' }: WeeklyPayDetailsProps) => {
-  const [weeklyPayDetails, setWeeklyPayDetails] = useState(defaultWeeklyPayDetails);
+const WeeklyPayDetails = ({ onChange = noop, currencySymbol = '£', details = {} }: WeeklyPayDetailsProps) => {
+  const [weeklyPayDetails, setWeeklyPayDetails] = useState<IWeeklyPayDetails>({
+    ...defaultWeeklyPayDetails,
+    ...details,
+  });
   const { rehearsalFee, rehearsalHolidayPay, performanceFee, performanceHolidayPay, touringAllowance, subsNotes } =
     weeklyPayDetails;
   const handleChange = useCallback(

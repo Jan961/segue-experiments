@@ -8,13 +8,20 @@ const defaultTotalPayDetails = {
   feeNotes: '',
 };
 
+interface ITotalPayDetails {
+  totalFee: number;
+  totalHolidayPay: number;
+  feeNotes: string;
+}
+
 interface TotalPayDetailsProps {
+  details?: Partial<ITotalPayDetails>;
   onChange: (data: any) => void;
   currencySymbol?: string;
 }
 
-const TotalPayDetails = ({ onChange = noop, currencySymbol = '£' }: TotalPayDetailsProps) => {
-  const [totalPayDetails, setTotalPayDetails] = useState(defaultTotalPayDetails);
+const TotalPayDetails = ({ onChange = noop, currencySymbol = '£', details = {} }: TotalPayDetailsProps) => {
+  const [totalPayDetails, setTotalPayDetails] = useState<ITotalPayDetails>({ ...defaultTotalPayDetails, ...details });
   const { totalFee, totalHolidayPay, feeNotes } = totalPayDetails;
   const handleChange = useCallback(
     (key: string, value: number | string | boolean | null) => {

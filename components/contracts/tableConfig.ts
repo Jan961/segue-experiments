@@ -12,6 +12,7 @@ import IconRowRenderer from 'components/global/salesTable/renderers/IconRowRende
 import SelectCellRenderer from 'components/core-ui-lib/Table/renderers/SelectCellRenderer';
 import { statusOptions, statusToBgColorMap } from 'config/contracts';
 import NotesRenderer from 'components/tasks/NotesRenderer';
+import DateRenderer from 'components/core-ui-lib/Table/renderers/DateRenderer';
 
 export const contractsStyleProps = { headerColor: tileColors.contracts };
 
@@ -99,7 +100,7 @@ export const getCompanyContractsColumnDefs = (userList = []) => [
       return { backgroundColor: statusToBgColorMap[status] || 'white' };
     },
   },
-  { headerName: 'Role', field: 'role', cellRenderer: DefaultCellRenderer, width: 140, flex: 1 },
+  { headerName: 'Role', field: 'role', cellRenderer: DefaultCellRenderer, width: 140, flex: 1, editable: true },
   {
     headerName: 'Contract Status',
     field: 'status',
@@ -167,11 +168,11 @@ export const getCompanyContractsColumnDefs = (userList = []) => [
       isSearchable: true,
     }),
   },
-  { headerName: 'Date Issued', field: 'dateIssue', cellRenderer: DateColumnRenderer, flex: 1, width: 180 },
+  { headerName: 'Date Issued', field: 'dateIssue', cellRenderer: DateRenderer, flex: 1, width: 180 },
   {
     headerName: 'Date Returned',
     field: 'dateReturned',
-    cellRenderer: DateColumnRenderer,
+    cellRenderer: DateRenderer,
     resizable: false,
     width: 180,
     flex: 1,

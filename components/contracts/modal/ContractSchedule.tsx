@@ -13,7 +13,7 @@ import { objectify } from 'radash';
 import { PersonMinimalDTO } from 'interfaces';
 import { IContractSchedule } from '../types';
 
-const defaultContractSchedule = {
+export const defaultContractSchedule = {
   production: null,
   department: null,
   role: '',
@@ -154,7 +154,7 @@ export const ContractScheduleModal = ({ openContract, onClose }: { openContract:
       {openNewBuildContract && (
         <BuildNewContract
           contractSchedule={contractSchedule}
-          openNewPersonContract={openNewBuildContract}
+          visible={openNewBuildContract}
           onClose={() => {
             setOpenNewBuildContract(false);
             onClose?.();

@@ -2,6 +2,7 @@ import { selector } from 'recoil';
 import { contractListState } from '../contractsListState';
 import { contractsFilterState } from '../contractsFilterState';
 import { compareStrings } from 'utils';
+import { companyContractStatusOrder } from 'config/contracts';
 
 export const companyContractSelector = selector({
   key: 'companyContractSelector',
@@ -9,8 +10,9 @@ export const companyContractSelector = selector({
     const contractsLookUp = get(contractListState);
     const filters = get(contractsFilterState);
     const { status, person, startDate, endDate, department, contractText } = filters;
-    console.log('===', status, contractsLookUp);
-    return Object.values(contractsLookUp).filter((contract) => {
+
+    // Apply filters
+    const filteredContracts = Object.values(contractsLookUp).filter((contract) => {
       return (
         (!person || person === contract.personId) &&
         (!contractText ||
@@ -22,6 +24,15 @@ export const companyContractSelector = selector({
         (!startDate || new Date(contract.dateIssue) >= startDate) &&
         (status === 'all' || status === contract.status)
       );
+    });
+
+    // Sort contracts by status order and then by lastName
+    return filteredContracts.sort((a, b) => {
+      const statusComparison = companyContractStatusOrder[a.status] - companyContractStatusOrder[b.status];
+      if (statusComparison !== 0) {
+        return statusComparison;
+      }
+      return a.lastName.localeCompare(b.lastName);
     });
   },
 });

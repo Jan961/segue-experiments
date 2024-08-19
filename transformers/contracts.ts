@@ -159,7 +159,7 @@ export const transformContractDetails = (contract: any) => {
     lastDayOfWork: contract.LastDay?.toISOString() || null,
     specificAvailabilityNotes: contract.Availability || null,
     publicityEventList: contract.ACCPubEvent.map((event: any) => ({
-      isRequired: true, // Assuming all events are required; adjust as needed
+      isRequired: true,
       date: event.Date?.toISOString() || null,
       notes: event.Notes || null,
     })),
@@ -176,26 +176,26 @@ export const transformContractDetails = (contract: any) => {
     nominatedDriverNotes: contract.NominatedDriverNotes || null,
     paymentType: contract.PaymentType || null,
     weeklyPayDetails: {
-      rehearsalFee: contract.WeeklyRehFee || null,
-      rehearsalHolidayPay: contract.WeeklyRehHolPay || null,
-      performanceFee: contract.WeeklyPerfFee || null,
-      performanceHolidayPay: contract.WeeklyPerfHolPay || null,
-      touringAllowance: contract.WeeklySubs || null,
+      rehearsalFee: contract.WeeklyRehFee ? parseInt(contract.WeeklyRehFee, 10) : null,
+      rehearsalHolidayPay: contract.WeeklyRehHolPay ? parseInt(contract.WeeklyRehHolPay, 10) : null,
+      performanceFee: contract.Weekly ? parseInt(contract.WeeklyPerfFee, 10) : null,
+      performanceHolidayPay: contract.WeeklyPerfHolPay ? parseInt(contract.WeeklyPerfHolPay, 10) : null,
+      touringAllowance: contract.WeeklySubs ? parseInt(contract.WeeklySubs, 10) : null,
       subsNotes: contract.WeeklySubsNotes || null,
     },
     totalPayDetails: {
-      totalFee: contract.TotalFee || null,
-      totalHolidayPay: contract.TotalHolPay || null,
+      totalFee: contract.TotalFee ? parseInt(contract.TotalFee, 10) : null,
+      totalHolidayPay: contract.TotalHolPay ? parseInt(contract.TotalHolPay, 10) : null,
       feeNotes: contract.TotalFeeNotes || null,
     },
     paymentBreakdownList: contract.ACCPayment.map((payment: any) => ({
       date: payment.Date?.toISOString() || null,
-      amount: payment.Amount || null,
+      amount: payment.Amount ? parseInt(payment.Amount, 10) : null,
       notes: payment.Notes || null,
     })),
     cancellationFee: contract.CancelFee || null,
     cancellationFeeNotes: contract.CancelFeeNotes || null,
-    includeAdditionalClauses: !!contract.ACCClause.length, // Assuming any clause means additional clauses were included
+    includeAdditionalClauses: !!contract.ACCClause.length,
     additionalClause: contract.ACCClause.map((clause: any) => clause.StdClauseId).filter((id: any) => id !== null),
     customClauseList: contract.ACCClause.map((clause: any) => clause.Text).filter((text: any) => text !== null),
     includeClauses: !!contract.ACCClause.length,
@@ -208,7 +208,7 @@ export const transformContractResponse = (contract: any) => {
     department: contract.ACCCDeptId,
     role: contract.RoleName,
     personId: contract.PersonId,
-    templateId: null, // Assuming templateId is not stored directly in the contract, set as null or retrieve if applicable
+    templateId: null,
     contractDetails: transformContractDetails(contract),
   };
 };

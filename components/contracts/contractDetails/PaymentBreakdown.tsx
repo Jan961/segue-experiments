@@ -21,7 +21,7 @@ interface PaymentBreakdownProps {
 }
 
 const PaymentBreakdown = ({ breakdown, currencySymbol = '£', onChange = noop }: PaymentBreakdownProps) => {
-  const [payment, setPayment] = useState({ ...breakdown, ...defaultPaymentBreakdown });
+  const [payment, setPayment] = useState({ ...defaultPaymentBreakdown, ...breakdown });
   const { date, amount, notes } = payment;
   const handleChange = useCallback(
     (key: string, value: number | string | boolean | null) => {

@@ -12,13 +12,21 @@ import { IContractSchedule } from '../types';
 import useAxiosCancelToken from 'hooks/useCancelToken';
 import { useRouter } from 'next/router';
 
-interface BuildNewContractProps {
-  contractSchedule: Partial<IContractSchedule>;
-  openNewPersonContract: boolean;
+export interface BuildNewContractProps {
+  contractSchedule?: Partial<IContractSchedule>;
+  visible: boolean;
+  contractId?: number;
+  isEdit?: boolean;
   onClose: () => void;
 }
 
-export const BuildNewContract = ({ openNewPersonContract, contractSchedule, onClose }: BuildNewContractProps) => {
+export const BuildNewContract = ({
+  visible,
+  contractSchedule,
+  contractId,
+  isEdit = false,
+  onClose = noop,
+}: BuildNewContractProps) => {
   const [mainButtonSelection, setMainButtonSelection] = useState({ name: true, details: false, preview: false });
   const [contractPerson, setContractPerson] = useState(null);
   const [contractDetails, setContractDetails] = useState({});
@@ -37,14 +45,32 @@ export const BuildNewContract = ({ openNewPersonContract, contractSchedule, onCl
       }
       setLoading(false);
     },
-    [setContractPerson],
+    [setContractPerson, cancelToken],
+  );
+
+  const fetchContractDetails = useCallback(
+    async (id: number) => {
+      setLoading(true);
+      try {
+        const response = await axios.get('/api/company-contracts/read/' + id, { cancelToken });
+        setContractDetails(response.data?.contractDetails);
+      } catch (error) {
+        onClose();
+        notify.error('Error fetching contract details. Please try again');
+      }
+      setLoading(false);
+    },
+    [setContractDetails, cancelToken],
   );
 
   useEffect(() => {
     if (contractSchedule.personId) {
       fetchPersonDetails(contractSchedule.personId);
     }
-  }, [contractSchedule.personId]);
+    if (isEdit && contractId) {
+      fetchContractDetails(contractId);
+    }
+  }, [contractSchedule.personId, isEdit, contractId]);
 
   const handleButtons = (key: string) => {
     const buttons = { name: false, details: false, preview: false };
@@ -69,7 +95,7 @@ export const BuildNewContract = ({ openNewPersonContract, contractSchedule, onCl
 
   return (
     <PopupModal
-      show={openNewPersonContract}
+      show={visible}
       title="Contract Details"
       titleClass="text-xl text-primary-navy font-bold -mt-2"
       hasOverflow={false}
@@ -103,7 +129,7 @@ export const BuildNewContract = ({ openNewPersonContract, contractSchedule, onCl
           Contract Preview
         </div>
       </div>
-      <div className="border-solid border-2 border-primary-navy  rounded p-2 max-h-[70vh] overflow-scroll">
+      <div className="border-solid border-2 border-primary-navy rounded p-2 max-h-[70vh] overflow-scroll">
         {loading && (
           <div className="w-full h-96">
             <LoadingOverlay />
