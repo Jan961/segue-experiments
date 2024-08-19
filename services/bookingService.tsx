@@ -3,8 +3,9 @@ import { addDays, differenceInDays } from 'date-fns';
 import prisma from 'lib/prisma';
 import { omit } from 'radash';
 import { isNullOrEmpty } from 'utils';
+import { checkDateValid, getPerformanceTime } from 'utils/getTimeFromDateTime';
 
-type NewPerformance = {
+export type NewPerformance = {
   Date: string;
   Time: string;
 };
@@ -69,7 +70,7 @@ export const updateBooking = async (booking: NewBooking, tx = prisma) => {
         data: booking.Performances.map((p: NewPerformance) => ({
           BookingId: booking.Id,
           Date: new Date(p.Date),
-          Time: p.Time ? new Date(p.Time) : null,
+          Time: getPerformanceTime(p),
         })),
       });
     }
@@ -260,6 +261,12 @@ export const createNewBooking = (
   { Performances, VenueId, DateBlockId, BookingDate, StatusCode, Notes, PencilNum, RunTag }: NewBooking,
   tx = prisma,
 ) => {
+  const performanceData = Performances.map((p: NewPerformance) => {
+    return {
+      Date: new Date(p.Date),
+      Time: checkDateValid(getPerformanceTime(p)),
+    };
+  });
   return tx.booking.create({
     data: {
       Notes,
@@ -277,14 +284,13 @@ export const createNewBooking = (
           Id: VenueId,
         },
       },
+
       Performance: {
         createMany: {
-          data: Performances.map((p: NewPerformance) => ({
-            Date: new Date(p.Date),
-            Time: p.Time ? new Date(p.Time) : null,
-          })),
+          data: performanceData,
         },
       },
+
       HasSchoolsSales: true,
     },
     include: {

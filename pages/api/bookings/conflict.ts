@@ -6,7 +6,7 @@ import { BookingWithVenueDTO } from 'interfaces';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const { fromDate, toDate, ProductionId } = req.body;
+    const { fromDate, toDate, ProductionId, runTag } = req.body;
     const results: Booking[] = await prisma.booking.findMany({
       where: {
         FirstDate: {
@@ -20,6 +20,9 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         },
         StatusCode: {
           in: ['C', 'U'],
+        },
+        RunTag: {
+          not: { equals: runTag },
         },
       },
       include: {

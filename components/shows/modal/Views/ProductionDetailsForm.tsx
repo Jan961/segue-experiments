@@ -191,7 +191,7 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
               onClick={() => setIsUploadOpen(true)}
             >
               {imageUrl ? (
-                <div className="flex overflow-hidden justify-center items-center">
+                <div className="flex overflow-hidden justify-center items-center scale-75">
                   <img className="max-h-full max-w-full object-fit-contain" src={imageUrl} />
                 </div>
               ) : (
