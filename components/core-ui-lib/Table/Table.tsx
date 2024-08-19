@@ -39,7 +39,7 @@ interface TableProps {
   rowSelection?: string;
   onSelectionChanged?: (event: SelectionChangedEvent) => void;
   testId?: string;
-  tableHeightDelta?: number;
+  marginBottom?: number;
 }
 
 const ROW_HEIGHT = 43;
@@ -74,7 +74,7 @@ export default forwardRef(function Table(
     rowSelection = 'single',
     onSelectionChanged,
     testId = 'core-ui-lib-table',
-    tableHeightDelta = 250,
+    marginBottom = 250,
   }: TableProps,
   ref,
 ) {
@@ -132,9 +132,9 @@ export default forwardRef(function Table(
   }, [rowData, gridApi, autoHeightLimit, gridHeight]);
 
   useEffect(() => {
-    setAutoHeightLimit(tableHeight === 0 ? window.innerHeight - tableHeightDelta : tableHeight);
+    setAutoHeightLimit(tableHeight === 0 ? window.innerHeight - marginBottom : tableHeight);
     const handleResize = () => {
-      setAutoHeightLimit(tableHeight === 0 ? window.innerHeight - tableHeightDelta : tableHeight);
+      setAutoHeightLimit(tableHeight === 0 ? window.innerHeight - marginBottom : tableHeight);
     };
     window.addEventListener('resize', handleResize);
     return () => {

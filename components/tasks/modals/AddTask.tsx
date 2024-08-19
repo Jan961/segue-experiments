@@ -129,6 +129,10 @@ const AddTask = ({
   const [showRecurringDelete, setShowRecurringDelete] = useState<boolean>(false);
   const [showSingleDelete, setShowSingleDelete] = useState<boolean>(false);
   const [showConfirmationDialog, setShowConfirmationDialog] = useState<boolean>(false);
+  const showOverlay = useMemo(
+    () => showConfirmationDialog || showRecurringConfirmation || showRecurringDelete || showSingleDelete,
+    [showConfirmationDialog, showRecurringConfirmation, showRecurringDelete, showSingleDelete],
+  );
   const router = useRouter();
   const priorityOptionList = useMemo(
     () => priorityOptions.map((option) => ({ ...option, text: `${option.value} - ${option.text}` })),
@@ -437,7 +441,7 @@ const AddTask = ({
     <PopupModal
       show={visible}
       onClose={handleCancel}
-      hasOverlay={showConfirmationDialog || showRecurringConfirmation || showRecurringDelete || showSingleDelete}
+      hasOverlay={showOverlay}
       title={inputs.Id ? 'Edit Task' : 'Create New Task'}
       titleClass="text-primary-navy text-xl mb-4"
     >
