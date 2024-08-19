@@ -98,7 +98,7 @@ const GlobalActivityView = () => {
   const updateGlobalActivity = async (type: string, data: GlobalActivity) => {
     if (type === 'add') {
       try {
-        await axios.post('/api/marketing/globalActivities/create', data);
+        const response = await axios.post('/api/marketing/globalActivities/create', data);
 
         const tableRow = {
           actName: data.Name,
@@ -108,7 +108,7 @@ const GlobalActivityView = () => {
           cost: data.Cost,
           notes: data.Notes,
           followUpDt: data.DueByDate,
-          venueIds: data.VenueIds,
+          id: response.data.Id,
         };
 
         setRowData([...rowData, tableRow]);
