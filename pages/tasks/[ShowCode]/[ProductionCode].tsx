@@ -22,6 +22,7 @@ import ProductionTaskList from 'components/tasks/modals/ProductionTaskList';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import Spinner from 'components/core-ui-lib/Spinner';
 import { isNullOrEmpty } from 'utils';
+import { useRouter } from 'next/router';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
@@ -29,7 +30,7 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
   const { users } = useRecoilValue(userState);
 
   const filter = useRecoilValue(tasksfilterState);
-
+  const router = useRouter();
   const usersList = useMemo(
     () =>
       Object.values(users).map(({ Id, FirstName = '', LastName = '' }) => ({
@@ -101,11 +102,15 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
     else setIsProductionTaskList(true);
   };
 
-  const handleMasterListClose = (_val: string) => {
+  const handleMasterListClose = async (_val: string) => {
+    console.log('closed');
+    await router.replace(router.asPath);
     setIsMasterTaskList(false);
   };
 
-  const handleProductionListClose = (_val: string) => {
+  const handleProductionListClose = async (_val: string) => {
+    console.log('closed');
+    await router.replace(router.asPath);
     setIsProductionTaskList(false);
     setIsMasterTaskList(false);
   };
