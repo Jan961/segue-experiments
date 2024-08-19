@@ -66,9 +66,6 @@ const VenueBarringForm = ({ venue, onChange, validationErrors, updateValidationE
     onChange(updatedFormData);
     setSelectedVenueIds([...selectedVenueIds, value]);
   };
-  useEffect(() => {
-    console.log(selectedVenueIds);
-  }, [selectedVenueIds]);
   return (
     <>
       <label className="grid grid-cols-[100px_minmax(100px,350px)]  gap-10   w-full">
