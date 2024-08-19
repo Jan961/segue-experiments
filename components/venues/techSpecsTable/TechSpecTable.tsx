@@ -1,4 +1,4 @@
-import { attachmentsColDefs } from './tableConfig';
+import { attachmentsColDefs, styleProps } from './tableConfig';
 import { ConfirmationDialog, Table, UploadModal } from 'components/core-ui-lib';
 import Button from 'components/core-ui-lib/Button';
 import { techSpecsFileFormats } from '../techSpecsFileFormats';
@@ -53,6 +53,7 @@ export const TechSpecTable = ({ venueId, setFilesToSend, setFilesToDelete }: Tec
     if (isNullOrEmpty(fileToDelete?.imageUrl)) {
       setFilesToSend((prevFilesList) => prevFilesList.filter((file) => file.fileId !== delId));
       setFilesToUpload((prevFilesList) => prevFilesList.filter((file) => file.fileId !== delId));
+      setRowData((prevFilesList) => prevFilesList.filter((file) => file.fileId !== delId));
     } else {
       setRowData((prevRowData) => prevRowData.filter((file) => file.fileId !== delId));
       setFilesToDelete((prevFileList) => [...prevFileList, fileToDelete.fileId]);
@@ -110,8 +111,14 @@ export const TechSpecTable = ({ venueId, setFilesToSend, setFilesToDelete }: Tec
           }}
         />
       </div>
-
-      <Table columnDefs={attachmentsColDefs} rowData={rowData} onCellClicked={handleCellClick} />
+      {rowData.length > 0 && (
+        <Table
+          columnDefs={attachmentsColDefs}
+          styleProps={styleProps}
+          rowData={rowData}
+          onCellClicked={handleCellClick}
+        />
+      )}
     </div>
   );
 };
