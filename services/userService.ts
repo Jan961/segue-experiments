@@ -18,6 +18,7 @@ export const getUsers = async (AccountId: number): Promise<UserDto[]> => {
 
 export const getEmailAddressForClerkId = async (userId: string): Promise<string> => {
   const user = await clerkClient.users.getUser(userId);
+  console.log('getEmailAddressForClerkId', user);
   const matching = user.emailAddresses.filter((x) => x.id === user.primaryEmailAddressId)[0];
   return matching.emailAddress;
 };
@@ -49,6 +50,7 @@ export const getAccountId = async (email: string) => {
 export const getEmailFromReq = async (req: any) => {
   // It is definitely worth caching this!
   const { userId } = getAuth(req);
+  console.log('getEmailFromReq', userId);
   return getEmailAddressForClerkId(userId);
 };
 

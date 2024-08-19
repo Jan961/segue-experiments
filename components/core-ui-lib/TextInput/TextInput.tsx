@@ -24,6 +24,7 @@ export interface TextInputProps {
   onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   min?: number;
   max?: number;
+  pattern?: string;
 }
 
 const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
