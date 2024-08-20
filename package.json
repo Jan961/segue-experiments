@@ -61,7 +61,7 @@
     "ag-grid-enterprise": "^31.1.1",
     "ag-grid-react": "^31.1.1",
     "aws-sdk": "^2.1607.0",
-    "axios": "^1.2.0",
+    "axios": "^1.7.4",
     "babel-plugin-superjson-next": "^0.4.5",
     "bcryptjs": "^2.4.3",
     "cheerio": "^1.0.0-rc.12",

@@ -79,6 +79,20 @@ export const showsTableConfig = [
     width: 92,
     maxWidth: 92,
     cellRenderer: TableCheckboxRenderer,
+    cellRendererParams: (params) => {
+      return {
+        ...(params.data.productions.length > 0 &&
+        params.data.productions.some((production) => production.IsArchived === false)
+          ? {
+              disabled: true,
+              tpActive: true,
+              body: 'Please archive all Productions before archiving a Show',
+              position: 'right',
+              width: 'w-40',
+            }
+          : {}),
+      };
+    },
     cellStyle: {
       display: 'flex',
       justifyContent: 'center',
@@ -104,9 +118,18 @@ export const showsTableConfig = [
     field: 'Id',
     width: 70,
     cellRenderer: ButtonRenderer,
-    cellRendererParams: {
-      buttonText: 'Delete',
-      variant: 'tertiary',
+    cellRendererParams: (params) => {
+      return {
+        buttonText: 'Delete',
+        variant: 'tertiary',
+        ...(params.data.productions.length > 0 && {
+          disabled: true,
+          tpActive: true,
+          body: 'Please delete all Productions before deleting a Show',
+          position: 'right',
+          width: 'w-36',
+        }),
+      };
     },
     cellStyle: {
       paddingRight: '0.5em',
@@ -233,8 +256,13 @@ export const productionsTableConfig = [
     cellRendererParams: (params) => ({
       buttonText: 'Delete',
       variant: 'tertiary',
-      disabled: !params.data.IsArchived,
-      tooltipText: 'Please archive the production prior to deleting',
+      ...(!params.data.IsArchived && {
+        disabled: true,
+        tpActive: true,
+        body: 'Please archive the production prior to deleting',
+        position: 'right',
+        width: 'w-36',
+      }),
     }),
     cellStyle: {
       paddingRight: '0.5em',
