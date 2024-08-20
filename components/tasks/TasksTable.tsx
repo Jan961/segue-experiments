@@ -19,6 +19,7 @@ interface TasksTableProps {
   showAddTask?: boolean;
   handleShowTask?: () => void;
   productionId?: number;
+  setIsShowSpinner?: (value: boolean) => void;
 }
 
 export interface ProductionTaskDTOWithStringProgress extends Omit<ProductionTaskDTO, 'Progress'> {
@@ -32,6 +33,7 @@ export default function TasksTable({
   showAddTask,
   handleShowTask,
   productionId,
+  setIsShowSpinner,
 }: TasksTableProps) {
   const tableRef = useRef(null);
   const [filter, setFilter] = useRecoilState(filterState);
@@ -52,7 +54,7 @@ export default function TasksTable({
   const handleUpdateTask = async (task: ProductionTaskDTOWithStringProgress) => {
     try {
       setIsLoading(true);
-
+      setIsShowSpinner(true);
       const Progress = parseInt(task.Progress);
       const updatedTask = {
         ...task,
@@ -74,6 +76,7 @@ export default function TasksTable({
       setIsLoading(false);
       loggingService.logError(error);
     }
+    setIsShowSpinner(false);
   };
 
   const onCellValueChange = async (e) => {
@@ -82,6 +85,7 @@ export default function TasksTable({
 
   const handleSaveNote = async (value: string) => {
     setShowModal(false);
+    setIsShowSpinner(true);
     const updatedTask = { ...currentTask, Notes: value };
     handleUpdateTask(updatedTask);
   };
@@ -114,6 +118,7 @@ export default function TasksTable({
   };
 
   const updateTableData = async (task?: any) => {
+    setIsShowSpinner(true);
     if (isNullOrEmpty(task)) {
       await router.push(router.asPath);
       return;
@@ -127,6 +132,7 @@ export default function TasksTable({
     setIsLoading(false);
     setRows(updatedRowData);
     await router.push(router.asPath);
+    setIsShowSpinner(false);
   };
 
   const modalData = isEdit ? { ...currentTask, ProductionId: productionId } : { ProductionId: productionId };

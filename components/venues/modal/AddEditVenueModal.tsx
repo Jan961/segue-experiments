@@ -28,6 +28,7 @@ interface AddEditVenueModalProps {
   venue?: UiTransformedVenue;
   onClose: (isSuccess?: boolean) => void;
   fetchVenues: (payload?: any) => Promise<void>;
+  setIsLoading: (bool: boolean) => void;
 }
 
 export default function AddEditVenueModal({
@@ -38,6 +39,7 @@ export default function AddEditVenueModal({
   countryOptions,
   onClose,
   fetchVenues,
+  setIsLoading,
 }: AddEditVenueModalProps) {
   const [formData, setFormData] = useState({ ...initialVenueState, ...(venue || {}) });
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
@@ -61,7 +63,7 @@ export default function AddEditVenueModal({
 
   const createVenue = async (venue: UiTransformedVenue) => {
     try {
-      const data = await axios.post('/api/venue/create', venue, { cancelToken });
+      const { data } = await axios.post('/api/venue/create', venue, { cancelToken });
       onClose(true);
       return data;
     } catch (e) {
@@ -71,7 +73,7 @@ export default function AddEditVenueModal({
 
   const updateVenue = async (venue: UiTransformedVenue) => {
     try {
-      const data = await axios.post('/api/venue/update/' + venue.id, venue, { cancelToken });
+      const { data } = await axios.post('/api/venue/update/' + venue.id, venue, { cancelToken });
       onClose(true);
       return data;
     } catch (e) {
@@ -81,13 +83,15 @@ export default function AddEditVenueModal({
 
   const handleSaveAndClose = async () => {
     setIsSaving(true);
+    setIsLoading(true);
     const isValid = await validateVenue(formData);
     if (isValid) {
       const apiResponse = formData.id ? await updateVenue(formData) : await createVenue(formData);
-      await saveFiles(apiResponse);
       await deleteFiles();
+      await saveFiles(apiResponse);
     }
     await fetchVenues();
+    setIsLoading(false);
     setIsSaving(false);
   };
 
@@ -147,7 +151,7 @@ export default function AddEditVenueModal({
       if (!isNullOrEmpty(response)) {
         const fileRec = {
           FileId: response.data.id,
-          VenueId: venueResponse.data.Id,
+          VenueId: venueResponse.Id,
           Description: 'Tech Spec',
         };
         await axios.post('/api/venue/techSpecs/create', fileRec);

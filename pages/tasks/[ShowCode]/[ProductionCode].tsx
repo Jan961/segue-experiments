@@ -20,6 +20,9 @@ import { intialTasksState, tasksfilterState } from 'state/tasks/tasksFilterState
 import MasterTaskList from 'components/tasks/modals/MasterTaskList';
 import ProductionTaskList from 'components/tasks/modals/ProductionTaskList';
 import { productionJumpState } from 'state/booking/productionJumpState';
+import Spinner from 'components/core-ui-lib/Spinner';
+import { isNullOrEmpty } from 'utils';
+import { useRouter } from 'next/router';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
@@ -27,7 +30,7 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
   const { users } = useRecoilValue(userState);
 
   const filter = useRecoilValue(tasksfilterState);
-
+  const router = useRouter();
   const usersList = useMemo(
     () =>
       Object.values(users).map(({ Id, FirstName = '', LastName = '' }) => ({
@@ -48,28 +51,28 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
   const [showNewProduction, setShowNewProduction] = useState<boolean>(false);
   const [isMasterTaskList, setIsMasterTaskList] = useState<boolean>(false);
   const [isProductionTaskList, setIsProductionTaskList] = useState<boolean>(false);
+  const [isShowSpinner, setIsShowSpinner] = useState<boolean>(false);
+  const filterMatchingInitial = useMemo(() => {
+    const { assignee, endDueDate, startDueDate, status, taskText, production } = filter;
+    return (
+      assignee === intialTasksState.assignee &&
+      endDueDate === intialTasksState.endDueDate &&
+      startDueDate === intialTasksState.startDueDate &&
+      status === intialTasksState.status &&
+      taskText === intialTasksState.taskText &&
+      !isNullOrEmpty(production)
+    );
+  }, [filter]);
 
   const { selected: ProductionId } = useRecoilValue(productionJumpState);
   const handleShowTask = () => {
     setShowAddTask(false);
   };
 
-  const isFilterMatchingInitialState = () => {
-    const { assignee, endDueDate, startDueDate, status, taskText } = filter;
-
-    return (
-      assignee === intialTasksState.assignee &&
-      endDueDate === intialTasksState.endDueDate &&
-      startDueDate === intialTasksState.startDueDate &&
-      status === intialTasksState.status &&
-      taskText === intialTasksState.taskText
-    );
-  };
-
   useEffect(() => {
     if (filteredProductions.length === 1) {
       filteredProductions.forEach((production) => {
-        if (production.Tasks.length === 0 && isFilterMatchingInitialState()) {
+        if (production.Tasks.length === 0 && filterMatchingInitial) {
           setShowEmptyProductionModal(true);
         } else {
           setShowEmptyProductionModal(false);
@@ -97,56 +100,70 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
     else setIsProductionTaskList(true);
   };
 
-  const handleMasterListClose = (_val: string) => {
+  const handleMasterListClose = async (_val: string) => {
+    await router.replace(router.asPath);
     setIsMasterTaskList(false);
   };
 
-  const handleProductionListClose = (_val: string) => {
+  const handleProductionListClose = async (_val: string) => {
+    await router.replace(router.asPath);
     setIsProductionTaskList(false);
     setIsMasterTaskList(false);
   };
   const currentProductionObj = useRecoilValue(productionJumpState).productions.find((item) => item.Id === ProductionId);
   return (
-    <Layout title="Tasks | Segue" flush>
-      <div className="mb-8">
-        <Filters usersList={usersList} handleShowTask={handleModalConditions} />
-      </div>
-      {filteredProductions.length === 0 ? (
-        <TasksTable rowData={[]} />
-      ) : (
-        filteredProductions.map((production) => {
-          const columnDefs = getColumnDefs(usersList, currentProductionObj);
-          return (
-            <div key={production.Id} className="mb-10">
-              <TasksTable
-                tableHeight={filteredProductions.length > 1}
-                rowData={production.Tasks}
-                columnDefs={columnDefs}
-                productionId={production.Id}
-                showAddTask={showAddTask}
-                handleShowTask={handleShowTask}
-              />
-            </div>
-          );
-        })
+    <>
+      {' '}
+      {isShowSpinner && (
+        <div
+          data-testid="tasks-page-spinner"
+          className="inset-0 absolute bg-white bg-opacity-50 z-50 flex justify-center items-center"
+        >
+          <Spinner size="lg" />
+        </div>
       )}
-      <NewProductionEmpty
-        visible={showEmptyProductionModal}
-        onClose={handleShowEmptyProduction}
-        handleSubmit={handleNewProductionTaskSubmit}
-      />
-      <NewProductionTask
-        visible={showNewProduction}
-        onClose={handleNewProductionTaskModal}
-        handleNewProductionTaskSubmit={handleNewProductionTaskSubmit}
-      />
-      <MasterTaskList visible={isMasterTaskList} onClose={handleMasterListClose} productionId={ProductionId} />
-      <ProductionTaskList
-        visible={isProductionTaskList}
-        onClose={handleProductionListClose}
-        productionId={ProductionId}
-      />
-    </Layout>
+      <Layout title="Tasks | Segue" flush>
+        <div className="mb-8">
+          <Filters usersList={usersList} handleShowTask={handleModalConditions} />
+        </div>
+        {filteredProductions.length === 0 ? (
+          <TasksTable rowData={[]} />
+        ) : (
+          filteredProductions.map((production) => {
+            const columnDefs = getColumnDefs(usersList, currentProductionObj);
+            return (
+              <div key={production.Id} className="mb-10">
+                <TasksTable
+                  tableHeight={filteredProductions.length > 1}
+                  rowData={production.Tasks}
+                  columnDefs={columnDefs}
+                  productionId={production.Id}
+                  showAddTask={showAddTask}
+                  handleShowTask={handleShowTask}
+                  setIsShowSpinner={setIsShowSpinner}
+                />
+              </div>
+            );
+          })
+        )}
+        <NewProductionEmpty
+          visible={showEmptyProductionModal}
+          onClose={handleShowEmptyProduction}
+          handleSubmit={handleNewProductionTaskSubmit}
+        />
+        <NewProductionTask
+          visible={showNewProduction}
+          onClose={handleNewProductionTaskModal}
+          handleNewProductionTaskSubmit={handleNewProductionTaskSubmit}
+        />
+        <MasterTaskList visible={isMasterTaskList} onClose={handleMasterListClose} productionId={ProductionId} />
+        <ProductionTaskList
+          visible={isProductionTaskList}
+          onClose={handleProductionListClose}
+          productionId={ProductionId}
+        />
+      </Layout>
+    </>
   );
 };
 

@@ -95,8 +95,8 @@ const AddTask = ({
       ProductionId?: number;
       TaskCompletedDate?: string;
       RepeatInterval?: string;
-      TaskRepeatFromWeekNum?: string;
-      TaskRepeatToWeekNum?: string;
+      TaskRepeatFromWeekNum?: number;
+      TaskRepeatToWeekNum?: number;
       ProductionTaskRepeat?: any;
       PRTId?: number;
     }
@@ -135,6 +135,19 @@ const AddTask = ({
     () => priorityOptions.map((option) => ({ ...option, text: `${option.value} - ${option.text}` })),
     [],
   );
+  const weekOptionsDate = useMemo(
+    () => getWeekOptions(production, isMasterTask, !isMasterTask),
+    [production, isMasterTask],
+  );
+
+  const weekOptionsNoDate = useMemo(
+    () =>
+      getWeekOptions(production, isMasterTask, false).filter((option) => {
+        return option.value >= inputs?.StartByWeekNum;
+      }),
+    [production, isMasterTask, inputs?.StartByWeekNum],
+  );
+
   const showCode = useMemo(() => {
     return inputs?.Id ? `${production?.ShowCode}${production?.Code}-${inputs.Code}` : null;
   }, [inputs?.Id, production?.ShowCode, production?.Code, inputs.Code]);
@@ -208,6 +221,10 @@ const AddTask = ({
     if (id === 'RepeatInterval' && checked) {
       setIsRecurring(checked);
       value = 'once';
+    }
+
+    if (id === 'RepeatInterval' && isNullOrEmpty(inputs?.RepeatInterval)) {
+      inputs.TaskRepeatFromWeekNum = inputs?.StartByWeekNum;
     }
 
     let newInputs = { ...inputs, [id]: value };
@@ -478,7 +495,7 @@ const AddTask = ({
             <Label className="!text-secondary pr-6 mr-4" text="Start By" />
             <Select
               value={inputs?.StartByWeekNum}
-              options={getWeekOptions(production, isMasterTask, !isMasterTask)}
+              options={weekOptionsDate}
               placeholder="Week No."
               onChange={(value) => handleOnChange({ target: { id: 'StartByWeekNum', value } })}
               className="w-52"
@@ -491,14 +508,14 @@ const AddTask = ({
             <Select
               onChange={(value) => handleOnChange({ target: { id: 'CompleteByWeekNum', value } })}
               value={inputs?.CompleteByWeekNum}
-              options={getWeekOptions(production, isMasterTask, !isMasterTask).filter(
-                (option) => option.value >= inputs.StartByWeekNum,
+              options={weekOptionsDate.filter(
+                (option) => option.value >= inputs?.StartByWeekNum || isNullOrEmpty(inputs?.StartByWeekNum),
               )}
               placeholder="Week No."
               className="w-52"
               isSearchable={true}
               testId="sel-task-complete-week"
-              key={inputs?.CompleteByWeekNum}
+              key={inputs?.StartByWeekNum}
             />
           </div>
         </div>
@@ -568,14 +585,12 @@ const AddTask = ({
               <Select
                 onChange={(value) => handleOnChange({ target: { id: 'TaskRepeatFromWeekNum', value } })}
                 value={inputs?.TaskRepeatFromWeekNum}
-                options={getWeekOptions(production, isMasterTask, false).filter(
-                  (option) => option.value >= inputs.StartByWeekNum,
-                )}
+                options={weekOptionsNoDate}
                 className="w-32"
                 placeholder="Week No."
                 isSearchable={true}
                 testId="sel-task-repeat-from"
-                key={inputs?.TaskRepeatFromWeekNum}
+                key={inputs?.StartByWeekNum}
               />
             </div>
           )}
@@ -585,14 +600,12 @@ const AddTask = ({
               <Select
                 onChange={(value) => handleOnChange({ target: { id: 'TaskRepeatToWeekNum', value } })}
                 value={inputs?.TaskRepeatToWeekNum}
-                options={getWeekOptions(production, isMasterTask, false).filter(
-                  (option) => option.value >= inputs.StartByWeekNum,
-                )}
+                options={weekOptionsNoDate}
                 placeholder="Week No."
                 className="w-32"
                 isSearchable={true}
                 testId="sel-task-repeat-to"
-                key={inputs?.TaskRepeatToWeekNum}
+                key={inputs?.StartByWeekNum}
               />
             </div>
           )}

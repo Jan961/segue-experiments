@@ -31,9 +31,7 @@ export default function SelectVenueRenderer({
 
   useEffect(() => {
     if (data) {
-      const { isRunOfDates } = data;
-      setIsDisabled(isRunOfDates && node.rowIndex > 0);
-
+      setIsDisabled(node.rowIndex > 0);
       setValue(venueAsDayType && !data.isRunOfDates ? null : value);
     }
   }, [data, node, setIsDisabled]);

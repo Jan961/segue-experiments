@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { useRecoilValue } from 'recoil';
 import { tasksfilterState } from 'state/tasks/tasksFilterState';
 import { productionState } from 'state/tasks/productionState';
-import { calculateTaskStatus } from 'utils/tasks';
+import { calculateTaskStatus, sortProductionTasksByDueAndAlpha } from 'utils/tasks';
 import { isThisWeek } from 'date-fns';
 import { userState } from 'state/account/userState';
 import { productionJumpState } from 'state/booking/productionJumpState';
@@ -60,7 +60,7 @@ const useTasksFilter = () => {
   }, {});
 
   const filteredProductions = useMemo(() => {
-    return productions
+    const filteredTasks = productions
       .filter((productionItem) => {
         if (selected === -1) return productionItem.Tasks;
         return productionItem.Id === selected;
@@ -101,6 +101,7 @@ const useTasksFilter = () => {
             })),
         };
       });
+    return sortProductionTasksByDueAndAlpha(filteredTasks);
   }, [
     productions,
     selected,

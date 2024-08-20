@@ -142,6 +142,23 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
 
     for (const bookingType of Object.entries(rowsMap)) {
       const [type, { rowsToInsert, rowsToUpdate, rowsToDelete }] = bookingType;
+      const deletePromises = [];
+      rowsToDelete.forEach((rowToDelete) => {
+        switch (type) {
+          case 'booking':
+            deletePromises.push(deleteBookingById(rowToDelete.id));
+            break;
+          case 'rehearsal':
+            deletePromises.push(deleteRehearsalById(rowToDelete.id));
+            break;
+          case 'getInFitUp':
+            deletePromises.push(deleteGetInFitUpById(rowToDelete.id));
+            break;
+          default:
+            deletePromises.push(deleteOtherById(rowToDelete.id));
+        }
+      });
+      await Promise.allSettled(deletePromises);
 
       rowsToUpdate.forEach((rowToUpdate) => {
         switch (type) {
@@ -159,6 +176,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
             promises.push(updateOther(rowToUpdate));
         }
       });
+
       rowsToInsert.forEach((rowToInsert) => {
         switch (type) {
           case 'booking':
@@ -172,21 +190,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
             break;
           default:
             promises.push(createOtherBooking(rowToInsert));
-        }
-      });
-      rowsToDelete.forEach((rowToDelete) => {
-        switch (type) {
-          case 'booking':
-            promises.push(deleteBookingById(rowToDelete.id));
-            break;
-          case 'rehearsal':
-            promises.push(deleteRehearsalById(rowToDelete.id));
-            break;
-          case 'getInFitUp':
-            promises.push(deleteGetInFitUpById(rowToDelete.id));
-            break;
-          default:
-            promises.push(deleteOtherById(rowToDelete.id));
         }
       });
     }
