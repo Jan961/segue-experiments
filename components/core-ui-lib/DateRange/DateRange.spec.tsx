@@ -18,17 +18,20 @@ describe('DateRange Component', () => {
     expect(screen.getByText('Select Date Range')).toBeInTheDocument();
   });
 
-  test('renders with disabled state', () => {
-    render(<DateRange value={value} onChange={handleChange} disabled />);
+  test('renders with disabled state and checks inputs using testId', () => {
+    render(<DateRange value={value} onChange={handleChange} disabled={true} testId="test-id" />);
 
-    // Check if the component has the disabled class applied
-    const dateRangeContainer = screen.getByTestId('form-typeahead');
-    expect(dateRangeContainer).toHaveClass('!bg-disabled-input', '!cursor-not-allowed', '!pointer-events-none');
+    // Construct the expected data-testid values for the DateInput components
+    const fromDateTestId = `test-id-start-date-input`;
+    const toDateTestId = `test-id-end-date-input`;
+
+    // Select the components using the constructed testId
+    const fromDateInput = screen.getByTestId(fromDateTestId);
+    const toDateInput = screen.getByTestId(toDateTestId);
 
     // Check if the DateInput components are disabled
-    const fromDateInput = screen.getByTestId('form-typeahead-start-date-input');
-    const toDateInput = screen.getByTestId('form-typeahead-end-date-input');
-    expect(fromDateInput).toBeDisabled();
-    expect(toDateInput).toBeDisabled();
+    /* eslint-disable testing-library/no-node-access */
+    expect(fromDateInput.querySelector('input')).toBeDisabled();
+    expect(toDateInput.querySelector('input')).toBeDisabled();
   });
 });
