@@ -16,8 +16,8 @@ export const preparePersonUpdateData = (personDetails: Partial<IPersonDetails>) 
     { key: 'notes', updateKey: 'PersonNotes' },
     { key: 'healthDetails', updateKey: 'PersonHealthNotes' },
     { key: 'advisoryNotes', updateKey: 'PersonAdvisoryNotes' },
-    { key: 'workType', updateKey: 'PersonPersonRole', isSetArray: true, arrayKey: 'PersonRoleId' },
-    { key: 'otherWorkTypes', updateKey: 'PersonOtherRole', isSetArray: true, arrayKey: 'PORName' },
+    // { key: 'workType', updateKey: 'PersonPersonRole', isSetArray: true, arrayKey: 'PersonRoleId' },
+    // { key: 'otherWorkTypes', updateKey: 'PersonOtherRole', isSetArray: true, arrayKey: 'PORName' },
     // foreign key connections
     { key: 'addressId', updateKey: 'PersonAddressId', foreignKeyId: 'AddressId', isForeignKey: true },
     { key: 'checkedBy', updateKey: 'PersonFEUCheckByUserId', foreignKeyId: 'Id', isForeignKey: true },

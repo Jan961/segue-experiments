@@ -81,25 +81,21 @@ export const BuildNewContract = ({
 
   const createContract = useCallback(
     async () => axios.post('/api/company-contracts/create', { ...contractSchedule, contractDetails }),
-    [contractSchedule, contractDetails, onClose],
+    [contractSchedule, contractDetails],
   );
 
-  const updateContract = useCallback(
-    async () =>
-      axios.post('/api/company-contracts/update/' + contractId, {
-        ...contractSchedule,
-        contractDetails,
-      }),
-    [contractId, contractSchedule, contractDetails, onClose],
-  );
+  const updateContract = async () =>
+    axios.post('/api/company-contracts/update/' + contractId, {
+      ...contractSchedule,
+      contractDetails,
+    });
 
-  const updatePersonDetails = useCallback(async () => {
+  const updatePersonDetails = async () => {
     const id = contractSchedule.personId;
     return axios.post('/api/person/update/' + id, contractPerson);
-  }, [contractId, contractSchedule, contractDetails, onClose]);
+  };
 
-  const onSave = useCallback(async () => {
-    console.log('========PersonDetails============', contractPerson);
+  const onSave = async () => {
     try {
       let promise;
       if (isEdit) {
@@ -122,7 +118,7 @@ export const BuildNewContract = ({
     } catch (error) {
       console.log('Error creating/updating contracts', error);
     }
-  }, [isEdit, updateContract, createContract]);
+  };
 
   return (
     <PopupModal

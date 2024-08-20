@@ -34,7 +34,7 @@ export const updatePersonSchema = yup.object().shape({
   agencyDetails: yup
     .object()
     .shape({
-      agencyPersonId: yup.number().integer().required(),
+      agencyPersonId: yup.number().integer().nullable(),
       firstName: yup.string().nullable(),
       lastName: yup.string().nullable(),
       email: yup.string().email().nullable(),
@@ -82,7 +82,7 @@ export const updatePersonSchema = yup.object().shape({
   emergencyContact1: yup
     .object()
     .shape({
-      id: yup.number().integer().required(),
+      id: yup.number().integer().nullable(),
       firstName: yup.string().nullable(),
       lastName: yup.string().nullable(),
       email: yup.string().email().nullable(),
@@ -110,7 +110,7 @@ export const updatePersonSchema = yup.object().shape({
   emergencyContact2: yup
     .object()
     .shape({
-      id: yup.number().integer().required(),
+      id: yup.number().integer().nullable(),
       firstName: yup.string().nullable(),
       lastName: yup.string().nullable(),
       email: yup.string().email().nullable(),

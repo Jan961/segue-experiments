@@ -69,7 +69,7 @@ export const contractDetailsSchema = yup.object().shape({
 
 export const contractSchema = yup.object().shape({
   production: yup.number().integer().required(),
-  department: yup.string().required(),
+  department: yup.number().required(),
   role: yup.string().required(),
   personId: yup.number().integer().required(),
   templateId: yup.number().integer().required(),

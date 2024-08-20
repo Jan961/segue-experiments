@@ -6,12 +6,13 @@ import { BuildNewContract } from './BuildNewContract';
 import { transformToOptions } from 'utils';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { productionJumpState } from 'state/booking/productionJumpState';
-import { contractDepartmentOptions, contractTemplateOptions } from 'config/contracts';
+import { contractTemplateOptions } from 'config/contracts';
 import { personState } from 'state/contracts/PersonState';
 import axios from 'axios';
 import { objectify } from 'radash';
 import { PersonMinimalDTO } from 'interfaces';
 import { IContractSchedule } from '../types';
+import { contractDepartmentState } from 'state/contracts/contractDepartmentState';
 
 export const defaultContractSchedule = {
   production: null,
@@ -24,6 +25,11 @@ export const defaultContractSchedule = {
 export const ContractScheduleModal = ({ openContract, onClose }: { openContract: boolean; onClose: () => void }) => {
   const { productions } = useRecoilValue(productionJumpState);
   const [personMap, setPersonMap] = useRecoilState(personState);
+  const departmentMap = useRecoilValue(contractDepartmentState);
+  const departmentOptions = useMemo(
+    () => transformToOptions(Object.values(departmentMap), 'name', 'id'),
+    [departmentMap],
+  );
   const personOptions = useMemo(
     () =>
       transformToOptions(Object.values(personMap), null, 'id', ({ firstName, lastName }) => `${firstName} ${lastName}`),
@@ -115,11 +121,11 @@ export const ContractScheduleModal = ({ openContract, onClose }: { openContract:
           <div className=" text-primary-input-text mr-4">Department</div>
           <Select
             disabled={!production}
-            onChange={(value) => handleChange('department', parseInt(value as string, 10))}
+            onChange={(value) => handleChange('department', value as number)}
             value={department}
             className="bg-primary-white"
             placeholder="Please select department"
-            options={contractDepartmentOptions}
+            options={departmentOptions}
             isClearable
             isSearchable
           />

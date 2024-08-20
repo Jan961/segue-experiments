@@ -29,7 +29,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         ...preparePersonUpdateData(personDetails),
       };
       const personUpdates = [
-        updatePerson(personDetails.id, preparePersonUpdateData(updateMainPersonData), tx),
+        updatePerson(personDetails.id, updateMainPersonData, tx),
         agencyDetails && agencyDetails.agencyPersonId
           ? updatePerson(agencyDetails.agencyPersonId, preparePersonUpdateData(agencyDetails), tx)
           : null,

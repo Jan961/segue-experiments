@@ -134,15 +134,17 @@ export const prepareContractUpdateData = (data: any) => {
 export const prepareAccountUpdateData = (accountDetails: Partial<BankAccount>, isSalary: boolean) => {
   const fieldMappings = [
     { key: 'paidTo', updateKey: isSalary ? 'PersonPaymentTo' : 'PersonExpensesTo' },
-    { key: 'accountName', updateKey: isSalary ? 'PersonPaymentAccount' : 'PersonExpensesAccount' },
-    { key: 'accountNumber', updateKey: isSalary ? 'PersonPaymentAccountNumber' : 'PersonExpensesAccountNumber' },
+    { key: 'accountName', updateKey: isSalary ? 'PersonPaymentAccountName' : 'PersonExpensesAccountName' },
+    { key: 'accountNumber', updateKey: isSalary ? 'PersonPaymentAccount' : 'PersonExpensesAccount' },
     { key: 'sortCode', updateKey: isSalary ? 'PersonPaymentSortCode' : 'PersonExpensesSortCode' },
     { key: 'swift', updateKey: isSalary ? 'PersonPaymentSWIFTBIC' : 'PersonExpensesSWIFTBIC' },
     { key: 'iban', updateKey: isSalary ? 'PersonPaymentIBAN' : 'PersonExpensesIBAN' },
     // foreign key connections
     {
       key: 'country',
-      updateKey: isSalary ? 'PersonPaymentBankCountryId' : 'PersonExpensesBankCountryId',
+      updateKey: isSalary
+        ? 'Country_Person_PersonPaymentBankCountryIdToCountry'
+        : 'Country_Person_PersonExpensesBankCountryIdToCountry',
       foreignKeyId: 'Id',
       isForeignKey: true,
     },
