@@ -12,6 +12,7 @@ import { startOfDay } from 'date-fns';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import { hasActivityChanged } from '../utils';
 import { ConfDialogVariant } from 'components/core-ui-lib/ConfirmationDialog/ConfirmationDialog';
+import checkDecimalStringFormat from 'utils/decimalFormat';
 
 export type ActivityModalVariant = 'add' | 'edit' | 'delete';
 
@@ -105,11 +106,8 @@ export default function ActivityModal({
     onSave(variant, data);
   };
 
-  const setNumericVal = (type: string, value: string) => {
-    const regexPattern = /^-?\d*(\.\d*)?$/;
-    // validate value with regex
-
-    if (regexPattern.test(value)) {
+  const validateCost = (type: string, value: string, precision: number, scale: number) => {
+    if (parseInt(value) >= 0 && checkDecimalStringFormat(value, precision, scale)) {
       if (type === 'venueCost') {
         setVenueCost(value === '' ? '0' : value);
       } else if (type === 'companyCost') {
@@ -239,7 +237,7 @@ export default function ActivityModal({
                     placeholder="00.00"
                     id="companyCost"
                     value={companyCost}
-                    onChange={(event) => setNumericVal('companyCost', event.target.value)}
+                    onChange={(event) => validateCost('companyCost', event.target.value, 8, 2)}
                   />
                 </div>
               </div>
@@ -257,7 +255,7 @@ export default function ActivityModal({
                     placeholder="00.00"
                     id="venueCost"
                     value={venueCost}
-                    onChange={(event) => setNumericVal('venueCost', event.target.value)}
+                    onChange={(event) => validateCost('venueCost', event.target.value, 8, 2)}
                   />
                 </div>
               </div>
