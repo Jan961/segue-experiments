@@ -86,8 +86,8 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
   const producerList = useMemo(() => {
     const list = {};
     Object.values(users).forEach((listData) => {
-      list[`${listData.FirstName || ''} ${listData.LastName || ''}`] = `${listData.FirstName || ''} ${
-        listData.LastName || ''
+      list[`${listData.UserFirstName || ''} ${listData.UserLastName || ''}`] = `${listData.UserFirstName || ''} ${
+        listData.UserLastName || ''
       }`;
     });
     return list;

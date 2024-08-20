@@ -188,11 +188,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
               },
             }),
             ...(task.TaskAssignedToAccUserId && {
-              User: {
-                connect: {
-                  Id: task.TaskAssignedToAccUserId,
-                },
-              },
+              TaskAssignedToAccUserId: task.TaskAssignedToAccUserId,
             }),
           },
         });

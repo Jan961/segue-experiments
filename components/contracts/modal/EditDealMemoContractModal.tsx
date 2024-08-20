@@ -125,9 +125,9 @@ export const EditDealMemoContractModal = ({
   const { users } = useRecoilValue(userState);
   const userList = useMemo(
     () =>
-      Object.values(users).map(({ Id, FirstName = '', LastName = '', Email = '' }) => ({
-        value: Id,
-        text: `${FirstName || ''} ${LastName || ''} | ${Email || ''}`,
+      Object.values(users).map(({ AccUserId, UserFirstName = '', UserLastName = '', UserEmail = '' }) => ({
+        value: AccUserId,
+        text: `${UserFirstName || ''} ${UserLastName || ''} | ${UserEmail || ''}`,
       })),
     [users],
   );
