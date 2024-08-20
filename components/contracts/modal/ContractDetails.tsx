@@ -140,7 +140,7 @@ const ContractDetails = ({ contract = {}, onChange = noop }: ContractDetailsProp
       <div className="flex items-center gap-2">
         <Label className="w-36 !font-bold text-sm" text="Specific Availability" />
         <TextInput
-          testId="contract-details-first-day-work"
+          testId="contract-details-specific-availability-notes"
           placeholder="Specific availability notes"
           value={specificAvailabilityNotes}
           onChange={(event) => handleChange('specificAvailabilityNotes', event.target.value)}

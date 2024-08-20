@@ -187,7 +187,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return mainPerson;
     });
 
-    res.status(200).json(result);
+    res.status(201).json(result);
   } catch (error) {
     console.error(error);
     if (error instanceof yup.ValidationError) {

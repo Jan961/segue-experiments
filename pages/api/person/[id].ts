@@ -48,6 +48,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (!person) {
       return res.status(404).json({ message: 'Person not found' });
     }
+
     const emergencyContacts = person?.PersonPerson_PersonPerson_PPPersonIdToPerson?.reduce?.(
       (contacts, personPerson) => {
         if (personPerson.PPRoleType === 'emergencycontact') {
@@ -57,6 +58,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       },
       [],
     );
+
     const expensesAccountDetails = {
       paidTo: person.PersonExpensesTo || null,
       accountName: person.PersonExpensesAccountName || '',
@@ -66,6 +68,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       iban: person.PersonExpensesIBAN || '',
       country: person.PersonExpensesBankCountryId || null,
     };
+
     const responsePayload = {
       personDetails: transformPersonDetails(person),
       agencyDetails: transformOrganisationDetails(person.Organisation_Person_PersonAgencyOrgIdToOrganisation),

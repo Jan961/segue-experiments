@@ -143,7 +143,7 @@ export const replaceAtPos = <T>(array: T[], element: T, position: number): T[] =
   return [...array.slice(0, position), element, ...array.slice(position + 1)];
 };
 
-export const compareStrings = (a: string, b: string) => a?.toLowerCase?.().includes(b?.toLowerCase?.());
+export const compareStrings = (a = '', b = '') => a?.toLowerCase?.().includes(b?.toLowerCase?.());
 
 export const getAllOptions = (options: SelectOption[], allLabel?: string, allValue?: string | number) => [
   { text: allLabel ?? 'All', value: allValue ?? 'all' },

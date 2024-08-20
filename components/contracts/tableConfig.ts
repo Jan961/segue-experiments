@@ -11,8 +11,8 @@ import ButtonRenderer from 'components/core-ui-lib/Table/renderers/ButtonRendere
 import IconRowRenderer from 'components/global/salesTable/renderers/IconRowRenderer';
 import SelectCellRenderer from 'components/core-ui-lib/Table/renderers/SelectCellRenderer';
 import { statusOptions, statusToBgColorMap } from 'config/contracts';
-import NotesRenderer from 'components/tasks/NotesRenderer';
 import DateRenderer from 'components/core-ui-lib/Table/renderers/DateRenderer';
+import NotesRenderer from 'components/core-ui-lib/Table/renderers/NotesRenderer';
 
 export const contractsStyleProps = { headerColor: tileColors.contracts };
 
@@ -184,6 +184,8 @@ export const getCompanyContractsColumnDefs = (userList = []) => [
     headerClass: ['bgOrangeTextWhite'],
     cellRendererParams: {
       tpActive: true,
+      activeFillColor: '#082B4B',
+      strokeColor: '#082B4B',
     },
     resizable: false,
     width: 50,
