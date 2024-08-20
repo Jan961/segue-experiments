@@ -80,7 +80,7 @@ const InputDialog = ({
 
         <div className="text-base font-bold text-primary-navy">{inputLabel}</div>
         <TextInput
-          data-testid="landingpage-url"
+          testId="landingpage-url"
           className="w-full"
           placeholder={inputPlaceholder}
           id="input"

@@ -261,7 +261,7 @@ export default function AllocatedSeatsModal({
             <div className="flex flex-col w-2/3">
               <TextInput
                 className="w-full mb-4"
-                data-testid="customer-name"
+                testId="customer-name"
                 placeholder="Enter Customer Name"
                 id="custName"
                 value={custName}
@@ -275,7 +275,7 @@ export default function AllocatedSeatsModal({
             <div className="flex flex-col w-2/3">
               <TextInput
                 className="w-full mb-4"
-                data-testid="email-id"
+                testId="email-id"
                 placeholder="Enter Email Address"
                 id="emailAddress"
                 value={email}
@@ -291,7 +291,7 @@ export default function AllocatedSeatsModal({
             <div className="flex flex-col w-2/3">
               <TextInput
                 className="w-full mb-4"
-                data-testid="no-of-seats"
+                testId="no-of-seats"
                 placeholder="Enter No. Seats"
                 id="seatsRequired"
                 value={numSeatsReq}
@@ -305,7 +305,7 @@ export default function AllocatedSeatsModal({
             <div className="flex flex-col w-2/3">
               <TextInput
                 className="w-full mb-4"
-                data-testid="required-seat-numbers"
+                testId="required-seat-numbers"
                 placeholder="Seat Numbers"
                 id="seatsNumList"
                 value={seatNumList}
@@ -319,7 +319,7 @@ export default function AllocatedSeatsModal({
             <div className="flex flex-col w-2/3">
               <TextInput
                 className="w-full mb-4"
-                data-testid="requested-by-name"
+                testId="requested-by-name"
                 placeholder="Enter Name"
                 id="requestedBy"
                 value={requestedBy}
@@ -333,7 +333,7 @@ export default function AllocatedSeatsModal({
             <div className="flex flex-col w-2/3">
               <TextInput
                 className="w-full mb-4"
-                data-testid="notes-field"
+                testId="notes-field"
                 placeholder="Notes Field"
                 id="comments"
                 value={comments}

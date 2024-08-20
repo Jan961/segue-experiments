@@ -128,7 +128,7 @@ export default function ContactNoteModal({
           <div className="text-base font-bold text-primary-input-text">Name of Person Contacted</div>
           <TextInput
             className="w-full mb-4"
-            data-testid="contacted-person-name"
+            testId="contacted-person-name"
             placeholder="Enter Person Contacted"
             id="input"
             value={personContacted}

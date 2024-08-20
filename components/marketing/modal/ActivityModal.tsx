@@ -168,7 +168,7 @@ export default function ActivityModal({
           <TextInput
             className="w-full mb-4"
             placeholder="Enter Activity Name"
-            data-testid="enter-activity-name"
+            testId="enter-activity-name"
             id="activityName"
             value={actName}
             onChange={(event) => setActName(event.target.value)}
@@ -239,7 +239,7 @@ export default function ActivityModal({
                 <div className="flex flex-col">
                   <TextInput
                     className="w-full mb-4"
-                    data-testid="company-cost"
+                    testId="company-cost"
                     placeholder="00.00"
                     id="companyCost"
                     value={companyCost}
@@ -258,7 +258,7 @@ export default function ActivityModal({
                 <div className="flex flex-col">
                   <TextInput
                     className="w-full mb-4"
-                    data-testid="venue-cost"
+                    testId="venue-cost"
                     placeholder="00.00"
                     id="venueCost"
                     value={venueCost}
