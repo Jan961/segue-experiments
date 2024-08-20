@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { calibri } from 'lib/fonts';
 import { useSignIn } from '@clerk/nextjs';
 import { useRouter } from 'next/router';
+import redis from 'lib/redis';
 
 const SignIn = () => {
   const { isLoaded, signIn, setActive } = useSignIn();
@@ -30,7 +31,7 @@ const SignIn = () => {
         // and redirect the user
         if (signInAttempt.status === 'complete') {
           await setActive({ session: signInAttempt.createdSessionId, organization: 'Jendagi' });
-
+          await redis.set(loginDetails.email, 'Jendagi');
           router.push('/');
         } else {
           // If the status is not complete, check why. User may need to
@@ -48,7 +49,7 @@ const SignIn = () => {
   return (
     <div className={`${calibri.variable} font-calibri background-gradient flex flex-col py-20  px-6`}>
       <Image className="mx-auto mb-2" height={160} width={310} src="/segue/segue_logo_full.png" alt="Segue" />
-      <h1 className="my-4 text-2xl font-bold text-center text-primary-input-text">Sign In</h1>
+
       <div className="text-primary-input-text w-[364px] mx-auto">
         <div>
           <Label text="Email Address" required />
