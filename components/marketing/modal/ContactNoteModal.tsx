@@ -131,7 +131,11 @@ export default function ContactNoteModal({
             placeholder="Enter Person Contacted"
             id="input"
             value={personContacted}
-            onChange={(event) => setPersonContacted(event.target.value)}
+            onChange={(event) => {
+              if (event.target.value.length <= 30) {
+                setPersonContacted(event.target.value);
+              }
+            }}
           />
 
           <div className="flex flex-row gap-[105px]">
@@ -158,14 +162,14 @@ export default function ContactNoteModal({
             options={userList}
             value={actionedBy}
             onChange={(value) => setActionedBy(parseInt(value.toString()))}
-            placeholder={'Select User'}
+            placeholder="Select User"
             isClearable
             isSearchable
           />
 
           <div className="text-base font-bold text-primary-input-text">Notes</div>
           <TextArea
-            className={'mt-2 h-[162px] w-full'}
+            className="mt-2 h-[162px] w-full"
             value={notes}
             placeholder="Notes Field"
             onChange={(e) => setNotes(e.target.value)}

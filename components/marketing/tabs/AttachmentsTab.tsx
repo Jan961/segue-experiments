@@ -222,15 +222,17 @@ const AttachmentsTab = forwardRef<AttachmentsTabRef, AttachmentsTabProps>((props
             testId="tableProdAttach"
           />
 
-          <UploadModal
-            visible={showUploadModal}
-            title={attachType + ' Attachment'}
-            info="Please upload your file by dragging it into the grey box below or by clicking the upload cloud."
-            allowedFormats={attachmentMimeTypes.genericAttachment}
-            onClose={() => setShowUploadModal(false)}
-            maxFileSize={5120 * 1024} // 5MB
-            onSave={onSave}
-          />
+          {showUploadModal && (
+            <UploadModal
+              visible={showUploadModal}
+              title={attachType + ' Attachment'}
+              info="Please upload your file by dragging it into the grey box below or by clicking the upload cloud."
+              allowedFormats={attachmentMimeTypes.genericAttachment}
+              onClose={() => setShowUploadModal(false)}
+              maxFileSize={5120 * 1024} // 5MB
+              onSave={onSave}
+            />
+          )}
 
           <ConfirmationDialog
             variant="delete"
