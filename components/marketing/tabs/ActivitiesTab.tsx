@@ -268,18 +268,20 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
 
   const saveActivity = async (variant: ActivityModalVariant, data: ActivityDTO) => {
     if (variant === 'add') {
-      await axios.post('/api/marketing/activities/create', data);
+      const result = await axios.post('/api/marketing/activities/create', data);
+      const addedActivity = result.data;
 
       const newRow = {
-        actName: data.Name,
-        actType: actTypeList.find((type) => type.value === data.ActivityTypeId).text,
-        actDate: data.Date,
-        followUpCheck: data.FollowUpRequired,
-        followUpDt: data.DueByDate,
-        companyCost: data.CompanyCost,
-        venueCost: data.VenueCost,
-        notes: data.Notes,
-        bookingId: data.BookingId,
+        actName: addedActivity.Name,
+        actType: actTypeList.find((type) => type.value === addedActivity.ActivityTypeId).text,
+        actDate: addedActivity.Date === '' ? null : addedActivity.Date,
+        followUpCheck: addedActivity.FollowUpRequired,
+        followUpDt: addedActivity.DueByDate,
+        companyCost: addedActivity.CompanyCost,
+        venueCost: addedActivity.VenueCost,
+        notes: addedActivity.Notes,
+        bookingId: addedActivity.BookingId,
+        id: addedActivity.Id,
       };
 
       const activityData = [...actRowData, newRow];
