@@ -65,6 +65,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
   const [bookingIdVal, setBookingIdVal] = useState(null);
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
   const [confVariant, setConfVariant] = useState<ConfDialogVariant>('delete');
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [bookings, setBookings] = useRecoilState(bookingJumpState);
   const currency = useRecoilValue(currencyState);
 
@@ -94,6 +95,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
   const getActivities = async (bookingId: string) => {
     try {
       setActColDefs(activityColDefs(activityUpdate, currency.symbol));
+      setIsLoading(true);
 
       const { data } = await axios.get(`/api/marketing/activities/${bookingId}`);
 
@@ -169,6 +171,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
     } catch (error) {
       console.log(error);
     }
+    setIsLoading(false);
   };
 
   const viewGlobalActivity = async (data) => {
@@ -420,6 +423,10 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
     }
   }, [props.bookingId]);
 
+  useEffect(() => {
+    setDataAvailable(false);
+  }, [productionId]);
+
   const onExport = async () => {
     const urlPath = `/api/reports/marketing/activities/${props.bookingId}`;
     const selectedVenue = bookings.bookings?.filter((booking) => booking.Id === bookings.selected);
@@ -445,11 +452,13 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
   };
 
   if (!dataAvailable) {
-    return (
-      <div className="mt-[140px]">
-        <Spinner size="lg" className="mr-3" />
-      </div>
-    );
+    if (isLoading) {
+      return (
+        <div className="mt-[140px]">
+          <Spinner size="lg" className="mr-3" />
+        </div>
+      );
+    }
   } else {
     return (
       <div>
