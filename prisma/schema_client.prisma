@@ -966,7 +966,7 @@ model Person {
   PersonPassportExpiryDate                             DateTime?          @db.Date
   PersonEligibleToWork                                 Boolean            @default(dbgenerated("(b'0')")) @db.Bit(1)
   PersonFEURequired                                    Boolean            @default(dbgenerated("(b'0')")) @db.Bit(1)
-  PersonFEUCheckByUserId                               Int?
+  PersonFEUCheckByAccUserId                            Int?
   PersonNotes                                          String?            @db.LongText
   PersonHealthNotes                                    String?            @db.LongText
   PersonAdvisoryNotes                                  String?            @db.LongText
@@ -1002,6 +1002,7 @@ model Person {
   @@index([PersonExpensesBankCountryId], map: "Country_Person_ExpensesBank")
   @@index([PersonPaymentBankCountryId], map: "Country_Person_PaymentBank")
   @@index([PersonAgencyOrgId], map: "Organisation_Person_Agent")
+  @@index([PersonFEUCheckByAccUserId], map: "Master_AccountUser_Person")
 }
 
 model PersonOtherRole {
