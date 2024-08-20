@@ -33,6 +33,7 @@ export const BuildNewContract = ({
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const cancelToken = useAxiosCancelToken();
+
   const fetchPersonDetails = useCallback(
     async (id: number) => {
       setLoading(true);
@@ -78,20 +79,50 @@ export const BuildNewContract = ({
     setMainButtonSelection(buttons);
   };
 
-  const onSave = async () => {
+  const createContract = useCallback(
+    async () => axios.post('/api/company-contracts/create', { ...contractSchedule, contractDetails }),
+    [contractSchedule, contractDetails, onClose],
+  );
+
+  const updateContract = useCallback(
+    async () =>
+      axios.post('/api/company-contracts/update/' + contractId, {
+        ...contractSchedule,
+        contractDetails,
+      }),
+    [contractId, contractSchedule, contractDetails, onClose],
+  );
+
+  const updatePersonDetails = useCallback(async () => {
+    const id = contractSchedule.personId;
+    return axios.post('/api/person/update/' + id, contractPerson);
+  }, [contractId, contractSchedule, contractDetails, onClose]);
+
+  const onSave = useCallback(async () => {
+    console.log('========PersonDetails============', contractPerson);
     try {
-      const promise = axios.post('/api/contracts/create', { ...contractSchedule, contractDetails });
-      notify.promise(promise, {
-        loading: 'Saving Contract...',
-        success: 'Contracted saved successfully',
-        error: 'Error saving contract',
-      });
-      router.replace(router.asPath);
-      onClose();
+      let promise;
+      if (isEdit) {
+        await updatePersonDetails();
+        promise = updateContract();
+      } else {
+        promise = createContract();
+      }
+      notify.promise(
+        promise.then(() => {
+          router.replace(router.asPath);
+          onClose();
+        }),
+        {
+          loading: 'Saving Contract...',
+          success: 'Contracted saved successfully',
+          error: 'Error saving contract',
+        },
+      );
     } catch (error) {
-      console.log(error);
+      console.log('Error creating/updating contracts', error);
     }
-  };
+  }, [isEdit, updateContract, createContract]);
 
   return (
     <PopupModal

@@ -1,5 +1,4 @@
 export interface BankAccount {
-  accountName: string;
   paidTo: string | null;
   accountName: string;
   accountNumber: string;
@@ -40,6 +39,7 @@ export interface EmergencyContact {
 }
 
 export interface IPersonDetails {
+  id?: number;
   firstName: string;
   lastName: string;
   email: string;

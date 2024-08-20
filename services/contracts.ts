@@ -1,6 +1,7 @@
+import { BankAccount } from 'components/contracts/types';
 import { IContractDepartment, IContractSummary } from 'interfaces/contracts';
 import prisma from 'lib/prisma';
-import { isUndefined } from 'utils';
+import { prepareUpdateData } from 'utils/apiUtils';
 
 export const fetchAllStandardClauses = async () => {
   const clauses = await prisma.ACCStandardClause.findMany({});
@@ -69,9 +70,15 @@ export const fetchAllContracts = async (productionId?: number): Promise<IContrac
   );
 };
 
-export const prepareContractUpdateData = (data: any) => {
-  const updateData: any = {};
+export const fetchDepartmentList = async (): Promise<IContractDepartment[]> => {
+  const departments = await prisma.ACCDepartment.findMany({});
+  return departments.map(({ ACCDeptId, ACCDeptName }) => ({
+    id: ACCDeptId,
+    name: ACCDeptName,
+  }));
+};
 
+export const prepareContractUpdateData = (data: any) => {
   const fieldMappings = [
     { key: 'roleName', updateKey: 'RoleName' },
     { key: 'contractStatus', updateKey: 'ContractStatus' },
@@ -121,26 +128,40 @@ export const prepareContractUpdateData = (data: any) => {
       foreignKeyId: 'Id',
     },
   ];
-
-  fieldMappings.forEach(({ key, updateKey, isDate, isForeignKey, foreignKeyId }) => {
-    if (!isUndefined(data[key])) {
-      if (isDate) {
-        updateData[updateKey] = data[key] ? new Date(data[key]) : null;
-      } else if (isForeignKey) {
-        updateData[updateKey] = data[key] === null ? { disconnect: true } : { connect: { [foreignKeyId]: data[key] } };
-      } else {
-        updateData[updateKey] = data[key];
-      }
-    }
-  });
-
-  return updateData;
+  return prepareUpdateData(data, fieldMappings);
 };
 
-export const fetchDepartmentList = async (): Promise<IContractDepartment[]> => {
-  const departments = await prisma.ACCDepartment.findMany({});
-  return departments.map(({ ACCDeptId, ACCDeptName }) => ({
-    id: ACCDeptId,
-    name: ACCDeptName,
-  }));
+export const prepareAccountUpdateData = (accountDetails: Partial<BankAccount>, isSalary: boolean) => {
+  const fieldMappings = [
+    { key: 'paidTo', updateKey: isSalary ? 'PersonPaymentTo' : 'PersonExpensesTo' },
+    { key: 'accountName', updateKey: isSalary ? 'PersonPaymentAccount' : 'PersonExpensesAccount' },
+    { key: 'accountNumber', updateKey: isSalary ? 'PersonPaymentAccountNumber' : 'PersonExpensesAccountNumber' },
+    { key: 'sortCode', updateKey: isSalary ? 'PersonPaymentSortCode' : 'PersonExpensesSortCode' },
+    { key: 'swift', updateKey: isSalary ? 'PersonPaymentSWIFTBIC' : 'PersonExpensesSWIFTBIC' },
+    { key: 'iban', updateKey: isSalary ? 'PersonPaymentIBAN' : 'PersonExpensesIBAN' },
+    // foreign key connections
+    {
+      key: 'country',
+      updateKey: isSalary ? 'PersonPaymentBankCountryId' : 'PersonExpensesBankCountryId',
+      foreignKeyId: 'Id',
+      isForeignKey: true,
+    },
+  ];
+
+  return prepareUpdateData(accountDetails, fieldMappings);
+};
+
+export const prepareAgencyOrganisationUpdateData = (agencyDetails: any) => {
+  const fieldMappings = [
+    { key: 'name', updateKey: 'OrgName' },
+    { key: 'website', updateKey: 'OrgWebsite' },
+    {
+      key: 'agencyPersonId',
+      updateKey: 'Person_Organisation_OrgContactPersonIdToPerson',
+      foreignKeyId: 'PersonId',
+      isForeignKey: true,
+    },
+  ];
+
+  return prepareUpdateData(agencyDetails, fieldMappings);
 };

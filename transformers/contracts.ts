@@ -1,4 +1,5 @@
 interface PersonDetails {
+  id?: number;
   firstName: string | null;
   lastName: string | null;
   email: string | null;
@@ -53,6 +54,7 @@ export const transformPersonDetails = (personData: any): PersonDetails => {
     };
 
   return {
+    id: personData.PersonId,
     firstName: personData.PersonFirstName || null,
     lastName: personData.PersonLastName || null,
     email: personData.PersonEmail || null,
@@ -80,6 +82,7 @@ export const transformPersonDetails = (personData: any): PersonDetails => {
 };
 
 interface OrganisationDetails {
+  agencyPersonId?: number;
   firstName: string | null;
   lastName: string | null;
   email: string | null;
@@ -103,6 +106,7 @@ export const transformOrganisationDetails = (organisationData: any): Organisatio
   const contactPerson = organisationData.Person_Organisation_OrgContactPersonIdToPerson;
 
   return {
+    agencyPersonId: contactPerson.PersonId,
     firstName: contactPerson?.PersonFirstName || null,
     lastName: contactPerson?.PersonLastName || null,
     email: contactPerson?.PersonEmail || null,
