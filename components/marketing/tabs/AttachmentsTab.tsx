@@ -76,6 +76,7 @@ const AttachmentsTab = forwardRef<AttachmentsTabRef, AttachmentsTabProps>((props
         FileOriginalFilename: response.data.originalFilename,
         FileURL: getFileUrl(response.data.location),
         FileUploadedDateTime: new Date(),
+        FileId: response.data.id,
       };
 
       // update in the database
