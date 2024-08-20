@@ -209,6 +209,7 @@ const ProductionTaskList = ({ visible, onClose, productionId, isMaster = false }
       onClose={onClose}
       title="Add from Production Task List"
       titleClass="text-primary-navy text-xl mb-2"
+      hasOverlay={showExistingTaskModal}
     >
       <div className="bg-white border-primary-border rounded-md border shadow-md flex items-center w-[566px]">
         <Select
