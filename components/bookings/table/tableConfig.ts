@@ -729,13 +729,14 @@ export const venueContactDefs = (defaultRoles) => [
   },
 ];
 
-export const getBarredVenuesColDefs = (venueOptions) => [
+export const getBarredVenuesColDefs = (venueOptions, selectedVenueIds) => [
   {
     headerName: 'Barred Venues',
     field: 'barredVenueId',
     cellRenderer: SelectBarredVenuesRenderer,
     cellRendererParams: {
       venueOptions,
+      selectedVenueIds,
     },
     flex: 1,
     cellStyle: {

@@ -4,10 +4,12 @@ import SelectRenderer from 'components/core-ui-lib/Table/renderers/SelectRendere
 
 interface SelectVenueRendererProps extends ICellRendererParams {
   venueOptions: SelectOption[];
+  selectedVenueIds: number[];
 }
 
 export default function SelectBarredVenuesRenderer({
   venueOptions,
+  selectedVenueIds,
   eGridCell,
   value,
   setValue,
@@ -20,17 +22,22 @@ export default function SelectBarredVenuesRenderer({
     node.setData({ ...data, [colDef?.field]: value });
   };
 
+  const ids = selectedVenueIds.filter((num) => num !== value);
+  const options = venueOptions.filter((option) => {
+    return !ids.includes(Number(option.value));
+  });
+
   return (
     <div className="pl-1 pr-2 mt-1">
       <SelectRenderer
         eGridCell={eGridCell}
-        options={venueOptions}
+        options={options}
         value={value}
         inline
         onChange={handleVenueChange}
         isSearchable
         isClearable={false}
-        label={'Venue'}
+        label="Venue"
       />
     </div>
   );

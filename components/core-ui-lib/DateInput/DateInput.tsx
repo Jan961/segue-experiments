@@ -161,7 +161,7 @@ export default forwardRef<Ref, DateInputProps>(function DateInput(
       </div>
       <div data-testid={`${testId}-input`} className={errorMsg ? 'animate-shake' : ''}>
         <TextInput
-          data-testid="date-input"
+          testId="date-input"
           placeholder={placeholder}
           ref={inputRef}
           value={inputValue}

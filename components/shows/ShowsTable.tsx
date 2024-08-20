@@ -83,7 +83,9 @@ const ShowsTable = ({
     setShowId(e.data.Id);
     setRowIndex(e.rowIndex);
     if (e.column.colId === 'Id') {
-      setConfirm(true);
+      // only allow deletion if show has productions
+      // button is disabled if show has productions but has no effect on clicking cell
+      e.data?.productions.length === 0 && setConfirm(true);
     } else if (e.column.colId === 'productions' && e.data.Id) {
       setShowProductionsModal(true);
       setCurrentShow(e.data);
