@@ -117,13 +117,14 @@ const AddTask = ({
     useRecoilValue(currentProductionSelector) || productionList.find((item) => item.Id === productionId);
   useEffect(() => {
     setInputs(task);
+    if (isNullOrEmpty(task?.Id)) setIsRecurring(true);
   }, [task]);
 
   const [status, setStatus] = useState({ submitted: true, submitting: false });
   const [loading, setLoading] = useState<boolean>(false);
   const [isCloned, setIsCloned] = useState<boolean>(false);
   const [isChecked, setIsChecked] = useState<boolean>(false);
-  const [isRecurring, setIsRecurring] = useState<boolean>(false);
+  const [isRecurring, setIsRecurring] = useState<boolean>(true);
   const [showRecurringConfirmation, setShowRecurringConfirmation] = useState<boolean>(false);
   const [taskRecurringInfo, setTaskRecurringInfo] = useState(null);
   const [showRecurringDelete, setShowRecurringDelete] = useState<boolean>(false);
@@ -143,7 +144,13 @@ const AddTask = ({
     [production, isMasterTask],
   );
 
-  const weekOptionsNoDate = useMemo(() => getWeekOptions(production, isMasterTask, false), [production, isMasterTask]);
+  const weekOptionsNoDate = useMemo(
+    () =>
+      getWeekOptions(production, isMasterTask, false).filter((option) => {
+        return option.value >= inputs?.StartByWeekNum;
+      }),
+    [production, isMasterTask, inputs?.StartByWeekNum],
+  );
 
   const showCode = useMemo(() => {
     return inputs?.Id ? `${production?.ShowCode}${production?.Code}-${inputs.Code}` : null;
@@ -205,6 +212,14 @@ const AddTask = ({
 
     if (checked != null) {
       setIsRecurring(checked);
+    }
+    if (id === 'StartByWeekNum') {
+      const weekSelectArr = ['CompleteByWeekNum', 'TaskRepeatFromWeekNum', 'TaskRepeatToWeekNum'];
+      for (const week in weekSelectArr) {
+        if (inputs[week] < value) {
+          inputs[week] = value;
+        }
+      }
     }
 
     if (id === 'RepeatInterval' && checked) {
@@ -447,7 +462,6 @@ const AddTask = ({
       handleClose();
     }
   };
-
   return (
     <PopupModal
       show={visible}
@@ -499,11 +513,14 @@ const AddTask = ({
             <Select
               onChange={(value) => handleOnChange({ target: { id: 'CompleteByWeekNum', value } })}
               value={inputs?.CompleteByWeekNum}
-              options={weekOptionsDate}
+              options={weekOptionsDate.filter(
+                (option) => option.value >= inputs?.StartByWeekNum || isNullOrEmpty(inputs?.StartByWeekNum),
+              )}
               placeholder="Week No."
               className="w-52"
               isSearchable={true}
               testId="sel-task-complete-week"
+              key={inputs?.StartByWeekNum}
             />
           </div>
         </div>
@@ -567,7 +584,7 @@ const AddTask = ({
               />
             </div>
           )}
-          {!isRecurring && (
+          {!isRecurring && inputs.RepeatInterval && (
             <div className="flex ml-2">
               <Label className="!text-secondary pr-2" text="From" />
               <Select
@@ -578,10 +595,11 @@ const AddTask = ({
                 placeholder="Week No."
                 isSearchable={true}
                 testId="sel-task-repeat-from"
+                key={inputs?.StartByWeekNum}
               />
             </div>
           )}
-          {!isRecurring && (
+          {!isRecurring && inputs.RepeatInterval && (
             <div className="flex ml-2 gap-x-2">
               <Label className="!text-secondary" text="To" />
               <Select
@@ -592,6 +610,7 @@ const AddTask = ({
                 className="w-32"
                 isSearchable={true}
                 testId="sel-task-repeat-to"
+                key={inputs?.StartByWeekNum}
               />
             </div>
           )}
