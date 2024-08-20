@@ -168,7 +168,11 @@ export default function ActivityModal({
             placeholder="Enter Activity Name"
             id="activityName"
             value={actName}
-            onChange={(event) => setActName(event.target.value)}
+            onChange={(event) => {
+              if (event.target.value.length <= 30) {
+                setActName(event.target.value);
+              }
+            }}
           />
 
           <Select
