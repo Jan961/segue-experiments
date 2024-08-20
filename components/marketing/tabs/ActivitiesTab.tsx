@@ -570,36 +570,38 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
             gridOptions={{ suppressHorizontalScroll: true }}
           />
 
-          <div
-            className={classNames(
-              'flex flex-col w-[487px] h-[69px] bg-primary-green/[0.30] rounded-xl px-2 float-right',
-              actRowData.length === 0 ? '-mt-64' : 'mt-5',
-            )}
-          >
-            <div className="flex flex-row gap-4">
-              <div className="flex flex-col text-center">
-                <div className="text-base font-bold text-primary-input-text">Total Cost</div>
-                <div className="bg-primary-white h-7 w-[140px] rounded mt-[2px] ml-2">
-                  <div className="text text-base text-left pl-2 text-primary-input-text">
-                    {`${currency.symbol}${totalCost.toFixed(2)}`}
+          <div className="flex justify-end">
+            <div
+              className={classNames(
+                'flex flex-col w-[487px] h-[69px] bg-primary-green/[0.30] rounded-xl px-2',
+                actRowData.length === 0 ? '-mt-64' : 'mt-5',
+              )}
+            >
+              <div className="flex flex-row gap-4">
+                <div className="flex flex-col text-center">
+                  <div className="text-base font-bold text-primary-input-text">Total Cost</div>
+                  <div className="bg-primary-white h-7 w-[140px] rounded mt-[2px] ml-2">
+                    <div className="text text-base text-left pl-2 text-primary-input-text">
+                      {`${currency.symbol}${totalCost.toFixed(2)}`}
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="flex flex-col text-center">
-                <div className="text-base font-bold text-primary-input-text">Company</div>
-                <div className="bg-primary-white h-7 w-[140px] rounded mt-[2px]">
-                  <div className="text text-base text-left pl-2 text-primary-input-text">
-                    {`${currency.symbol}${totalCompanyCost.toFixed(2)}`}
+                <div className="flex flex-col text-center">
+                  <div className="text-base font-bold text-primary-input-text">Company</div>
+                  <div className="bg-primary-white h-7 w-[140px] rounded mt-[2px]">
+                    <div className="text text-base text-left pl-2 text-primary-input-text">
+                      {`${currency.symbol}${totalCompanyCost.toFixed(2)}`}
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="flex flex-col text-center">
-                <div className="text-base font-bold text-primary-input-text">Venue</div>
-                <div className="bg-primary-white h-7 w-[140px] rounded mt-[2px]">
-                  <div className="text text-base text-left pl-2 text-primary-input-text">
-                    {`${currency.symbol}${totalVenueCost.toFixed(2)}`}
+                <div className="flex flex-col text-center">
+                  <div className="text-base font-bold text-primary-input-text">Venue</div>
+                  <div className="bg-primary-white h-7 w-[140px] rounded mt-[2px]">
+                    <div className="text text-base text-left pl-2 text-primary-input-text">
+                      {`${currency.symbol}${totalVenueCost.toFixed(2)}`}
+                    </div>
                   </div>
                 </div>
               </div>

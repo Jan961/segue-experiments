@@ -162,6 +162,7 @@ const MasterTasks = (props: InferGetServerSidePropsType<typeof getServerSideProp
         styleProps={styleProps}
         onRowDoubleClicked={onRowDoubleClicked}
         testId="table-master-tasks"
+        marginBottom={185}
       />
 
       <ConfirmationDialog

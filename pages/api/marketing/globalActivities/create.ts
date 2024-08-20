@@ -13,7 +13,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
 
     const newGlobalBookingActivity = await prisma.globalBookingActivity.create({
       data: {
-        data: data.Id,
         Date: data.Date ? new Date(data.Date) : null,
         Name: data.Name,
         ActivityType: {
@@ -44,7 +43,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       data: globalBookingActivityVenueRecords,
     });
 
-    res.status(200).json(data);
+    res.status(200).json(newGlobalBookingActivity);
   } catch (err) {
     await loggingService.logError(err);
     console.log(err);
