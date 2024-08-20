@@ -80,6 +80,7 @@ const InputDialog = ({
 
         <div className="text-base font-bold text-primary-navy">{inputLabel}</div>
         <TextInput
+          testId="landingpage-url"
           className="w-full"
           placeholder={inputPlaceholder}
           id="input"
@@ -89,7 +90,7 @@ const InputDialog = ({
 
         <div className="flex float-right mt-5">
           <Button className="w-32" variant="secondary" text={cancelText} onClick={handleCancel} />
-          <Button className="ml-4 w-32" variant={'primary'} text={saveText} onClick={() => onSaveClick(inputVal)} />
+          <Button className="ml-4 w-32" variant="primary" text={saveText} onClick={() => onSaveClick(inputVal)} />
         </div>
 
         <ConfirmationDialog

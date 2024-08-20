@@ -128,6 +128,7 @@ export default function ContactNoteModal({
           <div className="text-base font-bold text-primary-input-text">Name of Person Contacted</div>
           <TextInput
             className="w-full mb-4"
+            testId="contacted-person-name"
             placeholder="Enter Person Contacted"
             id="input"
             value={personContacted}
@@ -159,6 +160,7 @@ export default function ContactNoteModal({
           <div className="text-base font-bold text-primary-input-text">Actioned By</div>
           <Select
             className={classNames('w-full !border-0 text-primary-input-text mb-4')}
+            testId="select-user"
             options={userList}
             value={actionedBy}
             onChange={(value) => setActionedBy(parseInt(value.toString()))}
@@ -170,6 +172,7 @@ export default function ContactNoteModal({
           <div className="text-base font-bold text-primary-input-text">Notes</div>
           <TextArea
             className="mt-2 h-[162px] w-full"
+            testId="notes-area"
             value={notes}
             placeholder="Notes Field"
             onChange={(e) => setNotes(e.target.value)}
