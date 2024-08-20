@@ -1,6 +1,6 @@
 import { clerkClient } from '@clerk/nextjs';
 import { getAuth } from '@clerk/nextjs/server';
-import prisma from 'lib/prisma';
+import prisma from 'lib/prisma_master';
 import { AccessCheck, checkAccess as checkAccessDirect } from './accessService';
 import { userMapper } from 'lib/mappers';
 import { UserDto } from 'interfaces';
@@ -9,8 +9,21 @@ import { isNullOrEmpty } from 'utils';
 export const getUsers = async (AccountId: number): Promise<UserDto[]> => {
   const result = await prisma.user.findMany({
     where: {
-      AccountId,
+      AccountUser: {
+        AccUserAccountId: AccountId,
+      }
     },
+    select: {
+      UserId: true,
+      UserEmail: true,
+      UserFirstName: true,
+      UserLastName: true,
+      AccountUser: {
+        select: {
+          AccUserId: true
+        }
+      }
+    }
   });
 
   return result.map(userMapper);
@@ -27,23 +40,27 @@ export const getUserNameForClerkId = async (userId: string): Promise<string> => 
   const matching = user.emailAddresses.filter((x) => x.id === user.primaryEmailAddressId)[0];
   const accountId = await getAccountId(matching.emailAddress);
   const users = await getUsers(accountId);
-  const currentUser = users.find((user) => user.Email === matching.emailAddress);
-  const firstname = isNullOrEmpty(currentUser.FirstName) ? '' : currentUser.FirstName;
-  const lastname = isNullOrEmpty(currentUser.LastName) ? '' : currentUser.LastName;
+  const currentUser = users.find((user) => user.UserEmail === matching.emailAddress);
+  const firstname = isNullOrEmpty(currentUser.UserFirstName) ? '' : currentUser.UserFirstName;
+  const lastname = isNullOrEmpty(currentUser.UserLastName) ? '' : currentUser.UserLastName;
   return firstname + ' ' + lastname;
 };
 
 export const getAccountId = async (email: string) => {
-  const { AccountId } = await prisma.user.findUnique({
+  const { AccountUser } = await prisma.user.findUnique({
     where: {
-      Email: email,
+      UserEmail: email,
     },
     select: {
-      AccountId: true,
+      AccountUser: {
+        select: {
+          AccUserAccountId: true
+        }
+      }
     },
   });
 
-  return AccountId;
+  return AccountUser?.AccUserAccountId;
 };
 
 export const getEmailFromReq = async (req: any) => {

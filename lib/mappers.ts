@@ -10,15 +10,17 @@ import {
   BookingActivity,
   BookingContactNotes,
   ProductionTask,
-  User,
   File,
   ConversionRate,
-  Currency,
   Country,
   CountryInRegion,
   Region,
   GlobalBookingActivity,
 } from 'prisma/generated/prisma-client';
+import { 
+  User,
+  Currency 
+} from 'prisma/generated/prisma-master';
 import {
   ActivityDTO,
   BookingContactNoteDTO,
@@ -200,7 +202,7 @@ export const countryMapper = (
 
 export const currencyMapper = (c: Currency & { Country: Country[] }): CurrencyDTO => ({
   ...c,
-  CountryList: c.Country.map(countryMapper),
+  CurrencyCountryList: c.Country.map(countryMapper),
 });
 
 export const conversionRateMapper = (
@@ -282,7 +284,7 @@ export const bookingContactNoteMapper = (a: BookingContactNotes): BookingContact
   CoContactName: a.CoContactName,
   ContactDate: convertDate(a.ContactDate),
   Notes: a.Notes,
-  UserId: a.UserId,
+  UserId: a.ContactNoteActionAccUserId,
 });
 
 export const contractStatusmapper = (status: ContractStatusType) => {
@@ -347,9 +349,10 @@ export const venueRoleMapper = (vr: any): VenueRoleDTO => ({
   Standard: vr.IsStandard,
 });
 
-export const userMapper = (user: User): UserDto => ({
-  Id: user.Id,
-  FirstName: user.FirstName,
-  LastName: user.LastName,
-  Email: user.Email,
+export const userMapper = (user): UserDto => ({
+  UserId: user.UserId,
+  UserFirstName: user.UserFirstName,
+  UserLastName: user.UserLastName,
+  UserEmail: user.UserEmail,
+  AccUserId: user.AccountUser.AccUserId
 });

@@ -32,7 +32,7 @@ export const masterTaskSchema = yup.object().shape({
   CopiedId: yup.number().optional().nullable(),
   Priority: yup.number().optional().nullable(),
   Notes: yup.string().optional().nullable(),
-  AssignedToUserId: yup.number().optional().nullable(),
+  TaskAssignedToAccUserId: yup.number().optional().nullable(),
   StartByWeekNum: yup.number().nullable(),
   CompleteByWeekNum: yup.number().nullable(),
   TaskCompletedDate: yup.date().nullable(),

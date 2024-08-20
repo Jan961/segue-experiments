@@ -37,8 +37,7 @@ export const getProductionJumpState = async (ctx, path: string, AccountId: numbe
             : null,
           RunningTime: t.RunningTime ? dateTimeToTime(t.RunningTime.toISOString()) : null,
           RunningTimeNote: t.RunningTimeNote,
-          SalesFrequency: t.SalesFrequency,
-          ProductionCompany: t.ProductionCompany,
+          SalesFrequency: t.SalesFrequency
         };
       })
       .sort((a, b) => {

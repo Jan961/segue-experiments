@@ -25,7 +25,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           StartByWeekNum,
           CompleteByWeekNum,
           Priority,
-          AssignedToUserId,
+          TaskAssignedToAccUserId,
           Notes,
         } = task;
 
@@ -41,12 +41,11 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
 
         return await prisma.MasterTask.create({
           data: {
-            AccountId,
             Name,
             StartByWeekNum,
             CompleteByWeekNum,
             Priority,
-            AssignedToUserId,
+            TaskAssignedToAccUserId,
             Notes,
             Code: Code + 1,
             CopiedFrom: 'R',
@@ -69,7 +68,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         return await prisma.MasterTask.create({
           data: {
             ...filteredTask,
-            AccountId,
             TaskStartByIsPostProduction: false,
             TaskCompleteByIsPostProduction: false,
             Code: Code + 1,

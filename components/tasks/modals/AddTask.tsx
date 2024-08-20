@@ -67,7 +67,7 @@ const DEFAULT_MASTER_TASK: Partial<MasterTask> & {
   Code: 0,
   Name: '',
   Notes: '',
-  AssignedToUserId: null,
+  TaskAssignedToAccUserId: null,
   Priority: 0,
   AccountId: 0,
   StartByWeekNum: 0,
@@ -174,9 +174,9 @@ const AddTask = ({
       return [];
     }
 
-    return Object.values(users).map(({ Id, FirstName = '', LastName = '' }) => ({
-      value: Id,
-      text: `${FirstName || ''} ${LastName || ''}`,
+    return Object.values(users).map(({ AccUserId, UserFirstName = '', UserLastName = '' }) => ({
+      value: AccUserId,
+      text: `${UserFirstName || ''} ${UserLastName || ''}`,
     }));
   }, [users]);
 
@@ -188,7 +188,7 @@ const AddTask = ({
     let { id, value, checked } = e.target;
     if (
       [
-        'AssignedToUserId',
+        'TaskAssignedToAccUserId',
         'StartByWeekNum',
         'CompleteByWeekNum',
         'Priority',
@@ -594,8 +594,8 @@ const AddTask = ({
         <div className="flex">
           <Label className="!text-secondary pr-6 mr-4" text="Assigned to" />
           <Select
-            onChange={(value) => handleOnChange({ target: { id: 'AssignedToUserId', value } })}
-            value={inputs?.AssignedToUserId}
+            onChange={(value) => handleOnChange({ target: { id: 'TaskAssignedToAccUserId', value } })}
+            value={inputs?.TaskAssignedToAccUserId}
             options={usersList}
             placeholder="Select Assignee"
             className="w-64"

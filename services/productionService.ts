@@ -52,9 +52,6 @@ export const getActiveProductions = async (accountId: number) => {
   const productions = await prisma.production.findMany({
     where: {
       IsArchived: false,
-      Show: {
-        AccountId: accountId,
-      },
     },
     include: productionDateBlockInclude,
   });
@@ -73,13 +70,6 @@ export const getAllProductionPageProps = async (ctx: any) => {
   const email = await getEmailFromReq(ctx.req);
   const AccountId = await getAccountId(email);
   const productionsRaw = await prisma.Production.findMany({
-    where: {
-      Show: {
-        is: {
-          AccountId,
-        },
-      },
-    },
     include: {
       Show: true,
       DateBlock: true,
@@ -146,15 +136,9 @@ export const getAllProductions = async (AccountId: number) => {
         },
       },
       DateBlock: true,
-      ProductionCompany: true,
     },
     where: {
       IsDeleted: false,
-      Show: {
-        is: {
-          AccountId,
-        },
-      },
     },
   });
   return getProductionsByStartDate(productions);
@@ -243,11 +227,6 @@ export const getProductionsAndTasks = async (AccountId: number, ProductionId?: n
     where: {
       IsArchived: false,
       ...(ProductionId && { Id: ProductionId }),
-      Show: {
-        is: {
-          AccountId,
-        },
-      },
     },
     include: {
       Show: true,

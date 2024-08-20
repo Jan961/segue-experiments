@@ -23,10 +23,10 @@ export type CountryDTO = {
 };
 
 export type CurrencyDTO = {
-  Code: string;
-  Name: string;
-  SymbolUnicode: string;
-  CountryList: CountryDTO[];
+  CurrencyCode: string;
+  CurrencyName: string;
+  CurrencySymbolUnicode: string;
+  CurrencyCountryList: CountryDTO[];
 };
 
 export type UICurrency = {
@@ -87,7 +87,7 @@ export type ProductionTaskDTO = {
   CompleteByWeekNum?: number;
   CompleteByIsPostProduction: boolean;
   StartByIsPostProduction: boolean;
-  AssignedToUserId?: number;
+  TaskAssignedToAccUserId?: number;
   StartDate?: string;
   CompleteDate?: string;
   TaskCompletedDate: Date;
@@ -112,7 +112,7 @@ export type MasterTaskDTO = {
   AssignedTo?: string;
   StartByWeekNum?: number;
   CompleteByWeekNum?: number;
-  AssignedToUserId?: number;
+  TaskAssignedToAccUserId?: number;
   MasterTaskRepeat?: any;
   MTRId?: number;
   RepeatInterval?: string;
@@ -407,10 +407,11 @@ export type VenueRoleDTO = {
 };
 
 export type UserDto = {
-  Id?: number;
-  Email: string;
-  FirstName: string;
-  LastName?: string;
+  UserId?: number;
+  UserEmail: string;
+  UserFirstName: string;
+  UserLastName?: string;
+  AccUserId: number;
 };
 
 export type Venue = {

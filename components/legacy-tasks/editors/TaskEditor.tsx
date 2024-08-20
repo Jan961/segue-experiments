@@ -162,8 +162,8 @@ const TaskEditor = ({ task, triggerClose, open, recurring = false }: NewTaskForm
           onChange={handleOnChange}
           value={inputs.AssignedToUserId}
           options={Object.values(users).map((user) => ({
-            text: `${user.FirstName} ${user?.LastName ?? ''}`,
-            value: user.Id,
+            text: `${user.UserFirstName} ${user?.UserLastName ?? ''}`,
+            value: user.AccUserId,
           }))}
         />
         <FormInputSelect
