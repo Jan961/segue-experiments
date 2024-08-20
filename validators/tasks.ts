@@ -9,9 +9,9 @@ export const productionTaskSchema = yup.object().shape({
   Priority: yup.number().optional().nullable(),
   Notes: yup.string().optional().nullable(),
   Progress: yup.number().required('Progress is a required field'),
-  StartByWeekNum: yup.number(),
-  CompleteByWeekNum: yup.number(),
-  TaskCompletedDate: yup.date(),
+  StartByWeekNum: yup.number().nullable(),
+  CompleteByWeekNum: yup.number().nullable(),
+  TaskCompletedDate: yup.date().nullable(),
   PRTId: yup.number(),
 });
 
@@ -33,9 +33,9 @@ export const masterTaskSchema = yup.object().shape({
   Priority: yup.number().optional().nullable(),
   Notes: yup.string().optional().nullable(),
   AssignedToUserId: yup.number().optional().nullable(),
-  StartByWeekNum: yup.number(),
-  CompleteByWeekNum: yup.number(),
-  TaskCompletedDate: yup.date(),
+  StartByWeekNum: yup.number().nullable(),
+  CompleteByWeekNum: yup.number().nullable(),
+  TaskCompletedDate: yup.date().nullable(),
   MRTId: yup.number().optional().nullable(),
 });
 
