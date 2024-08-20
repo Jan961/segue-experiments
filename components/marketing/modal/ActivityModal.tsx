@@ -107,11 +107,11 @@ export default function ActivityModal({
   };
 
   const validateCost = (type: string, value: string, precision: number, scale: number) => {
-    if (parseInt(value) >= 0 && checkDecimalStringFormat(value, precision, scale)) {
+    if (checkDecimalStringFormat(value, precision, scale)) {
       if (type === 'venueCost') {
-        setVenueCost(value === '' ? '0' : value);
+        setVenueCost(value);
       } else if (type === 'companyCost') {
-        setCompanyCost(value === '' ? '0' : value);
+        setCompanyCost(value);
       }
     }
   };
