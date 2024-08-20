@@ -20,7 +20,7 @@ export const getStops = (bookingDict: BookingState, performanceDict: Performance
           }
         });
         BookingDate = lastPerformanceDate?.toISOString();
-        if (StatusCode !== 'X') {
+        if (StatusCode !== 'X' && StatusCode !== 'S') {
           (acc[BookingDate] = acc[BookingDate] || []).push(VenueId);
         }
         return acc;

@@ -22,6 +22,7 @@ import ProductionTaskList from 'components/tasks/modals/ProductionTaskList';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import Spinner from 'components/core-ui-lib/Spinner';
 import { isNullOrEmpty } from 'utils';
+import { useRouter } from 'next/router';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
@@ -29,7 +30,7 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
   const { users } = useRecoilValue(userState);
 
   const filter = useRecoilValue(tasksfilterState);
-
+  const router = useRouter();
   const usersList = useMemo(
     () =>
       Object.values(users).map(({ Id, FirstName = '', LastName = '' }) => ({
@@ -51,13 +52,7 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
   const [isMasterTaskList, setIsMasterTaskList] = useState<boolean>(false);
   const [isProductionTaskList, setIsProductionTaskList] = useState<boolean>(false);
   const [isShowSpinner, setIsShowSpinner] = useState<boolean>(false);
-
-  const { selected: ProductionId } = useRecoilValue(productionJumpState);
-  const handleShowTask = () => {
-    setShowAddTask(false);
-  };
-
-  const isFilterMatchingInitialState = () => {
+  const filterMatchingInitial = useMemo(() => {
     const { assignee, endDueDate, startDueDate, status, taskText, production } = filter;
     return (
       assignee === intialTasksState.assignee &&
@@ -67,12 +62,17 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
       taskText === intialTasksState.taskText &&
       !isNullOrEmpty(production)
     );
+  }, [filter]);
+
+  const { selected: ProductionId } = useRecoilValue(productionJumpState);
+  const handleShowTask = () => {
+    setShowAddTask(false);
   };
 
   useEffect(() => {
     if (filteredProductions.length === 1) {
       filteredProductions.forEach((production) => {
-        if (production.Tasks.length === 0 && isFilterMatchingInitialState()) {
+        if (production.Tasks.length === 0 && filterMatchingInitial) {
           setShowEmptyProductionModal(true);
         } else {
           setShowEmptyProductionModal(false);
@@ -100,11 +100,13 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
     else setIsProductionTaskList(true);
   };
 
-  const handleMasterListClose = (_val: string) => {
+  const handleMasterListClose = async (_val: string) => {
+    await router.replace(router.asPath);
     setIsMasterTaskList(false);
   };
 
-  const handleProductionListClose = (_val: string) => {
+  const handleProductionListClose = async (_val: string) => {
+    await router.replace(router.asPath);
     setIsProductionTaskList(false);
     setIsMasterTaskList(false);
   };
