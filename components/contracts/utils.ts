@@ -233,7 +233,8 @@ export const parseAndSortDates = (arr: string[]): DateTimeEntry[] => {
   );
 
   const result = Object.entries(groupedByDate).map(([date, times]) => {
-    const formattedDate = `${date} ${times.join(' ')}`;
+    const sortedTimes = times.filter(Boolean).sort();
+    const formattedDate = sortedTimes.length > 0 ? `${date} ${sortedTimes.join(' ')}` : date;
     return { formattedDate, id: nanoid() };
   });
 
