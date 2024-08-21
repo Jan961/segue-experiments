@@ -39,7 +39,7 @@ class ContractsHelper {
       Id: venueId,
       CurrencyCode: currencyCode,
     } = this.venueDict[VenueId] || {};
-    const performanceTimes = PerformanceIds.map(
+    const PerformanceTimes = PerformanceIds.map(
       (performanceId) =>
         `${this.performanceDict[performanceId]?.Time?.substring(0, 5) ?? ''}? ${this.performanceDict[performanceId]
           ?.Date}`,
@@ -53,7 +53,7 @@ class ContractsHelper {
       town,
       capacity,
       note,
-      performanceTimes,
+      PerformanceTimes,
       performanceCount: PerformanceIds?.length || 0,
       runTag,
       pencilNo: PencilNum,

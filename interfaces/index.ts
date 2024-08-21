@@ -650,7 +650,7 @@ export interface VenueContractFormData {
   Notes: string;
   MerchandiseNotes: string;
   RoyaltyPercentage: string;
-  performanceTimes: string[];
+  PerformanceTimes: string[];
   performanceCount: string;
   DealNotes: string;
   status: string;

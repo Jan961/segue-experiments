@@ -54,7 +54,8 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
     ...initialEditContractFormData,
     ...selectedTableCell.contract,
   });
-  console.log(formData.performanceTimes);
+  console.log('Table Cell:', selectedTableCell.contract);
+  console.log('Resulting Form Data:', formData);
   const [dealMemoFormData, setDealMemoFormData] = useState<Partial<DealMemoContractFormData>>({});
   const [demoModalData, setDemoModalData] = useState<Partial<DealMemoContractFormData>>({});
   const [modalTitle, setModalTitle] = useState<string>(
@@ -506,7 +507,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
               <div className=" text-primary-input-text text-sm ml-5">{formData.performanceCount}</div>
               <div className=" text-primary-input-text font-bold text-sm ml-4">Times</div>
               <div>
-                {parseAndSortDates(formData.performanceTimes).map((dateTimeEntry) => {
+                {parseAndSortDates(formData.PerformanceTimes).map((dateTimeEntry) => {
                   return (
                     <div key={dateTimeEntry.id} className=" text-primary-input-text  text-sm ml-4">
                       {dateTimeEntry.formattedDate}
