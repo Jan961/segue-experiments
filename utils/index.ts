@@ -108,3 +108,10 @@ export const isUndefined = (value: unknown): boolean => value === undefined;
 export const isNullOrUndefined = (value: unknown): boolean => isNull(value) || isUndefined(value);
 
 export const noop = () => null;
+
+export const checkDecimalStringFormat = (decimalString: string, precision: number, scale: number, regex?: RegExp) => {
+  const [integerPart, fractionalPart] = decimalString.split('.');
+  if (regex && !regex.test(decimalString)) return false;
+  if (integerPart.length > precision - scale || (fractionalPart && fractionalPart.length > scale)) return false;
+  return true;
+};

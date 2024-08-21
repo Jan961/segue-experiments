@@ -12,7 +12,7 @@ import { startOfDay } from 'date-fns';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import { hasActivityChanged } from '../utils';
 import { ConfDialogVariant } from 'components/core-ui-lib/ConfirmationDialog/ConfirmationDialog';
-import checkDecimalStringFormat from 'utils/decimalFormat';
+import { checkDecimalStringFormat } from 'utils';
 
 export type ActivityModalVariant = 'add' | 'edit' | 'delete';
 
@@ -107,7 +107,8 @@ export default function ActivityModal({
   };
 
   const validateCost = (type: string, value: string, precision: number, scale: number) => {
-    if (checkDecimalStringFormat(value, precision, scale)) {
+    const regex = /^$|^\d+(\.\d*)?$/;
+    if (checkDecimalStringFormat(value, precision, scale, regex)) {
       if (type === 'venueCost') {
         setVenueCost(value);
       } else if (type === 'companyCost') {
