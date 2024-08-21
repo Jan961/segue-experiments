@@ -54,8 +54,6 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
     ...initialEditContractFormData,
     ...selectedTableCell.contract,
   });
-  console.log('Table Cell:', selectedTableCell.contract);
-  console.log('Resulting Form Data:', formData);
   const [dealMemoFormData, setDealMemoFormData] = useState<Partial<DealMemoContractFormData>>({});
   const [demoModalData, setDemoModalData] = useState<Partial<DealMemoContractFormData>>({});
   const [modalTitle, setModalTitle] = useState<string>(
@@ -665,7 +663,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
               <div className="w-4/5 flex items-center justify-between">
                 <div className="flex  items-center">
                   <div className=" text-primary-input-text font-bold text-sm mr-1">
-                    {charCodeToCurrency(formData.currencyCode)}
+                    {charCodeToCurrency(formData.CurrencyCode)}
                   </div>
                   <TextInput
                     id="venueText"

@@ -37,7 +37,7 @@ class ContractsHelper {
       Seats: capacity,
       Count: count,
       Id: venueId,
-      CurrencyCode: currencyCode,
+      CurrencyCode,
     } = this.venueDict[VenueId] || {};
     const PerformanceTimes = PerformanceIds.map(
       (performanceId) =>
@@ -58,7 +58,7 @@ class ContractsHelper {
       runTag,
       pencilNo: PencilNum,
       isBooking: true,
-      currencyCode,
+      CurrencyCode,
     };
   }
 

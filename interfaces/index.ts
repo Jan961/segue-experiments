@@ -655,7 +655,7 @@ export interface VenueContractFormData {
   DealNotes: string;
   status: string;
   SignedBy: string;
-  currencyCode: string;
+  CurrencyCode: string;
   FirstDate: string;
   Id: string;
   BankDetailsSent: boolean;
