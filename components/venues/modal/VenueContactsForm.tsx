@@ -91,9 +91,6 @@ const VenueContactForm = ({
     const updatedContacts = [...venueContacts];
     updatedContacts[rowIndex][column.colId] = value;
 
-    // Sort the updated contacts based on the Role column
-    updatedContacts.sort((a, b) => a.roleName?.localeCompare(b.roleName));
-
     setVenueContacts(updatedContacts);
     const updatedFormData = {
       ...venue,
