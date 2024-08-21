@@ -16,11 +16,12 @@ export const dealTypeOptions: SelectOption[] = [
   { text: 'Call Multiple', value: 'CM' },
   { text: 'First Call Against Split', value: 'FCAS' },
 ];
+
 export const allStatusOptions: SelectOption[] = [{ text: 'All', value: 'all' }, ...statusOptions];
 
 export const booleanOptions = [
-  { text: 'YES', value: 1 },
-  { text: 'NO', value: 2 },
+  { text: 'YES', value: true },
+  { text: 'NO', value: false },
 ];
 
 export const callOptions = [
@@ -204,11 +205,11 @@ export const initialEditDemoFormData = {
 export const salaryPaidToOptions = [
   {
     text: 'Agent',
-    value: 'agent',
+    value: 'A',
   },
   {
     text: 'Company Member',
-    value: 'companyMember',
+    value: 'C',
   },
 ];
 
@@ -249,3 +250,83 @@ export const workTypeOptions = [
   { text: 'Wigs', value: 34 },
   { text: 'Writer', value: 35 },
 ];
+
+export const paymentTypes = [
+  {
+    text: 'Weekly Payment',
+    value: 'W',
+  },
+  {
+    text: 'Total Fee',
+    value: 'O',
+  },
+];
+
+export const contractDepartmentOptions = [
+  {
+    text: 'Artiste',
+    value: 1,
+  },
+  {
+    text: 'Creative',
+    value: 2,
+  },
+  {
+    text: 'SM / Tech / Crew',
+    value: 3,
+  },
+];
+
+export const contractTemplateOptions = [
+  {
+    text: 'Jendagi Template',
+    value: 1,
+  },
+];
+
+export enum CompanyContractStatus {
+  NotYetIssued = 'CNI',
+  Issued = 'CI',
+  QuestionsRaised = 'CIQR',
+  SignedAndReturned = 'CSR',
+  Overdue = 'CO',
+}
+
+export const companyContractStatusOrder = {
+  [CompanyContractStatus.Overdue]: 1,
+  [CompanyContractStatus.QuestionsRaised]: 2,
+  [CompanyContractStatus.Issued]: 3,
+  [CompanyContractStatus.NotYetIssued]: 4,
+  [CompanyContractStatus.SignedAndReturned]: 5,
+};
+
+export const companyContractStatusOptions = [
+  {
+    text: 'Not Yet Issued',
+    value: CompanyContractStatus.NotYetIssued,
+  },
+  {
+    text: 'Issued',
+    value: CompanyContractStatus.Issued,
+  },
+  {
+    text: 'Questions Raised',
+    value: CompanyContractStatus.QuestionsRaised,
+  },
+  {
+    text: 'Signed and Returned',
+    value: CompanyContractStatus.SignedAndReturned,
+  },
+  {
+    text: 'Overdue',
+    value: CompanyContractStatus.Overdue,
+  },
+];
+
+export const statusToBgColorMap = {
+  [CompanyContractStatus.NotYetIssued]: 'white',
+  [CompanyContractStatus.Issued]: '#FFE606',
+  [CompanyContractStatus.QuestionsRaised]: '#FF7E07',
+  [CompanyContractStatus.SignedAndReturned]: '#10841C',
+  [CompanyContractStatus.Overdue]: '#ED1111',
+};

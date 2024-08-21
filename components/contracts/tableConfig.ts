@@ -4,12 +4,15 @@ import VenueColumnRenderer from './table/VenueColumnRenderer';
 import DateColumnRenderer from './table/DateColumnRenderer';
 import { tileColors } from 'config/global';
 import InputRenderer from 'components/global/salesTable/renderers/InputRenderer';
-import NoteColumnRenderer from 'components/bookings/table/NoteColumnRenderer';
 import DefaultTextRenderer from 'components/core-ui-lib/Table/renderers/DefaultTextRenderer';
 import formatInputDate from 'utils/dateInputFormat';
 import { getTimeFromDateAndTime } from 'services/dateService';
 import ButtonRenderer from 'components/core-ui-lib/Table/renderers/ButtonRenderer';
 import IconRowRenderer from 'components/global/salesTable/renderers/IconRowRenderer';
+import SelectCellRenderer from 'components/core-ui-lib/Table/renderers/SelectCellRenderer';
+import { statusOptions, statusToBgColorMap } from 'config/contracts';
+import DateRenderer from 'components/core-ui-lib/Table/renderers/DateRenderer';
+import NotesRenderer from 'components/core-ui-lib/Table/renderers/NotesRenderer';
 
 export const contractsStyleProps = { headerColor: tileColors.contracts };
 
@@ -73,50 +76,116 @@ export const contractsColumnDefs = [
   },
 ];
 
-export const companyContractsColumnDefs = [
+export const getCompanyContractsColumnDefs = (userList = []) => [
   {
     headerName: 'First Name',
-    field: 'Last Name',
+    field: 'firstName',
     cellRenderer: DefaultCellRenderer,
-    width: 120,
-    minWidth: 120,
+    width: 150,
+    flex: 1,
+    cellStyle: function (params) {
+      const { status } = params.data;
+      console.log(status, statusToBgColorMap[status]);
+      return { backgroundColor: statusToBgColorMap[status] || 'white' };
+    },
   },
   {
     headerName: 'Last Name',
-    field: 'date',
-    cellRenderer: DateColumnRenderer,
-    width: 120,
-    minWidth: 120,
-    cellClassRules: {
-      isMonday: (params) => params.value.includes('Mon'),
+    field: 'lastName',
+    cellRenderer: DefaultCellRenderer,
+    width: 150,
+    flex: 1,
+    cellStyle: function (params) {
+      const { status } = params.data;
+      return { backgroundColor: statusToBgColorMap[status] || 'white' };
     },
   },
-  { headerName: 'Role', field: 'week', cellRenderer: DefaultCellRenderer, width: 140 },
+  { headerName: 'Role', field: 'role', cellRenderer: DefaultCellRenderer, width: 140, flex: 1, editable: true },
   {
     headerName: 'Contract Status',
-    field: 'venue',
-    cellRenderer: VenueColumnRenderer,
+    field: 'status',
+    cellRenderer: SelectCellRenderer,
+    valueGetter: (params) => params?.data?.status,
     width: 100,
     minWidth: 100,
+    flex: 1,
+    editable: true,
+    cellRendererParams: () => ({
+      options: statusOptions,
+      isSearchable: true,
+    }),
   },
-  { headerName: '', field: 'actionBtn', cellRenderer: DefaultCellRenderer, minWidth: 100, flex: 1 },
-  { headerName: 'Completed By', field: 'capacity', cellRenderer: DefaultCellRenderer, width: 150 },
-  { headerName: 'Checked By', field: 'performanceCount', cellRenderer: DefaultCellRenderer, width: 90 },
-  { headerName: 'Date Issued', field: 'contractStatus', cellRenderer: ContractStatusCellRenderer, width: 180 },
+  {
+    headerName: '',
+    field: 'edit',
+    width: 60,
+    cellRenderer: ButtonRenderer,
+    cellRendererParams: {
+      buttonText: 'Edit',
+      variant: 'primary',
+      width: 60,
+    },
+    resizable: false,
+    headerClass: 'text-center',
+  },
+  {
+    headerName: '',
+    field: 'pdf',
+    width: 100,
+    cellRenderer: ButtonRenderer,
+    cellRendererParams: () => ({
+      buttonText: 'Save as PDF',
+      variant: 'primary',
+      width: 90,
+    }),
+    cellStyle: {
+      paddingRight: '0.5em',
+    },
+  },
+  {
+    headerName: 'Completed By',
+    field: 'completedBy',
+    cellRenderer: SelectCellRenderer,
+    width: 150,
+    flex: 1,
+    editable: true,
+    valueGetter: (params) => params?.data?.completedBy,
+    cellRendererParams: () => ({
+      options: userList,
+      isSearchable: true,
+    }),
+  },
+  {
+    headerName: 'Checked By',
+    field: 'checkedBy',
+    cellRenderer: SelectCellRenderer,
+    width: 90,
+    flex: 1,
+    editable: true,
+    valueGetter: (params) => params?.data?.checkedBy,
+    cellRendererParams: () => ({
+      options: userList,
+      isSearchable: true,
+    }),
+  },
+  { headerName: 'Date Issued', field: 'dateIssue', cellRenderer: DateRenderer, flex: 1, width: 180 },
   {
     headerName: 'Date Returned',
-    field: 'contractStatus',
-    cellRenderer: ContractStatusCellRenderer,
+    field: 'dateReturned',
+    cellRenderer: DateRenderer,
     resizable: false,
     width: 180,
+    flex: 1,
   },
   {
     headerName: '',
     field: 'notes',
-    cellRenderer: NoteColumnRenderer,
-    headerClass: [''],
+    cellRenderer: NotesRenderer,
+    headerClass: ['bgOrangeTextWhite'],
     cellRendererParams: {
       tpActive: true,
+      activeFillColor: '#082B4B',
+      strokeColor: '#082B4B',
     },
     resizable: false,
     width: 50,
