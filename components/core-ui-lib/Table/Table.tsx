@@ -104,6 +104,7 @@ export default forwardRef(function Table(
       type: 'fitGridWidth',
       defaultMinWidth: 50,
     },
+    stopEditingWhenCellsLoseFocus: true,
   };
 
   const onGridReady = (params: GridReadyEvent) => {
