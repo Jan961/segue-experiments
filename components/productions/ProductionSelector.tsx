@@ -4,10 +4,11 @@ import { useCallback, useMemo, useState } from 'react';
 
 interface ProductionSelectorProps {
   productions: Partial<ProductionDTO>[];
+  testId?: string;
   onChange: (value: number) => void;
 }
 
-const ProductionSelector = ({ productions, onChange }: ProductionSelectorProps) => {
+const ProductionSelector = ({ productions, testId, onChange }: ProductionSelectorProps) => {
   const [includeArchived, setIncludeArchived] = useState<boolean>(false);
   const [selectedProduction, setSelectedProduction] = useState<number>();
   const options = useMemo(() => {
@@ -53,6 +54,7 @@ const ProductionSelector = ({ productions, onChange }: ProductionSelectorProps) 
       <div className="rounded-l-md">
         <div className="flex items-center">
           <Select
+            testId={testId}
             className="border-0 !shadow-none w-[410px]"
             label="Production"
             onChange={(value) => onSelectionChange(value as number)}
