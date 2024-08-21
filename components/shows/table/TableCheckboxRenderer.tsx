@@ -3,10 +3,12 @@ import classNames from 'classnames';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import CheckboxRenderer from 'components/core-ui-lib/Table/renderers/CheckboxRenderer';
 import { useEffect, useState } from 'react';
+import Tooltip, { TooltipProps } from 'components/core-ui-lib/Tooltip/Tooltip';
 
-interface CheckPerfRendererProps extends ICellRendererParams {
+interface CheckPerfRendererProps extends ICellRendererParams, TooltipProps {
   dayTypeOptions: SelectOption[];
   disabled?: boolean;
+  tpActive?: boolean;
 }
 
 const TableCheckboxRenderer = ({
@@ -17,6 +19,8 @@ const TableCheckboxRenderer = ({
   value,
   colDef,
   disabled,
+  tpActive = false,
+  ...tooltipProps
 }: CheckPerfRendererProps) => {
   const [perfChecked, setPerfChecked] = useState<boolean>(false);
 
@@ -34,7 +38,7 @@ const TableCheckboxRenderer = ({
     });
   };
 
-  return (
+  const checkboxElement = (
     <CheckboxRenderer
       className={classNames({ 'opacity-30': disabled })}
       disabled={disabled}
@@ -44,5 +48,25 @@ const TableCheckboxRenderer = ({
       id="perf"
     />
   );
+
+  return (
+    <div>
+      {tpActive ? (
+        <Tooltip
+          title={tooltipProps.title}
+          body={tooltipProps.body}
+          position={tooltipProps.position}
+          height={tooltipProps.height}
+          width={tooltipProps.width}
+          bgColorClass={tooltipProps.bgColorClass}
+        >
+          {checkboxElement}
+        </Tooltip>
+      ) : (
+        checkboxElement
+      )}
+    </div>
+  );
 };
+
 export default TableCheckboxRenderer;

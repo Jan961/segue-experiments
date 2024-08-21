@@ -3,12 +3,12 @@ import DateInput from './DateInput';
 
 describe('DateInput Component', () => {
   const handleChange = jest.fn();
+
   test('renders without crashing', () => {
     render(<DateInput onChange={handleChange} />);
   });
 
   test('updates value when input changes', () => {
-    const handleChange = jest.fn();
     render(<DateInput onChange={handleChange} />);
     const input = screen.getByTestId('date-input');
     fireEvent.change(input, { target: { value: '20/03/22' } });
@@ -16,13 +16,13 @@ describe('DateInput Component', () => {
   });
 
   test('renders with provided props', () => {
-    const handleChange = jest.fn();
     const inputClass = 'custom-input';
     const error = 'Invalid date';
     const minDate = new Date('2022-01-01');
     const maxDate = new Date('2022-12-31');
     const placeholder = 'Select date';
-    const position = 24;
+    const position = '';
+
     render(
       <DateInput
         onChange={handleChange}
@@ -40,7 +40,6 @@ describe('DateInput Component', () => {
   });
 
   test('clears input value when blurred with empty value', () => {
-    const handleChange = jest.fn();
     render(<DateInput onChange={handleChange} />);
     const input = screen.getByTestId('date-input');
     fireEvent.change(input, { target: { value: '' } });
@@ -60,5 +59,13 @@ describe('DateInput Component', () => {
     render(<DateInput onChange={handleChange} label="Start Date" labelClassName={labelClassName} />);
     const label = screen.getByText('Start Date');
     expect(label).toHaveClass(labelClassName);
+  });
+
+  test('renders with disabled state', () => {
+    render(<DateInput onChange={handleChange} disabled={true} />);
+
+    // Check if the input field is disabled
+    const input = screen.getByTestId('date-input');
+    expect(input).toBeDisabled();
   });
 });

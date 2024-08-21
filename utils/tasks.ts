@@ -1,6 +1,7 @@
 import { SelectOption } from 'components/global/forms/FormInputSelect';
 import { TasksFilterType } from 'state/tasks/tasksFilterState';
 import { ProductionsWithTasks } from 'state/tasks/productionState';
+import { isNullOrEmpty } from './index';
 
 export const priorityOptions: SelectOption[] = [
   { text: 'Immediate', value: 1 },
@@ -81,4 +82,35 @@ export const getPriority = (priority) => {
     default:
       break;
   }
+};
+
+export const sortProductionTasksByDueAndAlpha = (taskList: any[]) => {
+  return taskList.map((production) => {
+    return {
+      ...production,
+      Tasks: sortTasksByDueAndAlpha(production.Tasks),
+    };
+  });
+};
+
+export const sortTasksByDueAndAlpha = (taskList: any[]) => {
+  const noStartWeeks = [];
+  const validTasks = [];
+  taskList.forEach((task) => {
+    if (isNullOrEmpty(task.StartByWeekNum)) {
+      noStartWeeks.push(task);
+    } else {
+      validTasks.push(task);
+    }
+  });
+
+  return [
+    ...noStartWeeks.sort((a, b) => a.Name.localeCompare(b.Name)),
+    ...validTasks.sort((a, b) => {
+      if (a.StartByWeekNum === b.StartByWeekNum) {
+        return a.Name.localeCompare(b.Name);
+      }
+      return a.StartByWeekNum - b.StartByWeekNum;
+    }),
+  ];
 };

@@ -278,11 +278,16 @@ export const salesColDefs = (schoolDataAvail, isMarketing, booking, setSalesActi
           headerName: 'Seat Sold No.',
           field: 'genSeatsSold',
           cellRenderer: function (params) {
-            if (params.data.genSeatsSold === '') {
-              const prevSeats = params.api.getDisplayedRowAtIndex(params.node.rowIndex - 1)?.data.genSeatsSold;
-              return prevSeats === '' || prevSeats === undefined ? '-' : prevSeats;
+            // if final sales are 0, they have bene deleted off - return blank
+            if (params.data.isFinal && parseInt(params.data.genSeatsSold) === 0) {
+              return '';
             } else {
-              return params.data.genSeatsSold;
+              if (params.data.genSeatsSold === '') {
+                const prevSeats = params.api.getDisplayedRowAtIndex(params.node.rowIndex - 1)?.data.genSeatsSold;
+                return prevSeats === '' || prevSeats === undefined ? '-' : prevSeats;
+              } else {
+                return params.data.genSeatsSold;
+              }
             }
           },
           width: 90,
@@ -296,14 +301,21 @@ export const salesColDefs = (schoolDataAvail, isMarketing, booking, setSalesActi
           resizable: false,
         },
         {
-          headerName: 'Seats Sold ',
+          headerName: 'Seats Sold',
           field: 'seatsSaleChange',
           cellRenderer: function (params) {
-            if (params.data.genTotalValue === 0 || params.data.genTotalValue === '') {
-              const prevTotal = params.api.getDisplayedRowAtIndex(params.node.rowIndex - 1)?.data.genTotalValue;
-              if (prevTotal) return !prevTotal ? '-' : stripSymbolAndRound(prevTotal.toString());
+            // if final sales value is 0, they have bene deleted off - return blank
+            // remove symbol for check
+            const salesValue = stripSymbolAndRound(params.data.genTotalValue);
+            if (params.data.isFinal && parseInt(salesValue) === 0) {
+              return '';
             } else {
-              return valueWithCurrency(params.data.genTotalValue);
+              if (params.data.genTotalValue === 0 || params.data.genTotalValue === '') {
+                const prevTotal = params.api.getDisplayedRowAtIndex(params.node.rowIndex - 1)?.data.genTotalValue;
+                if (prevTotal) return !prevTotal ? '-' : stripSymbolAndRound(prevTotal.toString());
+              } else {
+                return valueWithCurrency(params.data.genTotalValue);
+              }
             }
           },
           width: 90,
@@ -336,10 +348,15 @@ export const salesColDefs = (schoolDataAvail, isMarketing, booking, setSalesActi
           headerName: 'Reserved ',
           field: 'genReservations',
           cellRenderer: function (params) {
-            const currencySymbol = params.data.genReservations.charAt(0);
-            return params.data.genReservations === ''
-              ? '-'
-              : currencySymbol + stripSymbolAndRound(params.data.genReservations);
+            // if final week reserved values are not displayed
+            if (params.data.isFinal) {
+              return '-';
+            } else {
+              const currencySymbol = params.data.genReservations.charAt(0);
+              return params.data.genReservations === ''
+                ? '-'
+                : currencySymbol + stripSymbolAndRound(params.data.genReservations);
+            }
           },
           width: 100,
           cellStyle: {
@@ -362,7 +379,17 @@ export const salesColDefs = (schoolDataAvail, isMarketing, booking, setSalesActi
           headerName: 'Seat Sold No.',
           field: 'schSeatsSold',
           cellRenderer: function (params) {
-            return params.data.schSeatsSold || 0;
+            // if final sales are 0, they have bene deleted off - return blank
+            if (params.data.isFinal && parseInt(params.data.schSeatsSold) === 0) {
+              return '';
+            } else {
+              if (params.data.schSeatsSold === '') {
+                const prevSeats = params.api.getDisplayedRowAtIndex(params.node.rowIndex - 1)?.data.schSeatsSold;
+                return prevSeats === '' || prevSeats === undefined ? '-' : prevSeats;
+              } else {
+                return params.data.schSeatsSold;
+              }
+            }
           },
           width: 90,
           cellStyle: {
@@ -375,14 +402,21 @@ export const salesColDefs = (schoolDataAvail, isMarketing, booking, setSalesActi
           resizable: false,
         },
         {
-          headerName: 'Seats Sold ',
+          headerName: 'Seats Sold',
           field: 'seatsSaleChange',
           cellRenderer: function (params) {
-            if (isNullOrEmpty(params.data.schTotalValue)) {
-              const prevTotal = params.api.getDisplayedRowAtIndex(params.node.rowIndex - 1)?.data.schTotalValue;
-              if (prevTotal) return !prevTotal ? '-' : stripSymbolAndRound(prevTotal.toString());
+            // if final sales value is 0, they have bene deleted off - return blank
+            // remove symbol for check
+            const salesValue = stripSymbolAndRound(params.data.schTotalValue);
+            if (params.data.isFinal && parseInt(salesValue) === 0) {
+              return '';
             } else {
-              return valueWithCurrency(params.data.schTotalValue);
+              if (isNullOrEmpty(params.data.schTotalValue)) {
+                const prevTotal = params.api.getDisplayedRowAtIndex(params.node.rowIndex - 1)?.data.schTotalValue;
+                if (prevTotal) return !prevTotal ? '-' : stripSymbolAndRound(prevTotal.toString());
+              } else {
+                return valueWithCurrency(params.data.schTotalValue);
+              }
             }
           },
           width: 90,
@@ -399,7 +433,12 @@ export const salesColDefs = (schoolDataAvail, isMarketing, booking, setSalesActi
           headerName: 'Reserved No',
           field: 'schReserved',
           cellRenderer: function (params) {
-            return params.data.schReserved || 0;
+            // if final week reserved values are not displayed
+            if (params.data.isFinal) {
+              return '-';
+            } else {
+              return params.data.schReserved || 0;
+            }
           },
           width: 100,
           cellStyle: {
@@ -415,13 +454,18 @@ export const salesColDefs = (schoolDataAvail, isMarketing, booking, setSalesActi
           headerName: 'Reserved ',
           field: 'schReservations',
           cellRenderer: function (params) {
-            if (params.data.schReservations === '') {
-              const previousRev = params.api.getDisplayedRowAtIndex(params.node.rowIndex - 1)?.data.schReservations;
-              if (previousRev) return !previousRev ? '-' : stripSymbolAndRound(previousRev.toString());
+            // if final week reserved values are not displayed
+            if (params.data.isFinal) {
+              return '-';
             } else {
-              return params.data.schReservations === ''
-                ? valueWithCurrency('00.00')
-                : valueWithCurrency(params.data.schReservations);
+              if (params.data.schReservations === '') {
+                const previousRev = params.api.getDisplayedRowAtIndex(params.node.rowIndex - 1)?.data.schReservations;
+                if (previousRev) return !previousRev ? '-' : valueWithCurrency(previousRev);
+              } else {
+                return params.data.schReservations === ''
+                  ? valueWithCurrency('00.00')
+                  : valueWithCurrency(params.data.schReservations);
+              }
             }
           },
           width: 100,
