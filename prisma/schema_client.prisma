@@ -1168,7 +1168,6 @@ view BookingHoldCompUnionView {
   @@ignore
 }
 
-/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view ScheduleView {
   ProductionId        Int       @default(0)
   FullProductionCode  String?   @db.VarChar(20)
@@ -1193,7 +1192,7 @@ view ScheduleView {
   AffectsAvailability Bytes?    @db.VarBinary(1)
   SeqNo               Decimal?  @db.Decimal(4, 0)
 
-  @@ignore
+  @@id([EntryDate, ProductionId, EntryId])
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
