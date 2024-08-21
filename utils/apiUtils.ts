@@ -1,6 +1,6 @@
 import { isUndefined } from 'utils';
 
-type FieldMapping = {
+export type FieldMapping = {
   key: string;
   updateKey: string;
   isDate?: boolean;

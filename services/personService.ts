@@ -2,6 +2,8 @@ import { PersonMinimalDTO } from 'interfaces';
 import prisma from 'lib/prisma';
 import { Person } from 'prisma/generated/prisma-client';
 import { isUndefined } from 'utils';
+import { FieldMapping, prepareUpdateData } from 'utils/apiUtils';
+import { prepareAccountUpdateData } from './contracts';
 
 interface AddressDetails {
   address1?: string;
@@ -15,38 +17,16 @@ interface AddressDetails {
 export const prepareAddressQueryData = (addressDetails: AddressDetails | null) => {
   if (!addressDetails) return null;
 
-  const { address1, address2, address3, town, postcode, country } = addressDetails;
+  const fieldMappings: FieldMapping[] = [
+    { key: 'address1', updateKey: 'Address1' },
+    { key: 'address2', updateKey: 'Address2' },
+    { key: 'address3', updateKey: 'Address3' },
+    { key: 'town', updateKey: 'AddressTown' },
+    { key: 'postcode', updateKey: 'AddressPostcode' },
+    { key: 'country', updateKey: 'Country', isForeignKey: true, foreignKeyId: 'Id' },
+  ];
 
-  const addressData: any = {};
-
-  if (!isUndefined(address1)) {
-    addressData.Address1 = address1;
-  }
-  if (!isUndefined(address2)) {
-    addressData.Address2 = address2;
-  }
-  if (!isUndefined(address3)) {
-    addressData.Address3 = address3;
-  }
-  if (!isUndefined(town)) {
-    addressData.AddressTown = town;
-  }
-  if (!isUndefined(postcode)) {
-    addressData.AddressPostcode = postcode;
-  }
-  if (!isUndefined(country)) {
-    if (country === null) {
-      addressData.Country = {
-        disconnect: true,
-      };
-    } else {
-      addressData.Country = {
-        connect: { Id: country },
-      };
-    }
-  }
-
-  return addressData;
+  return prepareUpdateData(addressDetails, fieldMappings);
 };
 
 interface OrganisationDetails {
@@ -151,89 +131,33 @@ export const preparePersonQueryData = (
 ) => {
   if (!personDetails) return null;
 
-  const {
-    firstName,
-    lastName,
-    email,
-    landline,
-    mobileNumber,
-    passportName,
-    passportExpiryDate,
-    hasUKWorkPermit,
-    isFEURequired,
-    notes,
-    healthDetails,
-    advisoryNotes,
-    workTypes,
-    otherWorkTypes,
-  } = personDetails;
+  const personFieldMappings: FieldMapping[] = [
+    { key: 'firstName', updateKey: 'PersonFirstName' },
+    { key: 'lastName', updateKey: 'PersonLastName' },
+    { key: 'email', updateKey: 'PersonEmail' },
+    { key: 'landline', updateKey: 'PersonPhone' },
+    { key: 'mobileNumber', updateKey: 'PersonMobile' },
+    { key: 'passportName', updateKey: 'PersonPassportName' },
+    { key: 'passportExpiryDate', updateKey: 'PersonPassportExpiryDate', isDate: true },
+    { key: 'hasUKWorkPermit', updateKey: 'PersonEligibleToWork' },
+    { key: 'isFEURequired', updateKey: 'PersonFEURequired' },
+    { key: 'notes', updateKey: 'PersonNotes' },
+    { key: 'healthDetails', updateKey: 'PersonHealthNotes' },
+    { key: 'advisoryNotes', updateKey: 'PersonAdvisoryNotes' },
+    { key: 'addressId', updateKey: 'Address', isForeignKey: true, foreignKeyId: 'AddressId' },
+    {
+      key: 'organisationId',
+      updateKey: 'Organisation_Person_PersonAgencyOrgIdToOrganisation',
+      isForeignKey: true,
+      foreignKeyId: 'OrgId',
+    },
+  ];
 
-  const personData: any = {};
+  let personData = prepareUpdateData({ ...personDetails, addressId, organisationId }, personFieldMappings);
 
-  if (!isUndefined(firstName)) {
-    personData.PersonFirstName = firstName;
-  }
-  if (!isUndefined(lastName)) {
-    personData.PersonLastName = lastName;
-  }
-  if (!isUndefined(email)) {
-    personData.PersonEmail = email;
-  }
-  if (!isUndefined(landline)) {
-    personData.PersonPhone = landline;
-  }
-  if (!isUndefined(mobileNumber)) {
-    personData.PersonMobile = mobileNumber;
-  }
-  if (!isUndefined(passportName)) {
-    personData.PersonPassportName = passportName;
-  }
-  if (!isUndefined(passportExpiryDate)) {
-    personData.PersonPassportExpiryDate = passportExpiryDate ? new Date(passportExpiryDate) : null;
-  }
-  if (!isUndefined(hasUKWorkPermit)) {
-    personData.PersonEligibleToWork = hasUKWorkPermit === 1;
-  }
-  if (!isUndefined(isFEURequired)) {
-    personData.PersonFEURequired = isFEURequired === 1;
-  }
-  if (!isUndefined(notes)) {
-    personData.PersonNotes = notes;
-  }
-  if (!isUndefined(healthDetails)) {
-    personData.PersonHealthNotes = healthDetails;
-  }
-  if (!isUndefined(advisoryNotes)) {
-    personData.PersonAdvisoryNotes = advisoryNotes;
-  }
-
-  if (!isUndefined(addressId)) {
-    if (addressId === null) {
-      personData.Address = {
-        disconnect: true,
-      };
-    } else {
-      personData.Address = {
-        connect: { AddressId: addressId },
-      };
-    }
-  }
-
-  if (!isUndefined(organisationId)) {
-    if (organisationId === null) {
-      personData.Organisation_Person_PersonAgencyOrgIdToOrganisation = {
-        disconnect: true,
-      };
-    } else {
-      personData.Organisation_Person_PersonAgencyOrgIdToOrganisation = {
-        connect: { OrgId: organisationId },
-      };
-    }
-  }
-
-  if (workTypes && workTypes.length > 0) {
+  if (personDetails.workTypes && personDetails.workTypes.length > 0) {
     personData.PersonPersonRole = {
-      create: workTypes.map((workTypeId) => ({
+      create: personDetails.workTypes.map((workTypeId) => ({
         PersonRole: {
           connect: {
             PersonRoleId: workTypeId,
@@ -242,9 +166,10 @@ export const preparePersonQueryData = (
       })),
     };
   }
-  if (otherWorkTypes && otherWorkTypes.length > 0) {
+
+  if (personDetails.otherWorkTypes && personDetails.otherWorkTypes.length > 0) {
     personData.PersonOtherRole = {
-      create: otherWorkTypes.map((roleName) => ({
+      create: personDetails.otherWorkTypes.map((roleName) => ({
         PORName: roleName,
       })),
     };
@@ -252,71 +177,17 @@ export const preparePersonQueryData = (
 
   // Handle salaryAccountDetails
   if (salaryAccountDetails) {
-    const { paidTo, accountName, accountNumber, sortCode, swift, iban, country } = salaryAccountDetails;
-
-    if (!isUndefined(paidTo)) {
-      personData.PersonPaymentTo = paidTo;
-    }
-    if (!isUndefined(accountName)) {
-      personData.PersonPaymentAccount = accountName;
-    }
-    if (!isUndefined(accountNumber)) {
-      personData.PersonPaymentAccount = accountNumber;
-    }
-    if (!isUndefined(sortCode)) {
-      personData.PersonPaymentSortCode = sortCode;
-    }
-    if (!isUndefined(swift)) {
-      personData.PersonPaymentSWIFTBIC = swift;
-    }
-    if (!isUndefined(iban)) {
-      personData.PersonPaymentIBAN = iban;
-    }
-    if (!isUndefined(country)) {
-      if (country === null) {
-        personData.Country_Person_PersonPaymentBankCountryIdToCountry = {
-          disconnect: true,
-        };
-      } else {
-        personData.Country_Person_PersonPaymentBankCountryIdToCountry = {
-          connect: { Id: country },
-        };
-      }
+    const salaryAccountData = prepareAccountUpdateData(salaryAccountDetails, true);
+    if (salaryAccountData) {
+      personData = { ...personData, ...salaryAccountData };
     }
   }
 
   // Handle expenseAccountDetails
   if (expenseAccountDetails) {
-    const { paidTo, accountName, accountNumber, sortCode, swift, iban, country } = expenseAccountDetails;
-
-    if (!isUndefined(paidTo)) {
-      personData.PersonExpensesTo = paidTo;
-    }
-    if (!isUndefined(accountName)) {
-      personData.PersonExpensesAccount = accountName;
-    }
-    if (!isUndefined(accountNumber)) {
-      personData.PersonExpensesAccount = accountNumber;
-    }
-    if (!isUndefined(sortCode)) {
-      personData.PersonExpensesSortCode = sortCode;
-    }
-    if (!isUndefined(swift)) {
-      personData.PersonExpensesSWIFTBIC = swift;
-    }
-    if (!isUndefined(iban)) {
-      personData.PersonExpensesIBAN = iban;
-    }
-    if (!isUndefined(country)) {
-      if (country === null) {
-        personData.Country_Person_PersonExpensesBankCountryIdToCountry = {
-          disconnect: true,
-        };
-      } else {
-        personData.Country_Person_PersonExpensesBankCountryIdToCountry = {
-          connect: { Id: country },
-        };
-      }
+    const expensesAccountData = prepareAccountUpdateData(salaryAccountDetails, false);
+    if (expensesAccountData) {
+      personData = { ...personData, ...expensesAccountData };
     }
   }
 

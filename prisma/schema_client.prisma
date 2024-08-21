@@ -599,6 +599,7 @@ model AccountUser {
   AccountUserProduction                                         AccountUserProduction[]
   BookingContactNotes                                           BookingContactNotes[]
   CompAllocation                                                CompAllocation[]
+  Person                                                        Person[]
 
   @@index([AccountId], map: "Account_AccountUser")
 }
@@ -1155,7 +1156,7 @@ model Person {
   PersonPassportExpiryDate                             DateTime?          @db.Date
   PersonEligibleToWork                                 Boolean            @default(dbgenerated("(b'0')")) @db.Bit(1)
   PersonFEURequired                                    Boolean            @default(dbgenerated("(b'0')")) @db.Bit(1)
-  PersonFEUCheckByUserId                               Int?
+  PersonFEUCheckByAccUserId                            Int?
   PersonNotes                                          String?            @db.LongText
   PersonHealthNotes                                    String?            @db.LongText
   PersonAdvisoryNotes                                  String?            @db.LongText
@@ -1173,11 +1174,12 @@ model Person {
   PersonExpensesSWIFTBIC                               String?            @db.VarChar(11)
   PersonExpensesIBAN                                   String?            @db.VarChar(34)
   PersonExpensesBankCountryId                          Int?
-  PersonLastModified                                   DateTime?          @db.DateTime(0)
   PersonPaymentAccountName                             String?            @db.VarChar(80)
   PersonExpensesAccountName                            String?            @db.VarChar(80)
+  PersonLastModified                                   DateTime?          @db.DateTime(0)
   ACCContract                                          ACCContract[]
   Organisation_Organisation_OrgContactPersonIdToPerson Organisation[]     @relation("Organisation_OrgContactPersonIdToPerson")
+  AccountUser                                          AccountUser?       @relation(fields: [PersonFEUCheckByAccUserId], references: [Id], onDelete: NoAction, map: "AccountUser_Person")
   Address                                              Address?           @relation(fields: [PersonAddressId], references: [AddressId], onDelete: Cascade, map: "Address_Person")
   Country_Person_PersonExpensesBankCountryIdToCountry  Country?           @relation("Person_PersonExpensesBankCountryIdToCountry", fields: [PersonExpensesBankCountryId], references: [Id], onDelete: Cascade, map: "Country_Person_ExpensesBank")
   Country_Person_PersonPaymentBankCountryIdToCountry   Country?           @relation("Person_PersonPaymentBankCountryIdToCountry", fields: [PersonPaymentBankCountryId], references: [Id], onDelete: Cascade, map: "Country_Person_PaymentBank")
@@ -1191,6 +1193,7 @@ model Person {
   @@index([PersonExpensesBankCountryId], map: "Country_Person_ExpensesBank")
   @@index([PersonPaymentBankCountryId], map: "Country_Person_PaymentBank")
   @@index([PersonAgencyOrgId], map: "Organisation_Person_Agent")
+  @@index([PersonFEUCheckByAccUserId], map: "AccountUser_Person")
 }
 
 model PersonOtherRole {
@@ -1625,7 +1628,7 @@ view SalesView {
   VenueCurrencySymbolUnicode  String?   @db.VarChar(30)
   ConversionToCurrencyCode    String?   @db.VarChar(3)
   ConversionRate              Decimal?  @db.Decimal(8, 4)
-  SetId                       Int       @default(0)
+  SetId                       Int      @default(0)
   SetSalesFiguresDate         DateTime? @db.Date
   SetBookingWeekNum           Int?      @db.SmallInt
   SetProductionWeekDate       DateTime? @db.Date
@@ -1637,7 +1640,7 @@ view SalesView {
   SetSingleSeats              Boolean?  @default(dbgenerated("(b'0')")) @db.Bit(1)
   SetBrochureReleased         Boolean?  @default(dbgenerated("(b'0')")) @db.Bit(1)
   SetIsCopy                   Boolean?  @default(dbgenerated("(b'0')")) @db.Bit(1)
-  SaleTypeName                String    @db.VarChar(45)
+  SaleTypeName                String   @db.VarChar(45)
   Seats                       Decimal?  @db.Decimal(32, 0)
   Value                       Decimal?  @db.Decimal(32, 2)
   TotalCapacity               Float?
