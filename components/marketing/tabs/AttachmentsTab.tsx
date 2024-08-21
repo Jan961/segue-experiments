@@ -76,17 +76,16 @@ const AttachmentsTab = forwardRef<AttachmentsTabRef, AttachmentsTabProps>((props
         FileOriginalFilename: response.data.originalFilename,
         FileURL: getFileUrl(response.data.location),
         FileUploadedDateTime: new Date(),
-        FileId: response.data.id,
       };
 
       // update in the database
-      await axios.post('/api/marketing/attachments/create', fileRec);
+      const { data: uploadedFile } = await axios.post('/api/marketing/attachments/create', fileRec);
 
       // append to table to prevent the need for an API call to get new data
       if (attachType === 'Production') {
-        setProdAttachRows([...prodAttachRows, fileRec]);
+        setProdAttachRows([...prodAttachRows, uploadedFile]);
       } else if (attachType === 'Venue') {
-        setVenueAttachRows([...venueAttachRows, fileRec]);
+        setVenueAttachRows([...venueAttachRows, uploadedFile]);
       }
     } catch (error) {
       onError(file[0].file, 'Error uploading file. Please try again.');
