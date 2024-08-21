@@ -27,6 +27,7 @@ const gridOptions = {
       rowNode.id = rowNode.data.roleName;
     });
   },
+  stopEditingWhenCellsLoseFocus: true,
 };
 
 const VenueContactForm = ({
