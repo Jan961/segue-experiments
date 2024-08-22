@@ -79,13 +79,13 @@ const AttachmentsTab = forwardRef<AttachmentsTabRef, AttachmentsTabProps>((props
       };
 
       // update in the database
-      await axios.post('/api/marketing/attachments/create', fileRec);
+      const { data: uploadedFile } = await axios.post('/api/marketing/attachments/create', fileRec);
 
       // append to table to prevent the need for an API call to get new data
       if (attachType === 'Production') {
-        setProdAttachRows([...prodAttachRows, fileRec]);
+        setProdAttachRows([...prodAttachRows, uploadedFile]);
       } else if (attachType === 'Venue') {
-        setVenueAttachRows([...venueAttachRows, fileRec]);
+        setVenueAttachRows([...venueAttachRows, uploadedFile]);
       }
     } catch (error) {
       onError(file[0].file, 'Error uploading file. Please try again.');
@@ -222,15 +222,17 @@ const AttachmentsTab = forwardRef<AttachmentsTabRef, AttachmentsTabProps>((props
             testId="tableProdAttach"
           />
 
-          <UploadModal
-            visible={showUploadModal}
-            title={attachType + ' Attachment'}
-            info="Please upload your file by dragging it into the grey box below or by clicking the upload cloud."
-            allowedFormats={attachmentMimeTypes.genericAttachment}
-            onClose={() => setShowUploadModal(false)}
-            maxFileSize={5120 * 1024} // 5MB
-            onSave={onSave}
-          />
+          {showUploadModal && (
+            <UploadModal
+              visible={showUploadModal}
+              title={attachType + ' Attachment'}
+              info="Please upload your file by dragging it into the grey box below or by clicking the upload cloud."
+              allowedFormats={attachmentMimeTypes.genericAttachment}
+              onClose={() => setShowUploadModal(false)}
+              maxFileSize={5120 * 1024} // 5MB
+              onSave={onSave}
+            />
+          )}
 
           <ConfirmationDialog
             variant="delete"
