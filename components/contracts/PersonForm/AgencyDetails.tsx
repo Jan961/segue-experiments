@@ -2,8 +2,9 @@ import { useCallback, useState } from 'react';
 import { noop } from 'utils';
 import { Select, TextInput } from 'components/core-ui-lib';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
+import { IAgencyDetails } from '../types';
 
-const defaultAgencyDetails = {
+export const defaultAgencyDetails = {
   firstName: '',
   lastName: '',
   email: '',
@@ -20,13 +21,14 @@ const defaultAgencyDetails = {
 };
 
 interface AgencyDetailsProps {
+  details?: Partial<IAgencyDetails>;
   disabled: boolean;
   onChange: (data: any) => void;
   countryOptionList: SelectOption[];
 }
 
-const AgencyDetails = ({ countryOptionList, onChange = noop, disabled = false }: AgencyDetailsProps) => {
-  const [agencyDetails, setAgencyDetails] = useState(defaultAgencyDetails);
+const AgencyDetails = ({ details, countryOptionList, onChange = noop, disabled = false }: AgencyDetailsProps) => {
+  const [agencyDetails, setAgencyDetails] = useState<IAgencyDetails>({ ...defaultAgencyDetails, ...details });
   const {
     firstName,
     lastName,
