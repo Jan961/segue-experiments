@@ -13,12 +13,11 @@ import { PersonMinimalDTO, StandardClauseDTO, UserDto } from 'interfaces';
 import { getAllCurrencylist } from 'services/productionService';
 import { fetchAllContracts, fetchAllStandardClauses, fetchDepartmentList } from 'services/contracts';
 import { IContractDepartment, IContractSummary } from 'interfaces/contracts';
-import { useRecoilValue } from 'recoil';
-import { companyContractSelector } from 'state/contracts/selectors/companyContractRowsSelector';
+import useCompanyContractsFilter from 'hooks/useCompanyContractsFilters';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const ContractsPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-  const rows = useRecoilValue(companyContractSelector);
+  const rows = useCompanyContractsFilter();
 
   return (
     <Layout title="Contracts | Segue" flush>

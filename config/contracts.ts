@@ -324,9 +324,22 @@ export const companyContractStatusOptions = [
 ];
 
 export const statusToBgColorMap = {
-  [CompanyContractStatus.NotYetIssued]: 'white',
-  [CompanyContractStatus.Issued]: '#FFE606',
-  [CompanyContractStatus.QuestionsRaised]: '#FF7E07',
-  [CompanyContractStatus.SignedAndReturned]: '#10841C',
-  [CompanyContractStatus.Overdue]: '#ED1111',
+  [CompanyContractStatus.NotYetIssued]: {
+    backgroundColor: 'white',
+  },
+  [CompanyContractStatus.Issued]: {
+    backgroundColor: '#FFE606',
+  },
+  [CompanyContractStatus.QuestionsRaised]: {
+    backgroundColor: '#FF7E07',
+    color: 'white',
+  },
+  [CompanyContractStatus.SignedAndReturned]: {
+    backgroundColor: '#10841C',
+    color: 'white',
+  },
+  [CompanyContractStatus.Overdue]: {
+    backgroundColor: '#ED1111',
+    color: 'white',
+  },
 };

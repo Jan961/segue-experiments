@@ -1,6 +1,6 @@
 import Table from 'components/core-ui-lib/Table';
 import { contractsStyleProps, getCompanyContractsColumnDefs } from 'components/contracts/tableConfig';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { IContractSummary } from 'interfaces/contracts';
 import { userState } from 'state/account/userState';
 import { transformToOptions } from 'utils';
@@ -29,12 +29,7 @@ export default function CompanyContractsTable({ rowData = [] }: ContractsTablePr
   const { users } = useRecoilValue(userState);
   const [contracts, setContracts] = useRecoilState(contractListState);
   const [notesPopupContext, setNotesPopupContext] = useState(defaultNotesPopupContext);
-  const [rows, setRows] = useState(rowData);
   const [editContract, setEditContract] = useState<Partial<BuildNewContractProps>>(defaultEditContractState);
-
-  useEffect(() => {
-    setRows(rowData);
-  }, [rowData]);
 
   const userOptionList = useMemo(
     () =>
@@ -71,11 +66,7 @@ export default function CompanyContractsTable({ rowData = [] }: ContractsTablePr
 
   const onCellValueChange = async (e) => {
     const contract = e.data;
-    const updatedContract = {
-      ...(contracts[contract.Id] || {}),
-      ...(contract || {}),
-    };
-    setContracts({ ...contracts, [contract.Id]: updatedContract });
+    updateContract(contract.id, contract);
   };
 
   const updateContract = useCallback(
@@ -108,7 +99,7 @@ export default function CompanyContractsTable({ rowData = [] }: ContractsTablePr
       <div className="w-full h-[calc(100%-140px)]">
         <Table
           columnDefs={columnDefs}
-          rowData={rows}
+          rowData={rowData}
           ref={tableRef}
           styleProps={contractsStyleProps}
           onCellValueChange={onCellValueChange}
