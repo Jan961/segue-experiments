@@ -55,6 +55,7 @@ export default function ActivityModal({
   const [error, setError] = useState<boolean>(false);
   const [confVariant, setConfVariant] = useState<ConfDialogVariant>('close');
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
+  const [showNameLengthError, setShowNameLengthError] = useState<boolean>(false);
 
   const initForm = () => {
     if (variant === 'add') {
@@ -156,6 +157,7 @@ export default function ActivityModal({
   useEffect(() => {
     setVisible(show);
     initForm();
+    setShowNameLengthError(false);
   }, [show]);
 
   return (
@@ -163,7 +165,14 @@ export default function ActivityModal({
       <PopupModal show={visible} onClose={() => handleConfirm('close')} showCloseIcon={true} hasOverlay={showConfirm}>
         <div className="h-[526px] w-[404px]">
           <div className="text-xl text-primary-navy font-bold mb-4">{titleOptions[variant]}</div>
-          <div className="text-base font-bold text-primary-input-text">Activity Name</div>
+          <div className="flex gap-x-2 align-middle">
+            <div className="text-base font-bold text-primary-input-text">Activity Name</div>
+            {showNameLengthError && (
+              <div className="text-xs text-primary-red flex items-center">
+                Please enter a Name less than 30 characters
+              </div>
+            )}
+          </div>
           <TextInput
             className="w-full mb-4"
             placeholder="Enter Activity Name"
@@ -173,6 +182,8 @@ export default function ActivityModal({
             onChange={(event) => {
               if (event.target.value.length <= 30) {
                 setActName(event.target.value);
+              } else {
+                setShowNameLengthError(true);
               }
             }}
           />
