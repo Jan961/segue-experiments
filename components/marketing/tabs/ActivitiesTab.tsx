@@ -267,76 +267,82 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
   };
 
   const saveActivity = async (variant: ActivityModalVariant, data: ActivityDTO) => {
-    if (variant === 'add') {
-      const result = await axios.post('/api/marketing/activities/create', data);
-      const addedActivity = result.data;
+    try {
+      if (variant === 'add') {
+        const result = await axios.post('/api/marketing/activities/create', data);
+        const addedActivity = result.data;
 
-      const newRow = {
-        actName: addedActivity.Name,
-        actType: actTypeList.find((type) => type.value === addedActivity.ActivityTypeId).text,
-        actDate: addedActivity.Date === '' ? null : addedActivity.Date,
-        followUpCheck: addedActivity.FollowUpRequired,
-        followUpDt: addedActivity.DueByDate,
-        companyCost: addedActivity.CompanyCost,
-        venueCost: addedActivity.VenueCost,
-        notes: addedActivity.Notes,
-        bookingId: addedActivity.BookingId,
-        id: addedActivity.Id,
-      };
-
-      const activityData = [...actRowData, newRow];
-
-      // re sort the rows to ensure the new field is put in the correct place chronologically
-      const sortedActivities = activityData.sort(
-        (a, b) => new Date(a.actDate).getTime() - new Date(b.actDate).getTime(),
-      );
-
-      setActRowData(sortedActivities);
-      calculateActivityTotals(sortedActivities);
-      setShowActivityModal(false);
-    } else if (variant === 'edit') {
-      if (hasActivityChanged(actRow, data)) {
-        await axios.post('/api/marketing/activities/update', data);
-
-        const updatedRow = {
-          actName: data.Name,
-          actType: actTypeList.find((type) => type.value === data.ActivityTypeId).text,
-          actDate: data.Date,
-          followUpCheck: data.FollowUpRequired,
-          followUpDt: data.DueByDate,
-          companyCost: data.CompanyCost,
-          venueCost: data.VenueCost,
-          notes: data.Notes,
-          bookingId: data.BookingId,
-          id: data.Id,
+        const newRow = {
+          actName: addedActivity.Name,
+          actType: actTypeList.find((type) => type.value === addedActivity.ActivityTypeId).text,
+          actDate: addedActivity.Date === '' ? null : addedActivity.Date,
+          followUpCheck: addedActivity.FollowUpRequired,
+          followUpDt: addedActivity.DueByDate,
+          companyCost: addedActivity.CompanyCost,
+          venueCost: addedActivity.VenueCost,
+          notes: addedActivity.Notes,
+          bookingId: addedActivity.BookingId,
+          id: addedActivity.Id,
         };
+
+        const activityData = [...actRowData, newRow];
+
+        // re sort the rows to ensure the new field is put in the correct place chronologically
+        const sortedActivities = activityData.sort(
+          (a, b) => new Date(a.actDate).getTime() - new Date(b.actDate).getTime(),
+        );
+
+        setActRowData(sortedActivities);
+        calculateActivityTotals(sortedActivities);
+        setShowActivityModal(false);
+      } else if (variant === 'edit') {
+        if (hasActivityChanged(actRow, data)) {
+          await axios.post('/api/marketing/activities/update', data);
+
+          const updatedRow = {
+            actName: data.Name,
+            actType: actTypeList.find((type) => type.value === data.ActivityTypeId).text,
+            actDate: data.Date,
+            followUpCheck: data.FollowUpRequired,
+            followUpDt: data.DueByDate,
+            companyCost: data.CompanyCost,
+            venueCost: data.VenueCost,
+            notes: data.Notes,
+            bookingId: data.BookingId,
+            id: data.Id,
+          };
+
+          const rowIndex = actRowData.findIndex((act) => act.id === data.Id);
+          const newRows = [...actRowData];
+          newRows[rowIndex] = updatedRow;
+
+          // re sort the rows to ensure the new field is put in the correct place chronologically
+          const sortedActivities = newRows.sort(
+            (a, b) => new Date(a.actDate).getTime() - new Date(b.actDate).getTime(),
+          );
+
+          calculateActivityTotals(sortedActivities);
+          setActRowData(sortedActivities);
+
+          setShowActivityModal(false);
+        } else {
+          setShowActivityModal(false);
+        }
+      } else if (variant === 'delete') {
+        await axios.post('/api/marketing/activities/delete', data);
 
         const rowIndex = actRowData.findIndex((act) => act.id === data.Id);
         const newRows = [...actRowData];
-        newRows[rowIndex] = updatedRow;
+        if (rowIndex !== -1) {
+          newRows.splice(rowIndex, 1);
+        }
 
-        // re sort the rows to ensure the new field is put in the correct place chronologically
-        const sortedActivities = newRows.sort((a, b) => new Date(a.actDate).getTime() - new Date(b.actDate).getTime());
-
-        calculateActivityTotals(sortedActivities);
-        setActRowData(sortedActivities);
-
-        setShowActivityModal(false);
-      } else {
-        setShowActivityModal(false);
+        calculateActivityTotals(newRows);
+        setActRowData(newRows);
+        setShowConfirm(false);
       }
-    } else if (variant === 'delete') {
-      await axios.post('/api/marketing/activities/delete', data);
-
-      const rowIndex = actRowData.findIndex((act) => act.id === data.Id);
-      const newRows = [...actRowData];
-      if (rowIndex !== -1) {
-        newRows.splice(rowIndex, 1);
-      }
-
-      calculateActivityTotals(newRows);
-      setActRowData(newRows);
-      setShowConfirm(false);
+    } catch (error) {
+      console.log(error);
     }
   };
 
