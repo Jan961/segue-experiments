@@ -107,9 +107,23 @@ export default function AddEditVenueModal({
     );
   };
 
+  const venueAddressToUrl = (venueInfo: UiTransformedVenue) => {
+    const { primaryAddress1, primaryAddress2, primaryAddress3, primaryTown, primaryPostCode } = venueInfo;
+    const addressParts = [primaryAddress1, primaryAddress2, primaryAddress3, primaryTown, primaryPostCode].filter(
+      (part) => part && part.trim() !== '',
+    );
+
+    return encodeURI(addressParts.join(' '));
+  };
+
   async function validateVenue(data: UiTransformedVenue) {
     try {
       await schema.validate({ ...data }, { abortEarly: false });
+      const query = venueAddressToUrl(data);
+      const addressUrl = `https://nominatim.openstreetmap.org/search?q=${query}&format=json&polygon=1&addressdetails=1`;
+      const response = await fetch(addressUrl, { method: 'GET' });
+      const result = await response.json();
+      console.log(result);
       return true;
     } catch (validationErrors) {
       const errors = {};
