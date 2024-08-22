@@ -10,8 +10,10 @@ export const getUsers = async (AccountId: number): Promise<UserDto[]> => {
   const result = await prisma.user.findMany({
     where: {
       AccountUser: {
-        AccUserAccountId: AccountId,
-      }
+        some: {
+          AccUserAccountId: AccountId,
+        },
+      },
     },
     select: {
       UserId: true,
@@ -19,11 +21,15 @@ export const getUsers = async (AccountId: number): Promise<UserDto[]> => {
       UserFirstName: true,
       UserLastName: true,
       AccountUser: {
+        where: {
+          AccUserAccountId: AccountId,
+        },
         select: {
-          AccUserId: true
-        }
-      }
-    }
+          AccUserId: true,
+        },
+        take: 1,
+      },
+    },
   });
 
   return result.map(userMapper);
@@ -54,9 +60,9 @@ export const getAccountId = async (email: string) => {
     select: {
       AccountUser: {
         select: {
-          AccUserAccountId: true
-        }
-      }
+          AccUserAccountId: true,
+        },
+      },
     },
   });
 

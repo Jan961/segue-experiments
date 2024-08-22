@@ -19,11 +19,7 @@ export const getAllVenuesMin = async () => {
           CountryId: true,
           Country: {
             select: {
-              Currency: {
-                select: {
-                  SymbolUnicode: true,
-                },
-              },
+              CurrencyCode: true,
             },
           },
         },
