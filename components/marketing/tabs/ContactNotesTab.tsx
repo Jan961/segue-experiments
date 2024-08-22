@@ -70,9 +70,8 @@ const ContactNotesTab = forwardRef<ContactNoteTabRef, ContactNotesTabProps>((pro
 
   const saveContactNote = async (variant: ContactNoteModalVariant, data) => {
     if (variant === 'add') {
-      await axios.post('/api/marketing/contactNotes/create', data);
-
-      const conNoteData = [...contactNoteRows, data];
+      const result = await axios.post('/api/marketing/contactNotes/create', data);
+      const conNoteData = [...contactNoteRows, result.data];
 
       // re sort the rows to ensure the new field is put in the correct place chronologically
       const sortedContactNotes = conNoteData.sort(

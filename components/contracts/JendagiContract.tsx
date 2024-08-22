@@ -9,11 +9,12 @@ import charCodeToCurrency from 'utils/charCodeToCurrency';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import { ProductionCompanyDTO } from 'interfaces';
 
-interface JendagiContractProps {
+export interface JendagiContractProps {
   contractPerson: any;
   contractSchedule: Partial<IContractSchedule>;
   contractDetails: Partial<IContractDetails>;
   productionCompany: Partial<ProductionCompanyDTO>;
+  currency?: string;
 }
 
 const defaultContractDetails = {
@@ -960,7 +961,7 @@ const JendagiContract = ({
             <strong>for and on behalf of</strong>
           </p>
           <p>
-            <strong>PRODUCTION COMPANY</strong>
+            <strong>{productionCompany?.Name ? productionCompany.Name : 'PRODUCTION COMPANY'}</strong>
           </p>
           <p>
             <strong>DATE IS AS PER SCHEDULE CLAUSE 1</strong>

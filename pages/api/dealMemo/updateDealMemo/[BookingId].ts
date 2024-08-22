@@ -12,18 +12,18 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const access = await checkAccess(email, { BookingId });
     if (!access) return res.status(401).end();
     const data = getContactIdData(req.body.formData);
-    const demoIdData = data.DeMoId;
+    const demoIdData = data.Id;
     const updatedDate = omit(data, [
       'error',
-      'DeMoId',
-      'DeMoBookingId',
-      'DeMoAccContId',
-      'DeMoBOMVenueContactId',
-      'DeMoTechVenueContactId',
+      'Id',
+      'BookingId',
+      'AccContId',
+      'BOMVenueContactId',
+      'TechVenueContactId',
     ]);
     const existingDealMemo = await prisma.dealMemo.findFirst({
       where: {
-        DeMoBookingId: BookingId,
+        BookingId,
       },
     });
 
@@ -36,7 +36,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     if (existingDealMemo) {
       updateCreateDealMemo = await prisma.dealMemo.update({
         where: {
-          DeMoBookingId: BookingId,
+          BookingId,
         },
         data: {
           ...updatedDate,

@@ -17,6 +17,15 @@ export const getAllVenuesMin = async () => {
           Town: true,
           TypeName: true,
           CountryId: true,
+          Country: {
+            select: {
+              Currency: {
+                select: {
+                  SymbolUnicode: true,
+                },
+              },
+            },
+          },
         },
       },
     },

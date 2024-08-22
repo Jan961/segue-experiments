@@ -31,13 +31,20 @@ class ContractsHelper {
 
   getContractsDetails(booking: ContractsDTO) {
     const { VenueId, PerformanceIds, Notes: note, RunTag: runTag, PencilNum } = booking || {};
-    const { Name: venue, Town: town, Seats: capacity, Count: count, Id: venueId } = this.venueDict[VenueId] || {};
-    const performanceTimes = PerformanceIds.map(
+    const {
+      Name: venue,
+      Town: town,
+      Seats: capacity,
+      Count: count,
+      Id: venueId,
+      CurrencyCode,
+    } = this.venueDict[VenueId] || {};
+    const PerformanceTimes = PerformanceIds.map(
       (performanceId) =>
-        this.performanceDict[performanceId]?.Time?.substring(0, 5) + `? ${this.performanceDict[performanceId]?.Date}`,
-    )
-      .filter((time) => time)
-      .join('; ');
+        `${this.performanceDict[performanceId]?.Time?.substring(0, 5) ?? ''}? ${this.performanceDict[performanceId]
+          ?.Date}`,
+    ).filter((time) => time);
+
     return {
       Id: booking?.Id,
       count,
@@ -46,11 +53,12 @@ class ContractsHelper {
       town,
       capacity,
       note,
-      performanceTimes,
+      PerformanceTimes,
       performanceCount: PerformanceIds?.length || 0,
       runTag,
       pencilNo: PencilNum,
       isBooking: true,
+      CurrencyCode,
     };
   }
 

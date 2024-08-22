@@ -17,10 +17,7 @@ import {
   Region,
   GlobalBookingActivity,
 } from 'prisma/generated/prisma-client';
-import { 
-  User,
-  Currency 
-} from 'prisma/generated/prisma-master';
+import { Currency } from 'prisma/generated/prisma-master';
 import {
   ActivityDTO,
   BookingContactNoteDTO,
@@ -301,6 +298,11 @@ export const contractStatusmapper = (status: ContractStatusType) => {
       ContractNotes: status.Notes,
       ReceivedBackDate: convertDate(status.ReceivedBackDate),
       Exceptions: status.Exceptions,
+      BankDetailsSent: status.BankDetailsSent,
+      TechSpecSent: status.TechSpecSent,
+      PRSCertSent: status.PRSCertSent,
+      GP: convertToString(status.GP),
+      PromoterPercent: convertToString(status.PromoterPercent),
     };
   }
   return null;
@@ -354,5 +356,5 @@ export const userMapper = (user): UserDto => ({
   UserFirstName: user.UserFirstName,
   UserLastName: user.UserLastName,
   UserEmail: user.UserEmail,
-  AccUserId: user.AccountUser.AccUserId
+  AccUserId: user.AccountUser.AccUserId,
 });
