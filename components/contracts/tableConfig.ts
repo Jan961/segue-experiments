@@ -10,7 +10,7 @@ import { getTimeFromDateAndTime } from 'services/dateService';
 import ButtonRenderer from 'components/core-ui-lib/Table/renderers/ButtonRenderer';
 import IconRowRenderer from 'components/global/salesTable/renderers/IconRowRenderer';
 import SelectCellRenderer from 'components/core-ui-lib/Table/renderers/SelectCellRenderer';
-import { statusOptions, statusToBgColorMap } from 'config/contracts';
+import { companyContractStatusOptions, statusToBgColorMap } from 'config/contracts';
 import DateRenderer from 'components/core-ui-lib/Table/renderers/DateRenderer';
 import NotesRenderer from 'components/core-ui-lib/Table/renderers/NotesRenderer';
 
@@ -81,37 +81,38 @@ export const getCompanyContractsColumnDefs = (userList = []) => [
     headerName: 'First Name',
     field: 'firstName',
     cellRenderer: DefaultCellRenderer,
-    width: 150,
     flex: 1,
     cellStyle: function (params) {
       const { status } = params.data;
-      console.log(status, statusToBgColorMap[status]);
-      return { backgroundColor: statusToBgColorMap[status] || 'white' };
+      return {
+        backgroundColor: 'white',
+        ...(statusToBgColorMap[status] || {}),
+      };
     },
   },
   {
     headerName: 'Last Name',
     field: 'lastName',
     cellRenderer: DefaultCellRenderer,
-    width: 150,
     flex: 1,
     cellStyle: function (params) {
       const { status } = params.data;
-      return { backgroundColor: statusToBgColorMap[status] || 'white' };
+      return {
+        backgroundColor: 'white',
+        ...(statusToBgColorMap[status] || {}),
+      };
     },
   },
-  { headerName: 'Role', field: 'role', cellRenderer: DefaultCellRenderer, width: 140, flex: 1, editable: true },
+  { headerName: 'Role', field: 'role', cellRenderer: DefaultCellRenderer, flex: 1, editable: true },
   {
     headerName: 'Contract Status',
     field: 'status',
     cellRenderer: SelectCellRenderer,
     valueGetter: (params) => params?.data?.status,
-    width: 100,
-    minWidth: 100,
     flex: 1,
     editable: true,
     cellRendererParams: () => ({
-      options: statusOptions,
+      options: companyContractStatusOptions,
       isSearchable: true,
     }),
   },
@@ -146,7 +147,6 @@ export const getCompanyContractsColumnDefs = (userList = []) => [
     headerName: 'Completed By',
     field: 'completedBy',
     cellRenderer: SelectCellRenderer,
-    width: 150,
     flex: 1,
     editable: true,
     valueGetter: (params) => params?.data?.completedBy,
@@ -159,7 +159,6 @@ export const getCompanyContractsColumnDefs = (userList = []) => [
     headerName: 'Checked By',
     field: 'checkedBy',
     cellRenderer: SelectCellRenderer,
-    width: 90,
     flex: 1,
     editable: true,
     valueGetter: (params) => params?.data?.checkedBy,
@@ -168,14 +167,13 @@ export const getCompanyContractsColumnDefs = (userList = []) => [
       isSearchable: true,
     }),
   },
-  { headerName: 'Date Issued', field: 'dateIssue', cellRenderer: DateRenderer, flex: 1, width: 180 },
+  { headerName: 'Date Issued', field: 'dateIssue', cellRenderer: DateRenderer, width: 120 },
   {
     headerName: 'Date Returned',
     field: 'dateReturned',
     cellRenderer: DateRenderer,
     resizable: false,
-    width: 180,
-    flex: 1,
+    width: 120,
   },
   {
     headerName: '',
