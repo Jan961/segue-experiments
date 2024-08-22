@@ -113,7 +113,7 @@ export default function PreviewBookingDetails({
         }
 
         const payload = rowsWithUniqueVenue
-          .filter((row) => row.status !== 'X')
+          .filter((row) => row.status !== 'X' && row.status !== 'S')
           .map((row) => ({
             Date: row.dateTime || row.dateAsISOString,
             Ids: [row.venueId || row.item?.venue],

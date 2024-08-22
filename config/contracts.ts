@@ -13,14 +13,15 @@ export const dealTypeOptions: SelectOption[] = [
   { text: 'Split', value: 'SPLT' },
   { text: 'Guarantee', value: 'GUA' },
   { text: 'Call Single', value: 'CS' },
-  { text: 'Call multiple', value: 'CM' },
+  { text: 'Call Multiple', value: 'CM' },
   { text: 'First Call Against Split', value: 'FCAS' },
 ];
+
 export const allStatusOptions: SelectOption[] = [{ text: 'All', value: 'all' }, ...statusOptions];
 
 export const booleanOptions = [
-  { text: 'YES', value: 1 },
-  { text: 'NO', value: 2 },
+  { text: 'YES', value: true },
+  { text: 'NO', value: false },
 ];
 
 export const callOptions = [
@@ -129,86 +130,86 @@ export const initialEditContractFormData = {
 };
 
 export const initialEditDemoFormData = {
-  DeMoId: null,
-  DeMoBookingId: null,
-  DeMoAgreementDate: null,
-  DeMoAccContId: null,
-  DeMoRunningTime: null,
-  DeMoRunningTimeNotes: '',
-  DeMoPrePostShowEvents: '',
-  DeMoVenueCurfewTime: null,
-  DeMoPerformanceNotes: '',
-  DeMoProgrammerVenueContactId: null,
-  DeMoROTTPercentage: null,
-  DeMoPRSPercentage: null,
-  DeMoGuarantee: null,
-  DeMoGuaranteeAmount: null,
-  DeMoHasCalls: null,
-  DeMoPromoterSplitPercentage: null,
-  DeMoVenueSplitPercentage: null,
-  DeMoVenueRental: null,
-  DeMoVenueRentalNotes: '',
-  DeMoStaffingContra: null,
-  DeMoStaffingContraNotes: '',
-  DeMoAgreedContraItems: null,
-  DeMoAgreedContraItemsNotes: '',
-  DeMoBOMVenueContactId: null,
-  DeMoOnSaleDate: null,
-  DeMoSettlementVenueContactId: null,
-  DeMoSellableSeats: null,
-  DeMoMixerDeskPosition: '',
-  DeMoStandardSeatKills: '',
-  DeMoRestorationLevy: null,
-  DeMoBookingFees: null,
-  DeMoCCCommissionPercent: null,
-  DeMoTxnChargeOption: '',
-  DeMoTxnChargeAmount: null,
-  DeMoAgreedDiscounts: '',
-  DeMoMaxTAAlloc: '',
-  DeMoTAAlloc: '',
-  DeMoTicketCopy: '',
-  DeMoProducerCompCount: null,
-  DeMoOtherHolds: '',
-  DeMoAgeNotes: '',
-  DeMoSalesDayNum: null,
-  DeMoMMVenueContactId: null,
-  DeMoBrochureDeadline: null,
-  DeMoFinalProofBy: null,
-  DeMoPrintReqs: '',
-  DeMoLocalMarketingBudget: null,
-  DeMoLocalMarketingContra: null,
-  DeMoSellWho: '',
-  DeMoSellProgrammes: null,
-  DeMoSellMerch: null,
-  DeMoSellNotes: '',
-  DeMoSellProgCommPercent: null,
-  DeMoSellMerchCommPercent: null,
-  DeMoSellPitchFee: null,
-  DeMoTechVenueContactId: null,
-  DeMoTechArrivalDate: null,
-  DeMoTechArrivalTime: null,
-  DeMoNumDressingRooms: null,
-  DeMoNumFacilitiesLaundry: null,
-  DeMoNumFacilitiesDrier: null,
-  DeMoNumFacilitiesLaundryRoom: null,
-  DeMoNumFacilitiesNotes: '',
-  DeMoNumCateringNotes: '',
-  DeMoBarringClause: '',
-  DeMoAdvancePaymentRequired: null,
-  DeMoAdvancePaymentAmount: null,
-  DeMoAdvancePaymentDueBy: null,
-  DeMoSettlementDays: null,
-  DeMoContractClause: '',
+  Id: null,
+  BookingId: null,
+  AgreementDate: null,
+  AccContId: null,
+  RunningTime: null,
+  RunningTimeNotes: '',
+  PrePostShowEvents: '',
+  VenueCurfewTime: null,
+  PerformanceNotes: '',
+  ProgrammerVenueContactId: null,
+  ROTTPercentage: null,
+  PRSPercentage: null,
+  Guarantee: null,
+  GuaranteeAmount: null,
+  HasCalls: null,
+  PromoterSplitPercentage: null,
+  VenueSplitPercentage: null,
+  VenueRental: null,
+  VenueRentalNotes: '',
+  StaffingContra: null,
+  StaffingContraNotes: '',
+  AgreedContraItems: null,
+  AgreedContraItemsNotes: '',
+  BOMVenueContactId: null,
+  OnSaleDate: null,
+  SettlementVenueContactId: null,
+  SellableSeats: null,
+  MixerDeskPosition: '',
+  StandardSeatKills: '',
+  RestorationLevy: null,
+  BookingFees: null,
+  CCCommissionPercent: null,
+  TxnChargeOption: '',
+  TxnChargeAmount: null,
+  AgreedDiscounts: '',
+  MaxTAAlloc: '',
+  TAAlloc: '',
+  TicketCopy: '',
+  ProducerCompCount: null,
+  OtherHolds: '',
+  AgeNotes: '',
+  SalesDayNum: null,
+  MMVenueContactId: null,
+  BrochureDeadline: null,
+  FinalProofBy: null,
+  PrintReqs: '',
+  LocalMarketingBudget: null,
+  LocalMarketingContra: null,
+  SellWho: '',
+  SellProgrammes: null,
+  SellMerch: null,
+  SellNotes: '',
+  SellProgCommPercent: null,
+  SellMerchCommPercent: null,
+  SellPitchFee: null,
+  TechVenueContactId: null,
+  TechArrivalDate: null,
+  TechArrivalTime: null,
+  NumDressingRooms: null,
+  NumFacilitiesLaundry: null,
+  NumFacilitiesDrier: null,
+  NumFacilitiesLaundryRoom: null,
+  NumFacilitiesNotes: '',
+  NumCateringNotes: '',
+  BarringClause: '',
+  AdvancePaymentRequired: null,
+  AdvancePaymentAmount: null,
+  AdvancePaymentDueBy: null,
+  SettlementDays: null,
+  ContractClause: '',
 };
 
 export const salaryPaidToOptions = [
   {
     text: 'Agent',
-    value: 'agent',
+    value: 'A',
   },
   {
     text: 'Company Member',
-    value: 'companyMember',
+    value: 'C',
   },
 ];
 
@@ -249,3 +250,96 @@ export const workTypeOptions = [
   { text: 'Wigs', value: 34 },
   { text: 'Writer', value: 35 },
 ];
+
+export const paymentTypes = [
+  {
+    text: 'Weekly Payment',
+    value: 'W',
+  },
+  {
+    text: 'Total Fee',
+    value: 'O',
+  },
+];
+
+export const contractDepartmentOptions = [
+  {
+    text: 'Artiste',
+    value: 1,
+  },
+  {
+    text: 'Creative',
+    value: 2,
+  },
+  {
+    text: 'SM / Tech / Crew',
+    value: 3,
+  },
+];
+
+export const contractTemplateOptions = [
+  {
+    text: 'Jendagi Template',
+    value: 1,
+  },
+];
+
+export enum CompanyContractStatus {
+  NotYetIssued = 'CNI',
+  Issued = 'CI',
+  QuestionsRaised = 'CIQR',
+  SignedAndReturned = 'CSR',
+  Overdue = 'CO',
+}
+
+export const companyContractStatusOrder = {
+  [CompanyContractStatus.Overdue]: 1,
+  [CompanyContractStatus.QuestionsRaised]: 2,
+  [CompanyContractStatus.Issued]: 3,
+  [CompanyContractStatus.NotYetIssued]: 4,
+  [CompanyContractStatus.SignedAndReturned]: 5,
+};
+
+export const companyContractStatusOptions = [
+  {
+    text: 'Not Yet Issued',
+    value: CompanyContractStatus.NotYetIssued,
+  },
+  {
+    text: 'Issued',
+    value: CompanyContractStatus.Issued,
+  },
+  {
+    text: 'Questions Raised',
+    value: CompanyContractStatus.QuestionsRaised,
+  },
+  {
+    text: 'Signed and Returned',
+    value: CompanyContractStatus.SignedAndReturned,
+  },
+  {
+    text: 'Overdue',
+    value: CompanyContractStatus.Overdue,
+  },
+];
+
+export const statusToBgColorMap = {
+  [CompanyContractStatus.NotYetIssued]: {
+    backgroundColor: 'white',
+  },
+  [CompanyContractStatus.Issued]: {
+    backgroundColor: '#FFE606',
+  },
+  [CompanyContractStatus.QuestionsRaised]: {
+    backgroundColor: '#FF7E07',
+    color: 'white',
+  },
+  [CompanyContractStatus.SignedAndReturned]: {
+    backgroundColor: '#10841C',
+    color: 'white',
+  },
+  [CompanyContractStatus.Overdue]: {
+    backgroundColor: '#ED1111',
+    color: 'white',
+  },
+};

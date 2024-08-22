@@ -33,7 +33,7 @@ export const prepareOrganisationQueryData = (orgDetails, contactPersonId) => {
         disconnect: true,
       };
     } else {
-      organisationData.OrgContactPersonId = {
+      organisationData.Person_Organisation_OrgContactPersonIdToPerson = {
         connect: { PersonId: contactPersonId },
       };
     }
@@ -89,7 +89,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const access = await checkAccess(email);
     if (!access) return res.status(401).end();
 
-    // Validate the incoming payload
     const validatedData = await personSchema.validate(req.body, { abortEarly: false });
 
     const {
@@ -101,9 +100,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       expenseAccountDetails,
     } = validatedData;
 
-    // Start transaction
     const result = await prisma.$transaction(async (tx) => {
-      // 1. Create the agency person and organization (if provided)
       let agencyPersonId = null;
       let organisationId = null;
       if (agencyDetails) {
@@ -111,10 +108,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const agencyPersonData = preparePersonQueryData(omit(agencyDetails, [...addressFields, ...organisationFields]));
         const agencyPerson = await tx.person.create({
           data: {
-            ...agencyPersonAddressData,
+            ...agencyPersonData,
             Address: {
               create: {
-                ...agencyPersonData,
+                ...agencyPersonAddressData,
               },
             },
           },
@@ -127,7 +124,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         organisationId = organisation.OrgId;
       }
 
-      // 2. Create emergency contacts (if provided)
       const emergencyContactList = [];
       if (emergencyContact1) {
         const emergencyContactAddressData = prepareAddressQueryData(pick(emergencyContact1, addressFields));
@@ -157,7 +153,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         emergencyContactList.push(emergencyContact2Person.PersonId);
       }
 
-      // 3. Create the main person with all foreign keys connected
       const personAddressData = prepareAddressQueryData(pick(personDetails, addressFields));
       const personData = preparePersonQueryData(
         omit(personDetails, addressFields),
@@ -168,7 +163,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       );
       const mainPerson = await tx.person.create({
         data: {
-          personData,
+          ...personData,
           Address: {
             create: personAddressData,
           },

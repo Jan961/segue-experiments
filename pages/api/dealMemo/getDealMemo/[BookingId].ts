@@ -11,7 +11,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     if (!access) return res.status(401).end();
     const dealMemo = await prisma.dealMemo.findFirst({
       where: {
-        DeMoBookingId: BookingId,
+        BookingId,
       },
       include: {
         DealMemoPrice: true,

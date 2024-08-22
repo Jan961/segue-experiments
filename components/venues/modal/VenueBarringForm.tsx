@@ -19,11 +19,14 @@ interface VenueBarringFormProps {
 const VenueBarringForm = ({ venue, onChange, validationErrors, updateValidationErrrors }: VenueBarringFormProps) => {
   const [formData, setFormData] = useState<Partial<UiTransformedVenue>>({ ...initialVenueBarringRules, ...venue });
   const [barredVenueTableRows, setBarredVenueTableRows] = useState<UiBarredVenue[]>(venue?.barredVenues || []);
-  const venueOptions = useRecoilValue(venueOptionsSelector([]));
+  const venueOptions = useRecoilValue(venueOptionsSelector([venue?.id]));
+  const [selectedVenueIds, setSelectedVenueIds] = useState<number[]>(
+    venue?.barredVenues.map((venue) => venue.barredVenueId) || [],
+  );
   const [columnDefs, setColumnDefs] = useState([]);
   useEffect(() => {
-    setColumnDefs(getBarredVenuesColDefs(venueOptions));
-  }, [venueOptions]);
+    setColumnDefs(getBarredVenuesColDefs(venueOptions, selectedVenueIds));
+  }, [venueOptions, selectedVenueIds]);
   const handleInputChange = (field: string, value: any) => {
     const updatedFormData = {
       ...venue,
@@ -41,6 +44,7 @@ const VenueBarringForm = ({ venue, onChange, validationErrors, updateValidationE
   const onCellClicked = (e) => {
     const { column, rowIndex } = e;
     if (column.colId === 'delete') {
+      setSelectedVenueIds(selectedVenueIds.filter((id) => id !== e.node.data.barredVenueId));
       const updatedBarredVenueTableRows = [
         ...barredVenueTableRows.slice(0, rowIndex),
         ...barredVenueTableRows.slice(rowIndex + 1),
@@ -60,6 +64,7 @@ const VenueBarringForm = ({ venue, onChange, validationErrors, updateValidationE
       barredVenues: updatedBarredVenueRows,
     };
     onChange(updatedFormData);
+    setSelectedVenueIds([...selectedVenueIds, value]);
   };
   return (
     <>

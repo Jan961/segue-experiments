@@ -13,7 +13,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const access = await checkAccess(email, { BookingId });
     if (!access) return res.status(401).end();
 
-    await prisma.bookingContactNotes.create({
+    const result = await prisma.bookingContactNotes.create({
       data: {
         BookingId: bcn.BookingId,
         Notes: bcn.Notes,
@@ -22,7 +22,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         UserId: bcn.UserId,
       },
     });
-    res.status(200).json({});
+    res.status(200).json(result);
   } catch (err) {
     await loggingService.logError(err);
     console.log(err);

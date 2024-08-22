@@ -46,6 +46,12 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
   const { selected: productionId, productions } = useRecoilValue(productionJumpState);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
+  const gridOptions = {
+    getRowId: (data) => {
+      return data.data.date + '-' + data.data.time;
+    },
+  };
+
   useImperativeHandle(ref, () => ({
     resetData: () => {
       setDataAvailable(false);
@@ -279,6 +285,7 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
           </div>
 
           <Table
+            gridOptions={gridOptions}
             rowData={allocRows}
             styleProps={styleProps}
             columnDefs={allocSeatsColDefs}
