@@ -37,6 +37,12 @@ module.exports = {
       files: ['**/__tests__/**/*.[jt]s?(x)', '**/?(*.)+(spec|test).[jt]s?(x)'],
       extends: ['plugin:testing-library/react'],
     },
+    {
+      files: ['*.ts', '*.tsx'],
+      rules: {
+        'no-undef': 'off', // Ensure ESLint does not wrongly flag TypeScript types
+      },
+    },
   ],
   root: true,
   rules: {

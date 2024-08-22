@@ -1,10 +1,11 @@
 import { useCallback, useState } from 'react';
-import { DateInput, Select, TextInput } from 'components/core-ui-lib';
+import { DateInput, Icon, Select, TextInput } from 'components/core-ui-lib';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import { workTypeOptions } from 'config/contracts';
-import { replace } from 'radash';
+import { insertAtPos, removeAtPos, replaceAtPos } from 'utils';
+import { IPersonDetails } from '../types';
 
-const defaultPersonDetails = {
+export const defaultPersonDetails = {
   firstName: '',
   lastName: '',
   email: '',
@@ -30,41 +31,22 @@ const defaultPersonDetails = {
   notes: '',
 };
 
-interface PersonDetails {
-  firstName: string;
-  lastName: string;
-  email: string;
-  landline: string;
-  address1: string;
-  address2: string;
-  address3: string;
-  town: string;
-  mobileNumber: string;
-  passportName: string;
-  passportNumber: string;
-  hasUKWorkPermit: boolean | null;
-  passportExpiryDate: string | null;
-  postcode: string;
-  checkedBy: number | null;
-  country: number | null;
-  isFEURequired: boolean | null;
-  workType: number[];
-  advisoryNotes: string;
-  generalNotes: string;
-  healthDetails: string;
-  otherWorkTypes: string[];
-  notes: string;
-}
-
 interface PersonalDetailsProps {
   countryOptionList: SelectOption[];
   booleanOptions: SelectOption[];
   userOptionList: SelectOption[];
-  onChange: (data: PersonDetails) => void;
+  details: Partial<IPersonDetails>;
+  onChange: (data: IPersonDetails) => void;
 }
 
-const PersonalDetails = ({ countryOptionList, booleanOptions, userOptionList, onChange }: PersonalDetailsProps) => {
-  const [formData, setFormData] = useState<PersonDetails>(defaultPersonDetails);
+const PersonalDetails = ({
+  countryOptionList,
+  booleanOptions,
+  userOptionList,
+  details = {},
+  onChange,
+}: PersonalDetailsProps) => {
+  const [formData, setFormData] = useState<IPersonDetails>({ ...defaultPersonDetails, ...details });
   const {
     firstName,
     lastName,
@@ -354,7 +336,7 @@ const PersonalDetails = ({ countryOptionList, booleanOptions, userOptionList, on
       <div className="w-1/2 flex mt-2 items-center">
         <div className="flex items-start">
           <div className="text-primary-input-text font-bold mr-4 w-[11vw]">Type of Work</div>
-          <div className="w-[22vw] ml-4  flex flex-col gap-4">
+          <div className="w-[22vw] ml-4 flex flex-col gap-4">
             <Select
               testId="person-roles"
               onChange={(value) => handleChange('workType', value as number[])}
@@ -367,21 +349,34 @@ const PersonalDetails = ({ countryOptionList, booleanOptions, userOptionList, on
               isSearchable
             />
             {otherWorkTypes.map((otherWorkType, i) => (
-              <TextInput
-                key={i}
-                testId={`person-other-role-${i + 1}`}
-                className=" text-primary-input-text font-bold w-full"
-                onChange={(event) =>
-                  handleChange(
-                    'otherWorkTypes',
-                    replace(otherWorkTypes, event.target.value as string, (_, idx) => {
-                      return idx === i;
-                    }),
-                  )
-                }
-                placeholder="Other Type of Work"
-                value={otherWorkType}
-              />
+              <div key={i} className="flex items-center gap-2 w-full">
+                <TextInput
+                  key={i}
+                  testId={`person-other-role-${i + 1}`}
+                  className="text-primary-input-text font-bold w-full"
+                  onChange={(event) =>
+                    handleChange('otherWorkTypes', replaceAtPos(otherWorkTypes, event.target.value as string, i))
+                  }
+                  placeholder="Other Type of Work"
+                  value={otherWorkType}
+                />
+                {i === 0 && (
+                  <div
+                    className="cursor-pointer"
+                    onClick={() => handleChange('otherWorkTypes', insertAtPos(otherWorkTypes, '', i + 1) as string[])}
+                  >
+                    <Icon iconName="plus-circle-solid" />
+                  </div>
+                )}
+                {i > 0 && (
+                  <div
+                    className="cursor-pointer"
+                    onClick={() => handleChange('otherWorkTypes', removeAtPos(otherWorkTypes, i) as string[])}
+                  >
+                    <Icon iconName="minus-circle-solid" />
+                  </div>
+                )}
+              </div>
             ))}
 
             <TextInput

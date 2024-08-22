@@ -13,7 +13,7 @@ const SelectRenderer = ({ eGridCell, hidden = false, ...props }: SelectRendererP
   const selectRef = useRef(null);
 
   const handleOnFocus = () => {
-    selectRef.current.focus();
+    selectRef.current?.focus?.();
   };
 
   return (
