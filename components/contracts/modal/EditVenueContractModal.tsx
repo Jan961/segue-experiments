@@ -124,8 +124,8 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
   const fetchVenueData = async () => {
     try {
       if (selectedTableCell.contract && selectedTableCell.contract.venueId) {
-        const venueData = await axios.get(`/api/venue/${selectedTableCell.contract.venueId}`);
-        setVenue(transformVenues([venueData.data])[0]);
+        const { data } = await axios.get(`/api/venue/${selectedTableCell.contract.venueId}`);
+        setVenue(transformVenues([data])[0]);
         const barredVenues = await axios.get(`/api/venue/barredVenues/${selectedTableCell.contract.venueId}`);
         setBarredVenues(transformVenues(barredVenues.data));
       }
@@ -136,8 +136,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
 
   const fetchContractAttachments = async () => {
     try {
-      const response = await axios.get(`/api/contracts/read/attachments/${selectedTableCell.contract.Id}`);
-      const data = response.data;
+      const { data } = await axios.get(`/api/contracts/read/attachments/${selectedTableCell.contract.Id}`);
       setContractAttatchmentRows([
         ...data.map((file) => {
           return {
@@ -666,7 +665,6 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                     {charCodeToCurrency(formData.CurrencyCode)}
                   </div>
                   <TextInput
-                    id="venueText"
                     type="number"
                     className="w-[100px]"
                     value={formData.GP}
@@ -680,7 +678,6 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                 <div className="flex  items-center">
                   <div className=" text-primary-input-text font-bold text-sm mr-1">Royalty</div>
                   <TextInput
-                    id="venueText"
                     type="number"
                     className="w-[100px]"
                     value={formData.RoyaltyPercentage}
@@ -696,7 +693,6 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                 <div className="flex  items-center">
                   <div className=" text-primary-input-text font-bold text-sm mr-1">Promoter</div>
                   <TextInput
-                    id="venueText"
                     type="number"
                     className="w-[100px]"
                     value={formData.PromoterPercent}
