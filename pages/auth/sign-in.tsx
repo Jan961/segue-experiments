@@ -1,15 +1,21 @@
-import { Button, Icon, Label, PasswordInput, Select, TextInput } from 'components/core-ui-lib';
+import { Button, Icon, Label, PasswordInput, Select, TextInput, Tooltip } from 'components/core-ui-lib';
 import Image from 'next/image';
 import { useState } from 'react';
 import { calibri } from 'lib/fonts';
-import { useSignIn } from '@clerk/nextjs';
+import { useSignIn, useClerk } from '@clerk/nextjs';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import axios from 'axios';
 import redis from 'lib/redis';
+import { accountLoginSchema, loginSchema } from 'validators/auth';
+
+import * as yup from 'yup';
+import AuthError from 'components/auth/AuthError';
 
 const SignIn = () => {
   const { isLoaded, signIn, setActive } = useSignIn();
+  const { signOut } = useClerk();
+  const [validationError, setValidationError] = useState<string>('');
   const [accounts, setAccounts] = useState([]);
   const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -27,6 +33,9 @@ const SignIn = () => {
   const attemptClerkAuth = async () => {
     if (isLoaded) {
       try {
+        // validate inputs
+        await loginSchema.validate(loginDetails, { abortEarly: true });
+
         const signInAttempt = await signIn.create({
           identifier: loginDetails.email,
           password: loginDetails.password,
@@ -43,10 +52,11 @@ const SignIn = () => {
           // complete further steps.
           console.error(JSON.stringify(signInAttempt, null, 2));
         }
-      } catch (err: any) {
-        // See https://clerk.com/docs/custom-flows/error-handling
-        // for more info on error handling
-        console.error(JSON.stringify(err, null, 2));
+      } catch (error) {
+        if (error instanceof yup.ValidationError) {
+          setValidationError(error.errors[0]);
+        }
+        console.error('Error signing in:', error);
       }
     }
   };
@@ -62,6 +72,8 @@ const SignIn = () => {
 
   const handleSignIn = async () => {
     try {
+      // validate inputs
+      await accountLoginSchema.validate(loginDetails, { abortEarly: true });
       // Verify Pin
       const { data } = await axios.post('/api/account-user/verify', {
         pin: loginDetails.pin,
@@ -77,6 +89,24 @@ const SignIn = () => {
           console.error('Error setting redis');
         }
       }
+    } catch (error) {
+      if (error instanceof yup.ValidationError) {
+        setValidationError(error.errors[0]);
+      }
+      console.error(error);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      // Sign out from Clerk
+      await signOut();
+      // Remove organisation id on redis
+      await redis.del(loginDetails.email);
+
+      setIsAuthenticated(false);
+      setLoginDetails({ email: '', password: '', company: '', pin: '' });
+      router.replace(router.asPath);
     } catch (err) {
       console.error(err);
     }
@@ -95,7 +125,9 @@ const SignIn = () => {
             className="w-full"
             value={loginDetails.email}
             onChange={handleLoginDetailsChange}
+            disabled={isAuthenticated}
           />
+          {validationError?.includes('Email') && <AuthError error={validationError} />}
         </div>
         <div className="w-full">
           <div className="flex items-center gap-1">
@@ -108,7 +140,14 @@ const SignIn = () => {
             inputClassName="w-full"
             value={loginDetails.password}
             onChange={handleLoginDetailsChange}
+            disabled={isAuthenticated}
           />
+          {validationError?.includes('Password') && <AuthError error={validationError} />}
+          <div className="flex justify-end">
+            <Link href="/auth/sign-up" passHref className="ml-4">
+              Forgotten Password?
+            </Link>
+          </div>
         </div>
         <div className="flex justify-end gap-2 mt-5">
           <Button text="Next" onClick={attemptClerkAuth} className="w-32" disabled={isAuthenticated} />
@@ -125,9 +164,18 @@ const SignIn = () => {
                 isClearable={false}
               />
             </div>
+            {validationError?.includes('Company') && <AuthError error={validationError} />}
             <div className="flex items-center mt-4 ml-4 w-full">
               <Label text="PIN" required />
-              <Icon iconName="info-circle-solid" variant="xs" className="text-primary-blue ml-2" />
+              <Tooltip
+                body="Please enter the 4 digit pin for this account."
+                position="right"
+                width="w-[140px]"
+                bgColorClass="primary-input-text"
+              >
+                <Icon iconName="info-circle-solid" variant="xs" className="text-primary-blue ml-2" />
+              </Tooltip>
+
               <TextInput
                 name="pin"
                 placeholder="Enter PIN"
@@ -142,7 +190,15 @@ const SignIn = () => {
                 Forgotten PIN?
               </Link>
             </div>
+            {validationError?.includes('PIN') && (
+              <div className="flex items-center ml-2 w-full">
+                <AuthError error={validationError} />
+              </div>
+            )}
             <div className="flex justify-end mt-5">
+              {isAuthenticated && (
+                <Button text="Logout" variant="secondary" onClick={handleLogout} className="w-32 mr-3" />
+              )}
               <Button text="Sign In" onClick={handleSignIn} className="w-32" />
             </div>
           </div>

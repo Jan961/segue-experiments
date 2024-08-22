@@ -169,7 +169,7 @@ exports.Prisma.BookingContactNotesScalarFieldEnum = {
   BookingId: 'BookingId',
   CoContactName: 'CoContactName',
   ContactDate: 'ContactDate',
-  UserId: 'UserId',
+  ContactNoteActionAccUserId: 'ContactNoteActionAccUserId',
   Notes: 'Notes',
 };
 
@@ -185,12 +185,11 @@ exports.Prisma.ContractScalarFieldEnum = {
   Notes: 'Notes',
   ReceivedBackDate: 'ReceivedBackDate',
   Exceptions: 'Exceptions',
-};
-
-exports.Prisma.CurrencyScalarFieldEnum = {
-  Code: 'Code',
-  Name: 'Name',
-  SymbolUnicode: 'SymbolUnicode',
+  ContractBankDetailsSent: 'ContractBankDetailsSent',
+  ContractTechSpecSent: 'ContractTechSpecSent',
+  ContractPRSCertSent: 'ContractPRSCertSent',
+  ContractGP: 'ContractGP',
+  ContractPromoterPercent: 'ContractPromoterPercent',
 };
 
 exports.Prisma.DateTypeScalarFieldEnum = {
@@ -202,7 +201,6 @@ exports.Prisma.DateTypeScalarFieldEnum = {
 
 exports.Prisma.ShowScalarFieldEnum = {
   Id: 'Id',
-  AccountId: 'AccountId',
   Code: 'Code',
   Name: 'Name',
   Type: 'Type',
@@ -323,31 +321,6 @@ exports.Prisma.RehearsalScalarFieldEnum = {
   RunTag: 'RunTag',
 };
 
-exports.Prisma.AccountScalarFieldEnum = {
-  AccountId: 'AccountId',
-  AccountName: 'AccountName',
-  AccountAddress1: 'AccountAddress1',
-  AccountAddress2: 'AccountAddress2',
-  AccountAddress3: 'AccountAddress3',
-  AccountAddressTown: 'AccountAddressTown',
-  AccountAddressCounty: 'AccountAddressCounty',
-  AccountAddressPostcode: 'AccountAddressPostcode',
-  AccountAddressCountry: 'AccountAddressCountry',
-  AccountVATNumber: 'AccountVATNumber',
-  AccountCurrencyCode: 'AccountCurrencyCode',
-  AccountCompanyNumber: 'AccountCompanyNumber',
-  AccountLogoFileId: 'AccountLogoFileId',
-  AccountMainEmail: 'AccountMainEmail',
-  AccountNumPeople: 'AccountNumPeople',
-  AccountOrganisationId: 'AccountOrganisationId',
-  AccountTermsAgreedBy: 'AccountTermsAgreedBy',
-  AccountTermsAgreedDate: 'AccountTermsAgreedDate',
-  AccountWebsite: 'AccountWebsite',
-  AccountTypeOfCompany: 'AccountTypeOfCompany',
-  AccountPhone: 'AccountPhone',
-  AccountPaymentCurrencyCode: 'AccountPaymentCurrencyCode',
-};
-
 exports.Prisma.AvailableCompScalarFieldEnum = {
   Id: 'Id',
   PerformanceId: 'PerformanceId',
@@ -369,7 +342,7 @@ exports.Prisma.CompAllocationScalarFieldEnum = {
   Seats: 'Seats',
   Comments: 'Comments',
   RequestedBy: 'RequestedBy',
-  ArrangedById: 'ArrangedById',
+  CompAllocationArrangedByAccUserId: 'CompAllocationArrangedByAccUserId',
   VenueConfirmationNotes: 'VenueConfirmationNotes',
   TicketHolderEmail: 'TicketHolderEmail',
   SeatsAllocated: 'SeatsAllocated',
@@ -485,42 +458,6 @@ exports.Prisma.VenueAddressScalarFieldEnum = {
   Email: 'Email',
 };
 
-exports.Prisma.UserScalarFieldEnum = {
-  Id: 'Id',
-  Email: 'Email',
-  FirstName: 'FirstName',
-  LastName: 'LastName',
-  AccountId: 'AccountId',
-};
-
-exports.Prisma.AccountUserScalarFieldEnum = {
-  Id: 'Id',
-  UserId: 'UserId',
-  AccountId: 'AccountId',
-  AccUserIsAdmin: 'AccUserIsAdmin',
-  AccUserPIN: 'AccUserPIN',
-};
-
-exports.Prisma.AccountUserPermissionScalarFieldEnum = {
-  Id: 'Id',
-  AccUserId: 'AccUserId',
-  PermissionId: 'PermissionId',
-};
-
-exports.Prisma.PermissionScalarFieldEnum = {
-  Id: 'Id',
-  PermissionParentPermissionId: 'PermissionParentPermissionId',
-  Name: 'Name',
-  Description: 'Description',
-  SeqNo: 'SeqNo',
-};
-
-exports.Prisma.TaskWatcherScalarFieldEnum = {
-  WatcherId: 'WatcherId',
-  WatcherProductionTaskId: 'WatcherProductionTaskId',
-  WatcherUserId: 'WatcherUserId',
-};
-
 exports.Prisma.PerformanceReportScalarFieldEnum = {
   Id: 'Id',
   PerformanceId: 'PerformanceId',
@@ -547,19 +484,17 @@ exports.Prisma.DBSettingScalarFieldEnum = {
   DBSettingId: 'DBSettingId',
   DBSettingName: 'DBSettingName',
   DBSettingValue: 'DBSettingValue',
-  DBSettingLastDataLoad: 'DBSettingLastDataLoad',
 };
 
 exports.Prisma.MasterTaskScalarFieldEnum = {
   Id: 'Id',
-  AccountId: 'AccountId',
   Code: 'Code',
   Name: 'Name',
   CopiedFrom: 'CopiedFrom',
   CopiedId: 'CopiedId',
   Priority: 'Priority',
   Notes: 'Notes',
-  AssignedToUserId: 'AssignedToUserId',
+  TaskAssignedToAccUserId: 'TaskAssignedToAccUserId',
   StartByWeekNum: 'StartByWeekNum',
   TaskStartByIsPostProduction: 'TaskStartByIsPostProduction',
   CompleteByWeekNum: 'CompleteByWeekNum',
@@ -598,22 +533,13 @@ exports.Prisma.ProductionTaskScalarFieldEnum = {
   Priority: 'Priority',
   Notes: 'Notes',
   Progress: 'Progress',
-  AssignedToUserId: 'AssignedToUserId',
+  TaskAssignedToAccUserId: 'TaskAssignedToAccUserId',
   CompleteByIsPostProduction: 'CompleteByIsPostProduction',
   StartByWeekNum: 'StartByWeekNum',
   StartByIsPostProduction: 'StartByIsPostProduction',
   CompleteByWeekNum: 'CompleteByWeekNum',
   TaskCompletedDate: 'TaskCompletedDate',
   PRTId: 'PRTId',
-};
-
-exports.Prisma.AccountContactScalarFieldEnum = {
-  AccContId: 'AccContId',
-  AccContAccountId: 'AccContAccountId',
-  AccContFirstName: 'AccContFirstName',
-  AccContLastName: 'AccContLastName',
-  AccContPhone: 'AccContPhone',
-  AccContMainEmail: 'AccContMainEmail',
 };
 
 exports.Prisma.CountryScalarFieldEnum = {
@@ -626,16 +552,6 @@ exports.Prisma.CountryScalarFieldEnum = {
 exports.Prisma.CountryInRegionScalarFieldEnum = {
   CountryId: 'CountryId',
   RegionId: 'RegionId',
-};
-
-exports.Prisma.ProductionCompanyScalarFieldEnum = {
-  Id: 'Id',
-  AccountId: 'AccountId',
-  Name: 'Name',
-  WebSite: 'WebSite',
-  ProdCoSaleStartWeek: 'ProdCoSaleStartWeek',
-  ProdCoVATCode: 'ProdCoVATCode',
-  ProdCoLogoFileId: 'ProdCoLogoFileId',
 };
 
 exports.Prisma.ProductionRegionScalarFieldEnum = {
@@ -663,7 +579,12 @@ exports.Prisma.VenueFamilyScalarFieldEnum = {
 exports.Prisma.DealMemoScalarFieldEnum = {
   DeMoId: 'DeMoId',
   DeMoBookingId: 'DeMoBookingId',
+  DeMoStatus: 'DeMoStatus',
   DeMoDateIssued: 'DeMoDateIssued',
+  DeMoDateReturned: 'DeMoDateReturned',
+  DeMoApprovedBy: 'DeMoApprovedBy',
+  DeMoCompletedBy: 'DeMoCompletedBy',
+  DeMoNotes: 'DeMoNotes',
   DeMoAccContId: 'DeMoAccContId',
   DeMoRunningTime: 'DeMoRunningTime',
   DeMoRunningTimeNotes: 'DeMoRunningTimeNotes',
@@ -772,25 +693,6 @@ exports.Prisma.FileScalarFieldEnum = {
   SizeBytes: 'SizeBytes',
 };
 
-exports.Prisma.SubscriptionPlanScalarFieldEnum = {
-  PlanId: 'PlanId',
-  PlanName: 'PlanName',
-  PlanDescription: 'PlanDescription',
-  PlanPrice: 'PlanPrice',
-  PlanFrequency: 'PlanFrequency',
-  PlanPriceId: 'PlanPriceId',
-  PlanCurrency: 'PlanCurrency',
-};
-
-exports.Prisma.AccountSubscriptionScalarFieldEnum = {
-  AccSubId: 'AccSubId',
-  AccSubAccountId: 'AccSubAccountId',
-  AccSubPlanId: 'AccSubPlanId',
-  AccSubStartDate: 'AccSubStartDate',
-  AccSubEndDate: 'AccSubEndDate',
-  AccSubIsActive: 'AccSubIsActive',
-};
-
 exports.Prisma.EmailTemplateScalarFieldEnum = {
   EmTemId: 'EmTemId',
   EmTemName: 'EmTemName',
@@ -847,12 +749,7 @@ exports.Prisma.ACCContractScalarFieldEnum = {
   TotalFeeNotes: 'TotalFeeNotes',
   CancelFee: 'CancelFee',
   ProductionId: 'ProductionId',
-};
-
-exports.Prisma.ACCContractPersonScalarFieldEnum = {
-  ACCCPersonId: 'ACCCPersonId',
-  ACCCPersonPersonId: 'ACCCPersonPersonId',
-  ACCCPersonType: 'ACCCPersonType',
+  ACCCDeptId: 'ACCCDeptId',
 };
 
 exports.Prisma.AddressScalarFieldEnum = {
@@ -863,6 +760,7 @@ exports.Prisma.AddressScalarFieldEnum = {
   AddressTown: 'AddressTown',
   AddressCounty: 'AddressCounty',
   AddressPostcode: 'AddressPostcode',
+  AddressCountryId: 'AddressCountryId',
 };
 
 exports.Prisma.DealMemoHoldScalarFieldEnum = {
@@ -897,24 +795,27 @@ exports.Prisma.PersonScalarFieldEnum = {
   PersonPassportExpiryDate: 'PersonPassportExpiryDate',
   PersonEligibleToWork: 'PersonEligibleToWork',
   PersonFEURequired: 'PersonFEURequired',
-  PersonFEUCheckByUserId: 'PersonFEUCheckByUserId',
+  PersonFEUCheckByAccUserId: 'PersonFEUCheckByAccUserId',
   PersonNotes: 'PersonNotes',
   PersonHealthNotes: 'PersonHealthNotes',
   PersonAdvisoryNotes: 'PersonAdvisoryNotes',
   PersonRoleNotes: 'PersonRoleNotes',
   PersonAgencyOrgId: 'PersonAgencyOrgId',
   PersonPaymentTo: 'PersonPaymentTo',
+  PersonPaymentAccountName: 'PersonPaymentAccountName',
   PersonPaymentAccount: 'PersonPaymentAccount',
   PersonPaymentSortCode: 'PersonPaymentSortCode',
   PersonPaymentSWIFTBIC: 'PersonPaymentSWIFTBIC',
   PersonPaymentIBAN: 'PersonPaymentIBAN',
   PersonPaymentBankCountryId: 'PersonPaymentBankCountryId',
   PersonExpensesTo: 'PersonExpensesTo',
+  PersonExpensesAccountName: 'PersonExpensesAccountName',
   PersonExpensesAccount: 'PersonExpensesAccount',
   PersonExpensesSortCode: 'PersonExpensesSortCode',
   PersonExpensesSWIFTBIC: 'PersonExpensesSWIFTBIC',
   PersonExpensesIBAN: 'PersonExpensesIBAN',
   PersonExpensesBankCountryId: 'PersonExpensesBankCountryId',
+  PersonLastModified: 'PersonLastModified',
 };
 
 exports.Prisma.PersonOtherRoleScalarFieldEnum = {
@@ -924,8 +825,8 @@ exports.Prisma.PersonOtherRoleScalarFieldEnum = {
 };
 
 exports.Prisma.PersonPersonRoleScalarFieldEnum = {
-  PPPersonId: 'PPPersonId',
-  PPPersonRoleId: 'PPPersonRoleId',
+  PPRPersonId: 'PPRPersonId',
+  PPRPersonRoleId: 'PPRPersonRoleId',
 };
 
 exports.Prisma.PersonRoleScalarFieldEnum = {
@@ -976,6 +877,7 @@ exports.Prisma.ACCPubEventScalarFieldEnum = {
 
 exports.Prisma.ACCStandardClauseScalarFieldEnum = {
   Id: 'Id',
+  StdClauseTitle: 'StdClauseTitle',
   Text: 'Text',
 };
 
@@ -999,6 +901,11 @@ exports.Prisma.ContractFileScalarFieldEnum = {
   FileId: 'FileId',
   Type: 'Type',
   Description: 'Description',
+};
+
+exports.Prisma.ACCDepartmentScalarFieldEnum = {
+  ACCDeptId: 'ACCDeptId',
+  ACCDeptName: 'ACCDeptName',
 };
 
 exports.Prisma.SalesSetTotalsViewScalarFieldEnum = {
@@ -1125,7 +1032,6 @@ exports.Prisma.ModelName = {
   BookingActivity: 'BookingActivity',
   BookingContactNotes: 'BookingContactNotes',
   Contract: 'Contract',
-  Currency: 'Currency',
   DateType: 'DateType',
   Show: 'Show',
   Venue: 'Venue',
@@ -1138,7 +1044,6 @@ exports.Prisma.ModelName = {
   Other: 'Other',
   Performance: 'Performance',
   Rehearsal: 'Rehearsal',
-  Account: 'Account',
   AvailableComp: 'AvailableComp',
   BookedVenueHistory: 'BookedVenueHistory',
   CompAllocation: 'CompAllocation',
@@ -1154,21 +1059,14 @@ exports.Prisma.ModelName = {
   BookingAttachedFile: 'BookingAttachedFile',
   ContractAttachedFile: 'ContractAttachedFile',
   VenueAddress: 'VenueAddress',
-  User: 'User',
-  AccountUser: 'AccountUser',
-  AccountUserPermission: 'AccountUserPermission',
-  Permission: 'Permission',
-  TaskWatcher: 'TaskWatcher',
   PerformanceReport: 'PerformanceReport',
   DBSetting: 'DBSetting',
   MasterTask: 'MasterTask',
   AccountUserProduction: 'AccountUserProduction',
   Production: 'Production',
   ProductionTask: 'ProductionTask',
-  AccountContact: 'AccountContact',
   Country: 'Country',
   CountryInRegion: 'CountryInRegion',
-  ProductionCompany: 'ProductionCompany',
   ProductionRegion: 'ProductionRegion',
   Region: 'Region',
   RehearsalDateType: 'RehearsalDateType',
@@ -1178,12 +1076,9 @@ exports.Prisma.ModelName = {
   DealMemoPrice: 'DealMemoPrice',
   DealMemoTechProvision: 'DealMemoTechProvision',
   File: 'File',
-  SubscriptionPlan: 'SubscriptionPlan',
-  AccountSubscription: 'AccountSubscription',
   EmailTemplate: 'EmailTemplate',
   GlobalBookingActivity: 'GlobalBookingActivity',
   ACCContract: 'ACCContract',
-  ACCContractPerson: 'ACCContractPerson',
   Address: 'Address',
   DealMemoHold: 'DealMemoHold',
   GlobalBookingActivityVenue: 'GlobalBookingActivityVenue',
@@ -1201,6 +1096,7 @@ exports.Prisma.ModelName = {
   PersonPerson: 'PersonPerson',
   ACCClause: 'ACCClause',
   ContractFile: 'ContractFile',
+  ACCDepartment: 'ACCDepartment',
   SalesSetTotalsView: 'SalesSetTotalsView',
   VenueView: 'VenueView',
   SalesView: 'SalesView',

@@ -24,6 +24,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         Account: true,
       },
     });
+    console.log('accountUser', accountUser, email, organisationId, pin);
     return res.status(200).json({ isValid: accountUser !== null });
   } catch (err) {
     console.log(err);

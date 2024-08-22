@@ -186,7 +186,7 @@ exports.Prisma.FileScalarFieldEnum = {
   FileMediaType: 'FileMediaType',
   FileLocation: 'FileLocation',
   FileUploadDateTime: 'FileUploadDateTime',
-  FileUploadUserId: 'FileUploadUserId',
+  FileUploadAccUserId: 'FileUploadAccUserId',
   FileSizeBytes: 'FileSizeBytes',
 };
 
