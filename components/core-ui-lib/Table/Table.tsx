@@ -39,11 +39,11 @@ interface TableProps {
   rowSelection?: string;
   onSelectionChanged?: (event: SelectionChangedEvent) => void;
   testId?: string;
+  marginBottom?: number;
 }
 
 const ROW_HEIGHT = 43;
 const HEADER_HEIGHT = 51;
-const DELTA = 250; // Set as const for now. We may look to accept it as a prop if necessary
 
 const DEFAULT_COLUMN_DEF = {
   wrapHeaderText: true,
@@ -74,6 +74,7 @@ export default forwardRef(function Table(
     rowSelection = 'single',
     onSelectionChanged,
     testId = 'core-ui-lib-table',
+    marginBottom = 250,
   }: TableProps,
   ref,
 ) {
@@ -103,6 +104,7 @@ export default forwardRef(function Table(
       type: 'fitGridWidth',
       defaultMinWidth: 50,
     },
+    stopEditingWhenCellsLoseFocus: true,
   };
 
   const onGridReady = (params: GridReadyEvent) => {
@@ -131,9 +133,9 @@ export default forwardRef(function Table(
   }, [rowData, gridApi, autoHeightLimit, gridHeight]);
 
   useEffect(() => {
-    setAutoHeightLimit(tableHeight === 0 ? window.innerHeight - DELTA : tableHeight);
+    setAutoHeightLimit(tableHeight === 0 ? window.innerHeight - marginBottom : tableHeight);
     const handleResize = () => {
-      setAutoHeightLimit(tableHeight === 0 ? window.innerHeight - DELTA : tableHeight);
+      setAutoHeightLimit(tableHeight === 0 ? window.innerHeight - marginBottom : tableHeight);
     };
     window.addEventListener('resize', handleResize);
     return () => {

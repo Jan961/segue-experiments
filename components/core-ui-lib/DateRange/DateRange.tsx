@@ -108,7 +108,7 @@ export default function DateRange({
         </div>
       )}
       <DateInput
-        testId={`${testId}-start-date`}
+        testId={`${testId ? `${testId}-start-date` : 'start-date'}`}
         ref={fromInputRef}
         inputClass={`!shadow-none ${!errors?.fromError ? '!border-primary-white' : ''}`}
         value={dateRange.from}
@@ -116,10 +116,11 @@ export default function DateRange({
         error={errors?.fromError}
         minDate={minDate}
         maxDate={maxDate}
+        disabled={disabled}
       />
       <span className="mx-1 text-primary-label">to</span>
       <DateInput
-        testId={`${testId}-end-date`}
+        testId={`${testId ? `${testId}-end-date` : 'end-date'}`}
         ref={toInputRef}
         inputClass={`!shadow-none ${!errors?.toError ? '!border-primary-white' : ''}`}
         value={dateRange.to}
@@ -127,6 +128,7 @@ export default function DateRange({
         minDate={dateRange.from || minDate}
         error={errors?.toError}
         maxDate={maxDate}
+        disabled={disabled}
       />
     </div>
   );

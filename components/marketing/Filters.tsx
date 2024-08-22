@@ -129,6 +129,11 @@ const Filters = () => {
 
   useEffect(() => {
     fetchLastDates();
+    setSelectedIndex(-1);
+    setSelectedValue(null);
+    setVenueName('');
+    setVenueId(0);
+    setLandingURL('');
   }, [productionId]);
 
   useEffect(() => {
@@ -170,6 +175,7 @@ const Filters = () => {
             options={bookingOptions}
             isClearable
             isSearchable
+            key={productionId}
           />
 
           <Button

@@ -20,9 +20,10 @@ import { getAllVenuesMin } from 'services/venueService';
 import { BookingsWithPerformances } from 'services/bookingService';
 import { objectify, all } from 'radash';
 import { getDayTypes } from 'services/dayTypeService';
-import { getProductionsWithContent } from 'services/productionService';
+import { getAllCurrencylist, getProductionsWithContent } from 'services/productionService';
 import { getAllContractStatus } from 'services/contractStatus';
 import { DateType } from 'prisma/generated/prisma-client';
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const ContractsPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const rows = useContractsFilter();
@@ -52,11 +53,12 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const ProductionId = -1;
   productionJump.selected = -1;
 
-  const [venues, productions, dateTypeRaw, contractStatus] = await all([
+  const [venues, productions, dateTypeRaw, contractStatus, currencyList] = await all([
     getAllVenuesMin(),
     getProductionsWithContent(null, false),
     getDayTypes(),
     getAllContractStatus(),
+    getAllCurrencylist(),
   ]);
   const dateBlock = [];
   const rehearsal = {};
@@ -65,14 +67,14 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const performance = {};
   const other = {};
   const venue = objectify(
-    venues,
+    venues as any,
     (v) => v.Id,
     (v: any) => {
       const Town: string | null = v.VenueAddress.find((address: any) => address?.TypeName === 'Main')?.Town ?? null;
       return { Id: v.Id, Code: v.Code, Name: v.Name, Town, Seats: v.Seats, Count: 0 };
     },
   );
-  const dayTypeMap = objectify(dateTypeRaw, (type: DateType) => type.Id);
+  const dayTypeMap = objectify(dateTypeRaw as any, (type: DateType) => type.Id);
 
   // Map to DTO. The database can change and we want to control. More info in mappers.ts
   for (const production of productions) {
@@ -134,6 +136,9 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const initialState: InitialState = {
     global: {
       productionJump,
+    },
+    productions: {
+      currencyList,
     },
     contracts: {
       booking,

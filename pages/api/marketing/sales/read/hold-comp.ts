@@ -263,7 +263,7 @@ const getDealMemoHoldsByBookingId = async (bookingId: number) => {
 
   const dealMemoHolds = await prisma.dealMemoHold.findMany({
     where: {
-      DMHoldDeMoId: booking?.DealMemo.DeMoId,
+      DMHoldDeMoId: booking?.DealMemo.Id,
     },
     include: {
       HoldType: {

@@ -105,10 +105,12 @@ export const activityColDefs = (updateActivity, currencySymbol) => [
       iconList: [
         {
           name: 'edit',
+          table: 'activity',
           onClick: () => updateActivity('edit', params.data),
         },
         {
           name: 'delete',
+          table: 'activity',
           onClick: () => updateActivity('delete', params.data),
         },
       ],
@@ -188,10 +190,12 @@ export const contactNoteColDefs = (updateContactNote, userList) => [
       iconList: [
         {
           name: 'edit',
+          table: 'contactnotes',
           onClick: () => updateContactNote('edit', params.data),
         },
         {
           name: 'delete',
+          table: 'contactnotes',
           onClick: () => updateContactNote('delete', params.data),
         },
       ],

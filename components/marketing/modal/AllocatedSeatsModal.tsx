@@ -244,6 +244,7 @@ export default function AllocatedSeatsModal({
             <div className="text-base text-primary-input-text flex flex-col text-left w-1/3">For Performance</div>
             <div className="flex flex-col w-2/3">
               <Select
+                testId="perf-date-or-time"
                 className={classNames('w-full !border-0 text-primary-input-text mb-4')}
                 options={perfList}
                 value={perfSelected}
@@ -260,6 +261,7 @@ export default function AllocatedSeatsModal({
             <div className="flex flex-col w-2/3">
               <TextInput
                 className="w-full mb-4"
+                testId="customer-name"
                 placeholder="Enter Customer Name"
                 id="custName"
                 value={custName}
@@ -273,6 +275,7 @@ export default function AllocatedSeatsModal({
             <div className="flex flex-col w-2/3">
               <TextInput
                 className="w-full mb-4"
+                testId="email-id"
                 placeholder="Enter Email Address"
                 id="emailAddress"
                 value={email}
@@ -288,6 +291,7 @@ export default function AllocatedSeatsModal({
             <div className="flex flex-col w-2/3">
               <TextInput
                 className="w-full mb-4"
+                testId="no-of-seats"
                 placeholder="Enter No. Seats"
                 id="seatsRequired"
                 value={numSeatsReq}
@@ -301,6 +305,7 @@ export default function AllocatedSeatsModal({
             <div className="flex flex-col w-2/3">
               <TextInput
                 className="w-full mb-4"
+                testId="required-seat-numbers"
                 placeholder="Seat Numbers"
                 id="seatsNumList"
                 value={seatNumList}
@@ -314,6 +319,7 @@ export default function AllocatedSeatsModal({
             <div className="flex flex-col w-2/3">
               <TextInput
                 className="w-full mb-4"
+                testId="requested-by-name"
                 placeholder="Enter Name"
                 id="requestedBy"
                 value={requestedBy}
@@ -327,6 +333,7 @@ export default function AllocatedSeatsModal({
             <div className="flex flex-col w-2/3">
               <TextInput
                 className="w-full mb-4"
+                testId="notes-field"
                 placeholder="Notes Field"
                 id="comments"
                 value={comments}
@@ -340,6 +347,7 @@ export default function AllocatedSeatsModal({
             <div className="flex flex-col w-2/3">
               <Select
                 className={classNames('w-full !border-0 text-primary-input-text mb-4')}
+                testId="select-user"
                 options={userList}
                 value={arrangedBy}
                 onChange={(value) => setArrangedBy(value !== null ? value.toString() : '')}
@@ -361,6 +369,7 @@ export default function AllocatedSeatsModal({
             <div className="flex flex-col">
               <TextArea
                 className="w-[300px] h-[80px]"
+                testId="venue-confirmation-notes"
                 value={venueConfNotes}
                 placeholder="Notes Field"
                 onChange={(e) => setVenueConfNotes(e.target.value)}

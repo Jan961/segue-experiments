@@ -1127,63 +1127,63 @@ model Organisation {
   OrgName                                        String   @db.VarChar(80)
   OrgWebsite                                     String?  @db.VarChar(255)
   OrgContactPersonId                             Int?
-  Person_Organisation_OrgContactPersonIdToPerson Person?  @relation("Organisation_OrgContactPersonIdToPerson", fields: [OrgContactPersonId], references: [PersonId], onDelete: Cascade, map: "Person_Organisation")
+  Person_Organisation_OrgContactPersonIdToPerson Person?  @relation("Organisation_OrgContactPersonIdToPerson", fields: [OrgContactPersonId], references: [Id], onDelete: Cascade, map: "Person_Organisation")
   Person_Person_PersonAgencyOrgIdToOrganisation  Person[] @relation("Person_PersonAgencyOrgIdToOrganisation")
 
   @@index([OrgContactPersonId], map: "Person_Organisation")
 }
 
 model Person {
-  PersonId                                             Int                @id @default(autoincrement())
-  PersonFirstName                                      String             @db.VarChar(50)
-  PersonLastName                                       String?            @db.VarChar(50)
-  PersonEmail                                          String             @db.VarChar(120)
-  PersonAddressId                                      Int?
-  PersonPhone                                          String?            @db.VarChar(30)
-  PersonMobile                                         String?            @db.VarChar(30)
-  PersonPassportName                                   String?            @db.VarChar(100)
-  PersonPassportExpiryDate                             DateTime?          @db.Date
-  PersonEligibleToWork                                 Boolean            @default(dbgenerated("(b'0')")) @db.Bit(1)
-  PersonFEURequired                                    Boolean            @default(dbgenerated("(b'0')")) @db.Bit(1)
-  PersonFEUCheckByUserId                               Int?
-  PersonNotes                                          String?            @db.LongText
-  PersonHealthNotes                                    String?            @db.LongText
-  PersonAdvisoryNotes                                  String?            @db.LongText
-  PersonRoleNotes                                      String?            @db.LongText
-  PersonAgencyOrgId                                    Int?
-  PersonPaymentTo                                      String?            @db.VarChar(1)
-  PersonPaymentAccount                                 String?            @db.VarChar(8)
-  PersonPaymentSortCode                                String?            @db.VarChar(8)
-  PersonPaymentSWIFTBIC                                String?            @db.VarChar(11)
-  PersonPaymentIBAN                                    String?            @db.VarChar(34)
-  PersonPaymentBankCountryId                           Int?
-  PersonExpensesTo                                     String?            @db.VarChar(1)
-  PersonExpensesAccount                                String?            @db.VarChar(8)
-  PersonExpensesSortCode                               String?            @db.VarChar(8)
-  PersonExpensesSWIFTBIC                               String?            @db.VarChar(11)
-  PersonExpensesIBAN                                   String?            @db.VarChar(34)
-  PersonExpensesBankCountryId                          Int?
+  Id                                                   Int                @map("PersonId") @id @default(autoincrement())
+  FirstName                                            String             @map("PersonFirstName") @db.VarChar(50)
+  LastName                                             String?            @map("PersonLastName") @db.VarChar(50)
+  Email                                                String             @map("PersonEmail") @db.VarChar(120)
+  AddressId                                            Int?               @map("PersonAddressId")
+  Phone                                                String?            @map("PersonPhone") @db.VarChar(30)
+  Mobile                                               String?            @map("PersonMobile") @db.VarChar(30)
+  PassportName                                         String?            @map("PersonPassportName") @db.VarChar(100)
+  PassportExpiryDate                                   DateTime?          @map("PersonPassportExpiryDate") @db.Date
+  EligibleToWork                                       Boolean            @map("PersonEligibleToWork") @default(dbgenerated("(b'0')")) @db.Bit(1)
+  FEURequired                                          Boolean            @map("PersonFEURequired") @default(dbgenerated("(b'0')")) @db.Bit(1)
+  FEUCheckByUserId                                     Int?               @map("PersonFEUCheckByUserId")
+  Notes                                                String?            @map("PersonNotes") @db.LongText
+  HealthNotes                                          String?            @map("PersonHealthNotes") @db.LongText
+  AdvisoryNotes                                        String?            @map("PersonAdvisoryNotes") @db.LongText
+  RoleNotes                                            String?            @map("PersonRoleNotes") @db.LongText
+  AgencyOrgId                                          Int?               @map("PersonAgencyOrgId")
+  PaymentTo                                            String?            @map("PersonPaymentTo") @db.VarChar(1)
+  PaymentAccount                                       String?            @map("PersonPaymentAccount") @db.VarChar(8)
+  PaymentSortCode                                      String?            @map("PersonPaymentSortCode") @db.VarChar(8)
+  PaymentSWIFTBIC                                      String?            @map("PersonPaymentSWIFTBIC") @db.VarChar(11)
+  PaymentIBAN                                          String?            @map("PersonPaymentIBAN") @db.VarChar(34)
+  PaymentBankCountryId                                 Int?               @map("PersonPaymentBankCountryId")
+  ExpensesTo                                           String?            @map("PersonExpensesTo") @db.VarChar(1)
+  ExpensesAccount                                      String?            @map("PersonExpensesAccount") @db.VarChar(8)
+  ExpensesSortCode                                     String?            @map("PersonExpensesSortCode") @db.VarChar(8)
+  ExpensesSWIFTBIC                                     String?            @map("PersonExpensesSWIFTBIC") @db.VarChar(11)
+  ExpensesIBAN                                         String?            @map("PersonExpensesIBAN") @db.VarChar(34)
+  ExpensesBankCountryId                                Int?               @map("PersonExpensesBankCountryId")
   Organisation_Organisation_OrgContactPersonIdToPerson Organisation[]     @relation("Organisation_OrgContactPersonIdToPerson")
-  Address                                              Address?           @relation(fields: [PersonAddressId], references: [AddressId], onDelete: Cascade, map: "Address_Person")
-  Country_Person_PersonExpensesBankCountryIdToCountry  Country?           @relation("Person_PersonExpensesBankCountryIdToCountry", fields: [PersonExpensesBankCountryId], references: [Id], onDelete: Cascade, map: "Country_Person_ExpensesBank")
-  Country_Person_PersonPaymentBankCountryIdToCountry   Country?           @relation("Person_PersonPaymentBankCountryIdToCountry", fields: [PersonPaymentBankCountryId], references: [Id], onDelete: Cascade, map: "Country_Person_PaymentBank")
-  Organisation_Person_PersonAgencyOrgIdToOrganisation  Organisation?      @relation("Person_PersonAgencyOrgIdToOrganisation", fields: [PersonAgencyOrgId], references: [OrgId], onDelete: NoAction, map: "Organisation_Person_Agent")
+  Address                                              Address?           @relation(fields: [AddressId], references: [AddressId], onDelete: Cascade, map: "Address_Person")
+  Country_Person_PersonExpensesBankCountryIdToCountry  Country?           @relation("Person_PersonExpensesBankCountryIdToCountry", fields: [ExpensesBankCountryId], references: [Id], onDelete: Cascade, map: "Country_Person_ExpensesBank")
+  Country_Person_PersonPaymentBankCountryIdToCountry   Country?           @relation("Person_PersonPaymentBankCountryIdToCountry", fields: [PaymentBankCountryId], references: [Id], onDelete: Cascade, map: "Country_Person_PaymentBank")
+  Organisation_Person_PersonAgencyOrgIdToOrganisation  Organisation?      @relation("Person_PersonAgencyOrgIdToOrganisation", fields: [AgencyOrgId], references: [OrgId], onDelete: NoAction, map: "Organisation_Person_Agent")
   PersonOtherRole                                      PersonOtherRole[]
   PersonPerson_PersonPerson_PPPersonIdToPerson         PersonPerson[]     @relation("PersonPerson_PPPersonIdToPerson")
   PersonPerson_PersonPerson_PPRolePersonIdToPerson     PersonPerson[]     @relation("PersonPerson_PPRolePersonIdToPerson")
   PersonPersonRole                                     PersonPersonRole[]
 
-  @@index([PersonAddressId], map: "Address_Person")
-  @@index([PersonExpensesBankCountryId], map: "Country_Person_ExpensesBank")
-  @@index([PersonPaymentBankCountryId], map: "Country_Person_PaymentBank")
-  @@index([PersonAgencyOrgId], map: "Organisation_Person_Agent")
+  @@index([AddressId], map: "Address_Person")
+  @@index([ExpensesBankCountryId], map: "Country_Person_ExpensesBank")
+  @@index([PaymentBankCountryId], map: "Country_Person_PaymentBank")
+  @@index([AgencyOrgId], map: "Organisation_Person_Agent")
 }
 
 model PersonOtherRole {
   PORId       Int    @id @default(autoincrement())
   PORPersonId Int
   PORName     String @db.VarChar(50)
-  Person      Person @relation(fields: [PORPersonId], references: [PersonId], onDelete: Cascade, map: "Person_PersonOtherRole")
+  Person      Person @relation(fields: [PORPersonId], references: [Id], onDelete: Cascade, map: "Person_PersonOtherRole")
 
   @@unique([PORPersonId, PORName], map: "PersonOtherRole_UniqueRole")
 }
@@ -1191,7 +1191,7 @@ model PersonOtherRole {
 model PersonPersonRole {
   PPPersonId     Int
   PPPersonRoleId Int
-  Person         Person @relation(fields: [PPPersonId], references: [PersonId], onDelete: NoAction, map: "PersonRole_PersonPersonRole")
+  Person         Person @relation(fields: [PPPersonId], references: [Id], onDelete: NoAction, map: "PersonRole_PersonPersonRole")
 
   @@id([PPPersonId, PPPersonRoleId])
 }
@@ -1264,8 +1264,8 @@ model PersonPerson {
   PPPersonId                                 Int
   PPRoleType                                 Int
   PPRolePersonId                             Int
-  Person_PersonPerson_PPPersonIdToPerson     Person @relation("PersonPerson_PPPersonIdToPerson", fields: [PPPersonId], references: [PersonId], onDelete: Cascade, map: "Person_Person")
-  Person_PersonPerson_PPRolePersonIdToPerson Person @relation("PersonPerson_PPRolePersonIdToPerson", fields: [PPRolePersonId], references: [PersonId], onDelete: Cascade, map: "Person_Person_InRole")
+  Person_PersonPerson_PPPersonIdToPerson     Person @relation("PersonPerson_PPPersonIdToPerson", fields: [PPPersonId], references: [Id], onDelete: Cascade, map: "Person_Person")
+  Person_PersonPerson_PPRolePersonIdToPerson Person @relation("PersonPerson_PPRolePersonIdToPerson", fields: [PPRolePersonId], references: [Id], onDelete: Cascade, map: "Person_Person_InRole")
 
   @@index([PPPersonId], map: "Person_Person")
   @@index([PPRolePersonId], map: "Person_Person_InRole")
