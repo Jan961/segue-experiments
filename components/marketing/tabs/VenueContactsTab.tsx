@@ -100,7 +100,7 @@ const VenueContactsTab = forwardRef<VenueContactTabRef, VenueContactsProps>((pro
       // delete venue contact
     } else if (variant === 'delete') {
       const updatedRow = mapVenueContactToPrisma(data.updatedFormData);
-      await axios.post('/api/marketing/venueContacts/delete', updatedRow);
+      if (updatedRow.VenueRoleId) await axios.post('/api/marketing/venueContacts/delete', updatedRow);
     }
   };
 
