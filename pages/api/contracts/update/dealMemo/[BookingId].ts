@@ -24,7 +24,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       },
     });
 
-    await res.status(200).json(updateResult);
+    res.status(200).json(updateResult);
   } catch (err) {
     console.log(err);
     res.status(403).json({ err: 'Error occurred while updating deal memo.' });
