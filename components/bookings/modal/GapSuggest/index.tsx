@@ -21,7 +21,6 @@ type GapSuggestProps = {
 };
 
 export const gridOptions = {
-  headerHeight: 999,
   autoSizeStrategy: {
     type: 'fitGridWidth',
     defaultMinWidth: 50,
@@ -50,7 +49,6 @@ const GapSuggest = ({ startDate, endDate, productionId, onOkClick = () => null }
         });
       }
     }
-    console.log(filteredRows.sort((a, b) => a.MinsFromStart - b.MinsFromStart));
     return filteredRows.sort((a, b) => a.MinsFromStart - b.MinsFromStart);
   }, [selectedVenueIds, rows]);
 
