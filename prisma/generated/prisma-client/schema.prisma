@@ -554,7 +554,7 @@ model MasterTask {
   CopiedId                       Int?              @map("TaskCopiedId")
   Priority                       Int               @default(0) @map("TaskPriority") @db.TinyInt
   Notes                          String?           @map("TaskNotes") @db.VarChar(500)
-  TaskAssignedToAccUserId        Int?
+  AssignedToAccUserId            Int?              @map("TaskAssignedToAccUserId")
   StartByWeekNum                 Int?              @map("TaskStartByWeekNum") @db.SmallInt
   TaskStartByIsPostProduction    Boolean           @default(dbgenerated("(b'0')")) @db.Bit(1)
   CompleteByWeekNum              Int?              @map("TaskCompleteByWeekNum") @db.SmallInt
@@ -563,7 +563,7 @@ model MasterTask {
   MasterTaskRepeat               MasterTaskRepeat? @relation(fields: [MTRId], references: [Id], onDelete: Cascade, map: "MasterTaskRepeat_MasterTask")
 
   @@index([MTRId], map: "MasterTaskRepeat_MasterTask")
-  @@index([TaskAssignedToAccUserId], map: "Master_AccountUser_MasterTask")
+  @@index([AssignedToAccUserId], map: "Master_AccountUser_MasterTask")
 }
 
 model AccountUserProduction {
