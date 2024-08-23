@@ -124,7 +124,7 @@ const GapSuggest = ({ startDate, endDate, productionId, onOkClick = () => null }
   };
 
   return (
-    <div className="text-primary-input-text w-[800px] flex-col">
+    <div className="text-primary-input-text w-[900px] flex-col">
       <div className="flex flex-col">
         <Form onSave={getSuggestions} />
       </div>
