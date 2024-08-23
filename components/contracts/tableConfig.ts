@@ -134,10 +134,12 @@ export const getCompanyContractsColumnDefs = (userList = []) => [
     field: 'pdf',
     width: 100,
     cellRenderer: ButtonRenderer,
-    cellRendererParams: () => ({
+    cellRendererParams: (params) => ({
       buttonText: 'Save as PDF',
       variant: 'primary',
       width: 90,
+      type: 'download',
+      href: `/api/company-contracts/export/${params.data?.id}`,
     }),
     cellStyle: {
       paddingRight: '0.5em',

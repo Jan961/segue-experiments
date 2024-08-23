@@ -9,12 +9,30 @@ interface ButtonRendererProps extends ICellRendererParams, TooltipProps {
   className?: string;
   disabled?: boolean;
   tpActive?: boolean;
+  href?: string;
+  type?: string;
 }
 
 export default function ButtonRenderer(props: ButtonRendererProps) {
-  const { variant = 'secondary', buttonText, className, disabled = false, tpActive = false, ...tooltipProps } = props;
+  const {
+    variant = 'secondary',
+    buttonText,
+    className,
+    disabled = false,
+    tpActive = false,
+    type,
+    href,
+    ...tooltipProps
+  } = props;
 
-  const buttonElement = <Button disabled={disabled} className={className} variant={variant} text={buttonText} />;
+  const buttonElement =
+    type === 'download' ? (
+      <a href={href} target="_blank" rel="noreferrer" download>
+        <Button disabled={disabled} className={className} variant={variant} text={buttonText} />
+      </a>
+    ) : (
+      <Button disabled={disabled} className={className} variant={variant} text={buttonText} />
+    );
 
   return (
     <div className="w-full h-full flex justify-center items-center">

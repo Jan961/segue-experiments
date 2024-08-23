@@ -1,6 +1,7 @@
 import prisma from 'lib/prisma';
 import { IPersonDetails } from 'components/contracts/types';
 import { prepareUpdateData } from 'utils/apiUtils';
+import { Prisma } from 'prisma/generated/prisma-client';
 
 export const preparePersonUpdateData = (personDetails: Partial<IPersonDetails>) => {
   const fieldMappings = [
@@ -30,5 +31,65 @@ export const updatePerson = async (id: number, personDetails: any, tx = prisma) 
   return tx.person.update({
     where: { PersonId: id },
     data: personDetails,
+  });
+};
+
+const personInclude = Prisma.validator<Prisma.PersonInclude>()({
+  Organisation_Person_PersonAgencyOrgIdToOrganisation: {
+    include: {
+      Person_Organisation_OrgContactPersonIdToPerson: {
+        include: {
+          Address: true,
+        },
+      },
+    },
+  },
+  PersonPersonRole: true,
+  PersonOtherRole: true,
+  PersonPerson_PersonPerson_PPPersonIdToPerson: {
+    include: {
+      Person_PersonPerson_PPRolePersonIdToPerson: {
+        include: {
+          Address: true,
+        },
+      },
+    },
+  },
+});
+
+export type PersonWithRoles = Prisma.PersonGetPayload<{
+  include: typeof personInclude;
+}>;
+
+export const getPersonById = async (id: number): Promise<PersonWithRoles> => {
+  return prisma.person.findUnique({
+    where: { PersonId: Number(id) },
+    include: {
+      Address: true,
+      Organisation_Person_PersonAgencyOrgIdToOrganisation: {
+        include: {
+          Person_Organisation_OrgContactPersonIdToPerson: {
+            include: {
+              Address: true,
+            },
+          },
+        },
+      },
+      PersonPersonRole: {
+        include: {
+          PersonRole: true,
+        },
+      },
+      PersonOtherRole: true,
+      PersonPerson_PersonPerson_PPPersonIdToPerson: {
+        include: {
+          Person_PersonPerson_PPRolePersonIdToPerson: {
+            include: {
+              Address: true,
+            },
+          },
+        },
+      },
+    },
   });
 };

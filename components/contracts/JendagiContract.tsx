@@ -15,6 +15,8 @@ export interface JendagiContractProps {
   contractDetails: Partial<IContractDetails>;
   productionCompany: Partial<ProductionCompanyDTO>;
   currency?: string;
+  showName?: string;
+  venueName?: string;
 }
 
 const defaultContractDetails = {

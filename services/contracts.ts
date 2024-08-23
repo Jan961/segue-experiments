@@ -167,3 +167,19 @@ export const prepareAgencyOrganisationUpdateData = (agencyDetails: any) => {
 
   return prepareUpdateData(agencyDetails, fieldMappings);
 };
+
+export const getContractDataById = async (contractId: number) => {
+  return prisma.ACCContract.findUnique({
+    where: { ContractId: contractId },
+    include: {
+      Currency: true,
+      ACCClause: true,
+      ACCPayment: true,
+      ACCPubEvent: true,
+      ACCDepartment: true,
+      Person: true,
+      Production: true,
+      Venue: true,
+    },
+  });
+};

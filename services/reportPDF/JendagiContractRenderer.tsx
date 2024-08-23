@@ -1,37 +1,6 @@
 import { Document, Page, Text, View, StyleSheet, Image } from '@react-pdf/renderer';
 import { dateToSimple } from 'services/dateService';
-import { useRecoilValue } from 'recoil';
-import { contractsVenueState } from 'state/contracts/contractsVenueState';
-import { productionJumpState } from 'state/booking/productionJumpState';
 import { JendagiContractProps } from 'components/contracts/JendagiContract';
-
-const defaultContractDetails = {
-  currency: null,
-  firstDayOfWork: null,
-  lastDayOfWork: null,
-  specificAvailabilityNotes: '',
-  publicityEventList: null,
-  rehearsalVenue: {
-    townCity: '',
-    venue: null,
-    notes: '',
-  },
-  isAccomodationProvided: false,
-  accomodationNotes: '',
-  isTransportProvided: false,
-  transportNotes: '',
-  isNominatedDriver: false,
-  nominatedDriverNotes: '',
-  paymentType: null,
-  weeklyPayDetails: null,
-  totalPayDetails: null,
-  paymentBreakdownList: null,
-  cancellationFee: 0,
-  cancellationFeeNotes: '',
-  includeAdditionalClauses: false,
-  additionalClause: null,
-  customClauseList: null,
-};
 
 const styles = StyleSheet.create({
   page: {
@@ -100,18 +69,13 @@ const styles = StyleSheet.create({
 const JendagiContract = ({
   contractPerson,
   contractSchedule,
-  contractDetails = defaultContractDetails,
+  contractDetails = {},
   productionCompany,
   currency,
+  showName,
+  venueName,
 }: JendagiContractProps) => {
-  const { productions } = useRecoilValue(productionJumpState);
-  const venueMap = useRecoilValue(contractsVenueState);
-
   const currentDate = dateToSimple(new Date().toISOString());
-
-  const getVenueNameFromId = (venueId) => {
-    return Object.values(venueMap).find((venue) => venue.Id === venueId).Name;
-  };
 
   const formatPayment = (payment) => {
     return (contractDetails.currency ? currency : '') + (payment || 'N/A');
@@ -127,11 +91,6 @@ const JendagiContract = ({
     return publicityArray.map((list) => {
       return dateToSimple(list.date) + ': ' + (contractDetails.currency ? currency : '') + list.notes;
     });
-  };
-
-  const getShowNameFromId = (id) => {
-    const result = productions.find((prod) => prod.Id === id);
-    return result.ShowName;
   };
 
   return (
@@ -189,7 +148,7 @@ const JendagiContract = ({
           <View style={styles.tableRow}>
             <Text style={styles.tableCell}>4</Text>
             <Text style={styles.tableCell}>The PRODUCTION</Text>
-            <Text style={styles.tableCell}>{getShowNameFromId(contractSchedule.production)}</Text>
+            <Text style={styles.tableCell}>{showName}</Text>
           </View>
           <View style={styles.tableRow}>
             <Text style={styles.tableCell}>5</Text>
@@ -216,7 +175,7 @@ const JendagiContract = ({
             <Text style={styles.tableCell}>
               {contractDetails.rehearsalVenue.venue
                 ? 'Likely to be ' +
-                  getVenueNameFromId(contractDetails.rehearsalVenue.venue) +
+                  venueName +
                   (contractDetails.rehearsalVenue.notes !== '' ? ' - ' + contractDetails.rehearsalVenue.notes : '')
                 : 'N/A'}
             </Text>
