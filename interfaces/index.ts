@@ -397,7 +397,7 @@ export type BookingContactNoteDTO = {
   CoContactName: string;
   ContactDate: string;
   Notes: string;
-  UserId: number;
+  ActionAccUserId: number;
 };
 
 export type AllocatedHoldDTO = {

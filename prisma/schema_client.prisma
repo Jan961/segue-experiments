@@ -90,12 +90,12 @@ model BookingContactNotes {
   BookingId                  Int       @map("ContactNoteBookingId")
   CoContactName              String?   @map("ContactNoteContactName") @db.VarChar(50)
   ContactDate                DateTime? @map("ContactNoteDateTime") @db.DateTime(0)
-  ContactNoteActionAccUserId Int?
+  ActionAccUserId            Int?      @map("ContactNoteActionAccUserId")
   Notes                      String?   @map("ContactNoteNotes") @db.LongText
   Booking                    Booking   @relation(fields: [BookingId], references: [Id], onDelete: Cascade, map: "BookingBookingContactNotes")
 
   @@index([BookingId], map: "BookingBookingContactNotes")
-  @@index([ContactNoteActionAccUserId], map: "Master_AccountUser_BookingContactNotes")
+  @@index([ActionAccUserId], map: "Master_AccountUser_BookingContactNotes")
 }
 
 model Contract {

@@ -155,11 +155,14 @@ export const contactNoteColDefs = (updateContactNote, userList) => [
     headerName: 'Actioned By',
     field: 'UserId',
     cellRenderer: function (params) {
-      if (params.data.UserId === null) {
+      if (params.data.ActionAccUserId === null) {
         return '';
       } else {
-        const actByName = userList.find((user) => user.value === parseInt(params.data.UserId)).text;
+        // console.log(userList)
+        // console.log(params.data.ActionAccUserId)
+        const actByName = userList.find((user) => user.value === parseInt(params.data.ActionAccUserId)).text;
         return actByName;
+        // return 'HELLO'
       }
     },
     cellStyle: {
@@ -234,13 +237,16 @@ export const allocSeatsColDefs = [
         value: params.data.TicketHolderName + '\n' + params.data.TicketHolderEmail,
       };
     },
+    cellStyle: {
+      marginLeft: '4px',
+    },
     wrapText: true,
     autoHeight: true,
     width: 200,
   },
   {
     headerName: 'Arranged by',
-    field: 'ArrangedById',
+    field: 'ArrangedByAccUserId',
     cellRenderer: DefaultCellRenderer,
     width: 120,
   },

@@ -1,5 +1,6 @@
 import { startOfDay } from 'date-fns';
-import prisma from 'lib/prisma';
+import client from 'lib/prisma';
+import master from 'lib/prisma_master';
 import { addDurationToDate, getArrayOfDatesBetween, getMonday, getWeeksBetweenDates } from 'services/dateService';
 import { getEmailFromReq, checkAccess, getAccountIdFromReq } from 'services/userService';
 import formatInputDate from 'utils/dateInputFormat';
@@ -13,14 +14,14 @@ export default async function handle(req, res) {
     const access = await checkAccess(email);
     if (!access) return res.status(401).end();
 
-    const dateBlock = await prisma.dateBlock.findMany({
+    const dateBlock = await client.dateBlock.findMany({
       where: {
         ProductionId,
         IsPrimary: true,
       },
     });
 
-    const prodCo = await prisma.productionCompany.findMany({
+    const prodCo = await master.productionCompany.findMany({
       where: {
         AccountId: accountId,
       },
@@ -29,7 +30,7 @@ export default async function handle(req, res) {
       },
     });
 
-    const production = await prisma.production.findUnique({
+    const production = await client.production.findUnique({
       where: {
         Id: ProductionId,
       },

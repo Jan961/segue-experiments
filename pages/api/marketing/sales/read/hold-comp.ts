@@ -1,5 +1,6 @@
 import { startOfDay } from 'date-fns';
-import prisma from 'lib/prisma';
+import client from 'lib/prisma';
+import master from 'lib/prisma_master';
 import { addDurationToDate, getMonday } from 'services/dateService';
 import { getEmailFromReq, checkAccess, getAccountIdFromReq } from 'services/userService';
 
@@ -29,19 +30,19 @@ const removeTime = (inputDate: Date) => {
 };
 
 const getCompHoldData = async (salesDate, bookingId) => {
-  const holdTypes = await prisma.holdType.findMany({
+  const holdTypes = await client.holdType.findMany({
     orderBy: {
       HoldTypeSeqNo: 'asc',
     },
   });
 
-  const compTypes = await prisma.compType.findMany({
+  const compTypes = await client.compType.findMany({
     orderBy: {
       CompTypeSeqNo: 'asc',
     },
   });
 
-  const rawHoldData = await prisma.salesSet.findMany({
+  const rawHoldData = await client.salesSet.findMany({
     where: {
       SetBookingId: bookingId,
     },
@@ -85,7 +86,7 @@ const getCompHoldData = async (salesDate, bookingId) => {
     return acc;
   }, []);
 
-  const rawCompData = await prisma.salesSet.findMany({
+  const rawCompData = await client.salesSet.findMany({
     where: {
       SetBookingId: bookingId,
     },
@@ -189,7 +190,7 @@ const isDataAvailable = (data) => {
 const copyData = async (data, datesTried, bookingId) => {
   const promises = datesTried.map(async (dtIn) => {
     // create a SalesSet and get a setID for this week that has no data
-    const setResult = await prisma.SalesSet.create({
+    const setResult = await client.SalesSet.create({
       data: {
         SetBookingId: parseInt(bookingId),
         SetPerformanceId: null,
@@ -208,7 +209,7 @@ const copyData = async (data, datesTried, bookingId) => {
     data.holds.forEach((holdRec) => {
       if (holdRec.seats > 0 || holdRec.value > 0) {
         dbUpdates.push(
-          prisma.setHold.create({
+          client.setHold.create({
             data: {
               SetHoldSetId: setResult.SetId,
               SetHoldHoldTypeId: holdRec.id,
@@ -224,7 +225,7 @@ const copyData = async (data, datesTried, bookingId) => {
     data.comps.forEach((compRec) => {
       if (compRec.seats > 0) {
         dbUpdates.push(
-          prisma.setComp.create({
+          client.setComp.create({
             data: {
               SetCompSetId: setResult.SetId,
               SetCompCompTypeId: compRec.id,
@@ -235,7 +236,7 @@ const copyData = async (data, datesTried, bookingId) => {
       }
     });
 
-    await prisma.$transaction(dbUpdates);
+    await client.$transaction(dbUpdates);
 
     // Return the setId for each created SalesSet
     return setResult.SetId;
@@ -247,7 +248,7 @@ const copyData = async (data, datesTried, bookingId) => {
 };
 
 const getDealMemoHoldsByBookingId = async (bookingId: number) => {
-  const booking = await prisma.booking.findUnique({
+  const booking = await client.booking.findUnique({
     where: {
       Id: bookingId,
     },
@@ -261,7 +262,7 @@ const getDealMemoHoldsByBookingId = async (bookingId: number) => {
     return [];
   }
 
-  const dealMemoHolds = await prisma.dealMemoHold.findMany({
+  const dealMemoHolds = await client.dealMemoHold.findMany({
     where: {
       DMHoldDeMoId: booking?.DealMemo.Id,
     },
@@ -298,7 +299,7 @@ export default async function handle(req, res) {
 
     let result: Res = null;
 
-    const { SalesFrequency } = await prisma.production.findUnique({
+    const { SalesFrequency } = await client.production.findUnique({
       where: {
         Id: ProductionId,
       },
@@ -309,7 +310,7 @@ export default async function handle(req, res) {
 
     // get first week of sales - this will depend of the production week start
     // this will determine how far back the process looks for hold/comp figure and define the stopping point
-    const prodCo = await prisma.productionCompany.findMany({
+    const prodCo = await master.productionCompany.findMany({
       where: {
         AccountId: accountId,
       },
@@ -318,7 +319,7 @@ export default async function handle(req, res) {
       },
     });
 
-    const dateBlock = await prisma.dateBlock.findMany({
+    const dateBlock = await client.dateBlock.findMany({
       where: {
         ProductionId,
         IsPrimary: true,

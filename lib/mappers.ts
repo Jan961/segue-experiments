@@ -281,7 +281,7 @@ export const bookingContactNoteMapper = (a: BookingContactNotes): BookingContact
   CoContactName: a.CoContactName,
   ContactDate: convertDate(a.ContactDate),
   Notes: a.Notes,
-  UserId: a.ContactNoteActionAccUserId,
+  ActionAccUserId: a.ActionAccUserId,
 });
 
 export const contractStatusmapper = (status: ContractStatusType) => {

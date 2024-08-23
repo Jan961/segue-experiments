@@ -90,14 +90,14 @@ export const checkAccess = async (email: string, items: AccessCheck = null): Pro
 };
 
 export const getUserId = async (email: string) => {
-  const { Id } = await prisma.user.findUnique({
+  const { UserId } = await prisma.user.findUnique({
     where: {
-      Email: email,
+      UserEmail: email,
     },
     select: {
-      Id: true,
+      UserId: true,
     },
   });
 
-  return Id;
+  return UserId;
 };

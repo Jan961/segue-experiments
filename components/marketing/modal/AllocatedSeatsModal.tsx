@@ -64,7 +64,7 @@ export default function AllocatedSeatsModal({
         (perfRec) => formatInputDate(perfRec.date) === data.date && getTimeFromDateAndTime(perfRec.date) === data.time,
       );
 
-      alert(JSON.stringify(data));
+      console.log(data);
 
       setPerfSelected(perf.value);
       setCustName(data.TicketHolderName);
@@ -79,7 +79,8 @@ export default function AllocatedSeatsModal({
       if (data.ArrangedByAccUserId === undefined) {
         setArrangedBy(null);
       } else {
-        setArrangedBy(data.ArrangedByAccUserId);
+        const accUserId = userTempList.find((user) => user.text === data.ArrangedByAccUserId).value;
+        setArrangedBy(accUserId);
       }
     } else if (type === 'new') {
       setPerfSelected(null);
