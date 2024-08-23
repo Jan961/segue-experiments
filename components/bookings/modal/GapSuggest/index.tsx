@@ -21,6 +21,7 @@ type GapSuggestProps = {
 };
 
 export const gridOptions = {
+  headerHeight: 999,
   autoSizeStrategy: {
     type: 'fitGridWidth',
     defaultMinWidth: 50,
@@ -42,11 +43,14 @@ const GapSuggest = ({ startDate, endDate, productionId, onOkClick = () => null }
       if (!selectedVenueIds.includes(row.VenueId)) {
         filteredRows.push({
           ...row,
-          TravelTime: formatMinutes(row.MinsFromStart + row.MinsFromEnd),
-          Miles: row.MinsFromStart + row.MinsFromEnd,
+          TravelTimeTo: formatMinutes(row.MinsFromStart),
+          MilesTo: row.MileageFromStart,
+          TravelTimeFrom: formatMinutes(row.MinsFromEnd),
+          MilesFrom: row.MileageFromEnd,
         });
       }
     }
+    console.log(filteredRows.sort((a, b) => a.MinsFromStart - b.MinsFromStart));
     return filteredRows.sort((a, b) => a.MinsFromStart - b.MinsFromStart);
   }, [selectedVenueIds, rows]);
 
@@ -140,6 +144,7 @@ const GapSuggest = ({ startDate, endDate, productionId, onOkClick = () => null }
                 rowData={filteredRows?.slice(0, 30)}
                 styleProps={styleProps}
                 gridOptions={gapSuggestTableOptions}
+                headerHeight={80}
               />
             </div>
           </div>
