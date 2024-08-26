@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { authMiddleware } from '@clerk/nextjs';
-
 const publicPaths = [
   '/api/user*',
   '/api/account*',
@@ -11,6 +10,7 @@ const publicPaths = [
   '/sign-in*',
   '/account/sign-up',
   '/access-denied',
+  '/auth/**',
 ];
 
 const isPublic = (path: string) => {
@@ -26,7 +26,7 @@ export default authMiddleware({
 
     if (!userId) {
       // redirect the users to /pages/sign-in/[[...index]].ts
-      const signInUrl = new URL('/sign-in', request.url);
+      const signInUrl = new URL('/auth/sign-in', request.url);
       return NextResponse.redirect(signInUrl);
     }
 
