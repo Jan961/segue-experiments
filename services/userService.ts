@@ -1,6 +1,6 @@
 import { clerkClient } from '@clerk/nextjs';
 import { getAuth } from '@clerk/nextjs/server';
-import prisma from 'lib/prisma';
+import prisma from 'lib/prisma_master';
 import { AccessCheck, checkAccess as checkAccessDirect } from './accessService';
 import { userMapper } from 'lib/mappers';
 import { UserDto } from 'interfaces';
@@ -34,16 +34,16 @@ export const getUserNameForClerkId = async (userId: string): Promise<string> => 
 };
 
 export const getAccountId = async (email: string) => {
-  const { AccountId } = await prisma.user.findUnique({
+  const { AccUserAccountId } = await prisma.user.findUnique({
     where: {
-      Email: email,
+      UserEmail: email,
     },
     select: {
-      AccountId: true,
+      AccountUser: true,
     },
   });
 
-  return AccountId;
+  return AccUserAccountId;
 };
 
 export const getEmailFromReq = async (req: any) => {
