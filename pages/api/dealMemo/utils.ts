@@ -89,15 +89,15 @@ export const getDealMemoHold = (dealMemoHold, demoId) => {
 };
 
 export const getContactIdData = (dealMemo) => {
-  if (dealMemo.DeMoBOMVenueContactId) {
-    dealMemo.VenueContact_DealMemo_DeMoBOMVenueContactIdToVenueContact = {
-      connect: { Id: dealMemo.DeMoBOMVenueContactId },
+  if (dealMemo.BOMVenueContactId) {
+    dealMemo.VenueContact_DealMemo_BOMVenueContactIdToVenueContact = {
+      connect: { Id: dealMemo.BOMVenueContactId },
     };
   }
 
-  if (dealMemo.DeMoTechVenueContactId) {
-    dealMemo.VenueContact_DealMemo_DeMoTechVenueContactIdToVenueContact = {
-      connect: { Id: dealMemo.DeMoTechVenueContactId },
+  if (dealMemo.TechVenueContactId) {
+    dealMemo.VenueContact_DealMemo_TechVenueContactIdToVenueContact = {
+      connect: { Id: dealMemo.TechVenueContactId },
     };
   }
   return dealMemo;

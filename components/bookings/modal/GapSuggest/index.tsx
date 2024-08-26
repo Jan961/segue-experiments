@@ -42,8 +42,10 @@ const GapSuggest = ({ startDate, endDate, productionId, onOkClick = () => null }
       if (!selectedVenueIds.includes(row.VenueId)) {
         filteredRows.push({
           ...row,
-          TravelTime: formatMinutes(row.MinsFromStart + row.MinsFromEnd),
-          Miles: row.MinsFromStart + row.MinsFromEnd,
+          TravelTimeTo: formatMinutes(row.MinsFromStart),
+          MilesTo: row.MileageFromStart,
+          TravelTimeFrom: formatMinutes(row.MinsFromEnd),
+          MilesFrom: row.MileageFromEnd,
         });
       }
     }
@@ -122,7 +124,7 @@ const GapSuggest = ({ startDate, endDate, productionId, onOkClick = () => null }
   };
 
   return (
-    <div className="text-primary-input-text w-[800px] flex-col">
+    <div className="text-primary-input-text w-[900px] flex-col">
       <div className="flex flex-col">
         <Form onSave={getSuggestions} />
       </div>
@@ -140,6 +142,7 @@ const GapSuggest = ({ startDate, endDate, productionId, onOkClick = () => null }
                 rowData={filteredRows?.slice(0, 30)}
                 styleProps={styleProps}
                 gridOptions={gapSuggestTableOptions}
+                headerHeight={80}
               />
             </div>
           </div>

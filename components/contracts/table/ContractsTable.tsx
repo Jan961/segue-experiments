@@ -44,10 +44,12 @@ export default function ContractsTable({ rowData }: ContractsTableProps) {
   }, [rowData]);
 
   const handleRowDoubleClicked = (e: RowDoubleClickedEvent) => {
-    setEditContractData({
-      visible: true,
-      contract: e.data,
-    });
+    if (e.data.dayType === 'Performance') {
+      setEditContractData({
+        visible: true,
+        contract: e.data,
+      });
+    }
   };
 
   const handleClose = () => {

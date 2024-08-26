@@ -43,7 +43,13 @@ const SalesTab = forwardRef<SalesTabRef, SalesTabProps>((props, ref) => {
   };
 
   useEffect(() => {
-    setDataAvailable(true);
+    if (props.bookingId === null) {
+      setDataAvailable(false);
+    } else {
+      setDataAvailable(true);
+      setIsLoading(true);
+      setShowError(false);
+    }
     setRowData([]);
     if (props.bookingId !== null && props.bookingId !== undefined) {
       retrieveSalesData(props.bookingId.toString());

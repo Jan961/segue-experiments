@@ -149,3 +149,10 @@ export const getAllOptions = (options: SelectOption[], allLabel?: string, allVal
   { text: allLabel ?? 'All', value: allValue ?? 'all' },
   ...options,
 ];
+
+export const checkDecimalStringFormat = (decimalString: string, precision: number, scale: number, regex?: RegExp) => {
+  const [integerPart, fractionalPart] = decimalString.split('.');
+  if (regex && !regex.test(decimalString)) return false;
+  if (integerPart.length > precision - scale || (fractionalPart && fractionalPart.length > scale)) return false;
+  return true;
+};

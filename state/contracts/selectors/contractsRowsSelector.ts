@@ -75,6 +75,11 @@ export const contractsRowsSelector = selector({
         Notes: contractData[rowData.Id] ? contractData[rowData.Id].ContractNotes : '',
         ReceivedBackDate: contractData[rowData.Id] ? contractData[rowData.Id].ReceivedBackDate : '',
         Exceptions: contractData[rowData.Id] ? contractData[rowData.Id].Exceptions : '',
+        BankDetailsSent: contractData[rowData.Id] ? contractData[rowData.Id].BankDetailsSent : '',
+        TechSpecSent: contractData[rowData.Id] ? contractData[rowData.Id].TechSpecSent : '',
+        PRSCertSent: contractData[rowData.Id] ? contractData[rowData.Id].PRSCertSent : '',
+        GP: contractData[rowData.Id] ? contractData[rowData.Id].GP : '',
+        PromoterPercent: contractData[rowData.Id] ? contractData[rowData.Id].PromoterPercent : '',
         DateBlockId: contractBookingData[rowData.Id] ? contractBookingData[rowData.Id].DateBlockId : '',
         VenueId: contractBookingData[rowData.Id] ? contractBookingData[rowData.Id].VenueId : '',
         FirstDate: contractBookingData[rowData.Id] ? contractBookingData[rowData.Id].FirstDate : '',
@@ -138,7 +143,12 @@ export const contractsRowsSelector = selector({
       }, {});
       Object.keys(performancesGroup).forEach((date) => {
         bookedDates.push(getKey(date));
-        addRow(date, 'Performance', { ...b, PerformanceIds: performancesGroup[date] }, helper.getContractsDetails);
+        addRow(
+          date,
+          'Performance',
+          { ...b, PerformanceIds: Object.values(performancesGroup).flatMap((arr) => arr) },
+          helper.getContractsDetails,
+        );
       });
     });
     Object.values(other).forEach((o) => {
