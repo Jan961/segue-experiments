@@ -59,4 +59,3 @@ coverage
 
 #prisma
 prisma/views/
-prisma/generated/
