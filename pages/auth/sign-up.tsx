@@ -18,24 +18,26 @@ import classNames from 'classnames';
 
 const PIN_REGEX = /^[0-9]{4}$/;
 
+const DEFAULT_ACCOUNT_DETAILS = {
+  firstName: '',
+  lastName: '',
+  companyName: '',
+  email: '',
+  phoneNumber: '',
+  password: '',
+  confirmPassword: '',
+  organisationId: '',
+  pin: '',
+  repeatPin: '',
+};
+
 const SignUp = () => {
   const router = useRouter();
   const [error, setError] = useState('');
   const { isLoaded: signUpLoaded, signUp } = useSignUp();
   const [authMode, setAuthMode] = useState<'default' | 'signUp' | 'signIn'>('default');
   const { signIn } = useSignIn();
-  const [accountDetails, setAccountDetails] = useState({
-    firstName: '',
-    lastName: '',
-    companyName: '',
-    email: '',
-    phoneNumber: '',
-    password: '',
-    confirmPassword: '',
-    organisationId: '',
-    pin: '',
-    repeatPin: '',
-  });
+  const [accountDetails, setAccountDetails] = useState(DEFAULT_ACCOUNT_DETAILS);
   const isValidEmail = useMemo(() => validateEmail(accountDetails.email), [accountDetails.email]);
 
   const isFormValid = useMemo(() => {
@@ -83,18 +85,18 @@ const SignUp = () => {
       }
       setAccountDetails((prev) => ({ ...prev, accountId: data.id }));
       // Check if user already registered with Clerk
-      const response = await signIn.create({
+      await signIn.create({
         identifier: accountDetails.email,
         password: 'dummy_password',
       });
-      console.log(response);
+
       return true;
     } catch (err) {
       const errorCode = err.errors[0].code;
       if (errorCode === EMAIL_NOT_FOUND) {
         setAuthMode('signUp');
       } else if (errorCode === PASSWORD_INCORRECT || errorCode === INVALID_VERIFICATION_STRATEGY) {
-        console.log('User already registeredwith clerk. Verify if they have a pin registered');
+        // 'User already registeredwith clerk. Verify if they have a pin registered'
         verifyUserExits();
       } else {
         setError(err.errors[0].messsage);
@@ -124,8 +126,7 @@ const SignUp = () => {
   const handleSaveUser = async () => {
     try {
       // Create the user within clerk
-      const data = await createNewUserWithClerk();
-      console.log(data);
+      await createNewUserWithClerk();
 
       // Create the user in our database
       await axios.post('/api/user/create', accountDetails);
@@ -289,7 +290,6 @@ const SignUp = () => {
                 placeholder="Enter PIN"
                 className="w-32"
                 value={accountDetails.pin}
-                pattern="\d{4}"
                 maxlength={4}
                 onChange={handleAccountDetailsChange}
               />
@@ -311,7 +311,6 @@ const SignUp = () => {
                 placeholder="Enter PIN"
                 className="w-32"
                 value={accountDetails.repeatPin}
-                pattern="\d{4}"
                 maxlength={4}
                 onChange={handleAccountDetailsChange}
               />

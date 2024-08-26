@@ -183,7 +183,6 @@ const SignIn = () => {
                 onChange={handleLoginDetailsChange}
                 className="w-24 ml-4"
                 type="text"
-                pattern="\d{4}"
                 maxlength={4}
               />
               <Link href="/auth/sign-up" passHref className="ml-4">

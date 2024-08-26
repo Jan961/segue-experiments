@@ -9,7 +9,8 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         AccountOrganisationId: organisationId,
       },
     });
-    return res.status(200).json(
+
+    const userAccount =
       accounts?.length > 0
         ? {
             id: accounts[0].AccountId,
@@ -18,8 +19,9 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         : {
             id: null,
             companyName: '',
-          },
-    );
+          };
+
+    return res.status(200).json(userAccount);
   } catch (err) {
     console.log(err);
     res.status(500).json({ err: 'Error occurred while validating account' });

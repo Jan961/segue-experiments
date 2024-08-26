@@ -16,9 +16,10 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         Account: true,
       },
     });
-    return res
-      .status(200)
-      .json(accounts.flatMap((a) => ({ text: a.Account.AccountName, value: a.Account.AccountOrganisationId })));
+
+    const accountsForUser =
+      accounts?.flatMap((a) => ({ text: a.Account.AccountName, value: a.Account.AccountOrganisationId })) || [];
+    return res.status(200).json(accountsForUser);
   } catch (err) {
     console.log(err);
     res.status(500).json({ err: 'Error occurred while getting accounts' });
