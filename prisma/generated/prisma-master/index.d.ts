@@ -1846,10 +1846,12 @@ export namespace Prisma {
 
   export type AccountUserCountOutputType = {
     AccountUserPermission: number;
+    File: number;
   };
 
   export type AccountUserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     AccountUserPermission?: boolean | AccountUserCountOutputTypeCountAccountUserPermissionArgs;
+    File?: boolean | AccountUserCountOutputTypeCountFileArgs;
   };
 
   // Custom InputTypes
@@ -1872,6 +1874,15 @@ export namespace Prisma {
     ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs,
   > = {
     where?: AccountUserPermissionWhereInput;
+  };
+
+  /**
+   * AccountUserCountOutputType without action
+   */
+  export type AccountUserCountOutputTypeCountFileArgs<
+    ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs,
+  > = {
+    where?: FileWhereInput;
   };
 
   /**
@@ -2015,36 +2026,6 @@ export namespace Prisma {
     ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs,
   > = {
     where?: AccountSubscriptionWhereInput;
-  };
-
-  /**
-   * Count Type UserCountOutputType
-   */
-
-  export type UserCountOutputType = {
-    File: number;
-  };
-
-  export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    File?: boolean | UserCountOutputTypeCountFileArgs;
-  };
-
-  // Custom InputTypes
-  /**
-   * UserCountOutputType without action
-   */
-  export type UserCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the UserCountOutputType
-     */
-    select?: UserCountOutputTypeSelect<ExtArgs> | null;
-  };
-
-  /**
-   * UserCountOutputType without action
-   */
-  export type UserCountOutputTypeCountFileArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: FileWhereInput;
   };
 
   /**
@@ -2338,7 +2319,7 @@ export namespace Prisma {
     AccountLogoFileId: number | null;
     AccountMainEmail: string | null;
     AccountNumPeople: number | null;
-    AccountOrganisationId: string | null;
+    AccountOrganisationId: string;
     AccountTermsAgreedBy: string | null;
     AccountTermsAgreedDate: Date | null;
     AccountWebsite: string | null;
@@ -2461,7 +2442,7 @@ export namespace Prisma {
         AccountLogoFileId: number | null;
         AccountMainEmail: string | null;
         AccountNumPeople: number | null;
-        AccountOrganisationId: string | null;
+        AccountOrganisationId: string;
         AccountTermsAgreedBy: string | null;
         AccountTermsAgreedDate: Date | null;
         AccountWebsite: string | null;
@@ -5555,6 +5536,7 @@ export namespace Prisma {
         Account?: boolean | AccountDefaultArgs<ExtArgs>;
         User?: boolean | UserDefaultArgs<ExtArgs>;
         AccountUserPermission?: boolean | AccountUser$AccountUserPermissionArgs<ExtArgs>;
+        File?: boolean | AccountUser$FileArgs<ExtArgs>;
         _count?: boolean | AccountUserCountOutputTypeDefaultArgs<ExtArgs>;
       },
       ExtArgs['result']['accountUser']
@@ -5572,6 +5554,7 @@ export namespace Prisma {
     Account?: boolean | AccountDefaultArgs<ExtArgs>;
     User?: boolean | UserDefaultArgs<ExtArgs>;
     AccountUserPermission?: boolean | AccountUser$AccountUserPermissionArgs<ExtArgs>;
+    File?: boolean | AccountUser$FileArgs<ExtArgs>;
     _count?: boolean | AccountUserCountOutputTypeDefaultArgs<ExtArgs>;
   };
 
@@ -5581,6 +5564,7 @@ export namespace Prisma {
       Account: Prisma.$AccountPayload<ExtArgs>;
       User: Prisma.$UserPayload<ExtArgs>;
       AccountUserPermission: Prisma.$AccountUserPermissionPayload<ExtArgs>[];
+      File: Prisma.$FilePayload<ExtArgs>[];
     };
     scalars: $Extensions.GetPayloadResult<
       {
@@ -5992,6 +5976,9 @@ export namespace Prisma {
     AccountUserPermission<T extends AccountUser$AccountUserPermissionArgs<ExtArgs> = {}>(
       args?: Subset<T, AccountUser$AccountUserPermissionArgs<ExtArgs>>,
     ): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AccountUserPermissionPayload<ExtArgs>, T, 'findMany'> | Null>;
+    File<T extends AccountUser$FileArgs<ExtArgs> = {}>(
+      args?: Subset<T, AccountUser$FileArgs<ExtArgs>>,
+    ): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FilePayload<ExtArgs>, T, 'findMany'> | Null>;
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -6345,6 +6332,26 @@ export namespace Prisma {
     take?: number;
     skip?: number;
     distinct?: AccountUserPermissionScalarFieldEnum | AccountUserPermissionScalarFieldEnum[];
+  };
+
+  /**
+   * AccountUser.File
+   */
+  export type AccountUser$FileArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the File
+     */
+    select?: FileSelect<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FileInclude<ExtArgs> | null;
+    where?: FileWhereInput;
+    orderBy?: FileOrderByWithRelationInput | FileOrderByWithRelationInput[];
+    cursor?: FileWhereUniqueInput;
+    take?: number;
+    skip?: number;
+    distinct?: FileScalarFieldEnum | FileScalarFieldEnum[];
   };
 
   /**
@@ -9171,13 +9178,13 @@ export namespace Prisma {
 
   export type FileAvgAggregateOutputType = {
     FileId: number | null;
-    FileUploadUserId: number | null;
+    FileUploadAccUserId: number | null;
     FileSizeBytes: number | null;
   };
 
   export type FileSumAggregateOutputType = {
     FileId: number | null;
-    FileUploadUserId: number | null;
+    FileUploadAccUserId: number | null;
     FileSizeBytes: bigint | null;
   };
 
@@ -9187,7 +9194,7 @@ export namespace Prisma {
     FileMediaType: string | null;
     FileLocation: string | null;
     FileUploadDateTime: Date | null;
-    FileUploadUserId: number | null;
+    FileUploadAccUserId: number | null;
     FileSizeBytes: bigint | null;
   };
 
@@ -9197,7 +9204,7 @@ export namespace Prisma {
     FileMediaType: string | null;
     FileLocation: string | null;
     FileUploadDateTime: Date | null;
-    FileUploadUserId: number | null;
+    FileUploadAccUserId: number | null;
     FileSizeBytes: bigint | null;
   };
 
@@ -9207,20 +9214,20 @@ export namespace Prisma {
     FileMediaType: number;
     FileLocation: number;
     FileUploadDateTime: number;
-    FileUploadUserId: number;
+    FileUploadAccUserId: number;
     FileSizeBytes: number;
     _all: number;
   };
 
   export type FileAvgAggregateInputType = {
     FileId?: true;
-    FileUploadUserId?: true;
+    FileUploadAccUserId?: true;
     FileSizeBytes?: true;
   };
 
   export type FileSumAggregateInputType = {
     FileId?: true;
-    FileUploadUserId?: true;
+    FileUploadAccUserId?: true;
     FileSizeBytes?: true;
   };
 
@@ -9230,7 +9237,7 @@ export namespace Prisma {
     FileMediaType?: true;
     FileLocation?: true;
     FileUploadDateTime?: true;
-    FileUploadUserId?: true;
+    FileUploadAccUserId?: true;
     FileSizeBytes?: true;
   };
 
@@ -9240,7 +9247,7 @@ export namespace Prisma {
     FileMediaType?: true;
     FileLocation?: true;
     FileUploadDateTime?: true;
-    FileUploadUserId?: true;
+    FileUploadAccUserId?: true;
     FileSizeBytes?: true;
   };
 
@@ -9250,7 +9257,7 @@ export namespace Prisma {
     FileMediaType?: true;
     FileLocation?: true;
     FileUploadDateTime?: true;
-    FileUploadUserId?: true;
+    FileUploadAccUserId?: true;
     FileSizeBytes?: true;
     _all?: true;
   };
@@ -9344,7 +9351,7 @@ export namespace Prisma {
     FileMediaType: string | null;
     FileLocation: string;
     FileUploadDateTime: Date;
-    FileUploadUserId: number;
+    FileUploadAccUserId: number;
     FileSizeBytes: bigint | null;
     _count: FileCountAggregateOutputType | null;
     _avg: FileAvgAggregateOutputType | null;
@@ -9372,10 +9379,10 @@ export namespace Prisma {
       FileMediaType?: boolean;
       FileLocation?: boolean;
       FileUploadDateTime?: boolean;
-      FileUploadUserId?: boolean;
+      FileUploadAccUserId?: boolean;
       FileSizeBytes?: boolean;
       Account?: boolean | File$AccountArgs<ExtArgs>;
-      User?: boolean | UserDefaultArgs<ExtArgs>;
+      AccountUser?: boolean | AccountUserDefaultArgs<ExtArgs>;
       ProductionCompany?: boolean | File$ProductionCompanyArgs<ExtArgs>;
       _count?: boolean | FileCountOutputTypeDefaultArgs<ExtArgs>;
     },
@@ -9388,13 +9395,13 @@ export namespace Prisma {
     FileMediaType?: boolean;
     FileLocation?: boolean;
     FileUploadDateTime?: boolean;
-    FileUploadUserId?: boolean;
+    FileUploadAccUserId?: boolean;
     FileSizeBytes?: boolean;
   };
 
   export type FileInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     Account?: boolean | File$AccountArgs<ExtArgs>;
-    User?: boolean | UserDefaultArgs<ExtArgs>;
+    AccountUser?: boolean | AccountUserDefaultArgs<ExtArgs>;
     ProductionCompany?: boolean | File$ProductionCompanyArgs<ExtArgs>;
     _count?: boolean | FileCountOutputTypeDefaultArgs<ExtArgs>;
   };
@@ -9403,7 +9410,7 @@ export namespace Prisma {
     name: 'File';
     objects: {
       Account: Prisma.$AccountPayload<ExtArgs>[];
-      User: Prisma.$UserPayload<ExtArgs>;
+      AccountUser: Prisma.$AccountUserPayload<ExtArgs>;
       ProductionCompany: Prisma.$ProductionCompanyPayload<ExtArgs>[];
     };
     scalars: $Extensions.GetPayloadResult<
@@ -9413,7 +9420,7 @@ export namespace Prisma {
         FileMediaType: string | null;
         FileLocation: string;
         FileUploadDateTime: Date;
-        FileUploadUserId: number;
+        FileUploadAccUserId: number;
         FileSizeBytes: bigint | null;
       },
       ExtArgs['result']['file']
@@ -9788,10 +9795,10 @@ export namespace Prisma {
     Account<T extends File$AccountArgs<ExtArgs> = {}>(
       args?: Subset<T, File$AccountArgs<ExtArgs>>,
     ): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AccountPayload<ExtArgs>, T, 'findMany'> | Null>;
-    User<T extends UserDefaultArgs<ExtArgs> = {}>(
-      args?: Subset<T, UserDefaultArgs<ExtArgs>>,
-    ): Prisma__UserClient<
-      $Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, 'findUniqueOrThrow'> | Null,
+    AccountUser<T extends AccountUserDefaultArgs<ExtArgs> = {}>(
+      args?: Subset<T, AccountUserDefaultArgs<ExtArgs>>,
+    ): Prisma__AccountUserClient<
+      $Result.GetResult<Prisma.$AccountUserPayload<ExtArgs>, T, 'findUniqueOrThrow'> | Null,
       Null,
       ExtArgs
     >;
@@ -9834,7 +9841,7 @@ export namespace Prisma {
     readonly FileMediaType: FieldRef<'File', 'String'>;
     readonly FileLocation: FieldRef<'File', 'String'>;
     readonly FileUploadDateTime: FieldRef<'File', 'DateTime'>;
-    readonly FileUploadUserId: FieldRef<'File', 'Int'>;
+    readonly FileUploadAccUserId: FieldRef<'File', 'Int'>;
     readonly FileSizeBytes: FieldRef<'File', 'BigInt'>;
   }
 
@@ -13433,8 +13440,6 @@ export namespace Prisma {
       UserFirstName?: boolean;
       UserLastName?: boolean;
       AccountUser?: boolean | User$AccountUserArgs<ExtArgs>;
-      File?: boolean | User$FileArgs<ExtArgs>;
-      _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>;
     },
     ExtArgs['result']['user']
   >;
@@ -13448,15 +13453,12 @@ export namespace Prisma {
 
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     AccountUser?: boolean | User$AccountUserArgs<ExtArgs>;
-    File?: boolean | User$FileArgs<ExtArgs>;
-    _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>;
   };
 
   export type $UserPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: 'User';
     objects: {
       AccountUser: Prisma.$AccountUserPayload<ExtArgs> | null;
-      File: Prisma.$FilePayload<ExtArgs>[];
     };
     scalars: $Extensions.GetPayloadResult<
       {
@@ -13841,9 +13843,6 @@ export namespace Prisma {
       null,
       ExtArgs
     >;
-    File<T extends User$FileArgs<ExtArgs> = {}>(
-      args?: Subset<T, User$FileArgs<ExtArgs>>,
-    ): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FilePayload<ExtArgs>, T, 'findMany'> | Null>;
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -14192,26 +14191,6 @@ export namespace Prisma {
   };
 
   /**
-   * User.File
-   */
-  export type User$FileArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the File
-     */
-    select?: FileSelect<ExtArgs> | null;
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: FileInclude<ExtArgs> | null;
-    where?: FileWhereInput;
-    orderBy?: FileOrderByWithRelationInput | FileOrderByWithRelationInput[];
-    cursor?: FileWhereUniqueInput;
-    take?: number;
-    skip?: number;
-    distinct?: FileScalarFieldEnum | FileScalarFieldEnum[];
-  };
-
-  /**
    * User without action
    */
   export type UserDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -14330,7 +14309,7 @@ export namespace Prisma {
     FileMediaType: 'FileMediaType';
     FileLocation: 'FileLocation';
     FileUploadDateTime: 'FileUploadDateTime';
-    FileUploadUserId: 'FileUploadUserId';
+    FileUploadAccUserId: 'FileUploadAccUserId';
     FileSizeBytes: 'FileSizeBytes';
   };
 
@@ -14457,7 +14436,7 @@ export namespace Prisma {
     AccountLogoFileId?: IntNullableFilter<'Account'> | number | null;
     AccountMainEmail?: StringNullableFilter<'Account'> | string | null;
     AccountNumPeople?: IntNullableFilter<'Account'> | number | null;
-    AccountOrganisationId?: StringNullableFilter<'Account'> | string | null;
+    AccountOrganisationId?: StringFilter<'Account'> | string;
     AccountTermsAgreedBy?: StringNullableFilter<'Account'> | string | null;
     AccountTermsAgreedDate?: DateTimeNullableFilter<'Account'> | Date | string | null;
     AccountWebsite?: StringNullableFilter<'Account'> | string | null;
@@ -14488,7 +14467,7 @@ export namespace Prisma {
     AccountLogoFileId?: SortOrderInput | SortOrder;
     AccountMainEmail?: SortOrderInput | SortOrder;
     AccountNumPeople?: SortOrderInput | SortOrder;
-    AccountOrganisationId?: SortOrderInput | SortOrder;
+    AccountOrganisationId?: SortOrder;
     AccountTermsAgreedBy?: SortOrderInput | SortOrder;
     AccountTermsAgreedDate?: SortOrderInput | SortOrder;
     AccountWebsite?: SortOrderInput | SortOrder;
@@ -14556,7 +14535,7 @@ export namespace Prisma {
     AccountLogoFileId?: SortOrderInput | SortOrder;
     AccountMainEmail?: SortOrderInput | SortOrder;
     AccountNumPeople?: SortOrderInput | SortOrder;
-    AccountOrganisationId?: SortOrderInput | SortOrder;
+    AccountOrganisationId?: SortOrder;
     AccountTermsAgreedBy?: SortOrderInput | SortOrder;
     AccountTermsAgreedDate?: SortOrderInput | SortOrder;
     AccountWebsite?: SortOrderInput | SortOrder;
@@ -14589,7 +14568,7 @@ export namespace Prisma {
     AccountLogoFileId?: IntNullableWithAggregatesFilter<'Account'> | number | null;
     AccountMainEmail?: StringNullableWithAggregatesFilter<'Account'> | string | null;
     AccountNumPeople?: IntNullableWithAggregatesFilter<'Account'> | number | null;
-    AccountOrganisationId?: StringNullableWithAggregatesFilter<'Account'> | string | null;
+    AccountOrganisationId?: StringWithAggregatesFilter<'Account'> | string;
     AccountTermsAgreedBy?: StringNullableWithAggregatesFilter<'Account'> | string | null;
     AccountTermsAgreedDate?: DateTimeNullableWithAggregatesFilter<'Account'> | Date | string | null;
     AccountWebsite?: StringNullableWithAggregatesFilter<'Account'> | string | null;
@@ -14624,6 +14603,7 @@ export namespace Prisma {
   export type AccountContactWhereUniqueInput = Prisma.AtLeast<
     {
       AccContId?: number;
+      AccContAccountId_AccContFirstName_AccContLastName?: AccountContactAccContAccountIdAccContFirstNameAccContLastNameCompoundUniqueInput;
       AND?: AccountContactWhereInput | AccountContactWhereInput[];
       OR?: AccountContactWhereInput[];
       NOT?: AccountContactWhereInput | AccountContactWhereInput[];
@@ -14634,7 +14614,7 @@ export namespace Prisma {
       AccContMainEmail?: StringNullableFilter<'AccountContact'> | string | null;
       Account?: XOR<AccountRelationFilter, AccountWhereInput>;
     },
-    'AccContId'
+    'AccContId' | 'AccContAccountId_AccContFirstName_AccContLastName'
   >;
 
   export type AccountContactOrderByWithAggregationInput = {
@@ -14743,6 +14723,7 @@ export namespace Prisma {
     Account?: XOR<AccountRelationFilter, AccountWhereInput>;
     User?: XOR<UserRelationFilter, UserWhereInput>;
     AccountUserPermission?: AccountUserPermissionListRelationFilter;
+    File?: FileListRelationFilter;
   };
 
   export type AccountUserOrderByWithRelationInput = {
@@ -14754,6 +14735,7 @@ export namespace Prisma {
     Account?: AccountOrderByWithRelationInput;
     User?: UserOrderByWithRelationInput;
     AccountUserPermission?: AccountUserPermissionOrderByRelationAggregateInput;
+    File?: FileOrderByRelationAggregateInput;
   };
 
   export type AccountUserWhereUniqueInput = Prisma.AtLeast<
@@ -14769,6 +14751,7 @@ export namespace Prisma {
       Account?: XOR<AccountRelationFilter, AccountWhereInput>;
       User?: XOR<UserRelationFilter, UserWhereInput>;
       AccountUserPermission?: AccountUserPermissionListRelationFilter;
+      File?: FileListRelationFilter;
     },
     'AccUserId' | 'AccUserUserId'
   >;
@@ -14954,10 +14937,10 @@ export namespace Prisma {
     FileMediaType?: StringNullableFilter<'File'> | string | null;
     FileLocation?: StringFilter<'File'> | string;
     FileUploadDateTime?: DateTimeFilter<'File'> | Date | string;
-    FileUploadUserId?: IntFilter<'File'> | number;
+    FileUploadAccUserId?: IntFilter<'File'> | number;
     FileSizeBytes?: BigIntNullableFilter<'File'> | bigint | number | null;
     Account?: AccountListRelationFilter;
-    User?: XOR<UserRelationFilter, UserWhereInput>;
+    AccountUser?: XOR<AccountUserRelationFilter, AccountUserWhereInput>;
     ProductionCompany?: ProductionCompanyListRelationFilter;
   };
 
@@ -14967,10 +14950,10 @@ export namespace Prisma {
     FileMediaType?: SortOrderInput | SortOrder;
     FileLocation?: SortOrder;
     FileUploadDateTime?: SortOrder;
-    FileUploadUserId?: SortOrder;
+    FileUploadAccUserId?: SortOrder;
     FileSizeBytes?: SortOrderInput | SortOrder;
     Account?: AccountOrderByRelationAggregateInput;
-    User?: UserOrderByWithRelationInput;
+    AccountUser?: AccountUserOrderByWithRelationInput;
     ProductionCompany?: ProductionCompanyOrderByRelationAggregateInput;
   };
 
@@ -14984,10 +14967,10 @@ export namespace Prisma {
       FileMediaType?: StringNullableFilter<'File'> | string | null;
       FileLocation?: StringFilter<'File'> | string;
       FileUploadDateTime?: DateTimeFilter<'File'> | Date | string;
-      FileUploadUserId?: IntFilter<'File'> | number;
+      FileUploadAccUserId?: IntFilter<'File'> | number;
       FileSizeBytes?: BigIntNullableFilter<'File'> | bigint | number | null;
       Account?: AccountListRelationFilter;
-      User?: XOR<UserRelationFilter, UserWhereInput>;
+      AccountUser?: XOR<AccountUserRelationFilter, AccountUserWhereInput>;
       ProductionCompany?: ProductionCompanyListRelationFilter;
     },
     'FileId'
@@ -14999,7 +14982,7 @@ export namespace Prisma {
     FileMediaType?: SortOrderInput | SortOrder;
     FileLocation?: SortOrder;
     FileUploadDateTime?: SortOrder;
-    FileUploadUserId?: SortOrder;
+    FileUploadAccUserId?: SortOrder;
     FileSizeBytes?: SortOrderInput | SortOrder;
     _count?: FileCountOrderByAggregateInput;
     _avg?: FileAvgOrderByAggregateInput;
@@ -15017,7 +15000,7 @@ export namespace Prisma {
     FileMediaType?: StringNullableWithAggregatesFilter<'File'> | string | null;
     FileLocation?: StringWithAggregatesFilter<'File'> | string;
     FileUploadDateTime?: DateTimeWithAggregatesFilter<'File'> | Date | string;
-    FileUploadUserId?: IntWithAggregatesFilter<'File'> | number;
+    FileUploadAccUserId?: IntWithAggregatesFilter<'File'> | number;
     FileSizeBytes?: BigIntNullableWithAggregatesFilter<'File'> | bigint | number | null;
   };
 
@@ -15233,7 +15216,6 @@ export namespace Prisma {
     UserFirstName?: StringFilter<'User'> | string;
     UserLastName?: StringNullableFilter<'User'> | string | null;
     AccountUser?: XOR<AccountUserNullableRelationFilter, AccountUserWhereInput> | null;
-    File?: FileListRelationFilter;
   };
 
   export type UserOrderByWithRelationInput = {
@@ -15242,7 +15224,6 @@ export namespace Prisma {
     UserFirstName?: SortOrder;
     UserLastName?: SortOrderInput | SortOrder;
     AccountUser?: AccountUserOrderByWithRelationInput;
-    File?: FileOrderByRelationAggregateInput;
   };
 
   export type UserWhereUniqueInput = Prisma.AtLeast<
@@ -15255,7 +15236,6 @@ export namespace Prisma {
       UserFirstName?: StringFilter<'User'> | string;
       UserLastName?: StringNullableFilter<'User'> | string | null;
       AccountUser?: XOR<AccountUserNullableRelationFilter, AccountUserWhereInput> | null;
-      File?: FileListRelationFilter;
     },
     'UserId' | 'UserId' | 'UserEmail'
   >;
@@ -15296,7 +15276,7 @@ export namespace Prisma {
     AccountCompanyNumber?: string | null;
     AccountMainEmail?: string | null;
     AccountNumPeople?: number | null;
-    AccountOrganisationId?: string | null;
+    AccountOrganisationId: string;
     AccountTermsAgreedBy?: string | null;
     AccountTermsAgreedDate?: Date | string | null;
     AccountWebsite?: string | null;
@@ -15326,7 +15306,7 @@ export namespace Prisma {
     AccountLogoFileId?: number | null;
     AccountMainEmail?: string | null;
     AccountNumPeople?: number | null;
-    AccountOrganisationId?: string | null;
+    AccountOrganisationId: string;
     AccountTermsAgreedBy?: string | null;
     AccountTermsAgreedDate?: Date | string | null;
     AccountWebsite?: string | null;
@@ -15353,7 +15333,7 @@ export namespace Prisma {
     AccountCompanyNumber?: NullableStringFieldUpdateOperationsInput | string | null;
     AccountMainEmail?: NullableStringFieldUpdateOperationsInput | string | null;
     AccountNumPeople?: NullableIntFieldUpdateOperationsInput | number | null;
-    AccountOrganisationId?: NullableStringFieldUpdateOperationsInput | string | null;
+    AccountOrganisationId?: StringFieldUpdateOperationsInput | string;
     AccountTermsAgreedBy?: NullableStringFieldUpdateOperationsInput | string | null;
     AccountTermsAgreedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     AccountWebsite?: NullableStringFieldUpdateOperationsInput | string | null;
@@ -15383,7 +15363,7 @@ export namespace Prisma {
     AccountLogoFileId?: NullableIntFieldUpdateOperationsInput | number | null;
     AccountMainEmail?: NullableStringFieldUpdateOperationsInput | string | null;
     AccountNumPeople?: NullableIntFieldUpdateOperationsInput | number | null;
-    AccountOrganisationId?: NullableStringFieldUpdateOperationsInput | string | null;
+    AccountOrganisationId?: StringFieldUpdateOperationsInput | string;
     AccountTermsAgreedBy?: NullableStringFieldUpdateOperationsInput | string | null;
     AccountTermsAgreedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     AccountWebsite?: NullableStringFieldUpdateOperationsInput | string | null;
@@ -15412,7 +15392,7 @@ export namespace Prisma {
     AccountLogoFileId?: number | null;
     AccountMainEmail?: string | null;
     AccountNumPeople?: number | null;
-    AccountOrganisationId?: string | null;
+    AccountOrganisationId: string;
     AccountTermsAgreedBy?: string | null;
     AccountTermsAgreedDate?: Date | string | null;
     AccountWebsite?: string | null;
@@ -15435,7 +15415,7 @@ export namespace Prisma {
     AccountCompanyNumber?: NullableStringFieldUpdateOperationsInput | string | null;
     AccountMainEmail?: NullableStringFieldUpdateOperationsInput | string | null;
     AccountNumPeople?: NullableIntFieldUpdateOperationsInput | number | null;
-    AccountOrganisationId?: NullableStringFieldUpdateOperationsInput | string | null;
+    AccountOrganisationId?: StringFieldUpdateOperationsInput | string;
     AccountTermsAgreedBy?: NullableStringFieldUpdateOperationsInput | string | null;
     AccountTermsAgreedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     AccountWebsite?: NullableStringFieldUpdateOperationsInput | string | null;
@@ -15459,7 +15439,7 @@ export namespace Prisma {
     AccountLogoFileId?: NullableIntFieldUpdateOperationsInput | number | null;
     AccountMainEmail?: NullableStringFieldUpdateOperationsInput | string | null;
     AccountNumPeople?: NullableIntFieldUpdateOperationsInput | number | null;
-    AccountOrganisationId?: NullableStringFieldUpdateOperationsInput | string | null;
+    AccountOrganisationId?: StringFieldUpdateOperationsInput | string;
     AccountTermsAgreedBy?: NullableStringFieldUpdateOperationsInput | string | null;
     AccountTermsAgreedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     AccountWebsite?: NullableStringFieldUpdateOperationsInput | string | null;
@@ -15591,6 +15571,7 @@ export namespace Prisma {
     Account: AccountCreateNestedOneWithoutAccountUserInput;
     User: UserCreateNestedOneWithoutAccountUserInput;
     AccountUserPermission?: AccountUserPermissionCreateNestedManyWithoutAccountUserInput;
+    File?: FileCreateNestedManyWithoutAccountUserInput;
   };
 
   export type AccountUserUncheckedCreateInput = {
@@ -15600,6 +15581,7 @@ export namespace Prisma {
     AccUserIsAdmin?: boolean;
     AccUserPIN?: string | null;
     AccountUserPermission?: AccountUserPermissionUncheckedCreateNestedManyWithoutAccountUserInput;
+    File?: FileUncheckedCreateNestedManyWithoutAccountUserInput;
   };
 
   export type AccountUserUpdateInput = {
@@ -15608,6 +15590,7 @@ export namespace Prisma {
     Account?: AccountUpdateOneRequiredWithoutAccountUserNestedInput;
     User?: UserUpdateOneRequiredWithoutAccountUserNestedInput;
     AccountUserPermission?: AccountUserPermissionUpdateManyWithoutAccountUserNestedInput;
+    File?: FileUpdateManyWithoutAccountUserNestedInput;
   };
 
   export type AccountUserUncheckedUpdateInput = {
@@ -15617,6 +15600,7 @@ export namespace Prisma {
     AccUserIsAdmin?: BoolFieldUpdateOperationsInput | boolean;
     AccUserPIN?: NullableStringFieldUpdateOperationsInput | string | null;
     AccountUserPermission?: AccountUserPermissionUncheckedUpdateManyWithoutAccountUserNestedInput;
+    File?: FileUncheckedUpdateManyWithoutAccountUserNestedInput;
   };
 
   export type AccountUserCreateManyInput = {
@@ -15768,7 +15752,7 @@ export namespace Prisma {
     FileUploadDateTime: Date | string;
     FileSizeBytes?: bigint | number | null;
     Account?: AccountCreateNestedManyWithoutFileInput;
-    User: UserCreateNestedOneWithoutFileInput;
+    AccountUser: AccountUserCreateNestedOneWithoutFileInput;
     ProductionCompany?: ProductionCompanyCreateNestedManyWithoutFileInput;
   };
 
@@ -15778,7 +15762,7 @@ export namespace Prisma {
     FileMediaType?: string | null;
     FileLocation: string;
     FileUploadDateTime: Date | string;
-    FileUploadUserId: number;
+    FileUploadAccUserId: number;
     FileSizeBytes?: bigint | number | null;
     Account?: AccountUncheckedCreateNestedManyWithoutFileInput;
     ProductionCompany?: ProductionCompanyUncheckedCreateNestedManyWithoutFileInput;
@@ -15791,7 +15775,7 @@ export namespace Prisma {
     FileUploadDateTime?: DateTimeFieldUpdateOperationsInput | Date | string;
     FileSizeBytes?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null;
     Account?: AccountUpdateManyWithoutFileNestedInput;
-    User?: UserUpdateOneRequiredWithoutFileNestedInput;
+    AccountUser?: AccountUserUpdateOneRequiredWithoutFileNestedInput;
     ProductionCompany?: ProductionCompanyUpdateManyWithoutFileNestedInput;
   };
 
@@ -15801,7 +15785,7 @@ export namespace Prisma {
     FileMediaType?: NullableStringFieldUpdateOperationsInput | string | null;
     FileLocation?: StringFieldUpdateOperationsInput | string;
     FileUploadDateTime?: DateTimeFieldUpdateOperationsInput | Date | string;
-    FileUploadUserId?: IntFieldUpdateOperationsInput | number;
+    FileUploadAccUserId?: IntFieldUpdateOperationsInput | number;
     FileSizeBytes?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null;
     Account?: AccountUncheckedUpdateManyWithoutFileNestedInput;
     ProductionCompany?: ProductionCompanyUncheckedUpdateManyWithoutFileNestedInput;
@@ -15813,7 +15797,7 @@ export namespace Prisma {
     FileMediaType?: string | null;
     FileLocation: string;
     FileUploadDateTime: Date | string;
-    FileUploadUserId: number;
+    FileUploadAccUserId: number;
     FileSizeBytes?: bigint | number | null;
   };
 
@@ -15831,7 +15815,7 @@ export namespace Prisma {
     FileMediaType?: NullableStringFieldUpdateOperationsInput | string | null;
     FileLocation?: StringFieldUpdateOperationsInput | string;
     FileUploadDateTime?: DateTimeFieldUpdateOperationsInput | Date | string;
-    FileUploadUserId?: IntFieldUpdateOperationsInput | number;
+    FileUploadAccUserId?: IntFieldUpdateOperationsInput | number;
     FileSizeBytes?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null;
   };
 
@@ -16033,7 +16017,6 @@ export namespace Prisma {
     UserFirstName: string;
     UserLastName?: string | null;
     AccountUser?: AccountUserCreateNestedOneWithoutUserInput;
-    File?: FileCreateNestedManyWithoutUserInput;
   };
 
   export type UserUncheckedCreateInput = {
@@ -16042,7 +16025,6 @@ export namespace Prisma {
     UserFirstName: string;
     UserLastName?: string | null;
     AccountUser?: AccountUserUncheckedCreateNestedOneWithoutUserInput;
-    File?: FileUncheckedCreateNestedManyWithoutUserInput;
   };
 
   export type UserUpdateInput = {
@@ -16050,7 +16032,6 @@ export namespace Prisma {
     UserFirstName?: StringFieldUpdateOperationsInput | string;
     UserLastName?: NullableStringFieldUpdateOperationsInput | string | null;
     AccountUser?: AccountUserUpdateOneWithoutUserNestedInput;
-    File?: FileUpdateManyWithoutUserNestedInput;
   };
 
   export type UserUncheckedUpdateInput = {
@@ -16059,7 +16040,6 @@ export namespace Prisma {
     UserFirstName?: StringFieldUpdateOperationsInput | string;
     UserLastName?: NullableStringFieldUpdateOperationsInput | string | null;
     AccountUser?: AccountUserUncheckedUpdateOneWithoutUserNestedInput;
-    File?: FileUncheckedUpdateManyWithoutUserNestedInput;
   };
 
   export type UserCreateManyInput = {
@@ -16370,6 +16350,12 @@ export namespace Prisma {
     isNot?: AccountWhereInput;
   };
 
+  export type AccountContactAccContAccountIdAccContFirstNameAccContLastNameCompoundUniqueInput = {
+    AccContAccountId: number;
+    AccContFirstName: string;
+    AccContLastName: string;
+  };
+
   export type AccountContactCountOrderByAggregateInput = {
     AccContId?: SortOrder;
     AccContAccountId?: SortOrder;
@@ -16505,7 +16491,17 @@ export namespace Prisma {
     none?: AccountUserPermissionWhereInput;
   };
 
+  export type FileListRelationFilter = {
+    every?: FileWhereInput;
+    some?: FileWhereInput;
+    none?: FileWhereInput;
+  };
+
   export type AccountUserPermissionOrderByRelationAggregateInput = {
+    _count?: SortOrder;
+  };
+
+  export type FileOrderByRelationAggregateInput = {
     _count?: SortOrder;
   };
 
@@ -16664,13 +16660,13 @@ export namespace Prisma {
     FileMediaType?: SortOrder;
     FileLocation?: SortOrder;
     FileUploadDateTime?: SortOrder;
-    FileUploadUserId?: SortOrder;
+    FileUploadAccUserId?: SortOrder;
     FileSizeBytes?: SortOrder;
   };
 
   export type FileAvgOrderByAggregateInput = {
     FileId?: SortOrder;
-    FileUploadUserId?: SortOrder;
+    FileUploadAccUserId?: SortOrder;
     FileSizeBytes?: SortOrder;
   };
 
@@ -16680,7 +16676,7 @@ export namespace Prisma {
     FileMediaType?: SortOrder;
     FileLocation?: SortOrder;
     FileUploadDateTime?: SortOrder;
-    FileUploadUserId?: SortOrder;
+    FileUploadAccUserId?: SortOrder;
     FileSizeBytes?: SortOrder;
   };
 
@@ -16690,13 +16686,13 @@ export namespace Prisma {
     FileMediaType?: SortOrder;
     FileLocation?: SortOrder;
     FileUploadDateTime?: SortOrder;
-    FileUploadUserId?: SortOrder;
+    FileUploadAccUserId?: SortOrder;
     FileSizeBytes?: SortOrder;
   };
 
   export type FileSumOrderByAggregateInput = {
     FileId?: SortOrder;
-    FileUploadUserId?: SortOrder;
+    FileUploadAccUserId?: SortOrder;
     FileSizeBytes?: SortOrder;
   };
 
@@ -16868,16 +16864,6 @@ export namespace Prisma {
   export type AccountUserNullableRelationFilter = {
     is?: AccountUserWhereInput | null;
     isNot?: AccountUserWhereInput | null;
-  };
-
-  export type FileListRelationFilter = {
-    every?: FileWhereInput;
-    some?: FileWhereInput;
-    none?: FileWhereInput;
-  };
-
-  export type FileOrderByRelationAggregateInput = {
-    _count?: SortOrder;
   };
 
   export type UserCountOrderByAggregateInput = {
@@ -17358,6 +17344,16 @@ export namespace Prisma {
     connect?: AccountUserPermissionWhereUniqueInput | AccountUserPermissionWhereUniqueInput[];
   };
 
+  export type FileCreateNestedManyWithoutAccountUserInput = {
+    create?:
+      | XOR<FileCreateWithoutAccountUserInput, FileUncheckedCreateWithoutAccountUserInput>
+      | FileCreateWithoutAccountUserInput[]
+      | FileUncheckedCreateWithoutAccountUserInput[];
+    connectOrCreate?: FileCreateOrConnectWithoutAccountUserInput | FileCreateOrConnectWithoutAccountUserInput[];
+    createMany?: FileCreateManyAccountUserInputEnvelope;
+    connect?: FileWhereUniqueInput | FileWhereUniqueInput[];
+  };
+
   export type AccountUserPermissionUncheckedCreateNestedManyWithoutAccountUserInput = {
     create?:
       | XOR<
@@ -17371,6 +17367,16 @@ export namespace Prisma {
       | AccountUserPermissionCreateOrConnectWithoutAccountUserInput[];
     createMany?: AccountUserPermissionCreateManyAccountUserInputEnvelope;
     connect?: AccountUserPermissionWhereUniqueInput | AccountUserPermissionWhereUniqueInput[];
+  };
+
+  export type FileUncheckedCreateNestedManyWithoutAccountUserInput = {
+    create?:
+      | XOR<FileCreateWithoutAccountUserInput, FileUncheckedCreateWithoutAccountUserInput>
+      | FileCreateWithoutAccountUserInput[]
+      | FileUncheckedCreateWithoutAccountUserInput[];
+    connectOrCreate?: FileCreateOrConnectWithoutAccountUserInput | FileCreateOrConnectWithoutAccountUserInput[];
+    createMany?: FileCreateManyAccountUserInputEnvelope;
+    connect?: FileWhereUniqueInput | FileWhereUniqueInput[];
   };
 
   export type BoolFieldUpdateOperationsInput = {
@@ -17427,6 +17433,23 @@ export namespace Prisma {
     deleteMany?: AccountUserPermissionScalarWhereInput | AccountUserPermissionScalarWhereInput[];
   };
 
+  export type FileUpdateManyWithoutAccountUserNestedInput = {
+    create?:
+      | XOR<FileCreateWithoutAccountUserInput, FileUncheckedCreateWithoutAccountUserInput>
+      | FileCreateWithoutAccountUserInput[]
+      | FileUncheckedCreateWithoutAccountUserInput[];
+    connectOrCreate?: FileCreateOrConnectWithoutAccountUserInput | FileCreateOrConnectWithoutAccountUserInput[];
+    upsert?: FileUpsertWithWhereUniqueWithoutAccountUserInput | FileUpsertWithWhereUniqueWithoutAccountUserInput[];
+    createMany?: FileCreateManyAccountUserInputEnvelope;
+    set?: FileWhereUniqueInput | FileWhereUniqueInput[];
+    disconnect?: FileWhereUniqueInput | FileWhereUniqueInput[];
+    delete?: FileWhereUniqueInput | FileWhereUniqueInput[];
+    connect?: FileWhereUniqueInput | FileWhereUniqueInput[];
+    update?: FileUpdateWithWhereUniqueWithoutAccountUserInput | FileUpdateWithWhereUniqueWithoutAccountUserInput[];
+    updateMany?: FileUpdateManyWithWhereWithoutAccountUserInput | FileUpdateManyWithWhereWithoutAccountUserInput[];
+    deleteMany?: FileScalarWhereInput | FileScalarWhereInput[];
+  };
+
   export type AccountUserPermissionUncheckedUpdateManyWithoutAccountUserNestedInput = {
     create?:
       | XOR<
@@ -17453,6 +17476,23 @@ export namespace Prisma {
       | AccountUserPermissionUpdateManyWithWhereWithoutAccountUserInput
       | AccountUserPermissionUpdateManyWithWhereWithoutAccountUserInput[];
     deleteMany?: AccountUserPermissionScalarWhereInput | AccountUserPermissionScalarWhereInput[];
+  };
+
+  export type FileUncheckedUpdateManyWithoutAccountUserNestedInput = {
+    create?:
+      | XOR<FileCreateWithoutAccountUserInput, FileUncheckedCreateWithoutAccountUserInput>
+      | FileCreateWithoutAccountUserInput[]
+      | FileUncheckedCreateWithoutAccountUserInput[];
+    connectOrCreate?: FileCreateOrConnectWithoutAccountUserInput | FileCreateOrConnectWithoutAccountUserInput[];
+    upsert?: FileUpsertWithWhereUniqueWithoutAccountUserInput | FileUpsertWithWhereUniqueWithoutAccountUserInput[];
+    createMany?: FileCreateManyAccountUserInputEnvelope;
+    set?: FileWhereUniqueInput | FileWhereUniqueInput[];
+    disconnect?: FileWhereUniqueInput | FileWhereUniqueInput[];
+    delete?: FileWhereUniqueInput | FileWhereUniqueInput[];
+    connect?: FileWhereUniqueInput | FileWhereUniqueInput[];
+    update?: FileUpdateWithWhereUniqueWithoutAccountUserInput | FileUpdateWithWhereUniqueWithoutAccountUserInput[];
+    updateMany?: FileUpdateManyWithWhereWithoutAccountUserInput | FileUpdateManyWithWhereWithoutAccountUserInput[];
+    deleteMany?: FileScalarWhereInput | FileScalarWhereInput[];
   };
 
   export type AccountUserCreateNestedOneWithoutAccountUserPermissionInput = {
@@ -17571,10 +17611,10 @@ export namespace Prisma {
     connect?: AccountWhereUniqueInput | AccountWhereUniqueInput[];
   };
 
-  export type UserCreateNestedOneWithoutFileInput = {
-    create?: XOR<UserCreateWithoutFileInput, UserUncheckedCreateWithoutFileInput>;
-    connectOrCreate?: UserCreateOrConnectWithoutFileInput;
-    connect?: UserWhereUniqueInput;
+  export type AccountUserCreateNestedOneWithoutFileInput = {
+    create?: XOR<AccountUserCreateWithoutFileInput, AccountUserUncheckedCreateWithoutFileInput>;
+    connectOrCreate?: AccountUserCreateOrConnectWithoutFileInput;
+    connect?: AccountUserWhereUniqueInput;
   };
 
   export type ProductionCompanyCreateNestedManyWithoutFileInput = {
@@ -17636,14 +17676,14 @@ export namespace Prisma {
     deleteMany?: AccountScalarWhereInput | AccountScalarWhereInput[];
   };
 
-  export type UserUpdateOneRequiredWithoutFileNestedInput = {
-    create?: XOR<UserCreateWithoutFileInput, UserUncheckedCreateWithoutFileInput>;
-    connectOrCreate?: UserCreateOrConnectWithoutFileInput;
-    upsert?: UserUpsertWithoutFileInput;
-    connect?: UserWhereUniqueInput;
+  export type AccountUserUpdateOneRequiredWithoutFileNestedInput = {
+    create?: XOR<AccountUserCreateWithoutFileInput, AccountUserUncheckedCreateWithoutFileInput>;
+    connectOrCreate?: AccountUserCreateOrConnectWithoutFileInput;
+    upsert?: AccountUserUpsertWithoutFileInput;
+    connect?: AccountUserWhereUniqueInput;
     update?: XOR<
-      XOR<UserUpdateToOneWithWhereWithoutFileInput, UserUpdateWithoutFileInput>,
-      UserUncheckedUpdateWithoutFileInput
+      XOR<AccountUserUpdateToOneWithWhereWithoutFileInput, AccountUserUpdateWithoutFileInput>,
+      AccountUserUncheckedUpdateWithoutFileInput
     >;
   };
 
@@ -17936,30 +17976,10 @@ export namespace Prisma {
     connect?: AccountUserWhereUniqueInput;
   };
 
-  export type FileCreateNestedManyWithoutUserInput = {
-    create?:
-      | XOR<FileCreateWithoutUserInput, FileUncheckedCreateWithoutUserInput>
-      | FileCreateWithoutUserInput[]
-      | FileUncheckedCreateWithoutUserInput[];
-    connectOrCreate?: FileCreateOrConnectWithoutUserInput | FileCreateOrConnectWithoutUserInput[];
-    createMany?: FileCreateManyUserInputEnvelope;
-    connect?: FileWhereUniqueInput | FileWhereUniqueInput[];
-  };
-
   export type AccountUserUncheckedCreateNestedOneWithoutUserInput = {
     create?: XOR<AccountUserCreateWithoutUserInput, AccountUserUncheckedCreateWithoutUserInput>;
     connectOrCreate?: AccountUserCreateOrConnectWithoutUserInput;
     connect?: AccountUserWhereUniqueInput;
-  };
-
-  export type FileUncheckedCreateNestedManyWithoutUserInput = {
-    create?:
-      | XOR<FileCreateWithoutUserInput, FileUncheckedCreateWithoutUserInput>
-      | FileCreateWithoutUserInput[]
-      | FileUncheckedCreateWithoutUserInput[];
-    connectOrCreate?: FileCreateOrConnectWithoutUserInput | FileCreateOrConnectWithoutUserInput[];
-    createMany?: FileCreateManyUserInputEnvelope;
-    connect?: FileWhereUniqueInput | FileWhereUniqueInput[];
   };
 
   export type AccountUserUpdateOneWithoutUserNestedInput = {
@@ -17975,23 +17995,6 @@ export namespace Prisma {
     >;
   };
 
-  export type FileUpdateManyWithoutUserNestedInput = {
-    create?:
-      | XOR<FileCreateWithoutUserInput, FileUncheckedCreateWithoutUserInput>
-      | FileCreateWithoutUserInput[]
-      | FileUncheckedCreateWithoutUserInput[];
-    connectOrCreate?: FileCreateOrConnectWithoutUserInput | FileCreateOrConnectWithoutUserInput[];
-    upsert?: FileUpsertWithWhereUniqueWithoutUserInput | FileUpsertWithWhereUniqueWithoutUserInput[];
-    createMany?: FileCreateManyUserInputEnvelope;
-    set?: FileWhereUniqueInput | FileWhereUniqueInput[];
-    disconnect?: FileWhereUniqueInput | FileWhereUniqueInput[];
-    delete?: FileWhereUniqueInput | FileWhereUniqueInput[];
-    connect?: FileWhereUniqueInput | FileWhereUniqueInput[];
-    update?: FileUpdateWithWhereUniqueWithoutUserInput | FileUpdateWithWhereUniqueWithoutUserInput[];
-    updateMany?: FileUpdateManyWithWhereWithoutUserInput | FileUpdateManyWithWhereWithoutUserInput[];
-    deleteMany?: FileScalarWhereInput | FileScalarWhereInput[];
-  };
-
   export type AccountUserUncheckedUpdateOneWithoutUserNestedInput = {
     create?: XOR<AccountUserCreateWithoutUserInput, AccountUserUncheckedCreateWithoutUserInput>;
     connectOrCreate?: AccountUserCreateOrConnectWithoutUserInput;
@@ -18003,23 +18006,6 @@ export namespace Prisma {
       XOR<AccountUserUpdateToOneWithWhereWithoutUserInput, AccountUserUpdateWithoutUserInput>,
       AccountUserUncheckedUpdateWithoutUserInput
     >;
-  };
-
-  export type FileUncheckedUpdateManyWithoutUserNestedInput = {
-    create?:
-      | XOR<FileCreateWithoutUserInput, FileUncheckedCreateWithoutUserInput>
-      | FileCreateWithoutUserInput[]
-      | FileUncheckedCreateWithoutUserInput[];
-    connectOrCreate?: FileCreateOrConnectWithoutUserInput | FileCreateOrConnectWithoutUserInput[];
-    upsert?: FileUpsertWithWhereUniqueWithoutUserInput | FileUpsertWithWhereUniqueWithoutUserInput[];
-    createMany?: FileCreateManyUserInputEnvelope;
-    set?: FileWhereUniqueInput | FileWhereUniqueInput[];
-    disconnect?: FileWhereUniqueInput | FileWhereUniqueInput[];
-    delete?: FileWhereUniqueInput | FileWhereUniqueInput[];
-    connect?: FileWhereUniqueInput | FileWhereUniqueInput[];
-    update?: FileUpdateWithWhereUniqueWithoutUserInput | FileUpdateWithWhereUniqueWithoutUserInput[];
-    updateMany?: FileUpdateManyWithWhereWithoutUserInput | FileUpdateManyWithWhereWithoutUserInput[];
-    deleteMany?: FileScalarWhereInput | FileScalarWhereInput[];
   };
 
   export type NestedIntFilter<$PrismaModel = never> = {
@@ -18313,7 +18299,7 @@ export namespace Prisma {
     FileLocation: string;
     FileUploadDateTime: Date | string;
     FileSizeBytes?: bigint | number | null;
-    User: UserCreateNestedOneWithoutFileInput;
+    AccountUser: AccountUserCreateNestedOneWithoutFileInput;
     ProductionCompany?: ProductionCompanyCreateNestedManyWithoutFileInput;
   };
 
@@ -18323,7 +18309,7 @@ export namespace Prisma {
     FileMediaType?: string | null;
     FileLocation: string;
     FileUploadDateTime: Date | string;
-    FileUploadUserId: number;
+    FileUploadAccUserId: number;
     FileSizeBytes?: bigint | number | null;
     ProductionCompany?: ProductionCompanyUncheckedCreateNestedManyWithoutFileInput;
   };
@@ -18388,6 +18374,7 @@ export namespace Prisma {
     AccUserPIN?: string | null;
     User: UserCreateNestedOneWithoutAccountUserInput;
     AccountUserPermission?: AccountUserPermissionCreateNestedManyWithoutAccountUserInput;
+    File?: FileCreateNestedManyWithoutAccountUserInput;
   };
 
   export type AccountUserUncheckedCreateWithoutAccountInput = {
@@ -18396,6 +18383,7 @@ export namespace Prisma {
     AccUserIsAdmin?: boolean;
     AccUserPIN?: string | null;
     AccountUserPermission?: AccountUserPermissionUncheckedCreateNestedManyWithoutAccountUserInput;
+    File?: FileUncheckedCreateNestedManyWithoutAccountUserInput;
   };
 
   export type AccountUserCreateOrConnectWithoutAccountInput = {
@@ -18475,7 +18463,7 @@ export namespace Prisma {
     FileLocation?: StringFieldUpdateOperationsInput | string;
     FileUploadDateTime?: DateTimeFieldUpdateOperationsInput | Date | string;
     FileSizeBytes?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null;
-    User?: UserUpdateOneRequiredWithoutFileNestedInput;
+    AccountUser?: AccountUserUpdateOneRequiredWithoutFileNestedInput;
     ProductionCompany?: ProductionCompanyUpdateManyWithoutFileNestedInput;
   };
 
@@ -18485,7 +18473,7 @@ export namespace Prisma {
     FileMediaType?: NullableStringFieldUpdateOperationsInput | string | null;
     FileLocation?: StringFieldUpdateOperationsInput | string;
     FileUploadDateTime?: DateTimeFieldUpdateOperationsInput | Date | string;
-    FileUploadUserId?: IntFieldUpdateOperationsInput | number;
+    FileUploadAccUserId?: IntFieldUpdateOperationsInput | number;
     FileSizeBytes?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null;
     ProductionCompany?: ProductionCompanyUncheckedUpdateManyWithoutFileNestedInput;
   };
@@ -18616,7 +18604,7 @@ export namespace Prisma {
     AccountCompanyNumber?: string | null;
     AccountMainEmail?: string | null;
     AccountNumPeople?: number | null;
-    AccountOrganisationId?: string | null;
+    AccountOrganisationId: string;
     AccountTermsAgreedBy?: string | null;
     AccountTermsAgreedDate?: Date | string | null;
     AccountWebsite?: string | null;
@@ -18645,7 +18633,7 @@ export namespace Prisma {
     AccountLogoFileId?: number | null;
     AccountMainEmail?: string | null;
     AccountNumPeople?: number | null;
-    AccountOrganisationId?: string | null;
+    AccountOrganisationId: string;
     AccountTermsAgreedBy?: string | null;
     AccountTermsAgreedDate?: Date | string | null;
     AccountWebsite?: string | null;
@@ -18687,7 +18675,7 @@ export namespace Prisma {
     AccountCompanyNumber?: NullableStringFieldUpdateOperationsInput | string | null;
     AccountMainEmail?: NullableStringFieldUpdateOperationsInput | string | null;
     AccountNumPeople?: NullableIntFieldUpdateOperationsInput | number | null;
-    AccountOrganisationId?: NullableStringFieldUpdateOperationsInput | string | null;
+    AccountOrganisationId?: StringFieldUpdateOperationsInput | string;
     AccountTermsAgreedBy?: NullableStringFieldUpdateOperationsInput | string | null;
     AccountTermsAgreedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     AccountWebsite?: NullableStringFieldUpdateOperationsInput | string | null;
@@ -18716,7 +18704,7 @@ export namespace Prisma {
     AccountLogoFileId?: NullableIntFieldUpdateOperationsInput | number | null;
     AccountMainEmail?: NullableStringFieldUpdateOperationsInput | string | null;
     AccountNumPeople?: NullableIntFieldUpdateOperationsInput | number | null;
-    AccountOrganisationId?: NullableStringFieldUpdateOperationsInput | string | null;
+    AccountOrganisationId?: StringFieldUpdateOperationsInput | string;
     AccountTermsAgreedBy?: NullableStringFieldUpdateOperationsInput | string | null;
     AccountTermsAgreedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     AccountWebsite?: NullableStringFieldUpdateOperationsInput | string | null;
@@ -18742,7 +18730,7 @@ export namespace Prisma {
     AccountCompanyNumber?: string | null;
     AccountMainEmail?: string | null;
     AccountNumPeople?: number | null;
-    AccountOrganisationId?: string | null;
+    AccountOrganisationId: string;
     AccountTermsAgreedBy?: string | null;
     AccountTermsAgreedDate?: Date | string | null;
     AccountWebsite?: string | null;
@@ -18771,7 +18759,7 @@ export namespace Prisma {
     AccountLogoFileId?: number | null;
     AccountMainEmail?: string | null;
     AccountNumPeople?: number | null;
-    AccountOrganisationId?: string | null;
+    AccountOrganisationId: string;
     AccountTermsAgreedBy?: string | null;
     AccountTermsAgreedDate?: Date | string | null;
     AccountWebsite?: string | null;
@@ -18840,7 +18828,7 @@ export namespace Prisma {
     AccountCompanyNumber?: NullableStringFieldUpdateOperationsInput | string | null;
     AccountMainEmail?: NullableStringFieldUpdateOperationsInput | string | null;
     AccountNumPeople?: NullableIntFieldUpdateOperationsInput | number | null;
-    AccountOrganisationId?: NullableStringFieldUpdateOperationsInput | string | null;
+    AccountOrganisationId?: StringFieldUpdateOperationsInput | string;
     AccountTermsAgreedBy?: NullableStringFieldUpdateOperationsInput | string | null;
     AccountTermsAgreedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     AccountWebsite?: NullableStringFieldUpdateOperationsInput | string | null;
@@ -18869,7 +18857,7 @@ export namespace Prisma {
     AccountLogoFileId?: NullableIntFieldUpdateOperationsInput | number | null;
     AccountMainEmail?: NullableStringFieldUpdateOperationsInput | string | null;
     AccountNumPeople?: NullableIntFieldUpdateOperationsInput | number | null;
-    AccountOrganisationId?: NullableStringFieldUpdateOperationsInput | string | null;
+    AccountOrganisationId?: StringFieldUpdateOperationsInput | string;
     AccountTermsAgreedBy?: NullableStringFieldUpdateOperationsInput | string | null;
     AccountTermsAgreedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     AccountWebsite?: NullableStringFieldUpdateOperationsInput | string | null;
@@ -18934,7 +18922,7 @@ export namespace Prisma {
     AccountCompanyNumber?: string | null;
     AccountMainEmail?: string | null;
     AccountNumPeople?: number | null;
-    AccountOrganisationId?: string | null;
+    AccountOrganisationId: string;
     AccountTermsAgreedBy?: string | null;
     AccountTermsAgreedDate?: Date | string | null;
     AccountWebsite?: string | null;
@@ -18963,7 +18951,7 @@ export namespace Prisma {
     AccountLogoFileId?: number | null;
     AccountMainEmail?: string | null;
     AccountNumPeople?: number | null;
-    AccountOrganisationId?: string | null;
+    AccountOrganisationId: string;
     AccountTermsAgreedBy?: string | null;
     AccountTermsAgreedDate?: Date | string | null;
     AccountWebsite?: string | null;
@@ -18984,7 +18972,6 @@ export namespace Prisma {
     UserEmail: string;
     UserFirstName: string;
     UserLastName?: string | null;
-    File?: FileCreateNestedManyWithoutUserInput;
   };
 
   export type UserUncheckedCreateWithoutAccountUserInput = {
@@ -18992,7 +18979,6 @@ export namespace Prisma {
     UserEmail: string;
     UserFirstName: string;
     UserLastName?: string | null;
-    File?: FileUncheckedCreateNestedManyWithoutUserInput;
   };
 
   export type UserCreateOrConnectWithoutAccountUserInput = {
@@ -19022,6 +19008,37 @@ export namespace Prisma {
     skipDuplicates?: boolean;
   };
 
+  export type FileCreateWithoutAccountUserInput = {
+    FileOriginalFilename: string;
+    FileMediaType?: string | null;
+    FileLocation: string;
+    FileUploadDateTime: Date | string;
+    FileSizeBytes?: bigint | number | null;
+    Account?: AccountCreateNestedManyWithoutFileInput;
+    ProductionCompany?: ProductionCompanyCreateNestedManyWithoutFileInput;
+  };
+
+  export type FileUncheckedCreateWithoutAccountUserInput = {
+    FileId?: number;
+    FileOriginalFilename: string;
+    FileMediaType?: string | null;
+    FileLocation: string;
+    FileUploadDateTime: Date | string;
+    FileSizeBytes?: bigint | number | null;
+    Account?: AccountUncheckedCreateNestedManyWithoutFileInput;
+    ProductionCompany?: ProductionCompanyUncheckedCreateNestedManyWithoutFileInput;
+  };
+
+  export type FileCreateOrConnectWithoutAccountUserInput = {
+    where: FileWhereUniqueInput;
+    create: XOR<FileCreateWithoutAccountUserInput, FileUncheckedCreateWithoutAccountUserInput>;
+  };
+
+  export type FileCreateManyAccountUserInputEnvelope = {
+    data: FileCreateManyAccountUserInput | FileCreateManyAccountUserInput[];
+    skipDuplicates?: boolean;
+  };
+
   export type AccountUpsertWithoutAccountUserInput = {
     update: XOR<AccountUpdateWithoutAccountUserInput, AccountUncheckedUpdateWithoutAccountUserInput>;
     create: XOR<AccountCreateWithoutAccountUserInput, AccountUncheckedCreateWithoutAccountUserInput>;
@@ -19047,7 +19064,7 @@ export namespace Prisma {
     AccountCompanyNumber?: NullableStringFieldUpdateOperationsInput | string | null;
     AccountMainEmail?: NullableStringFieldUpdateOperationsInput | string | null;
     AccountNumPeople?: NullableIntFieldUpdateOperationsInput | number | null;
-    AccountOrganisationId?: NullableStringFieldUpdateOperationsInput | string | null;
+    AccountOrganisationId?: StringFieldUpdateOperationsInput | string;
     AccountTermsAgreedBy?: NullableStringFieldUpdateOperationsInput | string | null;
     AccountTermsAgreedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     AccountWebsite?: NullableStringFieldUpdateOperationsInput | string | null;
@@ -19076,7 +19093,7 @@ export namespace Prisma {
     AccountLogoFileId?: NullableIntFieldUpdateOperationsInput | number | null;
     AccountMainEmail?: NullableStringFieldUpdateOperationsInput | string | null;
     AccountNumPeople?: NullableIntFieldUpdateOperationsInput | number | null;
-    AccountOrganisationId?: NullableStringFieldUpdateOperationsInput | string | null;
+    AccountOrganisationId?: StringFieldUpdateOperationsInput | string;
     AccountTermsAgreedBy?: NullableStringFieldUpdateOperationsInput | string | null;
     AccountTermsAgreedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     AccountWebsite?: NullableStringFieldUpdateOperationsInput | string | null;
@@ -19103,7 +19120,6 @@ export namespace Prisma {
     UserEmail?: StringFieldUpdateOperationsInput | string;
     UserFirstName?: StringFieldUpdateOperationsInput | string;
     UserLastName?: NullableStringFieldUpdateOperationsInput | string | null;
-    File?: FileUpdateManyWithoutUserNestedInput;
   };
 
   export type UserUncheckedUpdateWithoutAccountUserInput = {
@@ -19111,7 +19127,6 @@ export namespace Prisma {
     UserEmail?: StringFieldUpdateOperationsInput | string;
     UserFirstName?: StringFieldUpdateOperationsInput | string;
     UserLastName?: NullableStringFieldUpdateOperationsInput | string | null;
-    File?: FileUncheckedUpdateManyWithoutUserNestedInput;
   };
 
   export type AccountUserPermissionUpsertWithWhereUniqueWithoutAccountUserInput = {
@@ -19151,11 +19166,41 @@ export namespace Prisma {
     UserAuthPermissionId?: IntFilter<'AccountUserPermission'> | number;
   };
 
+  export type FileUpsertWithWhereUniqueWithoutAccountUserInput = {
+    where: FileWhereUniqueInput;
+    update: XOR<FileUpdateWithoutAccountUserInput, FileUncheckedUpdateWithoutAccountUserInput>;
+    create: XOR<FileCreateWithoutAccountUserInput, FileUncheckedCreateWithoutAccountUserInput>;
+  };
+
+  export type FileUpdateWithWhereUniqueWithoutAccountUserInput = {
+    where: FileWhereUniqueInput;
+    data: XOR<FileUpdateWithoutAccountUserInput, FileUncheckedUpdateWithoutAccountUserInput>;
+  };
+
+  export type FileUpdateManyWithWhereWithoutAccountUserInput = {
+    where: FileScalarWhereInput;
+    data: XOR<FileUpdateManyMutationInput, FileUncheckedUpdateManyWithoutAccountUserInput>;
+  };
+
+  export type FileScalarWhereInput = {
+    AND?: FileScalarWhereInput | FileScalarWhereInput[];
+    OR?: FileScalarWhereInput[];
+    NOT?: FileScalarWhereInput | FileScalarWhereInput[];
+    FileId?: IntFilter<'File'> | number;
+    FileOriginalFilename?: StringFilter<'File'> | string;
+    FileMediaType?: StringNullableFilter<'File'> | string | null;
+    FileLocation?: StringFilter<'File'> | string;
+    FileUploadDateTime?: DateTimeFilter<'File'> | Date | string;
+    FileUploadAccUserId?: IntFilter<'File'> | number;
+    FileSizeBytes?: BigIntNullableFilter<'File'> | bigint | number | null;
+  };
+
   export type AccountUserCreateWithoutAccountUserPermissionInput = {
     AccUserIsAdmin?: boolean;
     AccUserPIN?: string | null;
     Account: AccountCreateNestedOneWithoutAccountUserInput;
     User: UserCreateNestedOneWithoutAccountUserInput;
+    File?: FileCreateNestedManyWithoutAccountUserInput;
   };
 
   export type AccountUserUncheckedCreateWithoutAccountUserPermissionInput = {
@@ -19164,6 +19209,7 @@ export namespace Prisma {
     AccUserAccountId: number;
     AccUserIsAdmin?: boolean;
     AccUserPIN?: string | null;
+    File?: FileUncheckedCreateNestedManyWithoutAccountUserInput;
   };
 
   export type AccountUserCreateOrConnectWithoutAccountUserPermissionInput = {
@@ -19222,6 +19268,7 @@ export namespace Prisma {
     AccUserPIN?: NullableStringFieldUpdateOperationsInput | string | null;
     Account?: AccountUpdateOneRequiredWithoutAccountUserNestedInput;
     User?: UserUpdateOneRequiredWithoutAccountUserNestedInput;
+    File?: FileUpdateManyWithoutAccountUserNestedInput;
   };
 
   export type AccountUserUncheckedUpdateWithoutAccountUserPermissionInput = {
@@ -19230,6 +19277,7 @@ export namespace Prisma {
     AccUserAccountId?: IntFieldUpdateOperationsInput | number;
     AccUserIsAdmin?: BoolFieldUpdateOperationsInput | boolean;
     AccUserPIN?: NullableStringFieldUpdateOperationsInput | string | null;
+    File?: FileUncheckedUpdateManyWithoutAccountUserNestedInput;
   };
 
   export type PermissionUpsertWithoutAccountUserPermissionInput = {
@@ -19281,7 +19329,7 @@ export namespace Prisma {
     AccountCompanyNumber?: string | null;
     AccountMainEmail?: string | null;
     AccountNumPeople?: number | null;
-    AccountOrganisationId?: string | null;
+    AccountOrganisationId: string;
     AccountTermsAgreedBy?: string | null;
     AccountTermsAgreedDate?: Date | string | null;
     AccountWebsite?: string | null;
@@ -19310,7 +19358,7 @@ export namespace Prisma {
     AccountLogoFileId?: number | null;
     AccountMainEmail?: string | null;
     AccountNumPeople?: number | null;
-    AccountOrganisationId?: string | null;
+    AccountOrganisationId: string;
     AccountTermsAgreedBy?: string | null;
     AccountTermsAgreedDate?: Date | string | null;
     AccountWebsite?: string | null;
@@ -19367,7 +19415,7 @@ export namespace Prisma {
     AccountLogoFileId?: IntNullableFilter<'Account'> | number | null;
     AccountMainEmail?: StringNullableFilter<'Account'> | string | null;
     AccountNumPeople?: IntNullableFilter<'Account'> | number | null;
-    AccountOrganisationId?: StringNullableFilter<'Account'> | string | null;
+    AccountOrganisationId?: StringFilter<'Account'> | string;
     AccountTermsAgreedBy?: StringNullableFilter<'Account'> | string | null;
     AccountTermsAgreedDate?: DateTimeNullableFilter<'Account'> | Date | string | null;
     AccountWebsite?: StringNullableFilter<'Account'> | string | null;
@@ -19390,7 +19438,7 @@ export namespace Prisma {
     AccountCompanyNumber?: string | null;
     AccountMainEmail?: string | null;
     AccountNumPeople?: number | null;
-    AccountOrganisationId?: string | null;
+    AccountOrganisationId: string;
     AccountTermsAgreedBy?: string | null;
     AccountTermsAgreedDate?: Date | string | null;
     AccountWebsite?: string | null;
@@ -19418,7 +19466,7 @@ export namespace Prisma {
     AccountCompanyNumber?: string | null;
     AccountMainEmail?: string | null;
     AccountNumPeople?: number | null;
-    AccountOrganisationId?: string | null;
+    AccountOrganisationId: string;
     AccountTermsAgreedBy?: string | null;
     AccountTermsAgreedDate?: Date | string | null;
     AccountWebsite?: string | null;
@@ -19441,24 +19489,26 @@ export namespace Prisma {
     skipDuplicates?: boolean;
   };
 
-  export type UserCreateWithoutFileInput = {
-    UserEmail: string;
-    UserFirstName: string;
-    UserLastName?: string | null;
-    AccountUser?: AccountUserCreateNestedOneWithoutUserInput;
+  export type AccountUserCreateWithoutFileInput = {
+    AccUserIsAdmin?: boolean;
+    AccUserPIN?: string | null;
+    Account: AccountCreateNestedOneWithoutAccountUserInput;
+    User: UserCreateNestedOneWithoutAccountUserInput;
+    AccountUserPermission?: AccountUserPermissionCreateNestedManyWithoutAccountUserInput;
   };
 
-  export type UserUncheckedCreateWithoutFileInput = {
-    UserId?: number;
-    UserEmail: string;
-    UserFirstName: string;
-    UserLastName?: string | null;
-    AccountUser?: AccountUserUncheckedCreateNestedOneWithoutUserInput;
+  export type AccountUserUncheckedCreateWithoutFileInput = {
+    AccUserId?: number;
+    AccUserUserId: number;
+    AccUserAccountId: number;
+    AccUserIsAdmin?: boolean;
+    AccUserPIN?: string | null;
+    AccountUserPermission?: AccountUserPermissionUncheckedCreateNestedManyWithoutAccountUserInput;
   };
 
-  export type UserCreateOrConnectWithoutFileInput = {
-    where: UserWhereUniqueInput;
-    create: XOR<UserCreateWithoutFileInput, UserUncheckedCreateWithoutFileInput>;
+  export type AccountUserCreateOrConnectWithoutFileInput = {
+    where: AccountUserWhereUniqueInput;
+    create: XOR<AccountUserCreateWithoutFileInput, AccountUserUncheckedCreateWithoutFileInput>;
   };
 
   export type ProductionCompanyCreateWithoutFileInput = {
@@ -19504,30 +19554,32 @@ export namespace Prisma {
     data: XOR<AccountUpdateManyMutationInput, AccountUncheckedUpdateManyWithoutFileInput>;
   };
 
-  export type UserUpsertWithoutFileInput = {
-    update: XOR<UserUpdateWithoutFileInput, UserUncheckedUpdateWithoutFileInput>;
-    create: XOR<UserCreateWithoutFileInput, UserUncheckedCreateWithoutFileInput>;
-    where?: UserWhereInput;
+  export type AccountUserUpsertWithoutFileInput = {
+    update: XOR<AccountUserUpdateWithoutFileInput, AccountUserUncheckedUpdateWithoutFileInput>;
+    create: XOR<AccountUserCreateWithoutFileInput, AccountUserUncheckedCreateWithoutFileInput>;
+    where?: AccountUserWhereInput;
   };
 
-  export type UserUpdateToOneWithWhereWithoutFileInput = {
-    where?: UserWhereInput;
-    data: XOR<UserUpdateWithoutFileInput, UserUncheckedUpdateWithoutFileInput>;
+  export type AccountUserUpdateToOneWithWhereWithoutFileInput = {
+    where?: AccountUserWhereInput;
+    data: XOR<AccountUserUpdateWithoutFileInput, AccountUserUncheckedUpdateWithoutFileInput>;
   };
 
-  export type UserUpdateWithoutFileInput = {
-    UserEmail?: StringFieldUpdateOperationsInput | string;
-    UserFirstName?: StringFieldUpdateOperationsInput | string;
-    UserLastName?: NullableStringFieldUpdateOperationsInput | string | null;
-    AccountUser?: AccountUserUpdateOneWithoutUserNestedInput;
+  export type AccountUserUpdateWithoutFileInput = {
+    AccUserIsAdmin?: BoolFieldUpdateOperationsInput | boolean;
+    AccUserPIN?: NullableStringFieldUpdateOperationsInput | string | null;
+    Account?: AccountUpdateOneRequiredWithoutAccountUserNestedInput;
+    User?: UserUpdateOneRequiredWithoutAccountUserNestedInput;
+    AccountUserPermission?: AccountUserPermissionUpdateManyWithoutAccountUserNestedInput;
   };
 
-  export type UserUncheckedUpdateWithoutFileInput = {
-    UserId?: IntFieldUpdateOperationsInput | number;
-    UserEmail?: StringFieldUpdateOperationsInput | string;
-    UserFirstName?: StringFieldUpdateOperationsInput | string;
-    UserLastName?: NullableStringFieldUpdateOperationsInput | string | null;
-    AccountUser?: AccountUserUncheckedUpdateOneWithoutUserNestedInput;
+  export type AccountUserUncheckedUpdateWithoutFileInput = {
+    AccUserId?: IntFieldUpdateOperationsInput | number;
+    AccUserUserId?: IntFieldUpdateOperationsInput | number;
+    AccUserAccountId?: IntFieldUpdateOperationsInput | number;
+    AccUserIsAdmin?: BoolFieldUpdateOperationsInput | boolean;
+    AccUserPIN?: NullableStringFieldUpdateOperationsInput | string | null;
+    AccountUserPermission?: AccountUserPermissionUncheckedUpdateManyWithoutAccountUserNestedInput;
   };
 
   export type ProductionCompanyUpsertWithWhereUniqueWithoutFileInput = {
@@ -19610,7 +19662,7 @@ export namespace Prisma {
     AccountCompanyNumber?: string | null;
     AccountMainEmail?: string | null;
     AccountNumPeople?: number | null;
-    AccountOrganisationId?: string | null;
+    AccountOrganisationId: string;
     AccountTermsAgreedBy?: string | null;
     AccountTermsAgreedDate?: Date | string | null;
     AccountWebsite?: string | null;
@@ -19639,7 +19691,7 @@ export namespace Prisma {
     AccountLogoFileId?: number | null;
     AccountMainEmail?: string | null;
     AccountNumPeople?: number | null;
-    AccountOrganisationId?: string | null;
+    AccountOrganisationId: string;
     AccountTermsAgreedBy?: string | null;
     AccountTermsAgreedDate?: Date | string | null;
     AccountWebsite?: string | null;
@@ -19663,7 +19715,7 @@ export namespace Prisma {
     FileUploadDateTime: Date | string;
     FileSizeBytes?: bigint | number | null;
     Account?: AccountCreateNestedManyWithoutFileInput;
-    User: UserCreateNestedOneWithoutFileInput;
+    AccountUser: AccountUserCreateNestedOneWithoutFileInput;
   };
 
   export type FileUncheckedCreateWithoutProductionCompanyInput = {
@@ -19672,7 +19724,7 @@ export namespace Prisma {
     FileMediaType?: string | null;
     FileLocation: string;
     FileUploadDateTime: Date | string;
-    FileUploadUserId: number;
+    FileUploadAccUserId: number;
     FileSizeBytes?: bigint | number | null;
     Account?: AccountUncheckedCreateNestedManyWithoutFileInput;
   };
@@ -19707,7 +19759,7 @@ export namespace Prisma {
     AccountCompanyNumber?: NullableStringFieldUpdateOperationsInput | string | null;
     AccountMainEmail?: NullableStringFieldUpdateOperationsInput | string | null;
     AccountNumPeople?: NullableIntFieldUpdateOperationsInput | number | null;
-    AccountOrganisationId?: NullableStringFieldUpdateOperationsInput | string | null;
+    AccountOrganisationId?: StringFieldUpdateOperationsInput | string;
     AccountTermsAgreedBy?: NullableStringFieldUpdateOperationsInput | string | null;
     AccountTermsAgreedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     AccountWebsite?: NullableStringFieldUpdateOperationsInput | string | null;
@@ -19736,7 +19788,7 @@ export namespace Prisma {
     AccountLogoFileId?: NullableIntFieldUpdateOperationsInput | number | null;
     AccountMainEmail?: NullableStringFieldUpdateOperationsInput | string | null;
     AccountNumPeople?: NullableIntFieldUpdateOperationsInput | number | null;
-    AccountOrganisationId?: NullableStringFieldUpdateOperationsInput | string | null;
+    AccountOrganisationId?: StringFieldUpdateOperationsInput | string;
     AccountTermsAgreedBy?: NullableStringFieldUpdateOperationsInput | string | null;
     AccountTermsAgreedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     AccountWebsite?: NullableStringFieldUpdateOperationsInput | string | null;
@@ -19766,7 +19818,7 @@ export namespace Prisma {
     FileUploadDateTime?: DateTimeFieldUpdateOperationsInput | Date | string;
     FileSizeBytes?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null;
     Account?: AccountUpdateManyWithoutFileNestedInput;
-    User?: UserUpdateOneRequiredWithoutFileNestedInput;
+    AccountUser?: AccountUserUpdateOneRequiredWithoutFileNestedInput;
   };
 
   export type FileUncheckedUpdateWithoutProductionCompanyInput = {
@@ -19775,7 +19827,7 @@ export namespace Prisma {
     FileMediaType?: NullableStringFieldUpdateOperationsInput | string | null;
     FileLocation?: StringFieldUpdateOperationsInput | string;
     FileUploadDateTime?: DateTimeFieldUpdateOperationsInput | Date | string;
-    FileUploadUserId?: IntFieldUpdateOperationsInput | number;
+    FileUploadAccUserId?: IntFieldUpdateOperationsInput | number;
     FileSizeBytes?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null;
     Account?: AccountUncheckedUpdateManyWithoutFileNestedInput;
   };
@@ -19841,6 +19893,7 @@ export namespace Prisma {
     AccUserPIN?: string | null;
     Account: AccountCreateNestedOneWithoutAccountUserInput;
     AccountUserPermission?: AccountUserPermissionCreateNestedManyWithoutAccountUserInput;
+    File?: FileCreateNestedManyWithoutAccountUserInput;
   };
 
   export type AccountUserUncheckedCreateWithoutUserInput = {
@@ -19849,42 +19902,12 @@ export namespace Prisma {
     AccUserIsAdmin?: boolean;
     AccUserPIN?: string | null;
     AccountUserPermission?: AccountUserPermissionUncheckedCreateNestedManyWithoutAccountUserInput;
+    File?: FileUncheckedCreateNestedManyWithoutAccountUserInput;
   };
 
   export type AccountUserCreateOrConnectWithoutUserInput = {
     where: AccountUserWhereUniqueInput;
     create: XOR<AccountUserCreateWithoutUserInput, AccountUserUncheckedCreateWithoutUserInput>;
-  };
-
-  export type FileCreateWithoutUserInput = {
-    FileOriginalFilename: string;
-    FileMediaType?: string | null;
-    FileLocation: string;
-    FileUploadDateTime: Date | string;
-    FileSizeBytes?: bigint | number | null;
-    Account?: AccountCreateNestedManyWithoutFileInput;
-    ProductionCompany?: ProductionCompanyCreateNestedManyWithoutFileInput;
-  };
-
-  export type FileUncheckedCreateWithoutUserInput = {
-    FileId?: number;
-    FileOriginalFilename: string;
-    FileMediaType?: string | null;
-    FileLocation: string;
-    FileUploadDateTime: Date | string;
-    FileSizeBytes?: bigint | number | null;
-    Account?: AccountUncheckedCreateNestedManyWithoutFileInput;
-    ProductionCompany?: ProductionCompanyUncheckedCreateNestedManyWithoutFileInput;
-  };
-
-  export type FileCreateOrConnectWithoutUserInput = {
-    where: FileWhereUniqueInput;
-    create: XOR<FileCreateWithoutUserInput, FileUncheckedCreateWithoutUserInput>;
-  };
-
-  export type FileCreateManyUserInputEnvelope = {
-    data: FileCreateManyUserInput | FileCreateManyUserInput[];
-    skipDuplicates?: boolean;
   };
 
   export type AccountUserUpsertWithoutUserInput = {
@@ -19903,6 +19926,7 @@ export namespace Prisma {
     AccUserPIN?: NullableStringFieldUpdateOperationsInput | string | null;
     Account?: AccountUpdateOneRequiredWithoutAccountUserNestedInput;
     AccountUserPermission?: AccountUserPermissionUpdateManyWithoutAccountUserNestedInput;
+    File?: FileUpdateManyWithoutAccountUserNestedInput;
   };
 
   export type AccountUserUncheckedUpdateWithoutUserInput = {
@@ -19911,35 +19935,7 @@ export namespace Prisma {
     AccUserIsAdmin?: BoolFieldUpdateOperationsInput | boolean;
     AccUserPIN?: NullableStringFieldUpdateOperationsInput | string | null;
     AccountUserPermission?: AccountUserPermissionUncheckedUpdateManyWithoutAccountUserNestedInput;
-  };
-
-  export type FileUpsertWithWhereUniqueWithoutUserInput = {
-    where: FileWhereUniqueInput;
-    update: XOR<FileUpdateWithoutUserInput, FileUncheckedUpdateWithoutUserInput>;
-    create: XOR<FileCreateWithoutUserInput, FileUncheckedCreateWithoutUserInput>;
-  };
-
-  export type FileUpdateWithWhereUniqueWithoutUserInput = {
-    where: FileWhereUniqueInput;
-    data: XOR<FileUpdateWithoutUserInput, FileUncheckedUpdateWithoutUserInput>;
-  };
-
-  export type FileUpdateManyWithWhereWithoutUserInput = {
-    where: FileScalarWhereInput;
-    data: XOR<FileUpdateManyMutationInput, FileUncheckedUpdateManyWithoutUserInput>;
-  };
-
-  export type FileScalarWhereInput = {
-    AND?: FileScalarWhereInput | FileScalarWhereInput[];
-    OR?: FileScalarWhereInput[];
-    NOT?: FileScalarWhereInput | FileScalarWhereInput[];
-    FileId?: IntFilter<'File'> | number;
-    FileOriginalFilename?: StringFilter<'File'> | string;
-    FileMediaType?: StringNullableFilter<'File'> | string | null;
-    FileLocation?: StringFilter<'File'> | string;
-    FileUploadDateTime?: DateTimeFilter<'File'> | Date | string;
-    FileUploadUserId?: IntFilter<'File'> | number;
-    FileSizeBytes?: BigIntNullableFilter<'File'> | bigint | number | null;
+    File?: FileUncheckedUpdateManyWithoutAccountUserNestedInput;
   };
 
   export type AccountContactCreateManyAccountInput = {
@@ -20025,6 +20021,7 @@ export namespace Prisma {
     AccUserPIN?: NullableStringFieldUpdateOperationsInput | string | null;
     User?: UserUpdateOneRequiredWithoutAccountUserNestedInput;
     AccountUserPermission?: AccountUserPermissionUpdateManyWithoutAccountUserNestedInput;
+    File?: FileUpdateManyWithoutAccountUserNestedInput;
   };
 
   export type AccountUserUncheckedUpdateWithoutAccountInput = {
@@ -20033,6 +20030,7 @@ export namespace Prisma {
     AccUserIsAdmin?: BoolFieldUpdateOperationsInput | boolean;
     AccUserPIN?: NullableStringFieldUpdateOperationsInput | string | null;
     AccountUserPermission?: AccountUserPermissionUncheckedUpdateManyWithoutAccountUserNestedInput;
+    File?: FileUncheckedUpdateManyWithoutAccountUserNestedInput;
   };
 
   export type AccountUserUncheckedUpdateManyWithoutAccountInput = {
@@ -20073,6 +20071,15 @@ export namespace Prisma {
     UserAuthPermissionId: number;
   };
 
+  export type FileCreateManyAccountUserInput = {
+    FileId?: number;
+    FileOriginalFilename: string;
+    FileMediaType?: string | null;
+    FileLocation: string;
+    FileUploadDateTime: Date | string;
+    FileSizeBytes?: bigint | number | null;
+  };
+
   export type AccountUserPermissionUpdateWithoutAccountUserInput = {
     Permission?: PermissionUpdateOneRequiredWithoutAccountUserPermissionNestedInput;
   };
@@ -20085,6 +20092,36 @@ export namespace Prisma {
   export type AccountUserPermissionUncheckedUpdateManyWithoutAccountUserInput = {
     UserAuthId?: IntFieldUpdateOperationsInput | number;
     UserAuthPermissionId?: IntFieldUpdateOperationsInput | number;
+  };
+
+  export type FileUpdateWithoutAccountUserInput = {
+    FileOriginalFilename?: StringFieldUpdateOperationsInput | string;
+    FileMediaType?: NullableStringFieldUpdateOperationsInput | string | null;
+    FileLocation?: StringFieldUpdateOperationsInput | string;
+    FileUploadDateTime?: DateTimeFieldUpdateOperationsInput | Date | string;
+    FileSizeBytes?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null;
+    Account?: AccountUpdateManyWithoutFileNestedInput;
+    ProductionCompany?: ProductionCompanyUpdateManyWithoutFileNestedInput;
+  };
+
+  export type FileUncheckedUpdateWithoutAccountUserInput = {
+    FileId?: IntFieldUpdateOperationsInput | number;
+    FileOriginalFilename?: StringFieldUpdateOperationsInput | string;
+    FileMediaType?: NullableStringFieldUpdateOperationsInput | string | null;
+    FileLocation?: StringFieldUpdateOperationsInput | string;
+    FileUploadDateTime?: DateTimeFieldUpdateOperationsInput | Date | string;
+    FileSizeBytes?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null;
+    Account?: AccountUncheckedUpdateManyWithoutFileNestedInput;
+    ProductionCompany?: ProductionCompanyUncheckedUpdateManyWithoutFileNestedInput;
+  };
+
+  export type FileUncheckedUpdateManyWithoutAccountUserInput = {
+    FileId?: IntFieldUpdateOperationsInput | number;
+    FileOriginalFilename?: StringFieldUpdateOperationsInput | string;
+    FileMediaType?: NullableStringFieldUpdateOperationsInput | string | null;
+    FileLocation?: StringFieldUpdateOperationsInput | string;
+    FileUploadDateTime?: DateTimeFieldUpdateOperationsInput | Date | string;
+    FileSizeBytes?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null;
   };
 
   export type AccountCreateManyCurrencyInput = {
@@ -20103,7 +20140,7 @@ export namespace Prisma {
     AccountLogoFileId?: number | null;
     AccountMainEmail?: string | null;
     AccountNumPeople?: number | null;
-    AccountOrganisationId?: string | null;
+    AccountOrganisationId: string;
     AccountTermsAgreedBy?: string | null;
     AccountTermsAgreedDate?: Date | string | null;
     AccountWebsite?: string | null;
@@ -20125,7 +20162,7 @@ export namespace Prisma {
     AccountCompanyNumber?: NullableStringFieldUpdateOperationsInput | string | null;
     AccountMainEmail?: NullableStringFieldUpdateOperationsInput | string | null;
     AccountNumPeople?: NullableIntFieldUpdateOperationsInput | number | null;
-    AccountOrganisationId?: NullableStringFieldUpdateOperationsInput | string | null;
+    AccountOrganisationId?: StringFieldUpdateOperationsInput | string;
     AccountTermsAgreedBy?: NullableStringFieldUpdateOperationsInput | string | null;
     AccountTermsAgreedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     AccountWebsite?: NullableStringFieldUpdateOperationsInput | string | null;
@@ -20154,7 +20191,7 @@ export namespace Prisma {
     AccountLogoFileId?: NullableIntFieldUpdateOperationsInput | number | null;
     AccountMainEmail?: NullableStringFieldUpdateOperationsInput | string | null;
     AccountNumPeople?: NullableIntFieldUpdateOperationsInput | number | null;
-    AccountOrganisationId?: NullableStringFieldUpdateOperationsInput | string | null;
+    AccountOrganisationId?: StringFieldUpdateOperationsInput | string;
     AccountTermsAgreedBy?: NullableStringFieldUpdateOperationsInput | string | null;
     AccountTermsAgreedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     AccountWebsite?: NullableStringFieldUpdateOperationsInput | string | null;
@@ -20182,7 +20219,7 @@ export namespace Prisma {
     AccountLogoFileId?: NullableIntFieldUpdateOperationsInput | number | null;
     AccountMainEmail?: NullableStringFieldUpdateOperationsInput | string | null;
     AccountNumPeople?: NullableIntFieldUpdateOperationsInput | number | null;
-    AccountOrganisationId?: NullableStringFieldUpdateOperationsInput | string | null;
+    AccountOrganisationId?: StringFieldUpdateOperationsInput | string;
     AccountTermsAgreedBy?: NullableStringFieldUpdateOperationsInput | string | null;
     AccountTermsAgreedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     AccountWebsite?: NullableStringFieldUpdateOperationsInput | string | null;
@@ -20205,7 +20242,7 @@ export namespace Prisma {
     AccountCompanyNumber?: string | null;
     AccountMainEmail?: string | null;
     AccountNumPeople?: number | null;
-    AccountOrganisationId?: string | null;
+    AccountOrganisationId: string;
     AccountTermsAgreedBy?: string | null;
     AccountTermsAgreedDate?: Date | string | null;
     AccountWebsite?: string | null;
@@ -20237,7 +20274,7 @@ export namespace Prisma {
     AccountCompanyNumber?: NullableStringFieldUpdateOperationsInput | string | null;
     AccountMainEmail?: NullableStringFieldUpdateOperationsInput | string | null;
     AccountNumPeople?: NullableIntFieldUpdateOperationsInput | number | null;
-    AccountOrganisationId?: NullableStringFieldUpdateOperationsInput | string | null;
+    AccountOrganisationId?: StringFieldUpdateOperationsInput | string;
     AccountTermsAgreedBy?: NullableStringFieldUpdateOperationsInput | string | null;
     AccountTermsAgreedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     AccountWebsite?: NullableStringFieldUpdateOperationsInput | string | null;
@@ -20265,7 +20302,7 @@ export namespace Prisma {
     AccountCompanyNumber?: NullableStringFieldUpdateOperationsInput | string | null;
     AccountMainEmail?: NullableStringFieldUpdateOperationsInput | string | null;
     AccountNumPeople?: NullableIntFieldUpdateOperationsInput | number | null;
-    AccountOrganisationId?: NullableStringFieldUpdateOperationsInput | string | null;
+    AccountOrganisationId?: StringFieldUpdateOperationsInput | string;
     AccountTermsAgreedBy?: NullableStringFieldUpdateOperationsInput | string | null;
     AccountTermsAgreedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     AccountWebsite?: NullableStringFieldUpdateOperationsInput | string | null;
@@ -20293,7 +20330,7 @@ export namespace Prisma {
     AccountCompanyNumber?: NullableStringFieldUpdateOperationsInput | string | null;
     AccountMainEmail?: NullableStringFieldUpdateOperationsInput | string | null;
     AccountNumPeople?: NullableIntFieldUpdateOperationsInput | number | null;
-    AccountOrganisationId?: NullableStringFieldUpdateOperationsInput | string | null;
+    AccountOrganisationId?: StringFieldUpdateOperationsInput | string;
     AccountTermsAgreedBy?: NullableStringFieldUpdateOperationsInput | string | null;
     AccountTermsAgreedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     AccountWebsite?: NullableStringFieldUpdateOperationsInput | string | null;
@@ -20378,45 +20415,6 @@ export namespace Prisma {
     AccSubIsActive?: NullableBoolFieldUpdateOperationsInput | boolean | null;
   };
 
-  export type FileCreateManyUserInput = {
-    FileId?: number;
-    FileOriginalFilename: string;
-    FileMediaType?: string | null;
-    FileLocation: string;
-    FileUploadDateTime: Date | string;
-    FileSizeBytes?: bigint | number | null;
-  };
-
-  export type FileUpdateWithoutUserInput = {
-    FileOriginalFilename?: StringFieldUpdateOperationsInput | string;
-    FileMediaType?: NullableStringFieldUpdateOperationsInput | string | null;
-    FileLocation?: StringFieldUpdateOperationsInput | string;
-    FileUploadDateTime?: DateTimeFieldUpdateOperationsInput | Date | string;
-    FileSizeBytes?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null;
-    Account?: AccountUpdateManyWithoutFileNestedInput;
-    ProductionCompany?: ProductionCompanyUpdateManyWithoutFileNestedInput;
-  };
-
-  export type FileUncheckedUpdateWithoutUserInput = {
-    FileId?: IntFieldUpdateOperationsInput | number;
-    FileOriginalFilename?: StringFieldUpdateOperationsInput | string;
-    FileMediaType?: NullableStringFieldUpdateOperationsInput | string | null;
-    FileLocation?: StringFieldUpdateOperationsInput | string;
-    FileUploadDateTime?: DateTimeFieldUpdateOperationsInput | Date | string;
-    FileSizeBytes?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null;
-    Account?: AccountUncheckedUpdateManyWithoutFileNestedInput;
-    ProductionCompany?: ProductionCompanyUncheckedUpdateManyWithoutFileNestedInput;
-  };
-
-  export type FileUncheckedUpdateManyWithoutUserInput = {
-    FileId?: IntFieldUpdateOperationsInput | number;
-    FileOriginalFilename?: StringFieldUpdateOperationsInput | string;
-    FileMediaType?: NullableStringFieldUpdateOperationsInput | string | null;
-    FileLocation?: StringFieldUpdateOperationsInput | string;
-    FileUploadDateTime?: DateTimeFieldUpdateOperationsInput | Date | string;
-    FileSizeBytes?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null;
-  };
-
   /**
    * Aliases for legacy arg types
    */
@@ -20450,11 +20448,6 @@ export namespace Prisma {
    */
   export type SubscriptionPlanCountOutputTypeArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
     SubscriptionPlanCountOutputTypeDefaultArgs<ExtArgs>;
-  /**
-   * @deprecated Use UserCountOutputTypeDefaultArgs instead
-   */
-  export type UserCountOutputTypeArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
-    UserCountOutputTypeDefaultArgs<ExtArgs>;
   /**
    * @deprecated Use AccountDefaultArgs instead
    */
