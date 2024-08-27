@@ -677,3 +677,44 @@ export const globalActivityTabColDefs = (showGlobalActivity, currencySymbol) => 
     resizable: false,
   },
 ];
+
+export const loadSalesHistoryColDefs = [
+  {
+    headerName: 'Upload Name',
+    field: '...',
+    cellRenderer: DefaultTextRenderer,
+  },
+  {
+    headerName: 'Date Uploaded',
+    field: '...',
+    cellRenderer: DefaultTextRenderer,
+  },
+  {
+    headerName: 'Issues Flagged / Approved',
+    field: '...',
+    cellRenderer: DefaultTextRenderer,
+  },
+  {
+    headerName: 'View',
+    field: 'ViewBtn',
+    cellRenderer: ButtonRenderer,
+    cellRendererParams: {
+      buttonText: 'View',
+    },
+    width: 100,
+  },
+  {
+    headerName: '',
+    field: 'icons',
+    cellRenderer: IconRowRenderer,
+    cellRendererParams: {
+      iconList: [
+        {
+          name: 'delete',
+        },
+      ],
+    },
+    width: 80,
+    resizable: false,
+  },
+];

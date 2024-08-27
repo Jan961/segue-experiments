@@ -9,9 +9,8 @@ import { getAccountId, getEmailFromReq, getUserNameFromReq, getUsers } from 'ser
 import { getAllVenuesMin, getUniqueVenueTownlist } from 'services/venueService';
 import { BookingJump } from 'state/marketing/bookingJumpState';
 import { getProductionJumpState } from 'utils/getProductionJumpState';
-import LoadSalesHistoryFilters from 'components/marketing/load-history/LoadSalesHistoryFilters';
 import InstructionText from 'components/marketing/load-history/InstructionText';
-import { Button } from 'components/core-ui-lib';
+import LoadSalesHistory from 'components/marketing/load-history/LoadSalesHistory';
 
 const Index = () => {
   return (
@@ -26,13 +25,7 @@ const Index = () => {
           dropdown, please create and / or archive the production in the `Manage Shows / Productions` pages.
         </p>
       </div>
-      <div className="flex items-center justify-between">
-        <LoadSalesHistoryFilters />
-        <div className="flex gap-x-3">
-          <Button text="Download Template" className="w-[155px]" />
-          <Button text="Upload Template" className="w-[155px]" />
-        </div>
-      </div>
+      <LoadSalesHistory />
     </Layout>
   );
 };
