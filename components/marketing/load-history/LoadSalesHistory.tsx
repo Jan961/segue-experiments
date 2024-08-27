@@ -6,6 +6,7 @@ import { uploadFile } from 'requests/upload';
 import { getFileUrl } from 'lib/s3';
 import { attachmentMimeTypes } from 'components/core-ui-lib/UploadModal/interface';
 import { isNullOrEmpty } from 'utils';
+import { validateSpreadsheetFile } from '../utils';
 // import axios from 'axios';
 // import { useRecoilValue } from 'recoil';
 // import { productionJumpState } from 'state/booking/productionJumpState';
@@ -13,6 +14,8 @@ import { isNullOrEmpty } from 'utils';
 const LoadSalesHistory = () => {
   const [uploadSalesVisible, setUploadSalesVisible] = useState(false);
   const [salesHistoryRows, setSalesHistoryRows] = useState([]);
+  // const [uploadedFile, setUploadedFile] = useState();
+
   // const productionJump = useRecoilValue(productionJumpState);
 
   //   const onUploadSuccess = async ({ fileId }) => {
@@ -24,6 +27,11 @@ const LoadSalesHistory = () => {
   //   };
 
   const onSave = async (file, onProgress, onError, onUploadingImage) => {
+    file = await validateSpreadsheetFile(file);
+    handleUpload(file, onProgress, onError, onUploadingImage);
+  };
+
+  const handleUpload = async (file, onProgress, onError, onUploadingImage) => {
     const formData = new FormData();
     formData.append('file', file[0].file);
     formData.append('path', `marketing/salesHistory`);
