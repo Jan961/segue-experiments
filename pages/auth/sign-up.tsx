@@ -40,7 +40,7 @@ const SignUp = () => {
   const { signIn } = useSignIn();
   const [accountDetails, setAccountDetails] = useState(DEFAULT_ACCOUNT_DETAILS);
   const isValidEmail = useMemo(() => validateEmail(accountDetails.email), [accountDetails.email]);
-  console.log('Error msdg', error);
+
   const isFormValid = useMemo(() => {
     switch (authMode) {
       case 'default':
