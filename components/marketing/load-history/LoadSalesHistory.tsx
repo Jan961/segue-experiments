@@ -7,6 +7,7 @@ import { getFileUrl } from 'lib/s3';
 import { attachmentMimeTypes } from 'components/core-ui-lib/UploadModal/interface';
 import { isNullOrEmpty } from 'utils';
 import { validateSpreadsheetFile } from '../utils';
+import SpreadsheetUploadModal from './SpreadsheetUploadModal';
 // import axios from 'axios';
 // import { useRecoilValue } from 'recoil';
 // import { productionJumpState } from 'state/booking/productionJumpState';
@@ -93,6 +94,7 @@ const LoadSalesHistory = () => {
           onSave={onSave}
         />
       )}
+      <SpreadsheetUploadModal />
     </div>
   );
 };
