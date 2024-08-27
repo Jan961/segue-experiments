@@ -2,18 +2,18 @@ import LoadSalesHistoryFilters from './LoadSalesHistoryFilters';
 import { Button, UploadModal, Table } from 'components/core-ui-lib';
 import { loadSalesHistoryColDefs, styleProps } from '../table/tableConfig';
 import { useState } from 'react';
-// import { useRecoilValue } from 'recoil';
-// import { productionJumpState } from 'state/booking/productionJumpState';
 import { uploadFile } from 'requests/upload';
 import { getFileUrl } from 'lib/s3';
-// import axios from 'axios';
 import { attachmentMimeTypes } from 'components/core-ui-lib/UploadModal/interface';
 import { isNullOrEmpty } from 'utils';
+// import axios from 'axios';
+// import { useRecoilValue } from 'recoil';
+// import { productionJumpState } from 'state/booking/productionJumpState';
 
 const LoadSalesHistory = () => {
   const [uploadSalesVisible, setUploadSalesVisible] = useState(false);
-  // const productionJump = useRecoilValue(productionJumpState);
   const [salesHistoryRows, setSalesHistoryRows] = useState([]);
+  // const productionJump = useRecoilValue(productionJumpState);
 
   //   const onUploadSuccess = async ({ fileId }) => {
   //     try {
@@ -33,16 +33,11 @@ const LoadSalesHistory = () => {
       if (response.status >= 400 && response.status < 600) {
         onError(file[0].file, 'Error uploading file. Please try again.');
       } else {
-        console.log(response.uploadDateTime);
-
         const newFile = {
-          id: response.id,
           name: response.originalFilename,
           dateUploaded: response.uploadDateTime,
           fileURL: getFileUrl(response.location),
         };
-
-        console.log(newFile);
 
         setSalesHistoryRows([...salesHistoryRows, newFile]);
         // onUploadSuccess({ fileId: response.id });
@@ -54,7 +49,6 @@ const LoadSalesHistory = () => {
 
   const handleCellClick = async (params) => {
     const column = params.column.colId;
-    console.log(params.data);
     if (column === 'ViewBtn') {
       if (isNullOrEmpty(params.data?.fileURL)) {
         window.open(URL.createObjectURL(params.data.file), '_blank');
