@@ -2,7 +2,6 @@ import axios from 'axios';
 
 export const getCoordFromWhat3Words = async (searchTerm) => {
   const wordParts = searchTerm.split('.');
-  console.log(wordParts);
   if (wordParts.length !== 3)
     return {
       isError: true,
@@ -13,11 +12,12 @@ export const getCoordFromWhat3Words = async (searchTerm) => {
     };
   const apiKey = process.env.WHAT_3_WORDS_API_KEY;
   const w3wUrl = `https://api.what3words.com/v3/convert-to-coordinates?words=${searchTerm}&key=${apiKey}`;
-  const response = (await axios.get(w3wUrl)).data;
-  if (response?.error) {
-    return { isError: true, error: response.error };
+  const response = (await axios.get(w3wUrl))?.data;
+  const result = response?.data;
+  if (result?.error) {
+    return { isError: true, error: result.error };
   } else {
-    const { country, coordinates } = response;
+    const { country, coordinates } = result;
     const { lat, lng } = coordinates;
     return { isError: false, country, coordinates: { Latitude: lat, Longitude: lng } };
   }

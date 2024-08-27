@@ -1,4 +1,4 @@
-import { UiTransformedVenue } from '../utils/venue';
+import { UiTransformedVenue } from 'utils/venue';
 import axios from 'axios';
 
 export const addVenueToMilageCalculator = async (venueInfo: UiTransformedVenue) => {
@@ -11,6 +11,7 @@ export const addVenueToMilageCalculator = async (venueInfo: UiTransformedVenue) 
     primaryCountry,
     primaryCoordinates,
   } = venueInfo;
+  //  This address is my personal server running the Routing for GB + Ireland
   await axios.post('http://79.99.40.44:3000/api/addVenue', [
     {
       VenueAddress1: primaryAddress1,

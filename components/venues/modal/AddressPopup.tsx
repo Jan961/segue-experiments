@@ -1,4 +1,4 @@
-import { Button, PopupModal } from '../../core-ui-lib';
+import { Button, PopupModal } from 'components/core-ui-lib';
 
 export interface AddressPopupProps {
   show: boolean;
@@ -43,6 +43,7 @@ export const AddressPopup = ({ show, onYesClick, message, closeModal }: AddressP
           onYesClick();
           if (message === 'Located' || message === 'UsingWhat3Words') closeModal();
         }}
+        className="mt-4 float-right w-28"
       >
         OK
       </Button>

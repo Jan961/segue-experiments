@@ -97,14 +97,14 @@ export default function AddEditVenueModal({
         const addressUrl = `https://nominatim.openstreetmap.org/search?q=${query}&format=json&polygon=1&addressdetails=1`;
         const response = await fetch(addressUrl, { method: 'GET' });
         const result = await response.json();
-
+        const { primaryWhat3Words, primaryCountry } = formData;
         if (result.length === 0) {
           //  address failed then they entered what3words
-          if (formData.primaryWhat3Words !== '' && addressAttempted) {
-            if (formData.primaryWhat3Words.split('.').length === 3) {
+          if (primaryWhat3Words !== '' && addressAttempted) {
+            if (primaryWhat3Words.split('.').length === 3) {
               const wordsResponse = await axios.post('/api/address/checkWhat3Words', {
-                searchTerm: formData.primaryWhat3Words,
-                countryId: formData.primaryCountry,
+                searchTerm: primaryWhat3Words,
+                countryId: primaryCountry,
               });
 
               if (wordsResponse.status >= 400) {
@@ -115,9 +115,9 @@ export default function AddEditVenueModal({
               setAddressAttempted(false);
               setShowAddressMessage('UsingWhat3Words');
             }
-          } else if (formData.primaryWhat3Words === '' && addressAttempted) {
+          } else if (primaryWhat3Words === '' && addressAttempted) {
             setShowAddressMessage('NotUsingWhat3Words');
-          } else if (formData.primaryWhat3Words !== '') {
+          } else if (primaryWhat3Words !== '') {
             // request server to check if the what3words is valid, if so then confirm usage
           } else {
             setShowAddressMessage('NotFound');
@@ -143,10 +143,12 @@ export default function AddEditVenueModal({
       const isValid = await validateVenue(formData);
       if (isValid) {
         const noPopup = await findAddress(formData);
-        const apiResponse = formData.id ? await updateVenue(formData) : await createVenue(formData);
-        await deleteFiles();
-        await saveFiles(apiResponse);
-        if (noPopup) await closeModal();
+        if (noPopup) {
+          const apiResponse = formData.id ? await updateVenue(formData) : await createVenue(formData);
+          await deleteFiles();
+          await saveFiles(apiResponse);
+          await closeModal();
+        }
       }
     } catch (exception) {
       console.log(exception);
@@ -266,6 +268,7 @@ export default function AddEditVenueModal({
         show={visible}
         panelClass="relative h-[95vh] overflow-x-auto pb-4"
         titleClass="text-xl text-primary-navy"
+        hasOverlay={showAddressPopup}
       >
         <form className="w-[1026px]">
           <h2 className="text-xl text-primary-navy font-bold">Main</h2>
