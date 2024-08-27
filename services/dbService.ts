@@ -1,14 +1,13 @@
 import axios from 'axios';
 
-const deployments = ['dev', 'staging', 'demo', 'prod'];
 const DB_USER_PRIVILEGES = 'SELECT,INSERT,UPDATE,DELETE,EXECUTE,SHOW VIEW';
 
 export const createClientDB = async (organisationId: string) => {
   if (!organisationId) {
     throw new Error('Unable to create new DB. OrganisationId is required');
   }
-  console.log('Deployment environment', process.env.VERCEL_URL);
-  const deploymentEnv = process.env.VERCEL_URL ? deployments.find((d) => process.env.VERCEL_URL.includes(d)) : 'dev';
+
+  const deploymentEnv = process.env.DEPLOYMENT_ENV;
   if (!deploymentEnv) {
     throw new Error('Unable to create new DB as deployment environment is invalid');
   }
