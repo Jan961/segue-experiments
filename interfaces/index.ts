@@ -29,6 +29,25 @@ export type CurrencyDTO = {
   CurrencyCountryList: CountryDTO[];
 };
 
+export interface ICurrency {
+  code: string;
+  name: string;
+  symbolUniCode: string;
+}
+
+export interface IRegion {
+  id: number;
+  name: string;
+}
+
+export interface ICurrencyCountry {
+  id: number;
+  code: string;
+  name: string;
+  currencyCode: string;
+  regionList: IRegion[];
+}
+
 export type UICurrency = {
   code: number;
   name: string;

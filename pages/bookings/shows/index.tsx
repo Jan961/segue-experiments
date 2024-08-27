@@ -85,8 +85,6 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     };
   });
 
-  console.log({ showsList });
-
   const initialState: InitialState = {
     global: {
       productionJump,
