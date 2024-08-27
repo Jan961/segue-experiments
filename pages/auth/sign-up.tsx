@@ -8,6 +8,7 @@ import {
   INVALID_COMPANY_ID,
   EMAIL_NOT_FOUND,
   INVALID_VERIFICATION_STRATEGY,
+  SESSION_ALREADY_EXISTS,
 } from 'utils/authUtils';
 import { calibri } from 'lib/fonts';
 import Image from 'next/image';
@@ -89,15 +90,17 @@ const SignUp = () => {
         identifier: accountDetails.email,
         password: 'dummy_password',
       });
-
       return true;
     } catch (err) {
+      console.error(err);
       const errorCode = err.errors[0].code;
       if (errorCode === EMAIL_NOT_FOUND) {
         setAuthMode('signUp');
       } else if (errorCode === PASSWORD_INCORRECT || errorCode === INVALID_VERIFICATION_STRATEGY) {
         // 'User already registeredwith clerk. Verify if they have a pin registered'
         verifyUserExits();
+      } else if (errorCode === SESSION_ALREADY_EXISTS) {
+        setError('Please log out of the current session and try again');
       } else {
         setError(err.errors[0].messsage);
       }
