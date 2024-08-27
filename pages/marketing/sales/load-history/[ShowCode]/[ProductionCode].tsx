@@ -9,30 +9,11 @@ import { getAccountId, getEmailFromReq, getUserNameFromReq, getUsers } from 'ser
 import { getAllVenuesMin, getUniqueVenueTownlist } from 'services/venueService';
 import { BookingJump } from 'state/marketing/bookingJumpState';
 import { getProductionJumpState } from 'utils/getProductionJumpState';
-import LoadSalesHistoryFilters from 'components/marketing/load-history/LoadSalesHistoryFilters';
-import InstructionText from 'components/marketing/load-history/InstructionText';
-import { Button } from 'components/core-ui-lib';
 
 const Index = () => {
   return (
     <Layout title="Marketing | Segue">
-      <h1 className="mt-3 text-4xl font-bold text-primary-green">Load Sales History</h1>
-      <h2 className="text-2xl text-gray-500 font-bold pt-3 mb-4">Upload Instructions</h2>
-      <InstructionText />
-      <div className="w-full bg-gray-500 h-[1px] my-5" />
-      <div className="w-[800px] text-primary-input-text">
-        <p>
-          Only archived productions can be selected for Sales Data Upload. If your production does not appear in the
-          dropdown, please create and / or archive the production in the `Manage Shows / Productions` pages.
-        </p>
-      </div>
-      <div className="flex items-center justify-between">
-        <LoadSalesHistoryFilters />
-        <div className="flex gap-x-3">
-          <Button text="Download Template" className="w-[155px]" />
-          <Button text="Upload Template" className="w-[155px]" />
-        </div>
-      </div>
+      <div className="mb-8">Hello</div>
     </Layout>
   );
 };
