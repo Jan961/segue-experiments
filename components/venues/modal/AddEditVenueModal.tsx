@@ -103,6 +103,7 @@ export default function AddEditVenueModal({
           if (formData.primaryWhat3Words !== '' && addressAttempted) {
             const wordsResponse = await axios.post('/api/address/checkWhat3Words', {
               searchTerm: formData.primaryWhat3Words,
+              countryId: formData.primaryCountry,
             });
 
             if (wordsResponse.status >= 400) {
