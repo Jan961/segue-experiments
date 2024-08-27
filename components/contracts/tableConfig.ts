@@ -103,7 +103,7 @@ export const getCompanyContractsColumnDefs = (userList = []) => [
       };
     },
   },
-  { headerName: 'Role', field: 'role', cellRenderer: DefaultCellRenderer, flex: 1, editable: true },
+  { headerName: 'Role', field: 'role', cellRenderer: DefaultCellRenderer, flex: 1 },
   {
     headerName: 'Contract Status',
     field: 'status',

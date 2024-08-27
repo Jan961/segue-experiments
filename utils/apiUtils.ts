@@ -12,7 +12,7 @@ export type FieldMapping = {
 
 type UpdateData = Record<string, any>;
 
-export const prepareUpdateData = <T>(details: T, fieldMappings: FieldMapping[]): UpdateData => {
+export const prepareQuery = <T>(details: T, fieldMappings: FieldMapping[]): UpdateData => {
   const updateData: UpdateData = {};
 
   fieldMappings.forEach(({ key, updateKey, isDate, isSetArray, arrayKey, isForeignKey, foreignKeyId }) => {

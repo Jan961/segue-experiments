@@ -2,80 +2,15 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import prisma from 'lib/prisma';
 import * as yup from 'yup';
 import { getEmailFromReq, checkAccess } from 'services/userService';
-import { isUndefined } from 'utils';
 import { omit, pick } from 'radash';
-import { preparePersonQueryData } from 'services/personService';
+import { prepareAddressQueryData, prepareOrganisationQueryData, preparePersonQueryData } from 'services/personService';
 
-// Yup schema for validation (expand as needed)
 const personSchema = yup.object().shape({
   personDetails: yup.object().required(),
   agencyDetails: yup.object().nullable(),
   emergencyContact1: yup.object().nullable(),
   emergencyContact2: yup.object().nullable(),
 });
-
-export const prepareOrganisationQueryData = (orgDetails, contactPersonId) => {
-  if (!orgDetails) return null;
-
-  const organisationData: any = {};
-
-  if (!isUndefined(orgDetails.name)) {
-    organisationData.OrgName = orgDetails.name;
-  }
-
-  if (!isUndefined(orgDetails.website)) {
-    organisationData.OrgWebsite = orgDetails.website;
-  }
-
-  if (!isUndefined(contactPersonId)) {
-    if (contactPersonId === null) {
-      organisationData.OrgContactPersonId = {
-        disconnect: true,
-      };
-    } else {
-      organisationData.Person_Organisation_OrgContactPersonIdToPerson = {
-        connect: { PersonId: contactPersonId },
-      };
-    }
-  }
-
-  return organisationData;
-};
-
-export const prepareAddressQueryData = (addressDetails) => {
-  if (!addressDetails) return null;
-
-  const addressData: any = {};
-
-  if (!isUndefined(addressDetails.address1)) {
-    addressData.Address1 = addressDetails.address1;
-  }
-  if (!isUndefined(addressDetails.address2)) {
-    addressData.Address2 = addressDetails.address2;
-  }
-  if (!isUndefined(addressDetails.address3)) {
-    addressData.Address3 = addressDetails.address3;
-  }
-  if (!isUndefined(addressDetails.town)) {
-    addressData.AddressTown = addressDetails.town;
-  }
-  if (!isUndefined(addressDetails.postcode)) {
-    addressData.AddressPostcode = addressDetails.postcode;
-  }
-  if (!isUndefined(addressDetails.country)) {
-    if (addressDetails.country === null) {
-      addressData.Country = {
-        disconnect: true,
-      };
-    } else {
-      addressData.Country = {
-        connect: { Id: addressDetails.country },
-      };
-    }
-  }
-
-  return addressData;
-};
 
 const addressFields = ['address1', 'address2', 'address3', 'postcode', 'town'];
 const organisationFields = ['name', 'website'];

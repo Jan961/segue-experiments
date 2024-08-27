@@ -49,6 +49,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           TotalFeeNotes: contractDetails.totalPayDetails?.feeNotes || null,
           CancelFee: contractDetails.cancellationFee || null,
           ContractStatus: CompanyContractStatus.NotYetIssued,
+          DateIssued: new Date(),
           ...(department && {
             ACCDepartment: {
               connect: {

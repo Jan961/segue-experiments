@@ -52,7 +52,7 @@ const PaymentBreakdown = ({
           placeholder="00.00"
           type="number"
           value={amount}
-          onChange={(event) => handleChange('amount', parseInt(event.target.value, 10))}
+          onChange={(event) => handleChange('amount', parseFloat(event.target.value))}
         />
       </div>
       <TextInput

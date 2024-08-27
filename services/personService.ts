@@ -2,8 +2,9 @@ import { PersonMinimalDTO } from 'interfaces';
 import prisma from 'lib/prisma';
 import { Person } from 'prisma/generated/prisma-client';
 import { isUndefined } from 'utils';
-import { FieldMapping, prepareUpdateData } from 'utils/apiUtils';
+import { FieldMapping, prepareQuery } from 'utils/apiUtils';
 import { prepareAccountUpdateData } from './contracts';
+import { BankAccount, IPersonDetails } from 'components/contracts/types';
 
 interface AddressDetails {
   address1?: string;
@@ -26,7 +27,7 @@ export const prepareAddressQueryData = (addressDetails: AddressDetails | null) =
     { key: 'country', updateKey: 'Country', isForeignKey: true, foreignKeyId: 'Id' },
   ];
 
-  return prepareUpdateData(addressDetails, fieldMappings);
+  return prepareQuery(addressDetails, fieldMappings);
 };
 
 interface OrganisationDetails {
@@ -40,31 +41,23 @@ export const prepareOrganisationQueryData = (
 ) => {
   if (!orgDetails) return null;
 
-  const { name, website } = orgDetails;
+  const fieldMappings: FieldMapping[] = [
+    { key: 'name', updateKey: 'OrgName' },
+    { key: 'website', updateKey: 'OrgWebsite' },
+    {
+      key: 'contactPersonId',
+      updateKey: 'Person_Organisation_OrgContactPersonIdToPerson',
+      isForeignKey: true,
+      foreignKeyId: 'PersonId',
+    },
+  ];
 
-  const organisationData: any = {};
+  const detailsWithContactPerson = {
+    ...orgDetails,
+    contactPersonId,
+  };
 
-  if (!isUndefined(name)) {
-    organisationData.OrgName = name;
-  }
-
-  if (!isUndefined(website)) {
-    organisationData.OrgWebsite = website;
-  }
-
-  if (!isUndefined(contactPersonId)) {
-    if (contactPersonId === null) {
-      organisationData.OrgContactPersonId = {
-        disconnect: true,
-      };
-    } else {
-      organisationData.OrgContactPersonId = {
-        connect: { PersonId: contactPersonId },
-      };
-    }
-  }
-
-  return organisationData;
+  return prepareQuery(detailsWithContactPerson, fieldMappings);
 };
 
 interface PersonPersonDetails {
@@ -73,61 +66,30 @@ interface PersonPersonDetails {
   roleName?: string;
 }
 
-export const preparePersonPersonQueryData = ({ mainPersonId, relatedPersonId, roleName }: PersonPersonDetails) => {
-  if (isUndefined(mainPersonId) || isUndefined(relatedPersonId) || isUndefined(roleName)) {
+export const preparePersonPersonQueryData = (personPersonDetails: PersonPersonDetails) => {
+  if (
+    isUndefined(personPersonDetails.mainPersonId) ||
+    isUndefined(personPersonDetails.relatedPersonId) ||
+    isUndefined(personPersonDetails.roleName)
+  ) {
     return null;
   }
 
-  const personPersonData: any = {};
+  const fieldMappings: FieldMapping[] = [
+    { key: 'mainPersonId', updateKey: 'PPPersonId' },
+    { key: 'relatedPersonId', updateKey: 'PPPersonRoleId' },
+    { key: 'roleName', updateKey: 'PersonRoleType' },
+  ];
 
-  if (!isUndefined(mainPersonId)) {
-    personPersonData.PPPersonId = mainPersonId;
-  }
-
-  if (!isUndefined(relatedPersonId)) {
-    personPersonData.PPPersonRoleId = relatedPersonId;
-  }
-
-  if (!isUndefined(roleName)) {
-    personPersonData.PersonRoleType = roleName;
-  }
-
-  return personPersonData;
+  return prepareQuery(personPersonDetails, fieldMappings);
 };
 
-interface AccountDetails {
-  paidTo?: string;
-  accountName?: string;
-  accountNumber?: string;
-  sortCode?: string;
-  swift?: string;
-  iban?: string;
-  country?: number | null;
-}
-
-interface PersonDetails {
-  firstName?: string;
-  lastName?: string;
-  email?: string;
-  landline?: string;
-  mobileNumber?: string;
-  passportName?: string;
-  passportExpiryDate?: string | null;
-  hasUKWorkPermit?: number;
-  isFEURequired?: number;
-  notes?: string;
-  healthDetails?: string;
-  advisoryNotes?: string;
-  workTypes?: number[];
-  otherWorkTypes?: string[];
-}
-
 export const preparePersonQueryData = (
-  personDetails: PersonDetails,
+  personDetails: Partial<IPersonDetails>,
   addressId?: number | null,
   organisationId?: number | null,
-  salaryAccountDetails?: AccountDetails,
-  expenseAccountDetails?: AccountDetails,
+  salaryAccountDetails?: Partial<BankAccount>,
+  expenseAccountDetails?: Partial<BankAccount>,
 ) => {
   if (!personDetails) return null;
 
@@ -153,11 +115,11 @@ export const preparePersonQueryData = (
     },
   ];
 
-  let personData = prepareUpdateData({ ...personDetails, addressId, organisationId }, personFieldMappings);
+  let personData = prepareQuery({ ...personDetails, addressId, organisationId }, personFieldMappings);
 
-  if (personDetails.workTypes && personDetails.workTypes.length > 0) {
+  if (personDetails.workType && personDetails.workType.length > 0) {
     personData.PersonPersonRole = {
-      create: personDetails.workTypes.map((workTypeId) => ({
+      create: personDetails.workType.map((workTypeId) => ({
         PersonRole: {
           connect: {
             PersonRoleId: workTypeId,

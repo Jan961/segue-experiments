@@ -1,7 +1,7 @@
 import { BankAccount } from 'components/contracts/types';
 import { IContractDepartment, IContractSummary } from 'interfaces/contracts';
 import prisma from 'lib/prisma';
-import { prepareUpdateData } from 'utils/apiUtils';
+import { prepareQuery } from 'utils/apiUtils';
 
 export const fetchAllStandardClauses = async () => {
   const clauses = await prisma.ACCStandardClause.findMany({});
@@ -128,7 +128,7 @@ export const prepareContractUpdateData = (data: any) => {
       foreignKeyId: 'Id',
     },
   ];
-  return prepareUpdateData(data, fieldMappings);
+  return prepareQuery(data, fieldMappings);
 };
 
 export const prepareAccountUpdateData = (accountDetails: Partial<BankAccount>, isSalary: boolean) => {
@@ -150,7 +150,7 @@ export const prepareAccountUpdateData = (accountDetails: Partial<BankAccount>, i
     },
   ];
 
-  return prepareUpdateData(accountDetails, fieldMappings);
+  return prepareQuery(accountDetails, fieldMappings);
 };
 
 export const prepareAgencyOrganisationUpdateData = (agencyDetails: any) => {
@@ -165,7 +165,7 @@ export const prepareAgencyOrganisationUpdateData = (agencyDetails: any) => {
     },
   ];
 
-  return prepareUpdateData(agencyDetails, fieldMappings);
+  return prepareQuery(agencyDetails, fieldMappings);
 };
 
 export const getContractDataById = async (contractId: number) => {

@@ -350,7 +350,7 @@ const ContractDetails = ({ contract = {}, onChange = noop }: ContractDetailsProp
                 placeholder="00.00"
                 type="number"
                 value={cancellationFee}
-                onChange={(event) => handleChange('cancellationFee', parseInt(event.target.value, 10))}
+                onChange={(event) => handleChange('cancellationFee', parseFloat(event.target.value))}
               />
             </div>
             <TextInput

@@ -53,8 +53,8 @@ export const contractDetailsSchema = yup.object().shape({
     .array()
     .of(
       yup.object().shape({
-        date: yup.date().required(),
-        amount: yup.number().required(),
+        date: yup.date().nullable(),
+        amount: yup.number().nullable(),
         notes: yup.string().nullable(),
       }),
     )

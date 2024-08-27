@@ -1,6 +1,6 @@
 import prisma from 'lib/prisma';
 import { IPersonDetails } from 'components/contracts/types';
-import { prepareUpdateData } from 'utils/apiUtils';
+import { prepareQuery } from 'utils/apiUtils';
 import { Prisma } from 'prisma/generated/prisma-client';
 
 export const preparePersonUpdateData = (personDetails: Partial<IPersonDetails>) => {
@@ -24,7 +24,7 @@ export const preparePersonUpdateData = (personDetails: Partial<IPersonDetails>) 
     { key: 'checkedBy', updateKey: 'AccountUser', foreignKeyId: 'Id', isForeignKey: true },
   ];
 
-  return prepareUpdateData(personDetails, fieldMappings);
+  return prepareQuery(personDetails, fieldMappings);
 };
 
 export const updatePerson = async (id: number, personDetails: any, tx = prisma) => {
