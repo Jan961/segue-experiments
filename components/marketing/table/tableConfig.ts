@@ -681,17 +681,17 @@ export const globalActivityTabColDefs = (showGlobalActivity, currencySymbol) => 
 export const loadSalesHistoryColDefs = [
   {
     headerName: 'Upload Name',
-    field: '...',
+    field: 'name',
     cellRenderer: DefaultTextRenderer,
   },
   {
     headerName: 'Date Uploaded',
-    field: '...',
+    field: 'dateUploaded',
     cellRenderer: DefaultTextRenderer,
   },
   {
     headerName: 'Issues Flagged / Approved',
-    field: '...',
+    field: 'UploadMessage',
     cellRenderer: DefaultTextRenderer,
   },
   {

@@ -2,9 +2,67 @@ import LoadSalesHistoryFilters from './LoadSalesHistoryFilters';
 import { Button, UploadModal, Table } from 'components/core-ui-lib';
 import { loadSalesHistoryColDefs, styleProps } from '../table/tableConfig';
 import { useState } from 'react';
+// import { useRecoilValue } from 'recoil';
+// import { productionJumpState } from 'state/booking/productionJumpState';
+import { uploadFile } from 'requests/upload';
+import { getFileUrl } from 'lib/s3';
+// import axios from 'axios';
+import { attachmentMimeTypes } from 'components/core-ui-lib/UploadModal/interface';
+import { isNullOrEmpty } from 'utils';
 
 const LoadSalesHistory = () => {
   const [uploadSalesVisible, setUploadSalesVisible] = useState(false);
+  // const productionJump = useRecoilValue(productionJumpState);
+  const [salesHistoryRows, setSalesHistoryRows] = useState([]);
+
+  //   const onUploadSuccess = async ({ fileId }) => {
+  //     try {
+  //       await axios.post('/api/admin/accountDetails/accountLogo/update', { fileId });
+  //     } catch (error) {
+  //       console.log(error, 'Failed to update database with file.');
+  //     }
+  //   };
+
+  const onSave = async (file, onProgress, onError, onUploadingImage) => {
+    const formData = new FormData();
+    formData.append('file', file[0].file);
+    formData.append('path', `marketing/salesHistory`);
+
+    try {
+      const response = await uploadFile(formData, onProgress, onError, onUploadingImage);
+      if (response.status >= 400 && response.status < 600) {
+        onError(file[0].file, 'Error uploading file. Please try again.');
+      } else {
+        console.log(response.uploadDateTime);
+
+        const newFile = {
+          id: response.id,
+          name: response.originalFilename,
+          dateUploaded: response.uploadDateTime,
+          fileURL: getFileUrl(response.location),
+        };
+
+        console.log(newFile);
+
+        setSalesHistoryRows([...salesHistoryRows, newFile]);
+        // onUploadSuccess({ fileId: response.id });
+      }
+    } catch (error) {
+      onError(file[0].file, 'Error uploading file. Please try again.');
+    }
+  };
+
+  const handleCellClick = async (params) => {
+    const column = params.column.colId;
+    console.log(params.data);
+    if (column === 'ViewBtn') {
+      if (isNullOrEmpty(params.data?.fileURL)) {
+        window.open(URL.createObjectURL(params.data.file), '_blank');
+      } else {
+        window.open(params.data.fileURL, '_blank');
+      }
+    }
+  };
 
   return (
     <div>
@@ -15,15 +73,21 @@ const LoadSalesHistory = () => {
           <Button text="Upload Template" className="w-[155px]" onClick={() => setUploadSalesVisible(true)} />
         </div>
       </div>
-      <Table columnDefs={loadSalesHistoryColDefs} rowData={[]} styleProps={styleProps} />
+      <Table
+        columnDefs={loadSalesHistoryColDefs}
+        rowData={salesHistoryRows}
+        styleProps={styleProps}
+        onCellClicked={handleCellClick}
+      />
       <UploadModal
         title="Upload Template"
         visible={uploadSalesVisible}
         info=""
-        allowedFormats={[]}
+        allowedFormats={attachmentMimeTypes.spreadsheetAttachment}
         onClose={() => {
           setUploadSalesVisible(false);
         }}
+        onSave={onSave}
       />
     </div>
   );
