@@ -7,7 +7,7 @@ export const createClientDB = async (organisationId: string) => {
   if (!organisationId) {
     throw new Error('Unable to create new DB. OrganisationId is required');
   }
-
+  console.log('Deployment environment', process.env.VERCEL_URL);
   const deploymentEnv = process.env.VERCEL_URL ? deployments.find((d) => process.env.VERCEL_URL.includes(d)) : 'dev';
   if (!deploymentEnv) {
     throw new Error('Unable to create new DB as deployment environment is invalid');
