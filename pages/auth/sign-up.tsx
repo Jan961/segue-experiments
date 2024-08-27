@@ -92,9 +92,8 @@ const SignUp = () => {
       });
       return true;
     } catch (err) {
-      console.error('Error while verifying credentials', err);
       const errorCode = err.errors[0].code;
-      console.log(errorCode);
+
       if (errorCode === EMAIL_NOT_FOUND) {
         setAuthMode('signUp');
       } else if (errorCode === PASSWORD_INCORRECT || errorCode === INVALID_VERIFICATION_STRATEGY) {
