@@ -73,16 +73,18 @@ const LoadSalesHistory = () => {
         styleProps={styleProps}
         onCellClicked={handleCellClick}
       />
-      <UploadModal
-        title="Upload Template"
-        visible={uploadSalesVisible}
-        info=""
-        allowedFormats={attachmentMimeTypes.spreadsheetAttachment}
-        onClose={() => {
-          setUploadSalesVisible(false);
-        }}
-        onSave={onSave}
-      />
+      {uploadSalesVisible && (
+        <UploadModal
+          title="Upload Template"
+          visible={uploadSalesVisible}
+          info=""
+          allowedFormats={attachmentMimeTypes.spreadsheetAttachment}
+          onClose={() => {
+            setUploadSalesVisible(false);
+          }}
+          onSave={onSave}
+        />
+      )}
     </div>
   );
 };
