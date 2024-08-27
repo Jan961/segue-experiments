@@ -4,7 +4,7 @@ import { getAccountId, getEmailFromReq } from 'services/userService';
 import { updateVenue } from 'services/venueService';
 import { mapVenueContactToPrisma } from 'utils/venue';
 import { all } from 'radash';
-import axios from 'axios';
+import { addVenueToMilageCalculator } from 'services/addVenueToMilageCalculator';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -195,16 +195,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       updatedVenue = updatedVenueData;
     });
 
-    await axios.post('http://localhost:3001/api/addVenue', [
-      {
-        VenueAddress1: primaryAddress1,
-        VenueAddress2: primaryAddress2,
-        VenueAddress3: primaryAddress3,
-        VenueAddressTown: primaryTown,
-        VenueAddressCountryId: primaryCountry,
-        VenueAddressPostcode: primaryPostCode,
-      },
-    ]);
+    await addVenueToMilageCalculator(req.body);
 
     res.status(200).json(updatedVenue);
   } catch (error) {

@@ -3,6 +3,7 @@ import prisma from 'lib/prisma';
 import { getAccountId, getEmailFromReq } from 'services/userService';
 import { createVenue } from 'services/venueService';
 import { mapVenueContactToPrisma } from 'utils/venue';
+import { addVenueToMilageCalculator } from '../../../services/addVenueToMilageCalculator';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
@@ -118,6 +119,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           })),
         );
       });
+      await addVenueToMilageCalculator(req.body);
+
       res.status(200).json(venue);
     } catch (error) {
       console.error('Request error', error);

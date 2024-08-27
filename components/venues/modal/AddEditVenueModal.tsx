@@ -19,8 +19,7 @@ import Loader from 'components/core-ui-lib/Loader';
 import useAxiosCancelToken from 'hooks/useCancelToken';
 import { isNullOrEmpty } from 'utils';
 import { headlessUploadMultiple } from 'requests/upload';
-import { notify } from 'components/core-ui-lib';
-import { ToastMessages } from '../../../config/shows';
+import { AddressPopup } from './AddressPopup';
 
 interface AddEditVenueModalProps {
   visible: boolean;
@@ -51,6 +50,9 @@ export default function AddEditVenueModal({
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [fileList, setFileList] = useState<FormData[]>([]);
   const [deleteList, setDeleteList] = useState<number[]>([]);
+  const [showAddressPopup, setShowAddressPopup] = useState<boolean>(false);
+  const [showAddressMessage, setShowAddressMessage] = useState<string>('');
+  const [addressAttempted, setAddressAttempted] = useState<boolean>(false);
   const cancelToken = useAxiosCancelToken();
   const handleInputChange = (field: string, value: any) => {
     let sanitizedValue = value;
@@ -66,7 +68,6 @@ export default function AddEditVenueModal({
   const createVenue = async (venue: UiTransformedVenue) => {
     try {
       const { data } = await axios.post('/api/venue/create', venue, { cancelToken });
-      onClose(true);
       return data;
     } catch (e) {
       debug('Error creating venue', e);
@@ -76,25 +77,92 @@ export default function AddEditVenueModal({
   const updateVenue = async (venue: UiTransformedVenue) => {
     try {
       const { data } = await axios.post('/api/venue/update/' + venue.id, venue, { cancelToken });
-      onClose(true);
       return data;
     } catch (e) {
       debug('Error updating venue', e);
     }
   };
 
-  const handleSaveAndClose = async () => {
-    setIsSaving(true);
-    setIsLoading(true);
-    const isValid = await validateVenue(formData);
-    if (isValid) {
-      const apiResponse = formData.id ? await updateVenue(formData) : await createVenue(formData);
-      await deleteFiles();
-      await saveFiles(apiResponse);
-    }
+  const closeModal = async () => {
     await fetchVenues();
     setIsLoading(false);
     setIsSaving(false);
+    onClose(true);
+  };
+
+  const findAddress = async (data) => {
+    if (checkVenueAddrInfoChange()) {
+      try {
+        const query = venueAddressToUrl(data);
+        const addressUrl = `https://nominatim.openstreetmap.org/search?q=${query}&format=json&polygon=1&addressdetails=1`;
+        const response = await fetch(addressUrl, { method: 'GET' });
+        const result = await response.json();
+
+        if (result.length === 0) {
+          //  address failed then they entered what3words
+          if (formData.primaryWhat3Words !== '' && addressAttempted) {
+            const wordsResponse = await axios.post('/api/address/checkWhat3Words', {
+              searchTerm: formData.primaryWhat3Words,
+            });
+
+            if (wordsResponse.status >= 400) {
+              setShowAddressMessage(wordsResponse.data.message);
+            } else {
+              formData.primaryCoordinates = wordsResponse.data.coordinates;
+            }
+            setAddressAttempted(false);
+            setShowAddressMessage('UsingWhat3Words');
+          } else if (formData.primaryWhat3Words === '' && addressAttempted) {
+            setShowAddressMessage('NotUsingWhat3Words');
+          } else if (formData.primaryWhat3Words !== '') {
+            // request server to check if the what3words is valid, if so then confirm usage
+          } else {
+            setShowAddressMessage('NotFound');
+            setAddressAttempted(true);
+          }
+        } else {
+          setShowAddressMessage('Located');
+        }
+        setShowAddressPopup(true);
+      } catch (exception) {
+        console.log(exception);
+      }
+      return false;
+    } else {
+      return true;
+    }
+  };
+
+  const handleSaveAndClose = async () => {
+    try {
+      setIsSaving(true);
+      setIsLoading(true);
+      const isValid = await validateVenue(formData);
+      if (isValid) {
+        const noPopup = await findAddress(formData);
+        const apiResponse = formData.id ? await updateVenue(formData) : await createVenue(formData);
+        await deleteFiles();
+        await saveFiles(apiResponse);
+        if (noPopup) await closeModal();
+      }
+    } catch (exception) {
+      console.log(exception);
+    }
+
+    setIsSaving(false);
+    setIsLoading(false);
+  };
+
+  const checkVenueAddrInfoChange = () => {
+    const keyList = [
+      'primaryAddress1',
+      'primaryAddress2',
+      'primaryAddress3',
+      'primaryCountry',
+      'primaryPostcode',
+      'primaryTown',
+    ];
+    return keyList.some((key) => venue[key] !== formData[key]);
   };
 
   const deleteFiles = async () => {
@@ -121,6 +189,7 @@ export default function AddEditVenueModal({
   async function validateVenue(data: UiTransformedVenue) {
     try {
       await schema.validate({ ...data }, { abortEarly: false });
+      return true;
     } catch (validationErrors) {
       const errors = {};
       validationErrors.inner.forEach((error) => {
@@ -128,19 +197,6 @@ export default function AddEditVenueModal({
       });
       setValidationErrors(errors);
       console.log('validation Errors', errors);
-      return false;
-    }
-    try {
-      const query = venueAddressToUrl(data);
-      const addressUrl = `https://nominatim.openstreetmap.org/search?q=${query}&format=json&polygon=1&addressdetails=1`;
-      const response = await fetch(addressUrl, { method: 'GET' });
-      const result = await response.json();
-      if (result.length === 0) {
-        notify.error(ToastMessages.addressNotFoundWarning);
-      }
-      return result.length > 0;
-    } catch (exception) {
-      console.log(exception);
       return false;
     }
   }
@@ -193,6 +249,14 @@ export default function AddEditVenueModal({
   };
   return (
     <>
+      <AddressPopup
+        show={showAddressPopup}
+        message={showAddressMessage}
+        closeModal={() => closeModal()}
+        onYesClick={() => {
+          setShowAddressPopup(false);
+        }}
+      />
       <PopupModal
         onClose={onClose}
         title="Add / Edit Venue"
