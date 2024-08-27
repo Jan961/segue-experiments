@@ -101,18 +101,20 @@ export default function AddEditVenueModal({
         if (result.length === 0) {
           //  address failed then they entered what3words
           if (formData.primaryWhat3Words !== '' && addressAttempted) {
-            const wordsResponse = await axios.post('/api/address/checkWhat3Words', {
-              searchTerm: formData.primaryWhat3Words,
-              countryId: formData.primaryCountry,
-            });
+            if (formData.primaryWhat3Words.split('.').length === 3) {
+              const wordsResponse = await axios.post('/api/address/checkWhat3Words', {
+                searchTerm: formData.primaryWhat3Words,
+                countryId: formData.primaryCountry,
+              });
 
-            if (wordsResponse.status >= 400) {
-              setShowAddressMessage(wordsResponse.data.message);
-            } else {
-              formData.primaryCoordinates = wordsResponse.data.coordinates;
+              if (wordsResponse.status >= 400) {
+                setShowAddressMessage(wordsResponse.data.message);
+              } else {
+                formData.primaryCoordinates = wordsResponse.data.coordinates;
+              }
+              setAddressAttempted(false);
+              setShowAddressMessage('UsingWhat3Words');
             }
-            setAddressAttempted(false);
-            setShowAddressMessage('UsingWhat3Words');
           } else if (formData.primaryWhat3Words === '' && addressAttempted) {
             setShowAddressMessage('NotUsingWhat3Words');
           } else if (formData.primaryWhat3Words !== '') {
