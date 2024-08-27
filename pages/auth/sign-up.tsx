@@ -40,7 +40,7 @@ const SignUp = () => {
   const { signIn } = useSignIn();
   const [accountDetails, setAccountDetails] = useState(DEFAULT_ACCOUNT_DETAILS);
   const isValidEmail = useMemo(() => validateEmail(accountDetails.email), [accountDetails.email]);
-
+  console.log('Error msdg', error);
   const isFormValid = useMemo(() => {
     switch (authMode) {
       case 'default':
@@ -92,8 +92,9 @@ const SignUp = () => {
       });
       return true;
     } catch (err) {
-      console.error(err);
+      console.error('Error while verifying credentials', err);
       const errorCode = err.errors[0].code;
+      console.log(errorCode);
       if (errorCode === EMAIL_NOT_FOUND) {
         setAuthMode('signUp');
       } else if (errorCode === PASSWORD_INCORRECT || errorCode === INVALID_VERIFICATION_STRATEGY) {
@@ -336,6 +337,7 @@ const SignUp = () => {
             disabled={!isFormValid || !signUpLoaded}
           />
         </div>
+        {error.includes('current session') && <AuthError error={error} />}
       </div>
     </div>
   );
