@@ -10,6 +10,7 @@ export const ToastMessages = {
   deleteProductionSuccess: 'Production successfully deleted.',
   deleteProductionFailure: 'Production deletion failed. Please retry.',
   requiredFieldsWarning: 'Please complete all required fields and try again.',
+  addressNotFoundWarning: 'The primary address was not recognised. Please check it and try again.',
 };
 
 export const SALES_FIG_OPTIONS = [

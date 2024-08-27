@@ -19,6 +19,8 @@ import Loader from 'components/core-ui-lib/Loader';
 import useAxiosCancelToken from 'hooks/useCancelToken';
 import { isNullOrEmpty } from 'utils';
 import { headlessUploadMultiple } from 'requests/upload';
+import { notify } from 'components/core-ui-lib';
+import { ToastMessages } from '../../../config/shows';
 
 interface AddEditVenueModalProps {
   visible: boolean;
@@ -119,12 +121,6 @@ export default function AddEditVenueModal({
   async function validateVenue(data: UiTransformedVenue) {
     try {
       await schema.validate({ ...data }, { abortEarly: false });
-      const query = venueAddressToUrl(data);
-      const addressUrl = `https://nominatim.openstreetmap.org/search?q=${query}&format=json&polygon=1&addressdetails=1`;
-      const response = await fetch(addressUrl, { method: 'GET' });
-      const result = await response.json();
-      console.log(result);
-      return true;
     } catch (validationErrors) {
       const errors = {};
       validationErrors.inner.forEach((error) => {
@@ -132,6 +128,19 @@ export default function AddEditVenueModal({
       });
       setValidationErrors(errors);
       console.log('validation Errors', errors);
+      return false;
+    }
+    try {
+      const query = venueAddressToUrl(data);
+      const addressUrl = `https://nominatim.openstreetmap.org/search?q=${query}&format=json&polygon=1&addressdetails=1`;
+      const response = await fetch(addressUrl, { method: 'GET' });
+      const result = await response.json();
+      if (result.length === 0) {
+        notify.error(ToastMessages.addressNotFoundWarning);
+      }
+      return result.length > 0;
+    } catch (exception) {
+      console.log(exception);
       return false;
     }
   }
