@@ -86,14 +86,13 @@ const SignUp = () => {
       }
       setAccountDetails((prev) => ({ ...prev, accountId: data.id }));
       // Check if user already registered with Clerk
-      const response = await signIn.create({
+      await signIn.create({
         identifier: accountDetails.email,
         password: 'dummy_password',
       });
-      console.log('Sign in returned', response);
       return true;
     } catch (err) {
-      console.log(err);
+      console.error(err);
       const errorCode = err.errors[0].code;
       if (errorCode === EMAIL_NOT_FOUND) {
         setAuthMode('signUp');
