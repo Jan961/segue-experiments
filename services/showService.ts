@@ -1,11 +1,12 @@
 import { Prisma } from 'prisma/generated/prisma-client';
 import { ShowDTO } from 'interfaces';
 import { showMapper } from 'lib/mappers';
-import prisma from 'lib/prisma';
+import client from 'lib/prisma';
+import master from 'lib/prisma_master';
 import { getAccountId, getEmailFromReq } from './userService';
 
 export const getShows = (AccountId: number) => {
-  return prisma.show.findMany({ where: { AccountId, IsDeleted: false } });
+  return client.show.findMany({ where: { AccountId, IsDeleted: false } });
 };
 
 export interface ShowPageProps {
@@ -31,42 +32,8 @@ const showInclude = Prisma.validator<Prisma.ShowInclude>()({
       DateBlock: true,
       ProductionRegion: true,
       File: true,
-      ConversionRate: {
-        include: {
-          Currency_ConversionRate_ConversionFromCurrencyCodeToCurrency: {
-            include: {
-              Country: {
-                include: {
-                  CountryInRegion: {
-                    include: {
-                      Country: true,
-                      Region: true,
-                    },
-                  },
-                },
-              },
-            },
-          },
-          Currency_ConversionRate_ConversionToCurrencyCodeToCurrency: {
-            include: {
-              Country: {
-                include: {
-                  CountryInRegion: {
-                    include: {
-                      Country: true,
-                      Region: true,
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
+      ConversionRate: true,
     },
-  },
-  Account: {
-    include: { ProductionCompany: true },
   },
 });
 
@@ -75,7 +42,7 @@ export type ShowWithProductions = Prisma.ShowGetPayload<{
 }>;
 
 export const getShowWithProductionsById = async (Id: number) => {
-  return await prisma.show.findFirst({
+  return await client.show.findFirst({
     where: {
       Id,
     },
@@ -84,7 +51,7 @@ export const getShowWithProductionsById = async (Id: number) => {
 };
 
 export const getShowById = async (Id: number) => {
-  return await prisma.show.findFirst({
+  return await client.show.findFirst({
     where: {
       Id,
     },
@@ -92,7 +59,7 @@ export const getShowById = async (Id: number) => {
 };
 
 export const lookupShowCode = async (Code: string, AccountId: number) => {
-  const show = await prisma.show.findUnique({
+  const show = await client.show.findUnique({
     where: {
       AccountId_Code: {
         Code,
@@ -107,10 +74,9 @@ export const lookupShowCode = async (Code: string, AccountId: number) => {
   return show ? show.Id : undefined;
 };
 
-export const getShowsByAccountId = async (AccountId: number) => {
-  const shows = await prisma.show.findMany({
+export const getShowsByAccountId = async () => {
+  const shows = await client.show.findMany({
     where: {
-      AccountId,
       OR: [
         {
           Production: {
@@ -135,15 +101,15 @@ export const getShowsByAccountId = async (AccountId: number) => {
 };
 
 export const getAllProductionCompanyList = async () => {
-  const productionCompanies = await prisma.ProductionCompany.findMany({
+  const productionCompanies = await master.ProductionCompany.findMany({
     orderBy: {
-      Name: 'asc',
+      ProdCoName: 'asc',
     },
   });
-  return productionCompanies.map(({ Id, AccountId, Name, Website }) => ({
-    id: Id,
-    name: Name,
-    accountId: AccountId,
-    website: Website || '',
+  return productionCompanies.map(({ ProdCoId, ProdCoAccountId, ProdCoName, ProdCoWebSite }) => ({
+    id: ProdCoId,
+    name: ProdCoName,
+    accountId: ProdCoAccountId,
+    website: ProdCoWebSite || '',
   }));
 };

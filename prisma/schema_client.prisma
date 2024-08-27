@@ -86,13 +86,13 @@ model BookingActivity {
 }
 
 model BookingContactNotes {
-  Id                         Int       @id @default(autoincrement()) @map("ContactNoteId")
-  BookingId                  Int       @map("ContactNoteBookingId")
-  CoContactName              String?   @map("ContactNoteContactName") @db.VarChar(50)
-  ContactDate                DateTime? @map("ContactNoteDateTime") @db.DateTime(0)
-  ActionAccUserId            Int?      @map("ContactNoteActionAccUserId")
-  Notes                      String?   @map("ContactNoteNotes") @db.LongText
-  Booking                    Booking   @relation(fields: [BookingId], references: [Id], onDelete: Cascade, map: "BookingBookingContactNotes")
+  Id              Int       @id @default(autoincrement()) @map("ContactNoteId")
+  BookingId       Int       @map("ContactNoteBookingId")
+  CoContactName   String?   @map("ContactNoteContactName") @db.VarChar(50)
+  ContactDate     DateTime? @map("ContactNoteDateTime") @db.DateTime(0)
+  ActionAccUserId Int?      @map("ContactNoteActionAccUserId")
+  Notes           String?   @map("ContactNoteNotes") @db.LongText
+  Booking         Booking   @relation(fields: [BookingId], references: [Id], onDelete: Cascade, map: "BookingBookingContactNotes")
 
   @@index([BookingId], map: "BookingBookingContactNotes")
   @@index([ActionAccUserId], map: "Master_AccountUser_BookingContactNotes")
@@ -343,17 +343,17 @@ model BookedVenueHistory {
 }
 
 model CompAllocation {
-  Id                                Int           @id @default(autoincrement()) @map("CompAllocationId")
-  AvailableCompId                   Int           @map("CompAllocationAvailableCompId")
-  TicketHolderName                  String        @map("CompAllocationTicketHolderName") @db.VarChar(50)
-  Seats                             Int           @default(1) @map("CompAllocationSeats") @db.TinyInt
-  Comments                          String?       @map("CompAllocationComments") @db.VarChar(100)
-  RequestedBy                       String?       @map("CompAllocationRequestedBy") @db.VarChar(50)
-  ArrangedByAccUserId               Int           @map("CompAllocationArrangedByAccUserId")
-  VenueConfirmationNotes            String?       @map("CompAllocationVenueConfirmationNotes") @db.VarChar(100)
-  TicketHolderEmail                 String?       @map("CompAllocationTicketHolderEmail") @db.VarChar(80)
-  SeatsAllocated                    String?       @map("CompAllocationSeatsAllocated") @db.VarChar(50)
-  AvailableComp                     AvailableComp @relation(fields: [AvailableCompId], references: [Id], onDelete: Cascade, map: "AvailableCompsMayBeAllocated")
+  Id                     Int           @id @default(autoincrement()) @map("CompAllocationId")
+  AvailableCompId        Int           @map("CompAllocationAvailableCompId")
+  TicketHolderName       String        @map("CompAllocationTicketHolderName") @db.VarChar(50)
+  Seats                  Int           @default(1) @map("CompAllocationSeats") @db.TinyInt
+  Comments               String?       @map("CompAllocationComments") @db.VarChar(100)
+  RequestedBy            String?       @map("CompAllocationRequestedBy") @db.VarChar(50)
+  ArrangedByAccUserId    Int           @map("CompAllocationArrangedByAccUserId")
+  VenueConfirmationNotes String?       @map("CompAllocationVenueConfirmationNotes") @db.VarChar(100)
+  TicketHolderEmail      String?       @map("CompAllocationTicketHolderEmail") @db.VarChar(80)
+  SeatsAllocated         String?       @map("CompAllocationSeatsAllocated") @db.VarChar(50)
+  AvailableComp          AvailableComp @relation(fields: [AvailableCompId], references: [Id], onDelete: Cascade, map: "AvailableCompsMayBeAllocated")
 
   @@index([AvailableCompId], map: "AvailableCompsMayBeAllocated")
   @@index([ArrangedByAccUserId], map: "Master_AccountUser_CompAllocation")

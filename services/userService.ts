@@ -53,7 +53,7 @@ export const getUserNameForClerkId = async (userId: string): Promise<string> => 
 };
 
 export const getAccountId = async (email: string) => {
-  const { AccountUser } = await prisma.user.findUnique({
+  const response = await prisma.user.findUnique({
     where: {
       UserEmail: email,
     },
@@ -66,7 +66,7 @@ export const getAccountId = async (email: string) => {
     },
   });
 
-  return AccountUser?.AccUserAccountId;
+  return response?.AccountUser[0]?.AccUserAccountId;
 };
 
 export const getEmailFromReq = async (req: any) => {

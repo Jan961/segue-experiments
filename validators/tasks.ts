@@ -25,7 +25,6 @@ export const recurringProductionTaskSchema = yup.object().shape({
 });
 
 export const masterTaskSchema = yup.object().shape({
-  AccountId: yup.number().required('AccountId is a required field'),
   Code: yup.string().required('Code is a required field'),
   Name: yup.string().required('Name is a required field'),
   CopiedFrom: yup.string().nullable(),

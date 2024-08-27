@@ -50,7 +50,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   */
   const AccountId = await getAccountIdFromReq(ctx.req);
   const users = await getUsers(AccountId);
-  const productionJump = await getProductionJumpState(ctx, 'contracts', AccountId);
+  const productionJump = await getProductionJumpState(ctx, 'contracts');
   const ProductionId = productionJump.selected;
   // ProductionJumpState is checking if it's valid to access by accountId
   if (!ProductionId) return { notFound: true };

@@ -69,7 +69,6 @@ const DEFAULT_MASTER_TASK: Partial<MasterTask> & {
   Notes: '',
   TaskAssignedToAccUserId: null,
   Priority: 0,
-  AccountId: 0,
   StartByWeekNum: 0,
   TaskStartByIsPostProduction: false,
   CompleteByWeekNum: 0,
@@ -147,7 +146,7 @@ const AddTask = ({
   const weekOptionsNoDate = useMemo(
     () =>
       getWeekOptions(production, isMasterTask, false).filter((option) => {
-        return option.value >= inputs?.StartByWeekNum;
+        return parseInt(option.value.toString()) >= inputs?.StartByWeekNum;
       }),
     [production, isMasterTask, inputs?.StartByWeekNum],
   );
@@ -185,10 +184,14 @@ const AddTask = ({
       return [];
     }
 
-    return Object.values(users).map(({ AccUserId, UserFirstName = '', UserLastName = '' }) => ({
+    const usersToReturn = Object.values(users).map(({ AccUserId, UserFirstName = '', UserLastName = '' }) => ({
       value: AccUserId,
       text: `${UserFirstName || ''} ${UserLastName || ''}`,
     }));
+
+    console.log(usersToReturn);
+
+    return usersToReturn;
   }, [users]);
 
   const handleOnChange = (e: any) => {
@@ -514,7 +517,8 @@ const AddTask = ({
               onChange={(value) => handleOnChange({ target: { id: 'CompleteByWeekNum', value } })}
               value={inputs?.CompleteByWeekNum}
               options={weekOptionsDate.filter(
-                (option) => option.value >= inputs?.StartByWeekNum || isNullOrEmpty(inputs?.StartByWeekNum),
+                (option) =>
+                  parseInt(option.value.toString()) >= inputs?.StartByWeekNum || isNullOrEmpty(inputs?.StartByWeekNum),
               )}
               placeholder="Week No."
               className="w-52"

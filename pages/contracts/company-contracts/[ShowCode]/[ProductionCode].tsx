@@ -34,7 +34,7 @@ export default ContractsPage;
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const departmentId = ctx.query.d as string;
   const accountId = await getAccountIdFromReq(ctx.req);
-  const productionJump = await getProductionJumpState(ctx, `contracts/company-contracts`, accountId);
+  const productionJump = await getProductionJumpState(ctx, `contracts/company-contracts`);
   const ProductionId = productionJump.selected;
   const [users, countryList, venues, personsList, currencyList, standardClauses, departmentList, contractList] =
     await all([

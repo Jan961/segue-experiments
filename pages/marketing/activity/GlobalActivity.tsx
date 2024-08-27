@@ -22,7 +22,7 @@ export default Index;
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const accountId = await getAccountIdFromReq(ctx.req);
-  const productionJump = await getProductionJumpState(ctx, 'marketing/activity/GlobalActivity', accountId);
+  const productionJump = await getProductionJumpState(ctx, 'marketing/activity/GlobalActivity');
   const productionId = productionJump.selected;
   const users = await getUsers(accountId);
 

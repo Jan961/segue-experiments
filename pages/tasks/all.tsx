@@ -82,7 +82,7 @@ export default TasksPage;
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const AccountId = await getAccountIdFromReq(ctx.req);
-  const productionJump = await getProductionJumpState(ctx, 'tasks', AccountId);
+  const productionJump = await getProductionJumpState(ctx, 'tasks');
   productionJump.selected = -1;
   const users = await getUsers(AccountId);
   const productionsWithTasks = await getProductionsAndTasks(AccountId);

@@ -1,4 +1,5 @@
-import prisma from 'lib/prisma';
+import client from 'lib/prisma';
+import master from 'lib/prisma_master';
 import { Prisma } from 'prisma/generated/prisma-client';
 import { showProductionMapper, productionEditorMapper } from 'lib/mappers';
 import { getShowWithProductionsById } from './showService';
@@ -15,61 +16,42 @@ const productionDateBlockInclude = Prisma.validator<Prisma.ProductionSelect>()({
   ProductionRegion: true,
   File: true,
   ConversionRate: {
-    include: {
-      Currency_ConversionRate_ConversionFromCurrencyCodeToCurrency: {
-        include: {
-          Country: {
-            include: {
-              CountryInRegion: {
-                include: {
-                  Country: true,
-                  Region: true,
-                },
-              },
-            },
-          },
-        },
-      },
-      Currency_ConversionRate_ConversionToCurrencyCodeToCurrency: {
-        include: {
-          Country: {
-            include: {
-              CountryInRegion: {
-                include: {
-                  Country: true,
-                  Region: true,
-                },
-              },
-            },
-          },
-        },
-      },
+    select: {
+      FromCurrencyCode: true,
+      ToCurrencyCode: true,
     },
   },
 });
 
-export const getActiveProductions = async (accountId: number) => {
-  const productions = await prisma.production.findMany({
+export const getActiveProductions = async () => {
+  const productions = await client.production.findMany({
     where: {
       IsArchived: false,
     },
     include: productionDateBlockInclude,
   });
+  // const currencyList = productions.flatMap(({ ConversionRate }) => ConversionRate.map(({ ToCurrencyCode, FromCurrencyCode }) => [FromCurrencyCode, ToCurrencyCode]));
+  // const currencyData = await master.Currency({
+  //   where: {
+  //     CurrencyCode: {
+  //       in: currencyList
+  //     }
+  //   }
+  // })
+  // const currencyMap = objectify(currencyData, (c: Currency)=>c.CurrencyCode, c=>c);
   return getProductionsByStartDate(productions);
 };
 
 export const getRegionlist = async () => {
-  return await prisma.region.findMany({});
+  return await client.region.findMany({});
 };
 
 export interface AllProductionPageProps {
   productions: ProductionDTO[];
 }
 
-export const getAllProductionPageProps = async (ctx: any) => {
-  const email = await getEmailFromReq(ctx.req);
-  const AccountId = await getAccountId(email);
-  const productionsRaw = await prisma.Production.findMany({
+export const getAllProductionPageProps = async () => {
+  const productionsRaw = await client.Production.findMany({
     include: {
       Show: true,
       DateBlock: true,
@@ -86,7 +68,7 @@ export const getProductionPageProps = async (ctx: any) => {
   const email = await getEmailFromReq(ctx.req);
   const AccountId = await getAccountId(email);
 
-  const showRaw = await prisma.show.findFirst({
+  const showRaw = await client.show.findFirst({
     where: {
       Code: ShowCode,
       AccountId,
@@ -106,7 +88,7 @@ export const getProductionPageProps = async (ctx: any) => {
 };
 
 export const lookupProductionId = async (ShowCode: string, ProductionCode: string, AccountId: number) => {
-  return prisma.production.findFirst({
+  return client.production.findFirst({
     where: {
       Code: ProductionCode as string,
       Show: {
@@ -120,8 +102,8 @@ export const lookupProductionId = async (ShowCode: string, ProductionCode: strin
   });
 };
 
-export const getAllProductions = async (AccountId: number) => {
-  const productions = await prisma.production.findMany({
+export const getAllProductions = async () => {
+  const productions = await client.production.findMany({
     select: {
       Id: true,
       Code: true,
@@ -145,7 +127,7 @@ export const getAllProductions = async (AccountId: number) => {
 };
 
 export const getProductionsByShowCode = (Code: string) => {
-  return prisma.production.findMany({
+  return client.production.findMany({
     where: {
       Show: {
         Code,
@@ -191,7 +173,7 @@ export type ProductionContent = Prisma.ProductionGetPayload<{
 }>;
 
 export const getProductionWithContent = async (Id: number) => {
-  return await prisma.production.findUnique({
+  return await client.production.findUnique({
     where: {
       Id,
     },
@@ -200,7 +182,7 @@ export const getProductionWithContent = async (Id: number) => {
 };
 
 export const getProductionsWithContent = async (Id?: number, excludeArchived = true) => {
-  return await prisma.production.findMany({
+  return await client.production.findMany({
     where: {
       ...(Id && { Id }),
       ...(excludeArchived && { IsArchived: false }),
@@ -214,7 +196,7 @@ export type ProductionWithDateblocks = Prisma.ProductionGetPayload<{
 }>;
 
 export const getProductionById = async (Id: number) => {
-  return await prisma.production.findUnique({
+  return await client.production.findUnique({
     where: {
       Id,
     },
@@ -223,7 +205,7 @@ export const getProductionById = async (Id: number) => {
 };
 
 export const getProductionsAndTasks = async (AccountId: number, ProductionId?: number) => {
-  let productionsWithTasks = await prisma.Production.findMany({
+  let productionsWithTasks = await client.Production.findMany({
     where: {
       IsArchived: false,
       ...(ProductionId && { Id: ProductionId }),
@@ -278,7 +260,7 @@ export const getProductionsAndTasks = async (AccountId: number, ProductionId?: n
 
 export const getAllProductionRegions = async () => {
   try {
-    return prisma.ProductionRegion.findMany({
+    return client.ProductionRegion.findMany({
       orderBy: {
         PRProductionId: 'asc',
       },
@@ -290,10 +272,10 @@ export const getAllProductionRegions = async () => {
 };
 
 export const getAllCurrencylist = async (): Promise<UICurrency[]> => {
-  const currencyList = await prisma.currency.findMany({});
-  return currencyList.map(({ Code, Name, SymbolUnicode }) => ({
-    code: Code,
-    name: Name,
-    symbolUnicode: SymbolUnicode,
+  const currencyList = await master.currency.findMany({});
+  return currencyList.map(({ CurrencyCode, CurrencyName, CurrencySymbolUnicode }) => ({
+    code: CurrencyCode,
+    name: CurrencyName,
+    symbolUnicode: CurrencySymbolUnicode,
   }));
 };

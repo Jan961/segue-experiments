@@ -85,7 +85,6 @@ export const showMapper = (show: Show): ShowDTO => ({
 });
 
 export const showProductionMapper = (s: ShowWithProductions): ProductionDTO[] => {
-  // console.table(s.Production);
   return s.Production.map(productionEditorMapper);
 };
 
@@ -197,10 +196,12 @@ export const countryMapper = (
   RegionList: c.CountryInRegion.map((c) => c.Region) || [],
 });
 
-export const currencyMapper = (c: Currency & { Country: Country[] }): CurrencyDTO => ({
-  ...c,
-  CurrencyCountryList: c.Country.map(countryMapper),
-});
+export const currencyMapper = (c: Currency & { Country: Country[] }): CurrencyDTO => {
+  return {
+    ...c,
+    CurrencyCountryList: c.Country.map(countryMapper),
+  };
+};
 
 export const conversionRateMapper = (
   c: ConversionRate & {
@@ -210,8 +211,8 @@ export const conversionRateMapper = (
 ): ConversionRateDTO => ({
   ...c,
   Rate: c.Rate?.toNumber?.(),
-  FromCurrency: currencyMapper(c.Currency_ConversionRate_ConversionFromCurrencyCodeToCurrency),
-  ToCurrency: currencyMapper(c.Currency_ConversionRate_ConversionToCurrencyCodeToCurrency),
+  // FromCurrency: currencyMapper(c.Currency_ConversionRate_ConversionFromCurrencyCodeToCurrency),
+  // ToCurrency: currencyMapper(c.Currency_ConversionRate_ConversionToCurrencyCodeToCurrency),
 });
 
 export const productionEditorMapper = (t: ProductionWithDateblocks): ProductionDTO => ({

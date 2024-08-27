@@ -124,7 +124,7 @@ const MasterTasks = (props: InferGetServerSidePropsType<typeof getServerSideProp
     const updatedTask = { ...currentTask, Notes: value };
     setIsLoading(true);
     try {
-      await axios.put(`/api/tasks/master/update/`, updatedTask);
+      await axios.put(`/api/tasks/master/update/single/`, updatedTask);
     } finally {
       setIsLoading(false);
     }
