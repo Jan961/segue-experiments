@@ -1,7 +1,7 @@
 export const EMAIL_NOT_FOUND = 'form_identifier_not_found';
 export const EMAIL_ALREADY_EXISTS = 'form_identifier_exists';
 export const PASSWORD_INCORRECT = 'form_password_incorrect';
-export const SESSION_ALREADY_EXISTS = 'Session already exists';
+export const SESSION_ALREADY_EXISTS = 'session_exists';
 export const INVALID_COMPANY_ID = 'Invalid Company Id';
 export const INVALID_VERIFICATION_STRATEGY = 'strategy_for_user_invalid';
 
