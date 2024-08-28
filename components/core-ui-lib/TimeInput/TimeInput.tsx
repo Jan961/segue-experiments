@@ -1,6 +1,7 @@
 import { forwardRef, useEffect, useRef, useState } from 'react';
 import Label from '../Label';
 import classNames from 'classnames';
+import { isNullOrEmpty } from 'utils';
 
 export type Time = {
   hrs?: string;
@@ -30,26 +31,23 @@ const isOfTypTime = (t: any): t is Time => t.hrs !== undefined && t.min !== unde
 const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
   ({ onChange, value, onBlur, disabled, className, tabIndexShow, index, onInput }: TimeInputProps, ref) => {
     const [time, setTime] = useState<Time>(DEFAULT_TIME);
-    const [isFocused, setIsFocused] = useState(false);
     const disabledClass = disabled ? `!bg-disabled-input !cursor-not-allowed !pointer-events-none` : '';
     const hrsRef = useRef(null);
     const minsRef = useRef(null);
 
-    const handleBlur = () => {
-      if (isFocused) {
-        onChange(time);
-        onBlur?.({ ...time, sec: time.sec || '' });
-        setIsFocused(false);
-      }
-    };
-
-    const handleFocus = () => {
-      setIsFocused(true);
-    };
-
     const handleMinKeyDown = (e) => {
       if (e.shiftKey && e.code === 'Tab') {
         hrsRef.current.select();
+      }
+    };
+
+    const handleBlur = (e) => {
+      if (!isNullOrEmpty(onBlur)) {
+        onBlur(e);
+      } else {
+        const { name, value } = e.target;
+        // Adds a 0 to the front if it is a single digit on blur (e.g. 7 would become 07)
+        filterTimeInput(name, `${value.length === 1 ? '0' : ''}${value}`);
       }
     };
 
@@ -59,7 +57,9 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
           (name === 'hrs' && (parseInt(value) < 24 || value.length === 0)) ||
           (name === 'min' && (parseInt(value) < 60 || value.length === 0))
         ) {
-          setTime((prev) => ({ ...prev, [name]: value }));
+          setTime((prev) => {
+            return { ...prev, [name]: value };
+          });
         }
       }
     };
@@ -71,8 +71,10 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
     };
 
     const handleInputChange = (e) => {
-      const { name, value } = onInput(e);
-      filterTimeInput(name, value);
+      if (!isNullOrEmpty(onInput)) {
+        const { name, value } = onInput(e);
+        filterTimeInput(name, value);
+      }
     };
 
     useEffect(() => {
@@ -96,8 +98,6 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
     ) : (
       <div
         ref={ref}
-        onFocus={handleFocus}
-        onBlur={handleBlur}
         className={classNames(baseClass, className)}
         tabIndex={-1} // Make the div focusable
       >
@@ -111,7 +111,7 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
           type="text"
           className="w-8 h-5/6 border-none focus:ring-0 text-center ring-0 p-0"
           onChange={handleChange}
-          onBlur={onBlur}
+          onBlur={handleBlur}
           onFocus={(e) => e.target.select()}
           disabled={disabled}
           tabIndex={tabIndexShow ? 0 : 1}
@@ -126,7 +126,7 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
           placeholder="mm"
           className="w-8 h-5/6 border-none focus:ring-0 text-center ring-0 p-0"
           onChange={handleChange}
-          onBlur={onBlur}
+          onBlur={handleBlur}
           onFocus={(e) => e.target.select()}
           disabled={disabled}
           tabIndex={tabIndexShow ? 0 : 2}
