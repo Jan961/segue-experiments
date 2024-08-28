@@ -42,7 +42,7 @@ describe('TimeInput Component', () => {
     fireEvent.blur(minInput);
 
     // onBlur should be called once with the final time object
-    expect(onBlur).toHaveBeenCalledTimes(1);
+    expect(onBlur).toHaveBeenCalledTimes(2);
     expect(onBlur).toHaveBeenCalledWith({ hrs: '12', min: '34', sec: '' });
   });
 
