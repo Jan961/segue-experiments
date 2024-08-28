@@ -12,13 +12,13 @@ export const getCoordFromWhat3Words = async (searchTerm) => {
     };
   const apiKey = process.env.WHAT_3_WORDS_API_KEY;
   const w3wUrl = `https://api.what3words.com/v3/convert-to-coordinates?words=${searchTerm}&key=${apiKey}`;
-  const response = (await axios.get(w3wUrl))?.data;
+  const response = await axios.get(w3wUrl);
   const result = response?.data;
   if (result?.error) {
     return { isError: true, error: result.error };
   } else {
-    const { country, coordinates } = result;
+    const { coordinates } = result;
     const { lat, lng } = coordinates;
-    return { isError: false, country, coordinates: { Latitude: lat, Longitude: lng } };
+    return { isError: false, coordinates: { Latitude: lat, Longitude: lng } };
   }
 };

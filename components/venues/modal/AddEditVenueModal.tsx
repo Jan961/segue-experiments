@@ -84,7 +84,10 @@ export default function AddEditVenueModal({
   };
 
   const closeModal = async () => {
+    const apiResponse = formData.id ? await updateVenue(formData) : await createVenue(formData);
     await fetchVenues();
+    await deleteFiles();
+    await saveFiles(apiResponse);
     setIsLoading(false);
     setIsSaving(false);
     onClose(true);
