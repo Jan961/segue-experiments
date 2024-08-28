@@ -683,16 +683,19 @@ export const loadSalesHistoryColDefs = [
     headerName: 'Upload Name',
     field: 'name',
     cellRenderer: DefaultTextRenderer,
+    flex: 1,
   },
   {
     headerName: 'Date Uploaded',
     field: 'dateUploaded',
     cellRenderer: DefaultTextRenderer,
+    flex: 1,
   },
   {
     headerName: 'Issues Flagged / Approved',
     field: 'UploadMessage',
     cellRenderer: DefaultTextRenderer,
+    flex: 1,
   },
   {
     headerName: 'View',

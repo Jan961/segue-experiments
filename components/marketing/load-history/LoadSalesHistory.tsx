@@ -4,16 +4,22 @@ import { loadSalesHistoryColDefs, styleProps } from '../table/tableConfig';
 import { useState } from 'react';
 import { uploadFile } from 'requests/upload';
 import { getFileUrl } from 'lib/s3';
-import { attachmentMimeTypes } from 'components/core-ui-lib/UploadModal/interface';
+import { attachmentMimeTypes, UploadedFile } from 'components/core-ui-lib/UploadModal/interface';
 import { isNullOrEmpty } from 'utils';
-import SpreadsheetUploadModal from './SpreadsheetUploadModal';
+import SpreadsheetConfirmationModal from './SpreadsheetConfirmationModal';
+import { UploadParamType } from 'interfaces';
 
 const LoadSalesHistory = () => {
-  const [uploadSalesVisible, setUploadSalesVisible] = useState(false);
+  const [uploadModalVisible, setUploadModalVisible] = useState(false);
+  const [confirmationModalVisible, setConfirmationModalVisible] = useState(false);
   const [salesHistoryRows, setSalesHistoryRows] = useState([]);
+  const [uploadParams, setUploadParams] = useState<UploadParamType>(null);
+  const [uploadedFile, setUploadedFile] = useState<UploadedFile[]>();
 
   const onSave = async (file, onProgress, onError, onUploadingImage) => {
-    handleUpload(file, onProgress, onError, onUploadingImage);
+    setConfirmationModalVisible(true);
+    setUploadedFile(file);
+    setUploadParams({ onProgress, onError, onUploadingImage });
   };
 
   const handleUpload = async (file, onProgress, onError, onUploadingImage) => {
@@ -33,6 +39,7 @@ const LoadSalesHistory = () => {
         };
 
         setSalesHistoryRows([...salesHistoryRows, newFile]);
+        // onUploadSuccess({ fileId: response.id });
       }
     } catch (error) {
       onError(file[0].file, 'Error uploading file. Please try again.');
@@ -56,7 +63,7 @@ const LoadSalesHistory = () => {
         <LoadSalesHistoryFilters />
         <div className="flex gap-x-3">
           <Button text="Download Template" className="w-[155px]" />
-          <Button text="Upload Template" className="w-[155px]" onClick={() => setUploadSalesVisible(true)} />
+          <Button text="Upload Template" className="w-[155px]" onClick={() => setUploadModalVisible(true)} />
         </div>
       </div>
       <Table
@@ -65,19 +72,27 @@ const LoadSalesHistory = () => {
         styleProps={styleProps}
         onCellClicked={handleCellClick}
       />
-      {uploadSalesVisible && (
+      {uploadModalVisible && (
         <UploadModal
           title="Upload Template"
-          visible={uploadSalesVisible}
+          visible={uploadModalVisible}
           info=""
           allowedFormats={attachmentMimeTypes.spreadsheetAttachment}
           onClose={() => {
-            setUploadSalesVisible(false);
+            setUploadModalVisible(false);
           }}
           onSave={onSave}
         />
       )}
-      <SpreadsheetUploadModal />
+      {confirmationModalVisible && (
+        <SpreadsheetConfirmationModal
+          visible={confirmationModalVisible}
+          onClose={() => setConfirmationModalVisible(false)}
+          handleUpload={handleUpload}
+          uploadedFile={uploadedFile}
+          uploadParams={uploadParams}
+        />
+      )}
     </div>
   );
 };
