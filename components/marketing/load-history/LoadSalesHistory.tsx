@@ -11,17 +11,6 @@ import SpreadsheetUploadModal from './SpreadsheetUploadModal';
 const LoadSalesHistory = () => {
   const [uploadSalesVisible, setUploadSalesVisible] = useState(false);
   const [salesHistoryRows, setSalesHistoryRows] = useState([]);
-  // const [uploadedFile, setUploadedFile] = useState();
-
-  // const productionJump = useRecoilValue(productionJumpState);
-
-  //   const onUploadSuccess = async ({ fileId }) => {
-  //     try {
-  //       await axios.post('/api/admin/accountDetails/accountLogo/update', { fileId });
-  //     } catch (error) {
-  //       console.log(error, 'Failed to update database with file.');
-  //     }
-  //   };
 
   const onSave = async (file, onProgress, onError, onUploadingImage) => {
     handleUpload(file, onProgress, onError, onUploadingImage);
