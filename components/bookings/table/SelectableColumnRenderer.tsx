@@ -14,9 +14,9 @@ const SelectableColumnRenderer = (props: CustomCellRendererProps) => {
     });
   };
   return (
-    <div className="flex items-center gap-2 px-2">
+    <div className="flex items-center gap-2 px-2 ">
       <Checkbox className="!w-fit" label="" id={rowIndex + ''} checked={checked} onChange={onChange} />
-      <div>{value}</div>
+      <div className="truncate">{value}</div>
     </div>
   );
 };

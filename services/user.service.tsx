@@ -43,7 +43,7 @@ function logout() {
   sessionStorage.removeItem('accountId');
 
   userSubject.next(null);
-  Router.push('/login');
+  Router.push('/sign-in');
 }
 
 function register(user) {

@@ -1,5 +1,5 @@
 import { userMapper } from 'lib/mappers';
-import prisma from 'lib/prisma';
+import prisma from 'lib/prisma_master';
 import { NextApiRequest, NextApiResponse } from 'next';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
@@ -7,10 +7,20 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const user = req.body;
     const newUser = await prisma.user.create({
       data: {
-        FirstName: user.FirstName,
-        LastName: user.LastName,
-        Email: user.Email,
-        AccountId: Number(user.AccountId),
+        UserFirstName: user.firstName,
+        UserLastName: user.lastName,
+        UserEmail: user.email,
+        AccountUser: {
+          create: {
+            AccUserIsAdmin: true,
+            AccUserPIN: user.pin,
+            Account: {
+              connect: {
+                AccountId: Number(user.accountId),
+              },
+            },
+          },
+        },
       },
     });
 

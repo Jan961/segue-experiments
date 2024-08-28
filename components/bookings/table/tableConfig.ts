@@ -550,21 +550,41 @@ export const newBookingColumnDefs = (
 
 export const gapSuggestColumnDefs = [
   { headerName: 'Venue', field: 'Name', cellRenderer: SelectableColumnRenderer, flex: 1, headerClass: 'text-center' },
-  { headerName: 'Town', field: 'Town', cellRenderer: DefaultCellRenderer, width: 140, headerClass: 'text-center' },
-  { headerName: 'Seats', field: 'Capacity', cellRenderer: DefaultCellRenderer, width: 75, headerClass: 'text-center' },
+  { headerName: 'Town', field: 'Town', cellRenderer: DefaultCellRenderer, width: 80, headerClass: 'text-center' },
+  { headerName: 'Seats', field: 'Capacity', cellRenderer: DefaultCellRenderer, width: 70, headerClass: 'text-center' },
   {
-    headerName: 'Travel Time',
-    field: 'TravelTime',
+    headerName: 'Travel Time to Venue',
+    field: 'TravelTimeTo',
     cellRenderer: DefaultCellRenderer,
-    width: 90,
+    width: 85,
     headerClass: 'text-center',
   },
-  { headerName: 'Miles', field: 'Miles', cellRenderer: DefaultCellRenderer, width: 75, headerClass: 'text-center' },
+  {
+    headerName: 'Miles to Venue',
+    field: 'MilesTo',
+    cellRenderer: DefaultCellRenderer,
+    width: 75,
+    headerClass: 'text-center',
+  },
+  {
+    headerName: 'Travel Time From Venue',
+    field: 'TravelTimeFrom',
+    cellRenderer: DefaultCellRenderer,
+    width: 85,
+    headerClass: 'text-center',
+  },
+  {
+    headerName: 'Miles From Venue',
+    field: 'MilesFrom',
+    cellRenderer: DefaultCellRenderer,
+    width: 75,
+    headerClass: 'text-center',
+  },
   {
     headerName: 'Barring Check',
     field: 'barringCheck',
     cellRenderer: ButtonRenderer,
-    width: 140,
+    width: 130,
     headerClass: 'text-center',
     resizable: false,
     cellRendererParams: {
