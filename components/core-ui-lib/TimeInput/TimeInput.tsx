@@ -57,9 +57,7 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
           (name === 'hrs' && (parseInt(value) < 24 || value.length === 0)) ||
           (name === 'min' && (parseInt(value) < 60 || value.length === 0))
         ) {
-          setTime((prev) => {
-            return { ...prev, [name]: value };
-          });
+          setTime((prev) => ({ ...prev, [name]: value }));
         }
       }
     };
