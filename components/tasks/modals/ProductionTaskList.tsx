@@ -2,7 +2,7 @@ import Button from 'components/core-ui-lib/Button';
 import PopupModal from 'components/core-ui-lib/PopupModal';
 import Table from 'components/core-ui-lib/Table';
 import { getProductionTasksColumnDefs } from './tableConfig';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useRecoilValue } from 'recoil';
 import { userState } from 'state/account/userState';
 import { useEffect, useMemo, useState } from 'react';
 import { tileColors } from 'config/global';
@@ -36,16 +36,18 @@ const ProductionTaskList = ({ visible, onClose, productionId, isMaster = false }
   const styleProps = { headerColor: tileColors.tasks };
   const [rowData, setRowData] = useState([]);
   const [loading, setLoading] = useState<boolean>(false);
-  const [productionJump, setProductionJump] = useRecoilState(productionJumpState);
+  const productionJump = useRecoilValue(productionJumpState);
   const [selected, setSelected] = useState(null);
-  const [includeArchived, setIncludeArchived] = useState<boolean>(productionJump?.includeArchived || false);
+  const [includeArchived, setIncludeArchived] = useState<boolean>(false);
   const [showExistingTaskModal, setShowExistingTaskModal] = useState<boolean>(false);
   const [duplicateTasks, setDuplicateTasks] = useState([]);
   const unfilteredTasks = useRecoilValue(productionState).filter((prod) => prod.Id === productionId)[0]?.Tasks || [];
   const router = useRouter();
 
+  //  issue with the production selector not being able to list the archived productions and sometimes on vercel it doesnt show the productions
   const productionsData = useMemo(() => {
     const productionOptions = [];
+    console.log(productionJump.productions);
     for (const production of productionJump.productions) {
       if (includeArchived) {
         productionOptions.push({
@@ -195,7 +197,6 @@ const ProductionTaskList = ({ visible, onClose, productionId, isMaster = false }
   };
 
   const onIncludeArchiveChange = (e) => {
-    setProductionJump({ ...productionJump, includeArchived: e.target.value });
     setIncludeArchived(e.target.value);
   };
 
@@ -224,6 +225,7 @@ const ProductionTaskList = ({ visible, onClose, productionId, isMaster = false }
           isSearchable
           isClearable={false}
           testId="sel-production"
+          key={includeArchived.toString()}
         />
         <div className="flex  items-center ml-1 mr-4">
           <Checkbox
