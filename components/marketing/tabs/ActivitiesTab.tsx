@@ -598,7 +598,10 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
                 <div className="flex flex-col text-center">
                   <div className="text-base font-bold text-primary-input-text">Total Cost</div>
                   <div className="bg-primary-white h-7 w-[140px] rounded mt-[2px] ml-2">
-                    <div className="text text-base text-left pl-2 text-primary-input-text">
+                    <div
+                      className="text text-base text-left pl-2 text-primary-input-text"
+                      data-testid="activities-total-cost"
+                    >
                       {`${currency.symbol}${totalCost.toFixed(2)}`}
                     </div>
                   </div>
@@ -607,7 +610,10 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
                 <div className="flex flex-col text-center">
                   <div className="text-base font-bold text-primary-input-text">Company</div>
                   <div className="bg-primary-white h-7 w-[140px] rounded mt-[2px]">
-                    <div className="text text-base text-left pl-2 text-primary-input-text">
+                    <div
+                      className="text text-base text-left pl-2 text-primary-input-text"
+                      data-testid="activities-company-cost"
+                    >
                       {`${currency.symbol}${totalCompanyCost.toFixed(2)}`}
                     </div>
                   </div>
@@ -616,7 +622,10 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
                 <div className="flex flex-col text-center">
                   <div className="text-base font-bold text-primary-input-text">Venue</div>
                   <div className="bg-primary-white h-7 w-[140px] rounded mt-[2px]">
-                    <div className="text text-base text-left pl-2 text-primary-input-text">
+                    <div
+                      className="text text-base text-left pl-2 text-primary-input-text"
+                      data-testid="activities-venue-cost"
+                    >
                       {`${currency.symbol}${totalVenueCost.toFixed(2)}`}
                     </div>
                   </div>
@@ -647,7 +656,10 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
               <div className="flex flex-col text-center">
                 <div className="text-base font-bold text-primary-input-text">Total Cost</div>
                 <div className="bg-primary-white h-7 w-[140px] rounded mt-[2px] ml-2">
-                  <div className="text text-base text-left pl-2 text-primary-input-text">
+                  <div
+                    className="text text-base text-left pl-2 text-primary-input-text"
+                    data-testid="global-activities-total-cost"
+                  >
                     {`${currency.symbol}${globalTotalCost.toFixed(2)}`}
                   </div>
                 </div>
@@ -656,7 +668,10 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
               <div className="flex flex-col text-center">
                 <div className="text-base font-bold text-primary-input-text">Venue Share</div>
                 <div className="bg-primary-white h-7 w-[140px] rounded mt-[2px]">
-                  <div className="text text-base text-left pl-2 text-primary-input-text">
+                  <div
+                    className="text text-base text-left pl-2 text-primary-input-text"
+                    data-testid="global-activities-venues-share"
+                  >
                     {`${currency.symbol}${globalVenueShareCost.toFixed(2)}`}
                   </div>
                 </div>

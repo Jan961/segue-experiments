@@ -73,7 +73,7 @@ model AccountSubscription {
 
 model AccountUser {
   AccUserId             Int                     @id @default(autoincrement())
-  AccUserUserId         Int                     @unique(map: "AccUserUserId_UNIQUE")
+  AccUserUserId         Int
   AccUserAccountId      Int
   AccUserIsAdmin        Boolean                 @default(dbgenerated("(b'0')")) @db.Bit(1)
   AccUserPIN            String?                 @db.VarChar(4)
@@ -82,6 +82,7 @@ model AccountUser {
   AccountUserPermission AccountUserPermission[]
   File                  File[]
 
+  @@unique([AccUserUserId, AccUserAccountId], map: "AccountUser_UniqueUserOnAccount")
   @@index([AccUserAccountId], map: "Account_AccountUser")
 }
 
@@ -160,25 +161,9 @@ model SubscriptionPlan {
 }
 
 model User {
-  UserId        Int          @id @unique(map: "UserIdUnique") @default(autoincrement())
-  UserEmail     String       @unique(map: "UserEmail_uk") @db.VarChar(120)
-  UserFirstName String       @db.VarChar(50)
-  UserLastName  String?      @db.VarChar(50)
-  AccountUser   AccountUser?
-}
-
-/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-view AccountUserView {
-  AccountId             Int     @default(0)
-  AccountOrganisationId String  @db.VarChar(8)
-  AccountName           String  @db.VarChar(50)
-  AccUserId             Int     @default(0)
-  AccUserIsAdmin        Boolean @default(dbgenerated("(b'0')")) @db.Bit(1)
-  AccUserPIN            String? @db.VarChar(4)
-  UserId                Int     @default(0)
-  UserFirstName         String  @db.VarChar(50)
-  UserLastName          String? @db.VarChar(50)
-  UserEmail             String  @db.VarChar(120)
-
-  @@ignore
+  UserId        Int           @id @unique(map: "UserIdUnique") @default(autoincrement())
+  UserEmail     String        @unique(map: "UserEmail_uk") @db.VarChar(120)
+  UserFirstName String        @db.VarChar(50)
+  UserLastName  String?       @db.VarChar(50)
+  AccountUser   AccountUser[]
 }
