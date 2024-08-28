@@ -267,13 +267,13 @@ export interface FileDTO {
 }
 
 export interface ProductionCompanyDTO {
-  AccountId?: number;
-  Id?: number;
-  Logo?: string;
-  Name?: string;
+  ProdCoAccountId?: number;
+  ProdCoId?: number;
+  ProdCoLogoFileId?: number;
+  ProdCoName?: string;
   ProdCoSaleStartWeek?: number;
   ProdCoVATCode?: number;
-  WebSite?: string;
+  ProdCoWebSite?: string;
 }
 export type ConversionRateDTO = {
   Id: number;

@@ -158,11 +158,8 @@ export const contactNoteColDefs = (updateContactNote, userList) => [
       if (params.data.ActionAccUserId === null) {
         return '';
       } else {
-        // console.log(userList)
-        // console.log(params.data.ActionAccUserId)
         const actByName = userList.find((user) => user.value === parseInt(params.data.ActionAccUserId)).text;
         return actByName;
-        // return 'HELLO'
       }
     },
     cellStyle: {

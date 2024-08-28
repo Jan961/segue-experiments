@@ -109,7 +109,7 @@ function convertFileBuffer(file) {
       <a
         className="w-auto align-middle my-2 h-10 text-sm text-primary-pink ml-4 px-2 border-gray-800 border-1 bg-white hover:bg-primary-pink hover:text-white rounded-md transition-all duration-200 ease--in-out"
         href={`/api/files/download/${file.AttachedFile.FileId}`}
-        target={'_blank'}
+        target="_blank"
         rel="noreferrer"
       >
         <span className="font-bold">{file.AttachedFile.OriginalFilename}</span>
@@ -177,7 +177,6 @@ const ContractDetailsForm = ({ activeContract, incrementActiveContractIndex }: I
   useEffect(() => {
     if (activeContractData.length > 0) {
       const c = activeContractData[0];
-      console.log(moment(c.Contract?.SignedDate).format('DD-MM-YYYY'));
       setBookingDetails({
         ShowDate: c.ShowDate,
         VenueContractStatus: c.Contract?.StatusCode,
@@ -288,7 +287,6 @@ const ContractDetailsForm = ({ activeContract, incrementActiveContractIndex }: I
   if (loading) return <Spinner size="lg" className="mx-auto mt-20" />;
 
   if (bookingDetails) {
-    console.log(bookingDetails.ContractSignedDate, bookingDetails.ContractReturnDate);
     return (
       <>
         <StyledDialog open={!!saveChangesBookingId} title="Unsaved Changes" onClose={cancelNavigation}>
@@ -340,14 +338,14 @@ const ContractDetailsForm = ({ activeContract, incrementActiveContractIndex }: I
                 <Label htmlFor="checkedby">Returned to Venue: </Label>
                 <input
                   className="border-none rounded-md w-full"
-                  type={'date'}
+                  type="date"
                   value={bookingDetails.ContractReturnDate}
                   onChange={(e) => formDataHandler('ContractReturnDate', e.currentTarget.value, '')}
                 />
                 <Label htmlFor="checkedby">Returned by Venue: </Label>
                 <input
                   className="w-full border-none rounded-md"
-                  type={'date'}
+                  type="date"
                   value={bookingDetails.ContractReceivedBackDate}
                   onChange={(e) => formDataHandler('ContractReceivedBackDate', e.currentTarget.value, '')}
                 />
@@ -392,14 +390,14 @@ const ContractDetailsForm = ({ activeContract, incrementActiveContractIndex }: I
                 <Label>Gross Potential: </Label>
                 <input
                   className="w-full border-none rounded-md"
-                  type={'text'}
+                  type="text"
                   onChange={(e) => formDataHandler('GP', e.currentTarget.value, '')}
                   value={bookingDetails.GP}
                 />
                 <Label>Royalty: </Label>
                 <input
                   className="w-full border-none rounded-md"
-                  type={'text'}
+                  type="text"
                   onChange={(e) => formDataHandler('RoyaltyPC', e.currentTarget.value, '')}
                   value={bookingDetails.RoyaltyPC}
                 />

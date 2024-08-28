@@ -110,11 +110,11 @@ model Contract {
   Notes                   String?                @map("ContractNotes") @db.LongText
   ReceivedBackDate        DateTime?              @map("ContractReceivedBackDate") @db.Date
   Exceptions              String?                @map("ContractExceptions") @db.LongText
-  ContractBankDetailsSent Boolean                @default(dbgenerated("(b'0')")) @db.Bit(1)
-  ContractTechSpecSent    Boolean                @default(dbgenerated("(b'0')")) @db.Bit(1)
-  ContractPRSCertSent     Boolean                @default(dbgenerated("(b'0')")) @db.Bit(1)
-  ContractGP              Decimal?               @db.Decimal(10, 2)
-  ContractPromoterPercent Decimal?               @db.Decimal(6, 3)
+  BankDetailsSent         Boolean                @map("ContractBankDetailsSent") @default(dbgenerated("(b'0')")) @db.Bit(1)
+  TechSpecSent            Boolean                @map("ContractTechSpecSent") @default(dbgenerated("(b'0')")) @db.Bit(1)
+  PRSCertSent             Boolean                @map("ContractPRSCertSent") @default(dbgenerated("(b'0')")) @db.Bit(1)
+  GP                      Decimal?               @map("ContractGP") @db.Decimal(10, 2)
+  PromoterPercent         Decimal?               @map("ContractPromoterPercent") @db.Decimal(6, 3)
   Booking                 Booking                @relation(fields: [BookingId], references: [Id], onDelete: Cascade, map: "Booking_Contract")
   ContractAttachedFile    ContractAttachedFile[]
   ContractFile            ContractFile[]

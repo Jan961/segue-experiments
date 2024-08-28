@@ -16,10 +16,6 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
   const [isAddRow, setIsAddRow] = useState<boolean>(false);
   const [isEdited, setIsEdited] = useState<boolean>(false);
 
-  const handleArchive = () => {
-    setIsArchived(!isArchived);
-  };
-
   const unArchivedList = useMemo(() => {
     return showsList.filter((item) => !item.IsArchived);
   }, [showsList, isArchived]);
@@ -37,10 +33,6 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
     setIsAddRow(!isAddRow);
   };
 
-  const handleEdit = () => {
-    setIsEdited(!isEdited);
-  };
-
   return (
     <Layout title="Shows | Segue" flush>
       <div className="w-9/12 mx-auto">
@@ -51,15 +43,15 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
               className="flex flex-row-reverse"
               checked={isArchived}
               label="Include archived"
-              id=""
+              id="includeArchived"
               disabled={isEdited}
-              onChange={handleArchive}
+              onChange={() => setIsArchived(!isArchived)}
             />
             <Button disabled={isAddRow} onClick={addNewRow} text="Add New Show" />
           </div>
         </div>
         <ShowsTable
-          handleEdit={handleEdit}
+          handleEdit={() => setIsEdited(!isEdited)}
           isEdited={isEdited}
           isArchived={isArchived}
           isAddRow={isAddRow}

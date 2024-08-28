@@ -189,8 +189,6 @@ const AddTask = ({
       text: `${UserFirstName || ''} ${UserLastName || ''}`,
     }));
 
-    console.log(usersToReturn);
-
     return usersToReturn;
   }, [users]);
 

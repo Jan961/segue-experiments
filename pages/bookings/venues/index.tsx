@@ -159,8 +159,6 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
         )
       : [];
 
-  console.log(venueCurrencyOptionList);
-
   const venueFamilyOptionList: SelectOption[] =
     results[4].status === 'fulfilled' ? transformToOptions(results[4].value, 'Name', 'Id') : [];
 

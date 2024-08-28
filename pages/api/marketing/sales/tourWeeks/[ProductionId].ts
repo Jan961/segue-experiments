@@ -23,7 +23,7 @@ export default async function handle(req, res) {
 
     const prodCo = await master.productionCompany.findMany({
       where: {
-        AccountId: accountId,
+        ProdCoAccountId: accountId,
       },
       select: {
         ProdCoSaleStartWeek: true,

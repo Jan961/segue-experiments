@@ -312,7 +312,7 @@ export default async function handle(req, res) {
     // this will determine how far back the process looks for hold/comp figure and define the stopping point
     const prodCo = await master.productionCompany.findMany({
       where: {
-        AccountId: accountId,
+        ProdCoAccountId: accountId,
       },
       select: {
         ProdCoSaleStartWeek: true,

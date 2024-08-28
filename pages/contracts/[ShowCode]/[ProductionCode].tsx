@@ -157,7 +157,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       contractBookingStatus: contractBookingStatusData,
     },
     account: {
-      user: { users: objectify(users, (u) => u.Id) },
+      user: { users: objectify(users, (u) => u.UserId) },
     },
   };
 

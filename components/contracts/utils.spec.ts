@@ -8,7 +8,6 @@ describe('parseAndSortDates', () => {
   it('should parse and sort dates correctly when time is included', () => {
     const input = ['12:00? 2023-08-21', '10:00? 2023-08-21', '15:00? 2023-08-20'];
     const result = parseAndSortDates(input);
-    console.log(result);
 
     expect(result).toEqual([
       { formattedDate: '2023-08-20 15:00', id: 'test-id' },

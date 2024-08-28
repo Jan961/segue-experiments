@@ -30,6 +30,7 @@ export const getActiveProductions = async () => {
     },
     include: productionDateBlockInclude,
   });
+
   // const currencyList = productions.flatMap(({ ConversionRate }) => ConversionRate.map(({ ToCurrencyCode, FromCurrencyCode }) => [FromCurrencyCode, ToCurrencyCode]));
   // const currencyData = await master.Currency({
   //   where: {
@@ -182,13 +183,30 @@ export const getProductionWithContent = async (Id: number) => {
 };
 
 export const getProductionsWithContent = async (Id?: number, excludeArchived = true) => {
-  return await client.production.findMany({
+  const productionCompanyList = await master.ProductionCompany.findMany({
+    orderBy: {
+      ProdCoName: 'asc',
+    },
+  });
+
+  const productions = await client.production.findMany({
     where: {
       ...(Id && { Id }),
       ...(excludeArchived && { IsArchived: false }),
     },
     include: productionContentInclude,
   });
+
+  const productionList = productions.map((production) => {
+    return {
+      ...production,
+      ProductionCompany: productionCompanyList.find((prodCo) => prodCo.ProdCoId === production.ProdCoId),
+    };
+  });
+
+  console.log(productionList);
+
+  return productionList;
 };
 
 export type ProductionWithDateblocks = Prisma.ProductionGetPayload<{

@@ -149,7 +149,6 @@ const JendagiContract = ({
   const venueMap = useRecoilValue(contractsVenueState);
   const currencyList = useRecoilValue(currencyListState);
 
-  console.log(contractSchedule);
   const { personDetails, agencyDetails } = personState;
 
   const currentDate = dateToSimple(new Date().toISOString());
