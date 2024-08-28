@@ -32,11 +32,13 @@ describe('TimeInput Component', () => {
     const hourInput = screen.getByTestId('hourInput') as HTMLInputElement;
     const minInput = screen.getByTestId('minInput') as HTMLInputElement;
 
-    fireEvent.change(hourInput, { target: { value: '12' } });
-    fireEvent.change(minInput, { target: { value: '34' } });
-
     // Simulate focus and blur events
     fireEvent.focus(hourInput);
+    fireEvent.change(hourInput, { target: { value: '12' } });
+    fireEvent.blur(hourInput);
+
+    fireEvent.focus(minInput);
+    fireEvent.change(minInput, { target: { value: '34' } });
     fireEvent.blur(minInput);
 
     // onBlur should be called once with the final time object
