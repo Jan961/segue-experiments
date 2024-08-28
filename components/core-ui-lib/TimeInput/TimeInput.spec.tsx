@@ -43,6 +43,8 @@ describe('TimeInput Component', () => {
 
     // onBlur should be called twice when inputting into the min and hour fields since it will pad the front with the 0 on blur each time
     expect(onBlur).toHaveBeenCalledTimes(2);
+
+    //    Each onBlur call needs to be checked separately for the values that was updated in that field
     expect(onBlur.mock.calls[0][0].target.value).toBe('12');
     expect(onBlur.mock.calls[1][0].target.value).toBe('34');
   });
