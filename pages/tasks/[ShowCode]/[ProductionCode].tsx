@@ -72,7 +72,11 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
   useEffect(() => {
     if (filteredProductions.length === 1) {
       filteredProductions.forEach((production) => {
-        if (production.Tasks.length === 0 && filterMatchingInitial) {
+        if (
+          production.Tasks.length === 0 &&
+          filterMatchingInitial &&
+          !(showNewProduction || showAddTask || isMasterTaskList || isProductionTaskList || isShowSpinner)
+        ) {
           setShowEmptyProductionModal(true);
         } else {
           setShowEmptyProductionModal(false);
