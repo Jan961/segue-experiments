@@ -41,9 +41,12 @@ describe('TimeInput Component', () => {
     fireEvent.change(minInput, { target: { value: '34' } });
     fireEvent.blur(minInput);
 
-    // onBlur should be called once with the final time object
+    // onBlur should be called twice when inputting into the min and hour fields since it will pad the front with the 0 on blur each time
     expect(onBlur).toHaveBeenCalledTimes(2);
-    expect(onBlur).toHaveBeenCalledWith({ hrs: '12', min: '34', sec: '' });
+    expect(onBlur).toHaveBeenCalledWith([
+      { hrs: '12', min: '34', sec: '' },
+      { hrs: '12', min: '34', sec: '' },
+    ]);
   });
 
   test('handles disabled state correctly', () => {
