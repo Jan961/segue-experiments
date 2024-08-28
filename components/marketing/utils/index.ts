@@ -1,6 +1,5 @@
 import { ActivityDTO, BookingContactNoteDTO } from 'interfaces';
 import { GlobalActivity } from '../modal/GlobalActivityModal';
-import ExcelJS from 'exceljs';
 
 export const hasActivityChanged = (oldActivity: ActivityDTO, newActivity: ActivityDTO): boolean => {
   // List all keys to be compared
@@ -118,37 +117,4 @@ export const hasGlobalActivityChanged = (oldActivity: GlobalActivity, newActivit
   }
 
   return false;
-};
-
-export const validateSpreadsheetFile = async (file) => {
-  // file[0].file = new File([], file[0].file.name)
-  // note that the check when hitting the ok/upload button uses the selectedfiles list to check for progress and updating the file name here and not there cause issue
-
-  const workbook = new ExcelJS.Workbook();
-  await workbook.xlsx.load(file[0].file);
-
-  workbook.eachSheet((worksheet) => {
-    worksheet.eachRow((row) => {
-      row.eachCell((cell) => {
-        if (typeof cell.value === 'string') {
-          cell.value = cell.value.toUpperCase();
-        }
-      });
-    });
-  });
-
-  const buffer = await workbook.xlsx.writeBuffer();
-  const blob = new Blob([buffer], { type: file[0].file.type });
-
-  const newFile = new File([blob], file[0].file.name, {
-    type: file[0].file.type,
-  });
-
-  console.log('new file:', newFile);
-  console.log('old file:', file[0].file);
-
-  file[0].file = newFile;
-
-  console.log(file);
-  return file;
 };

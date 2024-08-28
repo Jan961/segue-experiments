@@ -6,11 +6,7 @@ import { uploadFile } from 'requests/upload';
 import { getFileUrl } from 'lib/s3';
 import { attachmentMimeTypes } from 'components/core-ui-lib/UploadModal/interface';
 import { isNullOrEmpty } from 'utils';
-import { validateSpreadsheetFile } from '../utils';
 import SpreadsheetUploadModal from './SpreadsheetUploadModal';
-// import axios from 'axios';
-// import { useRecoilValue } from 'recoil';
-// import { productionJumpState } from 'state/booking/productionJumpState';
 
 const LoadSalesHistory = () => {
   const [uploadSalesVisible, setUploadSalesVisible] = useState(false);
@@ -28,7 +24,6 @@ const LoadSalesHistory = () => {
   //   };
 
   const onSave = async (file, onProgress, onError, onUploadingImage) => {
-    file = await validateSpreadsheetFile(file);
     handleUpload(file, onProgress, onError, onUploadingImage);
   };
 
@@ -49,7 +44,6 @@ const LoadSalesHistory = () => {
         };
 
         setSalesHistoryRows([...salesHistoryRows, newFile]);
-        // onUploadSuccess({ fileId: response.id });
       }
     } catch (error) {
       onError(file[0].file, 'Error uploading file. Please try again.');
