@@ -112,12 +112,12 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
     const getHoldType = await axios.get<DealMemoHoldType>(`/api/dealMemo/hold-type/read`);
     setDealHoldType(getHoldType.data as DealMemoHoldType);
     if (demoModalData.data && demoModalData.data.BookingId) {
-      setDemoModalData(demoModalData.data as unknown as DealMemoContractFormData);
-      setDealMemoFormData(demoModalData.data as unknown as DealMemoContractFormData);
+      setDemoModalData(demoModalData.data as DealMemoContractFormData);
+      setDealMemoFormData(demoModalData.data as DealMemoContractFormData);
     }
     if (selectedTableCell.contract && selectedTableCell.contract.venueId) {
       const venueData = await axios.get(`/api/venue/${selectedTableCell.contract.venueId}`);
-      setVenue(venueData.data as unknown as VenueData);
+      setVenue(venueData.data as VenueData);
     }
   };
 
@@ -125,7 +125,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
     try {
       if (selectedTableCell.contract && selectedTableCell.contract.venueId) {
         const { data } = await axios.get(`/api/venue/${selectedTableCell.contract.venueId}`);
-        setVenue(data as unknown as VenueData);
+        setVenue(data as VenueData);
         const barredVenues = await axios.get(`/api/venue/barredVenues/${selectedTableCell.contract.venueId}`);
         setBarredVenues(transformVenues(barredVenues.data));
       }

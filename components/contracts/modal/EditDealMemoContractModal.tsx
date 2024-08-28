@@ -82,7 +82,7 @@ export const EditDealMemoContractModal = ({
   const [disableDate, setDisableDate] = useState<boolean>(true);
   const [seatKillsData, setSeatKillsData] = useState([]);
   const [sendTo, setSendTo] = useState([]);
-
+  const [currency, setCurrency] = useState('');
   const venueUserList = useMemo(
     () =>
       venueData && venueData.VenueContact
@@ -104,7 +104,6 @@ export const EditDealMemoContractModal = ({
     }
     return {};
   }, [venueData]);
-  console.log('venueUserData==>', venueData, venueUserList, venueUserData);
   useEffect(() => {
     setFormData({ ...demoModalData });
     const priceData = filterPrice(demoModalData.DealMemoPrice);
@@ -157,6 +156,25 @@ export const EditDealMemoContractModal = ({
       DealMemoCall: data,
     }));
   }, [dealCall]);
+
+  const getCurrency = async (bookingId) => {
+    try {
+      const response = await axios.get(`/api/marketing/currency/booking/${bookingId}`);
+
+      if (response.data && typeof response.data === 'object') {
+        const currencyObject = response.data as { currency: string };
+        setCurrency(currencyObject.currency);
+      }
+    } catch (error) {
+      console.error('Error retrieving currency:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (selectedTableCell.contract.Id) {
+      getCurrency(selectedTableCell.contract.Id);
+    }
+  }, [selectedTableCell.contract.Id]);
 
   const editDemoModalData = async (key: string, value, type: string) => {
     const updatedFormData = {
@@ -543,7 +561,6 @@ export const EditDealMemoContractModal = ({
               }
               tabIndexShow={true}
             />
-            {/* <TextInput placeholder="hh:mm" testId="venueText" className="w-[80px] mt-1 mb-1" /> */}
             <div className=" text-primary-input-text font-bold ml-8 mr-4">Notes</div>
 
             <TextInput
@@ -557,23 +574,23 @@ export const EditDealMemoContractModal = ({
         <hr className="bg-primary h-[3px] mt-4 mb-4" />
         <div className="text-xl text-primary-navy font-bold -mt-2.5">Venue</div>
         {[
-          ['Venue Name', 'Name'],
-          ['Phone', 'primaryPhoneNumber', 'venueAddress'],
-          ['Email', 'primaryEMail', 'venueAddress'],
-          ['Address', 'primaryAddress1', 'venueAddress'],
+          { label: 'Venue Name', value: 'Name' },
+          { label: 'Phone', value: 'primaryPhoneNumber', type: 'venueAddress' },
+          { label: 'Email', value: 'primaryEMail', type: 'venueAddress' },
+          { label: 'Address', value: 'primaryAddress1', type: 'venueAddress' },
         ].map((input) => {
           return (
-            <div key={input[0]} className="flex items-center mb-2">
-              <div className="w-1/5 text-primary-input-text font-bold">{input[0]}</div>
+            <div key={input.label} className="flex items-center mb-2">
+              <div className="w-1/5 text-primary-input-text font-bold">{input.label}</div>
               <div className="w-4/5">
                 <TextInput
-                  testId={`venue-${input[1]}`}
+                  testId={`venue-${input.value}`}
                   className="w-full text-primary-input-text font-bold"
                   value={
-                    input[2] === 'venueAddress'
-                      ? trasformVenueAddress(venueData.VenueAddress[0])[input[1]]
+                    input.type === 'venueAddress'
+                      ? trasformVenueAddress(venueData.VenueAddress[0])[input.value]
                       : venueData
-                      ? venueData[input[1]]
+                      ? venueData[input.value]
                       : ''
                   }
                   disabled={true}
@@ -679,7 +696,7 @@ export const EditDealMemoContractModal = ({
               isSearchable
               value={formData.GuaranteeAmount}
             />
-            <div className="text-primary-input-text font-bold ml-14 mr-5">{VENUE_CURRENCY_SYMBOLS.POUND}</div>
+            <div className="text-primary-input-text font-bold ml-14 mr-5">{currency}</div>
 
             <TextInput
               testId="guarnteeText"
@@ -825,7 +842,7 @@ export const EditDealMemoContractModal = ({
             <div key={inputData[0]} className="flex items-center mt-4">
               <div className="w-1/5 text-primary-input-text font-bold">{inputData[0]}</div>
               <div className="w-4/5 flex items-center">
-                <div className="text-primary-input-text font-bold  mr-4">{VENUE_CURRENCY_SYMBOLS.POUND}</div>
+                <div className="text-primary-input-text font-bold  mr-4">{currency}</div>
 
                 <TextInput
                   testId={`${inputData[1]}Text`}
@@ -1035,7 +1052,7 @@ export const EditDealMemoContractModal = ({
                   />
                 </div>
 
-                <div className="text-primary-input-text font-bold mr-2">{VENUE_CURRENCY_SYMBOLS.POUND}</div>
+                <div className="text-primary-input-text font-bold mr-2">{currency}</div>
 
                 <TextInput
                   testId={`DMPTicketPrice${index}Text`}
@@ -1099,7 +1116,7 @@ export const EditDealMemoContractModal = ({
                     />
                   </div>
 
-                  <div className="text-primary-input-text font-bold mr-2">{VENUE_CURRENCY_SYMBOLS.POUND}</div>
+                  <div className="text-primary-input-text font-bold mr-2">{currency}</div>
 
                   <TextInput
                     testId={`DMPTicketPriceCustomPrice${index}Text`}
@@ -1161,7 +1178,7 @@ export const EditDealMemoContractModal = ({
               />
             </div>
 
-            <div className="text-primary-input-text font-bold mr-2">{VENUE_CURRENCY_SYMBOLS.POUND}</div>
+            <div className="text-primary-input-text font-bold mr-2">{currency}</div>
 
             <TextInput
               testId="ticketPriceText"
@@ -1202,7 +1219,7 @@ export const EditDealMemoContractModal = ({
             Restoration Levy<div>{`(per ticket)`}</div>
           </div>
           <div className="w-4/5 flex items-center">
-            <div className="text-primary-input-text font-bold mr-2">{VENUE_CURRENCY_SYMBOLS.POUND}</div>
+            <div className="text-primary-input-text font-bold mr-2">{currency}</div>
 
             <TextInput
               testId="levyText"
@@ -1212,7 +1229,7 @@ export const EditDealMemoContractModal = ({
               onChange={(value) => editDemoModalData('RestorationLevy', parseFloat(value.target.value), 'dealMemo')}
             />
             <div className="text-primary-input-text font-bold ml-16 flex">
-              Booking fees <div className="ml-4 mr-2">{VENUE_CURRENCY_SYMBOLS.POUND}</div>
+              Booking fees <div className="ml-4 mr-2">{currency}</div>
             </div>
             <TextInput
               testId="bookingFeesText"
@@ -1248,7 +1265,7 @@ export const EditDealMemoContractModal = ({
               isSearchable
               value={formData.TxnChargeOption}
             />
-            <div className="text-primary-input-text font-bold ml-20 mr-2">{VENUE_CURRENCY_SYMBOLS.POUND}</div>
+            <div className="text-primary-input-text font-bold ml-20 mr-2">{currency}</div>
             <TextInput
               testId="chargesText"
               className="w-auto"
@@ -1480,7 +1497,7 @@ export const EditDealMemoContractModal = ({
         <div className="flex items-center mt-4">
           <div className="w-1/5 text-primary-input-text font-bold">Local Marketing Budget</div>
           <div className="w-4/5 flex">
-            <div className="text-primary-input-text font-bold mr-2">{VENUE_CURRENCY_SYMBOLS.POUND}</div>
+            <div className="text-primary-input-text font-bold mr-2">{currency}</div>
 
             <TextInput
               testId="localMarketingText"
@@ -1493,7 +1510,7 @@ export const EditDealMemoContractModal = ({
             />
             <div className="text-primary-input-text font-bold ml-28">Local Marketing Contra </div>
             <div className="text-primary-input-text font-bold ml-20 -mr-12" />
-            <div className="text-primary-input-text font-bold mr-2">{VENUE_CURRENCY_SYMBOLS.POUND}</div>
+            <div className="text-primary-input-text font-bold mr-2">{currency}</div>
 
             <TextInput
               testId="localMarketingText"
@@ -1581,7 +1598,7 @@ export const EditDealMemoContractModal = ({
             />
             <div className="ml-2">%</div>
             <div className="ml-14">Fixed Pitch Fee</div>
-            <div className="ml-2 mr-2">{VENUE_CURRENCY_SYMBOLS.POUND}</div>
+            <div className="ml-2 mr-2">{currency}</div>
 
             <TextInput
               testId="fixedPitchText"
@@ -1818,7 +1835,7 @@ export const EditDealMemoContractModal = ({
               value={formData.AdvancePaymentRequired}
             />
             <div className=" text-primary-input-text font-bold ml-20">
-              If Yes, Amount<span className="ml-2 mr-2">{VENUE_CURRENCY_SYMBOLS.POUND}</span>
+              If Yes, Amount<span className="ml-2 mr-2">{currency}</span>
             </div>
 
             <TextInput

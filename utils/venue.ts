@@ -79,22 +79,6 @@ export interface VenueData {
   VenueWarningNotes: number;
   Website: string;
 }
-
-// export interface VenueAddress{
-
-//   CountryId: number
-// County:number
-// Email:number
-// Id: number
-// Line1: string
-// Line2:number
-// Line3:number
-// Phone:number
-// Postcode: string
-// Town: string
-// TypeName: string
-// VenueId: number
-// }
 export interface UiVenue {
   id?: number;
   venueCode: string;
