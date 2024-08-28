@@ -95,9 +95,16 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
 
   const handleNewProductionTaskSubmit = (val: string) => {
     handleNewProductionTaskModal();
-    if (val === 'taskManual') setShowAddTask(true);
-    else if (val === 'master') setIsMasterTaskList(true);
-    else setIsProductionTaskList(true);
+    if (val === 'taskManual') {
+      setShowAddTask(true);
+      setShowEmptyProductionModal(false);
+    } else if (val === 'master') {
+      setIsMasterTaskList(true);
+      setShowEmptyProductionModal(false);
+    } else {
+      setIsProductionTaskList(true);
+      setShowEmptyProductionModal(false);
+    }
   };
 
   const handleMasterListClose = async (_val: string) => {
@@ -113,7 +120,6 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
   const currentProductionObj = useRecoilValue(productionJumpState).productions.find((item) => item.Id === ProductionId);
   return (
     <>
-      {' '}
       {isShowSpinner && (
         <div
           data-testid="tasks-page-spinner"
