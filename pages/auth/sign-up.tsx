@@ -92,8 +92,8 @@ const SignUp = () => {
       });
       return true;
     } catch (err) {
-      console.error(err);
       const errorCode = err.errors[0].code;
+
       if (errorCode === EMAIL_NOT_FOUND) {
         setAuthMode('signUp');
       } else if (errorCode === PASSWORD_INCORRECT || errorCode === INVALID_VERIFICATION_STRATEGY) {
@@ -336,6 +336,7 @@ const SignUp = () => {
             disabled={!isFormValid || !signUpLoaded}
           />
         </div>
+        {error.includes('current session') && <AuthError error={error} />}
       </div>
     </div>
   );
