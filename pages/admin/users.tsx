@@ -1,12 +1,15 @@
 import axios from 'axios';
 import { permissionGroupColDef, styleProps, usersColDef } from 'components/admin/tableConfig';
 import { Button, Table } from 'components/core-ui-lib';
+import AddEditUser from 'components/admin/modals/AddEditUser';
 import Layout from 'components/Layout';
 import { useEffect, useState } from 'react';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import { getPermissionsList } from 'services/permissionService';
 
-export default function Users() {
+export default function Users({ permissionsList }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const [userRowData, setUserRowData] = useState([]);
-
+  const [showUsersModal, setShowUsersModal] = useState(false);
   const populateUserTable = async () => {
     try {
       const users = await axios.get('/api/admin/users/read');
@@ -86,7 +89,12 @@ export default function Users() {
         <div className="text-primary-navy text-xl font-bold">All Users</div>
         <div className="flex flex-row gap-4">
           <Button className="px-8 mt-2 -mb-1" variant="secondary" text="Add New Touring Management User" />
-          <Button className="px-8 mt-2 -mb-1" variant="secondary" text="Add New Full User" />
+          <Button
+            className="px-8 mt-2 -mb-1"
+            variant="secondary"
+            text="Add New Full User"
+            onClick={() => setShowUsersModal(true)}
+          />
         </div>
       </div>
 
@@ -116,6 +124,16 @@ export default function Users() {
           />
         </div>
       </div>
+      {showUsersModal && <AddEditUser visible={showUsersModal} onClose={null} permissions={permissionsList} />}
     </Layout>
   );
 }
+
+export const getServerSideProps: GetServerSideProps = async () => {
+  const permissionsList = await getPermissionsList();
+  return {
+    props: {
+      permissionsList,
+    },
+  };
+};
