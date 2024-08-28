@@ -12,7 +12,7 @@ export const addVenueToMilageCalculator = async (venueInfo: UiTransformedVenue) 
     primaryCoordinates,
   } = venueInfo;
   //  This address is my personal server running the Routing for GB + Ireland
-  await axios.post('http://79.99.40.44:3000/api/addVenue', [
+  await axios.post(process.env.EUROPE_ROUTING_SERVER_BASE_URL, [
     {
       VenueAddress1: primaryAddress1,
       VenueAddress2: primaryAddress2,

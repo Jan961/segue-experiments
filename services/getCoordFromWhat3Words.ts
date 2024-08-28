@@ -11,7 +11,7 @@ export const getCoordFromWhat3Words = async (searchTerm) => {
       },
     };
   const apiKey = process.env.WHAT_3_WORDS_API_KEY;
-  const w3wUrl = `https://api.what3words.com/v3/convert-to-coordinates?words=${searchTerm}&key=${apiKey}`;
+  const w3wUrl = `${process.env.WHAT_3_WORDS_TO_COORD_BASE_URL}${searchTerm}&key=${apiKey}`;
   const response = await axios.get(w3wUrl);
   const result = response?.data;
   if (result?.error) {

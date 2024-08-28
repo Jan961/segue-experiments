@@ -147,7 +147,7 @@ export default function AddEditVenueModal({
       if (isValid) {
         const noPopup = await findAddress(formData);
         if (noPopup) {
-          const apiResponse = formData.id ? await updateVenue(formData) : await createVenue(formData);
+          const apiResponse = await (formData.id ? updateVenue(formData) : createVenue(formData));
           await deleteFiles();
           await saveFiles(apiResponse);
           await closeModal();
@@ -260,7 +260,7 @@ export default function AddEditVenueModal({
       <AddressPopup
         show={showAddressPopup}
         message={showAddressMessage}
-        closeModal={() => closeModal()}
+        closeModal={closeModal}
         onYesClick={() => {
           setShowAddressPopup(false);
         }}
