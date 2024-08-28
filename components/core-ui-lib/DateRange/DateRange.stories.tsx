@@ -11,7 +11,20 @@ type Story = StoryObj<typeof DateRange>;
 
 export const Primary: Story = {
   args: {
-    disabled: false,
+    className: 'w-fit',
     label: 'Date',
+    onChange: () => null,
+    value: { from: new Date(), to: new Date() },
+    disabled: false,
+  },
+};
+
+export const Disabled: Story = {
+  args: {
+    className: 'w-fit',
+    label: 'Date',
+    onChange: () => null,
+    value: { from: new Date(), to: new Date() },
+    disabled: true,
   },
 };

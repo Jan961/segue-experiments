@@ -12,6 +12,7 @@ import { startOfDay } from 'date-fns';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import { hasActivityChanged } from '../utils';
 import { ConfDialogVariant } from 'components/core-ui-lib/ConfirmationDialog/ConfirmationDialog';
+import { checkDecimalStringFormat } from 'utils';
 
 export type ActivityModalVariant = 'add' | 'edit' | 'delete';
 
@@ -54,6 +55,7 @@ export default function ActivityModal({
   const [error, setError] = useState<boolean>(false);
   const [confVariant, setConfVariant] = useState<ConfDialogVariant>('close');
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
+  const [showNameLengthError, setShowNameLengthError] = useState<boolean>(false);
 
   const initForm = () => {
     if (variant === 'add') {
@@ -105,15 +107,13 @@ export default function ActivityModal({
     onSave(variant, data);
   };
 
-  const setNumericVal = (type: string, value: string) => {
-    const regexPattern = /^-?\d*(\.\d*)?$/;
-    // validate value with regex
-
-    if (regexPattern.test(value)) {
+  const validateCost = (type: string, value: string, precision: number, scale: number) => {
+    const regex = /^$|^\d+(\.\d*)?$/;
+    if (checkDecimalStringFormat(value, precision, scale, regex)) {
       if (type === 'venueCost') {
-        setVenueCost(value === '' ? '0' : value);
+        setVenueCost(value);
       } else if (type === 'companyCost') {
-        setCompanyCost(value === '' ? '0' : value);
+        setCompanyCost(value);
       }
     }
   };
@@ -157,6 +157,7 @@ export default function ActivityModal({
   useEffect(() => {
     setVisible(show);
     initForm();
+    setShowNameLengthError(false);
   }, [show]);
 
   return (
@@ -164,17 +165,32 @@ export default function ActivityModal({
       <PopupModal show={visible} onClose={() => handleConfirm('close')} showCloseIcon={true} hasOverlay={showConfirm}>
         <div className="h-[526px] w-[404px]">
           <div className="text-xl text-primary-navy font-bold mb-4">{titleOptions[variant]}</div>
-          <div className="text-base font-bold text-primary-input-text">Activity Name</div>
+          <div className="flex gap-x-2 align-middle">
+            <div className="text-base font-bold text-primary-input-text">Activity Name</div>
+            {showNameLengthError && (
+              <div className="text-xs text-primary-red flex items-center">
+                Please enter a Name less than 30 characters
+              </div>
+            )}
+          </div>
           <TextInput
             className="w-full mb-4"
             placeholder="Enter Activity Name"
+            testId="enter-activity-name"
             id="activityName"
             value={actName}
-            onChange={(event) => setActName(event.target.value)}
+            onChange={(event) => {
+              if (event.target.value.length <= 30) {
+                setActName(event.target.value);
+              } else {
+                setShowNameLengthError(true);
+              }
+            }}
           />
 
           <Select
             className={classNames('w-full !border-0 text-primary-input-text', error ? 'mb-2' : 'mb-4')}
+            testId="select-activity-type"
             options={activityTypes}
             value={actType}
             onChange={(value) => changeActivityType(value)}
@@ -192,6 +208,7 @@ export default function ActivityModal({
                 onChange={(value) => setActDate(value)}
                 value={actDate}
                 label="Date"
+                testId="new-activity-date"
                 inputClass="!border-0 !shadow-none"
                 labelClassName="text-primary-input-text"
               />
@@ -236,10 +253,11 @@ export default function ActivityModal({
                 <div className="flex flex-col">
                   <TextInput
                     className="w-full mb-4"
+                    testId="company-cost"
                     placeholder="00.00"
                     id="companyCost"
                     value={companyCost}
-                    onChange={(event) => setNumericVal('companyCost', event.target.value)}
+                    onChange={(event) => validateCost('companyCost', event.target.value, 8, 2)}
                   />
                 </div>
               </div>
@@ -254,10 +272,11 @@ export default function ActivityModal({
                 <div className="flex flex-col">
                   <TextInput
                     className="w-full mb-4"
+                    testId="venue-cost"
                     placeholder="00.00"
                     id="venueCost"
                     value={venueCost}
-                    onChange={(event) => setNumericVal('venueCost', event.target.value)}
+                    onChange={(event) => validateCost('venueCost', event.target.value, 8, 2)}
                   />
                 </div>
               </div>
@@ -267,6 +286,7 @@ export default function ActivityModal({
           <div className="text-base font-bold text-primary-input-text">Notes</div>
           <TextArea
             className="mt-2 h-[162px] w-full"
+            testId="activity-notes"
             value={actNotes}
             placeholder="Notes Field"
             onChange={(e) => setActNotes(e.target.value)}

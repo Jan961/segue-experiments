@@ -11,11 +11,11 @@ interface RadioProps {
 const Radio: FC<RadioProps> = ({ value, option, name, handleChange }) => {
   const checked = useMemo(() => value === option.value, [option, value]);
   return (
-    <label key={option.value} className="flex items-center space-x-2">
+    <label key={option.value as string} className="flex items-center space-x-2">
       <input
         type="radio"
         name={name}
-        value={option.value}
+        value={option.value as string}
         checked={checked}
         onChange={handleChange}
         className="text-primary-navy"

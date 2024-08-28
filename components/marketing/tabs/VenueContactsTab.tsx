@@ -35,72 +35,76 @@ const VenueContactsTab = forwardRef<VenueContactTabRef, VenueContactsProps>((pro
   }));
 
   const saveVenueContact = async (inputData, mode, updatedFormData) => {
-    const data = { ...inputData, mode, updatedFormData };
-    const booking = bookings.bookings.find((booking) => booking.Id === props.bookingId);
-    const variant = data.mode;
+    try {
+      const data = { ...inputData, mode, updatedFormData };
+      const booking = bookings.bookings.find((booking) => booking.Id === props.bookingId);
+      const variant = data.mode;
 
-    // create venue contact
-    if (variant === 'create') {
-      const newContact = data.venueContacts.find((contact) => contact.venueRoleId === null);
-      const roleIndex = venueStandardRoleList.findIndex((role) => role.text === newContact.roleName);
-      let venueRole = null;
+      // create venue contact
+      if (variant === 'create') {
+        const newContact = data.venueContacts.find((contact) => contact.venueRoleId === null);
+        const roleIndex = venueStandardRoleList.findIndex((role) => role.text === newContact.roleName);
+        let venueRole = null;
 
-      // create a new role if it doesn't exist in the standard list - the api also does this check
-      if (roleIndex === -1) {
-        const response = await axios.post('/api/venue/role/upsert', {
-          name: newContact.roleName,
-          isStandard: false,
-        });
+        // create a new role if it doesn't exist in the standard list - the api also does this check
+        if (roleIndex === -1) {
+          const response = await axios.post('/api/venue/role/upsert', {
+            name: newContact.roleName,
+            isStandard: false,
+          });
 
-        venueRole = response.data;
+          venueRole = response.data;
 
-        setVenueRoles([...venueRoles, venueRole]);
-      }
+          setVenueRoles([...venueRoles, venueRole]);
+        }
 
-      const newVc = {
-        ...data,
-        FirstName: newContact.firstName,
-        LastName: newContact.lastName,
-        Phone: newContact.phone,
-        Email: newContact.email,
-        VenueRoleId: venueRole ? venueRole.Id : null,
-        VenueId: booking.VenueId,
-      };
-
-      const response = await axios.post('/api/marketing/venueContacts/create', newVc);
-      const newVenueContact = response.data;
-
-      if (typeof newVenueContact === 'object') {
-        const { Id } = newVenueContact;
-
-        const tempVenueContactUi: UiVenueContact = {
-          ...newContact,
-          venueId: parseInt(newVc.VenueId),
-          roleName: newContact.roleName,
-          venueRoleId: newVc.VenueRoleId,
-          id: Id,
+        const newVc = {
+          ...data,
+          FirstName: newContact.firstName,
+          LastName: newContact.lastName,
+          Phone: newContact.phone,
+          Email: newContact.email,
+          VenueRoleId: venueRole ? venueRole.Id : null,
+          VenueId: booking.VenueId,
         };
 
-        setVenueContacts([...venueContacts, tempVenueContactUi]);
+        const response = await axios.post('/api/marketing/venueContacts/create', newVc);
+        const newVenueContact = response.data;
+
+        if (typeof newVenueContact === 'object') {
+          const { Id } = newVenueContact;
+
+          const tempVenueContactUi: UiVenueContact = {
+            ...newContact,
+            venueId: parseInt(newVc.VenueId),
+            roleName: newContact.roleName,
+            venueRoleId: newVc.VenueRoleId,
+            id: Id,
+          };
+
+          setVenueContacts([...venueContacts, tempVenueContactUi]);
+        }
+
+        // update fields
+      } else if (variant === 'update') {
+        const role = venueRoles.find((role) => role.Name === data.updatedFormData.roleName);
+        if (!role || role.Id === undefined) {
+          return;
+        }
+
+        const vcId = venueContacts.find((vc) => vc.venueRoleId === role.Id).id;
+        const updatedRow = mapVenueContactToPrisma(data.updatedFormData);
+        const dataToUpdate = { ...updatedRow, VenueId: booking.VenueId, Id: vcId, VenueRoleId: role.Id };
+
+        await axios.post('/api/marketing/venueContacts/update', dataToUpdate);
+
+        // delete venue contact
+      } else if (variant === 'delete') {
+        const updatedRow = mapVenueContactToPrisma(data.updatedFormData);
+        if (updatedRow.VenueRoleId) await axios.post('/api/marketing/venueContacts/delete', updatedRow);
       }
-
-      // update fields
-    } else if (variant === 'update') {
-      const role = venueRoles.find((role) => role.Name === data.updatedFormData.roleName);
-      if (!role || role.Id === undefined) {
-        return;
-      }
-
-      const vcId = venueContacts.find((vc) => vc.venueRoleId === role.Id).id;
-      const updatedRow = mapVenueContactToPrisma(data.updatedFormData);
-      const dataToUpdate = { ...updatedRow, VenueId: booking.VenueId, Id: vcId, VenueRoleId: role.Id };
-
-      await axios.post('/api/marketing/venueContacts/update', dataToUpdate);
-
-      // delete venue contact
-    } else if (variant === 'delete') {
-      const updatedRow = mapVenueContactToPrisma(data.updatedFormData);
-      await axios.post('/api/marketing/venueContacts/delete', updatedRow);
+    } catch (error) {
+      console.error(error, 'Error - failed updating Venue Contact');
     }
   };
 

@@ -21,10 +21,10 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const access = await checkAccess(email, { BookingId: data.FileBookingBookingId });
     if (!access) return res.status(401).end();
 
-    await prisma.bookingAttachedFile.create({
+    const result = await prisma.bookingAttachedFile.create({
       data,
     });
-    res.status(200).json({});
+    res.status(200).json(result);
   } catch (err) {
     await loggingService.logError(err);
     console.log(err);

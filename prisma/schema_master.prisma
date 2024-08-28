@@ -27,7 +27,7 @@ model Account {
   AccountLogoFileId          Int?
   AccountMainEmail           String?               @db.VarChar(120)
   AccountNumPeople           Int?                  @db.TinyInt
-  AccountOrganisationId      String?               @unique(map: "Account_AccountOrganisationId_Unique") @db.VarChar(8)
+  AccountOrganisationId      String                @unique(map: "Account_AccountOrganisationId_Unique") @db.VarChar(8)
   AccountTermsAgreedBy       String?               @db.VarChar(100)
   AccountTermsAgreedDate     DateTime?             @db.Date
   AccountWebsite             String?               @db.VarChar(255)
@@ -41,8 +41,8 @@ model Account {
   AccountUser                AccountUser[]
   ProductionCompany          ProductionCompany[]
 
-  @@index([AccountPaymentCurrencyCode], map: "Currency_Account_Payment")
   @@index([AccountLogoFileId], map: "File_Account")
+  @@index([AccountPaymentCurrencyCode], map: "Currency_Account")
 }
 
 model AccountContact {
@@ -54,7 +54,7 @@ model AccountContact {
   AccContMainEmail String? @db.VarChar(120)
   Account          Account @relation(fields: [AccContAccountId], references: [AccountId], onDelete: Cascade, map: "Account_AccountContact")
 
-  @@index([AccContAccountId], map: "Account_AccountContact")
+  @@unique([AccContAccountId, AccContFirstName, AccContLastName], map: "AccountContact_AccountContactNames_Unique")
 }
 
 model AccountSubscription {
@@ -73,14 +73,16 @@ model AccountSubscription {
 
 model AccountUser {
   AccUserId             Int                     @id @default(autoincrement())
-  AccUserUserId         Int                     @unique(map: "AccUserUserId_UNIQUE")
+  AccUserUserId         Int
   AccUserAccountId      Int
   AccUserIsAdmin        Boolean                 @default(dbgenerated("(b'0')")) @db.Bit(1)
   AccUserPIN            String?                 @db.VarChar(4)
   Account               Account                 @relation(fields: [AccUserAccountId], references: [AccountId], onDelete: Cascade, map: "Account_AccountUser")
   User                  User                    @relation(fields: [AccUserUserId], references: [UserId], onDelete: Cascade, map: "User_AccountUser")
   AccountUserPermission AccountUserPermission[]
+  File                  File[]
 
+  @@unique([AccUserUserId, AccUserAccountId], map: "AccountUser_UniqueUserOnAccount")
   @@index([AccUserAccountId], map: "Account_AccountUser")
 }
 
@@ -114,13 +116,13 @@ model File {
   FileMediaType        String?             @db.VarChar(200)
   FileLocation         String              @db.VarChar(512)
   FileUploadDateTime   DateTime            @db.DateTime(0)
-  FileUploadUserId     Int
+  FileUploadAccUserId  Int
   FileSizeBytes        BigInt?
   Account              Account[]
-  User                 User                @relation(fields: [FileUploadUserId], references: [UserId], map: "User_AttachedFile")
+  AccountUser          AccountUser         @relation(fields: [FileUploadAccUserId], references: [AccUserId], map: "User_AttachedFile")
   ProductionCompany    ProductionCompany[]
 
-  @@index([FileUploadUserId], map: "User_AttachedFile")
+  @@index([FileUploadAccUserId], map: "User_AttachedFile")
 }
 
 model Permission {
@@ -159,10 +161,9 @@ model SubscriptionPlan {
 }
 
 model User {
-  UserId        Int          @id @unique(map: "UserIdUnique") @default(autoincrement())
-  UserEmail     String       @unique(map: "UserEmail_uk") @db.VarChar(120)
-  UserFirstName String       @db.VarChar(50)
-  UserLastName  String?      @db.VarChar(50)
-  AccountUser   AccountUser?
-  File          File[]
+  UserId        Int           @id @unique(map: "UserIdUnique") @default(autoincrement())
+  UserEmail     String        @unique(map: "UserEmail_uk") @db.VarChar(120)
+  UserFirstName String        @db.VarChar(50)
+  UserLastName  String?       @db.VarChar(50)
+  AccountUser   AccountUser[]
 }

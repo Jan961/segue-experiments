@@ -49,6 +49,7 @@ export default function ContactNoteModal({
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
   const [userList, setUserList] = useState([]);
   const users = useRecoilValue(userState);
+  const [showNameLengthError, setShowNameLengthError] = useState<boolean>(false);
 
   useEffect(() => {
     setVisible(show);
@@ -68,6 +69,7 @@ export default function ContactNoteModal({
       setTime(getTimeFromDateAndTime(new Date()));
       setActionedBy(null);
       setNotes('');
+      setShowNameLengthError(false);
     } else if (variant === 'edit') {
       setPersonContacted(data.CoContactName);
       setDate(new Date(data.ContactDate));
@@ -125,13 +127,27 @@ export default function ContactNoteModal({
       <PopupModal show={visible} onClose={() => handleConfirm('close')} showCloseIcon={true} hasOverlay={false}>
         <div className="h-[526px] w-[404px]">
           <div className="text-xl text-primary-navy font-bold mb-4">{titleOptions[variant]}</div>
-          <div className="text-base font-bold text-primary-input-text">Name of Person Contacted</div>
+          <div className="flex gap-x-2 align-middle">
+            <div className="text-base font-bold text-primary-input-text">Name of Person Contacted</div>
+            {showNameLengthError && (
+              <div className="text-xs text-primary-red flex items-center">
+                Please enter a Name less than 30 characters
+              </div>
+            )}
+          </div>
           <TextInput
             className="w-full mb-4"
+            testId="contacted-person-name"
             placeholder="Enter Person Contacted"
             id="input"
             value={personContacted}
-            onChange={(event) => setPersonContacted(event.target.value)}
+            onChange={(event) => {
+              if (event.target.value.length <= 30) {
+                setPersonContacted(event.target.value);
+              } else {
+                setShowNameLengthError(true);
+              }
+            }}
           />
 
           <div className="flex flex-row gap-[105px]">
@@ -155,17 +171,19 @@ export default function ContactNoteModal({
           <div className="text-base font-bold text-primary-input-text">Actioned By</div>
           <Select
             className={classNames('w-full !border-0 text-primary-input-text mb-4')}
+            testId="select-user"
             options={userList}
             value={actionedBy}
             onChange={(value) => setActionedBy(parseInt(value.toString()))}
-            placeholder={'Select User'}
+            placeholder="Select User"
             isClearable
             isSearchable
           />
 
           <div className="text-base font-bold text-primary-input-text">Notes</div>
           <TextArea
-            className={'mt-2 h-[162px] w-full'}
+            className="mt-2 h-[162px] w-full"
+            testId="notes-area"
             value={notes}
             placeholder="Notes Field"
             onChange={(e) => setNotes(e.target.value)}

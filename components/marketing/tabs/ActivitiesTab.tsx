@@ -65,6 +65,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
   const [bookingIdVal, setBookingIdVal] = useState(null);
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
   const [confVariant, setConfVariant] = useState<ConfDialogVariant>('delete');
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [bookings, setBookings] = useRecoilState(bookingJumpState);
   const currency = useRecoilValue(currencyState);
 
@@ -94,6 +95,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
   const getActivities = async (bookingId: string) => {
     try {
       setActColDefs(activityColDefs(activityUpdate, currency.symbol));
+      setIsLoading(true);
 
       const { data } = await axios.get(`/api/marketing/activities/${bookingId}`);
 
@@ -169,6 +171,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
     } catch (error) {
       console.log(error);
     }
+    setIsLoading(false);
   };
 
   const viewGlobalActivity = async (data) => {
@@ -264,74 +267,82 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
   };
 
   const saveActivity = async (variant: ActivityModalVariant, data: ActivityDTO) => {
-    if (variant === 'add') {
-      await axios.post('/api/marketing/activities/create', data);
+    try {
+      if (variant === 'add') {
+        const result = await axios.post('/api/marketing/activities/create', data);
+        const addedActivity = result.data;
 
-      const newRow = {
-        actName: data.Name,
-        actType: actTypeList.find((type) => type.value === data.ActivityTypeId).text,
-        actDate: data.Date,
-        followUpCheck: data.FollowUpRequired,
-        followUpDt: data.DueByDate,
-        companyCost: data.CompanyCost,
-        venueCost: data.VenueCost,
-        notes: data.Notes,
-        bookingId: data.BookingId,
-      };
-
-      const activityData = [...actRowData, newRow];
-
-      // re sort the rows to ensure the new field is put in the correct place chronologically
-      const sortedActivities = activityData.sort(
-        (a, b) => new Date(a.actDate).getTime() - new Date(b.actDate).getTime(),
-      );
-
-      setActRowData(sortedActivities);
-      calculateActivityTotals(sortedActivities);
-      setShowActivityModal(false);
-    } else if (variant === 'edit') {
-      if (hasActivityChanged(actRow, data)) {
-        await axios.post('/api/marketing/activities/update', data);
-
-        const updatedRow = {
-          actName: data.Name,
-          actType: actTypeList.find((type) => type.value === data.ActivityTypeId).text,
-          actDate: data.Date,
-          followUpCheck: data.FollowUpRequired,
-          followUpDt: data.DueByDate,
-          companyCost: data.CompanyCost,
-          venueCost: data.VenueCost,
-          notes: data.Notes,
-          bookingId: data.BookingId,
-          id: data.Id,
+        const newRow = {
+          actName: addedActivity.Name,
+          actType: actTypeList.find((type) => type.value === addedActivity.ActivityTypeId).text,
+          actDate: addedActivity.Date === '' ? null : addedActivity.Date,
+          followUpCheck: addedActivity.FollowUpRequired,
+          followUpDt: addedActivity.DueByDate,
+          companyCost: addedActivity.CompanyCost,
+          venueCost: addedActivity.VenueCost,
+          notes: addedActivity.Notes,
+          bookingId: addedActivity.BookingId,
+          id: addedActivity.Id,
         };
+
+        const activityData = [...actRowData, newRow];
+
+        // re sort the rows to ensure the new field is put in the correct place chronologically
+        const sortedActivities = activityData.sort(
+          (a, b) => new Date(a.actDate).getTime() - new Date(b.actDate).getTime(),
+        );
+
+        setActRowData(sortedActivities);
+        calculateActivityTotals(sortedActivities);
+        setShowActivityModal(false);
+      } else if (variant === 'edit') {
+        if (hasActivityChanged(actRow, data)) {
+          await axios.post('/api/marketing/activities/update', data);
+
+          const updatedRow = {
+            actName: data.Name,
+            actType: actTypeList.find((type) => type.value === data.ActivityTypeId).text,
+            actDate: data.Date,
+            followUpCheck: data.FollowUpRequired,
+            followUpDt: data.DueByDate,
+            companyCost: data.CompanyCost,
+            venueCost: data.VenueCost,
+            notes: data.Notes,
+            bookingId: data.BookingId,
+            id: data.Id,
+          };
+
+          const rowIndex = actRowData.findIndex((act) => act.id === data.Id);
+          const newRows = [...actRowData];
+          newRows[rowIndex] = updatedRow;
+
+          // re sort the rows to ensure the new field is put in the correct place chronologically
+          const sortedActivities = newRows.sort(
+            (a, b) => new Date(a.actDate).getTime() - new Date(b.actDate).getTime(),
+          );
+
+          calculateActivityTotals(sortedActivities);
+          setActRowData(sortedActivities);
+
+          setShowActivityModal(false);
+        } else {
+          setShowActivityModal(false);
+        }
+      } else if (variant === 'delete') {
+        await axios.post('/api/marketing/activities/delete', data);
 
         const rowIndex = actRowData.findIndex((act) => act.id === data.Id);
         const newRows = [...actRowData];
-        newRows[rowIndex] = updatedRow;
+        if (rowIndex !== -1) {
+          newRows.splice(rowIndex, 1);
+        }
 
-        // re sort the rows to ensure the new field is put in the correct place chronologically
-        const sortedActivities = newRows.sort((a, b) => new Date(a.actDate).getTime() - new Date(b.actDate).getTime());
-
-        calculateActivityTotals(sortedActivities);
-        setActRowData(sortedActivities);
-
-        setShowActivityModal(false);
-      } else {
-        setShowActivityModal(false);
+        calculateActivityTotals(newRows);
+        setActRowData(newRows);
+        setShowConfirm(false);
       }
-    } else if (variant === 'delete') {
-      await axios.post('/api/marketing/activities/delete', data);
-
-      const rowIndex = actRowData.findIndex((act) => act.id === data.Id);
-      const newRows = [...actRowData];
-      if (rowIndex !== -1) {
-        newRows.splice(rowIndex, 1);
-      }
-
-      calculateActivityTotals(newRows);
-      setActRowData(newRows);
-      setShowConfirm(false);
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -420,6 +431,10 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
     }
   }, [props.bookingId]);
 
+  useEffect(() => {
+    setDataAvailable(false);
+  }, [productionId]);
+
   const onExport = async () => {
     const urlPath = `/api/reports/marketing/activities/${props.bookingId}`;
     const selectedVenue = bookings.bookings?.filter((booking) => booking.Id === bookings.selected);
@@ -445,11 +460,13 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
   };
 
   if (!dataAvailable) {
-    return (
-      <div className="mt-[140px]">
-        <Spinner size="lg" className="mr-3" />
-      </div>
-    );
+    if (isLoading) {
+      return (
+        <div className="mt-[140px]">
+          <Spinner size="lg" className="mr-3" />
+        </div>
+      );
+    }
   } else {
     return (
       <div>
@@ -581,7 +598,10 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
                 <div className="flex flex-col text-center">
                   <div className="text-base font-bold text-primary-input-text">Total Cost</div>
                   <div className="bg-primary-white h-7 w-[140px] rounded mt-[2px] ml-2">
-                    <div className="text text-base text-left pl-2 text-primary-input-text">
+                    <div
+                      className="text text-base text-left pl-2 text-primary-input-text"
+                      data-testid="activities-total-cost"
+                    >
                       {`${currency.symbol}${totalCost.toFixed(2)}`}
                     </div>
                   </div>
@@ -590,7 +610,10 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
                 <div className="flex flex-col text-center">
                   <div className="text-base font-bold text-primary-input-text">Company</div>
                   <div className="bg-primary-white h-7 w-[140px] rounded mt-[2px]">
-                    <div className="text text-base text-left pl-2 text-primary-input-text">
+                    <div
+                      className="text text-base text-left pl-2 text-primary-input-text"
+                      data-testid="activities-company-cost"
+                    >
                       {`${currency.symbol}${totalCompanyCost.toFixed(2)}`}
                     </div>
                   </div>
@@ -599,7 +622,10 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
                 <div className="flex flex-col text-center">
                   <div className="text-base font-bold text-primary-input-text">Venue</div>
                   <div className="bg-primary-white h-7 w-[140px] rounded mt-[2px]">
-                    <div className="text text-base text-left pl-2 text-primary-input-text">
+                    <div
+                      className="text text-base text-left pl-2 text-primary-input-text"
+                      data-testid="activities-venue-cost"
+                    >
                       {`${currency.symbol}${totalVenueCost.toFixed(2)}`}
                     </div>
                   </div>
@@ -630,7 +656,10 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
               <div className="flex flex-col text-center">
                 <div className="text-base font-bold text-primary-input-text">Total Cost</div>
                 <div className="bg-primary-white h-7 w-[140px] rounded mt-[2px] ml-2">
-                  <div className="text text-base text-left pl-2 text-primary-input-text">
+                  <div
+                    className="text text-base text-left pl-2 text-primary-input-text"
+                    data-testid="global-activities-total-cost"
+                  >
                     {`${currency.symbol}${globalTotalCost.toFixed(2)}`}
                   </div>
                 </div>
@@ -639,7 +668,10 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
               <div className="flex flex-col text-center">
                 <div className="text-base font-bold text-primary-input-text">Venue Share</div>
                 <div className="bg-primary-white h-7 w-[140px] rounded mt-[2px]">
-                  <div className="text text-base text-left pl-2 text-primary-input-text">
+                  <div
+                    className="text text-base text-left pl-2 text-primary-input-text"
+                    data-testid="global-activities-venues-share"
+                  >
                     {`${currency.symbol}${globalVenueShareCost.toFixed(2)}`}
                   </div>
                 </div>
