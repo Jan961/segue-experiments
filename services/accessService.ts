@@ -1,4 +1,4 @@
-import prisma from 'lib/prisma';
+import prisma from 'lib/prisma_master';
 
 // This may need to be expanded to include Tasks, Contracts, Files
 export interface AccessCheck {
@@ -19,10 +19,9 @@ export interface AccessCheck {
 // No need for access check based on the second paramater. This method needs to be refactored
 // console log left on purpose to avoid ESLint errors
 export const checkAccess = async (email: string, items: AccessCheck = null): Promise<boolean> => {
-  console.log(items);
   const user = await prisma.user.findUnique({
     where: {
-      Email: email,
+      UserEmail: email,
     },
   });
 

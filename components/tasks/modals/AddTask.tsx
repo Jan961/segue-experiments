@@ -67,9 +67,8 @@ const DEFAULT_MASTER_TASK: Partial<MasterTask> & {
   Code: 0,
   Name: '',
   Notes: '',
-  AssignedToUserId: null,
+  TaskAssignedToAccUserId: null,
   Priority: 0,
-  AccountId: 0,
   StartByWeekNum: 0,
   TaskStartByIsPostProduction: false,
   CompleteByWeekNum: 0,
@@ -147,7 +146,7 @@ const AddTask = ({
   const weekOptionsNoDate = useMemo(
     () =>
       getWeekOptions(production, isMasterTask, false).filter((option) => {
-        return option.value >= inputs?.StartByWeekNum;
+        return parseInt(option.value.toString()) >= inputs?.StartByWeekNum;
       }),
     [production, isMasterTask, inputs?.StartByWeekNum],
   );
@@ -185,10 +184,12 @@ const AddTask = ({
       return [];
     }
 
-    return Object.values(users).map(({ Id, FirstName = '', LastName = '' }) => ({
-      value: Id,
-      text: `${FirstName || ''} ${LastName || ''}`,
+    const usersToReturn = Object.values(users).map(({ AccUserId, UserFirstName = '', UserLastName = '' }) => ({
+      value: AccUserId,
+      text: `${UserFirstName || ''} ${UserLastName || ''}`,
     }));
+
+    return usersToReturn;
   }, [users]);
 
   const handleOnChange = (e: any) => {
@@ -199,7 +200,7 @@ const AddTask = ({
     let { id, value, checked } = e.target;
     if (
       [
-        'AssignedToUserId',
+        'TaskAssignedToAccUserId',
         'StartByWeekNum',
         'CompleteByWeekNum',
         'Priority',
@@ -514,7 +515,8 @@ const AddTask = ({
               onChange={(value) => handleOnChange({ target: { id: 'CompleteByWeekNum', value } })}
               value={inputs?.CompleteByWeekNum}
               options={weekOptionsDate.filter(
-                (option) => option.value >= inputs?.StartByWeekNum || isNullOrEmpty(inputs?.StartByWeekNum),
+                (option) =>
+                  parseInt(option.value.toString()) >= inputs?.StartByWeekNum || isNullOrEmpty(inputs?.StartByWeekNum),
               )}
               placeholder="Week No."
               className="w-52"
@@ -618,8 +620,8 @@ const AddTask = ({
         <div className="flex">
           <Label className="!text-secondary pr-6 mr-4" text="Assigned to" />
           <Select
-            onChange={(value) => handleOnChange({ target: { id: 'AssignedToUserId', value } })}
-            value={inputs?.AssignedToUserId}
+            onChange={(value) => handleOnChange({ target: { id: 'TaskAssignedToAccUserId', value } })}
+            value={inputs?.TaskAssignedToAccUserId}
             options={usersList}
             placeholder="Select Assignee"
             className="w-64"

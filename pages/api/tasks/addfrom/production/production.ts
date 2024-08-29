@@ -47,7 +47,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           TaskRepeatFromWeekNum: FromWeekNum,
           TaskRepeatToWeekNum: ToWeekNum,
           TaskCompletedDate: null,
-          AssignedToUserId: task.AssignedToUserId,
+          TaskAssignedToAccUserId: task.TaskAssignedToAccUserId,
           ProductionId,
           Notes: task.Notes,
         };

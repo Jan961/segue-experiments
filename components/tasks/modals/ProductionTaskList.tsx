@@ -77,9 +77,9 @@ const ProductionTaskList = ({ visible, onClose, productionId, isMaster = false }
   }, [productionJump.productions, includeArchived]);
 
   const usersList = useMemo(() => {
-    return Object.values(users).map(({ Id, FirstName = '', LastName = '' }) => ({
-      value: Id,
-      text: `${FirstName || ''} ${LastName || ''}`,
+    return Object.values(users).map(({ AccUserId, UserFirstName = '', UserLastName = '' }) => ({
+      value: AccUserId,
+      text: `${UserFirstName || ''} ${UserLastName || ''}`,
     }));
   }, [users]);
 
@@ -160,7 +160,7 @@ const ProductionTaskList = ({ visible, onClose, productionId, isMaster = false }
           StartByIsPostProduction: false,
           StartByWeekNum: task.StartByWeekNum,
           CompleteByWeekNum: task.CompleteByWeekNum,
-          AssignedToUserId: task.AssignedToUserId,
+          TaskAssignedToAccUserId: task.TaskAssignedToAccUserId,
           Progress: 0,
           Priority: task.Priority,
           PRTId: task.PRTId,

@@ -2,14 +2,13 @@ import { MasterTaskDTO } from 'interfaces';
 import prisma from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getMaxMasterTaskCode } from 'services/TaskService';
-import { getEmailFromReq, checkAccess, getAccountIdFromReq } from 'services/userService';
+import { getEmailFromReq, checkAccess } from 'services/userService';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
     const task = req.body as MasterTaskDTO;
-
+    
     const email = await getEmailFromReq(req);
-    const AccountId = await getAccountIdFromReq(req);
     const access = await checkAccess(email);
     if (!access) return res.status(401).end();
 
@@ -17,11 +16,10 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
 
     const createResult = await prisma.MasterTask.create({
       data: {
-        AccountId,
         Code: Code + 1,
         Name: task.Name,
         Notes: task.Notes,
-        AssignedToUserId: task.AssignedToUserId,
+        TaskAssignedToAccUserId: task.TaskAssignedToAccUserId,
         StartByWeekNum: task.StartByWeekNum,
         CompleteByWeekNum: task.CompleteByWeekNum,
       },

@@ -1,4 +1,4 @@
-import { Account } from 'prisma/generated/prisma-client';
+import { Account } from 'prisma/generated/prisma-master';
 
 export const mapAccountFromPrismaFields = (account: Account) => {
   return {

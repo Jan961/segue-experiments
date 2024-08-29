@@ -1,4 +1,5 @@
-import prisma from 'lib/prisma';
+import master from 'lib/prisma_master';
+import client from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getAccountId, getEmailFromReq } from 'services/userService';
 
@@ -8,15 +9,15 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const AccountId = await getAccountId(email);
     const { id } = req.query;
 
-    const productionCount = await prisma.production.count({ where: { ProdCoId: Number(id) } });
+    const productionCount = await client.production.count({ where: { ProdCoId: Number(id) } });
 
     if (productionCount === 0) {
-      const numProdCompanies = await prisma.productionCompany.count({
+      const numProdCompanies = await master.productionCompany.count({
         where: { AccountId },
       });
 
       if (numProdCompanies > 1) {
-        const deletedRecord = await prisma.ProductionCompany.delete({
+        const deletedRecord = await master.ProductionCompany.delete({
           where: {
             Id: Number(id),
             AccountId,

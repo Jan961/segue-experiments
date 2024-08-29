@@ -128,6 +128,7 @@ const GlobalActivityView = () => {
         cost: data.Cost,
         notes: data.Notes,
         followUpDt: data.DueByDate,
+        id: data.Id,
       };
 
       const rowIndex = rowData.findIndex((act) => act.id === data.Id);

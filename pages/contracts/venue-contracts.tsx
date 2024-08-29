@@ -2,7 +2,6 @@ import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import Layout from 'components/Layout';
 import { InitialState } from 'lib/recoil';
 import { getProductionJumpState } from 'utils/getProductionJumpState';
-import { getAccountIdFromReq } from 'services/userService';
 import useContractsFilter from 'hooks/useContractsFilter';
 import ContractFilters from 'components/contracts/ContractsFilters';
 import ContractsTable from 'components/contracts/table/ContractsTable';
@@ -32,8 +31,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
     The itinery or miles will be different however, as this relies on the preview booking, and has to be generateed programatically
   */
-  const AccountId = await getAccountIdFromReq(ctx.req);
-  const productionJump = await getProductionJumpState(ctx, 'contracts', AccountId);
+  const productionJump = await getProductionJumpState(ctx, 'contracts');
   const ProductionId = productionJump.selected;
   // See _app.tsx for how this is picked up
   const initialState: InitialState = {

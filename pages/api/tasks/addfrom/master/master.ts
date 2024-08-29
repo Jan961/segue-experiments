@@ -11,7 +11,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
 
     const email = await getEmailFromReq(req);
     const access = await checkAccess(email, { ProductionId });
-    const AccountId = await getAccountIdFromReq(req);
     if (!access) return res.status(401).end();
 
     const taskList = selectedTaskList.map(async (task) => {
@@ -25,7 +24,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           StartByWeekNum,
           CompleteByWeekNum,
           Priority,
-          AssignedToUserId,
+          TaskAssignedToAccUserId,
           Notes,
         } = task;
 
@@ -41,12 +40,11 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
 
         return await prisma.MasterTask.create({
           data: {
-            AccountId,
             Name,
             StartByWeekNum,
             CompleteByWeekNum,
             Priority,
-            AssignedToUserId,
+            TaskAssignedToAccUserId,
             Notes,
             Code: Code + 1,
             CopiedFrom: 'D',
@@ -70,7 +68,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         return await prisma.MasterTask.create({
           data: {
             ...filteredTask,
-            AccountId,
             TaskStartByIsPostProduction: false,
             TaskCompleteByIsPostProduction: false,
             Code: Code + 1,

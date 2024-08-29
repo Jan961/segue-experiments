@@ -4,9 +4,6 @@ import { sortTasksByDueAndAlpha } from 'utils/tasks';
 
 export const getMasterTasksList = async (AccountId: number) => {
   const masterTaskList = await prisma.MasterTask.findMany({
-    where: {
-      AccountId,
-    },
     orderBy: {
       StartByWeekNum: 'asc',
     },
@@ -80,7 +77,7 @@ export const generateRecurringMasterTasks = async (requestBody, MTRId: number) =
     TaskRepeatFromWeekNum,
     TaskRepeatToWeekNum,
     TaskCompletedDate,
-    AssignedToUserId,
+    TaskAssignedToAccUserId,
     Notes,
   } = requestBody;
 
@@ -110,7 +107,7 @@ export const generateRecurringMasterTasks = async (requestBody, MTRId: number) =
       Priority,
       Notes,
       Progress,
-      AssignedToUserId,
+      TaskAssignedToAccUserId,
       TaskStartByIsPostProduction: false,
       StartByWeekNum: taskStartDate,
       TaskCompleteByIsPostProduction: false,
@@ -125,7 +122,7 @@ export const generateRecurringMasterTasks = async (requestBody, MTRId: number) =
 };
 
 export const generateSingleRecurringMasterTask = async (requestBody, MTRId: number) => {
-  const { Name, StartByWeekNum, CompleteByWeekNum, Priority, TaskRepeatFromWeekNum, AssignedToUserId, Notes } =
+  const { Name, StartByWeekNum, CompleteByWeekNum, Priority, TaskRepeatFromWeekNum, TaskAssignedToAccUserId, Notes } =
     requestBody;
 
   const maxTaskCode =
@@ -149,7 +146,7 @@ export const generateSingleRecurringMasterTask = async (requestBody, MTRId: numb
     Name,
     Priority,
     Notes,
-    AssignedToUserId,
+    TaskAssignedToAccUserId,
     TaskStartByIsPostProduction: false,
     StartByWeekNum: taskStartDate,
     TaskCompleteByIsPostProduction: false,
@@ -169,7 +166,7 @@ export const generateRecurringProductionTasks = async (requestBody, prodBlock, p
     TaskRepeatFromWeekNum,
     TaskRepeatToWeekNum,
     TaskCompletedDate,
-    AssignedToUserId,
+    TaskAssignedToAccUserId,
     ProductionId,
     Notes,
   } = requestBody;
@@ -202,7 +199,7 @@ export const generateRecurringProductionTasks = async (requestBody, prodBlock, p
       Priority,
       Notes,
       Progress: parseInt(Progress) || 0,
-      AssignedToUserId,
+      TaskAssignedToAccUserId,
       CompleteByIsPostProduction: CompleteByWeekNum > calculateWeekNumber(prodStartDate, prodBlock?.EndDate),
       StartByWeekNum: calculateWeekNumber(prodStartDate, taskStartDate),
       StartByIsPostProduction: StartByWeekNum > calculateWeekNumber(prodStartDate, prodBlock?.EndDate),

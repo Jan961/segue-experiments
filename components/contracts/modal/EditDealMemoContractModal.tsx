@@ -93,6 +93,8 @@ export const EditDealMemoContractModal = ({
     [venueData],
   );
 
+  console.log(productionJumpState);
+
   const venueUserData = useMemo(() => {
     const venueContactData = {};
     if (venueData && venueData.VenueContact) {
@@ -126,9 +128,9 @@ export const EditDealMemoContractModal = ({
   const { users } = useRecoilValue(userState);
   const userList = useMemo(
     () =>
-      Object.values(users).map(({ Id, FirstName = '', LastName = '', Email = '' }) => ({
-        value: Id,
-        text: `${FirstName || ''} ${LastName || ''} | ${Email || ''}`,
+      Object.values(users).map(({ AccUserId, UserFirstName = '', UserLastName = '', UserEmail = '' }) => ({
+        value: AccUserId,
+        text: `${UserFirstName || ''} ${UserLastName || ''} | ${UserEmail || ''}`,
       })),
     [users],
   );
@@ -376,7 +378,7 @@ export const EditDealMemoContractModal = ({
         </div>
         <div className="text-primary-input-text mt-4">
           Please read this carefully to ensure it reflects the terms as agreed between{' '}
-          {`${productionJumpState.ProductionCompany.Name}`} and {`${selectedTableCell.contract.venue}`}.
+          {`${productionJumpState.ProductionCompany.ProdCoName}`} and {`${selectedTableCell.contract.venue}`}.
           <br />
           Please note that any terms not specifically mentioned here are still to be negotiated. If you have any
           standard conditions that you consider to be non-negotiable, or if you{' '}
@@ -1266,7 +1268,7 @@ export const EditDealMemoContractModal = ({
         <div className="flex items-center">
           <div className="w-1/5"> </div>
           <div className="w-4/5 flex text-primary-input-text -mb-1">
-            No other discounts without written agreement from {`${productionJumpState.ProductionCompany.Name}`}
+            No other discounts without written agreement from {`${productionJumpState.ProductionCompany.ProdCoName}`}
           </div>
         </div>
         {[
@@ -1501,7 +1503,7 @@ export const EditDealMemoContractModal = ({
         <div className="flex items-center mt-2">
           <div className="w-1/5"> </div>
           <div className="w-4/5 flex text-primary-input-text text-sm">
-            Any expenditure needs pre-approval from {`${productionJumpState.ProductionCompany.Name}`}
+            Any expenditure needs pre-approval from {`${productionJumpState.ProductionCompany.ProdCoName}`}
           </div>
         </div>
         <hr className="bg-primary h-[3px] mt-2 mb-4" />
@@ -1862,7 +1864,7 @@ export const EditDealMemoContractModal = ({
         </div>
         <div className="flex items-center mt-4">
           <div className="w-1/5 text-primary-input-text font-bold">
-            {productionJumpState.ProductionCompany.Name} VAT No.
+            {productionJumpState.ProductionCompany.ProdCoName} VAT No.
           </div>
           <div className="w-4/5 flex">
             <div className="w-full">

@@ -52,9 +52,9 @@ export default function AllocatedSeatsModal({
   const [allocId, setAllocId] = useState(null);
 
   const initForm = () => {
-    const userTempList = Object.values(users).map(({ Id, FirstName = '', LastName = '' }) => ({
-      value: Id,
-      text: `${FirstName || ''} ${LastName || ''}`,
+    const userTempList = Object.values(users).map(({ AccUserId, UserFirstName = '', UserLastName = '' }) => ({
+      value: AccUserId,
+      text: `${UserFirstName || ''} ${UserLastName || ''}`,
     }));
 
     setUserList(userTempList);
@@ -63,7 +63,9 @@ export default function AllocatedSeatsModal({
       const perf = perfList.find(
         (perfRec) => formatInputDate(perfRec.date) === data.date && getTimeFromDateAndTime(perfRec.date) === data.time,
       );
-      const user = userTempList.find((user) => user.text === data.ArrangedById);
+
+      console.log(data);
+
       setPerfSelected(perf.value);
       setCustName(data.TicketHolderName);
       setEmail(data.TicketHolderEmail);
@@ -74,10 +76,11 @@ export default function AllocatedSeatsModal({
       setVenueConfNotes(data.VenueConfirmationNotes);
       setAllocId(data.Id);
 
-      if (user === undefined) {
+      if (data.ArrangedByAccUserId === undefined) {
         setArrangedBy(null);
       } else {
-        setArrangedBy(user.value);
+        const accUserId = userTempList.find((user) => user.text === data.ArrangedByAccUserId).value;
+        setArrangedBy(accUserId);
       }
     } else if (type === 'new') {
       setPerfSelected(null);
@@ -95,7 +98,7 @@ export default function AllocatedSeatsModal({
   const handleSave = () => {
     const perf = perfList.find((perfRec) => perfRec.value === parseInt(perfSelected));
     let data = {
-      ArrangedById: parseInt(arrangedBy),
+      ArrangedByAccUserId: parseInt(arrangedBy),
       Comments: comments,
       RequestedBy: requestedBy,
       Seats: parseInt(numSeatsReq),

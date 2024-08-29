@@ -27,7 +27,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     parseInt(bookingId as string, 10),
   );
   const users = await getUsers(accountId);
-  const usersMap = objectify(users, (user) => user.Id);
+  const usersMap = objectify(users, (user) => user.AccUserId);
   const data = await getContactNotesByBookingId(parseInt(bookingId as string, 10));
   const filename = `${prodCode} ${showName} ${venueName} Contact Notes`;
   const workbook = new ExcelJS.Workbook();
@@ -54,8 +54,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   headerRow.height = 30;
 
   data.map(bookingContactNoteMapper).forEach((note) => {
-    const { FirstName = '', LastName = '' } = usersMap[note.UserId] || {};
-    const actionedBy = `${FirstName || ''} ${LastName || ''}`;
+    const { UserFirstName = '', UserLastName = '' } = usersMap[note.ActionAccUserId] || {};
+    const actionedBy = `${UserFirstName || ''} ${UserLastName || ''}`;
     const row = worksheet.addRow([
       note.CoContactName,
       moment(note.ContactDate).format('DD/MM/YY'),

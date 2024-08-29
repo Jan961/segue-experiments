@@ -29,9 +29,11 @@ export const addWidthAsPerContent = ({
     i++, char = String.fromCharCode(char.charCodeAt(0) + 1)
   ) {
     let maxWidth = 0;
-    worksheet.getColumn(char).eachCell((cell: any, i) => {
-      if (i > rowsToIgnore) {
-        maxWidth = Math.max(maxWidth, htmlFields.includes(char) ? getHTMLFieldMaxWidth(cell.text) : cell.text.length);
+    worksheet.getColumn(char).eachCell((cell: any, rowNumber: number) => {
+      if (rowNumber > rowsToIgnore) {
+        const cellValue = cell.value;
+        const cellText = cellValue ? cellValue.toString() : ''; // Convert to string safely
+        maxWidth = Math.max(maxWidth, htmlFields.includes(char) ? getHTMLFieldMaxWidth(cellText) : cellText.length);
       }
     });
     worksheet.getColumn(char).width = getWidthConsideringThresholds({
