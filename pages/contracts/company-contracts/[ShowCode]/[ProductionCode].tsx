@@ -92,7 +92,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       currencyList,
     },
     account: {
-      user: { users: objectify(users, (user: UserDto) => user.Id) },
+      user: { users: objectify(users, (user: UserDto) => user.UserId) },
     },
     contracts: {
       venue,

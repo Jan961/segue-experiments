@@ -1,4 +1,4 @@
-import { AccountSubscription } from 'prisma/generated/prisma-client';
+import { AccountSubscription } from 'prisma/generated/prisma-master';
 import prisma from 'lib/prisma';
 import { omit } from 'radash';
 export const createSubscription = async (subscriptionDetails: Partial<AccountSubscription>, tx = prisma) => {
