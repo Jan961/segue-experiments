@@ -130,10 +130,11 @@ const AddTask = ({
   const [showRecurringDelete, setShowRecurringDelete] = useState<boolean>(false);
   const [showSingleDelete, setShowSingleDelete] = useState<boolean>(false);
   const [showConfirmationDialog, setShowConfirmationDialog] = useState<boolean>(false);
-  const showOverlay = useMemo(
-    () => showConfirmationDialog || showRecurringConfirmation || showRecurringDelete || showSingleDelete,
-    [showConfirmationDialog, showRecurringConfirmation, showRecurringDelete, showSingleDelete],
-  );
+  const showOverlay = useMemo(() => {
+    console.log('reasses');
+    console.log(showConfirmationDialog || showRecurringConfirmation || showRecurringDelete || showSingleDelete);
+    return showConfirmationDialog || showRecurringConfirmation || showRecurringDelete || showSingleDelete;
+  }, [showConfirmationDialog, showRecurringConfirmation, showRecurringDelete, showSingleDelete]);
   const router = useRouter();
   const priorityOptionList = useMemo(
     () => priorityOptions.map((option) => ({ ...option, text: `${option.value} - ${option.text}` })),
