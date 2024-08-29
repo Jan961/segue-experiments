@@ -1,5 +1,5 @@
 import LoadSalesHistoryFilters from './LoadSalesHistoryFilters';
-import { Button, UploadModal, Table, ConfirmationDialog } from 'components/core-ui-lib';
+import { Button, UploadModal, Table } from 'components/core-ui-lib';
 import { loadSalesHistoryColDefs, styleProps } from '../table/tableConfig';
 import { useEffect, useState } from 'react';
 import { uploadFile } from 'requests/upload';
@@ -13,6 +13,7 @@ import { productionJumpState } from 'state/booking/productionJumpState';
 import { venueState } from 'state/booking/venueState';
 import { dateToSimple } from 'services/dateService';
 import validateSpreadsheetFile from '../utils/validateSpreadsheet';
+import SpreadsheetDeleteModal from './SpreadsheetDeleteModal';
 
 const LoadSalesHistory = () => {
   const [uploadModalVisible, setUploadModalVisible] = useState(false);
@@ -138,12 +139,13 @@ const LoadSalesHistory = () => {
           closeUploadModal={() => setUploadModalVisible(false)}
         />
       )}
-      <ConfirmationDialog
-        variant="delete"
-        show={showConfirmDelete}
-        onNoClick={() => setShowConfirmDelete(false)}
-        onYesClick={() => deleteSalesHistory()}
-      />
+      {showConfirmDelete && (
+        <SpreadsheetDeleteModal
+          visible={showConfirmDelete}
+          onNoClick={() => setShowConfirmDelete(false)}
+          onDeleteClick={() => deleteSalesHistory()}
+        />
+      )}
     </div>
   );
 };
