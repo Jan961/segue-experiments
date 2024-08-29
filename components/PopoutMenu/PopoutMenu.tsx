@@ -138,7 +138,7 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
           },
           {
             label: 'Load Sales History',
-            value: '/marketing/sales/history-load',
+            value: '/marketing/sales/load-history',
             labelClass: leve2,
             testId: 'sidepanel-marketing-load-sales-history',
           },
