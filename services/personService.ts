@@ -1,7 +1,7 @@
 import { PersonMinimalDTO } from 'interfaces';
 import prisma from 'lib/prisma';
 import { Person } from 'prisma/generated/prisma-client';
-import { isUndefined } from 'utils';
+import { isNullOrEmpty, isUndefined } from 'utils';
 import { FieldMapping, prepareQuery } from 'utils/apiUtils';
 import { prepareAccountUpdateData } from './contracts';
 import { BankAccount, IPersonDetails } from 'components/contracts/types';
@@ -15,8 +15,8 @@ interface AddressDetails {
   country?: number | null;
 }
 
-export const prepareAddressQueryData = (addressDetails: AddressDetails | null) => {
-  if (!addressDetails) return null;
+export const prepareAddressQueryData = (addressDetails: AddressDetails | null, isCreate = false) => {
+  if (isNullOrEmpty(addressDetails)) return null;
 
   const fieldMappings: FieldMapping[] = [
     { key: 'address1', updateKey: 'Address1' },
@@ -27,7 +27,7 @@ export const prepareAddressQueryData = (addressDetails: AddressDetails | null) =
     { key: 'country', updateKey: 'Country', isForeignKey: true, foreignKeyId: 'Id' },
   ];
 
-  return prepareQuery(addressDetails, fieldMappings);
+  return prepareQuery(addressDetails, fieldMappings, isCreate);
 };
 
 interface OrganisationDetails {
@@ -38,8 +38,9 @@ interface OrganisationDetails {
 export const prepareOrganisationQueryData = (
   orgDetails: OrganisationDetails | null,
   contactPersonId?: number | null,
+  isCreate = false,
 ) => {
-  if (!orgDetails) return null;
+  if (isNullOrEmpty(orgDetails)) return null;
 
   const fieldMappings: FieldMapping[] = [
     { key: 'name', updateKey: 'OrgName' },
@@ -57,7 +58,7 @@ export const prepareOrganisationQueryData = (
     contactPersonId,
   };
 
-  return prepareQuery(detailsWithContactPerson, fieldMappings);
+  return prepareQuery(detailsWithContactPerson, fieldMappings, isCreate);
 };
 
 interface PersonPersonDetails {
@@ -66,7 +67,7 @@ interface PersonPersonDetails {
   roleName?: string;
 }
 
-export const preparePersonPersonQueryData = (personPersonDetails: PersonPersonDetails) => {
+export const preparePersonPersonQueryData = (personPersonDetails: PersonPersonDetails, isCreate = false) => {
   if (
     isUndefined(personPersonDetails.mainPersonId) ||
     isUndefined(personPersonDetails.relatedPersonId) ||
@@ -81,7 +82,7 @@ export const preparePersonPersonQueryData = (personPersonDetails: PersonPersonDe
     { key: 'roleName', updateKey: 'PersonRoleType' },
   ];
 
-  return prepareQuery(personPersonDetails, fieldMappings);
+  return prepareQuery(personPersonDetails, fieldMappings, isCreate);
 };
 
 export const preparePersonQueryData = (
@@ -90,8 +91,9 @@ export const preparePersonQueryData = (
   organisationId?: number | null,
   salaryAccountDetails?: Partial<BankAccount>,
   expenseAccountDetails?: Partial<BankAccount>,
+  isCreate = false,
 ) => {
-  if (!personDetails) return null;
+  if (isNullOrEmpty(personDetails)) return null;
 
   const personFieldMappings: FieldMapping[] = [
     { key: 'firstName', updateKey: 'PersonFirstName' },
@@ -115,7 +117,7 @@ export const preparePersonQueryData = (
     },
   ];
 
-  let personData = prepareQuery({ ...personDetails, addressId, organisationId }, personFieldMappings);
+  let personData = prepareQuery({ ...personDetails, addressId, organisationId }, personFieldMappings, isCreate);
 
   if (personDetails.workType && personDetails.workType.length > 0) {
     personData.PersonPersonRole = {

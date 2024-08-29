@@ -5,19 +5,19 @@ import { countryState } from 'state/global/countryState';
 import { transformToOptions } from 'utils';
 import { userState } from 'state/account/userState';
 import { Checkbox } from 'components/core-ui-lib';
-import AgencyDetails, { defaultAgencyDetails } from './PersonForm/AgencyDetails';
-import PersonalDetails, { defaultPersonDetails } from './PersonForm/PersonalDetails';
-import AccountDetailsForm, { defaultBankAccount } from './PersonForm/AccountDetailsForm';
-import EmergencyContact, { defaultEmergencyContactData } from './PersonForm/EmergencyContact';
+import AgencyDetails from './PersonForm/AgencyDetails';
+import PersonalDetails from './PersonForm/PersonalDetails';
+import AccountDetailsForm from './PersonForm/AccountDetailsForm';
+import EmergencyContact from './PersonForm/EmergencyContact';
 import { IPerson } from './types';
 
 const defaultContractDetails = {
-  personDetails: defaultPersonDetails,
-  emergencyContact1: defaultEmergencyContactData,
-  emergencyContact2: defaultEmergencyContactData,
-  agencyDetails: defaultAgencyDetails,
-  salaryAccountDetails: defaultBankAccount,
-  expenseAccountDetails: defaultBankAccount,
+  personDetails: null,
+  emergencyContact1: null,
+  emergencyContact2: null,
+  agencyDetails: null,
+  salaryAccountDetails: null,
+  expenseAccountDetails: null,
 };
 
 interface ContractPersonDataFormProps {

@@ -146,7 +146,11 @@ export const getAllProductions = async (AccountId: number) => {
         },
       },
       DateBlock: true,
-      ProductionCompany: true,
+      ProductionCompany: {
+        select: {
+          File: true,
+        },
+      },
     },
     where: {
       IsDeleted: false,

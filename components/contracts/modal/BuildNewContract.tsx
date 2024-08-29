@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 import axios from 'axios';
 import { Button, Label, notify } from 'components/core-ui-lib';
@@ -11,6 +11,8 @@ import { ContractPreviewDetailsForm } from '../ContractPreviewDetailsDataForm';
 import ContractDetails from './ContractDetails';
 import LoadingOverlay from 'components/shows/LoadingOverlay';
 import { IContractSchedule } from '../types';
+import { useRecoilValue } from 'recoil';
+import { productionJumpState } from 'state/booking/productionJumpState';
 
 export interface BuildNewContractProps {
   contractSchedule?: Partial<IContractSchedule>;
@@ -27,10 +29,15 @@ export const BuildNewContract = ({
   isEdit = false,
   onClose = noop,
 }: BuildNewContractProps) => {
+  const { productions } = useRecoilValue(productionJumpState);
   const [contractPerson, setContractPerson] = useState(null);
   const [contractDetails, setContractDetails] = useState({});
   const [activeViewIndex, setActiveViewIndex] = useState(0);
   const [loading, setLoading] = useState(false);
+  const selectedProduction = useMemo(
+    () => productions.find(({ Id }) => Id === contractSchedule.production),
+    [contractSchedule?.production, productions],
+  );
   const router = useRouter();
   const cancelToken = useAxiosCancelToken();
 
@@ -131,7 +138,7 @@ export const BuildNewContract = ({
     >
       <div>
         <div className="w-[82vw]">
-          <div className="text-xl text-primary-navy font-bold w-[50vw]">PROD CODE</div>
+          <div className="text-xl text-primary-navy font-bold w-[50vw]">{`${selectedProduction.ShowCode}${selectedProduction.Code}`}</div>
           <div className="text-xl text-primary-navy font-bold w-[50vw]">Department</div>
         </div>
         <div className="flex justify-center w-[100%] pt-2 pb-2">
@@ -177,7 +184,8 @@ export const BuildNewContract = ({
               contractPerson={contractPerson}
               contractSchedule={contractSchedule}
               contractDetails={contractDetails}
-              height="h-[70vh]"
+              production={selectedProduction}
+              height="70vh"
             />
           )}
         </div>

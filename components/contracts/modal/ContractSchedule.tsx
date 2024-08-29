@@ -57,10 +57,10 @@ export const ContractScheduleModal = ({ openContract, onClose }: { openContract:
     async (saveStatus = false) => {
       setOpenNewPersonContract(false);
       if (saveStatus) {
-        const personsMinList: PersonMinimalDTO[] = await axios.get('/api/person/list');
+        const response = await axios.get('/api/person/list');
         const idToPersonMap = objectify(
-          personsMinList ?? [],
-          (p) => p.id,
+          response.data ?? [],
+          (p: PersonMinimalDTO) => p.id,
           (p) => p,
         );
         setPersonMap(idToPersonMap);

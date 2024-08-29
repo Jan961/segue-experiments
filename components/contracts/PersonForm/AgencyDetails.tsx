@@ -23,7 +23,7 @@ export const defaultAgencyDetails = {
 interface AgencyDetailsProps {
   details?: Partial<IAgencyDetails>;
   disabled: boolean;
-  onChange: (data: any) => void;
+  onChange: (data: Partial<IAgencyDetails>) => void;
   countryOptionList: SelectOption[];
 }
 
@@ -48,7 +48,7 @@ const AgencyDetails = ({ details, countryOptionList, onChange = noop, disabled =
     (key: string, value: number | string | string[] | null) => {
       const updatedData = { ...agencyDetails, [key]: value };
       setAgencyDetails(updatedData);
-      onChange(updatedData);
+      onChange({ ...details, [key]: value });
     },
     [onChange, setAgencyDetails, agencyDetails],
   );

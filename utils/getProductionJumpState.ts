@@ -1,5 +1,6 @@
 import { dateBlockMapper } from 'lib/mappers';
 import { ParsedUrlQuery } from 'querystring';
+import { pick } from 'radash';
 import { dateTimeToTime } from 'services/dateService';
 import { getAllProductions, getAllProductionRegions } from 'services/productionService';
 import { ProductionJump } from 'state/booking/productionJumpState';
@@ -24,6 +25,7 @@ export const getProductionJumpState = async (ctx, path: string, AccountId: numbe
         if (db) {
           db = dateBlockMapper(db);
         }
+        const { File, ...company } = t.ProductionCompany;
         return {
           Id: t.Id,
           Code: t.Code,
@@ -38,7 +40,7 @@ export const getProductionJumpState = async (ctx, path: string, AccountId: numbe
           RunningTime: t.RunningTime ? dateTimeToTime(t.RunningTime.toISOString()) : null,
           RunningTimeNote: t.RunningTimeNote,
           SalesFrequency: t.SalesFrequency,
-          ProductionCompany: t.ProductionCompany,
+          ProductionCompany: { ...company, File: pick(File, ['Id', 'Location']) || null },
         };
       })
       .sort((a, b) => {

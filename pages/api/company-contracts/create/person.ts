@@ -2,15 +2,9 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import prisma from 'lib/prisma';
 import * as yup from 'yup';
 import { getEmailFromReq, checkAccess } from 'services/userService';
-import { omit, pick } from 'radash';
+import { isEmpty, omit, pick } from 'radash';
 import { prepareAddressQueryData, prepareOrganisationQueryData, preparePersonQueryData } from 'services/personService';
-
-const personSchema = yup.object().shape({
-  personDetails: yup.object().required(),
-  agencyDetails: yup.object().nullable(),
-  emergencyContact1: yup.object().nullable(),
-  emergencyContact2: yup.object().nullable(),
-});
+import { createPersonSchema } from 'validators/person';
 
 const addressFields = ['address1', 'address2', 'address3', 'postcode', 'town'];
 const organisationFields = ['name', 'website'];
@@ -24,7 +18,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const access = await checkAccess(email);
     if (!access) return res.status(401).end();
 
-    const validatedData = await personSchema.validate(req.body, { abortEarly: false });
+    const validatedData = await createPersonSchema.validate(req.body, { abortEarly: false });
 
     const {
       personDetails,
@@ -38,31 +32,53 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const result = await prisma.$transaction(async (tx) => {
       let agencyPersonId = null;
       let organisationId = null;
-      if (agencyDetails) {
-        const agencyPersonAddressData = prepareAddressQueryData(pick(agencyDetails, addressFields));
-        const agencyPersonData = preparePersonQueryData(omit(agencyDetails, [...addressFields, ...organisationFields]));
-        const agencyPerson = await tx.person.create({
-          data: {
-            ...agencyPersonData,
-            Address: {
-              create: {
-                ...agencyPersonAddressData,
+      if (!isEmpty(agencyDetails)) {
+        const agencyPersonAddressData = prepareAddressQueryData(pick(agencyDetails, addressFields), true);
+        const agencyPersonData = preparePersonQueryData(
+          omit(agencyDetails, [...addressFields, ...organisationFields]),
+          null,
+          null,
+          undefined,
+          undefined,
+          true,
+        );
+        if (agencyPersonData) {
+          const agencyPerson = await tx.person.create({
+            data: {
+              ...agencyPersonData,
+              Address: {
+                create: {
+                  ...agencyPersonAddressData,
+                },
               },
             },
-          },
-        });
-        agencyPersonId = agencyPerson.PersonId;
-        const organisationData = prepareOrganisationQueryData(pick(agencyDetails, organisationFields), agencyPersonId);
-        const organisation = await tx.organisation.create({
-          data: organisationData,
-        });
-        organisationId = organisation.OrgId;
+          });
+          agencyPersonId = agencyPerson.PersonId;
+        }
+        const organisationData = prepareOrganisationQueryData(
+          pick(agencyDetails, organisationFields),
+          agencyPersonId,
+          true,
+        );
+        if (organisationData) {
+          const organisation = await tx.organisation.create({
+            data: organisationData,
+          });
+          organisationId = organisation.OrgId;
+        }
       }
 
       const emergencyContactList = [];
-      if (emergencyContact1) {
-        const emergencyContactAddressData = prepareAddressQueryData(pick(emergencyContact1, addressFields));
-        const emergencyContactData = preparePersonQueryData(omit(emergencyContact1, addressFields));
+      if (!isEmpty(emergencyContact1)) {
+        const emergencyContactAddressData = prepareAddressQueryData(pick(emergencyContact1, addressFields), true);
+        const emergencyContactData = preparePersonQueryData(
+          omit(emergencyContact1, addressFields),
+          null,
+          null,
+          undefined,
+          undefined,
+          true,
+        );
         const emergencyContact1Person = await tx.person.create({
           data: {
             ...emergencyContactData,
@@ -74,9 +90,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         emergencyContactList.push(emergencyContact1Person.PersonId);
       }
 
-      if (emergencyContact2) {
-        const emergencyContactAddressData = prepareAddressQueryData(pick(emergencyContact1, addressFields));
-        const emergencyContactData = preparePersonQueryData(omit(emergencyContact1, addressFields));
+      if (!isEmpty(emergencyContact2)) {
+        const emergencyContactAddressData = prepareAddressQueryData(pick(emergencyContact1, addressFields), true);
+        const emergencyContactData = preparePersonQueryData(
+          omit(emergencyContact1, addressFields),
+          null,
+          null,
+          undefined,
+          undefined,
+          true,
+        );
         const emergencyContact2Person = await tx.person.create({
           data: {
             ...emergencyContactData,
@@ -88,20 +111,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         emergencyContactList.push(emergencyContact2Person.PersonId);
       }
 
-      const personAddressData = prepareAddressQueryData(pick(personDetails, addressFields));
+      const personAddressData = prepareAddressQueryData(pick(personDetails, addressFields), true);
       const personData = preparePersonQueryData(
         omit(personDetails, addressFields),
         null,
         organisationId,
         salaryAccountDetails,
         expenseAccountDetails,
+        true,
       );
       const mainPerson = await tx.person.create({
         data: {
           ...personData,
-          Address: {
-            create: personAddressData,
-          },
+          ...(!isEmpty(personAddressData) && {
+            Address: {
+              create: personAddressData,
+            },
+          }),
         },
       });
 
