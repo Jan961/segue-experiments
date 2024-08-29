@@ -74,8 +74,6 @@ export const validateSpreadsheetFile = async (file, prodCode, venueList, dateRan
   };
   let spreadsheetErrorOccured = false;
   let spreadsheetWarningOccured = false;
-  console.log(spreadsheetErrorOccured);
-  console.log(spreadsheetWarningOccured);
   const productionCodes = [];
   const venueCodes = [];
 
