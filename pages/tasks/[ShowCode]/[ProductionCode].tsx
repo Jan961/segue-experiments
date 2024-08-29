@@ -68,15 +68,14 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
   const handleShowTask = () => {
     setShowAddTask(false);
   };
+  const isShowingTaskModals = useMemo(() => {
+    return !(showNewProduction || showAddTask || isMasterTaskList || isProductionTaskList || isShowSpinner);
+  }, [showNewProduction, showAddTask, isMasterTaskList, isProductionTaskList, isShowSpinner]);
 
   useEffect(() => {
     if (filteredProductions.length === 1) {
       filteredProductions.forEach((production) => {
-        if (
-          production.Tasks.length === 0 &&
-          filterMatchingInitial &&
-          !(showNewProduction || showAddTask || isMasterTaskList || isProductionTaskList || isShowSpinner)
-        ) {
+        if (production.Tasks.length === 0 && filterMatchingInitial && isShowingTaskModals) {
           setShowEmptyProductionModal(true);
         } else {
           setShowEmptyProductionModal(false);
@@ -101,14 +100,12 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
     handleNewProductionTaskModal();
     if (val === 'taskManual') {
       setShowAddTask(true);
-      setShowEmptyProductionModal(false);
     } else if (val === 'master') {
       setIsMasterTaskList(true);
-      setShowEmptyProductionModal(false);
     } else {
       setIsProductionTaskList(true);
-      setShowEmptyProductionModal(false);
     }
+    setShowEmptyProductionModal(false);
   };
 
   const handleMasterListClose = async (_val: string) => {

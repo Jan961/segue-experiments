@@ -117,6 +117,7 @@ const AddTask = ({
     useRecoilValue(currentProductionSelector) || productionList.find((item) => item.Id === productionId);
   useEffect(() => {
     setInputs(task);
+
     if (isNullOrEmpty(task?.Id)) setIsRecurring(true);
     setIsRecurring(isNullOrEmpty(task?.RepeatInterval));
   }, [task]);
