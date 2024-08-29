@@ -43,11 +43,8 @@ const ProductionTaskList = ({ visible, onClose, productionId, isMaster = false }
   const [duplicateTasks, setDuplicateTasks] = useState([]);
   const unfilteredTasks = useRecoilValue(productionState).filter((prod) => prod.Id === productionId)[0]?.Tasks || [];
   const router = useRouter();
-
-  //  issue with the production selector not being able to list the archived productions and sometimes on vercel it doesnt show the productions
   const productionsData = useMemo(() => {
     const productionOptions = [];
-    console.log(productionJump.productions);
     for (const production of productionJump.productions) {
       if (includeArchived) {
         productionOptions.push({
