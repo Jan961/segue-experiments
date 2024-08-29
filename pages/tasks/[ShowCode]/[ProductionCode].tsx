@@ -68,11 +68,14 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
   const handleShowTask = () => {
     setShowAddTask(false);
   };
+  const isShowingTaskModals = useMemo(() => {
+    return !(showNewProduction || showAddTask || isMasterTaskList || isProductionTaskList || isShowSpinner);
+  }, [showNewProduction, showAddTask, isMasterTaskList, isProductionTaskList, isShowSpinner]);
 
   useEffect(() => {
     if (filteredProductions.length === 1) {
       filteredProductions.forEach((production) => {
-        if (production.Tasks.length === 0 && filterMatchingInitial) {
+        if (production.Tasks.length === 0 && filterMatchingInitial && isShowingTaskModals) {
           setShowEmptyProductionModal(true);
         } else {
           setShowEmptyProductionModal(false);
@@ -95,9 +98,14 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
 
   const handleNewProductionTaskSubmit = (val: string) => {
     handleNewProductionTaskModal();
-    if (val === 'taskManual') setShowAddTask(true);
-    else if (val === 'master') setIsMasterTaskList(true);
-    else setIsProductionTaskList(true);
+    if (val === 'taskManual') {
+      setShowAddTask(true);
+    } else if (val === 'master') {
+      setIsMasterTaskList(true);
+    } else {
+      setIsProductionTaskList(true);
+    }
+    setShowEmptyProductionModal(false);
   };
 
   const handleMasterListClose = async (_val: string) => {
@@ -113,7 +121,6 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
   const currentProductionObj = useRecoilValue(productionJumpState).productions.find((item) => item.Id === ProductionId);
   return (
     <>
-      {' '}
       {isShowSpinner && (
         <div
           data-testid="tasks-page-spinner"
