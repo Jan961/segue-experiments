@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import ogs from 'open-graph-scraper';
+import { isNullOrEmpty } from 'utils';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -19,7 +20,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     }
 
     const { ogTitle, ogImage } = result;
-    res.status(200).json({ ogTitle, ogImage: ogImage.length > 0 ? ogImage[0] : null });
+    res.status(200).json({ ogTitle, ogImage: !isNullOrEmpty(ogImage) ? ogImage[0] : null });
   } catch (error) {
     console.log(error);
     res.status(400).json({ error: 'Failed to fetch Open Graph data' });
