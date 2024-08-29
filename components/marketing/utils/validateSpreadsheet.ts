@@ -16,6 +16,29 @@ interface SpreadsheetRow {
   details: string;
 }
 
+enum SalesType {
+  'General Sales',
+  'General Reservations',
+  'School Sales',
+  'School Reservations',
+}
+
+enum isFinalType {
+  'Y',
+  'y',
+  'N',
+  'n',
+  '',
+}
+
+enum ignoreWarningType {
+  'Y',
+  'y',
+  'N',
+  'n',
+  '',
+}
+
 export const validateSpreadsheetFile = async (file, prodCode, venueList, dateRange) => {
   // file[0].file = new File([], file[0].file.name)
   // note that the check when hitting the ok/upload button uses the selectedfiles list to check for progress and updating the file name here and not there cause issue
@@ -57,9 +80,6 @@ export const validateSpreadsheetFile = async (file, prodCode, venueList, dateRan
   workbook.eachSheet((worksheet) => {
     worksheet.eachRow((row, rowNumber) => {
       if (rowNumber !== 1) {
-        // Perform validation checks on any row except the title row
-
-        // Assign values for currentRow based on current excel spreadsheet
         currentRow.productionCode = row.getCell(1).value as string;
         if (currentRow.productionCode) {
           // const currentProductionCode = currentRow.productionCode;
@@ -184,9 +204,25 @@ const validateRow = (
   detailsMessage += bookingValidation.returnString;
   if (bookingValidation.errorOccurred) rowErrorOccurred = true;
 
-  const seatsValidationm = validateSeats(currentRow, previousRow);
-  detailsMessage += seatsValidationm.returnString;
-  if (seatsValidationm.warningOccured) rowWarningOccured = true;
+  const salesTypeValidation = validateSalesType(currentRow);
+  detailsMessage += bookingValidation.returnString;
+  if (salesTypeValidation.errorOccurred) rowErrorOccurred = true;
+
+  const seatsValidation = validateSeats(currentRow, previousRow);
+  detailsMessage += seatsValidation.returnString;
+  if (seatsValidation.warningOccured) rowWarningOccured = true;
+
+  const valueValidation = validateValue(currentRow, previousRow);
+  detailsMessage += valueValidation.returnString;
+  if (valueValidation.warningOccured) rowWarningOccured = true;
+
+  const finalValidation = validateIsFinal(currentRow);
+  detailsMessage += finalValidation.returnString;
+  if (finalValidation.errorOccurred) rowErrorOccurred = true;
+
+  const ignoreWarningValidation = validateIgnoreWarning(currentRow);
+  detailsMessage += ignoreWarningValidation.returnString;
+  if (ignoreWarningValidation.errorOccurred) rowErrorOccurred = true;
 
   return { detailsMessage, rowErrorOccurred, rowWarningOccured };
 };
@@ -236,23 +272,75 @@ const validateBookingDate = (currentRow: SpreadsheetRow, dateRange, prodCode) =>
   return { returnString, errorOccurred };
 };
 
+const validateSalesType = (currentRow: SpreadsheetRow) => {
+  let returnString = '';
+  let errorOccurred = false;
+
+  if (!Object.values(SalesType).includes(currentRow.salesType)) {
+    returnString +=
+      "ERROR - Sales type must be either 'General Sales', 'General Reservations', 'School Sales', 'School Reservations'";
+    errorOccurred = true;
+  }
+
+  return { returnString, errorOccurred };
+};
+
 const validateSeats = (currentRow: SpreadsheetRow, previousRow: SpreadsheetRow) => {
   let returnString = '';
   let warningOccured = false;
 
   if (previousRow.seats) {
-    if (currentRow.seats >= previousRow.seats * 1.2) {
-      console.log('here');
+    if (currentRow.seats >= previousRow.seats * 1.15) {
       returnString += '| WARNING - Seats increased by more than 15%';
       warningOccured = true;
-    } else {
-      console.log(currentRow.seats);
-      console.log(previousRow.seats);
-      console.log('nope');
+    }
+    if (currentRow.seats < previousRow.seats) {
+      returnString += '| WARNING - Seats decreased from previous entry';
     }
   }
 
   return { returnString, warningOccured };
+};
+
+const validateValue = (currentRow: SpreadsheetRow, previousRow: SpreadsheetRow) => {
+  let returnString = '';
+  let warningOccured = false;
+
+  if (previousRow.value) {
+    if (parseFloat(currentRow.value) >= parseFloat(previousRow.value) * 1.15) {
+      returnString += '| WARNING - Value increased by more than 15%';
+      warningOccured = true;
+    }
+    if (parseFloat(currentRow.value) < parseFloat(previousRow.value)) {
+      returnString += '| WARNING - Value decreased from previous entry';
+    }
+  }
+
+  return { returnString, warningOccured };
+};
+
+const validateIsFinal = (currentRow: SpreadsheetRow) => {
+  let returnString = '';
+  let errorOccurred = false;
+
+  if (!Object.values(isFinalType).includes(currentRow.isFinal)) {
+    returnString += "| ERROR - Is Final must either be 'Y', 'N', or blank";
+    errorOccurred = true;
+  }
+
+  return { returnString, errorOccurred };
+};
+
+const validateIgnoreWarning = (currentRow: SpreadsheetRow) => {
+  let returnString = '';
+  let errorOccurred = false;
+
+  if (!Object.values(ignoreWarningType).includes(currentRow.ignoreWarning)) {
+    returnString += "| ERROR - Ignore Warning must either be 'Y', 'N', or blank";
+    errorOccurred = true;
+  }
+
+  return { returnString, errorOccurred };
 };
 
 export default validateSpreadsheetFile;
