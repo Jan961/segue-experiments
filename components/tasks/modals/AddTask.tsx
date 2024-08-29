@@ -30,7 +30,7 @@ interface AddTaskProps {
   visible: boolean;
   isMasterTask?: boolean;
   onClose: () => void;
-  task?: Partial<MasterTask> & { ProductionId?: number; ProductionTaskRepeat?: any };
+  task?: Partial<MasterTask> & { ProductionId?: number; ProductionTaskRepeat?: any; RepeatInterval?: string };
   productionId?: number;
   updateTableData: (task: any, isAdding: boolean) => Promise<void>;
 }
@@ -116,7 +116,9 @@ const AddTask = ({
     useRecoilValue(currentProductionSelector) || productionList.find((item) => item.Id === productionId);
   useEffect(() => {
     setInputs(task);
+
     if (isNullOrEmpty(task?.Id)) setIsRecurring(true);
+    setIsRecurring(isNullOrEmpty(task?.RepeatInterval));
   }, [task]);
 
   const [status, setStatus] = useState({ submitted: true, submitting: false });
@@ -129,10 +131,9 @@ const AddTask = ({
   const [showRecurringDelete, setShowRecurringDelete] = useState<boolean>(false);
   const [showSingleDelete, setShowSingleDelete] = useState<boolean>(false);
   const [showConfirmationDialog, setShowConfirmationDialog] = useState<boolean>(false);
-  const showOverlay = useMemo(
-    () => showConfirmationDialog || showRecurringConfirmation || showRecurringDelete || showSingleDelete,
-    [showConfirmationDialog, showRecurringConfirmation, showRecurringDelete, showSingleDelete],
-  );
+  const showOverlay = useMemo(() => {
+    return showConfirmationDialog || showRecurringConfirmation || showRecurringDelete || showSingleDelete;
+  }, [showConfirmationDialog, showRecurringConfirmation, showRecurringDelete, showSingleDelete]);
   const router = useRouter();
   const priorityOptionList = useMemo(
     () => priorityOptions.map((option) => ({ ...option, text: `${option.value} - ${option.text}` })),
@@ -173,7 +174,7 @@ const AddTask = ({
   }, [inputs.Notes]);
 
   const generatePercentageOptions: SelectOption[] = Array.from({ length: 101 }, (_, index) => ({
-    text: index.toString(), // Ensure text is a string
+    text: index.toString(),
     value: index.toString(),
   }));
 
