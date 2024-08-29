@@ -7,11 +7,12 @@ import { mapRecursive } from 'utils';
 import { Checkbox, Label } from 'components/core-ui-lib';
 
 export interface TreeItemProps {
+  defaultOpen: boolean;
   value: TreeItemOption;
   onChange: (v: TreeItemOption) => void;
 }
 
-export default memo(function TreeItem({ value, onChange }: TreeItemProps) {
+export default memo(function TreeItem({ value, onChange, defaultOpen }: TreeItemProps) {
   const { id, label, options, checked, groupHeader } = value;
   const isLeafNode = !options || options.length === 0;
   const labelClass = groupHeader ? 'text-responsive-sm font-semibold' : 'text-responsive-sm';
@@ -94,7 +95,7 @@ export default memo(function TreeItem({ value, onChange }: TreeItemProps) {
     </div>
   ) : (
     <div>
-      <Disclosure as="div" key={id} className="py-1" defaultOpen>
+      <Disclosure as="div" key={id} className="py-1" defaultOpen={defaultOpen}>
         {({ open }) => (
           <>
             <div className="flex items-center gap-3">
@@ -122,7 +123,7 @@ export default memo(function TreeItem({ value, onChange }: TreeItemProps) {
 
             <Disclosure.Panel className="ml-7 mt-1">
               {itemOptions.map((option) => (
-                <TreeItem key={option.id} value={option} onChange={handleOptionToggle} />
+                <TreeItem key={option.id} value={option} onChange={handleOptionToggle} defaultOpen={defaultOpen} />
               ))}
             </Disclosure.Panel>
           </>

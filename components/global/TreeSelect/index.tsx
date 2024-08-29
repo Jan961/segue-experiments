@@ -3,11 +3,15 @@ import TreeItem from './TreeItem';
 import { TreeItemOption } from './types';
 
 interface TreeSelectProps {
+  className?: string;
+  defaultOpen?: boolean;
   options: TreeItemOption[];
   onChange: (v: TreeItemOption[]) => void;
 }
 
-export default function TreeSelect({ options = [], onChange }: TreeSelectProps) {
+const baseClass = 'border bg-white px-3 py-2';
+
+export default function TreeSelect({ options = [], onChange, defaultOpen = false, className = '' }: TreeSelectProps) {
   const [itemOptions, setItemOptions] = useState(options || []);
 
   useEffect(() => {
@@ -23,9 +27,9 @@ export default function TreeSelect({ options = [], onChange }: TreeSelectProps) 
   };
 
   return (
-    <div className="border bg-white px-3 py-2">
+    <div className={`${baseClass} ${className}`}>
       {itemOptions.map((o) => (
-        <TreeItem key={o.id} value={o} onChange={handleOptionToggle} />
+        <TreeItem key={o.id} value={o} onChange={handleOptionToggle} defaultOpen={defaultOpen} />
       ))}
     </div>
   );

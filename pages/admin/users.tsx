@@ -40,6 +40,10 @@ export default function Users({ permissionsList }: InferGetServerSidePropsType<t
     }
   }, [userRowData]);
 
+  const handleModalClose = () => {
+    setShowUsersModal(false);
+  };
+
   return (
     <Layout title="Users | Segue" flush>
       <h1 className="mt-3 text-4xl font-bold text-primary-pink">Users</h1>
@@ -124,7 +128,9 @@ export default function Users({ permissionsList }: InferGetServerSidePropsType<t
           />
         </div>
       </div>
-      {showUsersModal && <AddEditUser visible={showUsersModal} onClose={null} permissions={permissionsList} />}
+      {showUsersModal && (
+        <AddEditUser visible={showUsersModal} onClose={handleModalClose} permissions={permissionsList} state={null} />
+      )}
     </Layout>
   );
 }
