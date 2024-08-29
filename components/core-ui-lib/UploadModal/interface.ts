@@ -57,4 +57,5 @@ export const attachmentMimeTypes = {
     'image/webp',
     'text/plain',
   ],
+  spreadsheetAttachment: ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'text/csv'],
 };
