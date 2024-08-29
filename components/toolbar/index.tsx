@@ -15,6 +15,7 @@ interface props {
   page?: string;
   titleClassName?: string;
   showArchivedCheck?: boolean;
+  onlyShowArchived?: boolean;
 }
 
 const GlobalToolbar = ({
@@ -25,6 +26,7 @@ const GlobalToolbar = ({
   children,
   titleClassName,
   showArchivedCheck = true,
+  onlyShowArchived = false,
 }: React.PropsWithChildren<props>) => {
   const [filtersOpen, setFiltersOpen] = React.useState(false);
 
@@ -59,7 +61,7 @@ const GlobalToolbar = ({
         <div className="bg-white border-primary-border rounded-md border shadow-md">
           <div className="rounded-l-md">
             <div className="flex items-center">
-              <ProductionJumpMenu showArchivedCheck={showArchivedCheck} />
+              <ProductionJumpMenu showArchivedCheck={showArchivedCheck} onlyShowArchived={onlyShowArchived} />
             </div>
           </div>
         </div>
