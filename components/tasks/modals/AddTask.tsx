@@ -234,8 +234,12 @@ const AddTask = ({
     }
 
     let newInputs = { ...inputs, [id]: value };
-    if (id === 'Progress' && value === 100) {
-      newInputs = { ...newInputs, TaskCompletedDate: moment.utc(new Date(), 'DD/MM/YY').toString() };
+    if (id === 'Progress') {
+      newInputs = {
+        ...newInputs,
+        TaskCompletedDate: value === 100 ? moment.utc(new Date(), 'DD/MM/YY').toString() : null,
+      };
+
       setInputs(newInputs);
     } else {
       setInputs(newInputs);

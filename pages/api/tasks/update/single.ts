@@ -3,6 +3,7 @@ import prisma from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getEmailFromReq, checkAccess } from 'services/userService';
 import { productionTaskSchema } from 'validators/tasks';
+import { isNullOrEmpty } from 'utils';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
@@ -23,7 +24,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         CompleteByWeekNum: task.CompleteByWeekNum,
         StartByIsPostProduction: task.StartByIsPostProduction,
         CompleteByIsPostProduction: task.CompleteByIsPostProduction,
-        TaskCompletedDate: new Date(task?.TaskCompletedDate) || null,
+        TaskCompletedDate: !isNullOrEmpty(task?.TaskCompletedDate) ? new Date(task?.TaskCompletedDate) : null,
         ProductionId: task.ProductionId,
         TaskAssignedToAccUserId: task.TaskAssignedToAccUserId,
       };
@@ -41,7 +42,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           CompleteByWeekNum: task.CompleteByWeekNum,
           StartByIsPostProduction: task.StartByIsPostProduction,
           CompleteByIsPostProduction: task.CompleteByIsPostProduction,
-          TaskCompletedDate: new Date(task?.TaskCompletedDate) || null,
+          TaskCompletedDate: !isNullOrEmpty(task?.TaskCompletedDate) ? new Date(task?.TaskCompletedDate) : null,
           ...(task.ProductionId && {
             Production: {
               connect: {
