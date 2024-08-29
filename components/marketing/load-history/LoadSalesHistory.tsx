@@ -10,6 +10,9 @@ import SpreadsheetConfirmationModal from './SpreadsheetConfirmationModal';
 import { UploadParamType } from 'interfaces';
 import { useRecoilValue } from 'recoil';
 import { productionJumpState } from 'state/booking/productionJumpState';
+import { venueState } from 'state/booking/venueState';
+import { dateToSimple } from 'services/dateService';
+import validateSpreadsheetFile from '../utils/validateSpreadsheet';
 
 const LoadSalesHistory = () => {
   const [uploadModalVisible, setUploadModalVisible] = useState(false);
@@ -19,11 +22,16 @@ const LoadSalesHistory = () => {
   const [salesHistoryRows, setSalesHistoryRows] = useState([]);
   const [uploadParams, setUploadParams] = useState<UploadParamType>(null);
   const [uploadedFile, setUploadedFile] = useState<UploadedFile[]>();
-  const { selected } = useRecoilValue(productionJumpState);
+
+  const { productions, selected } = useRecoilValue(productionJumpState);
+  const selectedProducton = productions.filter((prod) => prod.Id === selected)[0];
+  const prodCode = selectedProducton.ShowCode;
+  const venueList = useRecoilValue(venueState);
+  const dateRange = dateToSimple(selectedProducton.StartDate) + '-' + dateToSimple(selectedProducton.EndDate);
 
   const onSave = async (file, onProgress, onError, onUploadingImage) => {
     setConfirmationModalVisible(true);
-    setUploadedFile(file);
+    setUploadedFile(await validateSpreadsheetFile(file, prodCode, venueList, dateRange));
     setUploadParams({ onProgress, onError, onUploadingImage });
   };
 

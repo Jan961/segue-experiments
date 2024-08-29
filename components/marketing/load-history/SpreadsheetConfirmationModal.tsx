@@ -1,12 +1,6 @@
 import { Button, PopupModal } from 'components/core-ui-lib';
 import { UploadedFile } from 'components/core-ui-lib/UploadModal/interface';
-import validateSpreadsheetFile from '../utils/validateSpreadsheet';
 import { UploadParamType } from 'interfaces';
-import { useEffect, useState } from 'react';
-import { useRecoilValue } from 'recoil';
-import { productionJumpState } from 'state/booking/productionJumpState';
-import { venueState } from 'state/booking/venueState';
-import { dateToSimple } from 'services/dateService';
 
 interface SpreadsheetModalProps {
   visible: boolean;
@@ -28,22 +22,6 @@ const SpreadsheetConfirmationModal = ({
   uploadParams,
   uploadedFile,
 }: SpreadsheetModalProps) => {
-  const { productions, selected } = useRecoilValue(productionJumpState);
-  const selectedProducton = productions.filter((prod) => prod.Id === selected)[0];
-
-  const [file, setFile] = useState<UploadedFile[]>(uploadedFile);
-  const venueList = useRecoilValue(venueState);
-  const prodCode = selectedProducton.ShowCode;
-  const dateRange = dateToSimple(selectedProducton.StartDate) + '-' + dateToSimple(selectedProducton.EndDate);
-
-  const updatefile = async () => {
-    setFile(await validateSpreadsheetFile(file, prodCode, venueList, dateRange));
-  };
-
-  useEffect(() => {
-    updatefile();
-  }, []);
-
   return (
     <PopupModal show={visible} title="Load Sales History" onClose={onClose}>
       <div>{uploadedFile && uploadedFile[0].name}</div>
