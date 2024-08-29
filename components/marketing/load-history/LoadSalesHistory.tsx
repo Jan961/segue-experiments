@@ -46,7 +46,10 @@ const LoadSalesHistory = () => {
     formData.append('path', `marketing/salesHistory`);
 
     try {
-      const response = await uploadFile(formData, onProgress, onError, onUploadingImage);
+      const response = await uploadFile(formData, onProgress, onError, onUploadingImage, {
+        onSuccess: 'Spreadsheet uploaded successfully',
+        onFailure: 'Spreadsheet failed to upload',
+      });
       if (response.status >= 400 && response.status < 600) {
         onError(file[0].file, 'Error uploading file. Please try again.');
       } else {

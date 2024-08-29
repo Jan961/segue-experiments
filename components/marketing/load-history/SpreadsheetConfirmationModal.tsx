@@ -60,9 +60,9 @@ const SpreadsheetConfirmationModal = ({
           <Button
             className="w-[128px] mt-3"
             text="No"
+            variant="secondary"
             onClick={() => {
-              onClose();
-              closeUploadModal();
+              closeModals();
             }}
           />
           <Button
@@ -70,8 +70,7 @@ const SpreadsheetConfirmationModal = ({
             text="Yes"
             onClick={() => {
               handleUpload(uploadedFile, uploadParams.onProgress, uploadParams.onError, uploadParams.onUploadingImage);
-              onClose();
-              closeUploadModal();
+              closeModals();
             }}
           />
         </>
@@ -82,9 +81,9 @@ const SpreadsheetConfirmationModal = ({
           <Button
             className="w-[128px] mt-3"
             text="Close"
+            variant="secondary"
             onClick={() => {
-              onClose();
-              closeUploadModal();
+              closeModals();
             }}
           />
           <Button
@@ -92,8 +91,7 @@ const SpreadsheetConfirmationModal = ({
             text="Redownload"
             onClick={() => {
               downloadSpreadsheet();
-              onClose();
-              closeUploadModal();
+              closeModals();
             }}
           />
         </>
@@ -105,8 +103,13 @@ const SpreadsheetConfirmationModal = ({
     window.open(URL.createObjectURL(uploadedFile[0].file), '_blank');
   };
 
+  const closeModals = () => {
+    onClose();
+    closeUploadModal();
+  };
+
   return (
-    <PopupModal show={visible} title="Load Sales History" onClose={onClose} panelClass="w-1/4">
+    <PopupModal show={visible} title="Load Sales History" onClose={closeModals} panelClass="w-1/4">
       {statusMessage()}
       <div className="flex gap-x-2 justify-end">{buttonOptions()}</div>
     </PopupModal>
