@@ -145,7 +145,7 @@ export const validateSpreadsheetFile = async (file, prodCode, venueList, dateRan
             spreadsheetWarningOccured = true;
           }
 
-          spreadsheetWarningOccured = true;
+          if (currentRow.ignoreWarning.toLocaleUpperCase() !== 'Y') spreadsheetWarningOccured = true;
         } else {
           responseCell.value = 'OK';
 
@@ -183,7 +183,7 @@ export const validateSpreadsheetFile = async (file, prodCode, venueList, dateRan
 
   file[0].file = newFile;
 
-  return file;
+  return { file, spreadsheetErrorOccured, spreadsheetWarningOccured };
 };
 
 const validateRow = (
@@ -337,11 +337,11 @@ const validateSeats = (currentRow: SpreadsheetRow, previousRow: SpreadsheetRow) 
   if (previousRow.seats && !currentRow.venueCode) {
     if (currentRow.seats >= previousRow.seats * 1.15) {
       returnString += '| WARNING - Seats increased by more than 15%';
-      if (currentRow.ignoreWarning.toUpperCase() !== 'Y') warningOccured = true;
+      warningOccured = true;
     }
     if (currentRow.seats < previousRow.seats) {
       returnString += '| WARNING - Seats decreased from previous entry';
-      if (currentRow.ignoreWarning.toUpperCase() !== 'Y') warningOccured = true;
+      warningOccured = true;
     }
   }
 
@@ -362,11 +362,11 @@ const validateValue = (currentRow: SpreadsheetRow, previousRow: SpreadsheetRow) 
   if (previousRow.value && !currentRow.venueCode) {
     if (parseFloat(currentRow.value) >= parseFloat(previousRow.value) * 1.15) {
       returnString += '| WARNING - Value increased by more than 15%';
-      if (currentRow.ignoreWarning.toUpperCase() !== 'Y') warningOccured = true;
+      warningOccured = true;
     }
     if (parseFloat(currentRow.value) < parseFloat(previousRow.value)) {
       returnString += '| WARNING - Value decreased from previous entry';
-      if (currentRow.ignoreWarning.toUpperCase() !== 'Y') warningOccured = true;
+      warningOccured = true;
     }
   }
 

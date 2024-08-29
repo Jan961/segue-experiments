@@ -30,9 +30,14 @@ const LoadSalesHistory = () => {
   const dateRange = dateToSimple(selectedProducton.StartDate) + '-' + dateToSimple(selectedProducton.EndDate);
 
   const onSave = async (file, onProgress, onError, onUploadingImage) => {
+    const {
+      file: validateFile,
+      spreadsheetErrorOccured,
+      spreadsheetWarningOccured,
+    } = await validateSpreadsheetFile(file, prodCode, venueList, dateRange);
+    setUploadedFile(validateFile);
+    setUploadParams({ onProgress, onError, onUploadingImage, spreadsheetErrorOccured, spreadsheetWarningOccured });
     setConfirmationModalVisible(true);
-    setUploadedFile(await validateSpreadsheetFile(file, prodCode, venueList, dateRange));
-    setUploadParams({ onProgress, onError, onUploadingImage });
   };
 
   const handleUpload = async (file, onProgress, onError, onUploadingImage) => {
@@ -127,6 +132,7 @@ const LoadSalesHistory = () => {
           handleUpload={handleUpload}
           uploadedFile={uploadedFile}
           uploadParams={uploadParams}
+          closeUploadModal={() => setUploadModalVisible(false)}
         />
       )}
       <ConfirmationDialog
