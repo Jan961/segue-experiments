@@ -29,20 +29,20 @@ export const validateSpreadsheetFile = async (file, prodCode, venueList, dateRan
     bookingDate: '',
     salesDate: '',
     salesType: '',
-    seats: 0,
+    seats: null,
     value: '',
     isFinal: '',
     ignoreWarning: '',
     response: '',
     details: '',
   };
-  const previousRow: SpreadsheetRow = {
+  let previousRow: SpreadsheetRow = {
     productionCode: '',
     venueCode: '',
     bookingDate: '',
     salesDate: '',
     salesType: '',
-    seats: 0,
+    seats: null,
     value: '',
     isFinal: '',
     ignoreWarning: '',
@@ -57,15 +57,16 @@ export const validateSpreadsheetFile = async (file, prodCode, venueList, dateRan
   workbook.eachSheet((worksheet) => {
     worksheet.eachRow((row, rowNumber) => {
       if (rowNumber !== 1) {
+        // Perform validation checks on any row except the title row
+
+        // Assign values for currentRow based on current excel spreadsheet
         currentRow.productionCode = row.getCell(1).value as string;
         if (currentRow.productionCode) {
-          const currentProductionCode = currentRow.productionCode;
-          console.log(currentProductionCode);
+          // const currentProductionCode = currentRow.productionCode;
         }
         currentRow.venueCode = row.getCell(2).value as string;
         if (currentRow.venueCode) {
-          const currentVenueCode = currentRow.venueCode;
-          console.log(currentVenueCode);
+          // const currentVenueCode = currentRow.venueCode;
         }
         currentRow.bookingDate = row.getCell(3).value as string;
         currentRow.salesDate = row.getCell(4).value as string;
@@ -90,6 +91,7 @@ export const validateSpreadsheetFile = async (file, prodCode, venueList, dateRan
         if (rowErrorOccurred) {
           responseCell.value = 'ERROR';
 
+          responseCell.style = { ...responseCell.style }; // strange workaround to prevent styles from being wrongly applied to other cells, believe to be bug in exceljs
           responseCell.fill = {
             type: 'pattern',
             pattern: 'solid',
@@ -107,6 +109,7 @@ export const validateSpreadsheetFile = async (file, prodCode, venueList, dateRan
         } else if (rowWarningOccured) {
           responseCell.value = 'WARNING';
 
+          responseCell.style = { ...responseCell.style };
           responseCell.fill = {
             type: 'pattern',
             pattern: 'solid',
@@ -126,6 +129,7 @@ export const validateSpreadsheetFile = async (file, prodCode, venueList, dateRan
         } else {
           responseCell.value = 'OK';
 
+          responseCell.style = { ...responseCell.style };
           responseCell.fill = {
             type: 'pattern',
             pattern: 'solid',
@@ -138,6 +142,8 @@ export const validateSpreadsheetFile = async (file, prodCode, venueList, dateRan
           const detailsCell = row.getCell(11);
           detailsCell.value = '';
         }
+
+        previousRow = { ...currentRow };
       }
     });
   });
@@ -164,7 +170,7 @@ const validateRow = (
 ) => {
   let detailsMessage = '';
   let rowErrorOccurred = false;
-  const rowWarningOccured = false;
+  let rowWarningOccured = false;
 
   const prodValidation = validateProductionCode(currentRow, rowNumber, prodCode);
   detailsMessage += prodValidation.returnString;
@@ -177,6 +183,10 @@ const validateRow = (
   const bookingValidation = validateBookingDate(currentRow, dateRange, prodCode);
   detailsMessage += bookingValidation.returnString;
   if (bookingValidation.errorOccurred) rowErrorOccurred = true;
+
+  const seatsValidationm = validateSeats(currentRow, previousRow);
+  detailsMessage += seatsValidationm.returnString;
+  if (seatsValidationm.warningOccured) rowWarningOccured = true;
 
   return { detailsMessage, rowErrorOccurred, rowWarningOccured };
 };
@@ -224,6 +234,25 @@ const validateBookingDate = (currentRow: SpreadsheetRow, dateRange, prodCode) =>
   }
 
   return { returnString, errorOccurred };
+};
+
+const validateSeats = (currentRow: SpreadsheetRow, previousRow: SpreadsheetRow) => {
+  let returnString = '';
+  let warningOccured = false;
+
+  if (previousRow.seats) {
+    if (currentRow.seats >= previousRow.seats * 1.2) {
+      console.log('here');
+      returnString += '| WARNING - Seats increased by more than 15%';
+      warningOccured = true;
+    } else {
+      console.log(currentRow.seats);
+      console.log(previousRow.seats);
+      console.log('nope');
+    }
+  }
+
+  return { returnString, warningOccured };
 };
 
 export default validateSpreadsheetFile;
