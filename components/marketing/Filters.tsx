@@ -220,14 +220,14 @@ const Filters = () => {
           />
 
           {/* Iframe placed next to buttons but in the same flex container */}
-          <div className=" -mt-[60px] cursor-pointer w-[150px]">
+          <div className=" -mt-[50px] cursor-pointer w-[150px]">
             {isNullOrEmpty(landingURL) ? (
               'No URL Provided'
             ) : isNullOrEmpty(ogImage) ? (
-              <Iframe src={landingURL} />
+              <Iframe src={landingURL} variant="xs" />
             ) : (
               <a href={landingURL} target="_blank" rel="noreferrer">
-                <img src={ogImage.url} alt={ogTitle} key={landingURL} />
+                <img src={ogImage.url} alt={ogTitle} key={landingURL} className="w-[150px] h-[81px]" />
               </a>
             )}
           </div>

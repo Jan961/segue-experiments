@@ -14,10 +14,10 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   try {
     const response = await ogs({ url, onlyGetOpenGraphInfo: true });
     const { result } = response;
-    console.log(result);
     if (result.error) {
       res.status(200).json({ ogImage: [null] });
     }
+
     const { ogTitle, ogImage } = result;
     res.status(200).json({ ogTitle, ogImage });
   } catch (error) {
