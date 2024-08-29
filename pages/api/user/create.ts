@@ -27,7 +27,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       },
     });
 
-    return res.json(userMapper(newUser));
+    res.json(userMapper(newUser));
   } catch (err) {
     console.log(err);
     res.status(500).json({ err: 'Error occurred while creating the user.' });
