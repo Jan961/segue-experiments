@@ -20,7 +20,7 @@ const prepareUpdateData = async ({
   dateBlockList,
 }) => {
   const updateData: any = {};
-  if (isNullOrUndefined(code)) updateData.Code = code;
+  if (!isNullOrUndefined(code)) updateData.Code = code;
   if (!isNullOrUndefined(isArchived)) updateData.IsArchived = isArchived;
   if (!isUndefined(runningTime)) {
     if (runningTime) {
@@ -34,17 +34,7 @@ const prepareUpdateData = async ({
   if (!isUndefined(salesEmail)) updateData.SalesEmail = salesEmail;
   if (!isUndefined(salesFrequency)) updateData.SalesFrequency = salesFrequency;
   if (!isUndefined(currency)) {
-    if (currency === null) {
-      updateData.Currency = {
-        disconnect: true,
-      };
-    } else {
-      updateData.Currency = {
-        connect: {
-          Code: currency,
-        },
-      };
-    }
+    updateData.ReportCurrencyCode = currency;
   }
   if (!isUndefined(image)) {
     if (image === null) {
@@ -110,17 +100,7 @@ const prepareUpdateData = async ({
   }
 
   if (!isUndefined(company)) {
-    if (company === null) {
-      updateData.ProductionCompany = {
-        disconnect: true,
-      };
-    } else {
-      updateData.ProductionCompany = {
-        connect: {
-          Id: company,
-        },
-      };
-    }
+    updateData.ProdCoId = company;
   }
   return updateData;
 };

@@ -1,4 +1,4 @@
-import prisma from 'lib/prisma';
+import master from 'lib/prisma_master';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getAccountId, getEmailFromReq } from 'services/userService';
 
@@ -7,7 +7,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const email = await getEmailFromReq(req);
     const AccountId = await getAccountId(email);
     const { companyName, webSite, companyVATNo } = req.body;
-    const newProdCompany = await prisma.ProductionCompany.create({
+    const newProdCompany = await master.ProductionCompany.create({
       data: {
         AccountId,
         WebSite: webSite,

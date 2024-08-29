@@ -90,13 +90,13 @@ export const getDealMemoHold = (dealMemoHold, demoId) => {
 
 export const getContactIdData = (dealMemo) => {
   if (dealMemo.BOMVenueContactId) {
-    dealMemo.VenueContact_DealMemo_BOMVenueContactIdToVenueContact = {
+    dealMemo.VenueContact_DealMemo_DeMoBOMVenueContactIdToVenueContact = {
       connect: { Id: dealMemo.BOMVenueContactId },
     };
   }
 
   if (dealMemo.TechVenueContactId) {
-    dealMemo.VenueContact_DealMemo_TechVenueContactIdToVenueContact = {
+    dealMemo.VenueContact_DealMemo_DeMoTechVenueContactIdToVenueContact = {
       connect: { Id: dealMemo.TechVenueContactId },
     };
   }

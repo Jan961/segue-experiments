@@ -9,9 +9,9 @@ interface Params extends ParsedUrlQuery {
   ProductionCode: string;
 }
 
-export const getProductionJumpState = async (ctx, path: string, AccountId: number): Promise<ProductionJump> => {
+export const getProductionJumpState = async (ctx, path: string): Promise<ProductionJump> => {
   const { ProductionCode, ShowCode } = (ctx.params || {}) as Params;
-  const productionsRaw = await getAllProductions(AccountId);
+  const productionsRaw = await getAllProductions();
   const allProductionRegions: any = await getAllProductionRegions();
   const selectedProduction = productionsRaw.find(
     (production: any) => production.Code === ProductionCode && production.Show.Code === ShowCode,
@@ -38,7 +38,6 @@ export const getProductionJumpState = async (ctx, path: string, AccountId: numbe
           RunningTime: t.RunningTime ? dateTimeToTime(t.RunningTime.toISOString()) : null,
           RunningTimeNote: t.RunningTimeNote,
           SalesFrequency: t.SalesFrequency,
-          ProductionCompany: t.ProductionCompany,
         };
       })
       .sort((a, b) => {

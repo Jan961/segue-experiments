@@ -25,7 +25,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         CompleteByIsPostProduction: task.CompleteByIsPostProduction,
         TaskCompletedDate: new Date(task?.TaskCompletedDate) || null,
         ProductionId: task.ProductionId,
-        AssignedToUserId: task.AssignedToUserId,
+        TaskAssignedToAccUserId: task.TaskAssignedToAccUserId,
       };
 
       await productionTaskSchema.validate(prodTaskRecord);
@@ -49,12 +49,8 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
               },
             },
           }),
-          ...(task.AssignedToUserId && {
-            User: {
-              connect: {
-                Id: task.AssignedToUserId,
-              },
-            },
+          ...(task.TaskAssignedToAccUserId && {
+            TaskAssignedToAccUserId: task.TaskAssignedToAccUserId,
           }),
           ...(task.PRTId && {
             ProductionTaskRepeat: {

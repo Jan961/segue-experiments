@@ -32,16 +32,21 @@ describe('TimeInput Component', () => {
     const hourInput = screen.getByTestId('hourInput') as HTMLInputElement;
     const minInput = screen.getByTestId('minInput') as HTMLInputElement;
 
-    fireEvent.change(hourInput, { target: { value: '12' } });
-    fireEvent.change(minInput, { target: { value: '34' } });
-
     // Simulate focus and blur events
     fireEvent.focus(hourInput);
+    fireEvent.change(hourInput, { target: { value: '12' } });
+    fireEvent.blur(hourInput);
+
+    fireEvent.focus(minInput);
+    fireEvent.change(minInput, { target: { value: '34' } });
     fireEvent.blur(minInput);
 
-    // onBlur should be called once with the final time object
+    // onBlur should be called twice when inputting into the min and hour fields since it will pad the front with the 0 on blur each time
     expect(onBlur).toHaveBeenCalledTimes(2);
-    expect(onBlur).toHaveBeenCalledWith({ hrs: '12', min: '34', sec: '' });
+
+    //    Each onBlur call needs to be checked separately for the values that was updated in that field
+    expect(onBlur.mock.calls[0][0].target.value).toBe('12');
+    expect(onBlur.mock.calls[1][0].target.value).toBe('34');
   });
 
   test('handles disabled state correctly', () => {

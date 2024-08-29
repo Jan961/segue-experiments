@@ -8,7 +8,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   try {
     const data = req.body as GlobalActivity;
     const email = await getEmailFromReq(req);
-    const access = await checkAccess(email, { ActivityId: data.Id });
+    const access = await checkAccess(email);
     if (!access) return res.status(401).end();
 
     await prisma.$transaction(async (prisma) => {

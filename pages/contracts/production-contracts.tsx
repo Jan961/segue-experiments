@@ -4,6 +4,6 @@ import { AllProductionPageProps, getAllProductionPageProps } from 'services/prod
 
 const ShowSelection = ({ productions }: AllProductionPageProps) => <ProductionSelector productions={productions} />;
 
-export const getServerSideProps: GetServerSideProps = (ctx) => getAllProductionPageProps(ctx);
+export const getServerSideProps: GetServerSideProps = () => getAllProductionPageProps();
 
 export default ShowSelection;

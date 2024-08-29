@@ -18,7 +18,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         },
       }),
     ]);
-    console.log(`Deleted GIFU: ${gifu.Id}`);
+
     return res.status(200).json({});
   } catch (e) {
     console.log(e);

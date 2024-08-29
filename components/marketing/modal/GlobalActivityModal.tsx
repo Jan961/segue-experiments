@@ -136,7 +136,7 @@ export default function GlobalActivityModal({
       setActDate(isValidDate(data.Date) ? startOfDay(new Date(data.Date)) : null);
       setActFollowUp(data.FollowUpRequired);
       setFollowUpDt(isValidDate(data.DueByDate) ? startOfDay(new Date(data.DueByDate)) : null);
-      setCost(data.Cost.toFixed(2).toString());
+      setCost(isNaN(data.Cost) ? '' : data.Cost.toFixed(2).toString());
       setActNotes(data.Notes);
       setActId(data.Id);
       setSelectedList(venueIds);

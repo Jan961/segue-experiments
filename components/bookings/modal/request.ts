@@ -80,8 +80,8 @@ export const exportMasterplanReport = async (fromDate: string, toDate: string) =
     const response = await axios.post(
       '/api/reports/masterplan',
       {
-        fromDate: moment(getMonday(fromDate)).format('YYYY-MM-DD'),
-        toDate: moment(new Date(toDate)).format('YYYY-MM-DD'),
+        fromDate: moment(getMonday(fromDate)),
+        toDate: moment(new Date(toDate)),
         timezoneOffset: getTimezonOffset(),
       },
       { responseType: 'blob' },

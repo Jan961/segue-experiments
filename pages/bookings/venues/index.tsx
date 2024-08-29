@@ -13,7 +13,6 @@ import {
 } from 'services/venueService';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import { getProductionJumpState } from 'utils/getProductionJumpState';
-import { getAccountIdFromReq } from 'services/userService';
 import axios from 'axios';
 import { defaultVenueFilters } from 'config/bookings';
 import { debounce, objectify } from 'radash';
@@ -135,12 +134,8 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
 }
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const accountIdPromise = getAccountIdFromReq(ctx.req);
-
-  const AccountId = await accountIdPromise;
-
   const results = await Promise.allSettled([
-    getProductionJumpState(ctx, 'bookings', AccountId),
+    getProductionJumpState(ctx, 'bookings'),
     getUniqueVenueTownlist(),
     getUniqueVenueCountrylist(),
     getAllCurrencyList(),
@@ -156,7 +151,12 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
   const venueCurrencyOptionList: SelectOption[] =
     results[3].status === 'fulfilled'
-      ? transformToOptions(results[3].value, null, 'Code', (item) => item.Code + ' ' + item.Name)
+      ? transformToOptions(
+          results[3].value,
+          null,
+          'CurrencyCode',
+          (item) => item.CurrencyCode + ' ' + item.CurrencyName,
+        )
       : [];
 
   const venueFamilyOptionList: SelectOption[] =

@@ -25,10 +25,10 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
               },
             },
           }),
-          ...(task.AssignedToUserId && {
+          ...(task.TaskAssignedToAccUserId && {
             User: {
               connect: {
-                Id: task.AssignedToUserId,
+                Id: task.TaskAssignedToAccUserId,
               },
             },
           }),
@@ -43,7 +43,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         filteredTaskObject = omit(filteredTaskObject, [
           'Id',
           'AccountId',
-          'AssignedToUserId',
+          'TaskAssignedToAccUserId',
           'MTRId',
           'RepeatInterval',
           'TaskRepeatToWeekNum',
@@ -58,7 +58,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           },
         });
       } else if (task.RepeatInterval) {
-        const { RepeatInterval, TaskRepeatFromWeekNum, TaskRepeatToWeekNum, AccountId, AssignedToUserId } = task;
+        const { RepeatInterval, TaskRepeatFromWeekNum, TaskRepeatToWeekNum, AccountId, TaskAssignedToAccUserId } = task;
 
         const masterTaskRepeatInfo = {
           Interval: RepeatInterval,
@@ -76,9 +76,9 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         const MRTId = repeatingTask?.Id;
         let masterTaskData: any = await generateSingleRecurringMasterTask(req.body, repeatingTask.Id);
 
-        await masterTaskSchema.validate({ ...masterTaskData, AssignedToUserId, MRTId, AccountId: task.AccountId });
+        await masterTaskSchema.validate({ ...masterTaskData, TaskAssignedToAccUserId, MRTId, AccountId: task.AccountId });
 
-        masterTaskData = omit(masterTaskData, ['AssignedToUserId', 'MTRId']);
+        masterTaskData = omit(masterTaskData, ['TaskAssignedToAccUserId', 'MTRId']);
         const createdTask = await prisma.MasterTask.update({
           data: {
             ...masterTaskData,
@@ -89,10 +89,10 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
                 },
               },
             }),
-            ...(AssignedToUserId && {
+            ...(TaskAssignedToAccUserId && {
               User: {
                 connect: {
-                  Id: AssignedToUserId,
+                  Id: TaskAssignedToAccUserId,
                 },
               },
             }),
