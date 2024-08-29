@@ -202,39 +202,40 @@ const validateRow = (
 
   const prodValidation = validateProductionCode(currentRow, rowNumber, prodCode, productionCodes);
   detailsMessage += prodValidation.returnString;
-  if (prodValidation.errorOccurred) rowErrorOccurred = true;
+  rowErrorOccurred = prodValidation.errorOccurred;
 
   const venueValidation = validateVenueCode(currentRow, venueList);
   detailsMessage += venueValidation.returnString;
-  if (venueValidation.errorOccurred) rowErrorOccurred = true;
+  rowErrorOccurred = venueValidation.errorOccurred;
 
   const bookingValidation = validateBookingDate(currentRow, dateRange, prodCode);
   detailsMessage += bookingValidation.returnString;
-  if (bookingValidation.errorOccurred) rowErrorOccurred = true;
+  rowErrorOccurred = bookingValidation.errorOccurred;
 
   const salesDateValidation = validateSalesDate(currentRow);
   detailsMessage += salesDateValidation.returnString;
-  if (salesDateValidation.errorOccurred) rowErrorOccurred = true;
+  rowErrorOccurred = salesDateValidation.errorOccurred;
 
   const salesTypeValidation = validateSalesType(currentRow);
   detailsMessage += salesTypeValidation.returnString;
-  if (salesTypeValidation.errorOccurred) rowErrorOccurred = true;
+  rowErrorOccurred = salesTypeValidation.errorOccurred;
 
   const seatsValidation = validateSeats(currentRow, previousRow);
   detailsMessage += seatsValidation.returnString;
-  if (seatsValidation.warningOccured) rowWarningOccured = true;
+  rowWarningOccured = seatsValidation.warningOccured;
+  rowErrorOccurred = seatsValidation.errorOccurred;
 
   const valueValidation = validateValue(currentRow, previousRow);
   detailsMessage += valueValidation.returnString;
-  if (valueValidation.warningOccured) rowWarningOccured = true;
+  rowWarningOccured = valueValidation.warningOccured;
 
   const finalValidation = validateIsFinal(currentRow);
   detailsMessage += finalValidation.returnString;
-  if (finalValidation.errorOccurred) rowErrorOccurred = true;
+  rowErrorOccurred = finalValidation.errorOccurred;
 
   const ignoreWarningValidation = validateIgnoreWarning(currentRow);
   detailsMessage += ignoreWarningValidation.returnString;
-  if (ignoreWarningValidation.errorOccurred) rowErrorOccurred = true;
+  rowErrorOccurred = ignoreWarningValidation.errorOccurred;
 
   return { detailsMessage, rowErrorOccurred, rowWarningOccured };
 };
@@ -279,6 +280,12 @@ const validateBookingDate = (currentRow: SpreadsheetRow, dateRange, prodCode) =>
   const prodStartDate = simpleToDateDMY(productionDates[0]);
   const prodEndDate = simpleToDateDMY(productionDates[1]);
   const rowDate = new Date(currentRow.bookingDate);
+
+  if (!currentRow.bookingDate && currentRow.venueCode) {
+    returnString += '| ERROR - Must specify a Booking Date for a new Venue Code';
+    errorOccurred = true;
+    return { returnString, errorOccurred };
+  }
 
   if (currentRow.bookingDate && isNaN(rowDate.getTime())) {
     returnString += '| ERROR - Booking Date is not valid. Please use DD/MM/YYYY format';
@@ -329,7 +336,14 @@ const validateSalesType = (currentRow: SpreadsheetRow) => {
 
 const validateSeats = (currentRow: SpreadsheetRow, previousRow: SpreadsheetRow) => {
   let returnString = '';
+  let errorOccurred = false;
   let warningOccured = false;
+
+  if (!currentRow.seats) {
+    returnString += '| ERROR - Must specify a value for Seats';
+    errorOccurred = true;
+    return { returnString, errorOccurred, warningOccured };
+  }
 
   if (previousRow.seats && !currentRow.venueCode) {
     if (currentRow.seats >= previousRow.seats * 1.15) {
@@ -347,7 +361,14 @@ const validateSeats = (currentRow: SpreadsheetRow, previousRow: SpreadsheetRow) 
 
 const validateValue = (currentRow: SpreadsheetRow, previousRow: SpreadsheetRow) => {
   let returnString = '';
+  let errorOccurred = true;
   let warningOccured = false;
+
+  if (!currentRow.value) {
+    returnString += '| ERROR - Must specify a value for Value';
+    errorOccurred = true;
+    return { returnString, errorOccurred, warningOccured };
+  }
 
   if (previousRow.value && !currentRow.venueCode) {
     if (parseFloat(currentRow.value) >= parseFloat(previousRow.value) * 1.15) {
