@@ -22,6 +22,9 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           },
         },
       },
+      include: {
+        AccountUser: true,
+      },
     });
 
     return res.json(userMapper(newUser));
