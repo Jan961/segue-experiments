@@ -135,8 +135,11 @@ const Filters = () => {
       try {
         const response = await axios.post('/api/marketing/openGraphInfo/read', { url: landingURL });
         const result = await response.data;
-        setOgImage(result?.ogImage[0]);
-        setOgTitle(result.ogTitle);
+        const { ogImage, ogTitle } = result;
+        if (!isNullOrEmpty(ogImage)) {
+          setOgImage(ogImage);
+          setOgTitle(ogTitle);
+        }
       } catch (exception) {
         //  If you print the exceptions here then it will give an error whenever this isnt an image preview
       }

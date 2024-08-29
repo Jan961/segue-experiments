@@ -15,13 +15,13 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const response = await ogs({ url, onlyGetOpenGraphInfo: true });
     const { result } = response;
     if (result.error) {
-      res.status(200).json({ ogImage: [null] });
+      res.status(200).json({ ogImage: null });
     }
 
     const { ogTitle, ogImage } = result;
-    res.status(200).json({ ogTitle, ogImage });
+    res.status(200).json({ ogTitle, ogImage: ogImage.length > 0 ? ogImage[0] : null });
   } catch (error) {
     console.log(error);
-    res.status(200).json({ error: 'Failed to fetch Open Graph data' });
+    res.status(400).json({ error: 'Failed to fetch Open Graph data' });
   }
 }
