@@ -196,46 +196,27 @@ const validateRow = (
   productionCodes: string[],
   _venueCodes: string[],
 ) => {
+  const validations = [
+    validateProductionCode(currentRow, rowNumber, prodCode, productionCodes),
+    validateVenueCode(currentRow, venueList),
+    validateBookingDate(currentRow, dateRange, prodCode),
+    validateSalesDate(currentRow),
+    validateSalesType(currentRow),
+    validateSeats(currentRow, previousRow),
+    validateValue(currentRow, previousRow),
+    validateIsFinal(currentRow),
+    validateIgnoreWarning(currentRow),
+  ];
+
   let detailsMessage = '';
   let rowErrorOccurred = false;
   let rowWarningOccured = false;
 
-  const prodValidation = validateProductionCode(currentRow, rowNumber, prodCode, productionCodes);
-  detailsMessage += prodValidation.returnString;
-  rowErrorOccurred = prodValidation.errorOccurred;
-
-  const venueValidation = validateVenueCode(currentRow, venueList);
-  detailsMessage += venueValidation.returnString;
-  rowErrorOccurred = venueValidation.errorOccurred;
-
-  const bookingValidation = validateBookingDate(currentRow, dateRange, prodCode);
-  detailsMessage += bookingValidation.returnString;
-  rowErrorOccurred = bookingValidation.errorOccurred;
-
-  const salesDateValidation = validateSalesDate(currentRow);
-  detailsMessage += salesDateValidation.returnString;
-  rowErrorOccurred = salesDateValidation.errorOccurred;
-
-  const salesTypeValidation = validateSalesType(currentRow);
-  detailsMessage += salesTypeValidation.returnString;
-  rowErrorOccurred = salesTypeValidation.errorOccurred;
-
-  const seatsValidation = validateSeats(currentRow, previousRow);
-  detailsMessage += seatsValidation.returnString;
-  rowWarningOccured = seatsValidation.warningOccured;
-  rowErrorOccurred = seatsValidation.errorOccurred;
-
-  const valueValidation = validateValue(currentRow, previousRow);
-  detailsMessage += valueValidation.returnString;
-  rowWarningOccured = valueValidation.warningOccured;
-
-  const finalValidation = validateIsFinal(currentRow);
-  detailsMessage += finalValidation.returnString;
-  rowErrorOccurred = finalValidation.errorOccurred;
-
-  const ignoreWarningValidation = validateIgnoreWarning(currentRow);
-  detailsMessage += ignoreWarningValidation.returnString;
-  rowErrorOccurred = ignoreWarningValidation.errorOccurred;
+  validations.forEach((validation) => {
+    detailsMessage += validation.returnString;
+    if (validation.errorOccurred) rowErrorOccurred = true;
+    if (validation.warningOccured) rowWarningOccured = true;
+  });
 
   return { detailsMessage, rowErrorOccurred, rowWarningOccured };
 };
@@ -243,6 +224,8 @@ const validateRow = (
 const validateProductionCode = (currentRow: SpreadsheetRow, rowNumber, prodCode, productionCodes: string[]) => {
   let returnString = '';
   let errorOccurred = false;
+  const warningOccured = false;
+
   if (rowNumber === 2 && !currentRow.productionCode) {
     returnString += '| ERROR - Must include at least 1 ProdCode at start of file';
     errorOccurred = true;
@@ -253,13 +236,16 @@ const validateProductionCode = (currentRow: SpreadsheetRow, rowNumber, prodCode,
   }
   if (productionCodes.includes(currentRow.productionCode)) {
     returnString += '| ERROR - Spreadsheet should only represent sales for one production';
+    errorOccurred = true;
   }
-  return { returnString, errorOccurred };
+  return { returnString, warningOccured, errorOccurred };
 };
 
 const validateVenueCode = (currentRow: SpreadsheetRow, venueList: Record<number, VenueMinimalDTO>) => {
   let returnString = '';
   let errorOccurred = false;
+  const warningOccured = false;
+
   if (currentRow.productionCode && !currentRow.venueCode) {
     returnString += '| ERROR - must include at least one venue code for a given production';
     errorOccurred = true;
@@ -269,12 +255,13 @@ const validateVenueCode = (currentRow: SpreadsheetRow, venueList: Record<number,
     errorOccurred = true;
   }
 
-  return { returnString, errorOccurred };
+  return { returnString, warningOccured, errorOccurred };
 };
 
 const validateBookingDate = (currentRow: SpreadsheetRow, dateRange, prodCode) => {
   let returnString = '';
   let errorOccurred = false;
+  const warningOccured = false;
 
   const productionDates = dateRange.split('-');
   const prodStartDate = simpleToDateDMY(productionDates[0]);
@@ -284,13 +271,13 @@ const validateBookingDate = (currentRow: SpreadsheetRow, dateRange, prodCode) =>
   if (!currentRow.bookingDate && currentRow.venueCode) {
     returnString += '| ERROR - Must specify a Booking Date for a new Venue Code';
     errorOccurred = true;
-    return { returnString, errorOccurred };
+    return { returnString, warningOccured, errorOccurred };
   }
 
   if (currentRow.bookingDate && isNaN(rowDate.getTime())) {
     returnString += '| ERROR - Booking Date is not valid. Please use DD/MM/YYYY format';
     errorOccurred = true;
-    return { returnString, errorOccurred };
+    return { returnString, warningOccured, errorOccurred };
   }
 
   if ((rowDate < prodStartDate || rowDate > prodEndDate) && currentRow.bookingDate) {
@@ -298,32 +285,34 @@ const validateBookingDate = (currentRow: SpreadsheetRow, dateRange, prodCode) =>
     errorOccurred = true;
   }
 
-  return { returnString, errorOccurred };
+  return { returnString, warningOccured, errorOccurred };
 };
 
 const validateSalesDate = (currentRow: SpreadsheetRow) => {
   let returnString = '';
   let errorOccurred = false;
+  const warningOccured = false;
   const rowDate = new Date(currentRow.salesDate);
 
   if (!currentRow.salesDate) {
     returnString += '| ERROR - Must include a date for the sale';
     errorOccurred = true;
-    return { returnString, errorOccurred };
+    return { returnString, warningOccured, errorOccurred };
   }
 
   if (currentRow.salesDate && isNaN(rowDate.getTime())) {
     returnString += '| ERROR - Sales Date is not valid. Please use DD/MM/YYYY format';
     errorOccurred = true;
-    return { returnString, errorOccurred };
+    return { returnString, warningOccured, errorOccurred };
   }
 
-  return { returnString, errorOccurred };
+  return { returnString, warningOccured, errorOccurred };
 };
 
 const validateSalesType = (currentRow: SpreadsheetRow) => {
   let returnString = '';
   let errorOccurred = false;
+  const warningOccured = false;
 
   if (!Object.values(SalesType).includes(currentRow.salesType)) {
     returnString +=
@@ -331,7 +320,7 @@ const validateSalesType = (currentRow: SpreadsheetRow) => {
     errorOccurred = true;
   }
 
-  return { returnString, errorOccurred };
+  return { returnString, warningOccured, errorOccurred };
 };
 
 const validateSeats = (currentRow: SpreadsheetRow, previousRow: SpreadsheetRow) => {
@@ -356,12 +345,12 @@ const validateSeats = (currentRow: SpreadsheetRow, previousRow: SpreadsheetRow) 
     }
   }
 
-  return { returnString, warningOccured };
+  return { returnString, warningOccured, errorOccurred };
 };
 
 const validateValue = (currentRow: SpreadsheetRow, previousRow: SpreadsheetRow) => {
   let returnString = '';
-  let errorOccurred = true;
+  let errorOccurred = false;
   let warningOccured = false;
 
   if (!currentRow.value) {
@@ -381,31 +370,33 @@ const validateValue = (currentRow: SpreadsheetRow, previousRow: SpreadsheetRow) 
     }
   }
 
-  return { returnString, warningOccured };
+  return { returnString, warningOccured, errorOccurred };
 };
 
 const validateIsFinal = (currentRow: SpreadsheetRow) => {
   let returnString = '';
   let errorOccurred = false;
+  const warningOccured = false;
 
   if (!Object.values(isFinalType).includes(currentRow.isFinal)) {
     returnString += "| ERROR - Is Final must either be 'Y', 'N', or blank";
     errorOccurred = true;
   }
 
-  return { returnString, errorOccurred };
+  return { returnString, warningOccured, errorOccurred };
 };
 
 const validateIgnoreWarning = (currentRow: SpreadsheetRow) => {
   let returnString = '';
   let errorOccurred = false;
+  const warningOccured = false;
 
   if (!Object.values(ignoreWarningType).includes(currentRow.ignoreWarning)) {
     returnString += "| ERROR - Ignore Warning must either be 'Y', 'N', or blank";
     errorOccurred = true;
   }
 
-  return { returnString, errorOccurred };
+  return { returnString, warningOccured, errorOccurred };
 };
 
 export default validateSpreadsheetFile;
