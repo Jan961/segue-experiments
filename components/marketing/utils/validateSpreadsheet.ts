@@ -14,6 +14,7 @@ interface SpreadsheetRow {
   ignoreWarning: string;
   response: string;
   details: string;
+  rowNumber: number;
 }
 
 interface SpreadsheetData {
@@ -21,6 +22,10 @@ interface SpreadsheetData {
     venueCode: string;
     bookings: {
       bookingDate: Date;
+      // finalSaleEntry: {
+      //   hasIsFinalOccured: boolean;
+      //   finalSalesDate: Date;
+      // }
       sales: {
         salesDate: Date;
         salesType: string;
@@ -75,6 +80,7 @@ export const validateSpreadsheetFile = async (file, prodCode, venueList, prodDat
     ignoreWarning: '',
     response: '',
     details: '',
+    rowNumber: null,
   };
   let previousRow: SpreadsheetRow = {
     productionCode: '',
@@ -88,6 +94,7 @@ export const validateSpreadsheetFile = async (file, prodCode, venueList, prodDat
     ignoreWarning: '',
     response: '',
     details: '',
+    rowNumber: null,
   };
   let spreadsheetErrorOccured = false;
   let spreadsheetWarningOccured = false;
@@ -114,11 +121,11 @@ export const validateSpreadsheetFile = async (file, prodCode, venueList, prodDat
         currentRow.ignoreWarning = (row.getCell(9).value as string) ?? '';
         currentRow.response = row.getCell(10).value as string;
         currentRow.details = row.getCell(11).value as string;
+        currentRow.rowNumber = rowNumber;
 
         const { detailsMessage, rowErrorOccurred, rowWarningOccured } = validateRow(
           currentRow,
           previousRow,
-          rowNumber,
           prodCode,
           venueList,
           prodDateRange,
@@ -203,7 +210,6 @@ export const validateSpreadsheetFile = async (file, prodCode, venueList, prodDat
 const validateRow = (
   currentRow: SpreadsheetRow,
   previousRow: SpreadsheetRow,
-  rowNumber,
   prodCode,
   venueList: Record<number, VenueMinimalDTO>,
   prodDateRange,
@@ -212,7 +218,7 @@ const validateRow = (
   currentBookingDate,
 ) => {
   const validations = [
-    validateProductionCode(currentRow, rowNumber, prodCode),
+    validateProductionCode(currentRow, prodCode),
     validateVenueCode(currentRow, venueList),
     validateBookingDate(currentRow, prodDateRange, prodCode),
     validateSalesDate(currentRow),
@@ -246,12 +252,12 @@ const validateRow = (
   return { detailsMessage, rowErrorOccurred, rowWarningOccured };
 };
 
-const validateProductionCode = (currentRow: SpreadsheetRow, rowNumber, prodCode) => {
+const validateProductionCode = (currentRow: SpreadsheetRow, prodCode) => {
   let returnString = '';
   let errorOccurred = false;
   const warningOccured = false;
 
-  if (rowNumber === 2 && !currentRow.productionCode) {
+  if (currentRow.rowNumber === 2 && !currentRow.productionCode) {
     returnString += '| ERROR - Must include at least 1 ProdCode at start of file';
     errorOccurred = true;
   }
