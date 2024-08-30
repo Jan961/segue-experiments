@@ -22,7 +22,7 @@ interface SpreadsheetData {
     venueCode: string;
     bookings: {
       bookingDate: Date;
-      finalDate: Date;
+      finalSalesDate: Date;
       sales: {
         salesDate: Date;
         salesType: string;
@@ -218,6 +218,21 @@ const validateRow = (
   currentVenue,
   currentBookingDate,
 ) => {
+  let detailsMessage = '';
+  let rowErrorOccurred = false;
+  let rowWarningOccured = false;
+
+  const { returnString, errorOccurred, warningOccured } = updateValidateSpreadsheedData(
+    spreadsheetData,
+    currentRow,
+    currentVenue,
+    currentBookingDate,
+  );
+
+  detailsMessage += returnString;
+  if (errorOccurred) rowErrorOccurred = true;
+  if (warningOccured) rowWarningOccured = true;
+
   const validations = [
     validateProductionCode(currentRow, prodCode),
     validateVenueCode(currentRow, venueList),
@@ -226,29 +241,15 @@ const validateRow = (
     validateSalesType(currentRow),
     validateSeats(currentRow, previousRow),
     validateValue(currentRow, previousRow),
-    validateIsFinal(currentRow),
+    validateIsFinal(currentRow, spreadsheetData, currentVenue, currentBookingDate),
     validateIgnoreWarning(currentRow),
   ];
-
-  let detailsMessage = '';
-  let rowErrorOccurred = false;
-  let rowWarningOccured = false;
 
   validations.forEach((validation) => {
     detailsMessage += validation.returnString;
     if (validation.errorOccurred) rowErrorOccurred = true;
     if (validation.warningOccured) rowWarningOccured = true;
   });
-
-  const { returnString, errorOccurred, warningOccured } = updateValidateSpreadsheedData(
-    spreadsheetData,
-    currentRow,
-    currentVenue,
-    currentBookingDate,
-  );
-  detailsMessage += returnString;
-  if (errorOccurred) rowErrorOccurred = true;
-  if (warningOccured) rowWarningOccured = true;
 
   return { detailsMessage, rowErrorOccurred, rowWarningOccured };
 };
@@ -401,10 +402,17 @@ const validateValue = (currentRow: SpreadsheetRow, previousRow: SpreadsheetRow) 
   return { returnString, warningOccured, errorOccurred };
 };
 
-const validateIsFinal = (currentRow: SpreadsheetRow) => {
+const validateIsFinal = (
+  currentRow: SpreadsheetRow,
+  spreadsheetData: SpreadsheetData,
+  currentVenue,
+  currentBookingDate,
+) => {
   let returnString = '';
   let errorOccurred = false;
   const warningOccured = false;
+  const currentBooking = getCurrentBookingInfo(spreadsheetData, currentVenue, currentBookingDate);
+  console.log(currentBooking);
 
   if (!Object.values(isFinalType).includes(currentRow.isFinal)) {
     returnString += "| ERROR - Is Final must either be 'Y', 'N', or blank";
@@ -458,13 +466,13 @@ const updateValidateSpreadsheedData = (
           sale.ignoreWarning.toUpperCase() !== currentRow.ignoreWarning.toUpperCase()
         ) {
           // if any of the values do not match up between duplicate VenueCode/BookingDate/SalesDate entries
-          returnString += `| ERROR - Mismatch in information for Booking at Venue ${currentVenue} on ${dateToSimple(
+          returnString += ` | ERROR - Mismatch in information for Booking at Venue ${currentVenue} on ${dateToSimple(
             currentBookingDate,
           )}, on Sales Date ${dateToSimple(currentRow.salesDate)} (Row ${sale.rowNumber})`;
           errorOccurred = true;
         }
       } else {
-        booking.finalDate = currentRow.isFinal.toUpperCase() === 'Y' ? new Date(currentRow.salesDate) : null;
+        // Add new Sale for VenueCode/BookingDate
         booking.sales.push({
           salesDate: new Date(currentRow.salesDate),
           salesType: currentRow.salesType,
@@ -476,20 +484,41 @@ const updateValidateSpreadsheedData = (
         });
       }
 
-      if (currentRow.isFinal && booking.finalDate) {
-        returnString += '| ERROR - Duplicate Is Final dates';
-        errorOccurred = true;
-      } // wrong doesnt work because finalDate is only being added when new booking is being added
-
-      if (booking.finalDate) {
-        if (new Date(currentRow.salesDate) > booking.finalDate) {
-          returnString += '| ERROR - Cannot add more sales after specified Final date';
+      if (currentRow.isFinal.toUpperCase() === 'Y') {
+        if (booking.finalSalesDate) {
+          returnString += ' | ERROR - Cannot have more than one Is Final Date for a Booking';
+          errorOccurred = true;
+        } else {
+          booking.finalSalesDate = new Date(currentRow.salesDate);
         }
       }
+
+      // // check for if currentRow.seats/value for its given salesDate has an increase over 15% from its previous sales date
+      // const sortedSales = booking.sales.sort((a,b) => a.salesDate.getTime() - b.salesDate.getTime());
+      // let previousSale;
+
+      // for (let i = 0; i < sortedSales.length; i++) {
+      //   if (sortedSales[i].salesDate < new Date(currentRow.salesDate)) {
+      //     previousSale = sortedSales[i];
+      //   } else {
+      //     break;
+      //   }
+      // }
+
+      // if (previousSale) {
+      //   if (currentRow.seats > previousSale.seats * 1.15) {
+      //     returnString += "| WARNING - Seats increased by more than 15%"
+      //     warningOccured = true;
+      //   }
+      //   if (parseFloat(currentRow.value) > previousSale.value * 1.15) {
+      //     returnString += "| WARNING - Value increased by more than 15%"
+      //     warningOccured = true;
+      //   }
+      // }
     } else {
       venue.bookings.push({
         bookingDate: new Date(currentRow.bookingDate),
-        finalDate: currentRow.isFinal.toUpperCase() === 'Y' ? new Date(currentRow.salesDate) : null,
+        finalSalesDate: currentRow.isFinal.toUpperCase() === 'Y' ? new Date(currentRow.salesDate) : null,
         sales: [
           {
             salesDate: new Date(currentRow.salesDate),
@@ -509,7 +538,7 @@ const updateValidateSpreadsheedData = (
       bookings: [
         {
           bookingDate: new Date(currentRow.bookingDate),
-          finalDate: currentRow.isFinal.toUpperCase() === 'Y' ? new Date(currentRow.salesDate) : null,
+          finalSalesDate: currentRow.isFinal.toUpperCase() === 'Y' ? new Date(currentRow.salesDate) : null,
           sales: [
             {
               salesDate: new Date(currentRow.salesDate),
@@ -527,6 +556,13 @@ const updateValidateSpreadsheedData = (
   }
 
   return { returnString, warningOccured, errorOccurred };
+};
+
+// Return the already entered info for a VenueCode/BookingDate entry for a given row.
+const getCurrentBookingInfo = (spreadsheetData: SpreadsheetData, currentVenue, currentBookingDate) => {
+  const venue = spreadsheetData.venues.find((v) => v.venueCode === currentVenue);
+  const booking = venue.bookings.find((b) => b.bookingDate.getTime() === new Date(currentBookingDate).getTime());
+  return booking;
 };
 
 const formatDetailsMessage = (detailsMessage: string) => {
