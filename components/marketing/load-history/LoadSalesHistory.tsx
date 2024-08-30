@@ -26,9 +26,11 @@ const LoadSalesHistory = () => {
 
   const { productions, selected } = useRecoilValue(productionJumpState);
   const selectedProducton = productions.filter((prod) => prod.Id === selected)[0];
-  const prodCode = selectedProducton.ShowCode;
+  const prodCode = selectedProducton ? selectedProducton.ShowCode : null;
   const venueList = useRecoilValue(venueState);
-  const dateRange = dateToSimple(selectedProducton.StartDate) + '-' + dateToSimple(selectedProducton.EndDate);
+  const dateRange = selectedProducton
+    ? dateToSimple(selectedProducton.StartDate) + '-' + dateToSimple(selectedProducton.EndDate)
+    : null;
 
   const onSave = async (file, onProgress, onError, onUploadingImage) => {
     const {
