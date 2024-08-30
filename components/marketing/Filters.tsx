@@ -15,6 +15,7 @@ import { DATE_PATTERN, getWeekDayShort } from 'services/dateService';
 import { currencyState } from 'state/marketing/currencyState';
 import axios from 'axios';
 import { LastPerfDate } from 'types/MarketingTypes';
+import { isNullOrEmpty } from 'utils';
 
 type FutureBooking = {
   hasFutureBooking: boolean;
@@ -34,6 +35,8 @@ const Filters = () => {
   const [landingURL, setLandingURL] = useState('');
   const [futureBookings, setFutureBookings] = useState<FutureBooking>({ hasFutureBooking: false, nextBooking: null });
   const [lastDates, setLastDates] = useState([]);
+  const [ogImage, setOgImage] = useState(null);
+  const [ogTitle, setOgTitle] = useState(null);
 
   const bookingOptions = useMemo(() => {
     const initialOptions = bookings.bookings ? mapBookingsToProductionOptions(bookings.bookings) : [];
@@ -128,6 +131,25 @@ const Filters = () => {
   };
 
   useEffect(() => {
+    const getOpenGraphInfo = async () => {
+      try {
+        const response = await axios.post('/api/marketing/openGraphInfo/read', { url: landingURL });
+        const result = await response.data;
+        const { ogImage, ogTitle } = result;
+        if (!isNullOrEmpty(ogImage)) {
+          setOgImage(ogImage);
+          setOgTitle(ogTitle);
+        }
+      } catch (exception) {
+        //  If you print the exceptions here then it will give an error whenever this isnt an image preview
+      }
+    };
+
+    setOgImage(null);
+    if (!isNullOrEmpty(landingURL)) getOpenGraphInfo();
+  }, [landingURL]);
+
+  useEffect(() => {
     fetchLastDates();
     setSelectedIndex(-1);
     setSelectedValue(null);
@@ -201,8 +223,16 @@ const Filters = () => {
           />
 
           {/* Iframe placed next to buttons but in the same flex container */}
-          <div className="self-end -mt-[60px] cursor-pointer">
-            <Iframe variant="xs" src={landingURL} />
+          <div className=" -mt-[50px] cursor-pointer w-[150px]">
+            {isNullOrEmpty(landingURL) ? (
+              'No URL Provided'
+            ) : isNullOrEmpty(ogImage) ? (
+              <Iframe src={landingURL} variant="xs" />
+            ) : (
+              <a href={landingURL} target="_blank" rel="noreferrer">
+                <img src={ogImage.url} alt={ogTitle} key={landingURL} className="w-[150px] h-[81px]" />
+              </a>
+            )}
           </div>
         </div>
       </div>
