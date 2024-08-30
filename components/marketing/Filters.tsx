@@ -230,7 +230,7 @@ const Filters = () => {
           {/* Iframe placed next to buttons but in the same flex container */}
           <div className=" -mt-[50px] cursor-pointer w-[150px]">
             {!landingUrlValid ? (
-              'No URL Provided'
+              'No URL or Invalid URL Provided'
             ) : isNullOrEmpty(ogImage) ? (
               <Iframe src={landingURL} variant="xs" />
             ) : (
@@ -242,7 +242,7 @@ const Filters = () => {
         </div>
       </div>
 
-      <MarketingButtons venueName={venueName} venueId={venueId} />
+      <MarketingButtons venueName={venueName} venueId={venueId} setModalLandingURL={setLandingURL} />
     </div>
   );
 };
