@@ -33,6 +33,7 @@ interface SpreadsheetData {
         value: string;
         isFinal: string;
         ignoreWarning: string;
+        rowNumber: number;
       }[];
     }[];
   }[];
@@ -196,6 +197,8 @@ export const validateSpreadsheetFile = async (file, prodCode, venueList, prodDat
       }
     });
   });
+
+  console.log(spreadsheetData);
 
   const buffer = await workbook.xlsx.writeBuffer();
   const blob = new Blob([buffer], { type: file[0].file.type });
@@ -440,12 +443,15 @@ const updateValidateSpreadsheedData = (
   const venue = spreadsheetData.venues.find((v) => v.venueCode === currentVenue);
 
   if (venue) {
+    // if VenueCode has already been entered in Spreadsheet previously
     const booking = venue.bookings.find((b) => b.bookingDate.getTime() === new Date(currentBookingDate).getTime());
 
     if (booking) {
+      // if VenueCode/BookingDate has already been entered in Spreadsheet previously
       const sale = booking.sales.find((s) => s.salesDate.getTime() === new Date(currentRow.salesDate).getTime());
 
       if (sale) {
+        // if VenueCode/BookingDate/SalesDate has already been entered in Spreadsheet previously
         if (
           sale.seats !== currentRow.seats ||
           sale.value !== currentRow.value ||
@@ -453,11 +459,10 @@ const updateValidateSpreadsheedData = (
           sale.isFinal.toUpperCase() !== currentRow.isFinal.toUpperCase() ||
           sale.ignoreWarning.toUpperCase() !== currentRow.ignoreWarning.toUpperCase()
         ) {
-          returnString += `| ERROR - Mismatch in information for Venue: ${currentVenue}, Booking Date: ${dateToSimple(
+          // if any of the values do not match up between duplicate VenueCode/BookingDate/SalesDate entries
+          returnString += `| ERROR - Mismatch in information for Booking at Venue ${currentVenue} on ${dateToSimple(
             currentBookingDate,
-          )}, Sales Date: ${dateToSimple(
-            currentRow.salesDate,
-          )}. Please ensure duplicate Venue/Booking/Sales date combinations have identical values.`;
+          )}, on Sales Date ${dateToSimple(currentRow.salesDate)}. (Row ${sale.rowNumber})`;
           errorOccurred = true;
         }
       } else {
@@ -468,6 +473,7 @@ const updateValidateSpreadsheedData = (
           value: currentRow.value,
           isFinal: currentRow.isFinal,
           ignoreWarning: currentRow.ignoreWarning,
+          rowNumber: currentRow.rowNumber,
         });
       }
     } else {
@@ -481,6 +487,7 @@ const updateValidateSpreadsheedData = (
             value: currentRow.value,
             isFinal: currentRow.isFinal,
             ignoreWarning: currentRow.ignoreWarning,
+            rowNumber: currentRow.rowNumber,
           },
         ],
       });
@@ -499,6 +506,7 @@ const updateValidateSpreadsheedData = (
               value: currentRow.value,
               isFinal: currentRow.isFinal,
               ignoreWarning: currentRow.ignoreWarning,
+              rowNumber: currentRow.rowNumber,
             },
           ],
         },
