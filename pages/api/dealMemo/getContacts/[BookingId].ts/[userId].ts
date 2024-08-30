@@ -1,4 +1,4 @@
-import prisma from 'lib/prisma';
+import master from 'lib/prisma_master';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getEmailFromReq, checkAccess } from 'services/userService';
 
@@ -9,9 +9,9 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const email = await getEmailFromReq(req);
     const access = await checkAccess(email, { BookingId });
     if (!access) return res.status(401).end();
-    const getDealMemo = await prisma.user.findUnique({
+    const getDealMemo = await master.user.findUnique({
       where: {
-        Id: userId,
+        UserId: userId,
       },
       include: {
         AccountUser: {
@@ -26,7 +26,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       },
     });
 
-    await res.json(getDealMemo);
+    res.status(200).json(getDealMemo);
   } catch (err) {
     console.log(err);
     res.status(403).json({ err: 'Error occurred while getting data for contacts' });

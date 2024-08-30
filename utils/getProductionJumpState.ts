@@ -24,6 +24,7 @@ export const getProductionJumpState = async (ctx, path: string): Promise<Product
         if (db) {
           db = dateBlockMapper(db);
         }
+
         return {
           Id: t.Id,
           Code: t.Code,
@@ -38,6 +39,7 @@ export const getProductionJumpState = async (ctx, path: string): Promise<Product
           RunningTime: t.RunningTime ? dateTimeToTime(t.RunningTime.toISOString()) : null,
           RunningTimeNote: t.RunningTimeNote,
           SalesFrequency: t.SalesFrequency,
+          ProductionCompany: t.ProductionCompany,
         };
       })
       .sort((a, b) => {
