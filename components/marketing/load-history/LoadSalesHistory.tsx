@@ -33,11 +33,14 @@ const LoadSalesHistory = () => {
     : null;
 
   const onSave = async (file, onProgress, onError, onUploadingImage) => {
-    const {
-      file: validateFile,
-      spreadsheetErrorOccured,
-      spreadsheetWarningOccured,
-    } = await validateSpreadsheetFile(file, prodCode, venueList, dateRange);
+    const { file: validateFile, spreadsheetIssues } = await validateSpreadsheetFile(
+      file,
+      prodCode,
+      venueList,
+      dateRange,
+    );
+    const spreadsheetErrorOccured = spreadsheetIssues.spreadsheetErrorOccurred;
+    const spreadsheetWarningOccured = spreadsheetIssues.spreadsheetWarningOccured;
     setUploadedFile(validateFile);
     setUploadParams({ onProgress, onError, onUploadingImage, spreadsheetErrorOccured, spreadsheetWarningOccured });
     setConfirmationModalVisible(true);
