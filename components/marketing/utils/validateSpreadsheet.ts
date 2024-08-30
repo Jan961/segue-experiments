@@ -1,6 +1,6 @@
 import ExcelJS from 'exceljs';
 import { VenueMinimalDTO } from 'interfaces';
-import { simpleToDateDMY } from 'services/dateService';
+import { simpleToDateDMY, dateToSimple } from 'services/dateService';
 
 interface SpreadsheetRow {
   productionCode: string;
@@ -26,8 +26,8 @@ interface SpreadsheetData {
         salesType: string;
         seats: number;
         value: string;
-        isFinal: boolean;
-        ignoreWarning: boolean;
+        isFinal: string;
+        ignoreWarning: string;
       }[];
     }[];
   }[];
@@ -56,77 +56,7 @@ enum ignoreWarningType {
   '',
 }
 
-const updateSpreadsheetData = (
-  spreadsheetData: SpreadsheetData,
-  currentRow: SpreadsheetRow,
-  currentVenue: string,
-  currentBookingDate: string,
-) => {
-  const venue = spreadsheetData.venues.find((v) => v.venueCode === currentVenue);
-
-  if (venue) {
-    const booking = venue.bookings.find((b) => b.bookingDate.getTime() === new Date(currentBookingDate).getTime());
-
-    if (booking) {
-      const sale = booking.sales.find((s) => s.salesDate.getTime() === new Date(currentRow.salesDate).getTime());
-
-      if (sale) {
-        if (sale.seats !== currentRow.seats || sale.value !== currentRow.value) {
-          throw new Error(
-            `Mismatch in seats or value for venue: ${currentRow.venueCode}, booking date: ${currentRow.bookingDate}, sales date: ${currentRow.salesDate}`,
-          );
-        } else {
-          console.log('...');
-          
-        }
-      } else {
-        booking.sales.push({
-          salesDate: new Date(currentRow.salesDate),
-          salesType: currentRow.salesType,
-          seats: currentRow.seats,
-          value: currentRow.value,
-          isFinal: currentRow.isFinal === 'true',
-          ignoreWarning: currentRow.ignoreWarning === 'true',
-        });
-      }
-    } else {
-      venue.bookings.push({
-        bookingDate: new Date(currentRow.bookingDate),
-        sales: [
-          {
-            salesDate: new Date(currentRow.salesDate),
-            salesType: currentRow.salesType,
-            seats: currentRow.seats,
-            value: currentRow.value,
-            isFinal: currentRow.isFinal === 'true',
-            ignoreWarning: currentRow.ignoreWarning === 'true',
-          },
-        ],
-      });
-    }
-  } else {
-    spreadsheetData.venues.push({
-      venueCode: currentRow.venueCode,
-      bookings: [
-        {
-          bookingDate: new Date(currentRow.bookingDate),
-          sales: [
-            {
-              salesDate: new Date(currentRow.salesDate),
-              salesType: currentRow.salesType,
-              seats: currentRow.seats,
-              value: currentRow.value,
-              isFinal: currentRow.isFinal === 'true',
-              ignoreWarning: currentRow.ignoreWarning === 'true',
-            },
-          ],
-        },
-      ],
-    });
-  }
-};
-
-export const validateSpreadsheetFile = async (file, prodCode, venueList, dateRange) => {
+export const validateSpreadsheetFile = async (file, prodCode, venueList, prodDateRange) => {
   // file[0].file = new File([], file[0].file.name)
   // note that the check when hitting the ok/upload button uses the selectedfiles list to check for progress and updating the file name here and not there cause issue
 
@@ -191,7 +121,10 @@ export const validateSpreadsheetFile = async (file, prodCode, venueList, dateRan
           rowNumber,
           prodCode,
           venueList,
-          dateRange,
+          prodDateRange,
+          spreadsheetData,
+          currentVenue,
+          currentBookingDate,
         );
         const responseCell = row.getCell(10);
 
@@ -234,7 +167,7 @@ export const validateSpreadsheetFile = async (file, prodCode, venueList, dateRan
             spreadsheetWarningOccured = true;
           }
 
-          if (currentRow.ignoreWarning.toLocaleUpperCase() !== 'Y') spreadsheetWarningOccured = true;
+          if (currentRow.ignoreWarning.toLocaleUpperCase() !== 'Y') spreadsheetWarningOccured = true; // don't raise a warning when ignore flag
         } else {
           responseCell.value = 'OK';
 
@@ -251,9 +184,6 @@ export const validateSpreadsheetFile = async (file, prodCode, venueList, dateRan
           const detailsCell = row.getCell(11);
           detailsCell.value = '';
         }
-
-        updateSpreadsheetData(spreadsheetData, currentRow, currentVenue, currentBookingDate);
-        console.log(spreadsheetData);
 
         previousRow = { ...currentRow };
       }
@@ -276,12 +206,15 @@ const validateRow = (
   rowNumber,
   prodCode,
   venueList: Record<number, VenueMinimalDTO>,
-  dateRange,
+  prodDateRange,
+  spreadsheetData,
+  currentVenue,
+  currentBookingDate,
 ) => {
   const validations = [
     validateProductionCode(currentRow, rowNumber, prodCode),
     validateVenueCode(currentRow, venueList),
-    validateBookingDate(currentRow, dateRange, prodCode),
+    validateBookingDate(currentRow, prodDateRange, prodCode),
     validateSalesDate(currentRow),
     validateSalesType(currentRow),
     validateSeats(currentRow, previousRow),
@@ -299,6 +232,16 @@ const validateRow = (
     if (validation.errorOccurred) rowErrorOccurred = true;
     if (validation.warningOccured) rowWarningOccured = true;
   });
+
+  const { returnString, errorOccurred, warningOccured } = updateValidateSpreadsheedData(
+    spreadsheetData,
+    currentRow,
+    currentVenue,
+    currentBookingDate,
+  );
+  detailsMessage += returnString;
+  if (errorOccurred) rowErrorOccurred = true;
+  if (warningOccured) rowWarningOccured = true;
 
   return { detailsMessage, rowErrorOccurred, rowWarningOccured };
 };
@@ -336,12 +279,12 @@ const validateVenueCode = (currentRow: SpreadsheetRow, venueList: Record<number,
   return { returnString, warningOccured, errorOccurred };
 };
 
-const validateBookingDate = (currentRow: SpreadsheetRow, dateRange, prodCode) => {
+const validateBookingDate = (currentRow: SpreadsheetRow, prodDateRange, prodCode) => {
   let returnString = '';
   let errorOccurred = false;
   const warningOccured = false;
 
-  const productionDates = dateRange.split('-');
+  const productionDates = prodDateRange.split('-');
   const prodStartDate = simpleToDateDMY(productionDates[0]);
   const prodEndDate = simpleToDateDMY(productionDates[1]);
   const rowDate = new Date(currentRow.bookingDate);
@@ -472,6 +415,89 @@ const validateIgnoreWarning = (currentRow: SpreadsheetRow) => {
   if (!Object.values(ignoreWarningType).includes(currentRow.ignoreWarning)) {
     returnString += "| ERROR - Ignore Warning must either be 'Y', 'N', or blank";
     errorOccurred = true;
+  }
+
+  return { returnString, warningOccured, errorOccurred };
+};
+
+// Update SpreadsheetData var with the new row data and return any Warnings/Errors raised in the process
+const updateValidateSpreadsheedData = (
+  spreadsheetData: SpreadsheetData,
+  currentRow: SpreadsheetRow,
+  currentVenue: string,
+  currentBookingDate: string,
+) => {
+  let returnString = '';
+  const warningOccured = false;
+  let errorOccurred = false;
+
+  const venue = spreadsheetData.venues.find((v) => v.venueCode === currentVenue);
+
+  if (venue) {
+    const booking = venue.bookings.find((b) => b.bookingDate.getTime() === new Date(currentBookingDate).getTime());
+
+    if (booking) {
+      const sale = booking.sales.find((s) => s.salesDate.getTime() === new Date(currentRow.salesDate).getTime());
+
+      if (sale) {
+        if (
+          sale.seats !== currentRow.seats ||
+          sale.value !== currentRow.value ||
+          sale.salesType !== currentRow.salesType ||
+          sale.isFinal.toUpperCase() !== currentRow.isFinal.toUpperCase() ||
+          sale.ignoreWarning.toUpperCase() !== currentRow.ignoreWarning.toUpperCase()
+        ) {
+          returnString += `| ERROR - Mismatch in information for Venue: ${currentVenue}, Booking Date: ${dateToSimple(
+            currentBookingDate,
+          )}, Sales Date: ${dateToSimple(
+            currentRow.salesDate,
+          )}. Please ensure duplicate Venue/Booking/Sales date combinations have identical values.`;
+          errorOccurred = true;
+        }
+      } else {
+        booking.sales.push({
+          salesDate: new Date(currentRow.salesDate),
+          salesType: currentRow.salesType,
+          seats: currentRow.seats,
+          value: currentRow.value,
+          isFinal: currentRow.isFinal,
+          ignoreWarning: currentRow.ignoreWarning,
+        });
+      }
+    } else {
+      venue.bookings.push({
+        bookingDate: new Date(currentRow.bookingDate),
+        sales: [
+          {
+            salesDate: new Date(currentRow.salesDate),
+            salesType: currentRow.salesType,
+            seats: currentRow.seats,
+            value: currentRow.value,
+            isFinal: currentRow.isFinal,
+            ignoreWarning: currentRow.ignoreWarning,
+          },
+        ],
+      });
+    }
+  } else {
+    spreadsheetData.venues.push({
+      venueCode: currentRow.venueCode,
+      bookings: [
+        {
+          bookingDate: new Date(currentRow.bookingDate),
+          sales: [
+            {
+              salesDate: new Date(currentRow.salesDate),
+              salesType: currentRow.salesType,
+              seats: currentRow.seats,
+              value: currentRow.value,
+              isFinal: currentRow.isFinal,
+              ignoreWarning: currentRow.ignoreWarning,
+            },
+          ],
+        },
+      ],
+    });
   }
 
   return { returnString, warningOccured, errorOccurred };
