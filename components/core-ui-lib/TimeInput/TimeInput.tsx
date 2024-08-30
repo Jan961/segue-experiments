@@ -40,12 +40,15 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
     };
 
     const handleBlur = (e) => {
+      const { name, value } = e.target;
+    
+      // Add leading zero if needed
+      const paddedValue = value.length === 1 ? `0${value}` : value;
+    
       if (!isNullOrEmpty(onBlur)) {
-        onBlur(e);
+        onBlur({ ...e, target: { ...e.target, value: paddedValue } });
       } else {
-        const { name, value } = e.target;
-        // Adds a 0 to the front if it is a single digit on blur (e.g. 7 would become 07)
-        filterTimeInput(name, `${value.length === 1 ? '0' : ''}${value}`);
+        filterTimeInput(name, paddedValue);
       }
     };
 
