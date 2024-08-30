@@ -16,6 +16,7 @@ import { currencyState } from 'state/marketing/currencyState';
 import axios from 'axios';
 import { LastPerfDate } from 'types/MarketingTypes';
 import { isNullOrEmpty } from 'utils';
+import { validateUrl } from 'utils/validateUrl';
 
 type FutureBooking = {
   hasFutureBooking: boolean;
@@ -37,6 +38,7 @@ const Filters = () => {
   const [lastDates, setLastDates] = useState([]);
   const [ogImage, setOgImage] = useState(null);
   const [ogTitle, setOgTitle] = useState(null);
+  const [landingUrlValid, setLandingUrlValid] = useState<boolean>(false);
 
   const bookingOptions = useMemo(() => {
     const initialOptions = bookings.bookings ? mapBookingsToProductionOptions(bookings.bookings) : [];
@@ -146,7 +148,10 @@ const Filters = () => {
     };
 
     setOgImage(null);
-    if (!isNullOrEmpty(landingURL)) getOpenGraphInfo();
+
+    const urlValid = validateUrl(landingURL);
+    setLandingUrlValid(urlValid);
+    if (!isNullOrEmpty(landingURL) && urlValid) getOpenGraphInfo();
   }, [landingURL]);
 
   useEffect(() => {
@@ -224,7 +229,7 @@ const Filters = () => {
 
           {/* Iframe placed next to buttons but in the same flex container */}
           <div className=" -mt-[50px] cursor-pointer w-[150px]">
-            {isNullOrEmpty(landingURL) ? (
+            {!landingUrlValid ? (
               'No URL Provided'
             ) : isNullOrEmpty(ogImage) ? (
               <Iframe src={landingURL} variant="xs" />
