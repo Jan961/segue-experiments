@@ -128,6 +128,7 @@ const MasterTasks = (props: InferGetServerSidePropsType<typeof getServerSideProp
     } finally {
       setIsLoading(false);
     }
+    await router.push(router.asPath);
   };
 
   const updateTableData = async (task: any, isAdding: boolean) => {
