@@ -22,10 +22,7 @@ interface SpreadsheetData {
     venueCode: string;
     bookings: {
       bookingDate: Date;
-      // finalSaleEntry: {
-      //   hasIsFinalOccured: boolean;
-      //   finalSalesDate: Date;
-      // }
+      finalDate: Date;
       sales: {
         salesDate: Date;
         salesType: string;
@@ -135,6 +132,7 @@ export const validateSpreadsheetFile = async (file, prodCode, venueList, prodDat
           currentBookingDate,
         );
         const responseCell = row.getCell(10);
+        const formattedDetailsMessage = formatDetailsMessage(detailsMessage);
 
         if (rowErrorOccurred) {
           responseCell.value = 'ERROR';
@@ -151,7 +149,7 @@ export const validateSpreadsheetFile = async (file, prodCode, venueList, prodDat
           };
 
           const detailsCell = row.getCell(11);
-          detailsCell.value = detailsMessage;
+          detailsCell.value = formattedDetailsMessage;
 
           spreadsheetErrorOccured = true;
         } else if (rowWarningOccured) {
@@ -168,7 +166,7 @@ export const validateSpreadsheetFile = async (file, prodCode, venueList, prodDat
           };
 
           const detailsCell = row.getCell(11);
-          detailsCell.value = detailsMessage;
+          detailsCell.value = formattedDetailsMessage;
 
           const ignoreWarningCell = row.getCell(9);
           if (ignoreWarningCell.value !== 'Y') {
@@ -462,10 +460,11 @@ const updateValidateSpreadsheedData = (
           // if any of the values do not match up between duplicate VenueCode/BookingDate/SalesDate entries
           returnString += `| ERROR - Mismatch in information for Booking at Venue ${currentVenue} on ${dateToSimple(
             currentBookingDate,
-          )}, on Sales Date ${dateToSimple(currentRow.salesDate)}. (Row ${sale.rowNumber})`;
+          )}, on Sales Date ${dateToSimple(currentRow.salesDate)} (Row ${sale.rowNumber})`;
           errorOccurred = true;
         }
       } else {
+        booking.finalDate = currentRow.isFinal.toUpperCase() === 'Y' ? new Date(currentRow.salesDate) : null;
         booking.sales.push({
           salesDate: new Date(currentRow.salesDate),
           salesType: currentRow.salesType,
@@ -476,9 +475,21 @@ const updateValidateSpreadsheedData = (
           rowNumber: currentRow.rowNumber,
         });
       }
+
+      if (currentRow.isFinal && booking.finalDate) {
+        returnString += '| ERROR - Duplicate Is Final dates';
+        errorOccurred = true;
+      } // wrong doesnt work because finalDate is only being added when new booking is being added
+
+      if (booking.finalDate) {
+        if (new Date(currentRow.salesDate) > booking.finalDate) {
+          returnString += '| ERROR - Cannot add more sales after specified Final date';
+        }
+      }
     } else {
       venue.bookings.push({
         bookingDate: new Date(currentRow.bookingDate),
+        finalDate: currentRow.isFinal.toUpperCase() === 'Y' ? new Date(currentRow.salesDate) : null,
         sales: [
           {
             salesDate: new Date(currentRow.salesDate),
@@ -498,6 +509,7 @@ const updateValidateSpreadsheedData = (
       bookings: [
         {
           bookingDate: new Date(currentRow.bookingDate),
+          finalDate: currentRow.isFinal.toUpperCase() === 'Y' ? new Date(currentRow.salesDate) : null,
           sales: [
             {
               salesDate: new Date(currentRow.salesDate),
@@ -515,6 +527,18 @@ const updateValidateSpreadsheedData = (
   }
 
   return { returnString, warningOccured, errorOccurred };
+};
+
+const formatDetailsMessage = (detailsMessage: string) => {
+  const parts = detailsMessage.split('|').map((part) => part.trim());
+  const errors = parts.filter((part) => part.startsWith('ERROR -')).join('| ');
+  const warnings = parts.filter((part) => part.startsWith('WARNING -')).join(' | ');
+
+  let returnString = '';
+  if (errors) returnString += '| ' + errors;
+  if (warnings) returnString += '| ' + warnings;
+
+  return returnString;
 };
 
 export default validateSpreadsheetFile;
