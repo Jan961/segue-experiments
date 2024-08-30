@@ -1,5 +1,4 @@
 import { forwardRef, useEffect, useRef, useState } from 'react';
-import Label from '../Label';
 import classNames from 'classnames';
 import { isNullOrEmpty } from 'utils';
 
@@ -31,7 +30,6 @@ const isOfTypTime = (t: any): t is Time => t.hrs !== undefined && t.min !== unde
 const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
   ({ onChange, value, onBlur, disabled, className, tabIndexShow, index, onInput }: TimeInputProps, ref) => {
     const [time, setTime] = useState<Time>(DEFAULT_TIME);
-    const disabledClass = disabled ? `!bg-disabled-input !cursor-not-allowed !pointer-events-none` : '';
     const hrsRef = useRef(null);
     const minsRef = useRef(null);
 
@@ -91,9 +89,8 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
         setTime(DEFAULT_TIME);
       }
     }, [value]);
-    return disabled ? (
-      <Label text={`${time.hrs} : ${time.min}`} className={`${baseClass} ${disabledClass}`} />
-    ) : (
+
+    return (
       <div
         ref={ref}
         className={classNames(baseClass, className)}

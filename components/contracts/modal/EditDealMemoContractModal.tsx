@@ -9,7 +9,6 @@ import Button from 'components/core-ui-lib/Button';
 import {
   ContactDemoFormAccountData,
   ContactDemoFormData,
-  ContactsFormData,
   DealMemoContractFormData,
   DealMemoHoldType,
   ProductionDTO,
@@ -94,6 +93,7 @@ export const EditDealMemoContractModal = ({
     [venueData],
   );
 
+  console.log(selectedTableCell);
   console.log(productionJumpState);
 
   const venueUserData = useMemo(() => {
@@ -225,17 +225,21 @@ export const EditDealMemoContractModal = ({
     setIsLoading(true);
     setContactsFormData({ ...updatedFormData });
     setContactsData({ email: '', phone: '' });
+
     if (value) {
       try {
-        const userData = (await axios.get(
-          `/api/dealMemo/getContacts/${selectedTableCell.contract.Id}/${value}`,
-        )) as ContactsFormData;
-        if (userData.data !== null) {
-          const data = {
-            email: userData.data?.Email,
-            phone: userData.data?.AccountUser.Account.AccountContact.AccContPhone,
+        const { data } = await axios.get('/api/dealMemo/contact/read', {
+          params: {
+            accUserId: value,
+          },
+        });
+
+        if (data !== null) {
+          const contactInfo = {
+            email: data?.AccContMainEmail,
+            phone: data?.AccContPhone,
           };
-          setContactsData(data);
+          setContactsData(contactInfo);
         }
       } catch (error) {
         console.error(error);
@@ -493,8 +497,8 @@ export const EditDealMemoContractModal = ({
           <div className="w-1/5 text-primary-input-text font-bold">Performance Date(s) and Time(s)</div>
           <div className="w-4/5 flex">
             <div>
-              {selectedTableCell.contract.performanceTimes &&
-                parseAndSortDates(selectedTableCell.contract.performanceTimes).map((dateTimeEntry) => (
+              {selectedTableCell.contract.PerformanceTimes &&
+                parseAndSortDates(selectedTableCell.contract.PerformanceTimes).map((dateTimeEntry) => (
                   <TextInput
                     key={dateTimeEntry.id}
                     testId="performanceDate"
@@ -507,7 +511,7 @@ export const EditDealMemoContractModal = ({
                     }
                   />
                 ))}
-              {!selectedTableCell.contract.performanceTimes && (
+              {!selectedTableCell.contract.PerformanceTimes && (
                 <TextInput
                   testId="performanceTime"
                   className="w-[350px] mt-1 mb-1 text-primary-input-text font-bold"
@@ -1391,6 +1395,8 @@ export const EditDealMemoContractModal = ({
               options={[{ text: 'Select Assignee', value: null }, ...userList]}
               isClearable
               isSearchable
+              // * ARUN * there is something not right about this.
+              // components\productions\ProductionViewModal.tsx has this on lines 160-167
               renderOption={(option) => <CustomOption option={option} isMulti={true} />}
               value={sendTo}
             />
