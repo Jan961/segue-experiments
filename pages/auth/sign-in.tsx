@@ -6,7 +6,6 @@ import { useSignIn, useClerk } from '@clerk/nextjs';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import axios from 'axios';
-import redis from 'lib/redis';
 import { accountLoginSchema, loginSchema } from 'validators/auth';
 
 import * as yup from 'yup';
@@ -82,8 +81,12 @@ const SignIn = () => {
       });
       if (data.isValid) {
         // Set organisation id on redis
-        const redisResonse = await redis.set(loginDetails.email, loginDetails.company);
-        if (redisResonse) {
+
+        const { data } = await axios.post('/api/user/session/create', {
+          email: loginDetails.email,
+          organisationId: loginDetails.company,
+        });
+        if (data.success) {
           router.push('/');
         } else {
           console.error('Error setting redis');
@@ -102,8 +105,13 @@ const SignIn = () => {
       // Sign out from Clerk
       await signOut();
       // Remove organisation id on redis
-      await redis.del(loginDetails.email);
+      const { data } = await axios.post('/api/user/session/create', {
+        email: loginDetails.email,
+      });
 
+      if (!data.success) {
+        console.error('Error deleting user session');
+      }
       setIsAuthenticated(false);
       setLoginDetails({ email: '', password: '', company: '', pin: '' });
       router.replace(router.asPath);

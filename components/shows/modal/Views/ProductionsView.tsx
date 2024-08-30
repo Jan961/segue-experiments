@@ -6,7 +6,7 @@ import Table from 'components/core-ui-lib/Table';
 import { getProductionsConvertedPayload } from 'components/shows/constants';
 import { productionsTableConfig } from 'components/shows/table/tableConfig';
 import { useRouter } from 'next/router';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import useComponentMountStatus from 'hooks/useComponentMountStatus';
 import { sortByProductionStartDate } from './util';
 import { notify } from 'components/core-ui-lib/Notifications';
@@ -16,6 +16,8 @@ import ProductionDetailsForm, { ProductionFormData, defaultProductionFormData } 
 import LoadingOverlay from 'components/shows/LoadingOverlay';
 import CurrencyConversionModal from './CurrencyConversionModal';
 import { ConfirmationDialog, PopupModal } from 'components/core-ui-lib';
+import { all, group, objectify } from 'radash';
+import { ICurrency, ICurrencyCountry } from 'interfaces';
 
 interface ProductionsViewProps {
   showData: any;
@@ -40,6 +42,8 @@ const ProductionsView = ({ showData, visible, onClose }: ProductionsViewProps) =
   const [openEditModal, setOpenEditModal] = useState<boolean>(false);
   const [confirm, setConfirm] = useState<boolean>(false);
   const [openCurrencyConversionModal, setOpenCurrencyConversionModal] = useState<boolean>(false);
+  const [currencyLookup, setCurrencyLookup] = useState<Record<string, ICurrency>>({});
+  const [currencyCountryLookup, setCurrencyCountryLookup] = useState<Record<string, ICurrencyCountry[]>>({});
   const [currentProduction, setCurrentProduction] = useState<ProductionFormData>(defaultProductionFormData);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isArchived, setIsArchived] = useState<boolean>(true);
@@ -70,6 +74,41 @@ const ProductionsView = ({ showData, visible, onClose }: ProductionsViewProps) =
   const archivedList = useMemo(() => {
     return sortByProductionStartDate(showData.productions.filter((item) => item.IsArchived && !item.IsDeleted));
   }, [showData, isArchived]);
+
+  const currencyCodeList = useMemo(
+    () =>
+      showData.productions?.flatMap?.(
+        (production) =>
+          production.ConversionRateList?.flatMap?.(({ ToCurrencyCode, FromCurrencyCode }) => [
+            ToCurrencyCode,
+            FromCurrencyCode,
+          ]),
+      ),
+    [showData.productions],
+  );
+
+  useEffect(() => {
+    updateCurrencyDetails(currencyCodeList);
+  }, [currencyCodeList]);
+
+  const updateCurrencyDetails = async (currencyCodeList) => {
+    try {
+      const [currencyList, countryList] = await all([
+        axios.post(`/api/currency/read/list`, { currencyCodeList }),
+        axios.post(`/api/currency/read/country-list`, { currencyCodeList }),
+      ]);
+      setCurrencyLookup(
+        objectify(
+          currencyList.data,
+          (c: ICurrency) => c.code,
+          (c) => c,
+        ),
+      );
+      setCurrencyCountryLookup(group(countryList.data, (c: ICurrencyCountry) => c.currencyCode));
+    } catch (e) {
+      console.log(e);
+    }
+  };
 
   const rowsData = useMemo(() => {
     if (isArchived) return [...unArchivedList, ...archivedList];
@@ -282,6 +321,8 @@ const ProductionsView = ({ showData, visible, onClose }: ProductionsViewProps) =
       {openCurrencyConversionModal && (
         <CurrencyConversionModal
           conversionRates={currentProduction?.conversionRateList}
+          currencyCountryLookup={currencyCountryLookup}
+          currencyLookup={currencyLookup}
           title={title || ''}
           visible={openCurrencyConversionModal}
           onClose={() => setOpenCurrencyConversionModal(false)}

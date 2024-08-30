@@ -15,7 +15,6 @@ import { BookingsWithPerformances } from 'services/bookingService';
 import { objectify, all } from 'radash';
 import { getDayTypes } from 'services/dayTypeService';
 import { getProductionJumpState } from 'utils/getProductionJumpState';
-import { getAccountIdFromReq } from 'services/userService';
 import useBookingFilter from 'hooks/useBookingsFilter';
 import Filters from 'components/bookings/Filters';
 import { getProductionsWithContent } from 'services/productionService';
@@ -47,8 +46,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
     The itinery or miles will be different however, as this relies on the preview booking, and has to be generateed programatically
   */
-  const AccountId = await getAccountIdFromReq(ctx.req);
-  const productionJump = await getProductionJumpState(ctx, 'bookings', AccountId);
+  const productionJump = await getProductionJumpState(ctx, 'bookings');
   const ProductionId = -1;
   productionJump.selected = -1;
 

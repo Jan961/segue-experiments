@@ -124,7 +124,7 @@ const MasterTasks = (props: InferGetServerSidePropsType<typeof getServerSideProp
     const updatedTask = { ...currentTask, Notes: value };
     setIsLoading(true);
     try {
-      await axios.put(`/api/tasks/master/update/`, updatedTask);
+      await axios.put(`/api/tasks/master/update/single/`, updatedTask);
     } finally {
       setIsLoading(false);
     }
@@ -206,9 +206,9 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   return {
     props: {
       masterTask: masterTasks,
-      usersList: Object.values(users).map(({ Id, FirstName = '', LastName = '' }) => ({
-        value: Id,
-        text: `${FirstName || ''} ${LastName || ''}`,
+      usersList: Object.values(users).map(({ AccUserId, UserFirstName = '', UserLastName = '' }) => ({
+        value: AccUserId,
+        text: `${UserFirstName || ''} ${UserLastName || ''}`,
       })),
     },
   };

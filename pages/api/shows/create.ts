@@ -2,18 +2,15 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import prisma from 'lib/prisma';
 import * as yup from 'yup';
 import { ShowDTO } from 'interfaces';
-import { getAccountId, getEmailFromReq } from 'services/userService';
 import { showSchema } from 'validators/show';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   const show: ShowDTO = req.body;
-  const email = await getEmailFromReq(req);
-  const AccountId = await getAccountId(email);
 
   try {
     const validatedData = await showSchema.validate(show, { abortEarly: true });
     const result = await prisma.show.create({
-      data: { ...validatedData, AccountId },
+      data: { ...validatedData },
     });
     res.status(200).json(result);
   } catch (error) {

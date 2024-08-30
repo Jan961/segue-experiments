@@ -1,6 +1,6 @@
 import { dateBlockMapper } from 'lib/mappers';
 import { ParsedUrlQuery } from 'querystring';
-import { pick } from 'radash';
+// import { pick } from 'radash';
 import { dateTimeToTime } from 'services/dateService';
 import { getAllProductions, getAllProductionRegions } from 'services/productionService';
 import { ProductionJump } from 'state/booking/productionJumpState';
@@ -10,9 +10,9 @@ interface Params extends ParsedUrlQuery {
   ProductionCode: string;
 }
 
-export const getProductionJumpState = async (ctx, path: string, AccountId: number): Promise<ProductionJump> => {
+export const getProductionJumpState = async (ctx, path: string): Promise<ProductionJump> => {
   const { ProductionCode, ShowCode } = (ctx.params || {}) as Params;
-  const productionsRaw = await getAllProductions(AccountId);
+  const productionsRaw = await getAllProductions();
   const allProductionRegions: any = await getAllProductionRegions();
   const selectedProduction = productionsRaw.find(
     (production: any) => production.Code === ProductionCode && production.Show.Code === ShowCode,
@@ -25,7 +25,8 @@ export const getProductionJumpState = async (ctx, path: string, AccountId: numbe
         if (db) {
           db = dateBlockMapper(db);
         }
-        const { File, ...company } = t.ProductionCompany;
+         // TODO: handle this
+        // const { File, ...company } = t.ProductionCompany;
         return {
           Id: t.Id,
           Code: t.Code,
@@ -40,7 +41,8 @@ export const getProductionJumpState = async (ctx, path: string, AccountId: numbe
           RunningTime: t.RunningTime ? dateTimeToTime(t.RunningTime.toISOString()) : null,
           RunningTimeNote: t.RunningTimeNote,
           SalesFrequency: t.SalesFrequency,
-          ProductionCompany: { ...company, File: pick(File, ['Id', 'Location']) || null },
+          // TODO: Add production company details here from separate lookup 
+          // ProductionCompany: { ...company, File: pick(File, ['Id', 'Location']) || null },
         };
       })
       .sort((a, b) => {

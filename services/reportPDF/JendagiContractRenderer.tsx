@@ -323,9 +323,10 @@ const JendagiContract = ({
                   {'\n'}
                 </>
               )}
-              Holidays may be declared by {productionCompany?.Name ? productionCompany.Name : '!PRODUCTION COMPANY!'}.
-              Holiday pay shall be accrued and paid during declared holidays. Any outstanding holiday pay will be paid
-              at the end of the contract. Holiday pay shall be at the rate stated in Clause 14.
+              Holidays may be declared by{' '}
+              {productionCompany?.ProdCoName ? productionCompany.ProdCoName : '!PRODUCTION COMPANY!'}. Holiday pay shall
+              be accrued and paid during declared holidays. Any outstanding holiday pay will be paid at the end of the
+              contract. Holiday pay shall be at the rate stated in Clause 14.
             </Text>
           </View>
           <View style={styles.tableRow}>
@@ -433,7 +434,7 @@ const JendagiContract = ({
             <Text style={styles.tableCellNum}>25</Text>
             <Text style={styles.tableCellTitle}>MANAGER OR PRODUCER</Text>
             <Text style={styles.tableCell}>
-              {productionCompany?.Name ? productionCompany.Name : '!PRODUCTION COMPANY!'}
+              {productionCompany?.ProdCoName ? productionCompany.ProdCoName : '!PRODUCTION COMPANY!'}
             </Text>
           </View>
         </View>

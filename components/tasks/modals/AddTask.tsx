@@ -30,7 +30,7 @@ interface AddTaskProps {
   visible: boolean;
   isMasterTask?: boolean;
   onClose: () => void;
-  task?: Partial<MasterTask> & { ProductionId?: number; ProductionTaskRepeat?: any };
+  task?: Partial<MasterTask> & { ProductionId?: number; ProductionTaskRepeat?: any; RepeatInterval?: string };
   productionId?: number;
   updateTableData: (task: any, isAdding: boolean) => Promise<void>;
 }
@@ -67,9 +67,8 @@ const DEFAULT_MASTER_TASK: Partial<MasterTask> & {
   Code: 0,
   Name: '',
   Notes: '',
-  AssignedToUserId: null,
+  TaskAssignedToAccUserId: null,
   Priority: 0,
-  AccountId: 0,
   StartByWeekNum: 0,
   TaskStartByIsPostProduction: false,
   CompleteByWeekNum: 0,
@@ -117,7 +116,9 @@ const AddTask = ({
     useRecoilValue(currentProductionSelector) || productionList.find((item) => item.Id === productionId);
   useEffect(() => {
     setInputs(task);
+
     if (isNullOrEmpty(task?.Id)) setIsRecurring(true);
+    setIsRecurring(isNullOrEmpty(task?.RepeatInterval));
   }, [task]);
 
   const [status, setStatus] = useState({ submitted: true, submitting: false });
@@ -130,10 +131,9 @@ const AddTask = ({
   const [showRecurringDelete, setShowRecurringDelete] = useState<boolean>(false);
   const [showSingleDelete, setShowSingleDelete] = useState<boolean>(false);
   const [showConfirmationDialog, setShowConfirmationDialog] = useState<boolean>(false);
-  const showOverlay = useMemo(
-    () => showConfirmationDialog || showRecurringConfirmation || showRecurringDelete || showSingleDelete,
-    [showConfirmationDialog, showRecurringConfirmation, showRecurringDelete, showSingleDelete],
-  );
+  const showOverlay = useMemo(() => {
+    return showConfirmationDialog || showRecurringConfirmation || showRecurringDelete || showSingleDelete;
+  }, [showConfirmationDialog, showRecurringConfirmation, showRecurringDelete, showSingleDelete]);
   const router = useRouter();
   const priorityOptionList = useMemo(
     () => priorityOptions.map((option) => ({ ...option, text: `${option.value} - ${option.text}` })),
@@ -147,7 +147,7 @@ const AddTask = ({
   const weekOptionsNoDate = useMemo(
     () =>
       getWeekOptions(production, isMasterTask, false).filter((option) => {
-        return option.value >= inputs?.StartByWeekNum;
+        return parseInt(option.value.toString()) >= inputs?.StartByWeekNum;
       }),
     [production, isMasterTask, inputs?.StartByWeekNum],
   );
@@ -174,7 +174,7 @@ const AddTask = ({
   }, [inputs.Notes]);
 
   const generatePercentageOptions: SelectOption[] = Array.from({ length: 101 }, (_, index) => ({
-    text: index.toString(), // Ensure text is a string
+    text: index.toString(),
     value: index.toString(),
   }));
 
@@ -185,10 +185,12 @@ const AddTask = ({
       return [];
     }
 
-    return Object.values(users).map(({ Id, FirstName = '', LastName = '' }) => ({
-      value: Id,
-      text: `${FirstName || ''} ${LastName || ''}`,
+    const usersToReturn = Object.values(users).map(({ AccUserId, UserFirstName = '', UserLastName = '' }) => ({
+      value: AccUserId,
+      text: `${UserFirstName || ''} ${UserLastName || ''}`,
     }));
+
+    return usersToReturn;
   }, [users]);
 
   const handleOnChange = (e: any) => {
@@ -199,7 +201,7 @@ const AddTask = ({
     let { id, value, checked } = e.target;
     if (
       [
-        'AssignedToUserId',
+        'TaskAssignedToAccUserId',
         'StartByWeekNum',
         'CompleteByWeekNum',
         'Priority',
@@ -232,8 +234,12 @@ const AddTask = ({
     }
 
     let newInputs = { ...inputs, [id]: value };
-    if (id === 'Progress' && value === 100) {
-      newInputs = { ...newInputs, TaskCompletedDate: moment.utc(new Date(), 'DD/MM/YY').toString() };
+    if (id === 'Progress') {
+      newInputs = {
+        ...newInputs,
+        TaskCompletedDate: value === 100 ? moment.utc(new Date(), 'DD/MM/YY').toString() : null,
+      };
+
       setInputs(newInputs);
     } else {
       setInputs(newInputs);
@@ -514,7 +520,8 @@ const AddTask = ({
               onChange={(value) => handleOnChange({ target: { id: 'CompleteByWeekNum', value } })}
               value={inputs?.CompleteByWeekNum}
               options={weekOptionsDate.filter(
-                (option) => option.value >= inputs?.StartByWeekNum || isNullOrEmpty(inputs?.StartByWeekNum),
+                (option) =>
+                  parseInt(option.value.toString()) >= inputs?.StartByWeekNum || isNullOrEmpty(inputs?.StartByWeekNum),
               )}
               placeholder="Week No."
               className="w-52"
@@ -618,8 +625,8 @@ const AddTask = ({
         <div className="flex">
           <Label className="!text-secondary pr-6 mr-4" text="Assigned to" />
           <Select
-            onChange={(value) => handleOnChange({ target: { id: 'AssignedToUserId', value } })}
-            value={inputs?.AssignedToUserId}
+            onChange={(value) => handleOnChange({ target: { id: 'TaskAssignedToAccUserId', value } })}
+            value={inputs?.TaskAssignedToAccUserId}
             options={usersList}
             placeholder="Select Assignee"
             className="w-64"

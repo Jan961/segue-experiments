@@ -39,7 +39,6 @@ export default async function handle(req, res) {
       (async () => {
         for (const element of data) {
           if (element[dbField] === comparedValue) {
-            console.log(element);
             await prisma.setHold.update({
               where: { SetHoldId: element.SetHoldId },
               data: {

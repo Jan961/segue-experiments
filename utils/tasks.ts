@@ -59,7 +59,7 @@ export const applyTaskFilters = (
       if (filters.endDueDate && new Date(taskDueDate) > new Date(filters.endDueDate)) {
         matches = false;
       }
-      if (filters.assignee && task.AssignedToUserId !== filters.assignee) {
+      if (filters.assignee && task.TaskAssignedToAccUserId !== filters.assignee) {
         matches = false;
       }
       return matches;

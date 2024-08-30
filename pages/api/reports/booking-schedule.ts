@@ -1,4 +1,3 @@
-import { Prisma } from 'prisma/generated/prisma-client';
 import ExcelJS from 'exceljs';
 import prisma from 'lib/prisma';
 import moment from 'moment';
@@ -13,7 +12,6 @@ import {
 import { addWidthAsPerContent } from 'services/reportsService';
 import { makeRowTextBoldAndAllignLeft } from './promoter-holds';
 import { convertToPDF } from 'utils/report';
-import { toSql } from 'services/dateService';
 import { addBorderToAllCells } from 'utils/export';
 import { bookingStatusMap } from 'config/bookings';
 
@@ -41,18 +39,16 @@ type SCHEDULE_VIEW = {
   AffectsAvailability: number;
   SeqNo: number;
 };
-// type UniqueHeadersObject = {
-//   FullProductionCode: string,
-//   ShowName: string
-// }
 
 const makeRowBold = ({ worksheet, row }: { worksheet: any; row: number }) => {
   worksheet.getRow(row).font = { bold: true };
 };
+
 const firstRowFormatting = ({ worksheet }: { worksheet: any }) => {
   worksheet.getRow(1).font = { bold: true, size: 16 };
   worksheet.getRow(1).alignment = { horizontal: 'left' };
 };
+
 const styleHeader = ({ worksheet, row, numberOfColumns }: { worksheet: any; row: number; numberOfColumns: number }) => {
   for (let col = 1; col <= numberOfColumns; col++) {
     const cell = worksheet.getCell(row, col);
@@ -60,6 +56,7 @@ const styleHeader = ({ worksheet, row, numberOfColumns }: { worksheet: any; row:
     cell.alignment = { horizontal: 'center' };
   }
 };
+
 const addTime = (timeArr: string[] = []) => {
   if (!timeArr?.length) {
     return '00:00';
@@ -78,29 +75,44 @@ const addTime = (timeArr: string[] = []) => {
   const [h, m] = minsTime.split(':');
   return `${hour + Number(h)}:${Number(m)}`;
 };
+
 const getKey = ({ FullProductionCode, ShowName, EntryDate }) => `${FullProductionCode} - ${ShowName} - ${EntryDate}`;
 
 const handler = async (req, res) => {
   const { ProductionId, startDate: from, endDate: to, status, format } = req.body || {};
 
-  const formatedFromDate = toSql(from);
-  const formatedToDate = toSql(to);
   if (!from || !to || !ProductionId) {
     throw new Error('Params are missing');
   }
-  const conditions: Prisma.Sql[] = [];
-  if (from && to) {
-    conditions.push(Prisma.sql`EntryDate BETWEEN ${formatedFromDate} AND ${formatedToDate}`);
-  }
-  if (ProductionId) {
-    conditions.push(Prisma.sql` ProductionId=${ProductionId}`);
-  }
-  if (status && status !== 'all') {
-    conditions.push(Prisma.sql` EntryStatusCode=${status}`);
-  }
-  const where: Prisma.Sql = conditions.length ? Prisma.sql` where ${Prisma.join(conditions, ' and ')}` : Prisma.empty;
-  const data: SCHEDULE_VIEW[] = await prisma.$queryRaw`select * FROM ScheduleView ${where} order by EntryDate;`;
-  // const { RehearsalStartDate: fromDate, ProductionEndDate: toDate } = data?.[0] || {};
+
+  const formatedFromDate = new Date(from);
+  const formatedToDate = new Date(to);
+
+  // Construct the Prisma query
+  const data: SCHEDULE_VIEW[] = await prisma.scheduleView.findMany({
+    where: {
+      AND: [
+        {
+          EntryDate: {
+            gte: formatedFromDate,
+            lte: formatedToDate,
+          },
+        },
+        {
+          ProductionId,
+        },
+        status && status !== 'all'
+          ? {
+              EntryStatusCode: status,
+            }
+          : {},
+      ],
+    },
+    orderBy: {
+      EntryDate: 'asc',
+    },
+  });
+
   const workbook = new ExcelJS.Workbook();
   const formattedData = data.map((x) => ({
     ...x,
@@ -108,9 +120,11 @@ const handler = async (req, res) => {
     ProductionStartDate: moment(x.ProductionStartDate).format('YYYY-MM-DD'),
     ProductionEndDate: moment(x.ProductionEndDate).format('YYYY-MM-DD'),
   }));
+
   const worksheet = workbook.addWorksheet('Travel Summary', {
     pageSetup: { fitToPage: true, fitToHeight: 5, fitToWidth: 7 },
   });
+
   if (!formattedData?.length) {
     const filename = 'Booking Report.xlsx';
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
@@ -120,26 +134,29 @@ const handler = async (req, res) => {
     });
     return;
   }
+
   const { ShowName, FullProductionCode } = data[0];
   const title = `${FullProductionCode} ${ShowName} Travel Summary - ${moment().format('DD.MM.YY')}`;
   let headerRowsLength = 4;
   worksheet.addRow([title]);
   worksheet.addRow([]);
   if (from) {
-    worksheet.addRow([`Start Date: ${formatedFromDate}`]);
+    worksheet.addRow([`Start Date: ${moment(formatedFromDate).format('YYYY-MM-DD')}`]);
     headerRowsLength++;
   }
   if (to) {
-    worksheet.addRow([`End Date: ${formatedToDate}`]);
+    worksheet.addRow([`End Date: ${moment(formatedToDate).format('YYYY-MM-DD')}`]);
     headerRowsLength++;
   }
   if (status) {
     worksheet.addRow([`Status: ${status === 'all' ? 'All' : bookingStatusMap[status]}`]);
     headerRowsLength++;
   }
+
   worksheet.addRow(['', '', '', '', '', 'Onward Travel']);
   worksheet.addRow(['Day', 'Date', 'Week', 'Venue', 'Town', 'Time', 'Miles']);
   worksheet.addRow([]);
+
   const map: { [key: string]: SCHEDULE_VIEW } = formattedData.reduce((acc, x) => ({ ...acc, [getKey(x)]: x }), {});
   const daysDiff = moment(to).diff(moment(from), 'days');
   let rowNo = 5;
@@ -152,12 +169,14 @@ const handler = async (req, res) => {
   let mileage: number[] = [];
   let totalTime: string[] = [];
   let totalMileage: number[] = [];
+
   for (let i = 1; i <= daysDiff; i++) {
     lastWeekMetaInfo = { ...lastWeekMetaInfo, weekTotalPrinted: false };
     const weekDay = moment(moment(from).add(i - 1, 'day')).format('dddd');
     const dateInIncomingFormat = moment(moment(from).add(i - 1, 'day'));
     const key = getKey({ FullProductionCode, ShowName, EntryDate: dateInIncomingFormat.format('YYYY-MM-DD') });
     const value: SCHEDULE_VIEW = map[key];
+
     if (!value) {
       worksheet.addRow([weekDay.substring(0, 3), dateInIncomingFormat.format('DD/MM/YY'), `${prevProductionWeekNum}`]);
       colorTextAndBGCell({
@@ -173,7 +192,7 @@ const handler = async (req, res) => {
       time.push(formattedTime || '00:00');
       mileage.push(Number(Mileage) || 0);
       prevProductionWeekNum = ProductionWeekNum ? String(ProductionWeekNum) : prevProductionWeekNum;
-      // localhost:8002/api/v1/dummy
+
       worksheet.addRow([
         weekDay.substring(0, 3),
         dateInIncomingFormat.format('DD/MM/YY'),
@@ -230,6 +249,7 @@ const handler = async (req, res) => {
     }
     lastWeekMetaInfo = { ...lastWeekMetaInfo, prevProductionWeekNum };
   }
+
   if (time.length) {
     totalTime = [...totalTime, ...time];
   }
@@ -251,6 +271,7 @@ const handler = async (req, res) => {
     makeRowBold({ worksheet, row: rowNo });
     topAndBottomBorder({ worksheet, row: rowNo, colFrom: 5, colTo: 7, borderStyle: 'thin' });
   }
+
   worksheet.addRow([
     '',
     '',
@@ -274,12 +295,11 @@ const handler = async (req, res) => {
       worksheet.getColumn(char).width = 20;
     }
   }
-  // alignCellText({ worksheet, row: 1, col: 1, align: ALIGNMENT.LEFT })
-  // alignCellText({ worksheet, row: 2, col: 1, align: ALIGNMENT.LEFT })
-  // alignCellText({ worksheet, row: 5, col: 2, align: ALIGNMENT.LEFT })
+
   worksheet.getColumn('C').alignment = { horizontal: 'right' };
   worksheet.getColumn('F').alignment = { horizontal: 'right' };
   worksheet.getColumn('G').alignment = { horizontal: 'right' };
+
   addWidthAsPerContent({
     worksheet,
     fromColNumber: 2,
@@ -299,6 +319,7 @@ const handler = async (req, res) => {
   }
   addBorderToAllCells({ worksheet });
   worksheet.getCell(1, 1).font = { size: 16, color: { argb: COLOR_HEXCODE.WHITE }, bold: true };
+
   const filename = `${title}`;
   if (format === 'pdf') {
     worksheet.pageSetup.printArea = `A1:${worksheet.getColumn(11).letter}${worksheet.rowCount}`;

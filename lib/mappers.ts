@@ -10,15 +10,14 @@ import {
   BookingActivity,
   BookingContactNotes,
   ProductionTask,
-  User,
   File,
   ConversionRate,
-  Currency,
   Country,
   CountryInRegion,
   Region,
   GlobalBookingActivity,
 } from 'prisma/generated/prisma-client';
+import { Currency } from 'prisma/generated/prisma-master';
 import {
   ActivityDTO,
   BookingContactNoteDTO,
@@ -86,7 +85,6 @@ export const showMapper = (show: Show): ShowDTO => ({
 });
 
 export const showProductionMapper = (s: ShowWithProductions): ProductionDTO[] => {
-  // console.table(s.Production);
   return s.Production.map(productionEditorMapper);
 };
 
@@ -198,10 +196,12 @@ export const countryMapper = (
   RegionList: c.CountryInRegion.map((c) => c.Region) || [],
 });
 
-export const currencyMapper = (c: Currency & { Country: Country[] }): CurrencyDTO => ({
-  ...c,
-  CountryList: c.Country.map(countryMapper),
-});
+export const currencyMapper = (c: Currency & { Country: Country[] }): CurrencyDTO => {
+  return {
+    ...c,
+    CurrencyCountryList: c.Country.map(countryMapper),
+  };
+};
 
 export const conversionRateMapper = (
   c: ConversionRate & {
@@ -211,8 +211,8 @@ export const conversionRateMapper = (
 ): ConversionRateDTO => ({
   ...c,
   Rate: c.Rate?.toNumber?.(),
-  FromCurrency: currencyMapper(c.Currency_ConversionRate_ConversionFromCurrencyCodeToCurrency),
-  ToCurrency: currencyMapper(c.Currency_ConversionRate_ConversionToCurrencyCodeToCurrency),
+  // FromCurrency: currencyMapper(c.Currency_ConversionRate_ConversionFromCurrencyCodeToCurrency),
+  // ToCurrency: currencyMapper(c.Currency_ConversionRate_ConversionToCurrencyCodeToCurrency),
 });
 
 export const productionEditorMapper = (t: ProductionWithDateblocks): ProductionDTO => ({
@@ -282,7 +282,7 @@ export const bookingContactNoteMapper = (a: BookingContactNotes): BookingContact
   CoContactName: a.CoContactName,
   ContactDate: convertDate(a.ContactDate),
   Notes: a.Notes,
-  UserId: a.UserId,
+  ActionAccUserId: a.ActionAccUserId,
 });
 
 export const contractStatusmapper = (status: ContractStatusType) => {
@@ -352,9 +352,10 @@ export const venueRoleMapper = (vr: any): VenueRoleDTO => ({
   Standard: vr.IsStandard,
 });
 
-export const userMapper = (user: User): UserDto => ({
-  Id: user.Id,
-  FirstName: user.FirstName,
-  LastName: user.LastName,
-  Email: user.Email,
+export const userMapper = (user): UserDto => ({
+  UserId: user.UserId,
+  UserFirstName: user.UserFirstName,
+  UserLastName: user.UserLastName,
+  UserEmail: user.UserEmail,
+  AccUserId: user.AccountUser[0].AccUserId,
 });
