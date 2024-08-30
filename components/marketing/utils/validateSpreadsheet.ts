@@ -446,34 +446,24 @@ const updateValidateSpreadsheedData = (
   const warningOccured = false;
   let errorOccurred = false;
 
-  const venue = spreadsheetData.venues.find((v) => v.venueCode === currentVenue);
+  const createNewSale = () => {
+    return {
+      salesDate: new Date(currentRow.salesDate),
+      salesType: currentRow.salesType,
+      seats: currentRow.seats,
+      value: currentRow.value,
+      isFinal: currentRow.isFinal,
+      ignoreWarning: currentRow.ignoreWarning,
+      rowNumber: currentRow.rowNumber,
+    };
+  };
 
-  if (venue) {
-    // if VenueCode has already been entered in Spreadsheet previously
-    const booking = venue.bookings.find((b) => b.bookingDate.getTime() === new Date(currentBookingDate).getTime());
-
-    if (booking) {
-      // if VenueCode/BookingDate has already been entered in Spreadsheet previously
-      const sale = booking.sales.find((s) => s.salesDate.getTime() === new Date(currentRow.salesDate).getTime());
-
-      if (sale) {
-        // if VenueCode/BookingDate/SalesDate has already been entered in Spreadsheet previously
-        if (
-          sale.seats !== currentRow.seats ||
-          sale.value !== currentRow.value ||
-          sale.salesType !== currentRow.salesType ||
-          sale.isFinal.toUpperCase() !== currentRow.isFinal.toUpperCase() ||
-          sale.ignoreWarning.toUpperCase() !== currentRow.ignoreWarning.toUpperCase()
-        ) {
-          // if any of the values do not match up between duplicate VenueCode/BookingDate/SalesDate entries
-          returnString += ` | ERROR - Mismatch in information for Booking at Venue ${currentVenue} on ${dateToSimple(
-            currentBookingDate,
-          )}, on Sales Date ${dateToSimple(currentRow.salesDate)} (Row ${sale.rowNumber})`;
-          errorOccurred = true;
-        }
-      } else {
-        // Add new Sale for VenueCode/BookingDate
-        booking.sales.push({
+  const createNewBooking = () => {
+    return {
+      bookingDate: new Date(currentRow.bookingDate),
+      finalSalesDate: currentRow.isFinal.toUpperCase() === 'Y' ? new Date(currentRow.salesDate) : null,
+      sales: [
+        {
           salesDate: new Date(currentRow.salesDate),
           salesType: currentRow.salesType,
           seats: currentRow.seats,
@@ -481,7 +471,35 @@ const updateValidateSpreadsheedData = (
           isFinal: currentRow.isFinal,
           ignoreWarning: currentRow.ignoreWarning,
           rowNumber: currentRow.rowNumber,
-        });
+        },
+      ],
+    };
+  };
+
+  const venue = spreadsheetData.venues.find((v) => v.venueCode === currentVenue);
+
+  if (venue) {
+    const booking = venue.bookings.find((b) => b.bookingDate.getTime() === new Date(currentBookingDate).getTime());
+
+    if (booking) {
+      const sale = booking.sales.find((s) => s.salesDate.getTime() === new Date(currentRow.salesDate).getTime());
+
+      if (sale) {
+        const isMismatch =
+          sale.seats !== currentRow.seats ||
+          sale.value !== currentRow.value ||
+          sale.salesType !== currentRow.salesType ||
+          sale.isFinal.toUpperCase() !== currentRow.isFinal.toUpperCase() ||
+          sale.ignoreWarning.toUpperCase() !== currentRow.ignoreWarning.toUpperCase();
+
+        if (isMismatch) {
+          returnString += ` | ERROR - Mismatch in information for Booking at Venue ${currentVenue} on ${dateToSimple(
+            currentBookingDate,
+          )}, on Sales Date ${dateToSimple(currentRow.salesDate)} (Row ${sale.rowNumber})`;
+          errorOccurred = true;
+        }
+      } else {
+        booking.sales.push(createNewSale());
       }
 
       if (currentRow.isFinal.toUpperCase() === 'Y') {
@@ -492,66 +510,13 @@ const updateValidateSpreadsheedData = (
           booking.finalSalesDate = new Date(currentRow.salesDate);
         }
       }
-
-      // // check for if currentRow.seats/value for its given salesDate has an increase over 15% from its previous sales date
-      // const sortedSales = booking.sales.sort((a,b) => a.salesDate.getTime() - b.salesDate.getTime());
-      // let previousSale;
-
-      // for (let i = 0; i < sortedSales.length; i++) {
-      //   if (sortedSales[i].salesDate < new Date(currentRow.salesDate)) {
-      //     previousSale = sortedSales[i];
-      //   } else {
-      //     break;
-      //   }
-      // }
-
-      // if (previousSale) {
-      //   if (currentRow.seats > previousSale.seats * 1.15) {
-      //     returnString += "| WARNING - Seats increased by more than 15%"
-      //     warningOccured = true;
-      //   }
-      //   if (parseFloat(currentRow.value) > previousSale.value * 1.15) {
-      //     returnString += "| WARNING - Value increased by more than 15%"
-      //     warningOccured = true;
-      //   }
-      // }
     } else {
-      venue.bookings.push({
-        bookingDate: new Date(currentRow.bookingDate),
-        finalSalesDate: currentRow.isFinal.toUpperCase() === 'Y' ? new Date(currentRow.salesDate) : null,
-        sales: [
-          {
-            salesDate: new Date(currentRow.salesDate),
-            salesType: currentRow.salesType,
-            seats: currentRow.seats,
-            value: currentRow.value,
-            isFinal: currentRow.isFinal,
-            ignoreWarning: currentRow.ignoreWarning,
-            rowNumber: currentRow.rowNumber,
-          },
-        ],
-      });
+      venue.bookings.push(createNewBooking());
     }
   } else {
     spreadsheetData.venues.push({
       venueCode: currentRow.venueCode,
-      bookings: [
-        {
-          bookingDate: new Date(currentRow.bookingDate),
-          finalSalesDate: currentRow.isFinal.toUpperCase() === 'Y' ? new Date(currentRow.salesDate) : null,
-          sales: [
-            {
-              salesDate: new Date(currentRow.salesDate),
-              salesType: currentRow.salesType,
-              seats: currentRow.seats,
-              value: currentRow.value,
-              isFinal: currentRow.isFinal,
-              ignoreWarning: currentRow.ignoreWarning,
-              rowNumber: currentRow.rowNumber,
-            },
-          ],
-        },
-      ],
+      bookings: [createNewBooking()],
     });
   }
 
