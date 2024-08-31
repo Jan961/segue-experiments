@@ -333,8 +333,8 @@ const AddTask = ({
       try {
         await axios.post(`/api/tasks/master/update/${inputs?.RepeatInterval ? 'recurring' : 'single'}`, inputs);
         setLoading(false);
-        await router.replace(router.asPath);
         handleClose();
+        await router.replace(router.asPath);
       } catch (error) {
         setLoading(false);
       }
@@ -343,8 +343,8 @@ const AddTask = ({
         const endpoint = `/api/tasks/master/create/${inputs?.RepeatInterval ? 'recurring' : 'single'}/`;
         await axios.post(endpoint, inputs);
         setLoading(false);
-        await router.replace(router.asPath);
         handleClose();
+        await router.replace(router.asPath);
       } catch (error) {
         setLoading(false);
         console.error(error);
@@ -375,8 +375,9 @@ const AddTask = ({
           await axios.post(endpoint, inputs);
           if (isChecked) await handleMasterTask();
           setLoading(false);
-          await router.replace(router.asPath);
           handleClose();
+          await router.replace(router.asPath);
+
           await updateTableData(inputs, true);
         } catch (error) {
           setLoading(false);
@@ -733,7 +734,7 @@ const AddTask = ({
         }}
         onYesClick={() => {
           setShowConfirmationDialog(false);
-          onClose();
+          handleClose();
         }}
       />
     </PopupModal>
