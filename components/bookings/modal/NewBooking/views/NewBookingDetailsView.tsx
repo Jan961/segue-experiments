@@ -409,14 +409,14 @@ export default function NewBookingDetailsView({
           onSave={handleSaveNote}
           onCancel={handleNotesCancel}
         />
-        <div className="pt-8 w-full grid grid-cols-2 items-center  justify-end  justify-items-end gap-3">
+        <div className="pt-8 w-full grid grid-cols-2 items-center ">
           <Button
-            className=" w-33 place-self-start"
+            className="w-33 "
             text="Check Mileage"
             onClick={handeCheckMileageClick}
             disabled={changeBookingLength}
           />
-          <div className="flex gap-4">
+          <div className="flex justify-end  justify-items-end gap-4">
             {isNewBooking && (
               <Button className="w-33" variant="secondary" text="Back" onClick={handleBackButtonClick} />
             )}
@@ -424,7 +424,7 @@ export default function NewBookingDetailsView({
             {!isNewBooking && (
               <>
                 <Button
-                  className="w-33 "
+                  className="w-33"
                   variant="tertiary"
                   text="Delete Booking"
                   onClick={handleDeleteBooking}
