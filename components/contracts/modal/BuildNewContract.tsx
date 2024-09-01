@@ -13,6 +13,7 @@ import LoadingOverlay from 'components/shows/LoadingOverlay';
 import { IContractSchedule } from '../types';
 import { useRecoilValue } from 'recoil';
 import { productionJumpState } from 'state/booking/productionJumpState';
+import { transformContractData } from 'transformers/contracts';
 
 export interface BuildNewContractProps {
   contractSchedule?: Partial<IContractSchedule>;
@@ -86,10 +87,13 @@ export const BuildNewContract = ({
   );
 
   const updateContract = async () =>
-    axios.post('/api/company-contracts/update/' + contractId, {
-      ...contractSchedule,
-      contractDetails,
-    });
+    axios.post(
+      '/api/company-contracts/update/' + contractId,
+      transformContractData({
+        ...contractSchedule,
+        ...contractDetails,
+      }),
+    );
 
   const updatePersonDetails = async () => {
     const id = contractSchedule.personId;

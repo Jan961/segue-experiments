@@ -21,7 +21,7 @@ export const preparePersonUpdateData = (personDetails: Partial<IPersonDetails>) 
     // { key: 'otherWorkTypes', updateKey: 'PersonOtherRole', isSetArray: true, arrayKey: 'PORName' },
     // foreign key connections
     { key: 'addressId', updateKey: 'PersonAddressId', foreignKeyId: 'AddressId', isForeignKey: true },
-    { key: 'checkedBy', updateKey: 'AccountUser', foreignKeyId: 'Id', isForeignKey: true },
+    { key: 'checkedBy', updateKey: 'PersonFEUCheckByAccUserId' },
   ];
 
   return prepareQuery(personDetails, fieldMappings);

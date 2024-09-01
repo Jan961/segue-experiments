@@ -109,24 +109,14 @@ export const prepareContractUpdateData = (data: any) => {
     { key: 'totalHolPay', updateKey: 'TotalHolPay' },
     { key: 'totalFeeNotes', updateKey: 'TotalFeeNotes' },
     { key: 'cancelFee', updateKey: 'CancelFee' },
+    { key: 'checkedBy', updateKey: 'CheckedByAccUserId' },
+    { key: 'completedBy', updateKey: 'CompletedByAccUserId' },
+    { key: 'currency', updateKey: 'CurrencyCode' },
     // Foreign key connections
     { key: 'departmentId', updateKey: 'ACCDepartment', isForeignKey: true, foreignKeyId: 'ACCDeptId' },
     { key: 'personId', updateKey: 'Person', isForeignKey: true, foreignKeyId: 'PersonId' },
     { key: 'productionId', updateKey: 'Production', isForeignKey: true, foreignKeyId: 'Id' },
-    { key: 'currency', updateKey: 'Currency', isForeignKey: true, foreignKeyId: 'Code' },
     { key: 'venueId', updateKey: 'Venue', isForeignKey: true, foreignKeyId: 'Id' },
-    {
-      key: 'checkedBy',
-      updateKey: 'AccountUser_ACCContract_ACCCCheckedByAccUserIdToAccountUser',
-      isForeignKey: true,
-      foreignKeyId: 'Id',
-    },
-    {
-      key: 'completedBy',
-      updateKey: 'AccountUser_ACCContract_ACCCCompletedByAccUserIdToAccountUser',
-      isForeignKey: true,
-      foreignKeyId: 'Id',
-    },
   ];
   return prepareQuery(data, fieldMappings);
 };

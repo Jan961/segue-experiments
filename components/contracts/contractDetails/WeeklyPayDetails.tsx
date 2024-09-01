@@ -23,7 +23,7 @@ interface IWeeklyPayDetails {
 interface WeeklyPayDetailsProps {
   testId?: string;
   details?: Partial<IWeeklyPayDetails>;
-  onChange: (data: any) => void;
+  onChange: (data: Partial<IWeeklyPayDetails>) => void;
   currencySymbol?: string;
 }
 
@@ -43,7 +43,7 @@ const WeeklyPayDetails = ({
     (key: string, value: number | string | boolean | null) => {
       const updatedData = { ...weeklyPayDetails, [key]: value };
       setWeeklyPayDetails(updatedData);
-      onChange(updatedData);
+      onChange({ ...details, [key]: value });
     },
     [onChange, weeklyPayDetails, setWeeklyPayDetails],
   );

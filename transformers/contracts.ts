@@ -218,3 +218,38 @@ export const transformContractResponse = (contract: any) => {
     contractDetails: transformContractDetails(contract),
   };
 };
+
+export const transformContractData = (data) => {
+  return {
+    roleName: data.role || null,
+    notes: data.specificAvailabilityNotes || null,
+    currencyCode: data.currency || null,
+    firstDay: data.firstDayOfWork || null,
+    lastDay: data.lastDayOfWork || null,
+    availability: data.specificAvailabilityNotes || null,
+    rehearsalLocation: data.rehearsalVenue?.townCity || null,
+    rehearsalVenueId: null,
+    rehearsalVenueNotes: data.rehearsalVenue?.notes || null,
+    isAccomProvided: !!data.isAccomodationProvided,
+    accomNotes: data.accomodationNotes || null,
+    isTransportProvided: !!data.isTransportProvided,
+    transportNotes: data.transportNotes || null,
+    isNominatedDriver: !!data.isNominatedDriver,
+    nominatedDriverNotes: data.nominatedDriverNotes || null,
+    paymentType: data.paymentType || null,
+    weeklyRehFee: data.weeklyPayDetails.rehearsalFee || null,
+    weeklyRehHolPay: data.weeklyPayDetails.rehearsalHolidayPay || null,
+    weeklyPerfFee: data.weeklyPayDetails.performanceFee || null,
+    weeklyPerfHolPay: data.weeklyPayDetails.performanceHolidayPay || null,
+    weeklySubs: data.weeklyPayDetails.touringAllowance || null,
+    weeklySubsNotes: data.weeklyPayDetails.subsNotes || null,
+    totalFee: data.totalPayDetails.totalFee || null,
+    totalHolPay: data.totalPayDetails.totalHolidayPay || null,
+    totalFeeNotes: data.totalPayDetails.feeNotes || null,
+    cancelFee: data.cancellationFee || null,
+    productionId: data.production || null,
+    departmentId: data.department || null,
+    personId: data.personId || null,
+    currency: data.currency || null,
+  };
+};

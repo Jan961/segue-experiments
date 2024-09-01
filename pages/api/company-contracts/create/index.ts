@@ -49,6 +49,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           TotalFeeNotes: contractDetails.totalPayDetails?.feeNotes || null,
           CancelFee: contractDetails.cancellationFee || null,
           ContractStatus: CompanyContractStatus.NotYetIssued,
+          CurrencyCode: contractDetails.currency || null,
           DateIssued: new Date(),
           ...(department && {
             ACCDepartment: {
@@ -68,13 +69,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             Production: {
               connect: {
                 Id: production,
-              },
-            },
-          }),
-          ...(contractDetails.currency && {
-            Currency: {
-              connect: {
-                Code: contractDetails.currency,
               },
             },
           }),
