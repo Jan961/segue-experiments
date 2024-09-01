@@ -50,6 +50,7 @@ import StandardSeatKillsTable from '../table/StandardSeatKillsTable';
 import LoadingOverlay from 'components/shows/LoadingOverlay';
 import { CustomOption } from 'components/core-ui-lib/Table/renderers/SelectCellRenderer';
 import { trasformVenueAddress } from 'utils/venue';
+import { omit } from 'radash';
 
 export const EditDealMemoContractModal = ({
   visible,
@@ -92,9 +93,6 @@ export const EditDealMemoContractModal = ({
         : [],
     [venueData],
   );
-
-  console.log(selectedTableCell);
-  console.log(productionJumpState);
 
   const venueUserData = useMemo(() => {
     const venueContactData = {};
@@ -206,7 +204,8 @@ export const EditDealMemoContractModal = ({
     setIsLoading(true);
     try {
       await axios.post(`/api/dealMemo/updateDealMemo/${selectedTableCell.contract.Id}`, {
-        formData,
+        // omitted till the field has been added to db table
+        formData: omit(formData, ['PrintDelUseVenueAddressline']),
       });
 
       setIsLoading(false);
@@ -344,7 +343,7 @@ export const EditDealMemoContractModal = ({
   };
 
   const setSendToData = (value) => {
-    setSendTo((prevState) => [...prevState, ...value]);
+    setSendTo(value);
   };
   return (
     <PopupModal
@@ -694,14 +693,14 @@ export const EditDealMemoContractModal = ({
           <div className="w-4/5 flex items-center">
             <Select
               onChange={(value) => {
-                editDemoModalData('GuaranteeAmount', value, 'dealMemo');
+                editDemoModalData('Guarantee', value, 'dealMemo');
               }}
               className="bg-primary-white w-26 mr-3"
               placeholder="Please select.."
               options={booleanOptions}
               isClearable
               isSearchable
-              value={formData.GuaranteeAmount}
+              value={formData.Guarantee}
             />
             <div className="text-primary-input-text font-bold ml-14 mr-5">{currency}</div>
 
@@ -714,7 +713,7 @@ export const EditDealMemoContractModal = ({
                 editDemoModalData('GuaranteeAmount', filterCurrencyNum(parseFloat(value.target.value)), 'dealMemo')
               }
               placeholder="00.00"
-              disabled={!formData.GuaranteeAmount}
+              disabled={!formData.Guarantee}
             />
           </div>
         </div>
@@ -1386,17 +1385,13 @@ export const EditDealMemoContractModal = ({
           <div className="w-1/5"> </div>
           <div className="w-4/5 flex">
             <Select
-              onChange={(value) => {
-                setSendToData(value);
-              }}
+              onChange={(value) => setSendToData(value)}
               isMulti
               className="bg-primary-white w-full"
-              placeholder="Please select..."
-              options={[{ text: 'Select Assignee', value: null }, ...userList]}
+              placeholder="Please select assignee..."
+              options={[{ text: 'Select All', value: 'select_all' }, ...userList]}
               isClearable
               isSearchable
-              // * ARUN * there is something not right about this.
-              // components\productions\ProductionViewModal.tsx has this on lines 160-167
               renderOption={(option) => <CustomOption option={option} isMulti={true} />}
               value={sendTo}
             />
@@ -1498,8 +1493,8 @@ export const EditDealMemoContractModal = ({
                 testId="printDeliveryText"
                 className="w-3/4"
                 disabled={formData.PrintDelUseVenueAddress}
-                value={formData.VatCode}
-                onChange={(value) => editDemoModalData('VatCode', value.target.value, 'dealMemo')}
+                value={formData.PrintDelUseVenueAddress ? '' : formData.PrintDelUseVenueAddressline}
+                onChange={(value) => editDemoModalData('PrintDelUseVenueAddressline', value.target.value, 'dealMemo')}
               />
             </div>
           </div>
