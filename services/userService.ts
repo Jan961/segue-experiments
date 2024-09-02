@@ -8,12 +8,11 @@ import { isNullOrEmpty } from 'utils';
 import redis from 'lib/redis';
 
 export const getUsers = async (AccountId: number): Promise<UserDto[]> => {
+  console.log('in getUsers with issue, accountId is: ' + AccountId, 'type: ' + typeof AccountId);
   const result = await prisma.user.findMany({
     where: {
       AccountUser: {
-        some: {
-          AccUserAccountId: AccountId,
-        },
+        AccUserAccountId: AccountId,
       },
     },
     select: {
@@ -28,7 +27,6 @@ export const getUsers = async (AccountId: number): Promise<UserDto[]> => {
         select: {
           AccUserId: true,
         },
-        take: 1,
       },
     },
   });
@@ -67,7 +65,7 @@ export const getAccountId = async (email: string) => {
     },
   });
 
-  return response?.AccountUser[0]?.AccUserAccountId;
+  return response?.AccountUser.AccUserAccountId;
 };
 
 export const getEmailFromReq = async (req: any) => {

@@ -164,7 +164,16 @@ export const EditDealMemoContractModal = ({
     }));
   }, [dealCall]);
 
-  console.log(formData);
+  useEffect(() => {
+    if (formData.CompContactId !== null) {
+      const selectedContact = accountContacts.find((contact) => contact.AccContId === formData.CompContactId);
+      setContactsData({
+        email: selectedContact.AccContMainEmail,
+        id: formData.CompContactId,
+        phone: selectedContact.AccContPhone,
+      });
+    }
+  }, [formData.CompContactId]);
 
   const getCurrency = async (bookingId) => {
     try {

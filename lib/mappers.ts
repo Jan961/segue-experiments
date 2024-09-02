@@ -356,5 +356,5 @@ export const userMapper = (user): UserDto => ({
   UserFirstName: user.UserFirstName,
   UserLastName: user.UserLastName,
   UserEmail: user.UserEmail,
-  AccUserId: user.AccountUser[0].AccUserId,
+  AccUserId: user.AccountUser.AccUserId,
 });

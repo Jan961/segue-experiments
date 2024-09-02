@@ -766,7 +766,7 @@ model DealMemo {
   ContractClause                                             String?                 @map("DeMoContractClause") @db.LongText
   PrintDelVenueAddressId                                     Int?                    @map("DeMoPrintDelVenueAddressId")
   PrintDelUseVenueAddress                                    Boolean                 @default(dbgenerated("(b'0')")) @map("DeMoPrintDelUseVenueAddress") @db.Bit(1)
-  DeMoCompContactId                                          Int?
+  CompContactId                                              Int?                    @map("DeMoCompContactId")
   Booking                                                    Booking                 @relation(fields: [BookingId], references: [Id], onDelete: Cascade, map: "BookingDealMemo")
   VenueContact_DealMemo_DeMoBOMVenueContactIdToVenueContact  VenueContact?           @relation("DealMemo_DeMoBOMVenueContactIdToVenueContact", fields: [BOMVenueContactId], references: [Id], onDelete: Cascade, map: "VenueContactDealMemoBOM")
   VenueContact_DealMemo_DeMoTechVenueContactIdToVenueContact VenueContact?           @relation("DealMemo_DeMoTechVenueContactIdToVenueContact", fields: [TechVenueContactId], references: [Id], onDelete: Cascade, map: "VenueContactDealMemoTech")
