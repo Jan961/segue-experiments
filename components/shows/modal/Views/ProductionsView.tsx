@@ -50,7 +50,7 @@ const ProductionsView = ({ showData, visible, onClose }: ProductionsViewProps) =
   const [isArchived, setIsArchived] = useState<boolean>(true);
   const isMounted = useComponentMountStatus();
   const productionColumDefs = useMemo(() => (isMounted ? productionsTableConfig : []), [isMounted]);
-  const [showLoading, setLoadingOverlay] = useState<boolean>(false);
+  const [showParentLoading, setParentLoadingOverlay] = useState<boolean>(false);
   const showName = useMemo(() => showData.Name, [showData]);
   const showCode = useMemo(() => showData.Code, [showData]);
   const title = useMemo(
@@ -167,14 +167,14 @@ const ProductionsView = ({ showData, visible, onClose }: ProductionsViewProps) =
   );
 
   const onSaveProduction = (production: ProductionFormData, cb?: () => void) => {
-    setLoadingOverlay(true);
+    setParentLoadingOverlay(true);
     setOpenEditModal(false);
     if (production?.id) {
       updateCurrentProduction(production, cb);
     } else {
       createNewProduction(production, cb);
     }
-    setLoadingOverlay(false);
+    setParentLoadingOverlay(false);
   };
 
   const updateCurrentProductionState = (data) => {
@@ -266,7 +266,7 @@ const ProductionsView = ({ showData, visible, onClose }: ProductionsViewProps) =
 
   return (
     <div>
-      {showLoading && <LoadingOverlay />}
+      {showParentLoading && <LoadingOverlay />}
       <PopupModal
         show={visible}
         onClose={() => onClose()}
