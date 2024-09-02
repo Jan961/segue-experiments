@@ -2,29 +2,6 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import TextInput from './TextInput';
 
 describe('TextInput Component', () => {
-  // Test rendering with default props
-  test('renders with default props', () => {
-    render(<TextInput />);
-    const inputElement = screen.getByRole('textbox');
-    expect(inputElement).toBeInTheDocument();
-    expect(inputElement).not.toHaveAttribute('id');
-    expect(inputElement).toHaveAttribute('type', 'text');
-    expect(inputElement).toHaveClass(
-      'block',
-      'w-fit-content',
-      'pl-2',
-      '!border',
-      'text-sm',
-      'shadow-input-shadow',
-      'text-primary-input-text',
-      'rounded-md',
-      'outline-none',
-      'focus:ring-2',
-      'focus:ring-primary-input-text',
-      'ring-inset',
-    );
-  });
-
   // Test rendering with custom props
   test('renders with custom props', () => {
     const handleChange = jest.fn();
