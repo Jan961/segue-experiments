@@ -17,7 +17,6 @@ interface SelectCellRendererProps extends ICellRendererParams {
 
 export const CustomOption = ({ option, isMulti = false, ...props }: { option: OptionProps; isMulti?: boolean }) => {
   const { label, isSelected } = option;
-  console.log('====', isSelected, label, option?.data?.value);
 
   return (
     <components.Option {...option}>
