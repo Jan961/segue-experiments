@@ -67,9 +67,6 @@ interface SpreadsheetIssues {
 }
 
 export const validateSpreadsheetFile = async (file, prodCode, venueList, prodDateRange) => {
-  // file[0].file = new File([], file[0].file.name)
-  // note that the check when hitting the ok/upload button uses the selectedfiles list to check for progress and updating the file name here and not there cause issue
-
   const workbook = new ExcelJS.Workbook();
   await workbook.xlsx.load(file[0].file);
 
@@ -156,7 +153,6 @@ export const validateSpreadsheetFile = async (file, prodCode, venueList, prodDat
   });
 
   postValidationChecks(spreadsheetData, spreadsheetIssues);
-
   convertWorkbookToFile(workbook, file);
 
   return { file, spreadsheetIssues };
@@ -275,8 +271,8 @@ const updateValidateSpreadsheedData = (
     validateBookingDate(currentRow, prodDateRange, prodCode),
     validateSalesDate(currentRow),
     validateSalesType(currentRow),
-    validateSeats(currentRow, spreadsheetData, currentVenue, currentBookingDate, booking),
-    validateValue(currentRow, spreadsheetData, currentVenue, currentBookingDate, booking),
+    validateSeats(currentRow),
+    validateValue(currentRow),
     validateIsFinal(currentRow, booking),
     validateIgnoreWarning(currentRow),
   ];
@@ -388,17 +384,10 @@ const validateSalesType = (currentRow: SpreadsheetRow) => {
   return { returnString, warningOccured, errorOccurred };
 };
 
-const validateSeats = (
-  currentRow: SpreadsheetRow,
-  spreadsheetData: SpreadsheetData,
-  currentVenue,
-  currentBookingDate,
-  currentBooking,
-) => {
+const validateSeats = (currentRow: SpreadsheetRow) => {
   let returnString = '';
   let errorOccurred = false;
-  let warningOccured = false;
-  const previousSale = getPreviousSale(currentBooking, currentRow.salesDate);
+  const warningOccured = false;
 
   if (!currentRow.seats) {
     returnString += '| ERROR - Must specify a value for Seats';
@@ -406,49 +395,18 @@ const validateSeats = (
     return { returnString, errorOccurred, warningOccured };
   }
 
-  if (previousSale) {
-    if (currentRow.seats > previousSale.seats * 1.15) {
-      returnString += ' | WARNING - Seats increased by more than 15%';
-      warningOccured = true;
-      console.log('CurrentRowSeats:', currentRow.seats);
-      console.log('PreviousRowSeats:', previousSale.seats);
-    }
-    if (currentRow.seats < previousSale.seats) {
-      returnString += ' | WARNING - Seats decreased from previous entry';
-      warningOccured = true;
-    }
-  }
-
   return { returnString, warningOccured, errorOccurred };
 };
 
-const validateValue = (
-  currentRow: SpreadsheetRow,
-  spreadsheetData: SpreadsheetData,
-  currentVenue,
-  currentBookingDate,
-  currentBooking,
-) => {
+const validateValue = (currentRow: SpreadsheetRow) => {
   let returnString = '';
   let errorOccurred = false;
-  let warningOccured = false;
-  const previousSale = getPreviousSale(currentBooking, currentRow.salesDate);
+  const warningOccured = false;
 
   if (!currentRow.value) {
     returnString += '| ERROR - Must specify a value for Value';
     errorOccurred = true;
     return { returnString, errorOccurred, warningOccured };
-  }
-
-  if (previousSale) {
-    if (parseFloat(currentRow.value) > parseFloat(previousSale.value) * 1.15) {
-      returnString += ' | WARNING - Value increased by more than 15%';
-      warningOccured = true;
-    }
-    if (parseFloat(currentRow.value) < parseFloat(previousSale.value)) {
-      returnString += ' | WARNING - Value decreased from previous entry';
-      warningOccured = true;
-    }
   }
 
   return { returnString, warningOccured, errorOccurred };
@@ -491,21 +449,21 @@ const validateIgnoreWarning = (currentRow: SpreadsheetRow) => {
   return { returnString, warningOccured, errorOccurred };
 };
 
-// Expects a Booking, and a Sales Date, returns the date prior to the given Sales Date
-const getPreviousSale = (currentBooking, currentSaleDate) => {
-  let previousSale;
-  const sortedSales = currentBooking.sales.sort((a, b) => a.salesDate.getTime() - b.salesDate.getTime());
+// // Expects a Booking, and a Sales Date, returns the date prior to the given Sales Date
+// const getPreviousSale = (currentBooking, currentSaleDate) => {
+//   let previousSale;
+//   const sortedSales = currentBooking.sales.sort((a, b) => a.salesDate.getTime() - b.salesDate.getTime());
 
-  for (let i = 0; i < sortedSales.length; i++) {
-    if (sortedSales[i].salesDate < new Date(currentSaleDate)) {
-      previousSale = sortedSales[i];
-    } else {
-      break;
-    }
-  }
+//   for (let i = 0; i < sortedSales.length; i++) {
+//     if (sortedSales[i].salesDate < new Date(currentSaleDate)) {
+//       previousSale = sortedSales[i];
+//     } else {
+//       break;
+//     }
+//   }
 
-  return previousSale;
-};
+//   return previousSale;
+// };
 
 const formatDetailsMessage = (detailsMessage: string) => {
   const parts = detailsMessage.split('|').map((part) => part.trim());
@@ -534,7 +492,8 @@ const updateDetailsAndResponseCells = (
   if (rowErrorOccurred) {
     writeErrorCell(detailsCell, responseCell, spreadsheetIssues, formattedDetailsMessage);
   } else if (rowWarningOccured) {
-    writeWarningCell(detailsCell, responseCell, spreadsheetIssues, formattedDetailsMessage, currentRow);
+    const ignoreWarning = (currentRow.ignoreWarning?.toUpperCase() ?? 'N') === 'Y';
+    writeWarningCell(detailsCell, responseCell, spreadsheetIssues, formattedDetailsMessage, ignoreWarning);
   } else {
     writeOKCell(detailsCell, responseCell);
   }
@@ -551,30 +510,51 @@ const convertWorkbookToFile = async (workbook, file) => {
 
 const postValidationChecks = (spreadsheetData: SpreadsheetData, spreadsheetIssues) => {
   for (const venue of spreadsheetData.venues) {
-    // console.log(`Venue Code: ${venue.venueCode}`);
-
     for (const booking of venue.bookings) {
       if (!booking.finalSalesDate) {
         const errorMessage = '| ERROR - A VenueCode/BookingDate combination must have a specified final sales dates';
-        const currentErrorMessage = booking.bookingFirstRow.getCell(11).value;
-        const formattedErrorMessage = formatDetailsMessage(currentErrorMessage + errorMessage);
+        const currentDetailsMessage = booking.bookingFirstRow.getCell(11).value;
+        const formattedDetailsMessage = formatDetailsMessage(currentDetailsMessage + errorMessage);
 
-        const responseCell = booking.bookingFirstRow.getCell(10);
-        const detailsCell = booking.bookingFirstRow.getCell(11);
-        writeErrorCell(detailsCell, responseCell, spreadsheetIssues, formattedErrorMessage);
-        console.log(spreadsheetIssues);
+        writeErrorCell(
+          booking.bookingFirstRow.getCell(11),
+          booking.bookingFirstRow.getCell(10),
+          spreadsheetIssues,
+          formattedDetailsMessage,
+        );
       }
 
-      // for (const sale of booking.sales) {
-      //   console.log(`    Sales Date: ${sale.salesDate}`);
-      //   console.log(`    Sales Type: ${sale.salesType}`);
-      //   console.log(`    Seats: ${sale.seats}`);
-      //   console.log(`    Value: ${sale.value}`);
-      //   console.log(`    Is Final: ${sale.isFinal}`);
-      //   console.log(`    Ignore Warning: ${sale.ignoreWarning}`);
-      //   console.log(`    Row Number: ${sale.rowNumber}`);
-      //   console.log(`    Sales Row:`, sale.salesRow);
-      // }
+      let previousSale = null;
+      for (const sale of booking.sales.sort((a, b) => a.salesDate.getTime() - b.salesDate.getTime())) {
+        if (!previousSale) {
+          previousSale = sale;
+          continue;
+        }
+        let detailsMessage = '';
+        if (sale.seats > previousSale.seats * 1.15) {
+          detailsMessage += '| WARNING - Seats increased by more than 15% from previous sale';
+        }
+        if (sale.seats < previousSale.seats) {
+          detailsMessage += '| WARNING - Seats decreased from previous sale';
+        }
+        if (parseFloat(sale.value) > parseFloat(previousSale.value) * 1.15) {
+          detailsMessage += '| WARNING - Value increased by more than 15% from previous sale';
+        }
+        if (parseFloat(sale.value) < parseFloat(previousSale.value)) {
+          detailsMessage += '| WARNING - Value decreased from previous sale';
+        }
+
+        const formattedDetailsMessage = formatDetailsMessage((sale.salesRow.getCell(11).value += detailsMessage));
+        const ignoreWarning = (sale.salesRow.getCell(8).toUpperCase() ?? 'N') === 'Y';
+        writeWarningCell(
+          sale.salesRow.getCell(11),
+          sale.salesRow.getCell(10),
+          spreadsheetIssues,
+          formattedDetailsMessage,
+          ignoreWarning,
+        );
+        previousSale = sale;
+      }
     }
   }
 };
@@ -603,7 +583,7 @@ const writeWarningCell = (
   responseCell,
   spreadsheetIssues: SpreadsheetIssues,
   detailsMessage,
-  currentRow,
+  ignoreWarning,
 ) => {
   responseCell.value = 'WARNING';
 
@@ -619,12 +599,7 @@ const writeWarningCell = (
 
   detailsCell.value = detailsMessage;
 
-  // const ignoreWarningCell = row.getCell(9);
-  // if (ignoreWarningCell.value !== 'Y') {
-  //   spreadsheetIssues.spreadsheetWarningOccured = true;
-  // }
-
-  if (currentRow.ignoreWarning.toLocaleUpperCase() !== 'Y') spreadsheetIssues.spreadsheetWarningOccurred = true; // don't raise a warning when ignore flag
+  if (!ignoreWarning) spreadsheetIssues.spreadsheetWarningOccurred = true; // don't raise a warning when ignore flag
 };
 
 const writeOKCell = (detailsCell, responseCell) => {
