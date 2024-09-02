@@ -52,10 +52,9 @@ const LoadSalesHistory = () => {
           name: file.OriginalFilename,
           dateUploaded: file.UploadDateTime,
           fileURL: getFileUrl(file.Location),
-          fileId: file.Id,
           location: file.Location,
+          fileId: file.Id,
         };
-        console.log(file);
         setSalesHistoryRows([newFile]);
       }
     } catch (error) {
@@ -90,10 +89,13 @@ const LoadSalesHistory = () => {
       if (response.status >= 400 && response.status < 600) {
         onError(file[0].file, 'Error uploading file. Please try again.');
       } else {
+        console.log(response);
         const newFile = {
           name: response.originalFilename,
           dateUploaded: response.uploadDateTime,
           fileURL: getFileUrl(response.location),
+          fileId: response.id,
+          location: response.location,
         };
 
         setSalesHistoryRows([newFile]);
@@ -105,16 +107,15 @@ const LoadSalesHistory = () => {
   };
 
   const deleteSalesHistory = async () => {
-    // delete file from s3
-    // delete file from DB
     if (salesHistoryRows) {
       const file = salesHistoryRows[0];
       try {
         await axios.delete(`/api/file/delete?location=${file.location}`);
-        await axios.post('/api/marketing/load-history/delete', { salesHistoryRows });
       } catch (err) {
         console.log(err, 'Failed to delete Sales History Spreadsheet');
       }
+    } else {
+      console.log('no sales history rows');
     }
     setSalesHistoryRows([]);
     setShowConfirmDelete(false);
@@ -135,6 +136,7 @@ const LoadSalesHistory = () => {
 
   useEffect(() => {
     salesHistoryRows.length >= 1 ? setUploadDisabled(true) : setUploadDisabled(false);
+    console.log(salesHistoryRows);
   }, [salesHistoryRows]);
 
   useEffect(() => {
