@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 import axios from 'axios';
 import { Button, Label, notify } from 'components/core-ui-lib';
@@ -10,7 +10,11 @@ import { ContractPersonDataForm } from '../ContractPersonDataForm';
 import { ContractPreviewDetailsForm } from '../ContractPreviewDetailsDataForm';
 import ContractDetails from './ContractDetails';
 import LoadingOverlay from 'components/shows/LoadingOverlay';
-import { IContractSchedule } from '../types';
+import { IContractSchedule, IScheduleDay } from '../types';
+import { useRecoilValue } from 'recoil';
+import { productionJumpState } from 'state/booking/productionJumpState';
+import { transformContractData } from 'transformers/contracts';
+import ContractScheduleTable from './ContractScheduleTable';
 
 export interface BuildNewContractProps {
   contractSchedule?: Partial<IContractSchedule>;
@@ -27,10 +31,16 @@ export const BuildNewContract = ({
   isEdit = false,
   onClose = noop,
 }: BuildNewContractProps) => {
+  const { productions } = useRecoilValue(productionJumpState);
   const [contractPerson, setContractPerson] = useState(null);
   const [contractDetails, setContractDetails] = useState({});
   const [activeViewIndex, setActiveViewIndex] = useState(0);
+  const [schedule, setSchedule] = useState<IScheduleDay[]>([]);
   const [loading, setLoading] = useState(false);
+  const selectedProduction = useMemo(
+    () => productions.find(({ Id }) => Id === contractSchedule.production),
+    [contractSchedule?.production, productions],
+  );
   const router = useRouter();
   const cancelToken = useAxiosCancelToken();
 
@@ -53,8 +63,14 @@ export const BuildNewContract = ({
     async (id: number) => {
       setLoading(true);
       try {
-        const response = await axios.get('/api/company-contracts/read/' + id, { cancelToken });
-        setContractDetails(response.data?.contractDetails);
+        const { data } = await axios.get('/api/company-contracts/read/' + id, { cancelToken });
+        const { contractDetails } = data || {};
+        setContractDetails(contractDetails);
+        if (contractDetails?.accScheduleJson?.length) {
+          setSchedule(contractDetails.accScheduleJson);
+        } else {
+          fetchContractSchedule(contractSchedule.production);
+        }
       } catch (error) {
         onClose();
         notify.error('Error fetching contract details. Please try again');
@@ -71,18 +87,26 @@ export const BuildNewContract = ({
     if (isEdit && contractId) {
       fetchContractDetails(contractId);
     }
+    if (!isEdit) {
+      fetchContractSchedule(contractSchedule.production);
+    }
   }, [contractSchedule.personId, isEdit, contractId]);
 
   const createContract = useCallback(
-    async () => axios.post('/api/company-contracts/create', { ...contractSchedule, contractDetails }),
-    [contractSchedule, contractDetails],
+    async () =>
+      axios.post('/api/company-contracts/create', { ...contractSchedule, contractDetails, accScheduleJson: schedule }),
+    [contractSchedule, contractDetails, schedule],
   );
 
   const updateContract = async () =>
-    axios.post('/api/company-contracts/update/' + contractId, {
-      ...contractSchedule,
-      contractDetails,
-    });
+    axios.post(
+      '/api/company-contracts/update/' + contractId,
+      transformContractData({
+        ...contractSchedule,
+        ...contractDetails,
+        accScheduleJson: schedule,
+      }),
+    );
 
   const updatePersonDetails = async () => {
     const id = contractSchedule.personId;
@@ -114,12 +138,28 @@ export const BuildNewContract = ({
     }
   };
 
+  const fetchContractSchedule = async (productionId) => {
+    try {
+      const { data: schedule } = await axios.post('/api/reports/schedule-report', {
+        ProductionId: productionId,
+        format: 'json',
+      });
+      setSchedule(schedule.rows);
+    } catch (error) {
+      console.log('Error fetching contract schedule', error);
+    }
+  };
+
   const goToNext = useCallback(() => {
-    if (activeViewIndex === 2) {
+    if (activeViewIndex === 3) {
       return;
     }
     setActiveViewIndex((index) => index + 1);
   }, [activeViewIndex]);
+
+  const updateSchedule = (updatedSchedule: IScheduleDay[]) => {
+    setSchedule(updatedSchedule);
+  };
 
   return (
     <PopupModal
@@ -131,7 +171,7 @@ export const BuildNewContract = ({
     >
       <div>
         <div className="w-[82vw]">
-          <div className="text-xl text-primary-navy font-bold w-[50vw]">PROD CODE</div>
+          <div className="text-xl text-primary-navy font-bold w-[50vw]">{`${selectedProduction.ShowCode}${selectedProduction.Code}`}</div>
           <div className="text-xl text-primary-navy font-bold w-[50vw]">Department</div>
         </div>
         <div className="flex justify-center w-[100%] pt-2 pb-2">
@@ -154,6 +194,13 @@ export const BuildNewContract = ({
             style={{ background: activeViewIndex === 2 ? '#0093C0' : 'white' }}
             onClick={() => setActiveViewIndex(2)}
           >
+            Schedule
+          </div>
+          <div
+            className="w-[24vw] border-solid border-2 border-primary-navy text-center rounded cursor-pointer"
+            style={{ background: activeViewIndex === 3 ? '#0093C0' : 'white' }}
+            onClick={() => setActiveViewIndex(3)}
+          >
             Contract Preview
           </div>
         </div>
@@ -173,11 +220,18 @@ export const BuildNewContract = ({
             </div>
           )}
           {activeViewIndex === 2 && (
+            <div className="flex flex-col gap-8">
+              <ContractScheduleTable updateSchedule={updateSchedule} schedule={schedule} />
+            </div>
+          )}
+          {activeViewIndex === 3 && (
             <ContractPreviewDetailsForm
               contractPerson={contractPerson}
               contractSchedule={contractSchedule}
               contractDetails={contractDetails}
-              height="h-[70vh]"
+              production={selectedProduction}
+              schedule={schedule}
+              height="70vh"
             />
           )}
         </div>
@@ -187,8 +241,8 @@ export const BuildNewContract = ({
           <Button
             className="ml-4 w-33"
             variant="primary"
-            text={activeViewIndex === 2 ? 'Save and Return to Contracts' : 'Save and next'}
-            onClick={activeViewIndex === 2 ? onSave : goToNext}
+            text={activeViewIndex === 3 ? 'Save and Return to Contracts' : 'Save and next'}
+            onClick={activeViewIndex === 3 ? onSave : goToNext}
           />
         </div>
       </div>

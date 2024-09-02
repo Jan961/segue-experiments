@@ -25,8 +25,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const task = await generateSingleRecurringMasterTask(req.body, recurringTask.Id);
     const createdTask = await prisma.MasterTask.create({
       data: {
-        ...task,
-        AccountId,
+        ...task
       },
     });
 

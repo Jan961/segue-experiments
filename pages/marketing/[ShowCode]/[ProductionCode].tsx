@@ -27,7 +27,7 @@ export default Index;
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const accountId = await getAccountIdFromReq(ctx.req);
   const currentUser = await getUserNameFromReq(ctx.req);
-  const productionJump = await getProductionJumpState(ctx, 'marketing', accountId);
+  const productionJump = await getProductionJumpState(ctx, 'marketing');
   const productionId = productionJump.selected;
   const users = await getUsers(accountId);
 

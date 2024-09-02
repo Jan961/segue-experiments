@@ -13,6 +13,7 @@ import SelectCellRenderer from 'components/core-ui-lib/Table/renderers/SelectCel
 import { companyContractStatusOptions, statusToBgColorMap } from 'config/contracts';
 import DateRenderer from 'components/core-ui-lib/Table/renderers/DateRenderer';
 import NotesRenderer from 'components/core-ui-lib/Table/renderers/NotesRenderer';
+import DownloadButtonRenderer from 'components/core-ui-lib/Table/renderers/DownloadButtonRenderer';
 
 export const contractsStyleProps = { headerColor: tileColors.contracts };
 
@@ -103,7 +104,7 @@ export const getCompanyContractsColumnDefs = (userList = []) => [
       };
     },
   },
-  { headerName: 'Role', field: 'role', cellRenderer: DefaultCellRenderer, flex: 1, editable: true },
+  { headerName: 'Role', field: 'role', cellRenderer: DefaultCellRenderer, flex: 1 },
   {
     headerName: 'Contract Status',
     field: 'status',
@@ -133,11 +134,12 @@ export const getCompanyContractsColumnDefs = (userList = []) => [
     headerName: '',
     field: 'pdf',
     width: 100,
-    cellRenderer: ButtonRenderer,
-    cellRendererParams: () => ({
+    cellRenderer: DownloadButtonRenderer,
+    cellRendererParams: (params) => ({
       buttonText: 'Save as PDF',
       variant: 'primary',
       width: 90,
+      href: `/api/company-contracts/export/${params.data?.id}`,
     }),
     cellStyle: {
       paddingRight: '0.5em',
@@ -284,6 +286,121 @@ export const attachmentsColDefs = [
   {
     headerName: '',
     field: 'icons',
+    cellRenderer: IconRowRenderer,
+    cellRendererParams: {
+      iconList: [
+        {
+          name: 'delete',
+        },
+      ],
+    },
+    width: 80,
+    resizable: false,
+  },
+];
+
+export const contractTourScheduleColumns = [
+  {
+    headerName: 'PROD',
+    field: 'productionCode',
+    editable: true,
+    cellRenderer: DefaultTextRenderer,
+    width: 150,
+  },
+  {
+    headerName: 'DAY',
+    field: 'day',
+    editable: true,
+    cellRenderer: DefaultTextRenderer,
+    width: 150,
+  },
+  {
+    headerName: 'DATE',
+    field: 'date',
+    editable: true,
+    cellRenderer: DefaultTextRenderer,
+    width: 150,
+  },
+  {
+    headerName: 'Week',
+    field: 'week',
+    editable: true,
+    cellRenderer: DefaultTextRenderer,
+    width: 150,
+  },
+  {
+    headerName: 'VENUE/DETAILS',
+    field: 'venue',
+    editable: true,
+    cellRenderer: DefaultTextRenderer,
+    width: 150,
+  },
+  {
+    headerName: 'TOWN',
+    field: 'location',
+    editable: true,
+    cellRenderer: DefaultTextRenderer,
+    width: 150,
+  },
+  {
+    headerName: 'DAY TYPE',
+    field: 'type',
+    editable: true,
+    cellRenderer: DefaultTextRenderer,
+    width: 150,
+  },
+  {
+    headerName: 'STATUS',
+    field: 'status',
+    editable: true,
+    cellRenderer: DefaultTextRenderer,
+    width: 150,
+  },
+  {
+    headerName: 'CAPACITY',
+    field: 'capacity',
+    editable: true,
+    cellRenderer: DefaultTextRenderer,
+    width: 150,
+  },
+  {
+    headerName: 'Performances per day',
+    field: 'performancesPerDay',
+    editable: true,
+    cellRenderer: DefaultTextRenderer,
+    width: 150,
+  },
+  {
+    headerName: 'Performance 1 Time',
+    field: 'performance1',
+    editable: true,
+    cellRenderer: DefaultTextRenderer,
+    width: 150,
+  },
+  {
+    headerName: 'Performance 2 Time',
+    field: 'performance2',
+    editable: true,
+    cellRenderer: DefaultTextRenderer,
+    width: 150,
+  },
+  {
+    headerName: 'MILES',
+    field: 'mileage',
+    editable: true,
+    cellRenderer: DefaultTextRenderer,
+    width: 150,
+  },
+  {
+    headerName: 'TIME',
+    field: 'time',
+    editable: true,
+    cellRenderer: DefaultTextRenderer,
+    width: 150,
+  },
+  {
+    headerName: '',
+    field: 'delete',
     cellRenderer: IconRowRenderer,
     cellRendererParams: {
       iconList: [

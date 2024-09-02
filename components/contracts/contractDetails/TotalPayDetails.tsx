@@ -48,7 +48,7 @@ const TotalPayDetails = ({
             placeholder="00.00"
             type="number"
             value={totalFee}
-            onChange={(event) => handleChange('totalFee', parseInt(event.target.value || '0', 10))}
+            onChange={(event) => handleChange('totalFee', parseFloat(event.target.value || '0'))}
           />
         </div>
       </div>
@@ -61,7 +61,7 @@ const TotalPayDetails = ({
             placeholder="00.00"
             type="number"
             value={totalHolidayPay}
-            onChange={(event) => handleChange('totalHolidayPay', parseInt(event.target.value || '0', 10))}
+            onChange={(event) => handleChange('totalHolidayPay', parseFloat(event.target.value || '0'))}
           />
         </div>
       </div>
@@ -71,7 +71,7 @@ const TotalPayDetails = ({
           testId={`${testId}-fee-notes`}
           placeholder="Fee Notes"
           value={feeNotes}
-          onChange={(event) => handleChange('feeNotes', parseInt(event.target.value || '0', 10))}
+          onChange={(event) => handleChange('feeNotes', event.target.value)}
         />
       </div>
     </div>

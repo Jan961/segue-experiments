@@ -23,7 +23,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     parseInt(bookingId as string, 10),
   );
   const users = await getUsers(accountId);
-  const usersMap = objectify(users, (user) => user.Id);
+  const usersMap = objectify(users, (user) => user.AccUserId);
   const { allocations: data } = await getPerformanceCompAllocationsByBookingId(parseInt(bookingId as string, 10));
   const fileName = `${prodCode} ${showName} ${venueName} Allocated Seats`;
   const workbook = new ExcelJS.Workbook();
@@ -67,13 +67,13 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       TicketHolderEmail,
       TicketHolderName,
       Comments,
-      ArrangedById,
+      ArrangedByAccUserId,
       Seats,
       SeatsAllocated,
       VenueConfirmationNotes,
     }) => {
-      const { FirstName = '', LastName = '' } = usersMap[ArrangedById] || {};
-      const arrangedBy = `${FirstName || ''} ${LastName || ''}`;
+      const { UserFirstName = '', UserLastName = '' } = usersMap[ArrangedByAccUserId] || {};
+      const arrangedBy = `${UserFirstName || ''} ${UserLastName || ''}`;
       const row = worksheet.addRow([
         date,
         time,

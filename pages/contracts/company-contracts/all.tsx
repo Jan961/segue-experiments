@@ -34,7 +34,7 @@ export default ContractsPage;
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const departmentId = ctx.query.d as string;
   const accountId = await getAccountIdFromReq(ctx.req);
-  const productionJump = await getProductionJumpState(ctx, 'contracts/company-contracts', accountId);
+  const productionJump = await getProductionJumpState(ctx, 'contracts/company-contracts');
   const ProductionId = -1;
   productionJump.selected = -1;
   const [users, countryList, venues, personsList, currencyList, standardClauses, departmentList, contractList] =
@@ -93,7 +93,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       currencyList,
     },
     account: {
-      user: { users: objectify(users, (user: UserDto) => user.Id) },
+      user: { users: objectify(users, (user: UserDto) => user.UserId) },
     },
     contracts: {
       filters: {

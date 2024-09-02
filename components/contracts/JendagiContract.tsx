@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import { dateToSimple } from 'services/dateService';
-import { IContractSchedule, IContractDetails } from './types';
+import { IContractSchedule, IContractDetails, IScheduleDay } from './types';
 import { useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import { contractsVenueState } from 'state/contracts/contractsVenueState';
@@ -15,6 +15,9 @@ export interface JendagiContractProps {
   contractDetails: Partial<IContractDetails>;
   productionCompany: Partial<ProductionCompanyDTO>;
   currency?: string;
+  showName?: string;
+  venueName?: string;
+  schedule: IScheduleDay[];
 }
 
 const defaultContractDetails = {
@@ -149,7 +152,6 @@ const JendagiContract = ({
   const venueMap = useRecoilValue(contractsVenueState);
   const currencyList = useRecoilValue(currencyListState);
 
-  console.log(contractSchedule);
   const { personDetails, agencyDetails } = personState;
 
   const currentDate = dateToSimple(new Date().toISOString());
@@ -394,9 +396,10 @@ const JendagiContract = ({
                 <br />
               </>
             )}
-            Holidays may be declared by {productionCompany?.Name ? productionCompany.Name : '!PRODUCTION COMPANY!'}.
-            Holiday pay shall be accrued and paid during declared holidays. Any outstanding holiday pay will be paid at
-            the end of the contract. Holiday pay shall be at the rate stated in Clause 14.
+            Holidays may be declared by{' '}
+            {productionCompany?.ProdCoName ? productionCompany.ProdCoName : '!PRODUCTION COMPANY!'}. Holiday pay shall
+            be accrued and paid during declared holidays. Any outstanding holiday pay will be paid at the end of the
+            contract. Holiday pay shall be at the rate stated in Clause 14.
           </td>
         </tr>
         <tr>
@@ -505,7 +508,7 @@ const JendagiContract = ({
         <tr>
           <td>25</td>
           <td>MANAGER OR PRODUCER</td>
-          <td>{productionCompany?.Name ? productionCompany.Name : '!PRODUCTION COMPANY!'}</td>
+          <td>{productionCompany?.ProdCoName ? productionCompany.ProdCoName : '!PRODUCTION COMPANY!'}</td>
         </tr>
       </table>
 
@@ -521,10 +524,10 @@ const JendagiContract = ({
 
       <div className="details-container">
         <p>
-          {productionCompany?.Name ? productionCompany.Name : 'PRODUCTION COMPANY'} (“The Producer”) hereby engages The
-          Contractor to render their services in connection with The Producer’s production (“the Production”) of the
-          dramatic work as detailed at clause 4 of the foregoing schedule, on the terms and subject to the conditions
-          set out in this Agreement.
+          {productionCompany?.ProdCoName ? productionCompany.ProdCoName : 'PRODUCTION COMPANY'} (“The Producer”) hereby
+          engages The Contractor to render their services in connection with The Producer’s production (“the
+          Production”) of the dramatic work as detailed at clause 4 of the foregoing schedule, on the terms and subject
+          to the conditions set out in this Agreement.
         </p>
         <p>
           <strong>NOW IT IS HEREBY AGREED</strong> as follows:{' '}
@@ -961,7 +964,7 @@ const JendagiContract = ({
             <strong>for and on behalf of</strong>
           </p>
           <p>
-            <strong>{productionCompany?.Name ? productionCompany.Name : 'PRODUCTION COMPANY'}</strong>
+            <strong>{productionCompany?.ProdCoName ? productionCompany.ProdCoName : 'PRODUCTION COMPANY'}</strong>
           </p>
           <p>
             <strong>DATE IS AS PER SCHEDULE CLAUSE 1</strong>

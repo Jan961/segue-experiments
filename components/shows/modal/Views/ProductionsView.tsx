@@ -6,7 +6,7 @@ import Table from 'components/core-ui-lib/Table';
 import { getProductionsConvertedPayload } from 'components/shows/constants';
 import { productionsTableConfig } from 'components/shows/table/tableConfig';
 import { useRouter } from 'next/router';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import useComponentMountStatus from 'hooks/useComponentMountStatus';
 import { sortByProductionStartDate } from './util';
 import { notify } from 'components/core-ui-lib/Notifications';
@@ -16,6 +16,9 @@ import ProductionDetailsForm, { ProductionFormData, defaultProductionFormData } 
 import LoadingOverlay from 'components/shows/LoadingOverlay';
 import CurrencyConversionModal from './CurrencyConversionModal';
 import { ConfirmationDialog, PopupModal } from 'components/core-ui-lib';
+import { all, group, objectify } from 'radash';
+import { ICurrency, ICurrencyCountry } from 'interfaces';
+import { isNullOrEmpty } from 'utils';
 
 interface ProductionsViewProps {
   showData: any;
@@ -40,11 +43,14 @@ const ProductionsView = ({ showData, visible, onClose }: ProductionsViewProps) =
   const [openEditModal, setOpenEditModal] = useState<boolean>(false);
   const [confirm, setConfirm] = useState<boolean>(false);
   const [openCurrencyConversionModal, setOpenCurrencyConversionModal] = useState<boolean>(false);
+  const [currencyLookup, setCurrencyLookup] = useState<Record<string, ICurrency>>({});
+  const [currencyCountryLookup, setCurrencyCountryLookup] = useState<Record<string, ICurrencyCountry[]>>({});
   const [currentProduction, setCurrentProduction] = useState<ProductionFormData>(defaultProductionFormData);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isArchived, setIsArchived] = useState<boolean>(true);
   const isMounted = useComponentMountStatus();
   const productionColumDefs = useMemo(() => (isMounted ? productionsTableConfig : []), [isMounted]);
+  const [showParentLoading, setParentLoadingOverlay] = useState<boolean>(false);
   const showName = useMemo(() => showData.Name, [showData]);
   const showCode = useMemo(() => showData.Code, [showData]);
   const title = useMemo(
@@ -70,6 +76,44 @@ const ProductionsView = ({ showData, visible, onClose }: ProductionsViewProps) =
   const archivedList = useMemo(() => {
     return sortByProductionStartDate(showData.productions.filter((item) => item.IsArchived && !item.IsDeleted));
   }, [showData, isArchived]);
+
+  const currencyCodeList = useMemo(
+    () =>
+      showData.productions?.flatMap?.(
+        (production) =>
+          production.ConversionRateList?.flatMap?.(({ ToCurrencyCode, FromCurrencyCode }) => [
+            ToCurrencyCode,
+            FromCurrencyCode,
+          ]),
+      ),
+    [showData.productions],
+  );
+
+  useEffect(() => {
+    updateCurrencyDetails(currencyCodeList);
+  }, [currencyCodeList]);
+
+  const updateCurrencyDetails = async (currencyCodeList) => {
+    try {
+      if (!isNullOrEmpty(currencyCodeList)) {
+        const filteredCodeList = currencyCodeList.filter((code) => code !== undefined);
+        const [currencyList, countryList] = await all([
+          axios.post(`/api/currency/read/list`, { currencyCodeList: filteredCodeList }),
+          axios.post(`/api/currency/read/country-list`, { currencyCodeList: filteredCodeList }),
+        ]);
+        setCurrencyLookup(
+          objectify(
+            currencyList.data,
+            (c: ICurrency) => c.code,
+            (c) => c,
+          ),
+        );
+        setCurrencyCountryLookup(group(countryList.data, (c: ICurrencyCountry) => c.currencyCode));
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  };
 
   const rowsData = useMemo(() => {
     if (isArchived) return [...unArchivedList, ...archivedList];
@@ -123,11 +167,14 @@ const ProductionsView = ({ showData, visible, onClose }: ProductionsViewProps) =
   );
 
   const onSaveProduction = (production: ProductionFormData, cb?: () => void) => {
+    setParentLoadingOverlay(true);
+    setOpenEditModal(false);
     if (production?.id) {
       updateCurrentProduction(production, cb);
     } else {
       createNewProduction(production, cb);
     }
+    setParentLoadingOverlay(false);
   };
 
   const updateCurrentProductionState = (data) => {
@@ -218,76 +265,81 @@ const ProductionsView = ({ showData, visible, onClose }: ProductionsViewProps) =
   }, [handleDelete, setConfirm, currentProduction]);
 
   return (
-    <PopupModal
-      show={visible}
-      onClose={() => onClose()}
-      titleClass="text-xl text-primary-navy text-bold"
-      title="Productions"
-      panelClass="relative"
-      hasOverlay={openEditModal || openCurrencyConversionModal || confirm}
-    >
-      <div className="flex justify-between mb-2">
-        <div className="text-primary-navy text-xl relative bottom-2 font-bold">{showName}</div>
-        <div className="flex items-center justify-between">
-          <div className="flex gap-2 items-center">
-            <Checkbox
-              className="flex flex-row-reverse mr-2"
-              checked={isArchived}
-              label="Include archived"
-              id=""
-              onChange={handleArchive}
-            />
-            <Button onClick={addNewRow} text="Add New Production" />
+    <div>
+      {showParentLoading && <LoadingOverlay />}
+      <PopupModal
+        show={visible}
+        onClose={() => onClose()}
+        titleClass="text-xl text-primary-navy text-bold"
+        title="Productions"
+        panelClass="relative"
+        hasOverlay={openEditModal || openCurrencyConversionModal || confirm}
+      >
+        <div className="flex justify-between mb-2">
+          <div className="text-primary-navy text-xl relative bottom-2 font-bold">{showName}</div>
+          <div className="flex items-center justify-between">
+            <div className="flex gap-2 items-center">
+              <Checkbox
+                className="flex flex-row-reverse mr-2"
+                checked={isArchived}
+                label="Include archived"
+                id=""
+                onChange={handleArchive}
+              />
+              <Button onClick={addNewRow} text="Add New Production" />
+            </div>
           </div>
         </div>
-      </div>
-      <div className=" w-[750px] lg:w-[870px] h-full flex flex-col ">
-        <Table
-          ref={tableRef}
-          columnDefs={productionColumDefs}
-          rowData={rowsData}
-          styleProps={styleProps}
-          onCellClicked={handleCellClick}
-          gridOptions={gridOptions}
-          onCellValueChange={handleCellChanges}
-          headerHeight={30}
-          rowClassRules={rowClassRules}
-        />
+        <div className=" w-[750px] lg:w-[870px] h-full flex flex-col ">
+          <Table
+            ref={tableRef}
+            columnDefs={productionColumDefs}
+            rowData={rowsData}
+            styleProps={styleProps}
+            onCellClicked={handleCellClick}
+            gridOptions={gridOptions}
+            onCellValueChange={handleCellChanges}
+            headerHeight={30}
+            rowClassRules={rowClassRules}
+          />
 
-        {isLoading && <LoadingOverlay />}
-      </div>
-      <div className="pt-4 w-full grid grid-cols-2 items-center  justify-end  justify-items-end gap-3">
-        <div />
-        <div className="flex gap-3">
-          {/* <Button className="w-33 " variant="secondary" onClick={onClose} text="Cancel" /> */}
-          <Button className=" w-33" text="Close" onClick={onClose} />
+          {isLoading && <LoadingOverlay />}
         </div>
-      </div>
-      <ConfirmationDialog
-        variant="delete"
-        show={confirm}
-        onYesClick={onConfirmDelete}
-        onNoClick={() => setConfirm(false)}
-        hasOverlay={false}
-      />
-      {openEditModal && (
-        <ProductionDetailsForm
-          production={currentProduction}
-          title={title || ''}
-          visible={openEditModal}
-          onSave={onSaveProduction}
-          onClose={() => setOpenEditModal(false)}
+        <div className="pt-4 w-full grid grid-cols-2 items-center  justify-end  justify-items-end gap-3">
+          <div />
+          <div className="flex gap-3">
+            {/* <Button className="w-33 " variant="secondary" onClick={onClose} text="Cancel" /> */}
+            <Button className=" w-33" text="Close" onClick={onClose} />
+          </div>
+        </div>
+        <ConfirmationDialog
+          variant="delete"
+          show={confirm}
+          onYesClick={onConfirmDelete}
+          onNoClick={() => setConfirm(false)}
+          hasOverlay={false}
         />
-      )}
-      {openCurrencyConversionModal && (
-        <CurrencyConversionModal
-          conversionRates={currentProduction?.conversionRateList}
-          title={title || ''}
-          visible={openCurrencyConversionModal}
-          onClose={() => setOpenCurrencyConversionModal(false)}
-        />
-      )}
-    </PopupModal>
+        {openEditModal && (
+          <ProductionDetailsForm
+            production={currentProduction}
+            title={title || ''}
+            visible={openEditModal}
+            onSave={onSaveProduction}
+            onClose={() => setOpenEditModal(false)}
+          />
+        )}
+        {openCurrencyConversionModal && (
+          <CurrencyConversionModal
+            conversionRates={currentProduction?.conversionRateList}
+            currencyCountryLookup={currencyCountryLookup}
+            currencyLookup={currencyLookup}
+            title={title || ''}
+            visible={openCurrencyConversionModal}
+            onClose={() => setOpenCurrencyConversionModal(false)}
+          />
+        )}
+      </PopupModal>
+    </div>
   );
 };
 

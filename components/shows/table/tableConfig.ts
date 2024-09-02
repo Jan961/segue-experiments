@@ -5,6 +5,7 @@ import ShowNameAndCodeRenderer from './ShowNameAndCodeRenderer';
 import { ICellRendererParams } from 'ag-grid-community';
 import React from 'react';
 import CurrencyExchangeRenderer from './CurrencyExchangeRenderer';
+import { isUndefined } from 'utils';
 
 export const generateChildCol = (
   headerName: string,
@@ -81,7 +82,8 @@ export const showsTableConfig = [
     cellRenderer: TableCheckboxRenderer,
     cellRendererParams: (params) => {
       return {
-        ...(params.data.productions.length > 0 &&
+        ...(!isUndefined(params.data.productions) &&
+        params.data.productions.length > 0 &&
         params.data.productions.some((production) => production.IsArchived === false)
           ? {
               disabled: true,
@@ -122,13 +124,14 @@ export const showsTableConfig = [
       return {
         buttonText: 'Delete',
         variant: 'tertiary',
-        ...(params.data.productions.length > 0 && {
-          disabled: true,
-          tpActive: true,
-          body: 'Please delete all Productions before deleting a Show',
-          position: 'right',
-          width: 'w-36',
-        }),
+        ...(!isUndefined(params.data.productions) &&
+          params.data.productions.length > 0 && {
+            disabled: true,
+            tpActive: true,
+            body: 'Please delete all Productions before deleting a Show',
+            position: 'right',
+            width: 'w-36',
+          }),
       };
     },
     cellStyle: {

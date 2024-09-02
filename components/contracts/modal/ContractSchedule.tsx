@@ -1,4 +1,4 @@
-import { Button, Select, TextInput } from 'components/core-ui-lib';
+import { Button, Select, TextInput, notify } from 'components/core-ui-lib';
 import PopupModal from 'components/core-ui-lib/PopupModal';
 import { useCallback, useMemo, useState } from 'react';
 import { ContractNewPersonModal } from './ContractNewPersonModal';
@@ -57,10 +57,10 @@ export const ContractScheduleModal = ({ openContract, onClose }: { openContract:
     async (saveStatus = false) => {
       setOpenNewPersonContract(false);
       if (saveStatus) {
-        const personsMinList: PersonMinimalDTO[] = await axios.get('/api/person/list');
+        const response = await axios.get('/api/person/list');
         const idToPersonMap = objectify(
-          personsMinList ?? [],
-          (p) => p.id,
+          response.data ?? [],
+          (p: PersonMinimalDTO) => p.id,
           (p) => p,
         );
         setPersonMap(idToPersonMap);
@@ -68,6 +68,14 @@ export const ContractScheduleModal = ({ openContract, onClose }: { openContract:
     },
     [setOpenNewPersonContract, setPersonMap],
   );
+
+  const onOpenBuildContract = useCallback(() => {
+    if (production && department && role && personId && templateId) {
+      setOpenNewBuildContract(true);
+    } else {
+      notify.error('Please complete all the fields');
+    }
+  }, [production, department, role, personId, templateId, setOpenNewBuildContract]);
 
   return (
     <PopupModal
@@ -151,7 +159,7 @@ export const ContractScheduleModal = ({ openContract, onClose }: { openContract:
             disabled={!production}
             className="text-sm leading-8"
             text="Start Building Contract"
-            onClick={() => setOpenNewBuildContract(true)}
+            onClick={onOpenBuildContract}
           />
         </div>
       </div>

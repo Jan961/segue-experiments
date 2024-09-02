@@ -12,17 +12,17 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const email = await getEmailFromReq(req);
     const access = await checkAccess(email);
     if (!access) return res.status(401).end();
-    const { Id, AssignedToUserId, MTRId } = task;
+    const { Id, TaskAssignedToAccUserId, MTRId } = task;
     await masterTaskSchema.validate(task);
     if (isNullOrEmpty(MTRId)) {
-      task = omit(task, ['Id', 'AccountId', 'AssignedToUserId', 'MTRId', 'MasterTaskRepeat']);
+      task = omit(task, ['Id', 'AccountId', 'TaskAssignedToAccUserId', 'MTRId', 'MasterTaskRepeat']);
       const createResult = await prisma.MasterTask.update({
         data: {
           ...task,
-          ...(task.AssignedToUserId && {
+          ...(task.TaskAssignedToAccUserId && {
             User: {
               connect: {
-                Id: AssignedToUserId,
+                Id: TaskAssignedToAccUserId,
               },
             },
           }),
@@ -36,7 +36,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         'Id',
         'MasterTaskRepeat',
         'AccountId',
-        'AssignedToUserId',
+        'TaskAssignedToAccUserId',
         'MTRId',
         'TaskRepeatFromWeekNum',
         'TaskRepeatToWeekNum',
@@ -48,10 +48,10 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         data: {
           ...strippedTask,
           MTRId: null,
-          ...(AssignedToUserId && {
+          ...(TaskAssignedToAccUserId && {
             User: {
               connect: {
-                Id: AssignedToUserId,
+                Id: TaskAssignedToAccUserId,
               },
             },
           }),

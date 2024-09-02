@@ -11,7 +11,7 @@ import { currencyListState } from 'state/productions/currencyState';
 import PublicityEventDetails, { IPublicityEventDetails, defaultPublicityEventDetails } from './PublicityEventDetails';
 import { contractsVenueState } from 'state/contracts/contractsVenueState';
 import { standardClauseState } from 'state/contracts/standardClauseState';
-import { IContractDetails } from '../types';
+import { IContractDetails, IWeeklyPayDetails } from '../types';
 
 const defaultContractDetails = {
   currency: null,
@@ -84,12 +84,15 @@ const ContractDetails = ({ contract = {}, onChange = noop }: ContractDetailsProp
   const currencySymbol = useMemo(() => '£', [currency]);
 
   const handleChange = useCallback(
-    (key: string, value: number | string | boolean | string[] | TPaymentBreakdown[] | IPublicityEventDetails[]) => {
+    (
+      key: string,
+      value: number | string | boolean | string[] | TPaymentBreakdown[] | IPublicityEventDetails[] | IWeeklyPayDetails,
+    ) => {
       const updatedData = { ...contractDetails, [key]: value };
       setContractDetails(updatedData);
-      onChange(updatedData);
+      onChange({ ...contract, [key]: value });
     },
-    [onChange, contractDetails],
+    [onChange, contractDetails, contract],
   );
 
   const onRehearsalVenueChange = useCallback(
@@ -289,7 +292,7 @@ const ContractDetails = ({ contract = {}, onChange = noop }: ContractDetailsProp
             <WeeklyPayDetails
               testId="contract-details-weekly-payment"
               details={weeklyPayDetails}
-              onChange={(value) => handleChange('weeklyPayDetails', value as boolean)}
+              onChange={(value) => handleChange('weeklyPayDetails', value)}
             />
           </div>
           <div className="flex flex-col gap-4">
@@ -350,7 +353,7 @@ const ContractDetails = ({ contract = {}, onChange = noop }: ContractDetailsProp
                 placeholder="00.00"
                 type="number"
                 value={cancellationFee}
-                onChange={(event) => handleChange('cancellationFee', parseInt(event.target.value, 10))}
+                onChange={(event) => handleChange('cancellationFee', parseFloat(event.target.value))}
               />
             </div>
             <TextInput

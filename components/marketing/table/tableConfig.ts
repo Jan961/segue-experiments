@@ -155,10 +155,10 @@ export const contactNoteColDefs = (updateContactNote, userList) => [
     headerName: 'Actioned By',
     field: 'UserId',
     cellRenderer: function (params) {
-      if (params.data.UserId === null) {
+      if (params.data.ActionAccUserId === null) {
         return '';
       } else {
-        const actByName = userList.find((user) => user.value === parseInt(params.data.UserId)).text;
+        const actByName = userList.find((user) => user.value === parseInt(params.data.ActionAccUserId)).text;
         return actByName;
       }
     },
@@ -234,13 +234,16 @@ export const allocSeatsColDefs = [
         value: params.data.TicketHolderName + '\n' + params.data.TicketHolderEmail,
       };
     },
+    cellStyle: {
+      marginLeft: '4px',
+    },
     wrapText: true,
     autoHeight: true,
     width: 200,
   },
   {
     headerName: 'Arranged by',
-    field: 'ArrangedById',
+    field: 'ArrangedByAccUserId',
     cellRenderer: DefaultCellRenderer,
     width: 120,
   },
@@ -674,6 +677,47 @@ export const globalActivityTabColDefs = (showGlobalActivity, currencySymbol) => 
       ],
     }),
     width: 50,
+    resizable: false,
+  },
+];
+
+export const loadSalesHistoryColDefs = [
+  {
+    headerName: 'Upload Name',
+    field: 'name',
+    cellRenderer: DefaultTextRenderer,
+  },
+  {
+    headerName: 'Date Uploaded',
+    field: 'dateUploaded',
+    cellRenderer: DefaultTextRenderer,
+  },
+  {
+    headerName: 'Issues Flagged / Approved',
+    field: 'UploadMessage',
+    cellRenderer: DefaultTextRenderer,
+  },
+  {
+    headerName: 'View',
+    field: 'ViewBtn',
+    cellRenderer: ButtonRenderer,
+    cellRendererParams: {
+      buttonText: 'View',
+    },
+    width: 100,
+  },
+  {
+    headerName: '',
+    field: 'icons',
+    cellRenderer: IconRowRenderer,
+    cellRendererParams: {
+      iconList: [
+        {
+          name: 'delete',
+        },
+      ],
+    },
+    width: 80,
     resizable: false,
   },
 ];

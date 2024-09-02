@@ -140,10 +140,10 @@ export const getColumnDefs = (usersList = [], production) => {
     },
     {
       headerName: 'Assigned to',
-      field: 'AssignedToUserId',
+      field: 'TaskAssignedToAccUserId',
       valueGetter: function (params) {
-        return params.data?.AssignedToUserId
-          ? usersList.filter((user) => user.value === params.data?.AssignedToUserId)[0].text
+        return params.data?.TaskAssignedToAccUserId
+          ? usersList.filter((user) => user.value === params.data?.TaskAssignedToAccUserId)[0].text
           : null;
       },
       cellRenderer: DefaultCellRenderer,
@@ -201,10 +201,10 @@ export const getMasterTasksColumnDefs = (usersList = []) => {
     { headerName: 'Priority', field: 'Priority', cellRenderer: DefaultCellRenderer, width: 100 },
     {
       headerName: 'Assigned to',
-      field: 'AssignedToUserId',
+      field: 'TaskAssignedToAccUserId',
       valueGetter: function (params) {
-        return params.data?.AssignedToUserId
-          ? usersList.filter((user) => user.value === params.data?.AssignedToUserId)[0].text
+        return params.data?.TaskAssignedToAccUserId
+          ? usersList.filter((user) => user.value === params.data?.TaskAssignedToAccUserId)[0].text
           : null;
       },
       cellRenderer: DefaultCellRenderer,

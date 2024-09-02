@@ -20,7 +20,7 @@ export const defaultEmergencyContactData = {
 interface Props {
   emergencyContact?: Partial<EmergencyContact>;
   countryOptionList: SelectOption[];
-  onChange: (data: EmergencyContact) => void;
+  onChange: (data: Partial<EmergencyContact>) => void;
 }
 
 const EmergencyContactForm = ({ emergencyContact = {}, countryOptionList = [], onChange }: Props) => {
@@ -31,7 +31,7 @@ const EmergencyContactForm = ({ emergencyContact = {}, countryOptionList = [], o
     (key: string, value: number | string | null) => {
       const updatedData = { ...contact, [key]: value };
       setContact(updatedData);
-      onChange(updatedData);
+      onChange({ ...emergencyContact, [key]: value });
     },
     [onChange, setContact, contact],
   );

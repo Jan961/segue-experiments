@@ -27,8 +27,8 @@ const SelectBookingStatusRenderer = ({
 
   useEffect(() => {
     if (data) {
-      const { isRunOfDates, dayType } = data;
-      setIsDisabled((isRunOfDates && node.rowIndex > 0) || dayType === null || dayType === '');
+      const { dayType } = data;
+      setIsDisabled(node.rowIndex > 0 || dayType === null || dayType === '');
       if (!data.isRunOfDates) {
         setValue(dayType === null || dayType === '' ? null : value);
       } else if (node.rowIndex === 0 && value !== null && (dayType === null || dayType === '')) {

@@ -1,4 +1,5 @@
-import prisma from 'lib/prisma';
+import client from 'lib/prisma';
+import master from 'lib/prisma_master';
 
 const charCodeToCurrency = (charCode: string) => {
   return String.fromCharCode(Number('0x' + charCode));
@@ -6,7 +7,7 @@ const charCodeToCurrency = (charCode: string) => {
 
 export const getCurrencyFromBookingId = async (bookingId: number, returnCurrencyCode = false) => {
   try {
-    const venueIdQuery: any | null = await prisma.Booking.findFirst({
+    const venueIdQuery: any | null = await client.Booking.findFirst({
       where: {
         Id: bookingId,
       },
@@ -20,7 +21,7 @@ export const getCurrencyFromBookingId = async (bookingId: number, returnCurrency
       return null;
     }
 
-    const venueCountryQuery: any | null = await prisma.VenueAddress.findFirst({
+    const venueCountryQuery: any | null = await client.VenueAddress.findFirst({
       where: {
         VenueId: { equals: venueId },
         TypeName: { equals: 'Main' },
@@ -37,7 +38,7 @@ export const getCurrencyFromBookingId = async (bookingId: number, returnCurrency
       return null;
     }
 
-    const currencyCodeQuery: any | null = await prisma.Country.findFirst({
+    const currencyCodeQuery: any | null = await client.Country.findFirst({
       where: {
         Id: { equals: countryId },
       },
@@ -53,16 +54,16 @@ export const getCurrencyFromBookingId = async (bookingId: number, returnCurrency
       return null;
     }
 
-    const currencySymbolQuery: any | null = await prisma.Currency.findFirst({
+    const currencySymbolQuery: any | null = await master.Currency.findFirst({
       where: {
-        Code: { equals: currencyCode },
+        CurrencyCode: { equals: currencyCode },
       },
       select: {
-        SymbolUnicode: true,
+        CurrencySymbolUnicode: true,
       },
     });
 
-    const currencySymbol: string | null = currencySymbolQuery?.SymbolUnicode || null;
+    const currencySymbol: string | null = currencySymbolQuery?.CurrencySymbolUnicode || null;
 
     return returnCurrencyCode ? currencyCode : charCodeToCurrency(currencySymbol);
   } catch (exception) {
@@ -71,7 +72,7 @@ export const getCurrencyFromBookingId = async (bookingId: number, returnCurrency
 };
 
 export const getCurrencyCodeFromCountryId: (countryId: number) => Promise<any> = async (countryId: number) => {
-  const currencyCodeQuery: any | null = await prisma.Country.findFirst({
+  const currencyCodeQuery: any | null = await client.Country.findFirst({
     where: {
       Id: { equals: countryId },
     },
@@ -85,7 +86,7 @@ export const getCurrencyCodeFromCountryId: (countryId: number) => Promise<any> =
 export const getCurrencyFromProductionId = async (productionId: number, returnCurrencyCode = false) => {
   try {
     // Query to get the ReportCurrencyCode from Production
-    const currencyCodeQuery: any | null = await prisma.Production.findFirst({
+    const currencyCodeQuery: any | null = await client.Production.findFirst({
       where: {
         Id: { equals: productionId },
       },
@@ -103,17 +104,17 @@ export const getCurrencyFromProductionId = async (productionId: number, returnCu
     }
 
     // Query to get the currency symbol using the currency code
-    const currencySymbolQuery: any | null = await prisma.Currency.findFirst({
+    const currencySymbolQuery: any | null = await master.Currency.findFirst({
       where: {
-        Code: { equals: currencyCode },
+        CurrencyCode: { equals: currencyCode },
       },
       select: {
-        SymbolUnicode: true,
+        CurrencySymbolUnicode: true,
       },
     });
 
     // Extract the currency symbol from the query result
-    const currencySymbol: string | null = currencySymbolQuery?.SymbolUnicode || null;
+    const currencySymbol: string | null = currencySymbolQuery?.CurrencySymbolUnicode || null;
 
     return returnCurrencyCode ? currencyCode : charCodeToCurrency(currencySymbol);
   } catch (exception) {

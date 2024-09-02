@@ -3,6 +3,7 @@ import prisma from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getEmailFromReq, checkAccess } from 'services/userService';
 import { productionTaskSchema } from 'validators/tasks';
+import { isNullOrEmpty } from 'utils';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
@@ -23,9 +24,9 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         CompleteByWeekNum: task.CompleteByWeekNum,
         StartByIsPostProduction: task.StartByIsPostProduction,
         CompleteByIsPostProduction: task.CompleteByIsPostProduction,
-        TaskCompletedDate: new Date(task?.TaskCompletedDate) || null,
+        TaskCompletedDate: !isNullOrEmpty(task?.TaskCompletedDate) ? new Date(task?.TaskCompletedDate) : null,
         ProductionId: task.ProductionId,
-        AssignedToUserId: task.AssignedToUserId,
+        TaskAssignedToAccUserId: task.TaskAssignedToAccUserId,
       };
 
       await productionTaskSchema.validate(prodTaskRecord);
@@ -41,7 +42,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           CompleteByWeekNum: task.CompleteByWeekNum,
           StartByIsPostProduction: task.StartByIsPostProduction,
           CompleteByIsPostProduction: task.CompleteByIsPostProduction,
-          TaskCompletedDate: new Date(task?.TaskCompletedDate) || null,
+          TaskCompletedDate: !isNullOrEmpty(task?.TaskCompletedDate) ? new Date(task?.TaskCompletedDate) : null,
           ...(task.ProductionId && {
             Production: {
               connect: {
@@ -49,12 +50,8 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
               },
             },
           }),
-          ...(task.AssignedToUserId && {
-            User: {
-              connect: {
-                Id: task.AssignedToUserId,
-              },
-            },
+          ...(task.TaskAssignedToAccUserId && {
+            TaskAssignedToAccUserId: task.TaskAssignedToAccUserId,
           }),
           ...(task.PRTId && {
             ProductionTaskRepeat: {
