@@ -96,16 +96,38 @@ const validateRow = (
   currentBookingDate,
   row,
 ) => {
-  const { detailsColumnMessage, rowErrorOccurred, rowWarningOccurred } = updateValidateSpreadsheetData(
-    spreadsheetData,
-    currentRow,
-    currentVenue,
-    currentBookingDate,
-    prodCode,
-    venueList,
-    prodDateRange,
-    row,
-  );
+  let detailsColumnMessage = '';
+  let rowWarningOccurred = false;
+  let rowErrorOccurred = false;
+
+  const {
+    detailsColumnMessage: returnString,
+    rowErrorOccurred: errorOccurred,
+    rowWarningOccurred: warningOccurred,
+    currentRowBooking,
+  } = updateValidateSpreadsheetData(spreadsheetData, currentRow, currentVenue, currentBookingDate, row);
+
+  detailsColumnMessage += returnString;
+  if (errorOccurred) rowErrorOccurred = true;
+  if (warningOccurred) rowWarningOccurred = true;
+
+  const validations = [
+    validateProductionCode(currentRow, prodCode),
+    validateVenueCode(currentRow, venueList),
+    validateBookingDate(currentRow, prodDateRange, prodCode),
+    validateSalesDate(currentRow),
+    validateSalesType(currentRow),
+    validateSeats(currentRow),
+    validateValue(currentRow),
+    validateIsFinal(currentRow, currentRowBooking),
+    validateIgnoreWarning(currentRow),
+  ];
+
+  validations.forEach((validation) => {
+    detailsColumnMessage += validation.returnString;
+    if (validation.errorOccurred) rowErrorOccurred = true;
+    if (validation.warningOccurred) rowWarningOccurred = true;
+  });
 
   return { detailsColumnMessage, rowErrorOccurred, rowWarningOccurred };
 };
@@ -116,13 +138,10 @@ const updateValidateSpreadsheetData = (
   currentRow: SpreadsheetRow,
   currentVenue: string,
   currentBookingDate: string,
-  prodCode,
-  venueList: Record<number, VenueMinimalDTO>,
-  prodDateRange,
   row,
 ) => {
   let detailsColumnMessage = '';
-  let rowWarningOccurred = false;
+  const rowWarningOccurred = false;
   let rowErrorOccurred = false;
 
   const createNewSale = () => {
@@ -156,7 +175,7 @@ const updateValidateSpreadsheetData = (
       venueCode: currentRow.venueCode,
       bookings: [createNewBooking()],
     });
-    return { detailsColumnMessage, rowWarningOccurred, rowErrorOccurred };
+    return { detailsColumnMessage, rowWarningOccurred, rowErrorOccurred, currentRowBooking: null };
   }
 
   // Check to see if currentBookingDate exists in SpreadsheetData
@@ -165,7 +184,7 @@ const updateValidateSpreadsheetData = (
   if (!booking) {
     // If currentBookingDate not already exists, push a new booking
     venue.bookings.push(createNewBooking());
-    return { detailsColumnMessage, rowWarningOccurred, rowErrorOccurred };
+    return { detailsColumnMessage, rowWarningOccurred, rowErrorOccurred, currentRowBooking: null };
   }
 
   const sale = booking.sales.find((s) => s.salesDate.getTime() === new Date(currentRow.salesDate).getTime());
@@ -189,25 +208,7 @@ const updateValidateSpreadsheetData = (
     booking.sales.push(createNewSale());
   }
 
-  const validations = [
-    validateProductionCode(currentRow, prodCode),
-    validateVenueCode(currentRow, venueList),
-    validateBookingDate(currentRow, prodDateRange, prodCode),
-    validateSalesDate(currentRow),
-    validateSalesType(currentRow),
-    validateSeats(currentRow),
-    validateValue(currentRow),
-    validateIsFinal(currentRow, booking),
-    validateIgnoreWarning(currentRow),
-  ];
-
-  validations.forEach((validation) => {
-    detailsColumnMessage += validation.returnString;
-    if (validation.errorOccurred) rowErrorOccurred = true;
-    if (validation.warningOccurred) rowWarningOccurred = true;
-  });
-
-  return { detailsColumnMessage, rowWarningOccurred, rowErrorOccurred };
+  return { detailsColumnMessage, rowWarningOccurred, rowErrorOccurred, currentRowBooking: booking };
 };
 
 const validateProductionCode = (currentRow: SpreadsheetRow, prodCode) => {
@@ -346,15 +347,17 @@ const validateIsFinal = (currentRow: SpreadsheetRow, booking) => {
     errorOccurred = true;
   }
 
-  if (
-    currentRow.isFinal.toUpperCase() === 'Y' &&
-    booking.finalSalesDate &&
-    booking.finalSalesDate.getTime() !== new Date(currentRow.salesDate).getTime()
-  ) {
-    returnString += ' | ERROR - Cannot have more than one Is Final Date for a Booking';
-    errorOccurred = true;
-  } else if (currentRow.isFinal.toUpperCase() === 'Y') {
-    booking.finalSalesDate = new Date(currentRow.salesDate);
+  if (booking) {
+    if (
+      currentRow.isFinal.toUpperCase() === 'Y' &&
+      booking.finalSalesDate &&
+      booking.finalSalesDate.getTime() !== new Date(currentRow.salesDate).getTime()
+    ) {
+      returnString += ' | ERROR - Cannot have more than one Is Final Date for a Booking';
+      errorOccurred = true;
+    } else if (currentRow.isFinal.toUpperCase() === 'Y') {
+      booking.finalSalesDate = new Date(currentRow.salesDate);
+    }
   }
 
   return { returnString, warningOccurred, errorOccurred };
