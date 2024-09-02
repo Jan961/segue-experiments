@@ -138,14 +138,7 @@ export const validateSpreadsheetFile = async (file, prodCode, venueList, prodDat
           row,
         );
 
-        updateDetailsAndResponseCells(
-          row,
-          currentRow,
-          detailsMessage,
-          rowErrorOccurred,
-          rowWarningOccured,
-          spreadsheetIssues,
-        );
+        updateDetailsAndResponseCells(row, detailsMessage, rowErrorOccurred, rowWarningOccured, spreadsheetIssues);
 
         previousRow = { ...currentRow };
       }
@@ -449,22 +442,6 @@ const validateIgnoreWarning = (currentRow: SpreadsheetRow) => {
   return { returnString, warningOccured, errorOccurred };
 };
 
-// // Expects a Booking, and a Sales Date, returns the date prior to the given Sales Date
-// const getPreviousSale = (currentBooking, currentSaleDate) => {
-//   let previousSale;
-//   const sortedSales = currentBooking.sales.sort((a, b) => a.salesDate.getTime() - b.salesDate.getTime());
-
-//   for (let i = 0; i < sortedSales.length; i++) {
-//     if (sortedSales[i].salesDate < new Date(currentSaleDate)) {
-//       previousSale = sortedSales[i];
-//     } else {
-//       break;
-//     }
-//   }
-
-//   return previousSale;
-// };
-
 const formatDetailsMessage = (detailsMessage: string) => {
   const parts = detailsMessage.split('|').map((part) => part.trim());
   const errors = parts.filter((part) => part.startsWith('ERROR -')).join('| ');
@@ -479,24 +456,13 @@ const formatDetailsMessage = (detailsMessage: string) => {
 
 const updateDetailsAndResponseCells = (
   row,
-  currentRow,
   detailsMessage,
   rowErrorOccurred,
   rowWarningOccured,
   spreadsheetIssues: SpreadsheetIssues,
 ) => {
   const formattedDetailsMessage = formatDetailsMessage(detailsMessage);
-  const responseCell = row.getCell(10);
-  const detailsCell = row.getCell(11);
-
-  if (rowErrorOccurred) {
-    writeErrorCell(detailsCell, responseCell, spreadsheetIssues, formattedDetailsMessage);
-  } else if (rowWarningOccured) {
-    const ignoreWarning = (currentRow.ignoreWarning?.toUpperCase() ?? 'N') === 'Y';
-    writeWarningCell(detailsCell, responseCell, spreadsheetIssues, formattedDetailsMessage, ignoreWarning);
-  } else {
-    writeOKCell(detailsCell, responseCell);
-  }
+  writeDetailsResponse(row, formattedDetailsMessage, rowErrorOccurred, rowWarningOccured, spreadsheetIssues);
 };
 
 const convertWorkbookToFile = async (workbook, file) => {
@@ -530,32 +496,47 @@ const postValidationChecks = (spreadsheetData: SpreadsheetData, spreadsheetIssue
           previousSale = sale;
           continue;
         }
+
         let detailsMessage = '';
+        let warningOccured = sale.salesRow.getCell(10).value === 'WARNING';
+        const errorOccurred = sale.salesRow.getCell(10).value === 'ERROR';
         if (sale.seats > previousSale.seats * 1.15) {
           detailsMessage += '| WARNING - Seats increased by more than 15% from previous sale';
+          warningOccured = true;
         }
         if (sale.seats < previousSale.seats) {
           detailsMessage += '| WARNING - Seats decreased from previous sale';
+          warningOccured = true;
         }
         if (parseFloat(sale.value) > parseFloat(previousSale.value) * 1.15) {
           detailsMessage += '| WARNING - Value increased by more than 15% from previous sale';
+          warningOccured = true;
         }
         if (parseFloat(sale.value) < parseFloat(previousSale.value)) {
           detailsMessage += '| WARNING - Value decreased from previous sale';
+          warningOccured = true;
         }
 
         const formattedDetailsMessage = formatDetailsMessage((sale.salesRow.getCell(11).value += detailsMessage));
-        const ignoreWarning = (sale.salesRow.getCell(8).toUpperCase() ?? 'N') === 'Y';
-        writeWarningCell(
-          sale.salesRow.getCell(11),
-          sale.salesRow.getCell(10),
-          spreadsheetIssues,
-          formattedDetailsMessage,
-          ignoreWarning,
-        );
+        writeDetailsResponse(sale.salesRow, formattedDetailsMessage, errorOccurred, warningOccured, spreadsheetIssues);
+
         previousSale = sale;
       }
     }
+  }
+};
+
+const writeDetailsResponse = (row, message, errorOccurred, warningOccurred, spreadsheetIssues) => {
+  const responseCell = row.getCell(10);
+  const detailsCell = row.getCell(11);
+
+  if (errorOccurred) {
+    writeErrorCell(detailsCell, responseCell, spreadsheetIssues, message);
+  } else if (warningOccurred) {
+    const ignoreWarning = (row.getCell(8).value?.toUpperCase() ?? 'N') === 'Y';
+    writeWarningCell(detailsCell, responseCell, spreadsheetIssues, message, ignoreWarning);
+  } else {
+    writeOKCell(detailsCell, responseCell);
   }
 };
 
