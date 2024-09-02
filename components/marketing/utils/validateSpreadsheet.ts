@@ -23,6 +23,7 @@ interface SpreadsheetData {
     bookings: {
       bookingDate: Date;
       finalSalesDate: Date;
+      bookingFirstRow: any;
       sales: {
         salesDate: Date;
         salesType: string;
@@ -31,6 +32,7 @@ interface SpreadsheetData {
         isFinal: string;
         ignoreWarning: string;
         rowNumber: number;
+        salesRow: any;
       }[];
     }[];
   }[];
@@ -57,6 +59,11 @@ enum ignoreWarningType {
   'N',
   'n',
   '',
+}
+
+interface SpreadsheetIssues {
+  spreadsheetErrorOccurred: boolean;
+  spreadsheetWarningOccurred: boolean;
 }
 
 export const validateSpreadsheetFile = async (file, prodCode, venueList, prodDateRange) => {
@@ -94,9 +101,9 @@ export const validateSpreadsheetFile = async (file, prodCode, venueList, prodDat
     details: '',
     rowNumber: null,
   };
-  const spreadsheetIssues = {
+  const spreadsheetIssues: SpreadsheetIssues = {
     spreadsheetErrorOccurred: false,
-    spreadsheetWarningOccured: false,
+    spreadsheetWarningOccurred: false,
   };
   const spreadsheetData: SpreadsheetData = {
     venues: [],
@@ -131,6 +138,7 @@ export const validateSpreadsheetFile = async (file, prodCode, venueList, prodDat
           spreadsheetData,
           currentVenue,
           currentBookingDate,
+          row,
         );
 
         updateDetailsAndResponseCells(
@@ -147,7 +155,8 @@ export const validateSpreadsheetFile = async (file, prodCode, venueList, prodDat
     });
   });
 
-  console.log(spreadsheetData);
+  postValidationChecks(spreadsheetData, spreadsheetIssues);
+
   convertWorkbookToFile(workbook, file);
 
   return { file, spreadsheetIssues };
@@ -162,6 +171,7 @@ const validateRow = (
   spreadsheetData,
   currentVenue,
   currentBookingDate,
+  row,
 ) => {
   let detailsMessage = '';
   let rowErrorOccurred = false;
@@ -175,6 +185,7 @@ const validateRow = (
     prodCode,
     venueList,
     prodDateRange,
+    row,
   );
 
   detailsMessage += returnString;
@@ -193,6 +204,7 @@ const updateValidateSpreadsheedData = (
   prodCode,
   venueList: Record<number, VenueMinimalDTO>,
   prodDateRange,
+  row,
 ) => {
   let returnString = '';
   let warningOccurred = false;
@@ -207,6 +219,7 @@ const updateValidateSpreadsheedData = (
       isFinal: currentRow.isFinal,
       ignoreWarning: currentRow.ignoreWarning,
       rowNumber: currentRow.rowNumber,
+      salesRow: row,
     };
   };
 
@@ -214,6 +227,7 @@ const updateValidateSpreadsheedData = (
     return {
       bookingDate: new Date(currentRow.bookingDate),
       finalSalesDate: currentRow.isFinal.toUpperCase() === 'Y' ? new Date(currentRow.salesDate) : null,
+      bookingFirstRow: row,
       sales: [createNewSale()],
     };
   };
@@ -511,66 +525,18 @@ const updateDetailsAndResponseCells = (
   detailsMessage,
   rowErrorOccurred,
   rowWarningOccured,
-  spreadsheetIssues,
+  spreadsheetIssues: SpreadsheetIssues,
 ) => {
   const formattedDetailsMessage = formatDetailsMessage(detailsMessage);
   const responseCell = row.getCell(10);
+  const detailsCell = row.getCell(11);
 
   if (rowErrorOccurred) {
-    responseCell.value = 'ERROR';
-
-    responseCell.style = { ...responseCell.style }; // strange workaround to prevent styles from being wrongly applied to other cells, believe to be bug in exceljs
-    responseCell.fill = {
-      type: 'pattern',
-      pattern: 'solid',
-      fgColor: { argb: 'ffc7ce' },
-    };
-    responseCell.font = {
-      color: { argb: '9C0006' },
-      bold: true,
-    };
-
-    const detailsCell = row.getCell(11);
-    detailsCell.value = formattedDetailsMessage;
-
-    spreadsheetIssues.spreadsheetErrorOccured = true;
+    writeErrorCell(detailsCell, responseCell, spreadsheetIssues, formattedDetailsMessage);
   } else if (rowWarningOccured) {
-    responseCell.value = 'WARNING';
-
-    responseCell.style = { ...responseCell.style };
-    responseCell.fill = {
-      type: 'pattern',
-      pattern: 'solid',
-      fgColor: { argb: 'FFEB9C' },
-    };
-    responseCell.font = {
-      color: { argb: '9C5700' },
-    };
-
-    const detailsCell = row.getCell(11);
-    detailsCell.value = formattedDetailsMessage;
-
-    const ignoreWarningCell = row.getCell(9);
-    if (ignoreWarningCell.value !== 'Y') {
-      spreadsheetIssues.spreadsheetWarningOccured = true;
-    }
-
-    if (currentRow.ignoreWarning.toLocaleUpperCase() !== 'Y') spreadsheetIssues.spreadsheetWarningOccured = true; // don't raise a warning when ignore flag
+    writeWarningCell(detailsCell, responseCell, spreadsheetIssues, formattedDetailsMessage, currentRow);
   } else {
-    responseCell.value = 'OK';
-
-    responseCell.style = { ...responseCell.style };
-    responseCell.fill = {
-      type: 'pattern',
-      pattern: 'solid',
-      fgColor: { argb: 'C6EFCE' },
-    };
-    responseCell.font = {
-      color: { argb: '006100' },
-    };
-
-    const detailsCell = row.getCell(11);
-    detailsCell.value = '';
+    writeOKCell(detailsCell, responseCell);
   }
 };
 
@@ -581,6 +547,100 @@ const convertWorkbookToFile = async (workbook, file) => {
     type: file[0].file.type,
   });
   file[0].file = newFile;
+};
+
+const postValidationChecks = (spreadsheetData: SpreadsheetData, spreadsheetIssues) => {
+  for (const venue of spreadsheetData.venues) {
+    // console.log(`Venue Code: ${venue.venueCode}`);
+
+    for (const booking of venue.bookings) {
+      if (!booking.finalSalesDate) {
+        const errorMessage = '| ERROR - A VenueCode/BookingDate combination must have a specified final sales dates';
+        const currentErrorMessage = booking.bookingFirstRow.getCell(11).value;
+        const formattedErrorMessage = formatDetailsMessage(currentErrorMessage + errorMessage);
+
+        const responseCell = booking.bookingFirstRow.getCell(10);
+        const detailsCell = booking.bookingFirstRow.getCell(11);
+        writeErrorCell(detailsCell, responseCell, spreadsheetIssues, formattedErrorMessage);
+        console.log(spreadsheetIssues);
+      }
+
+      // for (const sale of booking.sales) {
+      //   console.log(`    Sales Date: ${sale.salesDate}`);
+      //   console.log(`    Sales Type: ${sale.salesType}`);
+      //   console.log(`    Seats: ${sale.seats}`);
+      //   console.log(`    Value: ${sale.value}`);
+      //   console.log(`    Is Final: ${sale.isFinal}`);
+      //   console.log(`    Ignore Warning: ${sale.ignoreWarning}`);
+      //   console.log(`    Row Number: ${sale.rowNumber}`);
+      //   console.log(`    Sales Row:`, sale.salesRow);
+      // }
+    }
+  }
+};
+
+const writeErrorCell = (detailsCell, responseCell, spreadsheetIssues: SpreadsheetIssues, detailsMessage) => {
+  responseCell.value = 'ERROR';
+
+  responseCell.style = { ...responseCell.style }; // strange workaround to prevent styles from being wrongly applied to other cells, believe to be bug in exceljs
+  responseCell.fill = {
+    type: 'pattern',
+    pattern: 'solid',
+    fgColor: { argb: 'ffc7ce' },
+  };
+  responseCell.font = {
+    color: { argb: '9C0006' },
+    bold: true,
+  };
+
+  detailsCell.value = detailsMessage.toString();
+
+  spreadsheetIssues.spreadsheetErrorOccurred = true;
+};
+
+const writeWarningCell = (
+  detailsCell,
+  responseCell,
+  spreadsheetIssues: SpreadsheetIssues,
+  detailsMessage,
+  currentRow,
+) => {
+  responseCell.value = 'WARNING';
+
+  responseCell.style = { ...responseCell.style };
+  responseCell.fill = {
+    type: 'pattern',
+    pattern: 'solid',
+    fgColor: { argb: 'FFEB9C' },
+  };
+  responseCell.font = {
+    color: { argb: '9C5700' },
+  };
+
+  detailsCell.value = detailsMessage;
+
+  // const ignoreWarningCell = row.getCell(9);
+  // if (ignoreWarningCell.value !== 'Y') {
+  //   spreadsheetIssues.spreadsheetWarningOccured = true;
+  // }
+
+  if (currentRow.ignoreWarning.toLocaleUpperCase() !== 'Y') spreadsheetIssues.spreadsheetWarningOccurred = true; // don't raise a warning when ignore flag
+};
+
+const writeOKCell = (detailsCell, responseCell) => {
+  responseCell.value = 'OK';
+
+  responseCell.style = { ...responseCell.style };
+  responseCell.fill = {
+    type: 'pattern',
+    pattern: 'solid',
+    fgColor: { argb: 'C6EFCE' },
+  };
+  responseCell.font = {
+    color: { argb: '006100' },
+  };
+
+  detailsCell.value = '';
 };
 
 export default validateSpreadsheetFile;

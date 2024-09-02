@@ -40,7 +40,7 @@ const LoadSalesHistory = () => {
       dateRange,
     );
     const spreadsheetErrorOccured = spreadsheetIssues.spreadsheetErrorOccurred;
-    const spreadsheetWarningOccured = spreadsheetIssues.spreadsheetWarningOccured;
+    const spreadsheetWarningOccured = spreadsheetIssues.spreadsheetWarningOccurred;
     setUploadedFile(validateFile);
     setUploadParams({ onProgress, onError, onUploadingImage, spreadsheetErrorOccured, spreadsheetWarningOccured });
     setConfirmationModalVisible(true);
