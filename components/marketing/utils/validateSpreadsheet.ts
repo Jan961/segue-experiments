@@ -73,7 +73,7 @@ export const validateSpreadsheetFile = async (file, prodCode, venueList, prodDat
       );
 
       const formattedDetailsMessage = formatDetailsMessage(detailsColumnMessage);
-      writeDetailsResponse(row, formattedDetailsMessage, rowErrorOccurred, rowWarningOccurred, spreadsheetIssues);
+      updateResponseDetailsCells(row, formattedDetailsMessage, rowErrorOccurred, rowWarningOccurred, spreadsheetIssues);
     });
   });
 
@@ -416,28 +416,34 @@ const postValidationChecks = (spreadsheetData: SpreadsheetData, spreadsheetIssue
           continue;
         }
 
-        let detailsMessage = '';
+        let detailsColumnMessage = '';
         let warningOccurred = sale.salesRow.getCell(10).value === 'WARNING';
         const errorOccurred = sale.salesRow.getCell(10).value === 'ERROR';
         if (sale.seats > previousSale.seats * 1.15) {
-          detailsMessage += '| WARNING - Seats increased by more than 15% from previous sale';
+          detailsColumnMessage += '| WARNING - Seats increased by more than 15% from previous sale';
           warningOccurred = true;
         }
         if (sale.seats < previousSale.seats) {
-          detailsMessage += '| WARNING - Seats decreased from previous sale';
+          detailsColumnMessage += '| WARNING - Seats decreased from previous sale';
           warningOccurred = true;
         }
         if (parseFloat(sale.value) > parseFloat(previousSale.value) * 1.15) {
-          detailsMessage += '| WARNING - Value increased by more than 15% from previous sale';
+          detailsColumnMessage += '| WARNING - Value increased by more than 15% from previous sale';
           warningOccurred = true;
         }
         if (parseFloat(sale.value) < parseFloat(previousSale.value)) {
-          detailsMessage += '| WARNING - Value decreased from previous sale';
+          detailsColumnMessage += '| WARNING - Value decreased from previous sale';
           warningOccurred = true;
         }
 
-        const formattedDetailsMessage = formatDetailsMessage((sale.salesRow.getCell(11).value += detailsMessage));
-        writeDetailsResponse(sale.salesRow, formattedDetailsMessage, errorOccurred, warningOccurred, spreadsheetIssues);
+        const formattedDetailsMessage = formatDetailsMessage((sale.salesRow.getCell(11).value += detailsColumnMessage));
+        updateResponseDetailsCells(
+          sale.salesRow,
+          formattedDetailsMessage,
+          errorOccurred,
+          warningOccurred,
+          spreadsheetIssues,
+        );
 
         previousSale = sale;
       }
@@ -445,7 +451,7 @@ const postValidationChecks = (spreadsheetData: SpreadsheetData, spreadsheetIssue
   }
 };
 
-const writeDetailsResponse = (
+const updateResponseDetailsCells = (
   row,
   message,
   rowErrorOccurred,
