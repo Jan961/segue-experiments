@@ -56,6 +56,9 @@ export const ProductionJumpMenu: React.FC<ProductionJumpMenuProps> = ({
     const productionOptions = router.route.includes('/marketing')
       ? []
       : [{ text: 'All Productions', value: -1, Id: -1, ShowCode: null, Code: null, IsArchived: false }];
+    if (!router.route.includes(productionJump.path)) {
+      setProductionJump({ ...productionJump, includeArchived: false });
+    }
     for (const production of productionJump.productions) {
       if (onlyShowArchived) {
         if (production.IsArchived) {

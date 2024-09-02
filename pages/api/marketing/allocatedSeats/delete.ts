@@ -8,10 +8,8 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   try {
     const data = req.body as CompAllocation;
 
-    const { AvailableCompId } = data;
-
     const email = await getEmailFromReq(req);
-    const access = await checkAccess(email, { AvailableCompId });
+    const access = await checkAccess(email);
     if (!access) return res.status(401).end();
 
     await prisma.compAllocation.delete({

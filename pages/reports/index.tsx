@@ -3,7 +3,6 @@ import { getActiveProductions } from 'services/productionService';
 import Layout from '../../components/Layout';
 import Switchboard from '../../components/reports/switchboard';
 import { productionEditorMapper } from 'lib/mappers';
-import { getAccountIdFromReq } from 'services/userService';
 import { Production } from 'prisma/generated/prisma-client';
 
 type ReportsProps = {
@@ -18,9 +17,8 @@ const Index = ({ activeProductions = [] }: ReportsProps) => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const AccountId = await getAccountIdFromReq(ctx.req);
-  const activeProductions = await getActiveProductions(AccountId);
+export const getServerSideProps: GetServerSideProps = async () => {
+  const activeProductions = await getActiveProductions();
   return {
     props: {
       activeProductions: activeProductions.map((production: any & Production) => productionEditorMapper(production)),

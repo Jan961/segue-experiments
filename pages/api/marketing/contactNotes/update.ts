@@ -21,7 +21,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         BookingId: bcn.BookingId,
         Notes: bcn.Notes,
         ContactDate: bcn.ContactDate ? new Date(bcn.ContactDate) : null,
-        UserId: bcn.UserId,
+        ActionAccUserId: bcn.ActionAccUserId,
         CoContactName: bcn.CoContactName,
       },
     });

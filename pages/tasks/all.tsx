@@ -25,9 +25,9 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
 
   const usersList = useMemo(
     () =>
-      Object.values(users).map(({ Id, FirstName = '', LastName = '' }) => ({
-        value: Id,
-        text: `${FirstName || ''} ${LastName || ''}`,
+      Object.values(users).map(({ AccUserId, UserFirstName = '', UserLastName = '' }) => ({
+        value: AccUserId,
+        text: `${UserFirstName || ''} ${UserLastName || ''}`,
       })),
     [users],
   );
@@ -82,7 +82,7 @@ export default TasksPage;
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const AccountId = await getAccountIdFromReq(ctx.req);
-  const productionJump = await getProductionJumpState(ctx, 'tasks', AccountId);
+  const productionJump = await getProductionJumpState(ctx, 'tasks');
   productionJump.selected = -1;
   const users = await getUsers(AccountId);
   const productionsWithTasks = await getProductionsAndTasks(AccountId);
@@ -94,7 +94,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     },
     tasks: { productions, bulkSelection: {} },
     account: {
-      user: { users: objectify(users, (user) => user.Id) },
+      user: { users: objectify(users, (user) => user.UserId) },
     },
   };
   return { props: { initialState } };

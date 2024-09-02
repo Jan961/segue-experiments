@@ -23,11 +23,30 @@ export type CountryDTO = {
 };
 
 export type CurrencyDTO = {
-  Code: string;
-  Name: string;
-  SymbolUnicode: string;
-  CountryList: CountryDTO[];
+  CurrencyCode: string;
+  CurrencyName: string;
+  CurrencySymbolUnicode: string;
+  CurrencyCountryList: CountryDTO[];
 };
+
+export interface ICurrency {
+  code: string;
+  name: string;
+  symbolUniCode: string;
+}
+
+export interface IRegion {
+  id: number;
+  name: string;
+}
+
+export interface ICurrencyCountry {
+  id: number;
+  code: string;
+  name: string;
+  currencyCode: string;
+  regionList: IRegion[];
+}
 
 export type UICurrency = {
   code: number;
@@ -87,7 +106,7 @@ export type ProductionTaskDTO = {
   CompleteByWeekNum?: number;
   CompleteByIsPostProduction: boolean;
   StartByIsPostProduction: boolean;
-  AssignedToUserId?: number;
+  TaskAssignedToAccUserId?: number;
   StartDate?: string;
   CompleteDate?: string;
   TaskCompletedDate: Date;
@@ -112,7 +131,7 @@ export type MasterTaskDTO = {
   AssignedTo?: string;
   StartByWeekNum?: number;
   CompleteByWeekNum?: number;
-  AssignedToUserId?: number;
+  TaskAssignedToAccUserId?: number;
   MasterTaskRepeat?: any;
   MTRId?: number;
   RepeatInterval?: string;
@@ -248,13 +267,13 @@ export interface FileDTO {
 }
 
 export interface ProductionCompanyDTO {
-  AccountId?: number;
-  Id?: number;
-  Logo?: string;
-  Name?: string;
+  ProdCoAccountId?: number;
+  ProdCoId?: number;
+  ProdCoLogoFileId?: number;
+  ProdCoName?: string;
   ProdCoSaleStartWeek?: number;
   ProdCoVATCode?: number;
-  WebSite?: string;
+  ProdCoWebSite?: string;
 }
 export type ConversionRateDTO = {
   Id: number;
@@ -397,7 +416,7 @@ export type BookingContactNoteDTO = {
   CoContactName: string;
   ContactDate: string;
   Notes: string;
-  UserId: number;
+  ActionAccUserId: number;
 };
 
 export type AllocatedHoldDTO = {
@@ -420,10 +439,11 @@ export type VenueRoleDTO = {
 };
 
 export type UserDto = {
-  Id?: number;
-  Email: string;
-  FirstName: string;
-  LastName?: string;
+  UserId?: number;
+  UserEmail: string;
+  UserFirstName: string;
+  UserLastName?: string;
+  AccUserId: number;
 };
 
 export type Venue = {

@@ -2,7 +2,6 @@ import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import Layout from 'components/Layout';
 import { InitialState } from 'lib/recoil';
 import { getProductionJumpState } from 'utils/getProductionJumpState';
-import { getAccountIdFromReq } from 'services/userService';
 import useBookingFilter from 'hooks/useBookingsFilter';
 import Filters from 'components/bookings/Filters';
 import BookingsTable from 'components/bookings/BookingsTable';
@@ -32,9 +31,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
     The itinery or miles will be different however, as this relies on the preview booking, and has to be generateed programatically
   */
-
-  const AccountId = await getAccountIdFromReq(ctx.req);
-  const productionJump = await getProductionJumpState(ctx, 'bookings', AccountId);
+  const productionJump = await getProductionJumpState(ctx, 'bookings');
   const ProductionId = productionJump.selected;
   // See _app.tsx for how this is picked up
   const initialState: InitialState = {

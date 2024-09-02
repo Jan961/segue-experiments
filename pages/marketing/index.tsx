@@ -1,7 +1,7 @@
 import Layout from 'components/Layout';
 import Filters from 'components/marketing/Filters';
 import MarketingHome from 'components/marketing/MarketingHome';
-import { getAccountIdFromReq, getUserNameFromReq } from 'services/userService';
+import { getUserNameFromReq } from 'services/userService';
 import { getProductionJumpState } from 'utils/getProductionJumpState';
 import { InitialState } from 'lib/recoil';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
@@ -27,9 +27,8 @@ const MarketingPage = (props: InferGetServerSidePropsType<typeof getServerSidePr
 export default MarketingPage;
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const accountId = await getAccountIdFromReq(ctx.req);
   const currentUser = await getUserNameFromReq(ctx.req);
-  const productionJump = await getProductionJumpState(ctx, 'marketing', accountId);
+  const productionJump = await getProductionJumpState(ctx, 'marketing');
   const productionId = productionJump.selected;
   let initialState: InitialState;
 
