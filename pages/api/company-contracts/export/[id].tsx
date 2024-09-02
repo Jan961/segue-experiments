@@ -1,12 +1,14 @@
 import prisma from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import ReactPDF from '@react-pdf/renderer';
+import master from 'lib/prisma_master';
 import { transformContractResponse } from 'transformers/contracts';
 import JendagiContractRenderer from 'services/reportPDF/JendagiContractRenderer';
 import { getContractDataById } from 'services/contracts';
 import { getPersonById } from 'services/person';
 import { transformPersonWithRoles } from 'transformers/person';
 import { pick } from 'radash';
+import { IScheduleDay } from 'components/contracts/types';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
@@ -29,14 +31,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         Id: contractSchedule.production,
       },
       include: {
-        ProductionCompany: true,
         Show: true,
+      },
+    });
+    const productionCompany = await master.productionCompany.findUnique({
+      where: {
+        ProdCoId: productionDetails.ProdCoId,
       },
     });
     const showName = `${productionDetails?.Show?.Code}${productionDetails?.Code} ${productionDetails.Show?.Name}`;
     const person = await getPersonById(Number(contractSchedule.personId));
     const personDetails = await transformPersonWithRoles(person);
-    const productionCompany = productionDetails?.ProductionCompany;
+    const schedule = contractDetails?.contractDetails?.accScheduleJson as IScheduleDay[];
     const reportStream = await ReactPDF.renderToStream(
       <JendagiContractRenderer
         productionCompany={productionCompany}
@@ -44,6 +50,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         contractSchedule={contractSchedule}
         contractPerson={personDetails}
         showName={showName}
+        schedule={schedule || []}
       />,
     );
     res.setHeader('Content-Type', 'application/pdf');

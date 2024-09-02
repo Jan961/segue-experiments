@@ -1,4 +1,4 @@
-import { IContractSchedule, IContractDetails } from './types';
+import { IContractSchedule, IContractDetails, IScheduleDay } from './types';
 import { useMemo, useRef } from 'react';
 import { useRecoilValue } from 'recoil';
 import { productionJumpState } from 'state/booking/productionJumpState';
@@ -12,6 +12,7 @@ interface ContractPreviewDetailsFormProps {
   production: Partial<ProductionDTO>;
   contractSchedule: Partial<IContractSchedule>;
   contractDetails: Partial<IContractDetails>;
+  schedule: IScheduleDay[];
 }
 
 export const ContractPreviewDetailsForm = ({
@@ -20,6 +21,7 @@ export const ContractPreviewDetailsForm = ({
   production,
   contractSchedule,
   contractDetails,
+  schedule,
 }: ContractPreviewDetailsFormProps) => {
   const contractRef = useRef(null);
   const { productions = [] } = useRecoilValue(productionJumpState);
@@ -29,7 +31,7 @@ export const ContractPreviewDetailsForm = ({
   );
   return (
     <div className="w-full relative">
-      <div ref={contractRef} className={`h-[${height}] w-[82vw] justify-center flex`}>
+      <div ref={contractRef} className={`h-[${height}] w-full justify-center flex`}>
         <PDFViewer style={{ width: '100%' }}>
           <JendagiContractRenderer
             contractPerson={contractPerson}
@@ -37,6 +39,7 @@ export const ContractPreviewDetailsForm = ({
             contractDetails={contractDetails}
             productionCompany={productionCompany}
             showName={production?.ShowName}
+            schedule={schedule}
           />
         </PDFViewer>
       </div>

@@ -15,7 +15,7 @@ import { makeRowTextBoldAndAllignLeft } from './promoter-holds';
 import { convertToPDF } from 'utils/report';
 import { bookingStatusMap } from 'config/bookings';
 import { addBorderToAllCells } from 'utils/export';
-import { addTime } from 'services/reports/schedule-report';
+import { addTime, getSheduleReport } from 'services/reports/schedule-report';
 
 type SCHEDULE_VIEW = {
   ProductionId: number;
@@ -69,6 +69,12 @@ const getKey = ({ FullProductionCode, ShowName, EntryDate }) => `${FullProductio
 
 const handler = async (req, res) => {
   const { ProductionId, startDate: from, endDate: to, status, format } = req.body;
+
+  if (format === 'json') {
+    const data = await getSheduleReport({ from, to, status, ProductionId });
+    res.status(200).json(data);
+    return;
+  }
 
   const formatedFromDate = new Date(from);
   const formatedToDate = new Date(to);

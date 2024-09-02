@@ -13,6 +13,14 @@ const styles = StyleSheet.create({
     padding: 40,
     fontFamily: 'Times-Roman',
   },
+  title: {
+    fontSize: 12,
+    textAlign: 'center',
+    fontFamily: 'Times-Roman',
+    textDecoration: 'underline',
+    marginBottom: 10,
+    marginTop: 10,
+  },
   titleContainer: {
     paddingBottom: 40,
     display: 'flex',
@@ -95,14 +103,15 @@ const JendagiContract = ({
   contractSchedule,
   contractDetails = {},
   productionCompany,
-  currency,
+  currency = '£',
   showName,
   venueName,
+  schedule = [],
 }: JendagiContractProps) => {
   const currentDate = dateToSimple(new Date().toISOString());
 
   const formatPayment = (payment) => {
-    return (contractDetails.currency ? currency : '') + (payment || 'N/A');
+    return (currency || '') + (payment || 'N/A');
   };
 
   const filterPaymentBreakdownList = (breakdownArray) => {
@@ -190,17 +199,17 @@ const JendagiContract = ({
             <Text style={styles.tableCellNum}>7</Text>
             <Text style={styles.tableCellTitle}>REHEARSAL TOWN/CITY</Text>
             <Text style={styles.tableCell}>
-              {contractDetails.rehearsalVenue.townCity ? contractDetails.rehearsalVenue.townCity : 'N/A'}
+              {contractDetails.rehearsalVenue?.townCity ? contractDetails.rehearsalVenue?.townCity : 'N/A'}
             </Text>
           </View>
           <View style={styles.tableRow}>
             <Text style={styles.tableCellNum}>8</Text>
             <Text style={styles.tableCellTitle}>REHEARSAL VENUES</Text>
             <Text style={styles.tableCell}>
-              {contractDetails.rehearsalVenue.venue
+              {contractDetails.rehearsalVenue?.venue
                 ? 'Likely to be ' +
                   venueName +
-                  (contractDetails.rehearsalVenue.notes !== '' ? ' - ' + contractDetails.rehearsalVenue.notes : '')
+                  (contractDetails.rehearsalVenue?.notes !== '' ? ' - ' + contractDetails.rehearsalVenue?.notes : '')
                 : 'N/A'}
             </Text>
           </View>
@@ -437,6 +446,38 @@ const JendagiContract = ({
               {productionCompany?.ProdCoName ? productionCompany.ProdCoName : '!PRODUCTION COMPANY!'}
             </Text>
           </View>
+        </View>
+      </Page>
+
+      <Page size="A4" style={styles.page}>
+        <View>
+          <Text style={styles.title}>All dates and performance times remain subject to change at any time.</Text>
+        </View>
+        <View style={styles.table}>
+          <View style={styles.tableRow}>
+            {['PROD', 'DAY', 'DATE', 'WK', 'VENUE/DETAILS', 'Perf/DAY', 'TIME', 'TIME'].map((th, i) => (
+              <Text key={i} style={styles.tableCell}>
+                {th}
+              </Text>
+            ))}
+          </View>
+          {schedule.map(
+            ({ productionCode, day, date, week, venue, performancesPerDay, performance1, performance2 }, i) => (
+              <View key={i} style={styles.tableRow}>
+                <Text style={styles.tableCell}>{productionCode}</Text>
+                <Text style={styles.tableCell}>{day}</Text>
+                <Text style={styles.tableCell}>{date}</Text>
+                <Text style={styles.tableCell}>{week}</Text>
+                <Text style={styles.tableCell}>{venue}</Text>
+                <Text style={styles.tableCell}>{performancesPerDay}</Text>
+                <Text style={styles.tableCell}>{performance1}</Text>
+                <Text style={styles.tableCell}>{performance2}</Text>
+              </View>
+            ),
+          )}
+        </View>
+        <View>
+          <Text>All dates and performance times remain subject to change at any time.</Text>
         </View>
       </Page>
 
@@ -867,7 +908,7 @@ const JendagiContract = ({
           <Image style={styles.signatureImage} src="/segue/contracts/rcksignature.jpg" />
           <Text style={{ fontSize: 12 }}>for and on behalf of</Text>
           <Text style={{ fontSize: 12 }}>
-            {productionCompany?.Name ? productionCompany.Name : '!PRODUCTION COMPANY!'}
+            {productionCompany?.ProdCoName ? productionCompany.ProdCoName : '!PRODUCTION COMPANY!'}
           </Text>
           <Text style={{ marginBottom: '20px', fontSize: 12 }}>DATE IS PER SCHEDULE CLAUSE 1</Text>
           <Text style={{ marginBottom: '20px', fontSize: 12 }}>SIGNED by</Text>

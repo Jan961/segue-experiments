@@ -1,3 +1,5 @@
+import { safeParseJson } from 'services/user.service';
+
 interface PersonDetails {
   id?: number;
   firstName: string | null;
@@ -205,6 +207,7 @@ export const transformContractDetails = (contract: any) => {
     additionalClause: contract.ACCClause.map((clause: any) => clause.StdClauseId).filter((id: any) => id !== null),
     customClauseList: contract.ACCClause.map((clause: any) => clause.Text).filter((text: any) => text !== null),
     includeClauses: !!contract.ACCClause.length,
+    accScheduleJson: safeParseJson(contract.ACCScheduleJSON || '') || [],
   };
 };
 
@@ -251,5 +254,6 @@ export const transformContractData = (data) => {
     departmentId: data.department || null,
     personId: data.personId || null,
     currency: data.currency || null,
+    accScheduleJson: data.accScheduleJson,
   };
 };

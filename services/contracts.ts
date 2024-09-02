@@ -112,6 +112,7 @@ export const prepareContractUpdateData = (data: any) => {
     { key: 'checkedBy', updateKey: 'CheckedByAccUserId' },
     { key: 'completedBy', updateKey: 'CompletedByAccUserId' },
     { key: 'currency', updateKey: 'CurrencyCode' },
+    { key: 'accScheduleJson', updateKey: 'ACCScheduleJSON' },
     // Foreign key connections
     { key: 'departmentId', updateKey: 'ACCDepartment', isForeignKey: true, foreignKeyId: 'ACCDeptId' },
     { key: 'personId', updateKey: 'Person', isForeignKey: true, foreignKeyId: 'PersonId' },
@@ -162,7 +163,6 @@ export const getContractDataById = async (contractId: number) => {
   return prisma.ACCContract.findUnique({
     where: { ContractId: contractId },
     include: {
-      Currency: true,
       ACCClause: true,
       ACCPayment: true,
       ACCPubEvent: true,
