@@ -8,15 +8,11 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const ProductionFile = await prisma.ProductionFile.findFirst({
       where: { ProFiProductionId: { equals: productionId } },
       select: {
-        ProFiFileId: true,
+        File: true,
       },
     });
 
-    const file = await prisma.file.findFirst({
-      where: { Id: { equals: ProductionFile.ProFiFileId } },
-    });
-
-    res.status(200).json({ file });
+    res.status(200).json({ ProductionFile });
   } catch (err) {
     console.log(err);
     res.status(500).json({ error: 'Error Reading Production File' });

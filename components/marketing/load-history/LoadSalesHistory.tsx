@@ -46,13 +46,18 @@ const LoadSalesHistory = () => {
       const response = await axios.get('/api/marketing/load-history/read', {
         params: { selected },
       });
-      const file = response.data.file;
-      const newFile = {
-        name: file.OriginalFilename,
-        dateUploaded: file.UploadDateTime,
-        fileURL: getFileUrl(file.Location),
-      };
-      setSalesHistoryRows([newFile]);
+      if (response.data.ProductionFile) {
+        const file = response.data.ProductionFile.File;
+        const newFile = {
+          name: file.OriginalFilename,
+          dateUploaded: file.UploadDateTime,
+          fileURL: getFileUrl(file.Location),
+          fileId: file.Id,
+          location: file.Location,
+        };
+        console.log(file);
+        setSalesHistoryRows([newFile]);
+      }
     } catch (error) {
       console.log(error, 'Failed to fetch Sales History Spreadsheet');
     }
@@ -99,9 +104,18 @@ const LoadSalesHistory = () => {
     }
   };
 
-  const deleteSalesHistory = () => {
+  const deleteSalesHistory = async () => {
     // delete file from s3
     // delete file from DB
+    if (salesHistoryRows) {
+      const file = salesHistoryRows[0];
+      try {
+        await axios.delete(`/api/file/delete?location=${file.location}`);
+        await axios.post('/api/marketing/load-history/delete', { salesHistoryRows });
+      } catch (err) {
+        console.log(err, 'Failed to delete Sales History Spreadsheet');
+      }
+    }
     setSalesHistoryRows([]);
     setShowConfirmDelete(false);
   };
