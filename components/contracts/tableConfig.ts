@@ -13,6 +13,7 @@ import SelectCellRenderer from 'components/core-ui-lib/Table/renderers/SelectCel
 import { companyContractStatusOptions, statusToBgColorMap } from 'config/contracts';
 import DateRenderer from 'components/core-ui-lib/Table/renderers/DateRenderer';
 import NotesRenderer from 'components/core-ui-lib/Table/renderers/NotesRenderer';
+import DownloadButtonRenderer from 'components/core-ui-lib/Table/renderers/DownloadButtonRenderer';
 
 export const contractsStyleProps = { headerColor: tileColors.contracts };
 
@@ -133,12 +134,11 @@ export const getCompanyContractsColumnDefs = (userList = []) => [
     headerName: '',
     field: 'pdf',
     width: 100,
-    cellRenderer: ButtonRenderer,
+    cellRenderer: DownloadButtonRenderer,
     cellRendererParams: (params) => ({
       buttonText: 'Save as PDF',
       variant: 'primary',
       width: 90,
-      type: 'download',
       href: `/api/company-contracts/export/${params.data?.id}`,
     }),
     cellStyle: {
