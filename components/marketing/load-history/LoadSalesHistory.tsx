@@ -136,7 +136,6 @@ const LoadSalesHistory = () => {
 
   useEffect(() => {
     salesHistoryRows.length >= 1 ? setUploadDisabled(true) : setUploadDisabled(false);
-    console.log(salesHistoryRows);
   }, [salesHistoryRows]);
 
   useEffect(() => {
@@ -191,6 +190,7 @@ const LoadSalesHistory = () => {
           visible={showConfirmDelete}
           onNoClick={() => setShowConfirmDelete(false)}
           onDeleteClick={() => deleteSalesHistory()}
+          uploadedFile={uploadedFile}
         />
       )}
     </div>
