@@ -15,6 +15,7 @@ import { makeRowTextBoldAndAllignLeft } from './promoter-holds';
 import { convertToPDF } from 'utils/report';
 import { bookingStatusMap } from 'config/bookings';
 import { addBorderToAllCells } from 'utils/export';
+import { addTime } from 'services/reports/schedule-report';
 
 type SCHEDULE_VIEW = {
   ProductionId: number;
@@ -62,25 +63,6 @@ const styleHeader = ({ worksheet, row, numberOfColumns }: { worksheet: any; row:
     cell.font = { bold: true };
     cell.alignment = { horizontal: 'center' };
   }
-};
-
-const addTime = (timeArr: string[] = []) => {
-  if (!timeArr?.length) {
-    return '00:00';
-  }
-  const { hour, min } = timeArr.reduce(
-    (acc, x) => {
-      const [h, m] = x.split(':');
-      return {
-        hour: Number(h) + acc.hour,
-        min: Number(m) + acc.min,
-      };
-    },
-    { hour: 0, min: 0 },
-  );
-  const minsTime = minutesInHHmmFormat(min);
-  const [h, m] = minsTime.split(':');
-  return `${hour + Number(h)}:${Number(m)}`;
 };
 
 const getKey = ({ FullProductionCode, ShowName, EntryDate }) => `${FullProductionCode} - ${ShowName} - ${EntryDate}`;
