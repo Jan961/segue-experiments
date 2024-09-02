@@ -17,7 +17,7 @@ export interface IPublicityEventDetails {
 interface PublicityEventDetailsProps {
   testId?: string;
   details: IPublicityEventDetails;
-  onChange: (data: IPublicityEventDetails) => void;
+  onChange: (data: Partial<IPublicityEventDetails>) => void;
 }
 
 const PublicityEventDetails: FC<PublicityEventDetailsProps> = ({ details, testId = 'publicity-event', onChange }) => {
@@ -31,7 +31,7 @@ const PublicityEventDetails: FC<PublicityEventDetailsProps> = ({ details, testId
     (key: string, value: number | string | boolean | null) => {
       const updatedData = { ...eventDetails, [key]: value };
       setEventDetails(updatedData);
-      onChange(updatedData);
+      onChange({ ...details, [key]: value });
     },
     [onChange, eventDetails, setEventDetails],
   );

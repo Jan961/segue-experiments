@@ -1,8 +1,10 @@
-import { Button } from 'components/core-ui-lib';
+import { Button, notify } from 'components/core-ui-lib';
 import PopupModal from 'components/core-ui-lib/PopupModal';
 import { ContractPersonDataForm } from '../ContractPersonDataForm';
 import { useState } from 'react';
 import axios from 'axios';
+import { createPersonSchema } from 'validators/person';
+import { debug } from 'utils/logging';
 
 interface ContractNewPersonModalProps {
   openNewPersonContract: boolean;
@@ -11,7 +13,28 @@ interface ContractNewPersonModalProps {
 
 export const ContractNewPersonModal = ({ openNewPersonContract, onClose }: ContractNewPersonModalProps) => {
   const [formData, setFormData] = useState({});
+  // const [validationErrors, setValidationErrors] = useState({});
+  const validateForm = async (data) => {
+    try {
+      await createPersonSchema.validate({ ...data }, { abortEarly: false });
+      return true;
+    } catch (validationErrors) {
+      const errors = {};
+      validationErrors.inner.forEach((error) => {
+        errors[error.path] = error.message;
+      });
+      // setValidationErrors(errors);
+      debug('validationErrors:', errors);
+      return false;
+    }
+  };
+
   const onSave = async () => {
+    const validation = await validateForm(formData);
+    if (!validation) {
+      notify.error('Person FirstName, LastName are required');
+      return;
+    }
     try {
       await axios.post('/api/company-contracts/create/person', formData);
       onClose(true);
@@ -25,7 +48,6 @@ export const ContractNewPersonModal = ({ openNewPersonContract, onClose }: Contr
       title="Add New Person"
       titleClass="text-xl text-primary-navy font-bold -mt-2"
       onClose={() => onClose?.()}
-      // hasOverlay={showSalesSnapshot}
     >
       <ContractPersonDataForm updateFormData={setFormData} height="h-[80vh]" />
       <div className="w-full mt-4 flex justify-end items-center">

@@ -104,6 +104,7 @@ export const lookupProductionId = async (ShowCode: string, ProductionCode: strin
 };
 
 export const getAllProductions = async () => {
+  // TODO: convert this to lookup.
   const productionCompanyList = await master.ProductionCompany.findMany({
     orderBy: {
       ProdCoName: 'asc',
