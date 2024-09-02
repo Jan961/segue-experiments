@@ -15,6 +15,7 @@ import { dateToSimple } from 'services/dateService';
 import validateSpreadsheetFile from '../utils/validateSpreadsheet';
 import SpreadsheetDeleteModal from './SpreadsheetDeleteModal';
 import axios from 'axios';
+import LoadingOverlay from 'components/shows/LoadingOverlay';
 
 const LoadSalesHistory = () => {
   const [uploadModalVisible, setUploadModalVisible] = useState(false);
@@ -24,6 +25,7 @@ const LoadSalesHistory = () => {
   const [salesHistoryRows, setSalesHistoryRows] = useState([]);
   const [uploadParams, setUploadParams] = useState<UploadParamType>(null);
   const [uploadedFile, setUploadedFile] = useState<UploadedFile[]>();
+  const [isLoading, setisLoading] = useState(false);
 
   const { productions, selected } = useRecoilValue(productionJumpState);
   const selectedProducton = productions.filter((prod) => prod.Id === selected)[0];
@@ -89,7 +91,6 @@ const LoadSalesHistory = () => {
       if (response.status >= 400 && response.status < 600) {
         onError(file[0].file, 'Error uploading file. Please try again.');
       } else {
-        console.log(response);
         const newFile = {
           name: response.originalFilename,
           dateUploaded: response.uploadDateTime,
@@ -97,7 +98,6 @@ const LoadSalesHistory = () => {
           fileId: response.id,
           location: response.location,
         };
-
         setSalesHistoryRows([newFile]);
         onUploadSuccess({ fileId: response.id });
       }
@@ -114,8 +114,6 @@ const LoadSalesHistory = () => {
       } catch (err) {
         console.log(err, 'Failed to delete Sales History Spreadsheet');
       }
-    } else {
-      console.log('no sales history rows');
     }
     setSalesHistoryRows([]);
     setShowConfirmDelete(false);
@@ -139,8 +137,9 @@ const LoadSalesHistory = () => {
   }, [salesHistoryRows]);
 
   useEffect(() => {
-    !selected ? setUploadDisabled(true) : setUploadDisabled(false);
+    setisLoading(true);
     fetchSpreadsheet();
+    setisLoading(false);
   }, []);
 
   return (
@@ -193,6 +192,7 @@ const LoadSalesHistory = () => {
           uploadedFile={uploadedFile}
         />
       )}
+      {isLoading && <LoadingOverlay />}
     </div>
   );
 };

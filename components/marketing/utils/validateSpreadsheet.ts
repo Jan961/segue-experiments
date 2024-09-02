@@ -77,11 +77,8 @@ export const validateSpreadsheetFile = async (file, prodCode, venueList, prodDat
     });
   });
 
-  console.log(spreadsheetIssues);
   postValidationChecks(spreadsheetData, spreadsheetIssues);
   convertWorkbookToFile(workbook, file);
-
-  console.log(spreadsheetIssues);
 
   return { file, spreadsheetIssues };
 };
@@ -471,7 +468,6 @@ const updateResponseDetailsCells = (
     writeErrorCell(detailsCell, responseCell, spreadsheetIssues, message);
   } else if (rowWarningOccurred) {
     const ignoreWarning = (row.getCell(tableColMaps.ignoreWarning).value?.toUpperCase() ?? 'N') === 'Y';
-    console.log(ignoreWarning);
     writeWarningCell(detailsCell, responseCell, spreadsheetIssues, message, ignoreWarning);
   } else {
     writeOKCell(detailsCell, responseCell);
