@@ -910,7 +910,7 @@ const JendagiContract = ({
           <Text style={{ fontSize: 12 }}>
             {productionCompany?.ProdCoName ? productionCompany.ProdCoName : '!PRODUCTION COMPANY!'}
           </Text>
-          <Text style={{ marginBottom: '20px', fontSize: 12 }}>DATE IS PER SCHEDULE CLAUSE 1</Text>
+          <Text style={{ marginBottom: '20px', fontSize: 12 }}>DATE IS AS PER SCHEDULE CLAUSE 1</Text>
           <Text style={{ marginBottom: '20px', fontSize: 12 }}>SIGNED by</Text>
           <Text style={{ marginBottom: '30px', fontSize: 12 }}>
             <Text>THE CONTRACTOR _________________________________________________</Text>
