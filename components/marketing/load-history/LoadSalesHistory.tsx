@@ -14,6 +14,7 @@ import { venueState } from 'state/booking/venueState';
 import { dateToSimple } from 'services/dateService';
 import validateSpreadsheetFile from '../utils/validateSpreadsheet';
 import SpreadsheetDeleteModal from './SpreadsheetDeleteModal';
+import axios from 'axios';
 
 const LoadSalesHistory = () => {
   const [uploadModalVisible, setUploadModalVisible] = useState(false);
@@ -31,6 +32,31 @@ const LoadSalesHistory = () => {
   const dateRange = selectedProducton
     ? dateToSimple(selectedProducton.StartDate) + '-' + dateToSimple(selectedProducton.EndDate)
     : null;
+
+  const onUploadSuccess = async ({ fileId }) => {
+    try {
+      await axios.post('/api/marketing/load-history/create', { fileId, selected });
+    } catch (error) {
+      console.log(error, 'Failed to update database with file.');
+    }
+  };
+
+  const fetchSpreadsheet = async () => {
+    try {
+      const response = await axios.get('/api/marketing/load-history/read', {
+        params: { selected },
+      });
+      const file = response.data.file;
+      const newFile = {
+        name: file.OriginalFilename,
+        dateUploaded: file.UploadDateTime,
+        fileURL: getFileUrl(file.Location),
+      };
+      setSalesHistoryRows([newFile]);
+    } catch (error) {
+      console.log(error, 'Failed to fetch Sales History Spreadsheet');
+    }
+  };
 
   const onSave = async (file, onProgress, onError, onUploadingImage) => {
     const { file: validateFile, spreadsheetIssues } = await validateSpreadsheetFile(
@@ -65,8 +91,8 @@ const LoadSalesHistory = () => {
           fileURL: getFileUrl(response.location),
         };
 
-        setSalesHistoryRows([...salesHistoryRows, newFile]);
-        // onUploadSuccess({ fileId: response.id });
+        setSalesHistoryRows([newFile]);
+        onUploadSuccess({ fileId: response.id });
       }
     } catch (error) {
       onError(file[0].file, 'Error uploading file. Please try again.');
@@ -76,7 +102,6 @@ const LoadSalesHistory = () => {
   const deleteSalesHistory = () => {
     // delete file from s3
     // delete file from DB
-    // remove from table
     setSalesHistoryRows([]);
     setShowConfirmDelete(false);
   };
@@ -100,6 +125,7 @@ const LoadSalesHistory = () => {
 
   useEffect(() => {
     !selected ? setUploadDisabled(true) : setUploadDisabled(false);
+    fetchSpreadsheet();
   }, []);
 
   return (
