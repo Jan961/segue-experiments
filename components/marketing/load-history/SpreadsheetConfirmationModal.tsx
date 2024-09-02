@@ -100,7 +100,17 @@ const SpreadsheetConfirmationModal = ({
   };
 
   const downloadSpreadsheet = () => {
-    window.open(URL.createObjectURL(uploadedFile[0].file), '_blank');
+    const file = uploadedFile[0].file;
+    const url = URL.createObjectURL(file);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = file.name;
+    document.body.appendChild(a);
+    a.click();
+
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   };
 
   const closeModals = () => {
