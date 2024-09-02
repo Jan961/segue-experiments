@@ -25,8 +25,6 @@ export const getProductionJumpState = async (ctx, path: string): Promise<Product
         if (db) {
           db = dateBlockMapper(db);
         }
-         // TODO: handle this
-        // const { File, ...company } = t.ProductionCompany;
         return {
           Id: t.Id,
           Code: t.Code,
@@ -41,8 +39,7 @@ export const getProductionJumpState = async (ctx, path: string): Promise<Product
           RunningTime: t.RunningTime ? dateTimeToTime(t.RunningTime.toISOString()) : null,
           RunningTimeNote: t.RunningTimeNote,
           SalesFrequency: t.SalesFrequency,
-          // TODO: Add production company details here from separate lookup 
-          // ProductionCompany: { ...company, File: pick(File, ['Id', 'Location']) || null },
+          ProductionCompany: t.ProductionCompany,
         };
       })
       .sort((a, b) => {

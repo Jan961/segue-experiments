@@ -203,7 +203,6 @@ export const getMasterTasksColumnDefs = (usersList = []) => {
       headerName: 'Assigned to',
       field: 'TaskAssignedToAccUserId',
       valueGetter: function (params) {
-        console.log(usersList)
         return params.data?.TaskAssignedToAccUserId
           ? usersList.filter((user) => user.value === params.data?.TaskAssignedToAccUserId)[0].text
           : null;

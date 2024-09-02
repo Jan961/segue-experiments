@@ -398,7 +398,8 @@ export const EditDealMemoContractModal = ({
         </div>
         <div className="text-primary-input-text mt-4">
           Please read this carefully to ensure it reflects the terms as agreed between{' '}
-          {`${productionJumpState.ProductionCompany.ProdCoName}`} and {`${selectedTableCell.contract.venue}`}.
+          {`${productionJumpState.ProductionCompany ? productionJumpState.ProductionCompany.ProdCoName : ''}`} and{' '}
+          {`${selectedTableCell.contract.venue}`}.
           <br />
           Please note that any terms not specifically mentioned here are still to be negotiated. If you have any
           standard conditions that you consider to be non-negotiable, or if you{' '}
@@ -1293,7 +1294,8 @@ export const EditDealMemoContractModal = ({
         <div className="flex items-center">
           <div className="w-1/5"> </div>
           <div className="w-4/5 flex text-primary-input-text -mb-1">
-            No other discounts without written agreement from {`${productionJumpState.ProductionCompany.ProdCoName}`}
+            No other discounts without written agreement from{' '}
+            {`${productionJumpState.ProductionCompany ? productionJumpState.ProductionCompany.ProdCoName : ''}`}
           </div>
         </div>
         {[
@@ -1528,7 +1530,8 @@ export const EditDealMemoContractModal = ({
         <div className="flex items-center mt-2">
           <div className="w-1/5"> </div>
           <div className="w-4/5 flex text-primary-input-text text-sm">
-            Any expenditure needs pre-approval from {`${productionJumpState.ProductionCompany.ProdCoName}`}
+            Any expenditure needs pre-approval from{' '}
+            {`${productionJumpState.ProductionCompany ? productionJumpState.ProductionCompany.ProdCoName : ''}`}
           </div>
         </div>
         <hr className="bg-primary h-[3px] mt-2 mb-4" />
@@ -1889,14 +1892,14 @@ export const EditDealMemoContractModal = ({
         </div>
         <div className="flex items-center mt-4">
           <div className="w-1/5 text-primary-input-text font-bold">
-            {productionJumpState.ProductionCompany.ProdCoName} VAT No.
+            {productionJumpState.ProductionCompany ? productionJumpState.ProductionCompany.ProdCoName : ''} VAT No.
           </div>
           <div className="w-4/5 flex">
             <div className="w-full">
               <TextInput
                 testId="vatText"
                 className="w-full"
-                value={productionJumpState.ProductionCompany.ProdCoVATCode}
+                value={productionJumpState.ProductionCompany ? productionJumpState.ProductionCompany.ProdCoVATCode : ''}
                 disabled
               />
             </div>

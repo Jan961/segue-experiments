@@ -104,12 +104,13 @@ export const lookupProductionId = async (ShowCode: string, ProductionCode: strin
 };
 
 export const getAllProductions = async () => {
-  // TODO: fetch production companies corresponding to these productions and their Files
-  // ProductionCompany: {
-  //   select: {
-  //     File: true,
-  //   },
-  // },
+  // TODO: convert this to lookup.
+  const productionCompanyList = await master.ProductionCompany.findMany({
+    orderBy: {
+      ProdCoName: 'asc',
+    },
+  });
+
   const productions = await client.production.findMany({
     select: {
       Id: true,
@@ -125,12 +126,21 @@ export const getAllProductions = async () => {
         },
       },
       DateBlock: true,
+      ProdCoId: true,
     },
     where: {
       IsDeleted: false,
     },
   });
-  return getProductionsByStartDate(productions);
+
+  const productionList = productions.map((production) => {
+    return {
+      ...production,
+      ProductionCompany: productionCompanyList.find((prodCo) => prodCo.ProdCoId === production.ProdCoId),
+    };
+  });
+
+  return getProductionsByStartDate(productionList);
 };
 
 export const getProductionsByShowCode = (Code: string) => {
@@ -189,12 +199,6 @@ export const getProductionWithContent = async (Id: number) => {
 };
 
 export const getProductionsWithContent = async (Id?: number, excludeArchived = true) => {
-  const productionCompanyList = await master.ProductionCompany.findMany({
-    orderBy: {
-      ProdCoName: 'asc',
-    },
-  });
-
   const productions = await client.production.findMany({
     where: {
       ...(Id && { Id }),
@@ -203,16 +207,7 @@ export const getProductionsWithContent = async (Id?: number, excludeArchived = t
     include: productionContentInclude,
   });
 
-  const productionList = productions.map((production) => {
-    return {
-      ...production,
-      ProductionCompany: productionCompanyList.find((prodCo) => prodCo.ProdCoId === production.ProdCoId),
-    };
-  });
-
-  console.log(productionList);
-
-  return productionList;
+  return productions;
 };
 
 export type ProductionWithDateblocks = Prisma.ProductionGetPayload<{
