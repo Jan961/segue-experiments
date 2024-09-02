@@ -6,13 +6,7 @@ import DateInput from 'components/core-ui-lib/DateInput';
 import TextArea from 'components/core-ui-lib/TextArea/TextArea';
 import Checkbox from 'components/core-ui-lib/Checkbox';
 import Button from 'components/core-ui-lib/Button';
-import {
-  ContactDemoFormAccountData,
-  ContactDemoFormData,
-  DealMemoContractFormData,
-  DealMemoHoldType,
-  ProductionDTO,
-} from 'interfaces';
+import { ContactDemoFormData, DealMemoContractFormData, DealMemoHoldType, ProductionDTO } from 'interfaces';
 import { AddEditContractsState } from 'state/contracts/contractsState';
 import { useEffect, useMemo, useState } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
@@ -50,7 +44,7 @@ import StandardSeatKillsTable from '../table/StandardSeatKillsTable';
 import LoadingOverlay from 'components/shows/LoadingOverlay';
 import { CustomOption } from 'components/core-ui-lib/Table/renderers/SelectCellRenderer';
 import { trasformVenueAddress } from 'utils/venue';
-import { omit } from 'radash';
+import { accountContactState } from 'state/contracts/accountContactState';
 
 export const EditDealMemoContractModal = ({
   visible,
@@ -70,7 +64,6 @@ export const EditDealMemoContractModal = ({
   dealHoldType: DealMemoHoldType;
 }) => {
   const [formData, setFormData] = useRecoilState(dealMemoInitialState);
-  const [contactsFormData, setContactsFormData] = useState<ContactDemoFormAccountData>({});
   const [contractCheckBox, setContractCheckBox] = useState<boolean>(false);
   const [dealMemoPriceFormData, setdealMemoPriceFormData] = useState({});
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -83,6 +76,19 @@ export const EditDealMemoContractModal = ({
   const [seatKillsData, setSeatKillsData] = useState([]);
   const [sendTo, setSendTo] = useState([]);
   const [currency, setCurrency] = useState('');
+  const accountContacts = useRecoilValue(accountContactState);
+
+  const companyContactList = useMemo(
+    () =>
+      accountContacts.map((contact) => {
+        return {
+          value: contact.AccContId,
+          text: contact.AccContFirstName + ' ' + contact.AccContLastName + ' | ' + contact.AccContMainEmail,
+        };
+      }),
+    [accountContacts],
+  );
+
   const venueUserList = useMemo(
     () =>
       venueData && venueData.VenueContact
@@ -106,6 +112,7 @@ export const EditDealMemoContractModal = ({
   }, [venueData]);
   useEffect(() => {
     setFormData({ ...demoModalData });
+
     const priceData = filterPrice(demoModalData.DealMemoPrice);
     const holdTypeData = filterHoldTypeData(dealHoldType, demoModalData.DealMemoHold);
 
@@ -123,7 +130,7 @@ export const EditDealMemoContractModal = ({
     setDisableDate(false);
   }, []);
 
-  const [contactsData, setContactsData] = useState<ContactDemoFormData>({ phone: '', email: '' });
+  const [contactsData, setContactsData] = useState<ContactDemoFormData>({ phone: '', email: '', id: null });
   const { users } = useRecoilValue(userState);
   const userList = useMemo(
     () =>
@@ -156,6 +163,8 @@ export const EditDealMemoContractModal = ({
       DealMemoCall: data,
     }));
   }, [dealCall]);
+
+  console.log(formData);
 
   const getCurrency = async (bookingId) => {
     try {
@@ -204,8 +213,7 @@ export const EditDealMemoContractModal = ({
     setIsLoading(true);
     try {
       await axios.post(`/api/dealMemo/updateDealMemo/${selectedTableCell.contract.Id}`, {
-        // omitted till the field has been added to db table
-        formData: omit(formData, ['PrintDelUseVenueAddressline']),
+        formData,
       });
 
       setIsLoading(false);
@@ -216,33 +224,21 @@ export const EditDealMemoContractModal = ({
     }
   };
 
-  const handleContactsSection = async (value, key) => {
-    const updatedFormData = {
-      ...contactsFormData,
-      [key]: value,
-    };
+  const handleContactsSection = async (value) => {
     setIsLoading(true);
-    setContactsFormData({ ...updatedFormData });
-    setContactsData({ email: '', phone: '' });
 
     if (value) {
-      try {
-        const { data } = await axios.get('/api/dealMemo/contact/read', {
-          params: {
-            accUserId: value,
-          },
-        });
+      const selectedContact = accountContacts.find((contact) => contact.AccContId === value);
 
-        if (data !== null) {
-          const contactInfo = {
-            email: data?.AccContMainEmail,
-            phone: data?.AccContPhone,
-          };
-          setContactsData(contactInfo);
-        }
-      } catch (error) {
-        console.error(error);
-      }
+      const contactInfo = {
+        email: selectedContact?.AccContMainEmail,
+        phone: selectedContact?.AccContPhone,
+        id: value,
+      };
+
+      setContactsData(contactInfo);
+
+      editDemoModalData('CompContactId', value, 'dealMemo');
     }
 
     setIsLoading(false);
@@ -414,7 +410,7 @@ export const EditDealMemoContractModal = ({
               }}
               className="bg-primary-white w-3/12 ml-2 mr-2"
               placeholder="Please select..."
-              options={[{ text: 'Select Assignee', value: null }, ...userList]}
+              options={[{ text: 'Select Assignee', value: null }, ...companyContactList]}
               isClearable
               isSearchable
               value={formData.AccContId}
@@ -423,8 +419,9 @@ export const EditDealMemoContractModal = ({
           </span>
         </div>
         <div className="text-primary-input-text mt-4">
-          If we have requested anything that incurs a cost, it must be agreed with {`Jendagi Productions Limited`} prior
-          to our arrival. No extras will be paid without a pre-authorisation
+          If we have requested anything that incurs a cost, it must be agreed with
+          {`${productionJumpState.ProductionCompany ? productionJumpState.ProductionCompany.ProdCoName : ''}`}
+          prior to our arrival. No extras will be paid without a pre-authorisation
           {`(this includes internet access).`} Unless otherwise agreed, all staff calls will be scheduled within the
           contractual allowance- if you foresee any overtime, please advise immediately.
         </div>
@@ -435,14 +432,14 @@ export const EditDealMemoContractModal = ({
           <div className="w-4/5">
             <Select
               onChange={(value) => {
-                handleContactsSection(value, 'companyContact');
+                handleContactsSection(value);
               }}
               className="bg-primary-white wfull"
               placeholder="Please select..."
-              options={[{ text: 'Select Assignee', value: null }, ...userList]}
+              options={[{ text: 'Select Assignee', value: null }, ...companyContactList]}
               isClearable
               isSearchable
-              value={contactsFormData.companyContact}
+              value={formData.CompContactId}
             />
           </div>
         </div>

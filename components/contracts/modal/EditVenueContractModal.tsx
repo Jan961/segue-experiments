@@ -76,8 +76,6 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
     [users],
   );
 
-  console.log(productionJumpState);
-
   const [showUploadModal, setShowUploadModal] = useState<boolean>(false);
   const [contractAttatchmentRows, setContractAttatchmentRows] = useState([]);
   const [filesForUpload, setFilesForUpload] = useState<FormData[]>([]);

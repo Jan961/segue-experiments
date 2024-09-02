@@ -70,7 +70,7 @@ model BookingActivity {
   Id               Int           @id @default(autoincrement()) @map("ActivityId")
   BookingId        Int           @map("ActivityBookingId")
   Date             DateTime?     @map("ActivityDate") @db.DateTime(0)
-  Name             String?       @map("ActivityName") @db.VarChar(50)
+  Name             String?       @map("ActivityName") @db.VarChar(30)
   ActivityTypeId   Int?          @map("ActivityActivityTypeId")
   CompanyCost      Decimal?      @map("ActivityCompanyCost") @db.Decimal(8, 2)
   VenueCost        Decimal?      @map("ActivityVenueCost") @db.Decimal(8, 2)
@@ -88,7 +88,7 @@ model BookingActivity {
 model BookingContactNotes {
   Id              Int       @id @default(autoincrement()) @map("ContactNoteId")
   BookingId       Int       @map("ContactNoteBookingId")
-  CoContactName   String?   @map("ContactNoteContactName") @db.VarChar(50)
+  CoContactName   String?   @map("ContactNoteContactName") @db.VarChar(30)
   ContactDate     DateTime? @map("ContactNoteDateTime") @db.DateTime(0)
   ActionAccUserId Int?      @map("ContactNoteActionAccUserId")
   Notes           String?   @map("ContactNoteNotes") @db.LongText
@@ -595,6 +595,7 @@ model Production {
   DateBlock             DateBlock[]
   File                  File?                   @relation(fields: [LogoFileId], references: [Id], onDelete: NoAction, map: "File_Production")
   Show                  Show                    @relation(fields: [ShowId], references: [Id], map: "ShowMayHaveProduction")
+  ProductionFile        ProductionFile[]
   ProductionRegion      ProductionRegion[]
   ProductionTask        ProductionTask[]
 
@@ -765,6 +766,7 @@ model DealMemo {
   ContractClause                                             String?                 @map("DeMoContractClause") @db.LongText
   PrintDelVenueAddressId                                     Int?                    @map("DeMoPrintDelVenueAddressId")
   PrintDelUseVenueAddress                                    Boolean                 @default(dbgenerated("(b'0')")) @map("DeMoPrintDelUseVenueAddress") @db.Bit(1)
+  DeMoCompContactId                                          Int?
   Booking                                                    Booking                 @relation(fields: [BookingId], references: [Id], onDelete: Cascade, map: "BookingDealMemo")
   VenueContact_DealMemo_DeMoBOMVenueContactIdToVenueContact  VenueContact?           @relation("DealMemo_DeMoBOMVenueContactIdToVenueContact", fields: [BOMVenueContactId], references: [Id], onDelete: Cascade, map: "VenueContactDealMemoBOM")
   VenueContact_DealMemo_DeMoTechVenueContactIdToVenueContact VenueContact?           @relation("DealMemo_DeMoTechVenueContactIdToVenueContact", fields: [TechVenueContactId], references: [Id], onDelete: Cascade, map: "VenueContactDealMemoTech")
@@ -814,15 +816,16 @@ model DealMemoTechProvision {
 }
 
 model File {
-  Id               Int           @id @default(autoincrement()) @map("FileId")
-  OriginalFilename String        @map("FileOriginalFilename") @db.VarChar(200)
-  MediaType        String?       @map("FileMediaType") @db.VarChar(200)
-  Location         String        @map("FileLocation") @db.VarChar(512)
-  UploadDateTime   DateTime      @map("FileUploadDateTime") @db.DateTime(0)
-  UploadUserId     Int           @map("FileUploadUserId")
-  SizeBytes        BigInt?       @map("FileSizeBytes")
+  Id               Int              @id @default(autoincrement()) @map("FileId")
+  OriginalFilename String           @map("FileOriginalFilename") @db.VarChar(200)
+  MediaType        String?          @map("FileMediaType") @db.VarChar(200)
+  Location         String           @map("FileLocation") @db.VarChar(512)
+  UploadDateTime   DateTime         @map("FileUploadDateTime") @db.DateTime(0)
+  UploadUserId     Int              @map("FileUploadUserId")
+  SizeBytes        BigInt?          @map("FileSizeBytes")
   ACCContract      ACCContract[]
   Production       Production[]
+  ProductionFile   ProductionFile[]
 
   @@index([UploadUserId], map: "UserAttachedFile")
 }
@@ -1133,6 +1136,19 @@ model ACCDepartment {
   ACCDeptId   Int           @id @default(autoincrement())
   ACCDeptName String        @db.VarChar(8)
   ACCContract ACCContract[]
+}
+
+model ProductionFile {
+  ProFiId              Int        @id @default(autoincrement())
+  ProFiProductionId    Int
+  ProFiFileId          Int
+  ProFiFileType        String     @db.VarChar(10)
+  ProFiFileDescription String?    @db.VarChar(80)
+  File                 File       @relation(fields: [ProFiFileId], references: [Id], onDelete: Cascade, map: "File_ProductionFile")
+  Production           Production @relation(fields: [ProFiProductionId], references: [Id], onDelete: Cascade, map: "Production_ProductionFile")
+
+  @@index([ProFiFileId], map: "File_ProductionFile")
+  @@index([ProFiProductionId], map: "Production_ProductionFile")
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.

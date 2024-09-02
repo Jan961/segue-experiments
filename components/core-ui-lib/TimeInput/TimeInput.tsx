@@ -41,10 +41,10 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
 
     const handleBlur = (e) => {
       const { name, value } = e.target;
-    
+
       // Add leading zero if needed
       const paddedValue = value.length === 1 ? `0${value}` : value;
-    
+
       if (!isNullOrEmpty(onBlur)) {
         onBlur({ ...e, target: { ...e.target, value: paddedValue } });
       } else {
@@ -94,11 +94,7 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
     }, [value]);
 
     return (
-      <div
-        ref={ref}
-        className={classNames(baseClass, className)}
-        tabIndex={-1} // Make the div focusable
-      >
+      <div ref={ref} className={classNames(baseClass, className)} tabIndex={-1}>
         <input
           data-testid="hourInput"
           data-index={index}

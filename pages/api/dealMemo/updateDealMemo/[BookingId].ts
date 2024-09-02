@@ -13,14 +13,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     if (!access) return res.status(401).end();
     const data = getContactIdData(req.body.formData);
     const demoIdData = data.Id;
-    const updatedDate = omit(data, [
-      'error',
-      'Id',
-      'BookingId',
-      'AccContId',
-      'BOMVenueContactId',
-      'TechVenueContactId',
-    ]);
+    const updatedData = omit(data, ['error', 'Id', 'BookingId', 'BOMVenueContactId', 'TechVenueContactId']);
     const existingDealMemo = await prisma.dealMemo.findFirst({
       where: {
         BookingId,
@@ -28,18 +21,18 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     });
 
     let updateCreateDealMemo;
-    const priceData = getPrice(updatedDate.DealMemoPrice);
-    const techProvisionData = getTechProvision(updatedDate.DealMemoTechProvision);
+    const priceData = getPrice(updatedData.DealMemoPrice);
+    const techProvisionData = getTechProvision(updatedData.DealMemoTechProvision);
 
-    const dealMemoCallData = getDealMemoCall(updatedDate.DealMemoCall);
-    const dealMemoHoldData = getDealMemoHold(updatedDate.DealMemoHold, demoIdData);
+    const dealMemoCallData = getDealMemoCall(updatedData.DealMemoCall);
+    const dealMemoHoldData = getDealMemoHold(updatedData.DealMemoHold, demoIdData);
     if (existingDealMemo) {
       updateCreateDealMemo = await prisma.dealMemo.update({
         where: {
           BookingId,
         },
         data: {
-          ...updatedDate,
+          ...updatedData,
           DealMemoPrice: {
             updateMany: priceData[0],
             create: priceData[1],
@@ -64,7 +57,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     } else {
       updateCreateDealMemo = await prisma.dealMemo.create({
         data: {
-          ...updatedDate,
+          ...updatedData,
           DealMemoPrice: {
             create: priceData[1],
           },
