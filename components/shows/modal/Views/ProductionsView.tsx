@@ -18,6 +18,7 @@ import CurrencyConversionModal from './CurrencyConversionModal';
 import { ConfirmationDialog, PopupModal } from 'components/core-ui-lib';
 import { all, group, objectify } from 'radash';
 import { ICurrency, ICurrencyCountry } from 'interfaces';
+import { isNullOrEmpty } from 'utils';
 
 interface ProductionsViewProps {
   showData: any;
@@ -93,18 +94,21 @@ const ProductionsView = ({ showData, visible, onClose }: ProductionsViewProps) =
 
   const updateCurrencyDetails = async (currencyCodeList) => {
     try {
-      const [currencyList, countryList] = await all([
-        axios.post(`/api/currency/read/list`, { currencyCodeList }),
-        axios.post(`/api/currency/read/country-list`, { currencyCodeList }),
-      ]);
-      setCurrencyLookup(
-        objectify(
-          currencyList.data,
-          (c: ICurrency) => c.code,
-          (c) => c,
-        ),
-      );
-      setCurrencyCountryLookup(group(countryList.data, (c: ICurrencyCountry) => c.currencyCode));
+      if (!isNullOrEmpty(currencyCodeList)) {
+        const filteredCodeList = currencyCodeList.filter((code) => code !== undefined);
+        const [currencyList, countryList] = await all([
+          axios.post(`/api/currency/read/list`, { currencyCodeList: filteredCodeList }),
+          axios.post(`/api/currency/read/country-list`, { currencyCodeList: filteredCodeList }),
+        ]);
+        setCurrencyLookup(
+          objectify(
+            currencyList.data,
+            (c: ICurrency) => c.code,
+            (c) => c,
+          ),
+        );
+        setCurrencyCountryLookup(group(countryList.data, (c: ICurrencyCountry) => c.currencyCode));
+      }
     } catch (e) {
       console.log(e);
     }
