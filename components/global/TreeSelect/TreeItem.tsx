@@ -89,7 +89,14 @@ export default memo(function TreeItem({ value, onChange, defaultOpen }: TreeItem
 
   return isLeafNode ? (
     <div className="flex items-center gap-3">
-      <Checkbox id={id} testId={label} name={`${id}`} checked={selected} value={id} onChange={handleLeafToggle} />
+      <Checkbox
+        id={id}
+        testId={label}
+        name={`${id}`}
+        checked={selected}
+        value={id}
+        onChange={groupHeader ? handleGroupToggle : handleLeafToggle}
+      />
 
       <Label text={label} className={labelClass} />
     </div>

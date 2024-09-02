@@ -1,14 +1,18 @@
 import { useSignUp } from '@clerk/nextjs';
 import axios from 'axios';
 import { useState } from 'react';
+import { contractsFilterState } from 'state/contracts/contractsFilterState';
+
+const USER_EXISTS = 'User already exists.';
 
 type UserDetails = {
-  firstName: '';
-  lastName: '';
-  email: '';
-  password: '';
-  organisationId: '';
-  pin: '';
+  email: string;
+  firstName: string;
+  lastName: string;
+  pin: string;
+  password?: string;
+  permissions: string[];
+  accountId: number;
 };
 
 const useClerk = () => {
@@ -38,6 +42,7 @@ const useClerk = () => {
 
   const createUser = async (userDetails: UserDetails): Promise<boolean> => {
     try {
+      setError('');
       // Create the user within clerk
       const status = await createNewUserWithClerk(userDetails.email, userDetails.password);
       if (!status) {
@@ -46,8 +51,12 @@ const useClerk = () => {
       }
 
       // Create the user in our database
-      await axios.post('/api/user/create', userDetails);
-
+      const { data } = await axios.post('/api/user/create', userDetails);
+      console.log(data);
+      if (data.error) {
+        setError(data.error);
+        return false;
+      }
       return true;
     } catch (error) {
       setError('Something went wrong, please try again');

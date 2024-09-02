@@ -6,8 +6,12 @@ import Layout from 'components/Layout';
 import { useEffect, useState } from 'react';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import { getPermissionsList } from 'services/permissionService';
+import { getAllProductions } from 'services/productionService';
 
-export default function Users({ permissionsList }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function Users({
+  permissionsList,
+  productionsList,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const [userRowData, setUserRowData] = useState([]);
   const [showUsersModal, setShowUsersModal] = useState(false);
   const populateUserTable = async () => {
@@ -129,7 +133,13 @@ export default function Users({ permissionsList }: InferGetServerSidePropsType<t
         </div>
       </div>
       {showUsersModal && (
-        <AddEditUser visible={showUsersModal} onClose={handleModalClose} permissions={permissionsList} state={null} />
+        <AddEditUser
+          visible={showUsersModal}
+          onClose={handleModalClose}
+          permissions={permissionsList}
+          productions={productionsList}
+          state={null}
+        />
       )}
     </Layout>
   );
@@ -137,9 +147,21 @@ export default function Users({ permissionsList }: InferGetServerSidePropsType<t
 
 export const getServerSideProps: GetServerSideProps = async () => {
   const permissionsList = await getPermissionsList();
+  const productions = await getAllProductions();
+  const formattedProductions = productions.map((t: any) => ({
+    id: t.Id,
+    code: t.Code,
+    isArchived: t.IsArchived,
+    showCode: t.Show.Code,
+    showName: t.Show.Name,
+    label: `${t.Show.Code}${t.Code} ${t.Show.Name}`,
+    checked: false,
+  }));
+
   return {
     props: {
-      permissionsList,
+      productionsList: formattedProductions || [],
+      permissionsList: permissionsList || [],
     },
   };
 };
