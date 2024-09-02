@@ -47,8 +47,7 @@ export const mapToPrismaFields = ({
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   const production: Partial<ProductionDTO> = mapToPrismaFields(req.body);
-  const { ShowId, Image, ReportCurrencyCode, ProdCoId } = production;
-
+  const { ShowId, Image } = production;
   const email = await getEmailFromReq(req);
   const access = await checkAccess(email, { ShowId });
   if (!access) return res.status(401).end();
@@ -56,7 +55,15 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   try {
     await prisma.production.create({
       data: {
-        ...pick(production, ['Code', 'IsArchived', 'SalesFrequency', 'SalesEmail', 'RunningTimeNote']),
+        ...pick(production, [
+          'Code',
+          'IsArchived',
+          'SalesFrequency',
+          'SalesEmail',
+          'RunningTimeNote',
+          'ReportCurrencyCode',
+          'ProdCoId',
+        ]),
         ProductionRegion: {
           create: production.RegionList.map((regionId) => ({
             PRRegionId: regionId,
@@ -80,16 +87,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         Show: {
           connect: {
             Id: ShowId,
-          },
-        },
-        Currency: {
-          connect: {
-            Code: ReportCurrencyCode,
-          },
-        },
-        ProductionCompany: {
-          connect: {
-            Id: ProdCoId,
           },
         },
       },

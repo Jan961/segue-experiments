@@ -1,24 +1,19 @@
 import { UserDto } from 'interfaces';
 import { userMapper } from 'lib/mappers';
-import prisma from 'lib/prisma';
+import master from 'lib/prisma_master';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getAccountId, getEmailFromReq } from 'services/userService';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
     const user = req.body as UserDto;
 
-    const email = await getEmailFromReq(req);
-    const AccountId = await getAccountId(email);
-
-    const updatedUser = await prisma.user.update({
+    const updatedUser = await master.user.update({
       data: {
-        FirstName: user.FirstName,
-        LastName: user.LastName,
+        UserFirstName: user.UserFirstName,
+        UserLastName: user.UserLastName,
       },
       where: {
-        AccountId,
-        Id: user.Id,
+        UserId: user.UserId,
       },
     });
 

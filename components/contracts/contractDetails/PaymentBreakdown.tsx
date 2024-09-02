@@ -18,7 +18,7 @@ interface PaymentBreakdownProps {
   testId?: string;
   breakdown: TPaymentBreakdown;
   currencySymbol: string;
-  onChange: (data: TPaymentBreakdown) => void;
+  onChange: (data: Partial<TPaymentBreakdown>) => void;
 }
 
 const PaymentBreakdown = ({
@@ -33,7 +33,7 @@ const PaymentBreakdown = ({
     (key: string, value: number | string | boolean | null) => {
       const updatedData = { ...payment, [key]: value };
       setPayment(updatedData);
-      onChange(updatedData);
+      onChange({ ...breakdown, [key]: value });
     },
     [onChange, payment, setPayment],
   );
@@ -52,7 +52,7 @@ const PaymentBreakdown = ({
           placeholder="00.00"
           type="number"
           value={amount}
-          onChange={(event) => handleChange('amount', parseInt(event.target.value, 10))}
+          onChange={(event) => handleChange('amount', parseFloat(event.target.value))}
         />
       </div>
       <TextInput

@@ -19,7 +19,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         Notes: bcn.Notes,
         ContactDate: bcn.ContactDate ? new Date(bcn.ContactDate) : null,
         CoContactName: bcn.CoContactName,
-        UserId: bcn.UserId,
+        ActionAccUserId: bcn.ActionAccUserId,
       },
     });
     res.status(200).json(result);

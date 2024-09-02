@@ -1,4 +1,3 @@
-import { Prisma } from 'prisma/generated/prisma-client';
 import ExcelJS from 'exceljs';
 import prisma from 'lib/prisma';
 import moment from 'moment';
@@ -93,14 +92,33 @@ type ReqBody = {
 const handler = async (req, res) => {
   const { fromDate, toDate, timezoneOffset, format }: ReqBody = req.body || {};
 
-  const formatedFromDate = formatDateWithTimezoneOffset({ date: fromDate, timezoneOffset });
-  const formatedToDate = formatDateWithTimezoneOffset({ date: toDate, timezoneOffset });
-  if (!fromDate || !toDate) {
-    throw new Error('Params are missing');
+  const formatedFromDateString = formatDateWithTimezoneOffset({
+    date: fromDate,
+    timezoneOffset,
+    dateFormat: 'YYYY-MM-DD',
+  });
+  const formatedToDateString = formatDateWithTimezoneOffset({ date: toDate, timezoneOffset, dateFormat: 'YYYY-MM-DD' });
+
+  // Convert the formatted date strings back to Date objects
+  const formatedFromDate = new Date(formatedFromDateString);
+  const formatedToDate = new Date(formatedToDateString);
+
+  if (!fromDate || !toDate || isNaN(formatedFromDate.getTime()) || isNaN(formatedToDate.getTime())) {
+    throw new Error('Params are missing or invalid dates provided');
   }
-  const conditions: Prisma.Sql[] = [Prisma.sql`EntryDate BETWEEN ${fromDate} AND ${toDate}`];
-  const where: Prisma.Sql = conditions.length ? Prisma.sql` where ${Prisma.join(conditions, ' and ')}` : Prisma.empty;
-  const data: SCHEDULE_VIEW[] = await prisma.$queryRaw`select * FROM ScheduleView ${where} order by EntryDate;`;
+
+  // Construct the Prisma query
+  const data: SCHEDULE_VIEW[] = await prisma.scheduleView.findMany({
+    where: {
+      EntryDate: {
+        gte: formatedFromDate,
+        lte: formatedToDate,
+      },
+    },
+    orderBy: {
+      EntryDate: 'asc',
+    },
+  });
 
   const workbook = new ExcelJS.Workbook();
   const formattedData = data.map((x) => ({
@@ -127,7 +145,7 @@ const handler = async (req, res) => {
     };
   }, {});
 
-  const destinctShowNames: UniqueHeadersObject[] = Object.keys(showNameAndProductionCode)
+  const distinctShowNames: UniqueHeadersObject[] = Object.keys(showNameAndProductionCode)
     .map((key) => {
       return showNameAndProductionCode[key].map((code) => ({ ShowName: key, FullProductionCode: code }));
     })
@@ -137,7 +155,7 @@ const handler = async (req, res) => {
     pageSetup: { fitToPage: true, fitToHeight: 5, fitToWidth: 7 },
     views: [{ state: 'frozen', xSplit: 2, ySplit: 6 }],
   });
-  const title = `All Productions Masterplan ${formatedFromDate} to ${formatedToDate}`;
+  const title = `All Productions Masterplan ${formatedFromDateString} to ${formatedToDateString}`;
   worksheet.addRow([title]);
   const date = new Date();
   worksheet.addRow([
@@ -148,8 +166,8 @@ const handler = async (req, res) => {
     })} at ${formatDateWithTimezoneOffset({ date, dateFormat: 'HH:mm', timezoneOffset })}`,
   ]);
   worksheet.addRow([]);
-  worksheet.addRow(['', '', ...destinctShowNames.map((x) => x.ShowName)]);
-  worksheet.addRow(['DAY', 'DATE', ...destinctShowNames.map((x) => x.FullProductionCode)]);
+  worksheet.addRow(['', '', ...distinctShowNames.map((x) => x.ShowName)]);
+  worksheet.addRow(['DAY', 'DATE', ...distinctShowNames.map((x) => x.FullProductionCode)]);
   worksheet.addRow([]);
 
   const map: { [key: string]: SCHEDULE_VIEW } = formattedData.reduce((acc, x) => ({ ...acc, [getKey(x)]: x }), {});
@@ -159,7 +177,7 @@ const handler = async (req, res) => {
   );
 
   const headerWeeks =
-    destinctShowNames.reduce((acc, { ShowName, FullProductionCode }) => {
+    distinctShowNames.reduce((acc, { ShowName, FullProductionCode }) => {
       const key = getShowAndProductionKey({ FullProductionCode, ShowName });
       const value = showNameAndProductionMap[key];
       if (!value) {
@@ -181,7 +199,7 @@ const handler = async (req, res) => {
       };
     }, {}) || {};
 
-  const weeks = destinctShowNames.reduce((acc, { FullProductionCode, ShowName }) => {
+  const weeks = distinctShowNames.reduce((acc, { FullProductionCode, ShowName }) => {
     const key = getShowAndProductionKey({ FullProductionCode, ShowName });
     const value = headerWeeks[key];
 
@@ -207,7 +225,7 @@ const handler = async (req, res) => {
 
   const daysDiff = moment(toDate).diff(moment(fromDate), 'days');
 
-  const minRehersalStartTimeInEpoch = data.reduce((acc, x) => {
+  const minRehearsalStartTimeInEpoch = data.reduce((acc, x) => {
     if (x.RehearsalStartDate && new Date(x.RehearsalStartDate).getTime() < acc) {
       acc = new Date(x.RehearsalStartDate).getTime();
     }
@@ -220,7 +238,7 @@ const handler = async (req, res) => {
     const dateInIncomingFormat = moment(moment(fromDate).add(i - 1, 'day')).format('YYYY-MM-DD');
     const date = formatDateWithTimezoneOffset({ date: dateInIncomingFormat, timezoneOffset });
 
-    const values: string[] = destinctShowNames.map(({ FullProductionCode, ShowName }) => {
+    const values: string[] = distinctShowNames.map(({ FullProductionCode, ShowName }) => {
       const key = getKey({ FullProductionCode, ShowName, EntryDate: dateInIncomingFormat });
       const value = map[key];
       if (value) {
@@ -232,7 +250,7 @@ const handler = async (req, res) => {
     worksheet.addRow([weekDay, date, ...values]);
     rowNo++;
 
-    if (weekDay === 'Monday' && new Date(dateInIncomingFormat).getTime() >= minRehersalStartTimeInEpoch) {
+    if (weekDay === 'Monday' && new Date(dateInIncomingFormat).getTime() >= minRehearsalStartTimeInEpoch) {
       colorCell({ worksheet, row: rowNo + 1, col: 1, argbColor: COLOR_HEXCODE.CREAM });
       colorCell({ worksheet, row: rowNo + 1, col: 2, argbColor: COLOR_HEXCODE.CREAM });
     }
@@ -256,9 +274,7 @@ const handler = async (req, res) => {
     );
 
     if (i % 7 === 0) {
-      // worksheet.addRow([])
-      // rowNo++
-      const weeks = destinctShowNames.reduce((acc, { FullProductionCode, ShowName }) => {
+      const weeks = distinctShowNames.reduce((acc, { FullProductionCode, ShowName }) => {
         const key = getShowAndProductionKey({ FullProductionCode, ShowName });
         const value = headerWeeks[key];
 
@@ -344,7 +360,7 @@ const handler = async (req, res) => {
     return;
   }
   res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-  res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+  res.setHeader('Content-Disposition', `attachment; filename="${filename}.xlsx"`);
 
   workbook.xlsx.write(res).then(() => {
     res.end();

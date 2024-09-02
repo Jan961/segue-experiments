@@ -3,7 +3,6 @@ import { NextApiRequest, NextApiResponse } from 'next';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   const VenueId: number = parseInt(req.query.venueID as string);
-  //    console.log(JSON.stringify(req.body))
   try {
     await prisma.venue.update({
       where: {

@@ -17,8 +17,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     const validatedData = await updateContractSchema.validate(req.body, { abortEarly: false });
 
-    const updateData = prepareContractUpdateData(validatedData);
-
+    const updateData = prepareContractUpdateData({
+      ...validatedData,
+      accScheduleJson: JSON.stringify(validatedData.accScheduleJson),
+    });
+    // console.log(updateData.);
     const updatedContract = await prisma.ACCContract.update({
       where: { ContractId: Number(id) },
       data: updateData,

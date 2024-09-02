@@ -8,6 +8,7 @@ import ProductionOption from './ProductionOption';
 
 type ProductionJumpMenuProps = {
   showArchivedCheck?: boolean;
+  onlyShowArchived?: boolean;
 };
 
 export const ARCHIVED_OPTION_STYLES = {
@@ -44,7 +45,10 @@ export const ARCHIVED_OPTION_STYLES = {
   },
 };
 
-export const ProductionJumpMenu: React.FC<ProductionJumpMenuProps> = ({ showArchivedCheck = true }) => {
+export const ProductionJumpMenu: React.FC<ProductionJumpMenuProps> = ({
+  showArchivedCheck = true,
+  onlyShowArchived = false,
+}) => {
   const router = useRouter();
   const [productionJump, setProductionJump] = useRecoilState(productionJumpState);
   const [includeArchived, setIncludeArchived] = useState<boolean>(productionJump?.includeArchived || false);
@@ -52,31 +56,50 @@ export const ProductionJumpMenu: React.FC<ProductionJumpMenuProps> = ({ showArch
     const productionOptions = router.route.includes('/marketing')
       ? []
       : [{ text: 'All Productions', value: -1, Id: -1, ShowCode: null, Code: null, IsArchived: false }];
+    if (!router.route.includes(productionJump.path)) {
+      setProductionJump({ ...productionJump, includeArchived: false });
+    }
     for (const production of productionJump.productions) {
-      if (includeArchived) {
-        productionOptions.push({
-          Id: -1,
-          ShowCode: null,
-          Code: null,
-          IsArchived: false,
-          ...production,
-          text: `${production.ShowCode}${production.Code} ${production.ShowName} ${
-            production.IsArchived ? ' (A)' : ''
-          }`,
-          value: production.Id,
-        });
-      } else if (!production.IsArchived) {
-        productionOptions.push({
-          Id: -1,
-          ShowCode: null,
-          Code: null,
-          IsArchived: false,
-          ...production,
-          text: `${production.ShowCode}${production.Code} ${production.ShowName} ${
-            production.IsArchived ? ' (A)' : ''
-          }`,
-          value: production.Id,
-        });
+      if (onlyShowArchived) {
+        if (production.IsArchived) {
+          productionOptions.push({
+            Id: -1,
+            ShowCode: null,
+            Code: null,
+            IsArchived: false,
+            ...production,
+            text: `${production.ShowCode}${production.Code} ${production.ShowName} ${
+              production.IsArchived ? ' (A)' : ''
+            }`,
+            value: production.Id,
+          });
+        }
+      } else {
+        if (includeArchived) {
+          productionOptions.push({
+            Id: -1,
+            ShowCode: null,
+            Code: null,
+            IsArchived: false,
+            ...production,
+            text: `${production.ShowCode}${production.Code} ${production.ShowName} ${
+              production.IsArchived ? ' (A)' : ''
+            }`,
+            value: production.Id,
+          });
+        } else if (!production.IsArchived) {
+          productionOptions.push({
+            Id: -1,
+            ShowCode: null,
+            Code: null,
+            IsArchived: false,
+            ...production,
+            text: `${production.ShowCode}${production.Code} ${production.ShowName} ${
+              production.IsArchived ? ' (A)' : ''
+            }`,
+            value: production.Id,
+          });
+        }
       }
     }
     return productionOptions;
@@ -109,7 +132,7 @@ export const ProductionJumpMenu: React.FC<ProductionJumpMenuProps> = ({ showArch
         label="Production"
         placeholder="Please select a Production"
         renderOption={(option) => <ProductionOption option={option} />}
-        customStyles={ARCHIVED_OPTION_STYLES}
+        customStyles={onlyShowArchived ? null : ARCHIVED_OPTION_STYLES}
         options={productions}
         onChange={goToProduction}
         isSearchable

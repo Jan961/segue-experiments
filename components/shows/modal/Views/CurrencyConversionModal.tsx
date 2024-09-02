@@ -3,7 +3,7 @@ import { styleProps } from 'components/bookings/table/tableConfig';
 import { Button, PopupModal, Table, notify } from 'components/core-ui-lib';
 import { updateConversionRate } from 'components/shows/request';
 import { currencyConversionTableConfig } from 'components/shows/table/tableConfig';
-import { ConversionRateDTO } from 'interfaces';
+import { ConversionRateDTO, ICurrency, ICurrencyCountry } from 'interfaces';
 import { useRouter } from 'next/router';
 import { unique } from 'radash';
 import { useCallback, useMemo, useRef, useState } from 'react';
@@ -13,30 +13,41 @@ interface CurrencyConversionModalProps {
   title: string;
   visible: boolean;
   conversionRates: ConversionRateDTO[];
+  currencyCountryLookup: Record<string, ICurrencyCountry[]>;
+  currencyLookup: Record<string, ICurrency>;
   onClose: () => void;
 }
-const CurrencyConversionModal = ({ conversionRates, onClose, title, visible }: CurrencyConversionModalProps) => {
+const CurrencyConversionModal = ({
+  conversionRates,
+  onClose,
+  title,
+  currencyCountryLookup = {},
+  currencyLookup = {},
+  visible,
+}: CurrencyConversionModalProps) => {
   const router = useRouter();
   const tableRef = useRef(null);
   const [editMap, setEditMap] = useState<Record<string, number>>({});
   const rowsData = useMemo(
     () =>
-      conversionRates.map(({ Rate, FromCurrency, ToCurrency, ...others }) => {
-        const allRegions = FromCurrency.CountryList.flatMap(({ RegionList }) => RegionList);
-        const uniqueRegions = unique(allRegions, ({ Id }) => Id);
-        const countries = FromCurrency.CountryList.map(({ Code }) => Code);
+      conversionRates.map(({ Rate, FromCurrencyCode, ToCurrencyCode, ...others }) => {
+        const allRegions = currencyCountryLookup[FromCurrencyCode].flatMap(({ regionList }) => regionList);
+        const fromCurrency = currencyLookup[FromCurrencyCode];
+        const toCurrency = currencyLookup[ToCurrencyCode];
+        const uniqueRegions = unique(allRegions, ({ id }) => id);
+        const countries = currencyCountryLookup[FromCurrencyCode].map(({ code }) => code);
         return {
           ...others,
           rate: Rate,
-          currency: `${FromCurrency.Code} | ${FromCurrency.Name}`,
+          currency: `${fromCurrency.code} | ${fromCurrency.name}`,
           countries: unique(countries).join(', '),
           exchange: {
-            toSymbol: ToCurrency?.SymbolUnicode,
-            fromCurrencyCode: FromCurrency.Code,
+            toSymbol: toCurrency?.symbolUniCode,
+            fromCurrencyCode: fromCurrency.code,
           },
-          region: uniqueRegions.map(({ Name }) => Name).join(', '),
-          ToCurrency,
-          FromCurrency,
+          region: uniqueRegions.map(({ name }) => name).join(', '),
+          ToCurrency: toCurrency,
+          FromCurrency: fromCurrency,
         };
       }),
     [conversionRates],

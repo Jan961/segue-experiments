@@ -27,11 +27,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         VenueConfirmationNotes: data.VenueConfirmationNotes,
         TicketHolderEmail: data.TicketHolderEmail,
         SeatsAllocated: data.SeatsAllocated,
-        AccountUser: {
-          connect: {
-            Id: data.ArrangedById,
-          },
-        },
+        ArrangedByAccUserId: data.ArrangedByAccUserId,
       },
     });
     res.status(200).json({});

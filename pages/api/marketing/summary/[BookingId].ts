@@ -1,4 +1,5 @@
-import prisma from 'lib/prisma';
+import client from 'lib/prisma';
+import master from 'lib/prisma_master';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { PerformanceDTO } from 'interfaces';
 import { calculateWeekNumber } from 'services/dateService';
@@ -46,7 +47,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const access = await checkAccess(email, { BookingId });
     if (!access) return res.status(401).end();
 
-    const performance: any = await prisma.performance.findFirst({
+    const performance: any = await client.performance.findFirst({
       where: {
         BookingId,
       },
@@ -56,7 +57,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       take: 1,
     });
 
-    const performances: any[] = await prisma.performance.findMany({
+    const performances: any[] = await client.performance.findMany({
       where: {
         BookingId,
       },
@@ -72,7 +73,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
 
     const NumberOfPerformances: number = performances.length;
 
-    const salesSummary = await prisma.salesSetTotalsView.findFirst({
+    const salesSummary = await client.salesSetTotalsView.findFirst({
       where: {
         SaleTypeName: {
           in: ['General Sales', 'School Sales'],
@@ -96,7 +97,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       },
     });
 
-    const booking: any = await prisma.booking.findFirst({
+    const booking: any = await client.booking.findFirst({
       select: {
         FirstDate: true,
         VenueId: true,
@@ -144,12 +145,12 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const currencyCode: string | null = await getCurrencyCodeFromCountryId(booking?.Venue?.VenueAddress[0]?.CountryId);
     const { Seats: Capacity } = booking?.Venue || {};
 
-    const unicodeQuery = await prisma.Currency.findFirst({
-      where: { Code: { equals: currencyCode } },
-      select: { SymbolUnicode: true },
+    const unicodeQuery = await master.Currency.findFirst({
+      where: { CurrencyCode: { equals: currencyCode } },
+      select: { CurrencySymbolUnicode: true },
     });
 
-    const SymbolUnicode = unicodeQuery?.SymbolUnicode;
+    const SymbolUnicode = unicodeQuery?.CurrencySymbolUnicode;
 
     const { ConversionRate } = performance?.DateBlock?.Production?.ConversionRate || {};
     const AvgTicketPrice = salesSummary === null ? 0 : salesSummary?.Value / salesSummary?.Seats;

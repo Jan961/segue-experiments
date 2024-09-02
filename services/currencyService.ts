@@ -1,9 +1,9 @@
-import prisma from 'lib/prisma';
+import prisma from 'lib/prisma_master';
 
 export const getAllCurrencyList = () => {
   return prisma.Currency.findMany({
     orderBy: {
-      Code: 'asc',
+      CurrencyCode: 'asc',
     },
   });
 };

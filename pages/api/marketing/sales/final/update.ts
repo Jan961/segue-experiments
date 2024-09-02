@@ -3,7 +3,7 @@ import { isNullOrEmpty } from 'utils';
 
 export default async function handle(req, res) {
   try {
-    const { SetId, general, schools } = req.body;
+    const { SetId, general, schools, user } = req.body;
 
     const salesUpdates = [];
 
@@ -62,6 +62,16 @@ export default async function handle(req, res) {
     }
 
     await prisma.$transaction(salesUpdates);
+
+    // update the sales set with the user
+    await prisma.SalesSet.update({
+      where: {
+        SetId,
+      },
+      data: {
+        SetFinalSalesApprovedByUser: user,
+      },
+    });
 
     res.status(200).json({ setId: SetId });
   } catch (e) {

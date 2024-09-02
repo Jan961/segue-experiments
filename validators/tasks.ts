@@ -25,14 +25,13 @@ export const recurringProductionTaskSchema = yup.object().shape({
 });
 
 export const masterTaskSchema = yup.object().shape({
-  AccountId: yup.number().required('AccountId is a required field'),
   Code: yup.string().required('Code is a required field'),
   Name: yup.string().required('Name is a required field'),
   CopiedFrom: yup.string().nullable(),
   CopiedId: yup.number().optional().nullable(),
   Priority: yup.number().optional().nullable(),
   Notes: yup.string().optional().nullable(),
-  AssignedToUserId: yup.number().optional().nullable(),
+  TaskAssignedToAccUserId: yup.number().optional().nullable(),
   StartByWeekNum: yup.number().nullable(),
   CompleteByWeekNum: yup.number().nullable(),
   TaskCompletedDate: yup.date().nullable(),

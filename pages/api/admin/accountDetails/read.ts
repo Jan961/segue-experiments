@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getAccountId, getEmailFromReq } from 'services/userService';
-import prisma from 'lib/prisma';
+import prismaMaster from 'lib/prisma_master';
+import prismaClient from 'lib/prisma';
 import { getAllCurrencyList } from 'services/currencyService';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
@@ -8,14 +9,14 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const email = await getEmailFromReq(req);
     const AccountId = await getAccountId(email);
 
-    const companyDetails = await prisma.Account.findFirst({
+    const companyDetails = await prismaMaster.Account.findFirst({
       where: { AccountId: { equals: AccountId } },
       include: {
         AccountContact: true,
       },
     });
 
-    const countryList = await prisma.Country.findMany({ select: { Id: true, Name: true } });
+    const countryList = await prismaClient.Country.findMany({ select: { Id: true, Name: true } });
 
     const currencyList = await getAllCurrencyList();
 

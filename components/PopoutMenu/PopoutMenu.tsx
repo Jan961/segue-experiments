@@ -138,7 +138,7 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
           },
           {
             label: 'Load Sales History',
-            value: '/marketing/sales/history-load',
+            value: '/marketing/sales/load-history',
             labelClass: leve2,
             testId: 'sidepanel-marketing-load-sales-history',
           },
@@ -184,16 +184,21 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
             labelClass: leve2,
             testId: 'sidepanel-contracts-venue-contracts',
           },
-          { label: 'Artiste Contracts', value: '', labelClass: leve2, testId: 'sidepanel-contracts-artiste-contracts' },
+          {
+            label: 'Artiste Contracts',
+            value: '/contracts/company-contracts/all?d=1',
+            labelClass: leve2,
+            testId: 'sidepanel-contracts-artiste-contracts',
+          },
           {
             label: 'Creative Contracts',
-            value: '',
+            value: '/contracts/company-contracts/all?d=2',
             labelClass: leve2,
             testId: 'sidepanel-contracts-creative-contracts',
           },
           {
             label: 'SM / Tech / Crew Contracts',
-            value: '',
+            value: '/contracts/company-contracts/all?d=3',
             labelClass: leve2,
             testId: 'sidepanel-contracts-sm-or-tech-or-crew-contracts',
           },

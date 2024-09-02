@@ -1,7 +1,6 @@
 import Layout from 'components/Layout';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import { getProductionJumpState } from 'utils/getProductionJumpState';
-import { getAccountIdFromReq } from 'services/userService';
 import { InitialState } from 'lib/recoil';
 import { getAllProductionCompanyList, getShowsByAccountId } from 'services/showService';
 import ShowsTable from 'components/shows/ShowsTable';
@@ -16,10 +15,6 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
   const [isArchived, setIsArchived] = useState<boolean>(false);
   const [isAddRow, setIsAddRow] = useState<boolean>(false);
   const [isEdited, setIsEdited] = useState<boolean>(false);
-
-  const handleArchive = () => {
-    setIsArchived(!isArchived);
-  };
 
   const unArchivedList = useMemo(() => {
     return showsList.filter((item) => !item.IsArchived);
@@ -38,10 +33,6 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
     setIsAddRow(!isAddRow);
   };
 
-  const handleEdit = () => {
-    setIsEdited(!isEdited);
-  };
-
   return (
     <Layout title="Shows | Segue" flush>
       <div className="w-9/12 mx-auto">
@@ -52,15 +43,15 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
               className="flex flex-row-reverse"
               checked={isArchived}
               label="Include archived"
-              id=""
+              id="includeArchived"
               disabled={isEdited}
-              onChange={handleArchive}
+              onChange={() => setIsArchived(!isArchived)}
             />
             <Button disabled={isAddRow} onClick={addNewRow} text="Add New Show" />
           </div>
         </div>
         <ShowsTable
-          handleEdit={handleEdit}
+          handleEdit={() => setIsEdited(!isEdited)}
           isEdited={isEdited}
           isArchived={isArchived}
           isAddRow={isAddRow}
@@ -73,9 +64,8 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
 }
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const AccountId = await getAccountIdFromReq(ctx.req);
-  const productionJump = await getProductionJumpState(ctx, 'bookings', AccountId);
-  const shows = (await getShowsByAccountId(AccountId)) || [];
+  const productionJump = await getProductionJumpState(ctx, 'bookings');
+  const shows = (await getShowsByAccountId()) || [];
   const regionsList = await getRegionlist();
   const productionCompanyList = await getAllProductionCompanyList();
   const currencyList = await getAllCurrencylist();
@@ -86,6 +76,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       productions: showProductionMapper(show),
     };
   });
+
   const initialState: InitialState = {
     global: {
       productionJump,
