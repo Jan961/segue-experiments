@@ -3,7 +3,7 @@ import TreeSelect from 'components/global/TreeSelect';
 import { TreeItemOption } from 'components/global/TreeSelect/types';
 import { useEffect, useState } from 'react';
 import { generateRandomHash } from 'utils/crypto';
-import useClerk from 'hooks/useClerk';
+import useUser from 'hooks/useUser';
 import Spinner from 'components/core-ui-lib/Spinner';
 import { newUserSchema } from 'validators/user';
 import FormError from 'components/core-ui-lib/FormError';
@@ -22,8 +22,7 @@ type UserDetails = {
 
 interface AdEditUserProps {
   permissions: TreeItemOption[];
-  productions: any;
-  state: any;
+  productions: TreeItemOption[];
   onClose: () => void;
   visible: boolean;
 }
@@ -43,8 +42,9 @@ const DEFAULT_USER_DETAILS: UserDetails = {
 const AdEditUser = ({ visible, onClose, permissions, productions = [] }: AdEditUserProps) => {
   const [userDetails, setUserDetails] = useState<UserDetails>(DEFAULT_USER_DETAILS);
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+  const [allProductionsChecked, setAllProductionsChecked] = useState(false);
 
-  const { isSignUpLoaded, createUser, error } = useClerk();
+  const { isSignUpLoaded, createUser, error } = useUser();
   const handleInputChange = (e) => {
     setUserDetails({ ...userDetails, [e.target.name]: e.target.value });
   };
@@ -63,7 +63,6 @@ const AdEditUser = ({ visible, onClose, permissions, productions = [] }: AdEditU
         errors[error.path] = error.message;
       });
       setValidationErrors(errors);
-      console.log('validation Errors', errors);
       return false;
     }
   }
@@ -72,6 +71,9 @@ const AdEditUser = ({ visible, onClose, permissions, productions = [] }: AdEditU
     const { id, checked } = e.target;
     const updatedProductions = userDetails.productions.map((p) => (p.id === id ? { ...p, checked } : p));
     setUserDetails({ ...userDetails, productions: updatedProductions });
+    if (!checked) {
+      setAllProductionsChecked(false);
+    }
   };
 
   const saveUser = async () => {
@@ -84,7 +86,15 @@ const AdEditUser = ({ visible, onClose, permissions, productions = [] }: AdEditU
       .filter(({ checked }) => checked)
       .map(({ id }) => id);
 
-    await createUser({ ...userDetails, permissions });
+    const selectedProductions = userDetails.productions.filter(({ checked }) => checked).map(({ id }) => id);
+
+    await createUser({ ...userDetails, permissions, productions: selectedProductions });
+  };
+
+  const handleAllProductionsToggle = (e) => {
+    setAllProductionsChecked(e.target.checked);
+    const updatedProductions = userDetails.productions.map((p) => ({ ...p, checked: e.target.checked }));
+    setUserDetails({ ...userDetails, productions: updatedProductions });
   };
 
   return isSignUpLoaded ? (
@@ -180,6 +190,13 @@ const AdEditUser = ({ visible, onClose, permissions, productions = [] }: AdEditU
           <div className="w-full max-h-[400px] overflow-y-hidden">
             <h2 className="text-xl text-bold mb-2">Productions</h2>
             <div className="w-full max-h-[400px] overflow-y-auto">
+              <Checkbox
+                id="allProductions"
+                name="allProductions"
+                label="All Productions"
+                checked={allProductionsChecked}
+                onChange={handleAllProductionsToggle}
+              />
               {userDetails.productions.map((production) => (
                 <Checkbox
                   key={production.id}
@@ -198,7 +215,7 @@ const AdEditUser = ({ visible, onClose, permissions, productions = [] }: AdEditU
               <TreeSelect
                 options={permissions}
                 onChange={(permissions) => setUserDetails({ ...userDetails, permissions })}
-                defaultOpen
+                selectAllLabel="Select All Areas"
               />
             </div>
           </div>

@@ -1,4 +1,5 @@
-import prisma from 'lib/prisma_master';
+import prismaMaster from 'lib/prisma_master';
+import prismaClient from 'lib/prisma';
 import { isNullOrEmpty } from 'utils';
 
 const formatAccountUsers = (data) => {
@@ -72,16 +73,16 @@ const formatPermissions = (permissions) => {
 
 export const getPermissionsList = async () => {
   try {
-    const results = await prisma.permission.findMany();
+    const results = await prismaMaster.permission.findMany();
     return formatPermissions(results);
   } catch (err) {
     console.log('Error fetching permissions ', err);
   }
 };
 
-export const getAccountUsersList = async (): Promise<any[]> => {
+export const getAccountUsersList = async () => {
   try {
-    const results = await prisma.AccountUser.findMany({
+    const results = await prismaMaster.AccountUser.findMany({
       include: {
         User: { select: { Email: true, FirstName: true, LastName: true } },
         Account: { select: { AccountName: true } },
@@ -92,4 +93,21 @@ export const getAccountUsersList = async (): Promise<any[]> => {
   } catch (err) {
     console.log('Error fetching account users ', err);
   }
+};
+
+export const replaceProudctionPermissions = async (accountUserId: string, productionIds: string[]) => {
+  prismaClient.$transaction(async (tx) => {
+    await tx.AccountUserProduction.deleteMany({
+      where: {
+        AUPAccUserId: accountUserId,
+      },
+    });
+
+    await tx.AccountUserProduction.createMany({
+      data: productionIds.map((productionId) => ({
+        AUPAccUserId: accountUserId,
+        AUPProductionId: productionId,
+      })),
+    });
+  });
 };

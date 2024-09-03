@@ -138,7 +138,6 @@ export default function Users({
           onClose={handleModalClose}
           permissions={permissionsList}
           productions={productionsList}
-          state={null}
         />
       )}
     </Layout>

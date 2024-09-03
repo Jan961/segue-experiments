@@ -9,11 +9,18 @@ interface TreeSelectProps {
   defaultOpen?: boolean;
   options: TreeItemOption[];
   onChange: (v: TreeItemOption[]) => void;
+  selectAllLabel?: string;
 }
 
 const baseClass = 'border bg-white px-3 py-2';
 
-export default function TreeSelect({ options = [], onChange, defaultOpen = false, className = '' }: TreeSelectProps) {
+export default function TreeSelect({
+  options = [],
+  onChange,
+  defaultOpen = false,
+  className = '',
+  selectAllLabel = 'Select All',
+}: TreeSelectProps) {
   const [itemOptions, setItemOptions] = useState(options || []);
   const [selectAll, setSelecteAll] = useState<boolean>(false);
 
@@ -42,7 +49,7 @@ export default function TreeSelect({ options = [], onChange, defaultOpen = false
   return (
     <div className={`${baseClass} ${className}`}>
       <Checkbox
-        label="Select All Areas"
+        label={selectAllLabel}
         labelClassName="text-responsive-sm font-semibold"
         id="select-all"
         testId="tree-select-select-all"
