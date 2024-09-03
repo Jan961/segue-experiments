@@ -5,22 +5,21 @@ interface SpreadsheetDeleteModalProps {
   visible: boolean;
   onNoClick: () => void;
   onDeleteClick: () => void;
-  uploadedFile: any;
+  salesHistoryRows: any;
 }
 
 export const SpreadsheetDeleteModal = ({
   visible,
   onNoClick,
   onDeleteClick,
-  uploadedFile,
+  salesHistoryRows,
 }: SpreadsheetDeleteModalProps) => {
   const [keepSpreadsheet, setKeepSpreadsheet] = useState(true);
 
   const handleDelete = () => {
     if (keepSpreadsheet) {
       const a = document.createElement('a');
-      a.href = uploadedFile[0].fileURL;
-      console.log(uploadedFile[0].location);
+      a.href = salesHistoryRows[0].fileURL;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);

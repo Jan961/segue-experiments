@@ -49,6 +49,7 @@ const LoadSalesHistory = () => {
         params: { selected },
       });
       if (response.data.ProductionFile) {
+        console.log(response.data.ProductionFile);
         const file = response.data.ProductionFile.File;
         const newFile = {
           name: file.OriginalFilename,
@@ -58,7 +59,6 @@ const LoadSalesHistory = () => {
           fileId: file.Id,
         };
         setSalesHistoryRows([newFile]);
-
         setUploadDisabled(true);
       }
     } catch (error) {
@@ -78,6 +78,7 @@ const LoadSalesHistory = () => {
     setUploadedFile(validateFile);
     setUploadParams({ onProgress, onError, onUploadingImage, spreadsheetErrorOccured, spreadsheetWarningOccured });
     setConfirmationModalVisible(true);
+    setUploadDisabled(true);
   };
 
   const handleUpload = async (file, onProgress, onError, onUploadingImage) => {
@@ -140,6 +141,13 @@ const LoadSalesHistory = () => {
   }, [salesHistoryRows]);
 
   useEffect(() => {
+    if (!selectedProducton.IsArchived) {
+      setUploadDisabled(true);
+    }
+  }, [selectedProducton]);
+
+  useEffect(() => {
+    if (!selected) setUploadDisabled(true);
     setisLoading(true);
     fetchSpreadsheet();
     setisLoading(false);
@@ -192,7 +200,7 @@ const LoadSalesHistory = () => {
           visible={showConfirmDelete}
           onNoClick={() => setShowConfirmDelete(false)}
           onDeleteClick={() => deleteSalesHistory()}
-          uploadedFile={salesHistoryRows}
+          salesHistoryRows={salesHistoryRows}
         />
       )}
       {isLoading && <LoadingOverlay />}
