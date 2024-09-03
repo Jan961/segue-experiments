@@ -107,7 +107,7 @@ const AdEditUser = ({ visible, onClose, permissions, productions = [] }: AdEditU
       hasOverlay={false}
     >
       <div className="w-full h-full max-h-[95vh]">
-        <div className="flex flex-col w-full gap-2 mb-4">
+        <div className="flex flex-col w-full gap-1 mb-4">
           <div className="w-full">
             <Label text="First Name" required />
             <TextInput
@@ -144,37 +144,39 @@ const AdEditUser = ({ visible, onClose, permissions, productions = [] }: AdEditU
             />
             <FormError error={validationErrors.email} className="mt-2 ml-2" />
           </div>
-          <div className="w-full">
-            <Label text="Password" required />
-            <div className="w-full flex items-center gap-3">
-              <TextInput
-                className="tracking-widest text-center"
-                name="password"
-                value={userDetails.password}
-                disabled
-                testId="user-password"
-              />
-              <Button onClick={() => setUserDetails({ ...userDetails, password: generateRandomHash(4) })}>
-                Generate Password
-              </Button>
+          <div className="w-full flex items-center justify-between">
+            <div>
+              <Label text="Password" required />
+              <div className="flex items-center gap-3">
+                <TextInput
+                  className="tracking-widest text-center"
+                  name="password"
+                  value={userDetails.password}
+                  disabled
+                  testId="user-password"
+                />
+                <Button onClick={() => setUserDetails({ ...userDetails, password: generateRandomHash(4) })}>
+                  Generate Password
+                </Button>
+              </div>
+              <FormError error={validationErrors.password} className="mt-2 ml-2" />
             </div>
-            <FormError error={validationErrors.password} className="mt-2 ml-2" />
-          </div>
-          <div className="w-full">
-            <Label text="PIN" required />
-            <div className="w-full flex items-center gap-3">
-              <TextInput
-                testId="user-pin"
-                className="tracking-widest text-center"
-                name="pin"
-                value={userDetails.pin}
-                disabled
-              />
-              <Button onClick={() => setUserDetails({ ...userDetails, pin: generateRandomHash(2) })}>
-                Generate PIN
-              </Button>
+            <div>
+              <Label text="PIN" required />
+              <div className="flex items-center gap-3">
+                <TextInput
+                  testId="user-pin"
+                  className="tracking-widest text-center w-24"
+                  name="pin"
+                  value={userDetails.pin}
+                  disabled
+                />
+                <Button onClick={() => setUserDetails({ ...userDetails, pin: generateRandomHash(2) })}>
+                  Generate PIN
+                </Button>
+              </div>
+              <FormError error={validationErrors.pin} className="mt-2 ml-2" />
             </div>
-            <FormError error={validationErrors.pin} className="mt-2 ml-2" />
           </div>
         </div>
         <Checkbox
