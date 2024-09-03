@@ -126,3 +126,22 @@ interface IContractDetails {
   additionalClause: string | null;
   customClauseList: string[];
 }
+
+export interface IScheduleDay {
+  productionCode: string;
+  day: string;
+  date: string;
+  week: number;
+  venue?: string;
+  isOtherDay?: boolean;
+  isCancelled?: boolean;
+  location?: string;
+  type?: string;
+  status?: string;
+  capacity?: number;
+  performancesPerDay?: number;
+  performance1?: string;
+  performance2?: string;
+  mileage?: number;
+  time?: string;
+}

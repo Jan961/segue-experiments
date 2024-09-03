@@ -70,8 +70,8 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
         Object.values(users),
         null,
         null,
-        ({ FirstName, LastName }) => `${FirstName || ''} ${LastName || ''}`,
-        ({ FirstName, LastName }) => `${FirstName || ''} ${LastName || ''}`,
+        ({ UserFirstName, UserLastName }) => `${UserFirstName || ''} ${UserLastName || ''}`,
+        ({ UserFirstName, UserLastName }) => `${UserFirstName || ''} ${UserLastName || ''}`,
       ),
     [users],
   );

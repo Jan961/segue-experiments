@@ -17,12 +17,12 @@ export const defaultPersonDetails = {
   mobileNumber: '',
   passportName: '',
   passportNumber: '',
-  hasUKWorkPermit: null,
+  hasUKWorkPermit: false,
   passportExpiryDate: null,
   postcode: '',
   checkedBy: null,
   country: null,
-  isFEURequired: null,
+  isFEURequired: false,
   workType: [],
   advisoryNotes: '',
   generalNotes: '',
@@ -36,7 +36,7 @@ interface PersonalDetailsProps {
   booleanOptions: SelectOption[];
   userOptionList: SelectOption[];
   details: Partial<IPersonDetails>;
-  onChange: (data: IPersonDetails) => void;
+  onChange: (data: Partial<IPersonDetails>) => void;
 }
 
 const PersonalDetails = ({
@@ -76,9 +76,9 @@ const PersonalDetails = ({
     (key: string, value: number | string | string[] | number[] | null) => {
       const updatedData = { ...formData, [key]: value };
       setFormData(updatedData);
-      onChange(updatedData);
+      onChange({ ...details, [key]: value });
     },
-    [onChange, setFormData, formData],
+    [onChange, setFormData, formData, details],
   );
   return (
     <>

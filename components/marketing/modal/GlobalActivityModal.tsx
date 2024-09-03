@@ -16,6 +16,7 @@ import { globalModalVenueColDefs, styleProps } from '../table/tableConfig';
 import { Table } from 'components/core-ui-lib';
 import { isValidDate } from 'services/dateService';
 import axios from 'axios';
+import LoadingOverlay from 'components/shows/LoadingOverlay';
 
 export type ActivityModalVariant = 'add' | 'edit' | 'delete' | 'view';
 
@@ -72,6 +73,7 @@ export default function GlobalActivityModal({
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
   const [venueColDefs, setVenueColDefs] = useState([]);
   const [selectedList, setSelectedList] = useState([]);
+  const [loadingVisible, setLoadingVisible] = useState<boolean>(false);
 
   const venueList = useMemo(() => {
     if (venues.length === 0) {
@@ -118,16 +120,9 @@ export default function GlobalActivityModal({
     }
 
     setVenueColDefs(globalModalVenueColDefs(dropList, selectVenue, multiVenueSelect, variant));
-
-    if (variant === 'add') {
-      setActName('');
-      setActType(null);
-      setActDate(null);
-      setActFollowUp(false);
-      setFollowUpDt(null);
-      setActNotes('');
-      setCost('');
-    } else if (variant === 'edit' || variant === 'view') {
+    setLoadingVisible(true);
+    if (variant === 'edit' || variant === 'view') {
+      clearInputs();
       const response = await axios.get(`/api/marketing/globalActivities/venueIds/${data.Id}`);
       const venueIds = response.data.map((rec) => rec.VenueId);
 
@@ -141,6 +136,7 @@ export default function GlobalActivityModal({
       setActId(data.Id);
       setSelectedList(venueIds);
     }
+    setLoadingVisible(false);
   };
 
   const selectVenue = (data, value) => {
@@ -179,8 +175,19 @@ export default function GlobalActivityModal({
     setSelectedList((prevSelectedList) => [...prevSelectedList, ...tempSelectedIndexList]);
   };
 
+  const clearInputs = () => {
+    setActName('');
+    setActType(null);
+    setActDate(null);
+    setActFollowUp(false);
+    setFollowUpDt(null);
+    setActNotes('');
+    setCost('');
+  };
+
   const handleSave = () => {
     // display error if the activity type is not selected
+    setLoadingVisible(true);
     if (actType === null) {
       setError(true);
       return;
@@ -202,7 +209,7 @@ export default function GlobalActivityModal({
     if (variant !== 'add') {
       data = { ...data, Id: actId };
     }
-
+    setLoadingVisible(false);
     onSave(variant, data);
   };
 
@@ -263,6 +270,7 @@ export default function GlobalActivityModal({
   return (
     <div>
       <PopupModal show={visible} onClose={() => handleConfirm('close')} showCloseIcon={true} hasOverlay={showConfirm}>
+        {loadingVisible && <LoadingOverlay />}
         <div className={`h-[${variant === 'view' ? 400 : 780}px] w-[450px]`}>
           <div className="text-xl text-primary-navy font-bold mb-4">{titleOptions[variant]}</div>
           <div className="text-base font-bold text-primary-input-text">Activity Name</div>

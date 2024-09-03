@@ -19,6 +19,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       personId,
       //   templateId,
       contractDetails,
+      accScheduleJson = [],
     } = validatedData;
 
     const result = await prisma.$transaction(async (tx) => {
@@ -49,6 +50,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           TotalFeeNotes: contractDetails.totalPayDetails?.feeNotes || null,
           CancelFee: contractDetails.cancellationFee || null,
           ContractStatus: CompanyContractStatus.NotYetIssued,
+          CurrencyCode: contractDetails.currency || null,
+          ACCScheduleJSON: JSON.stringify(accScheduleJson),
+          DateIssued: new Date(),
           ...(department && {
             ACCDepartment: {
               connect: {
@@ -67,13 +71,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             Production: {
               connect: {
                 Id: production,
-              },
-            },
-          }),
-          ...(contractDetails.currency && {
-            Currency: {
-              connect: {
-                Code: contractDetails.currency,
               },
             },
           }),

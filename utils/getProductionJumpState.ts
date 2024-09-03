@@ -1,5 +1,6 @@
 import { dateBlockMapper } from 'lib/mappers';
 import { ParsedUrlQuery } from 'querystring';
+// import { pick } from 'radash';
 import { dateTimeToTime } from 'services/dateService';
 import { getAllProductions, getAllProductionRegions } from 'services/productionService';
 import { ProductionJump } from 'state/booking/productionJumpState';
@@ -24,7 +25,6 @@ export const getProductionJumpState = async (ctx, path: string): Promise<Product
         if (db) {
           db = dateBlockMapper(db);
         }
-
         return {
           Id: t.Id,
           Code: t.Code,
