@@ -189,25 +189,29 @@ const updateValidateSpreadsheetData = (
     };
   };
 
-  // Check to see if currentVenue exists in SpreadsheetData
+  console.log('looking for venue: ', currentVenue);
   const venue = spreadsheetData.venues.find((v) => v.venueCode === currentVenue);
 
   if (!venue) {
-    // If currentVenue not already exists, push a new venue
-    if (currentBookingDate)
+    if (currentBookingDate) {
       spreadsheetData.venues.push({
         venueCode: currentRow.venueCode,
         bookings: [createNewBooking()],
       });
+    } else {
+      detailsColumnMessage += '| ERROR - Cannot add a new Sale without a Booking Date';
+      rowErrorOccurred = true;
+    }
+
     return { detailsColumnMessage, rowWarningOccurred, rowErrorOccurred, currentRowBooking: null };
   }
 
-  // Check to see if currentBookingDate exists in SpreadsheetData
   const booking = venue.bookings.find((b) => b.bookingDate.getTime() === new Date(currentBookingDate).getTime());
 
   if (!booking) {
-    // If currentBookingDate not already exists, push a new booking
-    if (currentBookingDate) venue.bookings.push(createNewBooking());
+    if (currentBookingDate) {
+      venue.bookings.push(createNewBooking());
+    }
     return { detailsColumnMessage, rowWarningOccurred, rowErrorOccurred, currentRowBooking: null };
   }
 
