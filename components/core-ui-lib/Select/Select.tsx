@@ -14,6 +14,7 @@ import Icon from '../Icon';
 import Label from '../Label';
 import classNames from 'classnames';
 import fuseFilter from 'utils/fuseFilter';
+import { isNullOrEmpty } from 'utils';
 
 export type SelectOption = { text: string; value: string | number | boolean; [key: string]: any };
 
@@ -177,6 +178,7 @@ export default forwardRef(function Select(
 
   const [filteredOptions, setFilteredOptions] = React.useState<SelectOption[]>(null);
   const [selectedOption, setSelectedOption] = useState<SelectOption | SelectOption[]>({ text: '', value: '' });
+  const [menuOpenedTime, setMenuOpenedTime] = useState<number>(0);
 
   const handleOptionSelect = (o: SelectOption, actionMeta: ActionMeta<SelectOption>) => {
     const { action, option } = actionMeta;
@@ -248,6 +250,33 @@ export default forwardRef(function Select(
     setMenuPortalTarget(gridViewportElement);
   }, []);
 
+  const [menuIsOpen, setMenuIsOpen] = useState(false);
+
+  const handleMenuOpen = () => {
+    const currentTimeInMilliseconds = Date.now();
+    setMenuIsOpen(true);
+    setMenuOpenedTime(currentTimeInMilliseconds);
+  };
+
+  const closeMenuOnScroll = (e) => {
+    if (menuIsOpen) {
+      const currentTimeInMilliseconds = Date.now();
+      if (currentTimeInMilliseconds - menuOpenedTime > 100) {
+        //  Check if owner document is null since the menu is portaled so it is part of the main HTMLDocument so it will have no parent
+        if (!isNullOrEmpty(e?.target?.ownerDocument)) {
+          if (e.target.className.includes('ag-body-horizontal') || e.target.className.includes('ag-body-vertical')) {
+            setMenuIsOpen(false);
+            return true;
+          }
+        } else {
+          return true;
+        }
+      }
+      return false;
+    }
+    return true;
+  };
+
   return (
     <div
       className={classNames(
@@ -289,8 +318,10 @@ export default forwardRef(function Select(
           hideSelectedOptions={false}
           onBlur={onBlur}
           menuPlacement={menuPlacement}
+          onMenuOpen={handleMenuOpen}
           menuPortalTarget={menuPortalTarget}
           menuPosition="fixed"
+          closeMenuOnScroll={closeMenuOnScroll}
           menuShouldScrollIntoView={false}
           filterOption={(option, _inputValue) => {
             if (filteredOptions === null) {
