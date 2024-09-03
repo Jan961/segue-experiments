@@ -3,7 +3,9 @@ import prisma from 'lib/prisma';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const selectedId = Array.isArray(req.query.selected) ? parseInt(req.query.selected[0]) : parseInt(req.query.selected);
+    const selectedId = Array.isArray(req.query.selected)
+      ? parseInt(req.query.selected[0])
+      : parseInt(req.query.selected);
 
     const ProductionFile = await prisma.ProductionFile.findFirst({
       where: { ProFiProductionId: { equals: selectedId } },
@@ -12,8 +14,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         ProFiId: true,
       },
     });
-
-    console.log(ProductionFile);
 
     res.status(200).json({ ProductionFile });
   } catch (err) {

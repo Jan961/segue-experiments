@@ -15,7 +15,6 @@ import { dateToSimple } from 'services/dateService';
 import validateSpreadsheetFile from '../utils/validateSpreadsheet';
 import SpreadsheetDeleteModal from './SpreadsheetDeleteModal';
 import axios from 'axios';
-import LoadingOverlay from 'components/shows/LoadingOverlay';
 
 const LoadSalesHistory = () => {
   const [uploadModalVisible, setUploadModalVisible] = useState(false);
@@ -25,7 +24,6 @@ const LoadSalesHistory = () => {
   const [salesHistoryRows, setSalesHistoryRows] = useState([]);
   const [uploadParams, setUploadParams] = useState<UploadParamType>(null);
   const [uploadedFile, setUploadedFile] = useState<UploadedFile[]>();
-  const [isLoading, setisLoading] = useState(false);
 
   const { productions, selected } = useRecoilValue(productionJumpState);
   const selectedProducton = productions.filter((prod) => prod.Id === selected)[0];
@@ -44,12 +42,12 @@ const LoadSalesHistory = () => {
   };
 
   const fetchSpreadsheet = async () => {
+    console.log('called');
     try {
       const response = await axios.get('/api/marketing/load-history/read', {
         params: { selected },
       });
       if (response.data.ProductionFile) {
-        console.log(response.data.ProductionFile);
         const file = response.data.ProductionFile.File;
         const newFile = {
           name: file.OriginalFilename,
@@ -59,7 +57,8 @@ const LoadSalesHistory = () => {
           fileId: file.Id,
         };
         setSalesHistoryRows([newFile]);
-        setUploadDisabled(true);
+      } else {
+        setSalesHistoryRows([]);
       }
     } catch (error) {
       console.log(error, 'Failed to fetch Sales History Spreadsheet');
@@ -81,7 +80,6 @@ const LoadSalesHistory = () => {
   };
 
   const handleUpload = async (file, onProgress, onError, onUploadingImage) => {
-    setUploadDisabled(true);
     const formData = new FormData();
     formData.append('file', file[0].file);
     formData.append('path', `marketing/salesHistory`);
@@ -101,6 +99,7 @@ const LoadSalesHistory = () => {
           fileId: response.id,
           location: response.location,
         };
+        console.log(newFile.fileURL);
         setSalesHistoryRows([newFile]);
         onUploadSuccess({ fileId: response.id });
       }
@@ -136,35 +135,37 @@ const LoadSalesHistory = () => {
     }
   };
 
+  const downloadExample = () => {
+    const a = document.createElement('a');
+    a.href = getFileUrl('marketing/salesHistory/exampleTemplate/Example+Sales+History+Template.xlsx');
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
+
   useEffect(() => {
-    salesHistoryRows.length >= 1 ? setUploadDisabled(true) : setUploadDisabled(false);
+    if (salesHistoryRows.length >= 1) {
+      setUploadDisabled(true);
+    } else {
+      setUploadDisabled(false);
+    }
   }, [salesHistoryRows]);
 
   useEffect(() => {
     if (!selectedProducton.IsArchived) {
       setUploadDisabled(true);
     }
-    setSalesHistoryRows([]);
-    setisLoading(true);
     fetchSpreadsheet();
-    setisLoading(false);
   }, [selectedProducton]);
-
-  useEffect(() => {
-    if (!selected) setUploadDisabled(true);
-    setisLoading(true);
-    fetchSpreadsheet();
-    setisLoading(false);
-  }, []);
 
   return (
     <div>
       <div className="flex items-center justify-between mb-3">
         <LoadSalesHistoryFilters />
         <div className="flex gap-x-3">
-          <Button text="Download Template" className="w-[155px]" />
+          <Button text="Download Template" className="w-[155px]" onClick={() => downloadExample()} />
           <Button
-            text="Upload Template"
+            text="Upload Spreadsheet"
             className="w-[155px]"
             onClick={() => setUploadModalVisible(true)}
             disabled={uploadDisabled}
@@ -207,7 +208,6 @@ const LoadSalesHistory = () => {
           salesHistoryRows={salesHistoryRows}
         />
       )}
-      {isLoading && <LoadingOverlay />}
     </div>
   );
 };

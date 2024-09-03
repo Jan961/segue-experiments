@@ -5,14 +5,24 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   try {
     const { fileId, selected } = req.body;
 
-    await prisma.ProductionFile.create({
-      data: {
-        ProFiFileId: fileId,
-        ProFiProductionId: selected,
-        ProFiFileType: '...',
-        ProFiFileDescription: '...',
+    const ProductionFile = await prisma.ProductionFile.findFirst({
+      where: { ProFiProductionId: { equals: selected } },
+      select: {
+        File: true,
+        ProFiId: true,
       },
     });
+
+    if (!ProductionFile) {
+      await prisma.ProductionFile.create({
+        data: {
+          ProFiFileId: fileId,
+          ProFiProductionId: selected,
+          ProFiFileType: '...',
+          ProFiFileDescription: '...',
+        },
+      });
+    }
 
     res.status(200).json({ status: 'Success' });
   } catch (err) {
