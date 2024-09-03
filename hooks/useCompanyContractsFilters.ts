@@ -21,7 +21,7 @@ const useCompanyContractsFilter = () => {
           compareStrings(contract.firstName, contractText) ||
           compareStrings(contract.lastName, contractText) ||
           compareStrings(contract.role, contractText)) &&
-        (department === -1 || department === contract.departmentId) &&
+        (department === -1 || !department || department === contract.departmentId) &&
         (!endDate || new Date(contract.dateIssue) <= endDate) &&
         (!startDate || new Date(contract.dateIssue) >= startDate) &&
         (status === 'all' || status === contract.status)

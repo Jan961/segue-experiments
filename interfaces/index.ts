@@ -784,6 +784,7 @@ export interface DealMemoContractFormData {
   SellWho?: string;
   SellProgrammes?: boolean;
   PrintDelUseVenueAddress?: boolean;
+  PrintDelUseVenueAddressline?: string;
   SellMerch?: boolean;
   SellNotes?: string;
   SellProgCommPercent?: number;

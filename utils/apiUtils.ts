@@ -1,4 +1,4 @@
-import { isUndefined } from 'utils';
+import { isNullOrUndefined, isUndefined } from 'utils';
 
 export type FieldMapping = {
   key: string;
@@ -12,12 +12,13 @@ export type FieldMapping = {
 
 type UpdateData = Record<string, any>;
 
-export const prepareUpdateData = <T>(details: T, fieldMappings: FieldMapping[]): UpdateData => {
+export const prepareQuery = <T>(details: T, fieldMappings: FieldMapping[], isCreate = false): UpdateData => {
   const updateData: UpdateData = {};
 
   fieldMappings.forEach(({ key, updateKey, isDate, isSetArray, arrayKey, isForeignKey, foreignKeyId }) => {
     const value = details[key];
-    if (!isUndefined(value)) {
+    const hasValue = isCreate ? !isNullOrUndefined(value) : !isUndefined(value);
+    if (hasValue) {
       if (isDate) {
         updateData[updateKey] = value ? new Date(value as string) : null;
       } else if (isSetArray && arrayKey) {

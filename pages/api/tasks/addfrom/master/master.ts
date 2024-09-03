@@ -1,6 +1,6 @@
 import prisma from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getEmailFromReq, checkAccess, getAccountIdFromReq } from 'services/userService';
+import { getEmailFromReq, checkAccess } from 'services/userService';
 import { getMaxMasterTaskCode } from 'services/TaskService';
 import { isNullOrEmpty } from 'utils';
 import { omit } from 'radash';

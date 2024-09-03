@@ -19,7 +19,7 @@ interface Props {
   details?: Partial<BankAccount>;
   accountType: string;
   countryOptionList: SelectOption[];
-  onChange: (data: BankAccount) => void;
+  onChange: (data: Partial<BankAccount>) => void;
 }
 
 const SalaryDetailsForm = ({ details, countryOptionList, onChange, accountType = 'Salary' }: Props) => {
@@ -29,7 +29,7 @@ const SalaryDetailsForm = ({ details, countryOptionList, onChange, accountType =
     (key: string, value: number | string | null) => {
       const updatedData = { ...formData, [key]: value };
       setFormData(updatedData);
-      onChange(updatedData);
+      onChange({ ...details, [key]: value });
     },
     [onChange, setFormData, formData],
   );
