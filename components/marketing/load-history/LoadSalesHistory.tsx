@@ -78,10 +78,10 @@ const LoadSalesHistory = () => {
     setUploadedFile(validateFile);
     setUploadParams({ onProgress, onError, onUploadingImage, spreadsheetErrorOccured, spreadsheetWarningOccured });
     setConfirmationModalVisible(true);
-    setUploadDisabled(true);
   };
 
   const handleUpload = async (file, onProgress, onError, onUploadingImage) => {
+    setUploadDisabled(true);
     const formData = new FormData();
     formData.append('file', file[0].file);
     formData.append('path', `marketing/salesHistory`);
@@ -144,6 +144,10 @@ const LoadSalesHistory = () => {
     if (!selectedProducton.IsArchived) {
       setUploadDisabled(true);
     }
+    setSalesHistoryRows([]);
+    setisLoading(true);
+    fetchSpreadsheet();
+    setisLoading(false);
   }, [selectedProducton]);
 
   useEffect(() => {
