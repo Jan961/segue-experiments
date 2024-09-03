@@ -14,6 +14,7 @@ interface SpreadsheetModalProps {
   ) => void;
   uploadParams: UploadParamType;
   uploadedFile: UploadedFile[];
+  prodCode: string | null;
 }
 
 const SpreadsheetConfirmationModal = ({
@@ -23,6 +24,7 @@ const SpreadsheetConfirmationModal = ({
   uploadParams,
   uploadedFile,
   closeUploadModal,
+  prodCode,
 }: SpreadsheetModalProps) => {
   const statusMessage = () => {
     if (uploadParams.spreadsheetIssues.spreadsheetErrorOccurred) {
@@ -61,7 +63,9 @@ const SpreadsheetConfirmationModal = ({
 
     return (
       <div>
-        <p>This date will be uploaded to. Any existing sales data will be overwritten. Do you wish to proceed?</p>
+        <p>
+          This date will be uploaded to {prodCode}. Any existing sales data will be overwritten. Do you wish to proceed?
+        </p>
       </div>
     );
   };
@@ -69,7 +73,8 @@ const SpreadsheetConfirmationModal = ({
   const buttonOptions = () => {
     if (
       !uploadParams.spreadsheetIssues.spreadsheetErrorOccurred &&
-      !uploadParams.spreadsheetIssues.spreadsheetWarningOccurred
+      !uploadParams.spreadsheetIssues.spreadsheetWarningOccurred &&
+      !uploadParams.spreadsheetIssues.spreadsheetFormatIssue
     ) {
       return (
         <>

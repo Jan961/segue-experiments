@@ -161,7 +161,7 @@ const updateValidateSpreadsheetData = (
       salesType: currentRow.salesType,
       seats: currentRow.seats,
       value: currentRow.value,
-      isFinal: currentRow.isFinal,
+      isFinal: typeof currentRow.isFinal === 'string' ? currentRow.isFinal : '',
       ignoreWarning: currentRow.ignoreWarning,
       rowNumber: currentRow.rowNumber,
       salesRow: row,
@@ -171,7 +171,10 @@ const updateValidateSpreadsheetData = (
   const createNewBooking = () => {
     return {
       bookingDate: new Date(currentRow.bookingDate),
-      finalSalesDate: currentRow.isFinal.toUpperCase() === 'Y' ? new Date(currentRow.salesDate) : null,
+      finalSalesDate:
+        typeof currentRow.isFinal === 'string' && currentRow.isFinal.toUpperCase() === 'Y'
+          ? new Date(currentRow.salesDate)
+          : null,
       bookingFirstRow: row,
       sales: [createNewSale()],
     };
@@ -206,7 +209,7 @@ const updateValidateSpreadsheetData = (
       sale.seats !== currentRow.seats ||
       sale.value !== currentRow.value ||
       sale.salesType !== currentRow.salesType ||
-      sale.isFinal.toUpperCase() !== currentRow.isFinal.toUpperCase() ||
+      String(sale.isFinal).toUpperCase() !== currentRow.isFinal.toUpperCase() ||
       sale.ignoreWarning.toUpperCase() !== currentRow.ignoreWarning.toUpperCase();
 
     if (isMismatch) {
@@ -435,7 +438,7 @@ const postValidationChecks = (spreadsheetData: SpreadsheetData, spreadsheetIssue
 
         let detailsColumnMessage = '';
         let warningOccurred = sale.salesRow.getCell(10).value === 'WARNING';
-        const errorOccurred = sale.salesRow.getCell(10).value === 'ERROR';
+        let errorOccurred = sale.salesRow.getCell(10).value === 'ERROR';
         if (sale.seats > previousSale.seats * 1.15) {
           detailsColumnMessage += '| WARNING - Seats increased by more than 15% from previous sale';
           warningOccurred = true;
@@ -451,6 +454,11 @@ const postValidationChecks = (spreadsheetData: SpreadsheetData, spreadsheetIssue
         if (parseFloat(sale.value) < parseFloat(previousSale.value)) {
           detailsColumnMessage += '| WARNING - Value decreased from previous sale';
           warningOccurred = true;
+        }
+        if (booking.finalSalesDate < sale.salesDate) {
+          console.log(booking.finalSalesDate, ' is greater than ', sale.salesDate);
+          detailsColumnMessage += '| ERROR - Cannot have additional sales after specified Final Sales Date';
+          errorOccurred = true;
         }
 
         const formattedDetailsMessage = formatDetailsMessage((sale.salesRow.getCell(11).value += detailsColumnMessage));

@@ -195,6 +195,7 @@ const LoadSalesHistory = () => {
           uploadedFile={uploadedFile}
           uploadParams={uploadParams}
           closeUploadModal={() => setUploadModalVisible(false)}
+          prodCode={prodCode}
         />
       )}
       {showConfirmDelete && (
