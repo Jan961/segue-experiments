@@ -154,6 +154,7 @@ const LoadSalesHistory = () => {
     if (!selectedProducton?.IsArchived) {
       setUploadDisabled(true);
     }
+    setSalesHistoryRows([]);
     fetchSpreadsheet();
   }, [selectedProducton]);
 
