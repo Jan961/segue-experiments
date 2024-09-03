@@ -47,6 +47,7 @@ export interface SelectProps extends WithTestId {
   onBlur?: () => void;
   menuPlacement?: MenuPlacement;
   error?: boolean;
+  closeMenuOnScroll?: boolean;
 }
 
 const Option = (props: OptionProps & { testId?: string }) => {
@@ -100,6 +101,7 @@ export default forwardRef(function Select(
     onBlur,
     menuPlacement = 'bottom',
     error,
+    closeMenuOnScroll = true,
   }: SelectProps,
   ref,
 ) {
@@ -178,7 +180,6 @@ export default forwardRef(function Select(
 
   const [filteredOptions, setFilteredOptions] = React.useState<SelectOption[]>(null);
   const [selectedOption, setSelectedOption] = useState<SelectOption | SelectOption[]>({ text: '', value: '' });
-  const [menuOpenedTime, setMenuOpenedTime] = useState<number>(0);
 
   const handleOptionSelect = (o: SelectOption, actionMeta: ActionMeta<SelectOption>) => {
     const { action, option } = actionMeta;
@@ -252,29 +253,21 @@ export default forwardRef(function Select(
 
   const [menuIsOpen, setMenuIsOpen] = useState(false);
 
-  const handleMenuOpen = () => {
-    const currentTimeInMilliseconds = Date.now();
-    setMenuIsOpen(true);
-    setMenuOpenedTime(currentTimeInMilliseconds);
-  };
-
-  const closeMenuOnScroll = (e) => {
+  const handleCloseMenuOnScroll = (e) => {
     if (menuIsOpen) {
-      const currentTimeInMilliseconds = Date.now();
-      if (currentTimeInMilliseconds - menuOpenedTime > 100) {
-        //  Check if owner document is null since the menu is portaled so it is part of the main HTMLDocument so it will have no parent
-        if (!isNullOrEmpty(e?.target?.ownerDocument)) {
-          if (e.target.className.includes('ag-body-horizontal') || e.target.className.includes('ag-body-vertical')) {
-            setMenuIsOpen(false);
-            return true;
-          }
-        } else {
+      //  Check if owner document is null since the menu is portaled so it is part of the main HTMLDocument so it will have no parent
+      if (!isNullOrEmpty(e?.target?.ownerDocument)) {
+        //  Checks if the scroll event is inside an AGGrid
+        if (e.target.className.includes('ag-body-horizontal') || e.target.className.includes('ag-body-vertical')) {
+          setMenuIsOpen(false);
           return true;
         }
+      } else {
+        setMenuIsOpen(false);
+        return true;
       }
-      return false;
     }
-    return true;
+    return false;
   };
 
   return (
@@ -318,10 +311,17 @@ export default forwardRef(function Select(
           hideSelectedOptions={false}
           onBlur={onBlur}
           menuPlacement={menuPlacement}
-          onMenuOpen={handleMenuOpen}
+          onMenuOpen={() => {
+            setMenuIsOpen(true);
+          }}
+          onMenuClose={() => {
+            setMenuIsOpen(false);
+          }}
           menuPortalTarget={menuPortalTarget}
           menuPosition="fixed"
-          closeMenuOnScroll={closeMenuOnScroll}
+          closeMenuOnScroll={(e) => {
+            if (closeMenuOnScroll) return handleCloseMenuOnScroll(e);
+          }}
           menuShouldScrollIntoView={false}
           filterOption={(option, _inputValue) => {
             if (filteredOptions === null) {
