@@ -456,7 +456,6 @@ const postValidationChecks = (spreadsheetData: SpreadsheetData, spreadsheetIssue
           warningOccurred = true;
         }
         if (booking.finalSalesDate < sale.salesDate) {
-          console.log(booking.finalSalesDate, ' is greater than ', sale.salesDate);
           detailsColumnMessage += '| ERROR - Cannot have additional sales after specified Final Sales Date';
           errorOccurred = true;
         }

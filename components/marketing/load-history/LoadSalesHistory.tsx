@@ -42,6 +42,9 @@ const LoadSalesHistory = () => {
   };
 
   const fetchSpreadsheet = async () => {
+    if (!selected) {
+      return;
+    }
     try {
       const response = await axios.get('/api/marketing/load-history/read', {
         params: { selected },
@@ -96,7 +99,6 @@ const LoadSalesHistory = () => {
           fileId: response.id,
           location: response.location,
         };
-        console.log(newFile.fileURL);
         setSalesHistoryRows([newFile]);
         onUploadSuccess({ fileId: response.id });
       }
@@ -149,7 +151,7 @@ const LoadSalesHistory = () => {
   }, [salesHistoryRows]);
 
   useEffect(() => {
-    if (!selectedProducton.IsArchived) {
+    if (!selectedProducton?.IsArchived) {
       setUploadDisabled(true);
     }
     fetchSpreadsheet();
