@@ -20,7 +20,7 @@ export const validateSpreadsheetFile = async (file, prodCode, venueList, prodDat
     productionCode: '',
     venueCode: '',
     bookingDate: '',
-    salesDate: '',
+    salesDate: null,
     salesType: '',
     seats: null,
     value: '',
@@ -65,7 +65,11 @@ export const validateSpreadsheetFile = async (file, prodCode, venueList, prodDat
       if (currentRow.venueCode) currentVenue = currentRow.venueCode; // allows for blank rows implying carrying on of venueCode from above
       currentRow.bookingDate = row.getCell(tableColMaps.BookingDate).value as string;
       if (currentRow.bookingDate) currentBookingDate = currentRow.bookingDate; // allows for blank rows implying carrying on of booking date from above
-      currentRow.salesDate = row.getCell(tableColMaps.SalesDate).value as string;
+      currentRow.salesDate =
+        typeof row.getCell(tableColMaps.SalesDate).value === 'object'
+          ? (row.getCell(tableColMaps.SalesDate).value as string)
+          : ''; // ensure salesdate comes in as date object from excel
+      // console.log(currentRow.salesDate)
       currentRow.salesType = row.getCell(tableColMaps.SalesType).value as string;
       currentRow.seats = row.getCell(tableColMaps.Seats).value as number;
       currentRow.value = row.getCell(tableColMaps.Value).value as string;
@@ -93,6 +97,7 @@ export const validateSpreadsheetFile = async (file, prodCode, venueList, prodDat
 
   postValidationChecks(spreadsheetData, spreadsheetIssues);
   convertWorkbookToFile(workbook, file);
+  console.log(spreadsheetData);
 
   return { file, spreadsheetIssues };
 };
@@ -292,16 +297,9 @@ const validateSalesDate = (currentRow: SpreadsheetRow) => {
   let returnString = '';
   let errorOccurred = false;
   const warningOccurred = false;
-  const rowDate = new Date(currentRow.salesDate);
 
   if (!currentRow.salesDate) {
-    returnString += '| ERROR - Must include a date for the sale';
-    errorOccurred = true;
-    return { returnString, warningOccurred, errorOccurred };
-  }
-
-  if (currentRow.salesDate && isNaN(rowDate.getTime())) {
-    returnString += '| ERROR - Sales Date is not valid. Please use DD/MM/YYYY format';
+    returnString += '| ERROR - Must include a valid date for the sale';
     errorOccurred = true;
     return { returnString, warningOccurred, errorOccurred };
   }
@@ -440,22 +438,24 @@ const postValidationChecks = (spreadsheetData: SpreadsheetData, spreadsheetIssue
         let warningOccurred = sale.salesRow.getCell(10).value === 'WARNING';
         let errorOccurred = sale.salesRow.getCell(10).value === 'ERROR';
         if (sale.seats > previousSale.seats * 1.15) {
-          detailsColumnMessage += '| WARNING - Seats increased by more than 15% from previous sale';
+          detailsColumnMessage +=
+            '| WARNING - Seats increased by more than 15% from previous sale (Row ' + previousSale.rowNumber + ')';
           warningOccurred = true;
         }
         if (sale.seats < previousSale.seats) {
-          detailsColumnMessage += '| WARNING - Seats decreased from previous sale';
+          detailsColumnMessage += '| WARNING - Seats decreased from previous sale (Row ' + previousSale.rowNumber + ')';
           warningOccurred = true;
         }
         if (parseFloat(sale.value) > parseFloat(previousSale.value) * 1.15) {
-          detailsColumnMessage += '| WARNING - Value increased by more than 15% from previous sale';
+          detailsColumnMessage +=
+            '| WARNING - Value increased by more than 15% from previous sale (Row ' + previousSale.rowNumber + ')';
           warningOccurred = true;
         }
         if (parseFloat(sale.value) < parseFloat(previousSale.value)) {
-          detailsColumnMessage += '| WARNING - Value decreased from previous sale';
+          detailsColumnMessage += '| WARNING - Value decreased from previous sale (Row ' + previousSale.rowNumber + ')';
           warningOccurred = true;
         }
-        if (booking.finalSalesDate < sale.salesDate) {
+        if (booking.finalSalesDate && booking.finalSalesDate < sale.salesDate) {
           detailsColumnMessage += '| ERROR - Cannot have additional sales after specified Final Sales Date';
           errorOccurred = true;
         }
