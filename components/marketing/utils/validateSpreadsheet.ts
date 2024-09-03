@@ -63,13 +63,17 @@ export const validateSpreadsheetFile = async (file, prodCode, venueList, prodDat
       currentRow.productionCode = row.getCell(tableColMaps.ProdCode).value as string;
       currentRow.venueCode = row.getCell(tableColMaps.VenueCode).value as string;
       if (currentRow.venueCode) currentVenue = currentRow.venueCode; // allows for blank rows implying carrying on of venueCode from above
-      currentRow.bookingDate = row.getCell(tableColMaps.BookingDate).value as string;
-      if (currentRow.bookingDate) currentBookingDate = currentRow.bookingDate; // allows for blank rows implying carrying on of booking date from above
+      currentRow.bookingDate =
+        typeof row.getCell(tableColMaps.BookingDate).value === 'object'
+          ? (row.getCell(tableColMaps.BookingDate).value as string)
+          : '';
+      if (currentRow.bookingDate) {
+        currentBookingDate = currentRow.bookingDate;
+      } // allows for blank rows implying carrying on of booking date from above
       currentRow.salesDate =
         typeof row.getCell(tableColMaps.SalesDate).value === 'object'
           ? (row.getCell(tableColMaps.SalesDate).value as string)
-          : ''; // ensure salesdate comes in as date object from excel
-      // console.log(currentRow.salesDate)
+          : '';
       currentRow.salesType = row.getCell(tableColMaps.SalesType).value as string;
       currentRow.seats = row.getCell(tableColMaps.Seats).value as number;
       currentRow.value = row.getCell(tableColMaps.Value).value as string;
@@ -202,7 +206,7 @@ const updateValidateSpreadsheetData = (
 
   if (!booking) {
     // If currentBookingDate not already exists, push a new booking
-    venue.bookings.push(createNewBooking());
+    if (currentBookingDate) venue.bookings.push(createNewBooking());
     return { detailsColumnMessage, rowWarningOccurred, rowErrorOccurred, currentRowBooking: null };
   }
 
@@ -274,7 +278,7 @@ const validateBookingDate = (currentRow: SpreadsheetRow, prodDateRange, prodCode
   const rowDate = new Date(currentRow.bookingDate);
 
   if (!currentRow.bookingDate && currentRow.venueCode) {
-    returnString += '| ERROR - Must specify a Booking Date for a new Venue Code';
+    returnString += '| ERROR - Must specify a Booking Date for a Venue Code';
     errorOccurred = true;
     return { returnString, warningOccurred, errorOccurred };
   }
