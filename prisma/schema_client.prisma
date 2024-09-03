@@ -70,7 +70,7 @@ model BookingActivity {
   Id               Int           @id @default(autoincrement()) @map("ActivityId")
   BookingId        Int           @map("ActivityBookingId")
   Date             DateTime?     @map("ActivityDate") @db.DateTime(0)
-  Name             String?       @map("ActivityName") @db.VarChar(30)
+  Name             String?       @map("ActivityName") @db.VarChar(50)
   ActivityTypeId   Int?          @map("ActivityActivityTypeId")
   CompanyCost      Decimal?      @map("ActivityCompanyCost") @db.Decimal(8, 2)
   VenueCost        Decimal?      @map("ActivityVenueCost") @db.Decimal(8, 2)
@@ -88,7 +88,7 @@ model BookingActivity {
 model BookingContactNotes {
   Id              Int       @id @default(autoincrement()) @map("ContactNoteId")
   BookingId       Int       @map("ContactNoteBookingId")
-  CoContactName   String?   @map("ContactNoteContactName") @db.VarChar(30)
+  CoContactName   String?   @map("ContactNoteContactName") @db.VarChar(50)
   ContactDate     DateTime? @map("ContactNoteDateTime") @db.DateTime(0)
   ActionAccUserId Int?      @map("ContactNoteActionAccUserId")
   Notes           String?   @map("ContactNoteNotes") @db.LongText
@@ -766,7 +766,7 @@ model DealMemo {
   ContractClause                                             String?                 @map("DeMoContractClause") @db.LongText
   PrintDelVenueAddressId                                     Int?                    @map("DeMoPrintDelVenueAddressId")
   PrintDelUseVenueAddress                                    Boolean                 @default(dbgenerated("(b'0')")) @map("DeMoPrintDelUseVenueAddress") @db.Bit(1)
-  CompContactId                                              Int?                    @map("DeMoCompContactId")
+  CompAccContId                                              Int?                    @map("DeMoCompAccContId")
   Booking                                                    Booking                 @relation(fields: [BookingId], references: [Id], onDelete: Cascade, map: "BookingDealMemo")
   VenueContact_DealMemo_DeMoBOMVenueContactIdToVenueContact  VenueContact?           @relation("DealMemo_DeMoBOMVenueContactIdToVenueContact", fields: [BOMVenueContactId], references: [Id], onDelete: Cascade, map: "VenueContactDealMemoBOM")
   VenueContact_DealMemo_DeMoTechVenueContactIdToVenueContact VenueContact?           @relation("DealMemo_DeMoTechVenueContactIdToVenueContact", fields: [TechVenueContactId], references: [Id], onDelete: Cascade, map: "VenueContactDealMemoTech")
@@ -778,6 +778,7 @@ model DealMemo {
   @@index([BOMVenueContactId], map: "VenueContactDealMemoBOM")
   @@index([TechVenueContactId], map: "VenueContactDealMemoTech")
   @@index([AccContId], map: "AccountContactDealMemo")
+  @@index([CompAccContId], map: "Master_AccountContact_DealMemo_Comp")
 }
 
 model DealMemoCall {

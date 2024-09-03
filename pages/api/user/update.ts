@@ -9,11 +9,11 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
 
     const updatedUser = await master.user.update({
       data: {
-        UserFirstName: user.UserFirstName,
-        UserLastName: user.UserLastName,
+        UserFirstName: user.FirstName,
+        UserLastName: user.LastName,
       },
       where: {
-        UserId: user.UserId,
+        UserId: user.Id,
       },
     });
 

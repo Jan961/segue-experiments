@@ -70,8 +70,8 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
         Object.values(users),
         null,
         null,
-        ({ UserFirstName, UserLastName }) => `${UserFirstName || ''} ${UserLastName || ''}`,
-        ({ UserFirstName, UserLastName }) => `${UserFirstName || ''} ${UserLastName || ''}`,
+        ({ FirstName, LastName }) => `${FirstName || ''} ${LastName || ''}`,
+        ({ FirstName, LastName }) => `${FirstName || ''} ${LastName || ''}`,
       ),
     [users],
   );
@@ -91,8 +91,8 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
   const producerList = useMemo(() => {
     const list = {};
     Object.values(users).forEach((listData) => {
-      list[`${listData.UserFirstName || ''} ${listData.UserLastName || ''}`] = `${listData.UserFirstName || ''} ${
-        listData.UserLastName || ''
+      list[`${listData.FirstName || ''} ${listData.LastName || ''}`] = `${listData.FirstName || ''} ${
+        listData.LastName || ''
       }`;
     });
     return list;

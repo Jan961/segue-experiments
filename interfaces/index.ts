@@ -448,10 +448,10 @@ export type VenueRoleDTO = {
 };
 
 export type UserDto = {
-  UserId?: number;
-  UserEmail: string;
-  UserFirstName: string;
-  UserLastName?: string;
+  Id?: number;
+  Email: string;
+  FirstName: string;
+  LastName?: string;
   AccUserId: number;
 };
 
@@ -813,7 +813,7 @@ export interface DealMemoContractFormData {
   ApprovedBy?: string;
   DateReturned?: Date;
   Notes?: string;
-  CompContactId?: number;
+  CompAccContId?: number;
 }
 
 export interface DealMemoHoldType {

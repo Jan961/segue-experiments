@@ -352,9 +352,9 @@ export const venueRoleMapper = (vr: any): VenueRoleDTO => ({
 });
 
 export const userMapper = (user): UserDto => ({
-  UserId: user.UserId,
-  UserFirstName: user.UserFirstName,
-  UserLastName: user.UserLastName,
-  UserEmail: user.UserEmail,
-  AccUserId: user.AccountUser.AccUserId,
+  Id: user.UserId,
+  FirstName: user.UserFirstName,
+  LastName: user.UserLastName,
+  Email: user.UserEmail,
+  AccUserId: user.AccountUser[0].AccUserId,
 });

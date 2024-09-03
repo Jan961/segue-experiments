@@ -50,9 +50,9 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     The itinery or miles will be different however, as this relies on the preview booking, and has to be generateed programatically
   */
   const AccountId = await getAccountIdFromReq(ctx.req);
-
   const users = await getUsers(AccountId);
   const productionJump = await getProductionJumpState(ctx, 'contracts');
+
   const ProductionId = productionJump.selected;
   // ProductionJumpState is checking if it's valid to access by accountId
   if (!ProductionId) return { notFound: true };
@@ -161,7 +161,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       accountContacts: contacts,
     },
     account: {
-      user: { users: objectify(users, (u) => u.UserId) },
+      user: { users: objectify(users, (u) => u.Id) },
     },
   };
 
