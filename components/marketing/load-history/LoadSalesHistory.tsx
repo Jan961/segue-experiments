@@ -58,6 +58,8 @@ const LoadSalesHistory = () => {
           fileId: file.Id,
         };
         setSalesHistoryRows([newFile]);
+
+        setUploadDisabled(true);
       }
     } catch (error) {
       console.log(error, 'Failed to fetch Sales History Spreadsheet');
@@ -116,6 +118,7 @@ const LoadSalesHistory = () => {
       }
     }
     setSalesHistoryRows([]);
+    setUploadedFile(null);
     setShowConfirmDelete(false);
   };
 
@@ -189,7 +192,7 @@ const LoadSalesHistory = () => {
           visible={showConfirmDelete}
           onNoClick={() => setShowConfirmDelete(false)}
           onDeleteClick={() => deleteSalesHistory()}
-          uploadedFile={uploadedFile}
+          uploadedFile={salesHistoryRows}
         />
       )}
       {isLoading && <LoadingOverlay />}
