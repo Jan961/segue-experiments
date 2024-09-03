@@ -7,7 +7,7 @@ import { getFileUrl } from 'lib/s3';
 import { attachmentMimeTypes, UploadedFile } from 'components/core-ui-lib/UploadModal/interface';
 import { isNullOrEmpty } from 'utils';
 import SpreadsheetConfirmationModal from './SpreadsheetConfirmationModal';
-import { UploadParamType } from 'interfaces';
+import { UploadParamType } from 'types/SpreadsheetValidationTypes';
 import { useRecoilValue } from 'recoil';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import { venueState } from 'state/booking/venueState';
@@ -42,7 +42,6 @@ const LoadSalesHistory = () => {
   };
 
   const fetchSpreadsheet = async () => {
-    console.log('called');
     try {
       const response = await axios.get('/api/marketing/load-history/read', {
         params: { selected },
@@ -72,10 +71,8 @@ const LoadSalesHistory = () => {
       venueList,
       dateRange,
     );
-    const spreadsheetErrorOccured = spreadsheetIssues.spreadsheetErrorOccurred;
-    const spreadsheetWarningOccured = spreadsheetIssues.spreadsheetWarningOccurred;
     setUploadedFile(validateFile);
-    setUploadParams({ onProgress, onError, onUploadingImage, spreadsheetErrorOccured, spreadsheetWarningOccured });
+    setUploadParams({ onProgress, onError, onUploadingImage, spreadsheetIssues });
     setConfirmationModalVisible(true);
   };
 

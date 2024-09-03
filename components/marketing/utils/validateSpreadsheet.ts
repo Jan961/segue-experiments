@@ -9,6 +9,7 @@ import {
   isFinalType,
   ignoreWarningType,
   tableColMaps,
+  expectedHeaders,
 } from 'types/SpreadsheetValidationTypes';
 
 export const validateSpreadsheetFile = async (file, prodCode, venueList, prodDateRange) => {
@@ -32,12 +33,25 @@ export const validateSpreadsheetFile = async (file, prodCode, venueList, prodDat
   const spreadsheetIssues: SpreadsheetIssues = {
     spreadsheetErrorOccurred: false,
     spreadsheetWarningOccurred: false,
+    spreadsheetFormatIssue: false,
   };
   const spreadsheetData: SpreadsheetData = {
     venues: [],
   };
   let currentVenue = '';
   let currentBookingDate = '';
+
+  const actualHeaders = [];
+  const row = workbook.getWorksheet(1).getRow(1);
+  row.eachCell((cell) => {
+    actualHeaders.push(cell.value);
+  });
+
+  const headersMatch = expectedHeaders.every((header, index) => header === actualHeaders[index]);
+  if (!headersMatch) {
+    spreadsheetIssues.spreadsheetFormatIssue = true;
+    return { file, spreadsheetIssues };
+  }
 
   workbook.eachSheet((worksheet) => {
     worksheet.eachRow((row, rowNumber) => {

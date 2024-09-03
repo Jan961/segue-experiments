@@ -1,6 +1,6 @@
 import { Button, PopupModal } from 'components/core-ui-lib';
 import { UploadedFile } from 'components/core-ui-lib/UploadModal/interface';
-import { UploadParamType } from 'interfaces';
+import { UploadParamType } from 'types/SpreadsheetValidationTypes';
 
 interface SpreadsheetModalProps {
   visible: boolean;
@@ -25,7 +25,7 @@ const SpreadsheetConfirmationModal = ({
   closeUploadModal,
 }: SpreadsheetModalProps) => {
   const statusMessage = () => {
-    if (uploadParams.spreadsheetErrorOccured) {
+    if (uploadParams.spreadsheetIssues.spreadsheetErrorOccurred) {
       return (
         <div>
           <p>There have been errors found in this data.</p>
@@ -34,13 +34,26 @@ const SpreadsheetConfirmationModal = ({
       );
     }
 
-    if (uploadParams.spreadsheetWarningOccured) {
+    if (uploadParams.spreadsheetIssues.spreadsheetWarningOccurred) {
       return (
         <div>
           <p>There have been warnings found in this data.</p>
           <p>
             Please download the spreadsheet, correct the warnings or enter a Y into the `Ignore Warnings` column for
             that row, then upload your data.
+          </p>
+        </div>
+      );
+    }
+
+    if (uploadParams.spreadsheetIssues.spreadsheetFormatIssue) {
+      return (
+        <div>
+          <p>There have been formatting issues found in this data.</p>
+          <p>
+            Please verify that the spreadsheet data is correctly formatted according to the provided template. This
+            includes ensuring that the headers match, the data starts at cell A1, and all formatting aligns with the
+            example.
           </p>
         </div>
       );
@@ -54,7 +67,10 @@ const SpreadsheetConfirmationModal = ({
   };
 
   const buttonOptions = () => {
-    if (!uploadParams.spreadsheetErrorOccured && !uploadParams.spreadsheetWarningOccured) {
+    if (
+      !uploadParams.spreadsheetIssues.spreadsheetErrorOccurred &&
+      !uploadParams.spreadsheetIssues.spreadsheetWarningOccurred
+    ) {
       return (
         <>
           <Button

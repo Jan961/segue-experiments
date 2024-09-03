@@ -60,6 +60,7 @@ export enum ignoreWarningType {
 export interface SpreadsheetIssues {
   spreadsheetErrorOccurred: boolean;
   spreadsheetWarningOccurred: boolean;
+  spreadsheetFormatIssue: boolean;
 }
 
 export const tableColMaps = {
@@ -75,3 +76,24 @@ export const tableColMaps = {
   Response: 10,
   Details: 11,
 };
+
+export const expectedHeaders = [
+  'Production Code',
+  'Venue Code',
+  'Booking Date',
+  'Sales Date',
+  'Sales Type',
+  'Seats',
+  'Value',
+  'Is Final',
+  'Ignore Warning',
+  'Response',
+  'Details',
+];
+
+export interface UploadParamType {
+  onProgress: (file: File, uploadProgress: number) => void;
+  onError: (file: File, errorMessage: string) => void;
+  onUploadingImage: (file: File, imageUrl: string) => void;
+  spreadsheetIssues: SpreadsheetIssues;
+}
