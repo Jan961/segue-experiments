@@ -1,5 +1,6 @@
 import { Button, PopupModal, Checkbox } from 'components/core-ui-lib';
 import { useState } from 'react';
+import LoadingOverlay from 'components/shows/LoadingOverlay';
 
 interface SpreadsheetDeleteModalProps {
   visible: boolean;
@@ -15,8 +16,10 @@ export const SpreadsheetDeleteModal = ({
   salesHistoryRows,
 }: SpreadsheetDeleteModalProps) => {
   const [keepSpreadsheet, setKeepSpreadsheet] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
+    setIsLoading(true);
     if (keepSpreadsheet) {
       const a = document.createElement('a');
       a.href = salesHistoryRows[0].fileURL;
@@ -24,7 +27,8 @@ export const SpreadsheetDeleteModal = ({
       a.click();
       document.body.removeChild(a);
     }
-    onDeleteClick();
+    await onDeleteClick();
+    setIsLoading(false);
   };
 
   return (
@@ -44,6 +48,7 @@ export const SpreadsheetDeleteModal = ({
         <Button className="w-[128px] mt-3" text="Close" variant="secondary" onClick={onNoClick} />
         <Button className="w-[128px] mt-3" variant="tertiary" text="Delete" onClick={handleDelete} />
       </div>
+      {isLoading && <LoadingOverlay />}
     </PopupModal>
   );
 };
