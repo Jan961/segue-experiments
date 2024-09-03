@@ -21,10 +21,8 @@ export const SpreadsheetDeleteModal = ({
       const a = document.createElement('a');
       a.href = uploadedFile[0].fileURL;
       console.log(uploadedFile[0].location);
-      a.download = 'your-file.xlsx'; // Optional: specify the download file name
       document.body.appendChild(a);
       a.click();
-
       document.body.removeChild(a);
     }
     onDeleteClick();
