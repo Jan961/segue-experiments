@@ -71,8 +71,9 @@ export const validateSpreadsheetFile = async (file, prodCode, venueList, prodDat
         currentBookingDate = currentRow.bookingDate;
       } // allows for blank rows implying carrying on of booking date from above
       currentRow.salesDate =
-        typeof row.getCell(tableColMaps.SalesDate).value === 'object'
-          ? (row.getCell(tableColMaps.SalesDate).value as string)
+        typeof row.getCell(tableColMaps.SalesDate).value === 'object' &&
+        row.getCell(tableColMaps.SalesDate).value !== null
+          ? row.getCell(tableColMaps.SalesDate).value.toString()
           : '';
       currentRow.salesType = row.getCell(tableColMaps.SalesType).value as string;
       currentRow.seats = row.getCell(tableColMaps.Seats).value as number;
@@ -101,7 +102,6 @@ export const validateSpreadsheetFile = async (file, prodCode, venueList, prodDat
 
   postValidationChecks(spreadsheetData, spreadsheetIssues);
   convertWorkbookToFile(workbook, file);
-  console.table(spreadsheetData);
 
   return { file, spreadsheetIssues };
 };
@@ -189,7 +189,6 @@ const updateValidateSpreadsheetData = (
     };
   };
 
-  console.log('looking for venue: ', currentVenue);
   const venue = spreadsheetData.venues.find((v) => v.venueCode === currentVenue);
 
   if (!venue) {
