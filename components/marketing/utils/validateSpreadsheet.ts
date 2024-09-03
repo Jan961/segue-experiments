@@ -101,7 +101,7 @@ export const validateSpreadsheetFile = async (file, prodCode, venueList, prodDat
 
   postValidationChecks(spreadsheetData, spreadsheetIssues);
   convertWorkbookToFile(workbook, file);
-  console.log(spreadsheetData);
+  console.table(spreadsheetData);
 
   return { file, spreadsheetIssues };
 };
@@ -194,10 +194,11 @@ const updateValidateSpreadsheetData = (
 
   if (!venue) {
     // If currentVenue not already exists, push a new venue
-    spreadsheetData.venues.push({
-      venueCode: currentRow.venueCode,
-      bookings: [createNewBooking()],
-    });
+    if (currentBookingDate)
+      spreadsheetData.venues.push({
+        venueCode: currentRow.venueCode,
+        bookings: [createNewBooking()],
+      });
     return { detailsColumnMessage, rowWarningOccurred, rowErrorOccurred, currentRowBooking: null };
   }
 
@@ -278,7 +279,7 @@ const validateBookingDate = (currentRow: SpreadsheetRow, prodDateRange, prodCode
   const rowDate = new Date(currentRow.bookingDate);
 
   if (!currentRow.bookingDate && currentRow.venueCode) {
-    returnString += '| ERROR - Must specify a Booking Date for a Venue Code';
+    returnString += '| ERROR - Must specify a valid Booking Date for a Venue Code';
     errorOccurred = true;
     return { returnString, warningOccurred, errorOccurred };
   }
@@ -432,7 +433,8 @@ const postValidationChecks = (spreadsheetData: SpreadsheetData, spreadsheetIssue
       }
 
       let previousSale = null;
-      for (const sale of booking.sales.sort((a, b) => a.salesDate.getTime() - b.salesDate.getTime())) {
+      const validSales = booking.sales.filter((sale) => !isNaN(sale.salesDate.getTime()));
+      for (const sale of validSales.sort((a, b) => a.salesDate.getTime() - b.salesDate.getTime())) {
         if (!previousSale) {
           previousSale = sale;
           continue;
