@@ -55,10 +55,7 @@ export const validateSpreadsheetFile = async (file, prodCode, venueList, prodDat
 
   workbook.eachSheet((worksheet) => {
     worksheet.eachRow((row, rowNumber) => {
-      if (rowNumber === 1) {
-        // Skip the first row (titles)
-        return;
-      }
+      if (rowNumber === 1) return; // Skip the first row (titles)
 
       currentRow.productionCode = row.getCell(tableColMaps.ProdCode).value as string;
       currentRow.venueCode = row.getCell(tableColMaps.VenueCode).value as string;
@@ -95,6 +92,21 @@ export const validateSpreadsheetFile = async (file, prodCode, venueList, prodDat
 
       const formattedDetailsMessage = formatDetailsMessage(detailsColumnMessage);
       updateResponseDetailsCells(row, formattedDetailsMessage, rowErrorOccurred, rowWarningOccurred, spreadsheetIssues);
+    });
+  });
+
+  workbook.eachSheet((worksheet) => {
+    worksheet.columns.forEach((column, colNum) => {
+      if (colNum !== 10) return; // don't auto adjust column widths for date fields - enlarges far too much
+      let maxLength = 0;
+      column.eachCell({ includeEmpty: true }, (cell) => {
+        console.log(cell.value?.toString());
+        const columnLength = cell.value ? cell.value.toString().length : 10;
+        if (columnLength > maxLength) {
+          maxLength = columnLength;
+        }
+      });
+      column.width = maxLength < 10 ? 10 : maxLength + 2; // Set width to fit content
     });
   });
 
