@@ -45,7 +45,8 @@ export const ContractPersonDataForm = ({ person = {}, height, updateFormData }: 
         Object.values(users),
         null,
         'Id',
-        ({ FirstName = '', LastName = '', Email = '' }) => `${FirstName || ''} ${LastName || ''} | ${Email || ''}`,
+        ({ UserFirstName = '', UserLastName = '', UserEmail = '' }) =>
+          `${UserFirstName || ''} ${UserLastName || ''} | ${UserEmail || ''}`,
       ),
     [users],
   );
