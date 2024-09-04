@@ -1,38 +1,6 @@
-import prisma from 'lib/prisma';
-import // AccountUser,
-// Permission
-'prisma/generated/prisma-client';
-
-/* const prisma = new PrismaClient().$extends({
-  model: {
-    permissionGroup: {
-      findMany: async (args?: Prisma.PermissionGroupFindManyArgs) => {
-        return prisma.permissionGroup.findMany(args);
-      },
-    },
-  },
-}); */
-
-// const formatPermissions = (data) => {
-//   if (!data || data.length === 0) {
-//     return [];
-//   }
-//   return data.reduce((acc, value) => {
-//     const item = {
-//       id: value.Id,
-//       label: value.Name,
-//       options:
-//         value.Permission?.map((p) => ({
-//           id: p.Id,
-//           value: p.Id,
-//           label: p.Name,
-//           options: value.Permission?.map((p) => ({ id: `${p.Id}-${p.value}`, value: p.Id, label: p.Name })),
-//         })) || [],
-//     };
-
-//     return [...acc, item];
-//   }, []);
-// };
+import prismaMaster from 'lib/prisma_master';
+import prismaClient from 'lib/prisma';
+import { isNullOrEmpty } from 'utils';
 
 const formatAccountUsers = (data) => {
   if (!data || data.length === 0) {
@@ -49,22 +17,72 @@ const formatAccountUsers = (data) => {
   }, []);
 };
 
-// export const getPermissionsList = async (): Promise<PermissionGroup[]> => {
-//   try {
-//     const results = await prisma.permissionGroup.findMany({
-//       include: {
-//         Permission: true,
-//       },
-//     });
-//     return formatPermissions(results);
-//   } catch (err) {
-//     console.log('Error fetching permissions ', err);
-//   }
-// };
+function findOptionById(item, id) {
+  if (item.id === id) {
+    return item;
+  }
+  for (const option of item.options) {
+    if (option.id === id) {
+      return option;
+    }
+    if (!isNullOrEmpty(option.options)) {
+      const found = findOptionById(option, id);
+      if (found) {
+        return found;
+      }
+    }
+  }
+  return null; // Return null if the item is not found
+}
 
-export const getAccountUsersList = async (): Promise<any[]> => {
+const formatPermission = (permission) => {
+  return {
+    id: permission.PermissionId,
+    label: permission.PermissionName,
+    value: permission.PermissionId,
+    parentId: permission.PermissionParentPermissionId || null,
+    groupHeader: !permission.PermissionParentPermissionId,
+    seqNo: permission.PermissionSeqNo,
+    options: [],
+  };
+};
+
+const formatPermissions = (permissions) => {
+  if (!permissions) {
+    return [];
+  }
+
+  const formattedResults = permissions.reduce((acc, permission) => {
+    const formattedItem = formatPermission(permission);
+
+    if (!formattedItem.parentId) {
+      acc.push(formattedItem);
+    } else {
+      acc.forEach((item) => {
+        const parentItem = findOptionById(item, formattedItem.parentId);
+        if (parentItem) {
+          parentItem.options.push(formattedItem);
+        }
+      });
+    }
+    return acc;
+  }, []);
+
+  return formattedResults;
+};
+
+export const getPermissionsList = async () => {
   try {
-    const results = await prisma.AccountUser.findMany({
+    const results = await prismaMaster.permission.findMany();
+    return formatPermissions(results);
+  } catch (err) {
+    console.log('Error fetching permissions ', err);
+  }
+};
+
+export const getAccountUsersList = async () => {
+  try {
+    const results = await prismaMaster.AccountUser.findMany({
       include: {
         User: { select: { Email: true, FirstName: true, LastName: true } },
         Account: { select: { AccountName: true } },
@@ -75,4 +93,21 @@ export const getAccountUsersList = async (): Promise<any[]> => {
   } catch (err) {
     console.log('Error fetching account users ', err);
   }
+};
+
+export const replaceProudctionPermissions = async (accountUserId: string, productionIds: string[]) => {
+  prismaClient.$transaction(async (tx) => {
+    await tx.AccountUserProduction.deleteMany({
+      where: {
+        AUPAccUserId: accountUserId,
+      },
+    });
+
+    await tx.AccountUserProduction.createMany({
+      data: productionIds.map((productionId) => ({
+        AUPAccUserId: accountUserId,
+        AUPProductionId: productionId,
+      })),
+    });
+  });
 };
