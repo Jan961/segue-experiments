@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useRef, useState } from 'react';
+import { forwardRef, KeyboardEvent, useEffect, useRef, useState } from 'react';
 import classNames from 'classnames';
 import { isNullOrEmpty } from 'utils';
 
@@ -32,6 +32,7 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
     const [time, setTime] = useState<Time>(DEFAULT_TIME);
     const hrsRef = useRef(null);
     const minsRef = useRef(null);
+    const [currentFocus, setCurrentFocus] = useState<string>('hrs');
 
     const handleMinKeyDown = (e) => {
       if (e.shiftKey && e.code === 'Tab') {
@@ -39,12 +40,25 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
       }
     };
 
-    const handleBlur = (e) => {
+    const handleKeyPress = (event: KeyboardEvent) => {
+      if (event.key === 'Tab') {
+        if (currentFocus === 'hrs') {
+          setCurrentFocus('hrs');
+          minsRef.current.select();
+        }
+      }
+    };
+
+    const handleBlur = (e, inputRef) => {
       const { name, value } = e.target;
-    
+      console.log(inputRef.current);
+      if (inputRef.current) {
+        inputRef.current.hasSelected = false;
+      }
+
       // Add leading zero if needed
       const paddedValue = value.length === 1 ? `0${value}` : value;
-    
+
       if (!isNullOrEmpty(onBlur)) {
         onBlur({ ...e, target: { ...e.target, value: paddedValue } });
       } else {
@@ -73,6 +87,15 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
       if (!isNullOrEmpty(onInput)) {
         const { name, value } = onInput(e);
         filterTimeInput(name, value);
+      }
+    };
+
+    const handleFocus = (e, inputRef) => {
+      if (inputRef.current && !inputRef.current.hasSelected) {
+        e.stopPropagation();
+        e.preventDefault();
+        e.target.select();
+        inputRef.current.hasSelected = true;
       }
     };
 
@@ -109,11 +132,12 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
           type="text"
           className="w-8 h-5/6 border-none focus:ring-0 text-center ring-0 p-0"
           onChange={handleChange}
-          onBlur={handleBlur}
-          onFocus={(e) => e.target.select()}
+          onBlur={(e) => handleBlur(e, hrsRef)}
+          onFocus={(e) => handleFocus(e, hrsRef)}
           disabled={disabled}
           tabIndex={tabIndexShow ? 0 : 1}
           onInput={handleInputChange}
+          onKeyDown={(e) => handleKeyPress(e)}
         />
         <span className="">:</span>
         <input
@@ -124,8 +148,8 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
           placeholder="mm"
           className="w-8 h-5/6 border-none focus:ring-0 text-center ring-0 p-0"
           onChange={handleChange}
-          onBlur={handleBlur}
-          onFocus={(e) => e.target.select()}
+          onBlur={(e) => handleBlur(e, minsRef)}
+          onFocus={(e) => handleFocus(e, minsRef)}
           disabled={disabled}
           tabIndex={tabIndexShow ? 0 : 2}
           onKeyDown={handleMinKeyDown}

@@ -8,10 +8,19 @@ import { useEffect, useRef, useState } from 'react';
 const PerformanceTimesRenderer = ({ data, setValue, eGridCell }: CustomCellRendererProps) => {
   const [performanceTimes, setPerformanceTimes] = useState<Time[]>([]);
   const [isDisabled, setIsDisabled] = useState(true);
-  const inputRef = useRef(null);
+  const cellRef = useRef(null);
+  const timeRef = useRef(null);
   const handleOnFocus = () => {
-    if (document.activeElement !== inputRef.current) {
-      inputRef && inputRef?.current?.focus();
+    console.log(timeRef?.current);
+    console.log(cellRef?.current.childNodes[0]);
+    const cellTargetDiv = cellRef?.current?.childNodes[0];
+    console.log(document.activeElement);
+    const currentlyFocussed = document.activeElement?.childNodes[0]?.childNodes[0];
+    // console.log(document.activeElement);
+    // console.log(cellRef.current.childNodes[0].childNodes[0]);
+
+    if (cellTargetDiv === currentlyFocussed) {
+      timeRef && timeRef?.current?.childNodes[0].focus();
     }
   };
 
@@ -91,7 +100,7 @@ const PerformanceTimesRenderer = ({ data, setValue, eGridCell }: CustomCellRende
   };
 
   return (
-    <BaseCellRenderer eGridCell={eGridCell} onFocus={handleOnFocus}>
+    <BaseCellRenderer eGridCell={eGridCell} onFocus={handleOnFocus} ref={cellRef}>
       {isDisabled ? (
         ''
       ) : (
@@ -101,7 +110,7 @@ const PerformanceTimesRenderer = ({ data, setValue, eGridCell }: CustomCellRende
               <TimeInput
                 key={index}
                 index={index}
-                ref={inputRef}
+                ref={timeRef}
                 onChange={handleTimeChange}
                 value={time}
                 className="bg-white h-10"
