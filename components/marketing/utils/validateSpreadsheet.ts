@@ -86,20 +86,19 @@ export const validateSpreadsheetFile = async (file, prodCode, venueList, prodDat
       const formattedDetailsMessage = formatDetailsMessage(detailsColumnMessage);
       updateResponseDetailsCells(row, formattedDetailsMessage, rowErrorOccurred, rowWarningOccurred, spreadsheetIssues);
     });
-  });
 
-  workbook.eachSheet((worksheet) => {
-    worksheet.columns.forEach((column, colNum) => {
-      if (colNum !== 10) return; // don't auto adjust column widths for date fields - enlarges far too much
-      let maxLength = 0;
-      column.eachCell({ includeEmpty: true }, (cell) => {
-        const columnLength = cell.value ? cell.value.toString().length : 10;
-        if (columnLength > maxLength) {
-          maxLength = columnLength;
+    // After modifying all rows, adjust Details column width to fit entire message
+    const detailsColumn = worksheet.getColumn(tableColMaps.Details);
+    let maxLength = 0;
+    detailsColumn.eachCell({ includeEmpty: true }, (cell) => {
+      if (cell.value) {
+        const cellLength = cell.value.toString().length;
+        if (cellLength > maxLength) {
+          maxLength = cellLength;
         }
-      });
-      column.width = maxLength < 10 ? 10 : maxLength + 2;
+      }
     });
+    detailsColumn.width = maxLength < 10 ? 10 : maxLength + 2;
   });
 
   postValidationChecks(spreadsheetData, spreadsheetIssues);
