@@ -11,6 +11,7 @@ export interface SpreadsheetRow {
   response: string;
   details: string;
   rowNumber: number;
+  row: any;
 }
 
 export interface SpreadsheetData {
@@ -29,6 +30,10 @@ export interface SpreadsheetData {
         ignoreWarning: string;
         rowNumber: number;
         salesRow: any;
+        mismatch?: {
+          isMismatch: boolean;
+          mismatchedWith: number;
+        };
       }[];
     }[];
   }[];

@@ -12,11 +12,18 @@ import {
   expectedHeaders,
 } from 'types/SpreadsheetValidationTypes';
 
+let currentRow: SpreadsheetRow;
+let spreadsheetIssues: SpreadsheetIssues;
+let spreadsheetData: SpreadsheetData;
+let errorRows;
+let warningRows;
+let mismatchedRows;
+
 export const validateSpreadsheetFile = async (file, prodCode, venueList, prodDateRange) => {
   const workbook = new ExcelJS.Workbook();
   await workbook.xlsx.load(file[0].file);
 
-  const currentRow: SpreadsheetRow = {
+  currentRow = {
     productionCode: '',
     venueCode: '',
     bookingDate: '',
@@ -29,21 +36,23 @@ export const validateSpreadsheetFile = async (file, prodCode, venueList, prodDat
     response: '',
     details: '',
     rowNumber: null,
+    row: null,
   };
-  const spreadsheetIssues: SpreadsheetIssues = {
+  spreadsheetIssues = {
     spreadsheetErrorOccurred: false,
     spreadsheetWarningOccurred: false,
     spreadsheetFormatIssue: false,
   };
-  const spreadsheetData: SpreadsheetData = {
+  spreadsheetData = {
     venues: [],
   };
-  const errorRows = [];
-  const warningRows = [];
+  errorRows = [];
+  warningRows = [];
+  mismatchedRows = new Set([]);
   let currentVenue = '';
   let currentBookingDate = '';
 
-  validateHeaders(workbook, spreadsheetIssues);
+  validateHeaders(workbook);
   if (spreadsheetIssues.spreadsheetFormatIssue) {
     return { file, spreadsheetIssues };
   }
@@ -78,6 +87,7 @@ export const validateSpreadsheetFile = async (file, prodCode, venueList, prodDat
     currentRow.response = row.getCell(tableColMaps.Response).value as string;
     currentRow.details = row.getCell(tableColMaps.Details).value as string;
     currentRow.rowNumber = rowNumber;
+    currentRow.row = row;
 
     const isBlankRow = checkForBlankRow(currentRow);
     if (isBlankRow) return;
@@ -87,7 +97,6 @@ export const validateSpreadsheetFile = async (file, prodCode, venueList, prodDat
       prodCode,
       venueList,
       prodDateRange,
-      spreadsheetData,
       currentVenue,
       currentBookingDate,
       row,
@@ -97,14 +106,13 @@ export const validateSpreadsheetFile = async (file, prodCode, venueList, prodDat
     if (rowWarningOccurred) warningRows.push(row);
 
     const formattedDetailsMessage = formatDetailsMessage(detailsColumnMessage);
-    updateResponseDetailsCells(row, formattedDetailsMessage, rowErrorOccurred, rowWarningOccurred, spreadsheetIssues);
+    updateResponseDetailsCells(row, formattedDetailsMessage, rowErrorOccurred, rowWarningOccurred);
   });
 
+  postValidationChecks();
   const detailsColumn = salesWorksheet.getColumn(tableColMaps.Details);
   widenColumn(detailsColumn);
-
-  postValidationChecks(spreadsheetData, spreadsheetIssues, errorRows, warningRows);
-  createSummaryWorksheet(workbook, errorRows, warningRows);
+  createSummaryWorksheet(workbook);
   convertWorkbookToFile(workbook, file);
 
   return { file, spreadsheetIssues };
@@ -115,7 +123,6 @@ const validateRow = (
   prodCode,
   venueList: Record<number, VenueMinimalDTO>,
   prodDateRange,
-  spreadsheetData,
   currentVenue,
   currentBookingDate,
   row,
@@ -129,7 +136,7 @@ const validateRow = (
     rowErrorOccurred: errorOccurred,
     rowWarningOccurred: warningOccurred,
     currentRowBooking,
-  } = updateValidateSpreadsheetData(spreadsheetData, currentRow, currentVenue, currentBookingDate, row);
+  } = updateValidateSpreadsheetData(currentRow, currentVenue, currentBookingDate, row);
 
   detailsColumnMessage += returnString;
   if (errorOccurred) rowErrorOccurred = true;
@@ -158,7 +165,6 @@ const validateRow = (
 
 // Update SpreadsheetData object with new row data and return any Warnings/Errors raised in the process
 const updateValidateSpreadsheetData = (
-  spreadsheetData: SpreadsheetData,
   currentRow: SpreadsheetRow,
   currentVenue: string,
   currentBookingDate: string,
@@ -230,17 +236,8 @@ const updateValidateSpreadsheetData = (
       sale.ignoreWarning.toUpperCase() !== currentRow.ignoreWarning.toUpperCase();
 
     if (isMismatch) {
-      detailsColumnMessage += ` | ERROR - Mismatch in information for Booking at Venue ${currentVenue} on ${dateToSimple(
-        currentBookingDate,
-      )}, on Sales Date ${dateToSimple(currentRow.salesDate)} (Row ${sale.rowNumber})`;
-      rowErrorOccurred = true;
-
-      const otherCell = sale.salesRow.getCell(tableColMaps.Details);
-      const otherDetailsColMsg =
-        ` | ERROR - Mismatch in information for Booking at Venue ${currentVenue} on ${dateToSimple(
-          currentBookingDate,
-        )}, on Sales Date ${dateToSimple(currentRow.salesDate)} (Row ${currentRow.rowNumber})` + otherCell.value;
-      updateResponseDetailsCells(sale.salesRow, formatDetailsMessage(otherDetailsColMsg), true, false, null);
+      mismatchedRows.add(sale.salesRow);
+      mismatchedRows.add(currentRow.row);
     }
   } else {
     booking.sales.push(createNewSale());
@@ -407,7 +404,7 @@ const validateIgnoreWarning = (currentRow: SpreadsheetRow) => {
   return { returnString, warningOccurred, errorOccurred };
 };
 
-const validateHeaders = (workbook, spreadsheetIssues) => {
+const validateHeaders = (workbook) => {
   const actualHeaders = [];
   const row = workbook.getWorksheet(1).getRow(1);
   row.eachCell((cell) => {
@@ -417,7 +414,6 @@ const validateHeaders = (workbook, spreadsheetIssues) => {
   const headersMatch = expectedHeaders.every((header, index) => header === actualHeaders[index]);
   if (!headersMatch) {
     spreadsheetIssues.spreadsheetFormatIssue = true;
-    return spreadsheetIssues;
   }
 };
 
@@ -444,7 +440,7 @@ const convertWorkbookToFile = async (workbook, file) => {
 };
 
 // Performs checks that can only be done after entire spreadsheet has been parsed
-const postValidationChecks = (spreadsheetData: SpreadsheetData, spreadsheetIssues, errorRows, warningRows) => {
+const postValidationChecks = () => {
   for (const venue of spreadsheetData.venues) {
     for (const booking of venue.bookings) {
       if (!booking.finalSalesDate) {
@@ -455,7 +451,6 @@ const postValidationChecks = (spreadsheetData: SpreadsheetData, spreadsheetIssue
         writeErrorCell(
           booking.bookingFirstRow.getCell(11),
           booking.bookingFirstRow.getCell(10),
-          spreadsheetIssues,
           formattedDetailsMessage,
         );
         errorRows.push(booking.bookingFirstRow);
@@ -464,32 +459,33 @@ const postValidationChecks = (spreadsheetData: SpreadsheetData, spreadsheetIssue
       let previousSale = null;
       const validSales = booking.sales.filter((sale) => !isNaN(sale.salesDate.getTime()));
       for (const sale of validSales.sort((a, b) => a.salesDate.getTime() - b.salesDate.getTime())) {
-        if (!previousSale) {
-          previousSale = sale;
-          continue;
-        }
-
         let detailsColumnMessage = '';
         let warningOccurred = sale.salesRow.getCell(10).value === 'WARNING';
         let errorOccurred = sale.salesRow.getCell(10).value === 'ERROR';
-        if (sale.seats > previousSale.seats * 1.15) {
-          detailsColumnMessage +=
-            '| WARNING - Seats increased by more than 15% from previous sale (Row ' + previousSale.rowNumber + ')';
-          warningOccurred = true;
+
+        if (previousSale) {
+          if (sale.seats > previousSale.seats * 1.15) {
+            detailsColumnMessage +=
+              '| WARNING - Seats increased by more than 15% from previous sale (Row ' + previousSale.rowNumber + ')';
+            warningOccurred = true;
+          }
+          if (sale.seats < previousSale.seats) {
+            detailsColumnMessage +=
+              '| WARNING - Seats decreased from previous sale (Row ' + previousSale.rowNumber + ')';
+            warningOccurred = true;
+          }
+          if (parseFloat(sale.value) > parseFloat(previousSale.value) * 1.15) {
+            detailsColumnMessage +=
+              '| WARNING - Value increased by more than 15% from previous sale (Row ' + previousSale.rowNumber + ')';
+            warningOccurred = true;
+          }
+          if (parseFloat(sale.value) < parseFloat(previousSale.value)) {
+            detailsColumnMessage +=
+              '| WARNING - Value decreased from previous sale (Row ' + previousSale.rowNumber + ')';
+            warningOccurred = true;
+          }
         }
-        if (sale.seats < previousSale.seats) {
-          detailsColumnMessage += '| WARNING - Seats decreased from previous sale (Row ' + previousSale.rowNumber + ')';
-          warningOccurred = true;
-        }
-        if (parseFloat(sale.value) > parseFloat(previousSale.value) * 1.15) {
-          detailsColumnMessage +=
-            '| WARNING - Value increased by more than 15% from previous sale (Row ' + previousSale.rowNumber + ')';
-          warningOccurred = true;
-        }
-        if (parseFloat(sale.value) < parseFloat(previousSale.value)) {
-          detailsColumnMessage += '| WARNING - Value decreased from previous sale (Row ' + previousSale.rowNumber + ')';
-          warningOccurred = true;
-        }
+
         if (booking.finalSalesDate && booking.finalSalesDate < sale.salesDate) {
           detailsColumnMessage += '| ERROR - Cannot have additional sales after specified Final Sales Date';
           errorOccurred = true;
@@ -498,41 +494,41 @@ const postValidationChecks = (spreadsheetData: SpreadsheetData, spreadsheetIssue
         if (errorOccurred) errorRows.push(sale.salesRow);
         if (warningOccurred) warningRows.push(sale.salesRow);
         const formattedDetailsMessage = formatDetailsMessage((sale.salesRow.getCell(11).value += detailsColumnMessage));
-        updateResponseDetailsCells(
-          sale.salesRow,
-          formattedDetailsMessage,
-          errorOccurred,
-          warningOccurred,
-          spreadsheetIssues,
-        );
+        updateResponseDetailsCells(sale.salesRow, formattedDetailsMessage, errorOccurred, warningOccurred);
 
         previousSale = sale;
       }
     }
   }
+
+  const rowNums = [...mismatchedRows].map((row) => row.number);
+  const rowString = '(Row: ' + rowNums.join(', ') + ')';
+  mismatchedRows.forEach((row) => {
+    const detailsColumnMessage = `| ERROR - Mismatch in information for Booking at Venue ${row
+      .getCell(tableColMaps.VenueCode)
+      .value.toString()} on ${dateToSimple(row.getCell(tableColMaps.BookingDate).value.toString())}, on Sales Date ${
+      dateToSimple(row.getCell(tableColMaps.SalesDate).value.toString()) + ' ' + rowString
+    }`;
+    updateResponseDetailsCells(row, detailsColumnMessage, true, false);
+    errorRows.push(row);
+  });
 };
 
-const updateResponseDetailsCells = (
-  row,
-  message,
-  rowErrorOccurred,
-  rowWarningOccurred,
-  spreadsheetIssues: SpreadsheetIssues,
-) => {
+const updateResponseDetailsCells = (row, message, rowErrorOccurred, rowWarningOccurred) => {
   const responseCell = row.getCell(tableColMaps.Response);
   const detailsCell = row.getCell(tableColMaps.Details);
 
   if (rowErrorOccurred) {
-    writeErrorCell(detailsCell, responseCell, spreadsheetIssues, message);
+    writeErrorCell(detailsCell, responseCell, message);
   } else if (rowWarningOccurred) {
     const ignoreWarning = (row.getCell(tableColMaps.ignoreWarning).value?.toUpperCase() ?? 'N') === 'Y';
-    writeWarningCell(detailsCell, responseCell, spreadsheetIssues, message, ignoreWarning);
+    writeWarningCell(detailsCell, responseCell, message, ignoreWarning);
   } else {
     writeOKCell(detailsCell, responseCell);
   }
 };
 
-const writeErrorCell = (detailsCell, responseCell, spreadsheetIssues: SpreadsheetIssues, detailsMessage) => {
+const writeErrorCell = (detailsCell, responseCell, detailsMessage) => {
   responseCell.value = 'ERROR';
 
   responseCell.style = { ...responseCell.style }; // strange workaround to prevent styles from being wrongly applied to other cells, believe to be bug in exceljs
@@ -548,16 +544,10 @@ const writeErrorCell = (detailsCell, responseCell, spreadsheetIssues: Spreadshee
 
   detailsCell.value = detailsMessage.toString();
 
-  if (spreadsheetIssues) spreadsheetIssues.spreadsheetErrorOccurred = true;
+  spreadsheetIssues.spreadsheetErrorOccurred = true;
 };
 
-const writeWarningCell = (
-  detailsCell,
-  responseCell,
-  spreadsheetIssues: SpreadsheetIssues,
-  detailsMessage,
-  ignoreWarning,
-) => {
+const writeWarningCell = (detailsCell, responseCell, detailsMessage, ignoreWarning) => {
   responseCell.value = 'WARNING';
 
   responseCell.style = { ...responseCell.style };
@@ -572,7 +562,7 @@ const writeWarningCell = (
 
   detailsCell.value = detailsMessage;
 
-  if (!ignoreWarning && spreadsheetIssues) spreadsheetIssues.spreadsheetWarningOccurred = true; // don't raise a warning when ignore flag
+  if (!ignoreWarning) spreadsheetIssues.spreadsheetWarningOccurred = true; // don't raise a warning when ignore flag
 };
 
 const writeOKCell = (detailsCell, responseCell) => {
@@ -591,7 +581,7 @@ const writeOKCell = (detailsCell, responseCell) => {
   detailsCell.value = '';
 };
 
-const createSummaryWorksheet = (workbook, errorRows, warningRows) => {
+const createSummaryWorksheet = (workbook) => {
   const addSummaryStyling = () => {
     if (errorRows.length > 0 || warningRows.length > 0) {
       summaryWorksheet.getCell('A1').value = 'The uploaded Sales data contained Errors / Warnings -';
