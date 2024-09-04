@@ -131,7 +131,7 @@ const AgencyDetails = ({ details, countryOptionList, onChange = noop, disabled =
                 placeholder="Enter Town"
                 testId="agency-contact-town"
                 onChange={(event) => handleChange('town', event.target.value)}
-                className="bg-primary-white w-full"
+                className="text-primary-input-text font-bold w-full"
                 value={town}
                 disabled={disabled}
               />

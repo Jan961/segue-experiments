@@ -25,42 +25,18 @@ interface PersonDetails {
   healthDetails: string | null;
   otherWorkTypes: string[];
   notes: string | null;
+  addressId?: number;
 }
 
 export const transformPersonDetails = (personData: any): PersonDetails => {
-  if (!personData)
-    return {
-      firstName: null,
-      lastName: null,
-      email: null,
-      landline: null,
-      address1: null,
-      address2: null,
-      address3: null,
-      town: null,
-      mobileNumber: null,
-      passportName: null,
-      passportNumber: null,
-      hasUKWorkPermit: 0,
-      passportExpiryDate: null,
-      postcode: null,
-      checkedBy: null,
-      country: null,
-      isFEURequired: 0,
-      workType: [],
-      advisoryNotes: null,
-      generalNotes: null,
-      healthDetails: null,
-      otherWorkTypes: [],
-      notes: null,
-    };
-
+  if (!personData) return null;
   return {
     id: personData.PersonId,
     firstName: personData.PersonFirstName || null,
     lastName: personData.PersonLastName || null,
     email: personData.PersonEmail || null,
     landline: personData.PersonPhone || null,
+    addressId: personData.Address?.Id,
     address1: personData.Address?.Address1 || null,
     address2: personData.Address?.Address2 || null,
     address3: personData.Address?.Address3 || null,
@@ -78,7 +54,10 @@ export const transformPersonDetails = (personData: any): PersonDetails => {
     advisoryNotes: personData.PersonAdvisoryNotes || null,
     generalNotes: personData.PersonNotes || null,
     healthDetails: personData.PersonHealthNotes || null,
-    otherWorkTypes: personData.PersonOtherRole?.map((role: any) => role.PORName),
+    otherWorkTypes: personData.PersonOtherRole?.map((role: any) => ({
+      id: role.PORId,
+      name: role.PORName,
+    })),
     notes: personData.PersonNotes || null,
   };
 };
@@ -100,6 +79,7 @@ interface OrganisationDetails {
   country: number | null;
   agencyName: string | null;
   landlineNumber: string | null;
+  agencyAddressId: number | null;
 }
 
 export const transformOrganisationDetails = (organisationData: any): OrganisationDetails | null => {
@@ -113,6 +93,7 @@ export const transformOrganisationDetails = (organisationData: any): Organisatio
     lastName: contactPerson?.PersonLastName || null,
     email: contactPerson?.PersonEmail || null,
     landline: contactPerson?.PersonPhone || null,
+    agencyAddressId: contactPerson?.Address?.Id || null,
     address1: contactPerson?.Address?.Address1 || null,
     address2: contactPerson?.Address?.Address2 || null,
     address3: contactPerson?.Address?.Address3 || null,
@@ -138,16 +119,7 @@ interface AccountDetails {
 }
 
 export const transformAccountDetails = (accountData: any): AccountDetails => {
-  if (!accountData)
-    return {
-      paidTo: '',
-      accountName: '',
-      accountNumber: '',
-      sortCode: '',
-      swift: '',
-      iban: '',
-      country: null,
-    };
+  if (!accountData) return null;
 
   return {
     paidTo: accountData.PersonPaymentTo || '',

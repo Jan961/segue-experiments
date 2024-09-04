@@ -15,6 +15,7 @@ import { useRecoilValue } from 'recoil';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import { transformContractData } from 'transformers/contracts';
 import ContractScheduleTable from './ContractScheduleTable';
+import { ERROR_CODES } from 'config/apiConfig';
 
 export interface BuildNewContractProps {
   contractSchedule?: Partial<IContractSchedule>;
@@ -110,7 +111,7 @@ export const BuildNewContract = ({
 
   const updatePersonDetails = async () => {
     const id = contractSchedule.personId;
-    return axios.post('/api/person/update/' + id, contractPerson);
+    await axios.post('/api/person/update/' + id, contractPerson);
   };
 
   const onSave = async () => {
@@ -135,6 +136,10 @@ export const BuildNewContract = ({
       );
     } catch (error) {
       console.log('Error creating/updating contracts', error);
+      if (error?.response?.data?.code === ERROR_CODES.VALIDATION_ERROR) {
+        const errors = error.response?.data?.errors || [];
+        errors.map((error) => notify.error(error));
+      }
     }
   };
 
@@ -238,12 +243,8 @@ export const BuildNewContract = ({
 
         <div className="w-full mt-4 flex justify-end items-center">
           <Button className="w-33" variant="secondary" text="Cancel" onClick={onClose} />
-          <Button
-            className="ml-4 w-33"
-            variant="primary"
-            text={activeViewIndex === 3 ? 'Save and Return to Contracts' : 'Save and next'}
-            onClick={activeViewIndex === 3 ? onSave : goToNext}
-          />
+          {activeViewIndex !== 3 && <Button className="ml-4 w-33" variant="primary" text="next" onClick={goToNext} />}
+          <Button className="ml-4 w-33" variant="primary" text="Save and Close" onClick={onSave} />
         </div>
       </div>
     </PopupModal>
