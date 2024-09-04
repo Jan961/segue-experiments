@@ -13,12 +13,14 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     if (!access) return res.status(401).end();
     const data = getContactIdData(req.body.formData);
     const demoIdData = data.Id;
-    const updatedData = omit(data, ['error', 'Id', 'BookingId', 'BOMVenueContactId', 'TechVenueContactId']);
+    const updatedData = omit(data, ['error', 'Id', 'BookingId', 'BOMVenueContactId', 'TechVenueContactId', 'SendTo']);
     const existingDealMemo = await prisma.dealMemo.findFirst({
       where: {
         BookingId,
       },
     });
+
+    console.log(updatedData);
 
     let updateCreateDealMemo;
     const priceData = getPrice(updatedData.DealMemoPrice);
@@ -75,8 +77,19 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           },
         },
       });
+
+      const emailSalesRecipients = updatedData.SendTo.map((accId) => {
+        return {
+          DMSRDeMoId: updateCreateDealMemo.Id,
+          DMSRAccUserId: accId,
+        };
+      });
+
+      // create sales email link list
+      await prisma.DealMemoSalesEmailRecipient.createMany(emailSalesRecipients);
     }
-    await res.json(updateCreateDealMemo);
+
+    res.status(200).json(updateCreateDealMemo);
   } catch (err) {
     console.log(err);
     res.status(403).json({ err: 'Error occurred while updating DealMemo' });

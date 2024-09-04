@@ -75,7 +75,6 @@ export const EditDealMemoContractModal = ({
   const [formEdited, setFormEdited] = useState<boolean>(false);
   const [disableDate, setDisableDate] = useState<boolean>(true);
   const [seatKillsData, setSeatKillsData] = useState([]);
-  const [sendTo, setSendTo] = useState([]);
   const [currency, setCurrency] = useState('');
   const accountContacts = useRecoilValue(accountContactState);
 
@@ -348,8 +347,9 @@ export const EditDealMemoContractModal = ({
     }));
   };
 
-  const setSendToData = (value) => {
-    setSendTo(value);
+  const testAssign = (value) => {
+    editDemoModalData('SendTo', value, 'dealMemo');
+    console.log(value);
   };
 
   //   const exportToPDF = async (modalId: string) => {
@@ -1473,7 +1473,7 @@ export const EditDealMemoContractModal = ({
             <div className="w-1/5"> </div>
             <div className="w-4/5 flex">
               <Select
-                onChange={(value) => setSendToData(value)}
+                onChange={(value) => testAssign(value)}
                 isMulti
                 className="bg-primary-white w-full"
                 placeholder="Please select assignee..."
@@ -1481,7 +1481,7 @@ export const EditDealMemoContractModal = ({
                 isClearable
                 isSearchable
                 renderOption={(option) => <CustomOption option={option} isMulti={true} />}
-                value={sendTo}
+                value={formData.SendTo}
               />
             </div>
           </div>

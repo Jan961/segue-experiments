@@ -814,6 +814,7 @@ export interface DealMemoContractFormData {
   DateReturned?: Date;
   Notes?: string;
   CompAccContId?: number;
+  SendTo?: Array<number>;
 }
 
 export interface DealMemoHoldType {
