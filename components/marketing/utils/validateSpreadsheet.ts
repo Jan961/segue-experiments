@@ -79,6 +79,9 @@ export const validateSpreadsheetFile = async (file, prodCode, venueList, prodDat
     currentRow.details = row.getCell(tableColMaps.Details).value as string;
     currentRow.rowNumber = rowNumber;
 
+    const isBlankRow = checkForBlankRow(currentRow);
+    if (isBlankRow) return;
+
     const { detailsColumnMessage, rowErrorOccurred, rowWarningOccurred } = validateRow(
       currentRow,
       prodCode,
@@ -644,6 +647,22 @@ const widenColumn = (column) => {
     }
   });
   column.width = maxLength < 10 ? 10 : maxLength + 2;
+};
+
+const checkForBlankRow = (currentRow) => {
+  const excludedKeys = ['rowNumber', 'details', 'response'];
+  const newRow = Object.entries(currentRow).reduce((acc, [key, value]) => {
+    if (!excludedKeys.includes(key)) {
+      acc[key] = value;
+    }
+    return acc;
+  }, {});
+  let isBlank = true;
+  isBlank = Object.values(newRow).every((value) => {
+    if (!value) return true;
+    return value?.toString().trim() === '';
+  });
+  return isBlank;
 };
 
 export default validateSpreadsheetFile;
