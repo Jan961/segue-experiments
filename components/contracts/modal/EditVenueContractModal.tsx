@@ -76,8 +76,6 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
     [users],
   );
 
-  console.log(productionJumpState);
-
   const [showUploadModal, setShowUploadModal] = useState<boolean>(false);
   const [contractAttatchmentRows, setContractAttatchmentRows] = useState([]);
   const [filesForUpload, setFilesForUpload] = useState<FormData[]>([]);
@@ -93,8 +91,8 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
   const producerList = useMemo(() => {
     const list = {};
     Object.values(users).forEach((listData) => {
-      list[`${listData.UserFirstName || ''} ${listData.UserLastName || ''}`] = `${listData.UserFirstName || ''} ${
-        listData.UserLastName || ''
+      list[`${listData.FirstName || ''} ${listData.LastName || ''}`] = `${listData.FirstName || ''} ${
+        listData.LastName || ''
       }`;
     });
     return list;

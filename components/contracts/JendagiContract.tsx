@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import { dateToSimple } from 'services/dateService';
-import { IContractSchedule, IContractDetails } from './types';
+import { IContractSchedule, IContractDetails, IScheduleDay } from './types';
 import { useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import { contractsVenueState } from 'state/contracts/contractsVenueState';
@@ -15,6 +15,9 @@ export interface JendagiContractProps {
   contractDetails: Partial<IContractDetails>;
   productionCompany: Partial<ProductionCompanyDTO>;
   currency?: string;
+  showName?: string;
+  venueName?: string;
+  schedule: IScheduleDay[];
 }
 
 const defaultContractDetails = {

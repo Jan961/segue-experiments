@@ -207,9 +207,9 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   return {
     props: {
       masterTask: masterTasks,
-      usersList: Object.values(users).map(({ AccUserId, UserFirstName = '', UserLastName = '' }) => ({
+      usersList: Object.values(users).map(({ AccUserId, FirstName = '', LastName = '' }) => ({
         value: AccUserId,
-        text: `${UserFirstName || ''} ${UserLastName || ''}`,
+        text: `${FirstName || ''} ${LastName || ''}`,
       })),
     },
   };

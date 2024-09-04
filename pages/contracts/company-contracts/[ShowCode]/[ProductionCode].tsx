@@ -14,6 +14,7 @@ import { getAllCurrencylist } from 'services/productionService';
 import { fetchAllContracts, fetchAllStandardClauses, fetchDepartmentList } from 'services/contracts';
 import { IContractDepartment, IContractSummary } from 'interfaces/contracts';
 import useCompanyContractsFilter from 'hooks/useCompanyContractsFilters';
+import { getAccountContacts } from 'services/contactService';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const ContractsPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
@@ -36,17 +37,27 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const accountId = await getAccountIdFromReq(ctx.req);
   const productionJump = await getProductionJumpState(ctx, `contracts/company-contracts`);
   const ProductionId = productionJump.selected;
-  const [users, countryList, venues, personsList, currencyList, standardClauses, departmentList, contractList] =
-    await all([
-      getUsers(accountId),
-      getUniqueVenueCountrylist(),
-      getAllVenuesMin(),
-      fetchAllMinPersonsList(),
-      getAllCurrencylist(),
-      fetchAllStandardClauses(),
-      fetchDepartmentList(),
-      fetchAllContracts(ProductionId),
-    ]);
+  const [
+    users,
+    countryList,
+    venues,
+    personsList,
+    currencyList,
+    standardClauses,
+    departmentList,
+    contractList,
+    contacts,
+  ] = await all([
+    getUsers(accountId),
+    getUniqueVenueCountrylist(),
+    getAllVenuesMin(),
+    fetchAllMinPersonsList(),
+    getAllCurrencylist(),
+    fetchAllStandardClauses(),
+    fetchDepartmentList(),
+    fetchAllContracts(ProductionId),
+    getAccountContacts(accountId),
+  ]);
 
   const department = objectify(
     departmentList,
@@ -92,7 +103,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       currencyList,
     },
     account: {
-      user: { users: objectify(users, (user: UserDto) => user.UserId) },
+      user: { users: objectify(users, (user: UserDto) => user.Id) },
     },
     contracts: {
       venue,
@@ -104,6 +115,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       standardClause,
       contract,
       department,
+      accountContacts: contacts,
     },
   };
   return {
