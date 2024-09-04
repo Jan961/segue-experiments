@@ -72,8 +72,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       SeatsAllocated,
       VenueConfirmationNotes,
     }) => {
-      const { UserFirstName = '', UserLastName = '' } = usersMap[ArrangedByAccUserId] || {};
-      const arrangedBy = `${UserFirstName || ''} ${UserLastName || ''}`;
+      const { FirstName = '', LastName = '' } = usersMap[ArrangedByAccUserId] || {};
+      const arrangedBy = `${FirstName || ''} ${LastName || ''}`;
       const row = worksheet.addRow([
         date,
         time,

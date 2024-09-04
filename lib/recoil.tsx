@@ -8,6 +8,7 @@ import {
   ContractsDTO,
   ContractStatusType,
   ContractBookingStatusType,
+  AccountContactDTO,
 } from 'interfaces';
 import { RecoilState, useRecoilCallback } from 'recoil';
 import { bookingState } from 'state/booking/bookingState';
@@ -49,6 +50,7 @@ import { TPersonState, personState } from 'state/contracts/PersonState';
 import { TStandardClauseState, standardClauseState } from 'state/contracts/standardClauseState';
 import { TContractListState, contractListState } from 'state/contracts/contractsListState';
 import { TContractDepartmentState, contractDepartmentState } from 'state/contracts/contractDepartmentState';
+import { accountContactState } from 'state/contracts/accountContactState';
 
 /*
   Experimental attempt to get Recoil.js working with SSR in React in a DRY manner.
@@ -96,6 +98,7 @@ export type InitialState = Partial<{
     standardClause?: TStandardClauseState;
     contract?: TContractListState;
     department?: TContractDepartmentState;
+    accountContacts?: Record<number, AccountContactDTO>;
   };
   marketing?: {
     bookingJump?: BookingJump;
@@ -164,6 +167,7 @@ const states: {
     standardClause: standardClauseState,
     contract: contractListState,
     department: contractDepartmentState,
+    accountContacts: accountContactState,
   },
   marketing: {
     bookingJump: bookingJumpState,

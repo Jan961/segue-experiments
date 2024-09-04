@@ -8,7 +8,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
 
     await master.user.delete({
       where: {
-        UserId: user.UserId,
+        UserId: user.Id,
       },
     });
 

@@ -15,6 +15,16 @@ interface SelectRendererProps {
   data?: any;
 }
 
+const formatValue = (value: any) => {
+  if (isNullOrEmpty(value)) {
+    return '';
+  } else if (value === '0') {
+    return '';
+  } else {
+    return value;
+  }
+};
+
 const InputRenderer = (props: SelectRendererProps) => {
   return (
     <div className={`pl-1 pr-2 ${props.colDef.field === 'value' ? 'mt-0' : 'mt-1'} flex `}>
@@ -25,7 +35,11 @@ const InputRenderer = (props: SelectRendererProps) => {
         id="venueText"
         type="number"
         className="w-full  font-bold"
-        value={!isNullOrEmpty(props.holdValue) ? props.holdValue[props.data.HoldTypeName][props.colDef.field] : 0}
+        value={
+          !isNullOrEmpty(props.holdValue)
+            ? formatValue(props.holdValue[props.data.HoldTypeName][props.colDef.field])
+            : ''
+        }
         onChange={(value) => props.onChange(value, props.holdValue, props.data.HoldTypeName, props.colDef.field)}
       />
     </div>
