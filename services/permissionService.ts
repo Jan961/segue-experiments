@@ -95,6 +95,23 @@ export const getAccountUsersList = async () => {
   }
 };
 
+export const replaceUserPermissions = async (accountUserId: string, permissionIds: string[]) => {
+  prismaMaster.$transaction(async (tx) => {
+    await tx.AccountUserPermission.deleteMany({
+      where: {
+        UserAuthAccUserId: accountUserId,
+      },
+    });
+
+    await tx.AccountUserPermission.createMany({
+      data: permissionIds.map((permissionId) => ({
+        UserAuthAccUserId: accountUserId,
+        UserAuthPermissionId: permissionId,
+      })),
+    });
+  });
+};
+
 export const replaceProudctionPermissions = async (accountUserId: string, productionIds: string[]) => {
   prismaClient.$transaction(async (tx) => {
     await tx.AccountUserProduction.deleteMany({

@@ -8,9 +8,9 @@ const useMasterTasksFilter = (tasks = []) => {
   const { users } = useRecoilValue(userState);
 
   const usersList = useMemo(() => {
-    return Object.values(users).map(({ AccUserId, UserFirstName = '', UserLastName = '' }) => ({
+    return Object.values(users).map(({ AccUserId, FirstName = '', LastName = '' }) => ({
       value: AccUserId,
-      text: `${UserFirstName || ''} ${UserLastName || ''}`,
+      text: `${FirstName || ''} ${LastName || ''}`,
     }));
   }, [users]);
   const userIdToNameMap = usersList.reduce((acc, user) => {

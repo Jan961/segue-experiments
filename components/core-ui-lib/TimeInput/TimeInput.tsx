@@ -22,7 +22,10 @@ export interface TimeInputProps {
 }
 
 const baseClass =
-  'h-comp-height flex items-center justify-around text-sm p-1 text-primary-input-text rounded-md border border-primary-border focus:ring-2 focus:ring-primary-input-text ring-inset';
+  'h-comp-height flex items-center justify-around text-sm p-1 text-primary-input-text rounded-md border border-primary-border ring-inset';
+
+const focusClass = 'focus:ring-2 focus:ring-primary-input-text';
+
 const DEFAULT_TIME = { hrs: '', min: '', sec: '' };
 
 const isOfTypTime = (t: any): t is Time => t.hrs !== undefined && t.min !== undefined;
@@ -41,10 +44,10 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
 
     const handleBlur = (e) => {
       const { name, value } = e.target;
-    
+
       // Add leading zero if needed
       const paddedValue = value.length === 1 ? `0${value}` : value;
-    
+
       if (!isNullOrEmpty(onBlur)) {
         onBlur({ ...e, target: { ...e.target, value: paddedValue } });
       } else {
@@ -94,11 +97,7 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
     }, [value]);
 
     return (
-      <div
-        ref={ref}
-        className={classNames(baseClass, className)}
-        tabIndex={-1} // Make the div focusable
-      >
+      <div ref={ref} className={classNames(baseClass, className, disabled ? '' : focusClass)} tabIndex={-1}>
         <input
           data-testid="hourInput"
           data-index={index}

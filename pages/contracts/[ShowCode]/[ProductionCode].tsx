@@ -24,6 +24,7 @@ import { getDayTypes } from 'services/dayTypeService';
 import { getProductionsWithContent } from 'services/productionService';
 import { getContractStatus } from 'services/contractStatus';
 import { DateType } from 'prisma/generated/prisma-client';
+import { getAccountContacts } from 'services/contactService';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const ContractsPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const rows = useContractsFilter();
@@ -51,16 +52,18 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const AccountId = await getAccountIdFromReq(ctx.req);
   const users = await getUsers(AccountId);
   const productionJump = await getProductionJumpState(ctx, 'contracts');
+
   const ProductionId = productionJump.selected;
   // ProductionJumpState is checking if it's valid to access by accountId
   if (!ProductionId) return { notFound: true };
 
   // Get in parallel
-  const [venues, productions, dateTypeRaw, contractStatus] = await all([
+  const [venues, productions, dateTypeRaw, contractStatus, contacts] = await all([
     getAllVenuesMin(),
     getProductionsWithContent(ProductionId === -1 ? null : ProductionId, !productionJump.includeArchived),
     getDayTypes(),
     getContractStatus(ProductionId === -1 ? null : ProductionId),
+    getAccountContacts(AccountId),
   ]);
   const dateBlock = [];
   const rehearsal = {};
@@ -155,9 +158,10 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       venue,
       contractStatus: contractStatusData,
       contractBookingStatus: contractBookingStatusData,
+      accountContacts: contacts,
     },
     account: {
-      user: { users: objectify(users, (u) => u.UserId) },
+      user: { users: objectify(users, (u) => u.Id) },
     },
   };
 

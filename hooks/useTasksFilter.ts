@@ -48,9 +48,9 @@ const useTasksFilter = () => {
       return [];
     }
 
-    return Object.values(users).map(({ AccUserId, UserFirstName = '', UserLastName = '' }) => ({
+    return Object.values(users).map(({ AccUserId, FirstName = '', LastName = '' }) => ({
       value: AccUserId,
-      text: `${UserFirstName || ''} ${UserLastName || ''}`,
+      text: `${FirstName || ''} ${LastName || ''}`,
     }));
   }, [users]);
 
