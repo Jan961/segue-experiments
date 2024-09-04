@@ -12,6 +12,7 @@ const PerformanceTimesRenderer = ({ data, setValue, eGridCell }: CustomCellRende
   const cellRef = useRef(null);
   const [focussedIndex, setFocussedIndex] = useState<number>(0);
 
+  //  Stores an array of refs for each of the elements that are rendered in the return
   const inputRefs = useRef<HTMLDivElement[]>([]);
   const setInputRef = (element: HTMLDivElement | null, index: number) => {
     if (element) {
@@ -19,9 +20,9 @@ const PerformanceTimesRenderer = ({ data, setValue, eGridCell }: CustomCellRende
     }
   };
 
+  //  This logic handles going through stepping through the refs to go to the Time input field above or below the current one
   const goToNextTimeField = (goDownField: boolean, e?: any) => {
     const currentlyFocussed = (isNullOrEmpty(e) ? document.activeElement : e.target).parentNode.parentNode;
-
     if (goDownField) {
       if (inputRefs.current.length > focussedIndex) {
         e.preventDefault();
@@ -37,11 +38,12 @@ const PerformanceTimesRenderer = ({ data, setValue, eGridCell }: CustomCellRende
 
   const handleOnFocus = () => {
     const cellTargetDiv = cellRef?.current?.childNodes[0];
-    const currentlyFocussed = document.activeElement?.childNodes[0]?.childNodes[0];
-
+    const currentlyFocussed = document.activeElement?.firstChild?.firstChild;
+    //  If the focus is on the AGGrid cell (the initial state when tabbing into the field)
     if (cellTargetDiv === currentlyFocussed) {
-      cellTargetDiv?.childNodes[0].childNodes[0]?.focus();
+      cellTargetDiv?.firstChild.firstChild?.focus();
     } else {
+      //  Find the index of the first hour field
       const childNodes = cellTargetDiv?.childNodes;
       childNodes.forEach((node, index) => {
         if (node === document.activeElement?.parentNode) {
@@ -118,8 +120,12 @@ const PerformanceTimesRenderer = ({ data, setValue, eGridCell }: CustomCellRende
       performanceTimes
         .map(({ hrs, min }) => {
           if (hrs.length === 0) return ``;
-          const paddedHrs = hrs.length > 0 ? `${'0'.repeat(2 - hrs.length >= 0 ? 2 - hrs.length : 0)}${hrs}` : hrs;
-          const paddedMin = min.length > 0 ? `${'0'.repeat(2 - min.length >= 0 ? 2 - min.length : 0)}${min}` : min;
+
+          const hrLength = 2 - hrs.length;
+          const minLength = 2 - min.length;
+
+          const paddedHrs = hrs.length > 0 ? `${'0'.repeat(hrLength >= 0 ? hrLength : 0)}${hrs}` : hrs;
+          const paddedMin = min.length > 0 ? `${'0'.repeat(minLength >= 0 ? minLength : 0)}${min}` : min;
           return `${paddedHrs}:${paddedMin}`;
         })
         .join(';'),
