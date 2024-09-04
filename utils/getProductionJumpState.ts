@@ -25,6 +25,7 @@ export const getProductionJumpState = async (ctx, path: string): Promise<Product
         if (db) {
           db = dateBlockMapper(db);
         }
+
         return {
           Id: t.Id,
           Code: t.Code,
@@ -40,6 +41,7 @@ export const getProductionJumpState = async (ctx, path: string): Promise<Product
           RunningTimeNote: t.RunningTimeNote,
           SalesFrequency: t.SalesFrequency,
           ProductionCompany: t.ProductionCompany,
+          SalesEmail: t.SalesEmail,
         };
       })
       .sort((a, b) => {

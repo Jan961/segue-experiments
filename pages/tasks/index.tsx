@@ -27,9 +27,9 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
       return [];
     }
 
-    return Object.values(users).map(({ AccUserId, UserFirstName = '', UserLastName = '' }) => ({
+    return Object.values(users).map(({ AccUserId, FirstName = '', LastName = '' }) => ({
       value: AccUserId,
-      text: `${UserFirstName || ''} ${UserLastName || ''}`,
+      text: `${FirstName || ''} ${LastName || ''}`,
     }));
   }, [users]);
 
@@ -79,7 +79,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     },
     tasks: { productions, bulkSelection: {} },
     account: {
-      user: { users: objectify(users, (user) => user.UserId) },
+      user: { users: objectify(users, (user) => user.Id) },
     },
   };
   return { props: { initialState } };
