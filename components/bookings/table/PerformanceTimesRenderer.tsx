@@ -20,22 +20,11 @@ const PerformanceTimesRenderer = ({ data, setValue, eGridCell }: CustomCellRende
   };
 
   const goToNextTimeField = (e?: any) => {
-    console.log(isNullOrEmpty(e));
-    console.log(document.activeElement.parentNode);
     const currentlyFocussed = (isNullOrEmpty(e) ? document.activeElement : e.target).parentNode.parentNode;
-    console.log(currentlyFocussed);
-    console.log(focussedIndex);
     if (inputRefs.current.length > focussedIndex) {
       e.preventDefault();
-
       currentlyFocussed?.childNodes[focussedIndex + 1]?.firstChild?.focus();
-    } else {
-      console.log('OUT OF ROWS');
     }
-    const inputField = currentlyFocussed?.childNodes[focussedIndex];
-    console.log('/////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\');
-    console.log(currentlyFocussed);
-    console.log(inputField);
   };
 
   const handleOnFocus = () => {
@@ -47,9 +36,6 @@ const PerformanceTimesRenderer = ({ data, setValue, eGridCell }: CustomCellRende
     } else {
       const childNodes = cellTargetDiv.childNodes;
       childNodes.forEach((node, index) => {
-        console.log(index);
-        console.log(node);
-        console.log(document.activeElement);
         if (node === document.activeElement.parentNode) {
           setFocussedIndex(index);
         }
@@ -149,7 +135,7 @@ const PerformanceTimesRenderer = ({ data, setValue, eGridCell }: CustomCellRende
                 className="bg-white h-10"
                 onInput={handleInput}
                 onBlur={handleBlur}
-                onKeyDown={(e) => {
+                minuteFieldJump={(e) => {
                   goToNextTimeField(e);
                 }}
               />

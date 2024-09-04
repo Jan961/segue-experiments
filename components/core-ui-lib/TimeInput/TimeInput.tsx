@@ -19,7 +19,7 @@ export interface TimeInputProps {
   className?: string;
   tabIndexShow?: boolean;
   index?: number;
-  onKeyDown?: (event: any) => void;
+  minuteFieldJump?: (event: any) => void;
 }
 
 const baseClass =
@@ -30,7 +30,10 @@ const DEFAULT_TIME = { hrs: '', min: '', sec: '' };
 const isOfTypTime = (t: any): t is Time => t.hrs !== undefined && t.min !== undefined;
 
 const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
-  ({ onChange, value, onBlur, disabled, className, tabIndexShow, index, onInput, onKeyDown }: TimeInputProps, ref) => {
+  (
+    { onChange, value, onBlur, disabled, className, tabIndexShow, index, onInput, minuteFieldJump }: TimeInputProps,
+    ref,
+  ) => {
     const [time, setTime] = useState<Time>(DEFAULT_TIME);
     const hrsRef = useRef(null);
     const minsRef = useRef(null);
@@ -38,23 +41,21 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
 
     const handleMinKeyDown = (e) => {
       if (e.shiftKey && e.code === 'Tab') {
+        e.preventDefault();
+        e.stopPropagation();
         hrsRef.current.select();
       } else if (e.code === 'Tab') {
-        console.log('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA');
-        onKeyDown(e);
+        if (!isNullOrEmpty(minuteFieldJump)) minuteFieldJump(e);
       }
     };
 
     const handleKeyPress = (event: KeyboardEvent) => {
-      if (event.key === 'Tab') {
-        console.log(currentFocus);
-        if (currentFocus === 'hrs') {
-          setCurrentFocus('mins');
-          event.stopPropagation();
-          event.preventDefault();
-          minsRef.current.focus();
-          minsRef.current.select();
-        }
+      if (event.key === 'Tab' && currentFocus === 'hrs') {
+        setCurrentFocus('mins');
+        event.stopPropagation();
+        event.preventDefault();
+        minsRef.current.focus();
+        minsRef.current.select();
       }
     };
 
@@ -92,7 +93,7 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
       if (value.length === 2) {
         minsRef.current.select();
         if (inputName === 'mins') {
-          onKeyDown(e);
+          if (!isNullOrEmpty(minuteFieldJump)) minuteFieldJump(e);
         }
       }
     };
