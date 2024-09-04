@@ -45,11 +45,13 @@ const PerformanceTimesRenderer = ({ data, setValue, eGridCell }: CustomCellRende
     } else {
       //  Find the index of the first hour field
       const childNodes = cellTargetDiv?.childNodes;
-      childNodes.forEach((node, index) => {
-        if (node === document.activeElement?.parentNode) {
-          setFocussedIndex(index);
-        }
-      });
+      if (!isNullOrEmpty(childNodes)) {
+        childNodes.forEach((node, index) => {
+          if (node === document.activeElement?.parentNode) {
+            setFocussedIndex(index);
+          }
+        });
+      }
     }
   };
 

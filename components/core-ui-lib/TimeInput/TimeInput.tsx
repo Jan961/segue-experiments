@@ -120,7 +120,6 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
     };
 
     const handleFocus = (e: BaseSyntheticEvent, inputRef: MutableRefObject<any>, hoursFocus: boolean) => {
-      console.log(e);
       setHoursInputFocus(hoursFocus);
       if (inputRef.current && !inputRef.current.hasSelected) {
         e.stopPropagation();
