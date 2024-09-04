@@ -54,8 +54,13 @@ const SpreadsheetConfirmationModal = ({
           <p>There have been formatting issues found in this data.</p>
           <p>
             Please verify that the spreadsheet data is correctly formatted according to the provided template. This
-            includes ensuring that the headers match, the data starts at cell A1, and all formatting aligns with the
-            example.
+            includes:
+            <ul className="list-disc ml-5">
+              <li>The Worksheet with Sales data is named &quot;Sales&quot; (Case Sensitive)</li>
+              <li>Ensuring the headers match those in the example template. </li>
+              <li>The data starts at cell A1</li>
+              <li>All formatting aligns with the example template</li>
+            </ul>
           </p>
         </div>
       );

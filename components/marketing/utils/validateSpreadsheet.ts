@@ -38,6 +38,8 @@ export const validateSpreadsheetFile = async (file, prodCode, venueList, prodDat
   const spreadsheetData: SpreadsheetData = {
     venues: [],
   };
+  const errorRows = [];
+  const warningRows = [];
   let currentVenue = '';
   let currentBookingDate = '';
 
@@ -46,62 +48,60 @@ export const validateSpreadsheetFile = async (file, prodCode, venueList, prodDat
     return { file, spreadsheetIssues };
   }
 
-  workbook.eachSheet((worksheet) => {
-    worksheet.eachRow((row, rowNumber) => {
-      if (rowNumber === 1) return; // Skip the first row (titles)
+  const salesWorksheet = workbook.getWorksheet('Sales');
+  if (!salesWorksheet) {
+    spreadsheetIssues.spreadsheetFormatIssue = true;
+    return { file, spreadsheetIssues };
+  }
 
-      currentRow.productionCode = row.getCell(tableColMaps.ProdCode).value as string;
-      currentRow.venueCode = row.getCell(tableColMaps.VenueCode).value as string;
-      if (currentRow.venueCode) currentVenue = currentRow.venueCode; // allows for blank rows implying carrying on of venueCode from above
-      currentRow.bookingDate =
-        typeof row.getCell(tableColMaps.BookingDate).value === 'object'
-          ? (row.getCell(tableColMaps.BookingDate).value as string)
-          : '';
-      if (currentRow.bookingDate) currentBookingDate = currentRow.bookingDate; // allows for blank rows implying carrying on of booking date from above
-      currentRow.salesDate =
-        typeof row.getCell(tableColMaps.SalesDate).value === 'object' &&
-        row.getCell(tableColMaps.SalesDate).value !== null
-          ? row.getCell(tableColMaps.SalesDate).value.toString()
-          : '';
-      currentRow.salesType = row.getCell(tableColMaps.SalesType).value as string;
-      currentRow.seats = row.getCell(tableColMaps.Seats).value as number;
-      currentRow.value = row.getCell(tableColMaps.Value).value as string;
-      currentRow.isFinal = (row.getCell(tableColMaps.isFinal).value as string) ?? '';
-      currentRow.ignoreWarning = (row.getCell(tableColMaps.ignoreWarning).value as string) ?? '';
-      currentRow.response = row.getCell(tableColMaps.Response).value as string;
-      currentRow.details = row.getCell(tableColMaps.Details).value as string;
-      currentRow.rowNumber = rowNumber;
+  salesWorksheet.eachRow((row, rowNumber) => {
+    if (rowNumber === 1) return; // Skip the first row (titles)
 
-      const { detailsColumnMessage, rowErrorOccurred, rowWarningOccurred } = validateRow(
-        currentRow,
-        prodCode,
-        venueList,
-        prodDateRange,
-        spreadsheetData,
-        currentVenue,
-        currentBookingDate,
-        row,
-      );
+    currentRow.productionCode = row.getCell(tableColMaps.ProdCode).value as string;
+    currentRow.venueCode = row.getCell(tableColMaps.VenueCode).value as string;
+    if (currentRow.venueCode) currentVenue = currentRow.venueCode; // allows for blank rows implying carrying on of venueCode from above
+    currentRow.bookingDate =
+      typeof row.getCell(tableColMaps.BookingDate).value === 'object'
+        ? (row.getCell(tableColMaps.BookingDate).value as string)
+        : '';
+    if (currentRow.bookingDate) currentBookingDate = currentRow.bookingDate; // allows for blank rows implying carrying on of booking date from above
+    currentRow.salesDate =
+      typeof row.getCell(tableColMaps.SalesDate).value === 'object' &&
+      row.getCell(tableColMaps.SalesDate).value !== null
+        ? row.getCell(tableColMaps.SalesDate).value.toString()
+        : '';
+    currentRow.salesType = row.getCell(tableColMaps.SalesType).value as string;
+    currentRow.seats = row.getCell(tableColMaps.Seats).value as number;
+    currentRow.value = row.getCell(tableColMaps.Value).value as string;
+    currentRow.isFinal = (row.getCell(tableColMaps.isFinal).value as string) ?? '';
+    currentRow.ignoreWarning = (row.getCell(tableColMaps.ignoreWarning).value as string) ?? '';
+    currentRow.response = row.getCell(tableColMaps.Response).value as string;
+    currentRow.details = row.getCell(tableColMaps.Details).value as string;
+    currentRow.rowNumber = rowNumber;
 
-      const formattedDetailsMessage = formatDetailsMessage(detailsColumnMessage);
-      updateResponseDetailsCells(row, formattedDetailsMessage, rowErrorOccurred, rowWarningOccurred, spreadsheetIssues);
-    });
+    const { detailsColumnMessage, rowErrorOccurred, rowWarningOccurred } = validateRow(
+      currentRow,
+      prodCode,
+      venueList,
+      prodDateRange,
+      spreadsheetData,
+      currentVenue,
+      currentBookingDate,
+      row,
+    );
 
-    // After modifying all rows, adjust Details column width to fit entire message
-    const detailsColumn = worksheet.getColumn(tableColMaps.Details);
-    let maxLength = 0;
-    detailsColumn.eachCell({ includeEmpty: true }, (cell) => {
-      if (cell.value) {
-        const cellLength = cell.value.toString().length;
-        if (cellLength > maxLength) {
-          maxLength = cellLength;
-        }
-      }
-    });
-    detailsColumn.width = maxLength < 10 ? 10 : maxLength + 2;
+    if (rowErrorOccurred) errorRows.push(row);
+    if (rowWarningOccurred) warningRows.push(row);
+
+    const formattedDetailsMessage = formatDetailsMessage(detailsColumnMessage);
+    updateResponseDetailsCells(row, formattedDetailsMessage, rowErrorOccurred, rowWarningOccurred, spreadsheetIssues);
   });
 
-  postValidationChecks(spreadsheetData, spreadsheetIssues);
+  const detailsColumn = salesWorksheet.getColumn(tableColMaps.Details);
+  widenColumn(detailsColumn);
+
+  postValidationChecks(spreadsheetData, spreadsheetIssues, errorRows, warningRows);
+  createSummaryWorksheet(workbook, errorRows, warningRows);
   convertWorkbookToFile(workbook, file);
 
   return { file, spreadsheetIssues };
@@ -434,7 +434,7 @@ const convertWorkbookToFile = async (workbook, file) => {
 };
 
 // Performs checks that can only be done after entire spreadsheet has been parsed
-const postValidationChecks = (spreadsheetData: SpreadsheetData, spreadsheetIssues) => {
+const postValidationChecks = (spreadsheetData: SpreadsheetData, spreadsheetIssues, errorRows, warningRows) => {
   for (const venue of spreadsheetData.venues) {
     for (const booking of venue.bookings) {
       if (!booking.finalSalesDate) {
@@ -448,6 +448,7 @@ const postValidationChecks = (spreadsheetData: SpreadsheetData, spreadsheetIssue
           spreadsheetIssues,
           formattedDetailsMessage,
         );
+        errorRows.push(booking.bookingFirstRow);
       }
 
       let previousSale = null;
@@ -484,6 +485,8 @@ const postValidationChecks = (spreadsheetData: SpreadsheetData, spreadsheetIssue
           errorOccurred = true;
         }
 
+        if (errorOccurred) errorRows.push(sale.salesRow);
+        if (warningOccurred) warningRows.push(sale.salesRow);
         const formattedDetailsMessage = formatDetailsMessage((sale.salesRow.getCell(11).value += detailsColumnMessage));
         updateResponseDetailsCells(
           sale.salesRow,
@@ -576,6 +579,71 @@ const writeOKCell = (detailsCell, responseCell) => {
   };
 
   detailsCell.value = '';
+};
+
+const createSummaryWorksheet = (workbook, errorRows, warningRows) => {
+  const addSummaryStyling = () => {
+    if (errorRows.length > 0 || warningRows.length > 0) {
+      summaryWorksheet.getCell('A1').value = 'The uploaded Sales data contained Errors / Warnings -';
+      summaryWorksheet.getCell('A1').font = { bold: true, size: 13 };
+      summaryWorksheet.getCell('B3').value = 'Rows containing Errors - ';
+      summaryWorksheet.getCell('B3').font = { bold: true };
+      summaryWorksheet.getCell('D3').value = 'Rows containing Errors - ';
+      summaryWorksheet.getCell('D3').font = { bold: true };
+    } else {
+      summaryWorksheet.getCell('A1').value = 'There were no Errors / Warnings found in the Sales data.';
+      summaryWorksheet.getCell('A1').font = { bold: true, size: 13 };
+    }
+  };
+
+  let summaryWorksheet = workbook.getWorksheet('Error Summary');
+
+  if (summaryWorksheet) {
+    summaryWorksheet.eachRow((row) => {
+      row.eachCell((cell) => {
+        cell.value = null;
+      });
+    });
+  } else {
+    summaryWorksheet = workbook.addWorksheet('Error Summary');
+  }
+
+  addSummaryStyling();
+
+  errorRows.forEach((row, index) => {
+    const rowNumber = row.number;
+    const linkCell = summaryWorksheet.getCell(`B${index + 4}`);
+    linkCell.value = {
+      text: `• Link to error in row ${rowNumber} in Sales`,
+      hyperlink: `#Sales!J${rowNumber}`,
+    };
+    linkCell.font = { color: { argb: 'FF0000FF' }, underline: true };
+  });
+  widenColumn(summaryWorksheet.getColumn(2));
+
+  warningRows.forEach((row, index) => {
+    const rowNumber = row.number;
+    const linkCell = summaryWorksheet.getCell(`D${index + 4}`);
+    linkCell.value = {
+      text: `• Link to warning in row ${rowNumber} in Sales`,
+      hyperlink: `#Sales!J${rowNumber}`,
+    };
+    linkCell.font = { color: { argb: 'FF0000FF' }, underline: true };
+  });
+  widenColumn(summaryWorksheet.getColumn(4));
+};
+
+const widenColumn = (column) => {
+  let maxLength = 0;
+  column.eachCell({ includeEmpty: true }, (cell) => {
+    if (cell.value) {
+      const cellLength = cell.value.toString().length;
+      if (cellLength > maxLength) {
+        maxLength = cellLength;
+      }
+    }
+  });
+  column.width = maxLength < 10 ? 10 : maxLength + 2;
 };
 
 export default validateSpreadsheetFile;
