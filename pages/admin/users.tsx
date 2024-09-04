@@ -1,11 +1,20 @@
 import axios from 'axios';
 import { permissionGroupColDef, styleProps, usersColDef } from 'components/admin/tableConfig';
 import { Button, Table } from 'components/core-ui-lib';
+import AddEditUser from 'components/admin/modals/AddEditUser';
 import Layout from 'components/Layout';
 import { useEffect, useState } from 'react';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import { getPermissionsList } from 'services/permissionService';
+import { getAllProductions } from 'services/productionService';
 
-export default function Users() {
+export default function Users({
+  permissionsList,
+  productionsList,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const [userRowData, setUserRowData] = useState([]);
+  const [showUsersModal, setShowUsersModal] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
 
   const populateUserTable = async () => {
     try {
@@ -14,11 +23,14 @@ export default function Users() {
       if (Array.isArray(users.data)) {
         setUserRowData(
           users.data.map((user) => {
-            const firstname = user.UserFirstName || '';
-            const lastname = user.UserLastName || '';
+            const firstName = user.UserFirstName || '';
+            const lastName = user.UserLastName || '';
 
             return {
-              name: `${firstname} ${lastname}`,
+              accountUserId: user.AccUserId,
+              firstName,
+              lastName,
+              name: `${firstName} ${lastName}`,
               email: user.UserEmail,
               permissionDesc: user.AllPermissions,
               licence: 'to be added later',
@@ -36,6 +48,19 @@ export default function Users() {
       populateUserTable();
     }
   }, [userRowData]);
+
+  const handleModalClose = (refresh = false) => {
+    setSelectedUser(null);
+    setShowUsersModal(false);
+    if (refresh) {
+      populateUserTable();
+    }
+  };
+
+  const handleUserEdit = ({ data }) => {
+    setSelectedUser(data);
+    setShowUsersModal(true);
+  };
 
   return (
     <Layout title="Users | Segue" flush>
@@ -86,7 +111,12 @@ export default function Users() {
         <div className="text-primary-navy text-xl font-bold">All Users</div>
         <div className="flex flex-row gap-4">
           <Button className="px-8 mt-2 -mb-1" variant="secondary" text="Add New Touring Management User" />
-          <Button className="px-8 mt-2 -mb-1" variant="secondary" text="Add New Full User" />
+          <Button
+            className="px-8 mt-2 -mb-1"
+            variant="secondary"
+            text="Add New Full User"
+            onClick={() => setShowUsersModal(true)}
+          />
         </div>
       </div>
 
@@ -96,6 +126,7 @@ export default function Users() {
         rowData={userRowData}
         styleProps={styleProps}
         tableHeight={300}
+        onRowDoubleClicked={handleUserEdit}
       />
 
       <div className="flex justify-end mt-5">
@@ -116,6 +147,36 @@ export default function Users() {
           />
         </div>
       </div>
+      {showUsersModal && (
+        <AddEditUser
+          visible={showUsersModal}
+          onClose={handleModalClose}
+          permissions={permissionsList}
+          productions={productionsList}
+          selectedUser={selectedUser}
+        />
+      )}
     </Layout>
   );
 }
+
+export const getServerSideProps: GetServerSideProps = async () => {
+  const permissionsList = await getPermissionsList();
+  const productions = await getAllProductions();
+  const formattedProductions = productions.map((t: any) => ({
+    id: t.Id,
+    code: t.Code,
+    isArchived: t.IsArchived,
+    showCode: t.Show.Code,
+    showName: t.Show.Name,
+    label: `${t.Show.Code}${t.Code} ${t.Show.Name}`,
+    checked: false,
+  }));
+
+  return {
+    props: {
+      productionsList: formattedProductions || [],
+      permissionsList: permissionsList || [],
+    },
+  };
+};

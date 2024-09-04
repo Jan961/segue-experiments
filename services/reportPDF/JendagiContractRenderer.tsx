@@ -1,6 +1,7 @@
 import { Document, Page, Text, View, StyleSheet, Image, Font } from '@react-pdf/renderer';
 import { dateToSimple } from 'services/dateService';
 import { JendagiContractProps } from 'components/contracts/JendagiContract';
+import { select } from 'radash';
 
 Font.register({
   family: 'Times-Roman',
@@ -109,7 +110,13 @@ const JendagiContract = ({
   schedule = [],
 }: JendagiContractProps) => {
   const currentDate = dateToSimple(new Date().toISOString());
-
+  const firstPerformance = schedule.find((day) => day.type === 'Performance');
+  const performanceVenues = select(
+    schedule,
+    (day) => day.location,
+    (day) => day.type === 'Performance',
+  );
+  const allSameVenue = performanceVenues.every((venue) => venue === venue[0]);
   const formatPayment = (payment) => {
     return (currency || '') + (payment || 'N/A');
   };
@@ -230,14 +237,14 @@ const JendagiContract = ({
           <View style={styles.tableRow}>
             <Text style={styles.tableCellNum}>10</Text>
             <Text style={styles.tableCellTitle}>FIRST PAID PERFORMANCE DATE</Text>
-            <Text style={styles.tableCell}>On or around !FIRST PERFORMANCE DATE!</Text>
+            <Text style={styles.tableCell}>On or around {firstPerformance?.date || 'N/A'}</Text>
           </View>
           <View style={styles.tableRow}>
             <Text style={styles.tableCellNum}>11</Text>
             <Text style={styles.tableCellTitle}>NORMAL PLACE OF WORK</Text>
             <Text style={styles.tableCell}>
-              At [REHEARSAL VENUE] as required and at [Either !VENUE! if all performance bookings are at the same venue
-              or ‘On Tour’]
+              At {contractDetails.rehearsalVenue?.venue || 'REHEARSAL VENUE'} as required and{' '}
+              {allSameVenue ? `at ${performanceVenues?.[0]}` : 'on Tour'}
             </Text>
           </View>
           <View style={styles.tableRow}>

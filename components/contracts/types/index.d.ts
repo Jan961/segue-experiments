@@ -38,6 +38,11 @@ export interface EmergencyContact {
   mobileNumber: string;
 }
 
+export interface IOtherWorkType {
+  id: number;
+  name: string;
+}
+
 export interface IPersonDetails {
   id?: number;
   firstName: string;
@@ -61,8 +66,9 @@ export interface IPersonDetails {
   advisoryNotes: string;
   generalNotes: string;
   healthDetails: string;
-  otherWorkTypes: string[];
+  otherWorkTypes: Partial<IOtherWorkType>[];
   notes: string;
+  addressId?: string;
 }
 
 export interface IPerson {

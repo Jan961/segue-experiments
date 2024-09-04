@@ -52,9 +52,9 @@ export default function AllocatedSeatsModal({
   const [allocId, setAllocId] = useState(null);
 
   const initForm = () => {
-    const userTempList = Object.values(users).map(({ AccUserId, UserFirstName = '', UserLastName = '' }) => ({
+    const userTempList = Object.values(users).map(({ AccUserId, FirstName = '', LastName = '' }) => ({
       value: AccUserId,
-      text: `${UserFirstName || ''} ${UserLastName || ''}`,
+      text: `${FirstName || ''} ${LastName || ''}`,
     }));
 
     setUserList(userTempList);
