@@ -7,8 +7,10 @@ import useUser from 'hooks/useUser';
 import Spinner from 'components/core-ui-lib/Spinner';
 import { newUserSchema } from 'validators/user';
 import FormError from 'components/core-ui-lib/FormError';
+import axios from 'axios';
 
 type UserDetails = {
+  accountUserId?: number;
   email: string;
   firstName: string;
   lastName: string;
@@ -25,6 +27,7 @@ interface AdEditUserProps {
   productions: TreeItemOption[];
   onClose: () => void;
   visible: boolean;
+  selectedUser?: Partial<UserDetails>;
 }
 
 const DEFAULT_USER_DETAILS: UserDetails = {
@@ -39,7 +42,7 @@ const DEFAULT_USER_DETAILS: UserDetails = {
   isSystemAdmin: false,
 };
 
-const AdEditUser = ({ visible, onClose, permissions, productions = [] }: AdEditUserProps) => {
+const AdEditUser = ({ visible, onClose, permissions, productions = [], selectedUser }: AdEditUserProps) => {
   const [userDetails, setUserDetails] = useState<UserDetails>(DEFAULT_USER_DETAILS);
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [allProductionsChecked, setAllProductionsChecked] = useState(false);
@@ -50,8 +53,33 @@ const AdEditUser = ({ visible, onClose, permissions, productions = [] }: AdEditU
   };
 
   useEffect(() => {
-    setUserDetails({ ...userDetails, productions });
-  }, [productions]);
+    if (!selectedUser) {
+      setUserDetails((prev) => ({ ...prev, productions, permissions: [] }));
+    }
+  }, [productions, permissions, selectedUser]);
+
+  const fetchPermissionsForSelectedUser = async () => {
+    const { data } = await axios.get(`/api/admin/user-permissions/${selectedUser.accountUserId}`);
+    const prodPermissions = productions.map((p) => (data.productions.includes(p.id) ? { ...p, checked: true } : p));
+    const userPermissions = permissions.map((p) => (data.permissions.includes(p.id) ? { ...p, checked: true } : p));
+    setUserDetails({
+      email: selectedUser.email,
+      firstName: selectedUser.firstName,
+      lastName: selectedUser.lastName,
+      accountId: selectedUser.accountId,
+      isSystemAdmin: selectedUser.isSystemAdmin,
+      pin: 'xxxx',
+      password: 'xxxx',
+      permissions: userPermissions,
+      productions: prodPermissions,
+    });
+  };
+
+  useEffect(() => {
+    if (selectedUser) {
+      fetchPermissionsForSelectedUser();
+    }
+  }, [selectedUser, productions]);
 
   async function validateUser() {
     try {
@@ -102,11 +130,11 @@ const AdEditUser = ({ visible, onClose, permissions, productions = [] }: AdEditU
       show={visible}
       onClose={onClose}
       titleClass="text-xl text-primary-navy text-bold"
-      title="Add New User"
+      title={selectedUser ? 'Edit User' : 'New User'}
       panelClass="relative"
       hasOverlay={false}
     >
-      <div className="w-full h-full max-h-[95vh]">
+      <div className="w-[640px] h-full max-h-[95vh]">
         <div className="flex flex-col w-full gap-1 mb-4">
           <div className="w-full">
             <Label text="First Name" required />
@@ -155,7 +183,10 @@ const AdEditUser = ({ visible, onClose, permissions, productions = [] }: AdEditU
                   disabled
                   testId="user-password"
                 />
-                <Button onClick={() => setUserDetails({ ...userDetails, password: generateRandomHash(4) })}>
+                <Button
+                  disabled={!!selectedUser}
+                  onClick={() => setUserDetails({ ...userDetails, password: generateRandomHash(4) })}
+                >
                   Generate Password
                 </Button>
               </div>
@@ -215,7 +246,7 @@ const AdEditUser = ({ visible, onClose, permissions, productions = [] }: AdEditU
             <h2 className="text-xl text-bold mb-2">Permissions</h2>
             <div className="w-full max-h-[400px] overflow-y-auto">
               <TreeSelect
-                options={permissions}
+                options={userDetails.permissions}
                 onChange={(permissions) => setUserDetails({ ...userDetails, permissions })}
                 selectAllLabel="Select All Areas"
               />

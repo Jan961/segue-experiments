@@ -14,6 +14,8 @@ export default function Users({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const [userRowData, setUserRowData] = useState([]);
   const [showUsersModal, setShowUsersModal] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+
   const populateUserTable = async () => {
     try {
       const users = await axios.get('/api/admin/users/read');
@@ -21,11 +23,14 @@ export default function Users({
       if (Array.isArray(users.data)) {
         setUserRowData(
           users.data.map((user) => {
-            const firstname = user.UserFirstName || '';
-            const lastname = user.UserLastName || '';
+            const firstName = user.UserFirstName || '';
+            const lastName = user.UserLastName || '';
 
             return {
-              name: `${firstname} ${lastname}`,
+              accountUserId: user.AccUserId,
+              firstName,
+              lastName,
+              name: `${firstName} ${lastName}`,
               email: user.UserEmail,
               permissionDesc: user.AllPermissions,
               licence: 'to be added later',
@@ -46,6 +51,11 @@ export default function Users({
 
   const handleModalClose = () => {
     setShowUsersModal(false);
+  };
+
+  const handleUserEdit = ({ data }) => {
+    setSelectedUser(data);
+    setShowUsersModal(true);
   };
 
   return (
@@ -112,6 +122,7 @@ export default function Users({
         rowData={userRowData}
         styleProps={styleProps}
         tableHeight={300}
+        onRowDoubleClicked={handleUserEdit}
       />
 
       <div className="flex justify-end mt-5">
@@ -138,6 +149,7 @@ export default function Users({
           onClose={handleModalClose}
           permissions={permissionsList}
           productions={productionsList}
+          selectedUser={selectedUser}
         />
       )}
     </Layout>

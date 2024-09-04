@@ -29,6 +29,8 @@ export default function TreeSelect({
 
     const updatedOptions = options.map((o) => ({ ...o, groupHeader: true }));
     setItemOptions(updatedOptions);
+    const areAllOptionsSelected = updatedOptions.every((o) => o.checked);
+    setSelecteAll(areAllOptionsSelected);
   }, [options]);
 
   const handleOptionToggle = (value: TreeItemOption) => {
