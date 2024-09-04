@@ -3,7 +3,7 @@ import { CustomCellRendererProps } from 'ag-grid-react';
 import BaseCellRenderer from 'components/core-ui-lib/Table/renderers/BaseCellRenderer';
 import TimeInput from 'components/core-ui-lib/TimeInput';
 import { Time } from 'components/core-ui-lib/TimeInput/TimeInput';
-import { useEffect, useRef, useState } from 'react';
+import { BaseSyntheticEvent, useEffect, useRef, useState } from 'react';
 import { isNullOrEmpty } from 'utils';
 
 const PerformanceTimesRenderer = ({ data, setValue, eGridCell }: CustomCellRendererProps) => {
@@ -21,7 +21,7 @@ const PerformanceTimesRenderer = ({ data, setValue, eGridCell }: CustomCellRende
   };
 
   //  This logic handles going through stepping through the refs to go to the Time input field above or below the current one
-  const goToNextTimeField = (goDownField: boolean, e?: any) => {
+  const goToNextTimeField = (goDownField: boolean, e?: BaseSyntheticEvent) => {
     const currentlyFocussed = (isNullOrEmpty(e) ? document.activeElement : e.target).parentNode.parentNode;
     if (goDownField) {
       if (inputRefs.current.length > focussedIndex) {

@@ -1,4 +1,4 @@
-import { forwardRef, KeyboardEvent, useEffect, useRef, useState } from 'react';
+import { BaseSyntheticEvent, forwardRef, KeyboardEvent, MutableRefObject, useEffect, useRef, useState } from 'react';
 import classNames from 'classnames';
 import { isNullOrEmpty } from 'utils';
 
@@ -64,14 +64,14 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
 
     //  We have to disable the propagation and default functionality
     //  Or else the tab events would change cell in the AgGrid when we want to move between the inputs within this cell
-    const setInputFocus = (event, targetRef) => {
-      event.preventDefault();
-      event.stopPropagation();
+    const setInputFocus = (e: BaseSyntheticEvent, targetRef: MutableRefObject<HTMLInputElement>) => {
+      e.preventDefault();
+      e.stopPropagation();
       targetRef.current.focus();
       targetRef.current.select();
     };
 
-    const handleBlur = (e, inputRef) => {
+    const handleBlur = (e: BaseSyntheticEvent, inputRef: MutableRefObject<any>) => {
       const { name, value } = e.target;
       if (inputRef.current) {
         inputRef.current.hasSelected = false;
@@ -87,7 +87,7 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
       }
     };
 
-    const filterTimeInput = (name, value) => {
+    const filterTimeInput = (name: string, value) => {
       if (value.length < 3) {
         if (
           (name === 'hrs' && (parseInt(value) < 24 || value.length === 0)) ||
@@ -98,7 +98,7 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
       }
     };
 
-    const handleChange = (e, minsInput = false) => {
+    const handleChange = (e: BaseSyntheticEvent, minsInput = false) => {
       onChange(e);
       const { name, value } = e.target;
       filterTimeInput(name, value);
@@ -119,7 +119,8 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
       }
     };
 
-    const handleFocus = (e, inputRef, hoursFocus) => {
+    const handleFocus = (e: BaseSyntheticEvent, inputRef: MutableRefObject<any>, hoursFocus: boolean) => {
+      console.log(e);
       setHoursInputFocus(hoursFocus);
       if (inputRef.current && !inputRef.current.hasSelected) {
         e.stopPropagation();
