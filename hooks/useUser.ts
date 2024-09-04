@@ -14,7 +14,7 @@ type UserDetails = {
   accountId: number;
 };
 
-const useClerk = () => {
+const useUser = () => {
   const { isLoaded: isSignUpLoaded } = useSignUp();
   const [error, setError] = useState('');
 
@@ -50,7 +50,23 @@ const useClerk = () => {
     }
   };
 
-  return { isSignUpLoaded, createUser, error };
+  const updateUser = async (userDetails: UserDetails): Promise<boolean> => {
+    try {
+      setError('');
+      const { data } = await axios.post('/api/user/update', userDetails);
+      if (data.error) {
+        setError(data.error);
+        return false;
+      }
+      return true;
+    } catch (error) {
+      console.log(error);
+      setError('Something went wrong, please try again');
+      return false;
+    }
+  };
+
+  return { isSignUpLoaded, createUser, updateUser, error };
 };
 
-export default useClerk;
+export default useUser;

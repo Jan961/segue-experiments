@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import TreeItem from './TreeItem';
 import { TreeItemOption } from './types';
 import { Checkbox } from 'components/core-ui-lib';
-import { mapRecursive } from 'utils';
+import { isNullOrEmpty, mapRecursive } from 'utils';
 
 interface TreeSelectProps {
   className?: string;
@@ -50,17 +50,19 @@ export default function TreeSelect({
 
   return (
     <div className={`${baseClass} ${className}`}>
-      <Checkbox
-        label={selectAllLabel}
-        labelClassName="text-responsive-sm font-semibold"
-        id="select-all"
-        testId="tree-select-select-all"
-        name="select-all"
-        checked={selectAll}
-        value="selectAll"
-        onChange={handleSelectAllToggle}
-        showIntermediate={false}
-      />
+      {!isNullOrEmpty(itemOptions) && (
+        <Checkbox
+          label={selectAllLabel}
+          labelClassName="text-responsive-sm font-semibold"
+          id="select-all"
+          testId="tree-select-select-all"
+          name="select-all"
+          checked={selectAll}
+          value="selectAll"
+          onChange={handleSelectAllToggle}
+          showIntermediate={false}
+        />
+      )}
       {itemOptions.map((o) => (
         <TreeItem key={o.id} value={o} onChange={handleOptionToggle} defaultOpen={defaultOpen} />
       ))}

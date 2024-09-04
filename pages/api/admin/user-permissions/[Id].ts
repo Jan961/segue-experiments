@@ -6,13 +6,17 @@ import { NextApiRequest, NextApiResponse } from 'next';
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
     if (req.method === 'GET') {
-      console.log(req.query);
       const Id = parseInt(req.query.Id as string);
 
       const userPermissions = await prismaMaster.AccountUser.findUnique({
         where: { AccUserId: Id },
-        select: { AccountUserPermission: { select: { UserAuthPermissionId: true } } },
+        select: {
+          AccountUserPermission: { select: { UserAuthPermissionId: true } },
+          AccUserIsAdmin: true,
+          AccUserPIN: true,
+        },
       });
+
       const formattedUserPermissions = userPermissions?.AccountUserPermission.map((perm) => perm.UserAuthPermissionId);
 
       // get prodction permissions
@@ -23,6 +27,8 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       const formattedProductionPermissions = productionPermissions.map((perm) => perm.AUPProductionId);
 
       const results = {
+        pin: userPermissions?.AccUserPIN,
+        isAdmin: userPermissions?.AccUserIsAdmin,
         permissions: formattedUserPermissions || [],
         productions: formattedProductionPermissions || [],
       };

@@ -49,8 +49,12 @@ export default function Users({
     }
   }, [userRowData]);
 
-  const handleModalClose = () => {
+  const handleModalClose = (refresh = false) => {
+    setSelectedUser(null);
     setShowUsersModal(false);
+    if (refresh) {
+      populateUserTable();
+    }
   };
 
   const handleUserEdit = ({ data }) => {
