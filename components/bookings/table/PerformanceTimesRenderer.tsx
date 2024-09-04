@@ -4,7 +4,7 @@ import BaseCellRenderer from 'components/core-ui-lib/Table/renderers/BaseCellRen
 import TimeInput from 'components/core-ui-lib/TimeInput';
 import { Time } from 'components/core-ui-lib/TimeInput/TimeInput';
 import { useEffect, useRef, useState } from 'react';
-import { isNullOrEmpty } from '../../../utils';
+import { isNullOrEmpty } from 'utils';
 
 const PerformanceTimesRenderer = ({ data, setValue, eGridCell }: CustomCellRendererProps) => {
   const [performanceTimes, setPerformanceTimes] = useState<Time[]>([]);
@@ -40,11 +40,11 @@ const PerformanceTimesRenderer = ({ data, setValue, eGridCell }: CustomCellRende
     const currentlyFocussed = document.activeElement?.childNodes[0]?.childNodes[0];
 
     if (cellTargetDiv === currentlyFocussed) {
-      cellTargetDiv.childNodes[0].childNodes[0]?.focus();
+      cellTargetDiv?.childNodes[0].childNodes[0]?.focus();
     } else {
-      const childNodes = cellTargetDiv.childNodes;
+      const childNodes = cellTargetDiv?.childNodes;
       childNodes.forEach((node, index) => {
-        if (node === document.activeElement.parentNode) {
+        if (node === document.activeElement?.parentNode) {
           setFocussedIndex(index);
         }
       });
