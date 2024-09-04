@@ -39,27 +39,27 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
     const minsRef = useRef(null);
     const [currentFocus, setCurrentFocus] = useState<string>('hrs');
 
-    const handleMinKeyDown = (e) => {
-      if (e.shiftKey && e.code === 'Tab') {
-        e.preventDefault();
-        e.stopPropagation();
-        hrsRef.current.select();
-      } else if (e.code === 'Tab') {
-        if (!isNullOrEmpty(inputFieldJump)) inputFieldJump(true, e);
-      }
-    };
-
     const handleKeyPress = (event: KeyboardEvent) => {
-      if (event.key === 'Tab' && currentFocus === 'hrs') {
-        if (event.shiftKey) {
-          if (!isNullOrEmpty(inputFieldJump)) inputFieldJump(false, event);
-          // go up a ref
+      if (event.key === 'Tab') {
+        if (currentFocus === 'hrs') {
+          if (event.shiftKey) {
+            if (!isNullOrEmpty(inputFieldJump)) inputFieldJump(false, event);
+          } else {
+            setCurrentFocus('mins');
+            event.stopPropagation();
+            event.preventDefault();
+            minsRef.current.focus();
+            minsRef.current.select();
+          }
         } else {
-          setCurrentFocus('mins');
-          event.stopPropagation();
-          event.preventDefault();
-          minsRef.current.focus();
-          minsRef.current.select();
+          if (event.shiftKey) {
+            event.preventDefault();
+            event.stopPropagation();
+            hrsRef.current.focus();
+            hrsRef.current.select();
+          } else {
+            if (!isNullOrEmpty(inputFieldJump)) inputFieldJump(true, event);
+          }
         }
       }
     };
@@ -174,7 +174,7 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
           disabled={disabled}
           tabIndex={tabIndexShow ? 0 : 2}
           onKeyDown={(e) => {
-            handleMinKeyDown(e);
+            handleKeyPress(e);
           }}
           data-index={index}
           onInput={handleInputChange}
