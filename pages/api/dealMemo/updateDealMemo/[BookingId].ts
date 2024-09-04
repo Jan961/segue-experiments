@@ -54,6 +54,26 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           },
         },
       });
+
+      // create sales email list
+      const emailSalesRecipients = data.SendTo.map((accId) => {
+        return {
+          DMSRDeMoId: existingDealMemo.Id,
+          DMSRAccUserId: accId,
+        };
+      });
+
+      // first delete DealMemoSalesEmailRecipient records with matching deal memo id
+      await prisma.DealMemoSalesEmailRecipient.deleteMany({
+        where: {
+          DMSRDeMoId: existingDealMemo.Id,
+        },
+      });
+
+      // create records for emails attached to this deal memo now
+      await prisma.DealMemoSalesEmailRecipient.createMany({
+        data: emailSalesRecipients,
+      });
     } else {
       updateCreateDealMemo = await prisma.dealMemo.create({
         data: {
@@ -76,7 +96,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         },
       });
 
-      const emailSalesRecipients = updatedData.SendTo.map((accId) => {
+      const emailSalesRecipients = data.SendTo.map((accId) => {
         return {
           DMSRDeMoId: updateCreateDealMemo.Id,
           DMSRAccUserId: accId,
