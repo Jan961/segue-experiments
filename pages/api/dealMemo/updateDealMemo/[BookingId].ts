@@ -20,8 +20,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       },
     });
 
-    console.log(updatedData);
-
     let updateCreateDealMemo;
     const priceData = getPrice(updatedData.DealMemoPrice);
     const techProvisionData = getTechProvision(updatedData.DealMemoTechProvision);
