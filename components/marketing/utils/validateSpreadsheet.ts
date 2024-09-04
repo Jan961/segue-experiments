@@ -67,9 +67,7 @@ export const validateSpreadsheetFile = async (file, prodCode, venueList, prodDat
         typeof row.getCell(tableColMaps.BookingDate).value === 'object'
           ? (row.getCell(tableColMaps.BookingDate).value as string)
           : '';
-      if (currentRow.bookingDate) {
-        currentBookingDate = currentRow.bookingDate;
-      } // allows for blank rows implying carrying on of booking date from above
+      if (currentRow.bookingDate) currentBookingDate = currentRow.bookingDate; // allows for blank rows implying carrying on of booking date from above
       currentRow.salesDate =
         typeof row.getCell(tableColMaps.SalesDate).value === 'object' &&
         row.getCell(tableColMaps.SalesDate).value !== null

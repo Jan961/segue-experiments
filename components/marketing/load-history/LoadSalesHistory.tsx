@@ -146,7 +146,11 @@ const LoadSalesHistory = () => {
     if (salesHistoryRows.length >= 1) {
       setUploadDisabled(true);
     } else {
-      setUploadDisabled(false);
+      if (!selectedProducton?.IsArchived) {
+        setUploadDisabled(true);
+      } else {
+        setUploadDisabled(false);
+      }
     }
   }, [salesHistoryRows]);
 
