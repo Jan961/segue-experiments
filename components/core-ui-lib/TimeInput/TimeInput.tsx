@@ -19,16 +19,18 @@ export interface TimeInputProps {
   className?: string;
   tabIndexShow?: boolean;
   index?: number;
+  onKeyDown?: (event: any) => void;
 }
 
 const baseClass =
-  'h-comp-height flex items-center justify-around text-sm p-1 text-primary-input-text rounded-md border border-primary-border focus:ring-2 focus:ring-primary-input-text ring-inset';
+  'h-comp-height flex items-center justify-around text-sm p-1 text-primary-input-text rounded-md border border-primary-border ring-inset';
+const focusClass = 'focus:ring-2 focus:ring-primary-input-text';
 const DEFAULT_TIME = { hrs: '', min: '', sec: '' };
 
 const isOfTypTime = (t: any): t is Time => t.hrs !== undefined && t.min !== undefined;
 
 const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
-  ({ onChange, value, onBlur, disabled, className, tabIndexShow, index, onInput }: TimeInputProps, ref) => {
+  ({ onChange, value, onBlur, disabled, className, tabIndexShow, index, onInput, onKeyDown }: TimeInputProps, ref) => {
     const [time, setTime] = useState<Time>(DEFAULT_TIME);
     const hrsRef = useRef(null);
     const minsRef = useRef(null);
@@ -41,7 +43,10 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
     };
 
     const handleKeyPress = (event: KeyboardEvent) => {
+      console.log('key pressed ');
+      onKeyDown(event);
       if (event.key === 'Tab') {
+        console.log('tab');
         if (currentFocus === 'hrs') {
           setCurrentFocus('hrs');
           minsRef.current.select();
@@ -81,6 +86,9 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
       onChange(e);
       const { name, value } = e.target;
       filterTimeInput(name, value);
+      if (value.length === 2) {
+        minsRef.current.select();
+      }
     };
 
     const handleInputChange = (e) => {
@@ -119,7 +127,7 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
     return (
       <div
         ref={ref}
-        className={classNames(baseClass, className)}
+        className={classNames(baseClass, className, disabled ? '' : focusClass)}
         tabIndex={-1} // Make the div focusable
       >
         <input

@@ -9,18 +9,36 @@ const PerformanceTimesRenderer = ({ data, setValue, eGridCell }: CustomCellRende
   const [performanceTimes, setPerformanceTimes] = useState<Time[]>([]);
   const [isDisabled, setIsDisabled] = useState(true);
   const cellRef = useRef(null);
-  const timeRef = useRef(null);
-  const handleOnFocus = () => {
-    console.log(timeRef?.current);
-    console.log(cellRef?.current.childNodes[0]);
-    const cellTargetDiv = cellRef?.current?.childNodes[0];
-    console.log(document.activeElement);
-    const currentlyFocussed = document.activeElement?.childNodes[0]?.childNodes[0];
-    // console.log(document.activeElement);
-    // console.log(cellRef.current.childNodes[0].childNodes[0]);
 
+  const inputRefs = useRef<HTMLDivElement[]>([]);
+  const setInputRef = (element: HTMLDivElement | null, index: number) => {
+    if (element) {
+      inputRefs.current[index] = element;
+    }
+  };
+
+  const handleOnFocus = () => {
+    const cellTargetDiv = cellRef?.current?.childNodes[0];
+    const currentlyFocussed = document.activeElement?.childNodes[0]?.childNodes[0];
+    console.log('/////////////////////////');
+    console.log(currentlyFocussed);
+    console.log(cellTargetDiv);
     if (cellTargetDiv === currentlyFocussed) {
-      timeRef && timeRef?.current?.childNodes[0].focus();
+      // Example of focusing the first input in refs array
+      console.log(cellTargetDiv.childNodes);
+      cellTargetDiv.childNodes[0].childNodes[0]?.focus();
+    } else {
+      let currentIndex;
+      const childNodes = cellTargetDiv.childNodes;
+      childNodes.forEach((node, index) => {
+        console.log(index);
+        console.log(node);
+        if (node === document.activeElement) {
+          currentIndex = index;
+        }
+      });
+      console.log(currentIndex);
+      console.log(childNodes);
     }
   };
 
@@ -91,8 +109,8 @@ const PerformanceTimesRenderer = ({ data, setValue, eGridCell }: CustomCellRende
       performanceTimes
         .map(({ hrs, min }) => {
           if (hrs.length === 0) return ``;
-          const paddedHrs = hrs.length > 0 ? `${'0'.repeat(2 - hrs.length)}${hrs}` : hrs;
-          const paddedMin = min.length > 0 ? `${'0'.repeat(2 - min.length)}${min}` : min;
+          const paddedHrs = hrs.length > 0 ? `${'0'.repeat(2 - hrs.length >= 0 ? 2 - hrs.length : 0)}${hrs}` : hrs;
+          const paddedMin = min.length > 0 ? `${'0'.repeat(2 - min.length >= 0 ? 2 - min.length : 0)}${min}` : min;
           return `${paddedHrs}:${paddedMin}`;
         })
         .join(';'),
@@ -110,12 +128,15 @@ const PerformanceTimesRenderer = ({ data, setValue, eGridCell }: CustomCellRende
               <TimeInput
                 key={index}
                 index={index}
-                ref={timeRef}
+                ref={(element) => setInputRef(element, index)}
                 onChange={handleTimeChange}
                 value={time}
                 className="bg-white h-10"
                 onInput={handleInput}
                 onBlur={handleBlur}
+                onKeyDown={(e) => {
+                  console.log(e);
+                }}
               />
             ))}
         </div>
