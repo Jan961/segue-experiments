@@ -347,6 +347,58 @@ export const EditDealMemoContractModal = ({
     }));
   };
 
+  const testAssign = (value) => {
+    editDemoModalData('SendTo', value, 'dealMemo');
+    console.log(value);
+  };
+
+  //   const exportToPDF = async (modalId: string) => {
+  //     const input = document.getElementById(modalId);
+
+  //     if (!input) {
+  //         console.error('Modal content not found');
+  //         return;
+  //     }
+
+  //     try {
+  //         // Wait until all fonts and images are loaded
+  //         await document.fonts.ready;
+  //         const images = Array.from(document.images);
+  //         await Promise.all(images.map(img => new Promise(resolve => img.complete ? resolve() : img.onload = resolve)));
+
+  //         const canvas = await html2canvas(input, {
+  //             scale: 2,  // Adjust as needed
+  //             useCORS: true,  // Ensure CORS-enabled content is captured
+  //             allowTaint: false,  // Set to false to avoid tainting issues
+  //             logging: true,  // Enable logging for debugging
+  //         });
+
+  //         const imgData = canvas.toDataURL('image/png');
+  //         const pdf = new jsPDF('p', 'mm', 'a4');
+
+  //         const imgWidth = 210;
+  //         const pageHeight = 297;
+  //         const imgHeight = (canvas.height * imgWidth) / canvas.width;
+  //         let heightLeft = imgHeight;
+
+  //         let position = 0;
+
+  //         pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+  //         heightLeft -= pageHeight;
+
+  //         while (heightLeft >= 0) {
+  //             position = heightLeft - imgHeight;
+  //             pdf.addPage();
+  //             pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+  //             heightLeft -= pageHeight;
+  //         }
+
+  //         pdf.save('deal_memo.pdf');
+  //     } catch (error) {
+  //         console.error('Error exporting to PDF:', error);
+  //     }
+  // };
+
   return (
     <div id="deal-memo-modal">
       <PopupModal
@@ -518,7 +570,7 @@ export const EditDealMemoContractModal = ({
                   <TextInput
                     testId="performanceTime"
                     className="w-[350px] mt-1 mb-1 text-primary-input-text font-bold"
-                    placeholder="—"
+                    placeholder="â€”"
                     disabled
                   />
                 )}
@@ -708,7 +760,6 @@ export const EditDealMemoContractModal = ({
                 placeholder="Please select.."
                 options={booleanOptions}
                 isClearable
-                isSearchable
                 value={formData.Guarantee}
               />
               <div className="text-primary-input-text font-bold ml-14 mr-5">{currency}</div>
@@ -1086,11 +1137,12 @@ export const EditDealMemoContractModal = ({
                       )
                     }
                     value={
-                      dealMemoPriceFormData[inputData.DMPTicketName]
-                        ? dealMemoPriceFormData[inputData.DMPTicketName].DMPTicketPrice
-                        : null
+                      dealMemoPriceFormData[inputData.DMPTicketName]?.DMPTicketPrice === 0
+                        ? ''
+                        : dealMemoPriceFormData[inputData.DMPTicketName]?.DMPTicketPrice ?? ''
                     }
                   />
+
                   <TextInput
                     testId={`DMPNotes${index}Text`}
                     className="w-[38vw] ml-8"
@@ -1391,6 +1443,7 @@ export const EditDealMemoContractModal = ({
                 testId="repFreqText"
                 className="w-[20vw]"
                 value={productionJumpState.SalesFrequency === 'W' ? 'Weekly' : 'Daily'}
+                disabled={true}
               />
               <div className=" text-primary-input-text font-bold ml-20 mr-4">If Weekly, on</div>
               <Select
@@ -1407,14 +1460,20 @@ export const EditDealMemoContractModal = ({
           <div className="flex items-center mt-4">
             <div className="w-1/5 text-primary-input-text font-bold">to be sent to</div>
             <div className="w-4/5">
-              <TextInput testId="sentToText" className="w-full" placeholder="Add to Production Details" disabled />
+              <TextInput
+                testId="sentToText"
+                className="w-full"
+                value={productionJumpState.SalesEmail || ''}
+                placeholder="Add to Production Details"
+                disabled
+              />
             </div>
           </div>
           <div className="flex items-center mt-4">
             <div className="w-1/5"> </div>
             <div className="w-4/5 flex">
               <Select
-                onChange={(value) => setSendToData(value)}
+                onChange={(value) => testAssign(value)}
                 isMulti
                 className="bg-primary-white w-full"
                 placeholder="Please select assignee..."
@@ -1422,7 +1481,7 @@ export const EditDealMemoContractModal = ({
                 isClearable
                 isSearchable
                 renderOption={(option) => <CustomOption option={option} isMulti={true} />}
-                value={sendTo}
+                value={formData.SendTo}
               />
             </div>
           </div>
@@ -1582,6 +1641,7 @@ export const EditDealMemoContractModal = ({
                 className="bg-primary-white w-full"
                 placeholder="Please select..."
                 options={sellerOptions}
+                value={formData.SellWho}
                 isClearable
                 isSearchable
               />

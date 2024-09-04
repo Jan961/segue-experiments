@@ -1,23 +1,39 @@
-import { UserDto } from 'interfaces';
-import { userMapper } from 'lib/mappers';
-import master from 'lib/prisma_master';
+import prismaMaster from 'lib/prisma_master';
 import { NextApiRequest, NextApiResponse } from 'next';
+import { replaceProudctionPermissions, replaceUserPermissions } from 'services/permissionService';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const user = req.body as UserDto;
+    const userDetails = req.body;
 
-    const updatedUser = await master.user.update({
+    const updatedUSer = await prismaMaster.user.update({
       data: {
-        UserFirstName: user.FirstName,
-        UserLastName: user.LastName,
+        UserFirstName: userDetails.firstName,
+        UserLastName: userDetails.lastName,
+        AccountUser: {
+          update: {
+            where: {
+              AccUserId: userDetails.accountUserId,
+            },
+            data: {
+              AccUserIsAdmin: userDetails.isSystemAdmin,
+              AccUserPIN: userDetails.pin,
+            },
+          },
+        },
+      },
+      include: {
+        AccountUser: true,
       },
       where: {
-        UserId: user.Id,
+        UserEmail: userDetails.email,
       },
     });
 
-    return res.json(userMapper(updatedUser));
+    await replaceUserPermissions(userDetails.accountUserId, userDetails.permissions);
+    await replaceProudctionPermissions(userDetails.accountUserId, userDetails.productions);
+
+    return res.json(updatedUSer);
   } catch (err) {
     console.log(err);
     res.status(500).json({ err: 'Error occurred while updating the user.' });
