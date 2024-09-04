@@ -41,15 +41,8 @@ export const validateSpreadsheetFile = async (file, prodCode, venueList, prodDat
   let currentVenue = '';
   let currentBookingDate = '';
 
-  const actualHeaders = [];
-  const row = workbook.getWorksheet(1).getRow(1);
-  row.eachCell((cell) => {
-    actualHeaders.push(cell.value);
-  });
-
-  const headersMatch = expectedHeaders.every((header, index) => header === actualHeaders[index]);
-  if (!headersMatch) {
-    spreadsheetIssues.spreadsheetFormatIssue = true;
+  validateHeaders(workbook, spreadsheetIssues);
+  if (spreadsheetIssues.spreadsheetFormatIssue) {
     return { file, spreadsheetIssues };
   }
 
@@ -100,13 +93,12 @@ export const validateSpreadsheetFile = async (file, prodCode, venueList, prodDat
       if (colNum !== 10) return; // don't auto adjust column widths for date fields - enlarges far too much
       let maxLength = 0;
       column.eachCell({ includeEmpty: true }, (cell) => {
-        console.log(cell.value?.toString());
         const columnLength = cell.value ? cell.value.toString().length : 10;
         if (columnLength > maxLength) {
           maxLength = columnLength;
         }
       });
-      column.width = maxLength < 10 ? 10 : maxLength + 2; // Set width to fit content
+      column.width = maxLength < 10 ? 10 : maxLength + 2;
     });
   });
 
@@ -404,6 +396,20 @@ const validateIgnoreWarning = (currentRow: SpreadsheetRow) => {
   }
 
   return { returnString, warningOccurred, errorOccurred };
+};
+
+const validateHeaders = (workbook, spreadsheetIssues) => {
+  const actualHeaders = [];
+  const row = workbook.getWorksheet(1).getRow(1);
+  row.eachCell((cell) => {
+    actualHeaders.push(cell.value);
+  });
+
+  const headersMatch = expectedHeaders.every((header, index) => header === actualHeaders[index]);
+  if (!headersMatch) {
+    spreadsheetIssues.spreadsheetFormatIssue = true;
+    return spreadsheetIssues;
+  }
 };
 
 // Formats Details Message to place all ERRORS infront of WARNINGS
