@@ -37,7 +37,7 @@ const PublicityEventDetails: FC<PublicityEventDetailsProps> = ({ details, testId
   );
 
   return (
-    <div className="flex items-start gap-4">
+    <div className="flex items-start gap-4 w-full">
       <div className="flex items-start gap-2">
         <Select
           testId={`${testId}-is-required`}
@@ -57,14 +57,16 @@ const PublicityEventDetails: FC<PublicityEventDetailsProps> = ({ details, testId
           onChange={(value) => handleChange('date', value?.toISOString?.() || '')}
         />
       </div>
-      <TextInput
-        disabled={!isRequired}
-        testId={`${testId}-notes`}
-        placeholder="Publicity Event Notes"
-        className="flex-1"
-        value={notes}
-        onChange={(event) => handleChange('notes', event.target.value)}
-      />
+      <div className="grow">
+        <TextInput
+          disabled={!isRequired}
+          testId={`${testId}-notes`}
+          placeholder="Publicity Event Notes"
+          className="grow"
+          value={notes}
+          onChange={(event) => handleChange('notes', event.target.value)}
+        />
+      </div>
     </div>
   );
 };

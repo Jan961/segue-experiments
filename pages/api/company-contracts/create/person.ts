@@ -5,9 +5,8 @@ import { getEmailFromReq, checkAccess } from 'services/userService';
 import { isEmpty, omit, pick } from 'radash';
 import { prepareAddressQueryData, prepareOrganisationQueryData, preparePersonQueryData } from 'services/personService';
 import { createPersonSchema } from 'validators/person';
+import { addressFields, organisationFields } from 'services/person';
 
-const addressFields = ['address1', 'address2', 'address3', 'postcode', 'town'];
-const organisationFields = ['name', 'website'];
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method not allowed' });

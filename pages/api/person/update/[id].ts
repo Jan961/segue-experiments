@@ -4,6 +4,7 @@ import prisma from 'lib/prisma';
 import { prepareAccountUpdateData, prepareAgencyOrganisationUpdateData } from 'services/contracts';
 import { preparePersonUpdateData, updatePerson } from 'services/person';
 import { updatePersonSchema } from 'validators/person';
+import { ERROR_CODES } from 'config/apiConfig';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -55,7 +56,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     res.status(200).json({ message: 'Person and related details updated successfully', ok: true });
   } catch (error) {
     if (error instanceof yup.ValidationError) {
-      return res.status(400).json({ message: 'Validation error', errors: error.errors });
+      return res
+        .status(400)
+        .json({ message: 'Validation error', errors: error.errors, code: ERROR_CODES.VALIDATION_ERROR });
     }
 
     console.error(error);
