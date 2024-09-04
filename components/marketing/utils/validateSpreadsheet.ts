@@ -234,6 +234,13 @@ const updateValidateSpreadsheetData = (
         currentBookingDate,
       )}, on Sales Date ${dateToSimple(currentRow.salesDate)} (Row ${sale.rowNumber})`;
       rowErrorOccurred = true;
+
+      const otherCell = sale.salesRow.getCell(tableColMaps.Details);
+      const otherDetailsColMsg =
+        ` | ERROR - Mismatch in information for Booking at Venue ${currentVenue} on ${dateToSimple(
+          currentBookingDate,
+        )}, on Sales Date ${dateToSimple(currentRow.salesDate)} (Row ${currentRow.rowNumber})` + otherCell.value;
+      updateResponseDetailsCells(sale.salesRow, formatDetailsMessage(otherDetailsColMsg), true, false, null);
     }
   } else {
     booking.sales.push(createNewSale());
@@ -541,7 +548,7 @@ const writeErrorCell = (detailsCell, responseCell, spreadsheetIssues: Spreadshee
 
   detailsCell.value = detailsMessage.toString();
 
-  spreadsheetIssues.spreadsheetErrorOccurred = true;
+  if (spreadsheetIssues) spreadsheetIssues.spreadsheetErrorOccurred = true;
 };
 
 const writeWarningCell = (
@@ -565,7 +572,7 @@ const writeWarningCell = (
 
   detailsCell.value = detailsMessage;
 
-  if (!ignoreWarning) spreadsheetIssues.spreadsheetWarningOccurred = true; // don't raise a warning when ignore flag
+  if (!ignoreWarning && spreadsheetIssues) spreadsheetIssues.spreadsheetWarningOccurred = true; // don't raise a warning when ignore flag
 };
 
 const writeOKCell = (detailsCell, responseCell) => {
