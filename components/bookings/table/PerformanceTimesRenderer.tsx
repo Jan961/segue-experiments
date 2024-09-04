@@ -19,11 +19,19 @@ const PerformanceTimesRenderer = ({ data, setValue, eGridCell }: CustomCellRende
     }
   };
 
-  const goToNextTimeField = (e?: any) => {
+  const goToNextTimeField = (goDownField: boolean, e?: any) => {
     const currentlyFocussed = (isNullOrEmpty(e) ? document.activeElement : e.target).parentNode.parentNode;
-    if (inputRefs.current.length > focussedIndex) {
-      e.preventDefault();
-      currentlyFocussed?.childNodes[focussedIndex + 1]?.firstChild?.focus();
+
+    if (goDownField) {
+      if (inputRefs.current.length > focussedIndex) {
+        e.preventDefault();
+        currentlyFocussed?.childNodes[focussedIndex + 1]?.firstChild?.focus();
+      }
+    } else {
+      if (focussedIndex > 0) {
+        e.preventDefault();
+        currentlyFocussed?.childNodes[focussedIndex - 1]?.firstChild?.focus();
+      }
     }
   };
 
@@ -135,9 +143,7 @@ const PerformanceTimesRenderer = ({ data, setValue, eGridCell }: CustomCellRende
                 className="bg-white h-10"
                 onInput={handleInput}
                 onBlur={handleBlur}
-                minuteFieldJump={(e) => {
-                  goToNextTimeField(e);
-                }}
+                inputFieldJump={goToNextTimeField}
               />
             ))}
         </div>

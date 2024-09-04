@@ -19,7 +19,7 @@ export interface TimeInputProps {
   className?: string;
   tabIndexShow?: boolean;
   index?: number;
-  minuteFieldJump?: (event: any) => void;
+  inputFieldJump?: (goDownField: boolean, event?: any) => void;
 }
 
 const baseClass =
@@ -31,7 +31,7 @@ const isOfTypTime = (t: any): t is Time => t.hrs !== undefined && t.min !== unde
 
 const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
   (
-    { onChange, value, onBlur, disabled, className, tabIndexShow, index, onInput, minuteFieldJump }: TimeInputProps,
+    { onChange, value, onBlur, disabled, className, tabIndexShow, index, onInput, inputFieldJump }: TimeInputProps,
     ref,
   ) => {
     const [time, setTime] = useState<Time>(DEFAULT_TIME);
@@ -45,17 +45,22 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
         e.stopPropagation();
         hrsRef.current.select();
       } else if (e.code === 'Tab') {
-        if (!isNullOrEmpty(minuteFieldJump)) minuteFieldJump(e);
+        if (!isNullOrEmpty(inputFieldJump)) inputFieldJump(true, e);
       }
     };
 
     const handleKeyPress = (event: KeyboardEvent) => {
       if (event.key === 'Tab' && currentFocus === 'hrs') {
-        setCurrentFocus('mins');
-        event.stopPropagation();
-        event.preventDefault();
-        minsRef.current.focus();
-        minsRef.current.select();
+        if (event.shiftKey) {
+          if (!isNullOrEmpty(inputFieldJump)) inputFieldJump(false, event);
+          // go up a ref
+        } else {
+          setCurrentFocus('mins');
+          event.stopPropagation();
+          event.preventDefault();
+          minsRef.current.focus();
+          minsRef.current.select();
+        }
       }
     };
 
@@ -93,7 +98,7 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
       if (value.length === 2) {
         minsRef.current.select();
         if (inputName === 'mins') {
-          if (!isNullOrEmpty(minuteFieldJump)) minuteFieldJump(e);
+          if (!isNullOrEmpty(inputFieldJump)) inputFieldJump(true, e);
         }
       }
     };
