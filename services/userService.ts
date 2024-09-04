@@ -120,3 +120,18 @@ export const deleteUserSession = async (email: string) => {
     console.error(err);
   }
 };
+
+export const createClerkUserWithoutSession = async (
+  emailAddress: string,
+  password: string,
+  firstName: string,
+  lastName: string,
+) => {
+  const response = await clerkClient.users.createUser({
+    emailAddress: [emailAddress],
+    password,
+    firstName,
+    lastName,
+  });
+  return response;
+};
