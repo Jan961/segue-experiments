@@ -257,10 +257,13 @@ export default forwardRef(function Select(
     if (menuIsOpen) {
       //  Check if owner document is null since the menu is portaled so it is part of the main HTMLDocument so it will have no parent
       if (!isNullOrEmpty(e?.target?.ownerDocument)) {
-        //  Checks if the scroll event is inside an AGGrid
-        if (e.target.className.includes('ag-body-horizontal') || e.target.className.includes('ag-body-vertical')) {
-          setMenuIsOpen(false);
-          return true;
+        //  Checks if scroll event is coming from a dropdown menu. If it is then let it scroll, otherwise, close the select
+        const childNodeArray = e.target?.firstElementChild?.childNodes;
+        if (!isNullOrEmpty(childNodeArray) || childNodeArray instanceof NodeList) {
+          if (childNodeArray.length === 0) {
+            setMenuIsOpen(false);
+            return true;
+          }
         }
       } else {
         setMenuIsOpen(false);
