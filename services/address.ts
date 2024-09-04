@@ -9,7 +9,13 @@ export const upsertAddress = async (addressId: number, addressDetails, tx = pris
     Address3: address3,
     AddressPostcode: postcode,
     AddressTown: town,
-    AddressCountryId: country,
+    ...(country && {
+      Country: {
+        connect: {
+          Id: country,
+        },
+      },
+    }),
   };
 
   // Update or create an address record

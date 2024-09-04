@@ -7,7 +7,6 @@ export const transformPersonWithRoles = (person) => {
     }
     return contacts;
   }, []);
-
   const expensesAccountDetails = {
     paidTo: person.PersonExpensesTo || null,
     accountName: person.PersonExpensesAccountName || '',

@@ -6,7 +6,7 @@ import { upsertAddress } from './address';
 import { pick } from 'radash';
 import { isNullOrEmpty } from 'utils';
 
-export const addressFields = ['address1', 'address2', 'address3', 'postcode', 'town'];
+export const addressFields = ['address1', 'address2', 'address3', 'postcode', 'town', 'country'];
 export const organisationFields = ['name', 'website'];
 
 export const preparePersonUpdateData = async (personDetails: Partial<IPersonDetails>) => {
@@ -188,10 +188,10 @@ export const updatePersonRoles = async (
 
 export const handleEmergencyContacts = async (personId: number, emergencyContact1, emergencyContact2, tx = prisma) => {
   if (!isNullOrEmpty(emergencyContact1)) {
-    await upsertEmergencyContact(personId, emergencyContact1, 'emergencycontact1', tx);
+    await upsertEmergencyContact(personId, emergencyContact1, 'emergencycontact', tx);
   }
   if (!isNullOrEmpty(emergencyContact2)) {
-    await upsertEmergencyContact(personId, emergencyContact2, 'emergencycontact2', tx);
+    await upsertEmergencyContact(personId, emergencyContact2, 'emergencycontact', tx);
   }
 };
 
