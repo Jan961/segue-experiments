@@ -46,22 +46,24 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
             if (!isNullOrEmpty(inputFieldJump)) inputFieldJump(false, event);
           } else {
             setCurrentFocus('mins');
-            event.stopPropagation();
-            event.preventDefault();
-            minsRef.current.focus();
-            minsRef.current.select();
+            setInputFocus(event, minsRef);
           }
         } else {
           if (event.shiftKey) {
-            event.preventDefault();
-            event.stopPropagation();
-            hrsRef.current.focus();
-            hrsRef.current.select();
+            setCurrentFocus('hrs');
+            setInputFocus(event, hrsRef);
           } else {
             if (!isNullOrEmpty(inputFieldJump)) inputFieldJump(true, event);
           }
         }
       }
+    };
+
+    const setInputFocus = (event, targetRef) => {
+      event.preventDefault();
+      event.stopPropagation();
+      targetRef.current.focus();
+      targetRef.current.select();
     };
 
     const handleBlur = (e, inputRef) => {
