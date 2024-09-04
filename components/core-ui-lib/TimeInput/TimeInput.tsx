@@ -39,16 +39,20 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
     const handleMinKeyDown = (e) => {
       if (e.shiftKey && e.code === 'Tab') {
         hrsRef.current.select();
+      } else if (e.code === 'Tab') {
+        console.log('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA');
+        onKeyDown(e);
       }
     };
 
     const handleKeyPress = (event: KeyboardEvent) => {
-      console.log('key pressed ');
-      onKeyDown(event);
       if (event.key === 'Tab') {
-        console.log('tab');
+        console.log(currentFocus);
         if (currentFocus === 'hrs') {
-          setCurrentFocus('hrs');
+          setCurrentFocus('mins');
+          event.stopPropagation();
+          event.preventDefault();
+          minsRef.current.focus();
           minsRef.current.select();
         }
       }
@@ -56,7 +60,6 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
 
     const handleBlur = (e, inputRef) => {
       const { name, value } = e.target;
-      console.log(inputRef.current);
       if (inputRef.current) {
         inputRef.current.hasSelected = false;
       }
@@ -82,12 +85,15 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
       }
     };
 
-    const handleChange = (e) => {
+    const handleChange = (e, inputName) => {
       onChange(e);
       const { name, value } = e.target;
       filterTimeInput(name, value);
       if (value.length === 2) {
         minsRef.current.select();
+        if (inputName === 'mins') {
+          onKeyDown(e);
+        }
       }
     };
 
@@ -98,7 +104,8 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
       }
     };
 
-    const handleFocus = (e, inputRef) => {
+    const handleFocus = (e, inputRef, inputName) => {
+      setCurrentFocus(inputName);
       if (inputRef.current && !inputRef.current.hasSelected) {
         e.stopPropagation();
         e.preventDefault();
@@ -139,9 +146,9 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
           placeholder="hh"
           type="text"
           className="w-8 h-5/6 border-none focus:ring-0 text-center ring-0 p-0"
-          onChange={handleChange}
+          onChange={(e) => handleChange(e, 'hrs')}
           onBlur={(e) => handleBlur(e, hrsRef)}
-          onFocus={(e) => handleFocus(e, hrsRef)}
+          onFocus={(e) => handleFocus(e, hrsRef, 'hrs')}
           disabled={disabled}
           tabIndex={tabIndexShow ? 0 : 1}
           onInput={handleInputChange}
@@ -155,12 +162,14 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
           value={time.min}
           placeholder="mm"
           className="w-8 h-5/6 border-none focus:ring-0 text-center ring-0 p-0"
-          onChange={handleChange}
+          onChange={(e) => handleChange(e, 'mins')}
           onBlur={(e) => handleBlur(e, minsRef)}
-          onFocus={(e) => handleFocus(e, minsRef)}
+          onFocus={(e) => handleFocus(e, minsRef, 'mins')}
           disabled={disabled}
           tabIndex={tabIndexShow ? 0 : 2}
-          onKeyDown={handleMinKeyDown}
+          onKeyDown={(e) => {
+            handleMinKeyDown(e);
+          }}
           data-index={index}
           onInput={handleInputChange}
         />

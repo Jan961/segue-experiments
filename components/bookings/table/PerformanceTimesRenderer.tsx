@@ -4,11 +4,13 @@ import BaseCellRenderer from 'components/core-ui-lib/Table/renderers/BaseCellRen
 import TimeInput from 'components/core-ui-lib/TimeInput';
 import { Time } from 'components/core-ui-lib/TimeInput/TimeInput';
 import { useEffect, useRef, useState } from 'react';
+import { isNullOrEmpty } from '../../../utils';
 
 const PerformanceTimesRenderer = ({ data, setValue, eGridCell }: CustomCellRendererProps) => {
   const [performanceTimes, setPerformanceTimes] = useState<Time[]>([]);
   const [isDisabled, setIsDisabled] = useState(true);
   const cellRef = useRef(null);
+  const [focussedIndex, setFocussedIndex] = useState<number>(0);
 
   const inputRefs = useRef<HTMLDivElement[]>([]);
   const setInputRef = (element: HTMLDivElement | null, index: number) => {
@@ -17,28 +19,41 @@ const PerformanceTimesRenderer = ({ data, setValue, eGridCell }: CustomCellRende
     }
   };
 
+  const goToNextTimeField = (e?: any) => {
+    console.log(isNullOrEmpty(e));
+    console.log(document.activeElement.parentNode);
+    const currentlyFocussed = (isNullOrEmpty(e) ? document.activeElement : e.target).parentNode.parentNode;
+    console.log(currentlyFocussed);
+    console.log(focussedIndex);
+    if (inputRefs.current.length > focussedIndex) {
+      e.preventDefault();
+
+      currentlyFocussed?.childNodes[focussedIndex + 1]?.firstChild?.focus();
+    } else {
+      console.log('OUT OF ROWS');
+    }
+    const inputField = currentlyFocussed?.childNodes[focussedIndex];
+    console.log('/////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\');
+    console.log(currentlyFocussed);
+    console.log(inputField);
+  };
+
   const handleOnFocus = () => {
     const cellTargetDiv = cellRef?.current?.childNodes[0];
     const currentlyFocussed = document.activeElement?.childNodes[0]?.childNodes[0];
-    console.log('/////////////////////////');
-    console.log(currentlyFocussed);
-    console.log(cellTargetDiv);
+
     if (cellTargetDiv === currentlyFocussed) {
-      // Example of focusing the first input in refs array
-      console.log(cellTargetDiv.childNodes);
       cellTargetDiv.childNodes[0].childNodes[0]?.focus();
     } else {
-      let currentIndex;
       const childNodes = cellTargetDiv.childNodes;
       childNodes.forEach((node, index) => {
         console.log(index);
         console.log(node);
-        if (node === document.activeElement) {
-          currentIndex = index;
+        console.log(document.activeElement);
+        if (node === document.activeElement.parentNode) {
+          setFocussedIndex(index);
         }
       });
-      console.log(currentIndex);
-      console.log(childNodes);
     }
   };
 
@@ -135,7 +150,7 @@ const PerformanceTimesRenderer = ({ data, setValue, eGridCell }: CustomCellRende
                 onInput={handleInput}
                 onBlur={handleBlur}
                 onKeyDown={(e) => {
-                  console.log(e);
+                  goToNextTimeField(e);
                 }}
               />
             ))}
