@@ -76,7 +76,7 @@ const SpreadsheetConfirmationModal = ({
           <strong className="text-primary-red">OVERWRITTEN</strong>. Do you wish to proceed?
         </p>
         <div className="mb-5">
-          <TextBoxConfirmation requiredMessage="UPLOAD" setValid={setValidConfirmationMessage} />
+          <TextBoxConfirmation requiredMessage={prodCode} setValid={setValidConfirmationMessage} />
           {displayErrorMessage && (
             <p className="text-primary-red absolute">Sorry, please enter the text exactly as displayed to confirm.</p>
           )}
