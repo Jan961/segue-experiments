@@ -30,10 +30,6 @@ export interface SpreadsheetData {
         ignoreWarning: string;
         rowNumber: number;
         salesRow: any;
-        mismatch?: {
-          isMismatch: boolean;
-          mismatchedWith: number;
-        };
       }[];
     }[];
   }[];

@@ -54,12 +54,14 @@ export const validateSpreadsheetFile = async (file, prodCode, venueList, prodDat
 
   validateHeaders(workbook);
   if (spreadsheetIssues.spreadsheetFormatIssue) {
+    cleanSpreadsheetData();
     return { file, spreadsheetIssues, spreadsheetData };
   }
 
   const salesWorksheet = workbook.getWorksheet('Sales');
   if (!salesWorksheet) {
     spreadsheetIssues.spreadsheetFormatIssue = true;
+    cleanSpreadsheetData();
     return { file, spreadsheetIssues, spreadsheetData };
   }
 
@@ -114,6 +116,7 @@ export const validateSpreadsheetFile = async (file, prodCode, venueList, prodDat
   widenColumn(detailsColumn);
   createSummaryWorksheet(workbook);
   convertWorkbookToFile(workbook, file);
+  cleanSpreadsheetData();
 
   return { file, spreadsheetIssues, spreadsheetData };
 };
@@ -660,6 +663,20 @@ const checkForBlankRow = (currentRow) => {
     return value?.toString().trim() === '';
   });
   return isBlank;
+};
+
+// Remove references to the Spreadsheet Rows from the Data
+const cleanSpreadsheetData = () => {
+  spreadsheetData.venues.forEach((venue) => {
+    venue.bookings.forEach((booking) => {
+      delete booking.bookingFirstRow;
+      booking.sales.forEach((sale) => {
+        delete sale.ignoreWarning;
+        delete sale.rowNumber;
+        delete sale.salesRow;
+      });
+    });
+  });
 };
 
 export default validateSpreadsheetFile;
