@@ -24,7 +24,6 @@ const PasswordReset = () => {
     password: '',
     code: '',
   });
-
   const handleLoginDetailsChange = (e) => {
     setLoginDetails((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
