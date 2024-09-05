@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import prisma from 'lib/prisma';
 import { SpreadsheetDataClean } from 'types/SpreadsheetValidationTypes';
-import { getDateBlockForProduction , deleteAllDateBlockEvents } from 'services/dateBlockService';
+import { getDateBlockForProduction, deleteAllDateBlockEvents } from 'services/dateBlockService';
 import { AddBookingsParams } from 'pages/api/bookings/interface/add.interface';
 import { nanoid } from 'nanoid';
 import { BookingService } from 'pages/api/bookings/services/add.bookings';
@@ -20,7 +20,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const primaryDateBlockID = primaryDateBlock[0].Id;
 
     // Delete all associated Bookings/Rehearsals/GetInFitUp/Other events for that Primary Date Block - to be replaced.
-    await deleteAllDateBlockEvents(primaryDateBlock.Id);
+    await deleteAllDateBlockEvents(primaryDateBlockID);
 
     // Get VenueIDs for each VenueCode in SpreadsheetData
     const venueCodes = spreadsheetData.venues.map((venue) => venue.venueCode);
