@@ -37,6 +37,7 @@ export const uploadFile = async (
   onProgress: (file: File, progress: number) => void,
   onError: (file: File, errorMessage: string) => void,
   onUploadingImage: (file: File, url: string) => void,
+  customToastMessages?: { onSuccess: string; onFailure: string },
 ): Promise<UploadImageResponse> => {
   let progress = 0;
   let slowProgressInterval: ReturnType<typeof setInterval>;
@@ -50,7 +51,9 @@ export const uploadFile = async (
     progress = 100;
     onProgress(formData.get('file') as File, progress);
     clearInterval(slowProgressInterval);
-    notify.success(ToastMessages.imageUploadSuccess);
+    customToastMessages
+      ? notify.success(customToastMessages.onSuccess)
+      : notify.success(ToastMessages.imageUploadSuccess);
 
     onUploadingImage(
       formData.get('file') as File,
@@ -59,7 +62,7 @@ export const uploadFile = async (
 
     return response.data;
   } catch (error) {
-    notify.error(ToastMessages.imageUploadFailure);
+    customToastMessages ? notify.error(customToastMessages.onFailure) : notify.error(ToastMessages.imageUploadFailure);
     onError(formData.get('file') as File, 'Error uploading file. Please try again.');
     clearInterval(slowProgressInterval);
     throw new Error('Error uploading file. Please try again.');
