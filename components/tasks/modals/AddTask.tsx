@@ -64,7 +64,7 @@ const DEFAULT_MASTER_TASK: Partial<MasterTask> & {
   TaskCompletedDate?: string;
 } = {
   Id: undefined,
-  Code: 0,
+  Code: null,
   Name: '',
   Notes: '',
   TaskAssignedToAccUserId: null,
