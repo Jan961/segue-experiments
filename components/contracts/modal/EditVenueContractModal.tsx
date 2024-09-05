@@ -102,7 +102,10 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
     const demoModalData = await axios.get<DealMemoContractFormData>(
       `/api/dealMemo/getDealMemo/${selectedTableCell.contract.Id ? selectedTableCell.contract.Id : 1}`,
     );
-    if (!demoModalData.data) {
+
+    console.log(demoModalData);
+
+    if (isNullOrEmpty(demoModalData.data)) {
       setDealMemoCreated(false);
       setDealMemoButtonText('Create Deal Memo');
     } else {

@@ -1,6 +1,7 @@
 import prisma from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getEmailFromReq, checkAccess } from 'services/userService';
+import { isNullOrEmpty } from 'utils';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -20,6 +21,13 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         DealMemoHold: true,
       },
     });
+
+    // if dealMemo Id is null or undefined - there isn't one - return empty object
+    // also return to ensure the function does not continue to execute
+    if (isNullOrEmpty(dealMemo)) {
+      res.status(200).json({});
+      return;
+    }
 
     const emailSalesRecipients = await prisma.DealMemoSalesEmailRecipient.findMany({
       where: {
