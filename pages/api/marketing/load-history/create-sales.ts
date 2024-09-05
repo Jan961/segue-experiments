@@ -1,11 +1,12 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import prisma from 'lib/prisma';
-import { SpreadsheetData } from 'types/SpreadsheetValidationTypes';
+import { SpreadsheetDataClean } from 'types/SpreadsheetValidationTypes';
 import { getDateBlockForProduction } from 'services/dateBlockService';
 // import { deleteAllDateBlockEvents } from 'services/dateBlockService';
+import { AddBookingsParams } from 'pages/api/bookings/interface/add.interface';
 
 interface RequestBody {
-  spreadsheetData: SpreadsheetData;
+  spreadsheetData: SpreadsheetDataClean;
   productionID: number;
 }
 
@@ -15,7 +16,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
 
     // Find DateBlock for ProductionID that isPrimary
     const primaryDateBlock = await getDateBlockForProduction(productionID, true);
-    console.log(primaryDateBlock);
+    const primaryDateBlockID = primaryDateBlock.Id;
 
     // Delete all associated Bookings/Rehearsals/GetInFitUp/Other events for that Primary Date Block - to be replaced.
     // await deleteAllDateBlockEvents(primaryDateBlock.Id)
@@ -36,17 +37,26 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     console.log(venueIDs);
 
     // Create Bookings for each listed Booking in the spreadsheetData
-    const newBookings = [];
+    const bookingsToCreate: AddBookingsParams[] = [];
     for (const venue of spreadsheetData.venues) {
       for (const booking of venue.bookings) {
-        const matchingVenue = venueIDs.find((venueID) => venueID.Code === venue.venueCode);
-        if (matchingVenue) {
-          console.log(primaryDateBlock, booking);
-          // create booking
+        const venueId = venueIDs.find((venueID) => venueID.Code === venue.venueCode)?.Id;
+        if (venueId) {
+          bookingsToCreate.push({
+            DateBlockId: primaryDateBlockID,
+            VenueId: venueId,
+            isBooking: true,
+            Notes: '',
+            BookingDate: booking.bookingDate,
+            StatusCode: 'C',
+            PencilNum: null,
+            Performances: null,
+            RunTag: '...',
+          });
         }
       }
     }
-    console.log(newBookings);
+    console.log(bookingsToCreate);
 
     res.status(200).json({ status: 'Success' });
   } catch (err) {

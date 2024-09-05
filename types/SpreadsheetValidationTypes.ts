@@ -35,6 +35,24 @@ export interface SpreadsheetData {
   }[];
 }
 
+export interface SpreadsheetDataClean {
+  venues: {
+    venueCode: string;
+    bookings: {
+      bookingDate: string;
+      finalSalesDate: string;
+      sales: {
+        salesDate: string;
+        salesType: string;
+        seats: number;
+        value: string;
+        isFinal: string;
+        ignoreWarning: string;
+      }[];
+    }[];
+  }[];
+}
+
 export enum SalesType {
   'General Sales',
   'General Reservations',

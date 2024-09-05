@@ -78,7 +78,7 @@ const SpreadsheetConfirmationModal = ({
         <div className="mb-5">
           <TextBoxConfirmation requiredMessage={prodCode} setValid={setValidConfirmationMessage} />
           {displayErrorMessage && (
-            <p className="text-primary-red absolute">Sorry, please enter the text exactly as displayed to confirm.</p>
+            <p className="text-primary-red absolute">Please enter the text exactly as displayed to confirm.</p>
           )}
         </div>
         <div className="flex gap-x-2 justify-end">{proceedButtons()}</div>
