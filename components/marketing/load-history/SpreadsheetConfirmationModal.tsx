@@ -1,7 +1,7 @@
 import { Button, PopupModal } from 'components/core-ui-lib';
 import { UploadedFile } from 'components/core-ui-lib/UploadModal/interface';
 import { UploadParamType } from 'types/SpreadsheetValidationTypes';
-import TextBoxConfirmation from './TextBoxConfirmation';
+import TextBoxConfirmation from 'components/core-ui-lib/TextBoxConfirmation';
 import { useState } from 'react';
 
 interface SpreadsheetModalProps {
