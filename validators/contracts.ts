@@ -97,7 +97,7 @@ export const contractSchema = yup.object().shape({
   personId: yup.number().integer().required(),
   templateId: yup.number().integer().required(),
   contractDetails: contractDetailsSchema.required(),
-  accScheduleJson: yup.array().of(scheduleDaySchema).nullable(),
+  accScheduleJson: yup.array().nullable(),
 });
 
 export const updateContractSchema = yup.object().shape({
