@@ -13,12 +13,12 @@ export interface TreeItemProps {
 }
 
 export default memo(function TreeItem({ value, onChange, defaultOpen }: TreeItemProps) {
-  const { id, label, options, checked, groupHeader } = value;
+  const { id, label, options, checked, groupHeader, isPartiallySelected } = value;
   const isLeafNode = !options || options.length === 0;
   const labelClass = groupHeader ? 'text-responsive-sm font-semibold' : 'text-responsive-sm';
   const [itemOptions, setItemOptions] = useState(options || []);
   const [selected, setSelected] = useState<boolean>(checked || false);
-  const [showIntermediateState, setShowIntermediateState] = useState<boolean>(false);
+  const [showIntermediateState, setShowIntermediateState] = useState<boolean>(isPartiallySelected);
 
   const handleSelectionChange = (checked) => {
     let updatedOptions = [];
@@ -56,6 +56,12 @@ export default memo(function TreeItem({ value, onChange, defaultOpen }: TreeItem
   const handleGroupToggle = (e: React.ChangeEvent<HTMLInputElement>) => {
     const isChecked = e.target.checked;
     const updatedOptions = handleSelectionChange(isChecked);
+    if (isChecked) {
+      setShowIntermediateState(false);
+    } else {
+      setShowIntermediateState(areAllChildrenSelected(updatedOptions));
+    }
+
     onChange({ ...value, options: updatedOptions, checked: isChecked, isPartiallySelected: false });
   };
 
@@ -71,7 +77,7 @@ export default memo(function TreeItem({ value, onChange, defaultOpen }: TreeItem
     if (isPartiallySelected) {
       setShowIntermediateState(true);
     } else {
-      // If this is not a leaf node, eavluate if this node should be partially selected
+      // If this is not a leaf node, evaluate if this node should be partially selected
       isPartiallySelected = hasPartiallySelectedChildren(updatedOptions);
       setShowIntermediateState(isPartiallySelected);
     }
