@@ -35,6 +35,11 @@ export const simpleToDate = (stringToFormat: string) => {
   return new Date(Number(`20${parts[2]}`), Number(Number(parts[0]) - 1), Number(parts[1]));
 };
 
+export const simpleToDateDMY = (dateStr: string) => {
+  const [day, month, year] = dateStr.split('/').map(Number);
+  return new Date(year + 2000, month - 1, day);
+};
+
 export const dateToSimple = (dateToFormat: Date | string) => {
   if (!dateToFormat) return 'DD/MM/YY';
   const date = safeDate(dateToFormat);
