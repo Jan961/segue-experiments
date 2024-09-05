@@ -209,9 +209,17 @@ const LoadSalesHistory = () => {
         <SpreadsheetConfirmationModal
           visible={confirmationModalVisible}
           onClose={() => setConfirmationModalVisible(false)}
-          handleUpload={handleUpload}
-          uploadedFile={uploadedFile}
+          handleUpload={() =>
+            handleUpload(
+              uploadedFile,
+              uploadParams.spreadsheetData,
+              uploadParams.onProgress,
+              uploadParams.onError,
+              uploadParams.onUploadingImage,
+            )
+          }
           uploadParams={uploadParams}
+          uploadedFile={uploadedFile}
           closeUploadModal={() => setUploadModalVisible(false)}
           prodCode={prodCode}
         />
