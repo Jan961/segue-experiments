@@ -1,9 +1,10 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import prisma from 'lib/prisma';
 import { SpreadsheetDataClean } from 'types/SpreadsheetValidationTypes';
-import { getDateBlockForProduction } from 'services/dateBlockService';
-// import { deleteAllDateBlockEvents } from 'services/dateBlockService';
+import { getDateBlockForProduction , deleteAllDateBlockEvents } from 'services/dateBlockService';
 import { AddBookingsParams } from 'pages/api/bookings/interface/add.interface';
+import { nanoid } from 'nanoid';
+import { BookingService } from 'pages/api/bookings/services/add.bookings';
 
 interface RequestBody {
   spreadsheetData: SpreadsheetDataClean;
@@ -16,10 +17,10 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
 
     // Find DateBlock for ProductionID that isPrimary
     const primaryDateBlock = await getDateBlockForProduction(productionID, true);
-    const primaryDateBlockID = primaryDateBlock.Id;
+    const primaryDateBlockID = primaryDateBlock[0].Id;
 
     // Delete all associated Bookings/Rehearsals/GetInFitUp/Other events for that Primary Date Block - to be replaced.
-    // await deleteAllDateBlockEvents(primaryDateBlock.Id)
+    await deleteAllDateBlockEvents(primaryDateBlock.Id);
 
     // Get VenueIDs for each VenueCode in SpreadsheetData
     const venueCodes = spreadsheetData.venues.map((venue) => venue.venueCode);
@@ -34,7 +35,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         Code: true,
       },
     });
-    console.log(venueIDs);
 
     // Create Bookings for each listed Booking in the spreadsheetData
     const bookingsToCreate: AddBookingsParams[] = [];
@@ -50,13 +50,20 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
             BookingDate: booking.bookingDate,
             StatusCode: 'C',
             PencilNum: null,
-            Performances: null,
-            RunTag: '...',
+            Performances: [
+              {
+                Time: null,
+                Date: booking.bookingDate,
+              },
+            ],
+            RunTag: nanoid(8),
           });
         }
       }
     }
-    console.log(bookingsToCreate);
+
+    const { bookings } = await BookingService.createBookings(bookingsToCreate);
+    console.log(bookings);
 
     res.status(200).json({ status: 'Success' });
   } catch (err) {

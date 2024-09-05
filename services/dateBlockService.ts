@@ -9,27 +9,30 @@ export const getDateBlockForProduction = async (productionId: number, isPrimary:
 };
 
 export const deleteAllDateBlockEvents = async (dateBlockID: number) => {
-  await prisma.Booking.deleteMany({
-    where: {
-      DateBlockId: { equals: dateBlockID },
-    },
-  });
+  if (dateBlockID) {
+    // important to Check DateBlockID is not null
+    await prisma.Booking.deleteMany({
+      where: {
+        DateBlockId: { equals: dateBlockID },
+      },
+    });
 
-  await prisma.Rehearsal.deleteMany({
-    where: {
-      DateBlockId: { equals: dateBlockID },
-    },
-  });
+    await prisma.Rehearsal.deleteMany({
+      where: {
+        DateBlockId: { equals: dateBlockID },
+      },
+    });
 
-  await prisma.GetInFitUp.deleteMany({
-    where: {
-      DateBlockId: { equals: dateBlockID },
-    },
-  });
+    await prisma.GetInFitUp.deleteMany({
+      where: {
+        DateBlockId: { equals: dateBlockID },
+      },
+    });
 
-  await prisma.Other.deleteMany({
-    where: {
-      DateBlockId: { equals: dateBlockID },
-    },
-  });
+    await prisma.Other.deleteMany({
+      where: {
+        DateBlockId: { equals: dateBlockID },
+      },
+    });
+  }
 };
