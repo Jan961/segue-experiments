@@ -352,53 +352,6 @@ export const EditDealMemoContractModal = ({
     console.log(value);
   };
 
-  //   const exportToPDF = async (modalId: string) => {
-  //     const input = document.getElementById(modalId);
-
-  //     if (!input) {
-  //         console.error('Modal content not found');
-  //         return;
-  //     }
-
-  //     try {
-  //         // Wait until all fonts and images are loaded
-  //         await document.fonts.ready;
-  //         const images = Array.from(document.images);
-  //         await Promise.all(images.map(img => new Promise(resolve => img.complete ? resolve() : img.onload = resolve)));
-
-  //         const canvas = await html2canvas(input, {
-  //             scale: 2,  // Adjust as needed
-  //             useCORS: true,  // Ensure CORS-enabled content is captured
-  //             allowTaint: false,  // Set to false to avoid tainting issues
-  //             logging: true,  // Enable logging for debugging
-  //         });
-
-  //         const imgData = canvas.toDataURL('image/png');
-  //         const pdf = new jsPDF('p', 'mm', 'a4');
-
-  //         const imgWidth = 210;
-  //         const pageHeight = 297;
-  //         const imgHeight = (canvas.height * imgWidth) / canvas.width;
-  //         let heightLeft = imgHeight;
-
-  //         let position = 0;
-
-  //         pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-  //         heightLeft -= pageHeight;
-
-  //         while (heightLeft >= 0) {
-  //             position = heightLeft - imgHeight;
-  //             pdf.addPage();
-  //             pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-  //             heightLeft -= pageHeight;
-  //         }
-
-  //         pdf.save('deal_memo.pdf');
-  //     } catch (error) {
-  //         console.error('Error exporting to PDF:', error);
-  //     }
-  // };
-
   return (
     <div id="deal-memo-modal">
       <PopupModal
