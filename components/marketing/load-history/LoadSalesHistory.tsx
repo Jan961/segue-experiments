@@ -43,7 +43,10 @@ const LoadSalesHistory = () => {
 
   const updateProductionSales = async (spreadsheetData) => {
     try {
-      await axios.post('/api/marketing/load-history/update-sales', { spreadsheetData });
+      await axios.post('/api/marketing/load-history/create-sales', {
+        spreadsheetData,
+        productionID: selectedProducton.Id,
+      });
     } catch (error) {
       console.log(error, 'Failed to update Production with Sales History Data');
     }
