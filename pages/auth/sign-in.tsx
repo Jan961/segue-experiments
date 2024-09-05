@@ -1,8 +1,8 @@
-import { Button, Icon, Label, PasswordInput, Select, TextInput, Tooltip } from 'components/core-ui-lib';
+import { Button, Icon, Label, Loader, PasswordInput, Select, TextInput, Tooltip } from 'components/core-ui-lib';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { calibri } from 'lib/fonts';
-import { useSignIn, useClerk } from '@clerk/nextjs';
+import { useSignIn, useClerk, useAuth } from '@clerk/nextjs';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import axios from 'axios';
@@ -10,13 +10,22 @@ import { accountLoginSchema, loginSchema } from 'validators/auth';
 
 import * as yup from 'yup';
 import AuthError from 'components/auth/AuthError';
+import Spinner from 'components/core-ui-lib/Spinner';
+
+export const LoadingOverlay = () => (
+  <div className="inset-0 absolute bg-white bg-opacity-50 z-50 flex justify-center items-center top-20 left-20 right-20 bottom-20">
+    <Loader variant="lg" iconProps={{ stroke: '#FFF' }} />
+  </div>
+);
 
 const SignIn = () => {
   const { isLoaded, signIn, setActive } = useSignIn();
+  const [isBusy, setIsBusy] = useState(false);
   const { signOut } = useClerk();
   const [validationError, setValidationError] = useState<string>('');
   const [accounts, setAccounts] = useState([]);
   const router = useRouter();
+  const { isSignedIn } = useAuth();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loginDetails, setLoginDetails] = useState({
     email: '',
@@ -25,11 +34,18 @@ const SignIn = () => {
     pin: '',
   });
 
+  useEffect(() => {
+    if (isSignedIn) {
+      router.push('/');
+    }
+  }, [isSignedIn]);
+
   const handleLoginDetailsChange = (e) => {
     setLoginDetails((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const attemptClerkAuth = async () => {
+    setIsBusy(true);
     if (isLoaded) {
       try {
         // validate inputs
@@ -56,6 +72,8 @@ const SignIn = () => {
           setValidationError(error.errors[0]);
         }
         console.error('Error signing in:', error);
+      } finally {
+        setIsBusy(false);
       }
     }
   };
@@ -70,6 +88,7 @@ const SignIn = () => {
   };
 
   const handleSignIn = async () => {
+    setIsBusy(true);
     try {
       // validate inputs
       await accountLoginSchema.validate(loginDetails, { abortEarly: true });
@@ -97,6 +116,8 @@ const SignIn = () => {
         setValidationError(error.errors[0]);
       }
       console.error(error);
+    } finally {
+      setIsBusy(false);
     }
   };
 
@@ -120,7 +141,9 @@ const SignIn = () => {
     }
   };
 
-  return (
+  return !isLoaded ? (
+    <Spinner size="lg" />
+  ) : (
     <div className={`${calibri.variable} font-calibri background-gradient flex flex-col py-20  px-6`}>
       <Image className="mx-auto mb-2" height={160} width={310} src="/segue/segue_logo_full.png" alt="Segue" />
 
@@ -152,13 +175,13 @@ const SignIn = () => {
           />
           {validationError?.includes('Password') && <AuthError error={validationError} />}
           <div className="flex justify-end">
-            <Link href="/auth/sign-up" passHref className="ml-4">
+            <Link href="/auth/password-reset" passHref className="ml-4">
               Forgotten Password?
             </Link>
           </div>
         </div>
         <div className="flex justify-end gap-2 mt-5">
-          <Button text="Next" onClick={attemptClerkAuth} className="w-32" disabled={isAuthenticated} />
+          <Button loading={isBusy} text="Next" onClick={attemptClerkAuth} className="w-32" disabled={isAuthenticated} />
         </div>
         {isAuthenticated && (
           <div>
@@ -211,6 +234,7 @@ const SignIn = () => {
           </div>
         )}
       </div>
+      {isBusy && <LoadingOverlay />}
     </div>
   );
 };
