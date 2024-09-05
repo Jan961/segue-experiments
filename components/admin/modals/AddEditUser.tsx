@@ -253,7 +253,7 @@ const AdEditUser = ({ visible, onClose, permissions, productions = [], selectedU
                 {userDetails.productions.map((production) => (
                   <Checkbox
                     key={production.id}
-                    id={production.id}
+                    id={`${production.label}${production.id}`}
                     name={production.id}
                     label={production.label}
                     checked={production.checked}
