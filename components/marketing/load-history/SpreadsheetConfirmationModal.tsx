@@ -1,6 +1,6 @@
 import { Button, PopupModal } from 'components/core-ui-lib';
 import { UploadedFile } from 'components/core-ui-lib/UploadModal/interface';
-import { UploadParamType } from 'types/SpreadsheetValidationTypes';
+import { UploadParamType , SpreadsheetData } from 'types/SpreadsheetValidationTypes';
 
 interface SpreadsheetModalProps {
   visible: boolean;
@@ -8,6 +8,7 @@ interface SpreadsheetModalProps {
   closeUploadModal: () => void;
   handleUpload: (
     selectedFiles: UploadedFile[],
+    spreadsheetData: SpreadsheetData,
     onProgress: (file: File, uploadProgress: number) => void,
     onError: (file: File, errorMessage: string) => void,
     onUploadingImage: (file: File, imageUrl: string) => void,
@@ -95,7 +96,13 @@ const SpreadsheetConfirmationModal = ({
             className="w-[128px] mt-3"
             text="Yes"
             onClick={() => {
-              handleUpload(uploadedFile, uploadParams.onProgress, uploadParams.onError, uploadParams.onUploadingImage);
+              handleUpload(
+                uploadedFile,
+                uploadParams.spreadsheetData,
+                uploadParams.onProgress,
+                uploadParams.onError,
+                uploadParams.onUploadingImage,
+              );
               closeModals();
             }}
           />

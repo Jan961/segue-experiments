@@ -101,4 +101,5 @@ export interface UploadParamType {
   onError: (file: File, errorMessage: string) => void;
   onUploadingImage: (file: File, imageUrl: string) => void;
   spreadsheetIssues: SpreadsheetIssues;
+  spreadsheetData: SpreadsheetData;
 }

@@ -54,13 +54,13 @@ export const validateSpreadsheetFile = async (file, prodCode, venueList, prodDat
 
   validateHeaders(workbook);
   if (spreadsheetIssues.spreadsheetFormatIssue) {
-    return { file, spreadsheetIssues };
+    return { file, spreadsheetIssues, spreadsheetData };
   }
 
   const salesWorksheet = workbook.getWorksheet('Sales');
   if (!salesWorksheet) {
     spreadsheetIssues.spreadsheetFormatIssue = true;
-    return { file, spreadsheetIssues };
+    return { file, spreadsheetIssues, spreadsheetData };
   }
 
   salesWorksheet.eachRow((row, rowNumber) => {
@@ -115,7 +115,7 @@ export const validateSpreadsheetFile = async (file, prodCode, venueList, prodDat
   createSummaryWorksheet(workbook);
   convertWorkbookToFile(workbook, file);
 
-  return { file, spreadsheetIssues };
+  return { file, spreadsheetIssues, spreadsheetData };
 };
 
 const validateRow = (

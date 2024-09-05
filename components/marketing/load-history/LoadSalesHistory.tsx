@@ -41,6 +41,14 @@ const LoadSalesHistory = () => {
     }
   };
 
+  const updateProductionSales = async (spreadsheetData) => {
+    try {
+      await axios.post('/api/marketing/load-history/update-sales', { spreadsheetData });
+    } catch (error) {
+      console.log(error, 'Failed to update Production with Sales History Data');
+    }
+  };
+
   const fetchSpreadsheet = async () => {
     if (!selected) {
       return;
@@ -68,18 +76,17 @@ const LoadSalesHistory = () => {
   };
 
   const onSave = async (file, onProgress, onError, onUploadingImage) => {
-    const { file: validateFile, spreadsheetIssues } = await validateSpreadsheetFile(
-      file,
-      prodCode,
-      venueList,
-      dateRange,
-    );
+    const {
+      file: validateFile,
+      spreadsheetIssues,
+      spreadsheetData,
+    } = await validateSpreadsheetFile(file, prodCode, venueList, dateRange);
     setUploadedFile(validateFile);
-    setUploadParams({ onProgress, onError, onUploadingImage, spreadsheetIssues });
+    setUploadParams({ onProgress, onError, onUploadingImage, spreadsheetIssues, spreadsheetData });
     setConfirmationModalVisible(true);
   };
 
-  const handleUpload = async (file, onProgress, onError, onUploadingImage) => {
+  const handleUpload = async (file, spreadsheetData, onProgress, onError, onUploadingImage) => {
     const formData = new FormData();
     formData.append('file', file[0].file);
     formData.append('path', `marketing/salesHistory`);
@@ -101,6 +108,7 @@ const LoadSalesHistory = () => {
         };
         setSalesHistoryRows([newFile]);
         onUploadSuccess({ fileId: response.id });
+        updateProductionSales(spreadsheetData);
       }
     } catch (error) {
       onError(file[0].file, 'Error uploading file. Please try again.');
