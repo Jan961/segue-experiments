@@ -37,7 +37,7 @@ export default function CompanyContractsTable({ rowData = [] }: ContractsTablePr
         Object.values(users),
         null,
         'Id',
-        ({ UserFirstName = '', UserLastName = '' }) => `${UserFirstName || ''} ${UserLastName || ''}`,
+        ({ FirstName = '', LastName = '' }) => `${FirstName || ''} ${LastName || ''}`,
       ),
     [users],
   );
