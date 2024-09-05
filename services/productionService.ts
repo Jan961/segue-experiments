@@ -127,6 +127,7 @@ export const getAllProductions = async () => {
       },
       DateBlock: true,
       ProdCoId: true,
+      SalesEmail: true,
     },
     where: {
       IsDeleted: false,

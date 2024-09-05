@@ -91,6 +91,7 @@ export const initialDealMemoDataState: DealMemoContractFormData = {
   SellProgCommPercent: null,
   SellMerchCommPercent: null,
   SellPitchFee: null,
+  SendTo: null,
   TechVenueContactId: null,
   TechArrivalDate: null,
   TechArrivalTime: null,

@@ -216,6 +216,15 @@ export type ContractsDTO = {
   ContactInfoReceived: boolean;
 };
 
+export type AccountContactDTO = {
+  AccContId: number;
+  AccContAccountId: number;
+  AccContFirstName: string;
+  AccContLastName: string;
+  AccContPhone: string;
+  AccContMainEmail: string;
+};
+
 export type GetInFitUpDTO = {
   Id: number;
   VenueId?: number; // check field name
@@ -439,10 +448,10 @@ export type VenueRoleDTO = {
 };
 
 export type UserDto = {
-  UserId?: number;
-  UserEmail: string;
-  UserFirstName: string;
-  UserLastName?: string;
+  Id?: number;
+  Email: string;
+  FirstName: string;
+  LastName?: string;
   AccUserId: number;
 };
 
@@ -707,17 +716,7 @@ export interface SaveContractBookingFormState {
 export interface ContactDemoFormData {
   phone: string;
   email: string;
-}
-
-export interface ContactDemoFormAccountData {
-  // phone: string;
-  Email?: string;
-  AccountUser?: any;
-  companyContact?: string;
-}
-
-export interface ContactsFormData {
-  data: ContactDemoFormAccountData;
+  id: number;
 }
 
 export interface DealMemoCall {
@@ -814,6 +813,8 @@ export interface DealMemoContractFormData {
   ApprovedBy?: string;
   DateReturned?: Date;
   Notes?: string;
+  CompAccContId?: number;
+  SendTo?: Array<number>;
 }
 
 export interface DealMemoHoldType {
