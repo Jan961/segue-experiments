@@ -137,5 +137,5 @@ export const updateContractSchema = yup.object().shape({
   personId: yup.number().integer().nullable(),
   currency: yup.string().length(3).nullable(),
   venueId: yup.number().integer().nullable(),
-  accScheduleJson: yup.array().of(scheduleDaySchema).nullable(),
+  accScheduleJson: yup.array().nullable(),
 });
