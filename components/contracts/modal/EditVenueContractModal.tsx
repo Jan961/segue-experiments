@@ -103,8 +103,6 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
       `/api/dealMemo/getDealMemo/${selectedTableCell.contract.Id ? selectedTableCell.contract.Id : 1}`,
     );
 
-    console.log(demoModalData);
-
     if (isNullOrEmpty(demoModalData.data)) {
       setDealMemoCreated(false);
       setDealMemoButtonText('Create Deal Memo');
