@@ -119,6 +119,8 @@ export const validateSpreadsheetFile = async (file, prodCode, venueList, prodDat
   convertWorkbookToFile(workbook, file);
   const cleanedSpreadsheetData = cleanSpreadsheetData(spreadsheetData);
 
+  console.log(cleanedSpreadsheetData);
+
   return { file, spreadsheetIssues, spreadsheetData: cleanedSpreadsheetData };
 };
 
@@ -710,10 +712,10 @@ const cleanSpreadsheetData = (data: SpreadsheetData): SpreadsheetDataCleaned => 
             salesForDate = {
               salesDate,
               isFinal,
-              generalSales: { seats: 0, value: '0' },
-              generalReservations: { seats: 0, value: '0' },
-              schoolSales: { seats: 0, value: '0' },
-              schoolReservations: { seats: 0, value: '0' },
+              generalSales: null,
+              generalReservations: null,
+              schoolSales: null,
+              schoolReservations: null,
             };
             acc.push(salesForDate);
           }
