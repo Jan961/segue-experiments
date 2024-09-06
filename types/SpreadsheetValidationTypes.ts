@@ -35,6 +35,36 @@ export interface SpreadsheetData {
   }[];
 }
 
+export interface SpreadsheetDataCleaned {
+  venues: {
+    venueCode: string;
+    bookings: {
+      bookingDate: Date;
+      finalSalesDate: Date;
+      sales: {
+        salesDate: Date;
+        isFinal: string;
+        generalSales: {
+          seats: number;
+          value: string;
+        };
+        generalReservations: {
+          seats: number;
+          value: string;
+        };
+        schoolSales: {
+          seats: number;
+          value: string;
+        };
+        schoolReservations: {
+          seats: number;
+          value: string;
+        };
+      }[];
+    }[];
+  }[];
+}
+
 export interface SpreadsheetDataClean {
   venues: {
     venueCode: string;
@@ -123,5 +153,5 @@ export interface UploadParamType {
   onError: (file: File, errorMessage: string) => void;
   onUploadingImage: (file: File, imageUrl: string) => void;
   spreadsheetIssues: SpreadsheetIssues;
-  spreadsheetData: SpreadsheetData;
+  spreadsheetData: SpreadsheetDataCleaned;
 }

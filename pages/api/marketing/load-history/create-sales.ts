@@ -72,7 +72,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       }
 
       const createdBookings = await Promise.allSettled(bookingsWithSales.map((item) => item.booking));
-
       // Update bookingsWithSales with the resolved bookings
       createdBookings.forEach((result, index) => {
         if (result.status === 'fulfilled') {
@@ -84,37 +83,10 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
 
       return bookingsWithSales;
     });
-
     console.log(bookingsWithSales);
+    console.log(SalesTypeMap);
 
-    // // create a sales set for each booking, and add all sales
-    await prisma.$transaction(async (tx) => {
-      for (const { booking, sales } of bookingsWithSales) {
-        for (const sale of sales) {
-          await tx.SalesSet.create({
-            data: {
-              SetBookingId: booking.Id,
-              SetPerformanceId: null,
-              SetSalesFiguresDate: sale.salesDate,
-              SetBrochureReleased: false,
-              SetSingleSeats: false,
-              SetNotOnSale: false,
-              SetIsFinalFigures: sale.isFinal.toString().toUpperCase() === 'Y',
-              SetIsCopy: false,
-              // adjust this to create multiple sales of potential different types when i fix the spreadsheet validation
-              Sale: {
-                create: {
-                  SaleSaleTypeId: SalesTypeMap[sale.salesType],
-                  SaleSeats: sale.seats,
-                  SaleValue: sale.value,
-                },
-              },
-            },
-          });
-          // console.log(result)
-        }
-      }
-    });
+    // Create the sales set and sales:
 
     res.status(200).json({ status: 'Success' });
   } catch (err) {

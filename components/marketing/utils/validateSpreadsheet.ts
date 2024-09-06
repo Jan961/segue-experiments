@@ -10,6 +10,7 @@ import {
   ignoreWarningType,
   tableColMaps,
   expectedHeaders,
+  SpreadsheetDataCleaned,
 } from 'types/SpreadsheetValidationTypes';
 
 let currentRow: SpreadsheetRow;
@@ -54,15 +55,15 @@ export const validateSpreadsheetFile = async (file, prodCode, venueList, prodDat
 
   validateHeaders(workbook);
   if (spreadsheetIssues.spreadsheetFormatIssue) {
-    cleanSpreadsheetData();
-    return { file, spreadsheetIssues, spreadsheetData };
+    const cleanedSpreadsheetData = cleanSpreadsheetData(spreadsheetData);
+    return { file, spreadsheetIssues, spreadsheetData: cleanedSpreadsheetData };
   }
 
   const salesWorksheet = workbook.getWorksheet('Sales');
   if (!salesWorksheet) {
     spreadsheetIssues.spreadsheetFormatIssue = true;
-    cleanSpreadsheetData();
-    return { file, spreadsheetIssues, spreadsheetData };
+    const cleanedSpreadsheetData = cleanSpreadsheetData(spreadsheetData);
+    return { file, spreadsheetIssues, spreadsheetData: cleanedSpreadsheetData };
   }
 
   salesWorksheet.eachRow((row, rowNumber) => {
@@ -116,11 +117,9 @@ export const validateSpreadsheetFile = async (file, prodCode, venueList, prodDat
   widenColumn(detailsColumn);
   createSummaryWorksheet(workbook);
   convertWorkbookToFile(workbook, file);
-  cleanSpreadsheetData();
+  const cleanedSpreadsheetData = cleanSpreadsheetData(spreadsheetData);
 
-  console.log(spreadsheetData);
-
-  return { file, spreadsheetIssues, spreadsheetData };
+  return { file, spreadsheetIssues, spreadsheetData: cleanedSpreadsheetData };
 };
 
 const validateRow = (
@@ -696,18 +695,49 @@ const checkForBlankRow = (currentRow) => {
   return isBlank;
 };
 
-// Remove references to the Spreadsheet Rows from the Data
-const cleanSpreadsheetData = () => {
-  spreadsheetData.venues.forEach((venue) => {
-    venue.bookings.forEach((booking) => {
-      delete booking.bookingFirstRow;
-      booking.sales.forEach((sale) => {
-        delete sale.ignoreWarning;
-        delete sale.rowNumber;
-        delete sale.salesRow;
-      });
-    });
-  });
+const cleanSpreadsheetData = (data: SpreadsheetData): SpreadsheetDataCleaned => {
+  return {
+    venues: data.venues.map((venue) => ({
+      venueCode: venue.venueCode,
+      bookings: venue.bookings.map((booking) => ({
+        bookingDate: booking.bookingDate,
+        finalSalesDate: booking.finalSalesDate,
+        sales: booking.sales.reduce((acc: any, sale) => {
+          const { salesDate, salesType, seats, value, isFinal } = sale;
+
+          let salesForDate = acc.find((s: any) => s.salesDate.getTime() === salesDate.getTime());
+          if (!salesForDate) {
+            salesForDate = {
+              salesDate,
+              isFinal,
+              generalSales: { seats: 0, value: '0' },
+              generalReservations: { seats: 0, value: '0' },
+              schoolSales: { seats: 0, value: '0' },
+              schoolReservations: { seats: 0, value: '0' },
+            };
+            acc.push(salesForDate);
+          }
+
+          switch (salesType) {
+            case 'General Sales':
+              salesForDate.generalSales = { seats, value };
+              break;
+            case 'General Reservations':
+              salesForDate.generalReservations = { seats, value };
+              break;
+            case 'School Sales':
+              salesForDate.schoolSales = { seats, value };
+              break;
+            case 'School Reservations':
+              salesForDate.schoolReservations = { seats, value, isFinal };
+              break;
+          }
+
+          return acc;
+        }, []),
+      })),
+    })),
+  };
 };
 
 export default validateSpreadsheetFile;
