@@ -54,8 +54,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   headerRow.height = 30;
 
   data.map(bookingContactNoteMapper).forEach((note) => {
-    const { UserFirstName = '', UserLastName = '' } = usersMap[note.ActionAccUserId] || {};
-    const actionedBy = `${UserFirstName || ''} ${UserLastName || ''}`;
+    const { FirstName = '', LastName = '' } = usersMap[note.ActionAccUserId] || {};
+    const actionedBy = `${FirstName || ''} ${LastName || ''}`;
     const row = worksheet.addRow([
       note.CoContactName,
       moment(note.ContactDate).format('DD/MM/YY'),

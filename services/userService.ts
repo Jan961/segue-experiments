@@ -47,9 +47,9 @@ export const getUserNameForClerkId = async (userId: string): Promise<string> => 
   const matching = user.emailAddresses.filter((x) => x.id === user.primaryEmailAddressId)[0];
   const accountId = await getAccountId(matching.emailAddress);
   const users = await getUsers(accountId);
-  const currentUser = users.find((user) => user.UserEmail === matching.emailAddress);
-  const firstname = isNullOrEmpty(currentUser.UserFirstName) ? '' : currentUser.UserFirstName;
-  const lastname = isNullOrEmpty(currentUser.UserLastName) ? '' : currentUser.UserLastName;
+  const currentUser = users.find((user) => user.Email === matching.emailAddress);
+  const firstname = isNullOrEmpty(currentUser.FirstName) ? '' : currentUser.FirstName;
+  const lastname = isNullOrEmpty(currentUser.LastName) ? '' : currentUser.LastName;
   return firstname + ' ' + lastname;
 };
 

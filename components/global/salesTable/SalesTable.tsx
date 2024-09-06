@@ -95,7 +95,7 @@ export default function SalesTable({
     });
 
     setRowData(processedBookings);
-
+    console.log(variant);
     if (variant === 'prodComparision') {
       setColumnDefs(
         prodComparisionColDefs(
@@ -200,6 +200,7 @@ export default function SalesTable({
   };
 
   const calculateWidth = () => {
+    console.log(variant);
     switch (variant) {
       case 'salesSnapshot': {
         const isMarketing = module !== 'bookings';

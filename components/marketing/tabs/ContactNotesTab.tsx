@@ -113,9 +113,9 @@ const ContactNotesTab = forwardRef<ContactNoteTabRef, ContactNotesTabProps>((pro
   };
 
   useEffect(() => {
-    const userTempList = Object.values(users).map(({ AccUserId, UserFirstName = '', UserLastName = '' }) => ({
+    const userTempList = Object.values(users).map(({ AccUserId, FirstName = '', LastName = '' }) => ({
       value: AccUserId,
-      text: `${UserFirstName || ''} ${UserLastName || ''}`,
+      text: `${FirstName || ''} ${LastName || ''}`,
     }));
 
     if (props.bookingId !== null && props.bookingId !== undefined) {

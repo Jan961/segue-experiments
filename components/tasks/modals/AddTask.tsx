@@ -64,7 +64,7 @@ const DEFAULT_MASTER_TASK: Partial<MasterTask> & {
   TaskCompletedDate?: string;
 } = {
   Id: undefined,
-  Code: 0,
+  Code: null,
   Name: '',
   Notes: '',
   TaskAssignedToAccUserId: null,
@@ -185,9 +185,9 @@ const AddTask = ({
       return [];
     }
 
-    const usersToReturn = Object.values(users).map(({ AccUserId, UserFirstName = '', UserLastName = '' }) => ({
+    const usersToReturn = Object.values(users).map(({ AccUserId, FirstName = '', LastName = '' }) => ({
       value: AccUserId,
-      text: `${UserFirstName || ''} ${UserLastName || ''}`,
+      text: `${FirstName || ''} ${LastName || ''}`,
     }));
 
     return usersToReturn;
