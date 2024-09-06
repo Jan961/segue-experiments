@@ -239,8 +239,18 @@ const updateValidateSpreadsheetData = (
       sale.ignoreWarning.toUpperCase() !== currentRow.ignoreWarning.toUpperCase();
 
     if (isMismatch) {
-      mismatchedRows.add(sale.salesRow);
-      mismatchedRows.add(currentRow.row);
+      mismatchedRows.add({
+        row: sale.salesRow,
+        bookingDate: currentBookingDate,
+        salesDate: sale.salesDate,
+        venueCode: currentVenue,
+      });
+      mismatchedRows.add({
+        row: currentRow.row,
+        bookingDate: currentBookingDate,
+        salesDate: sale.salesDate,
+        venueCode: currentVenue,
+      });
     }
   } else {
     booking.sales.push(createNewSale());
@@ -504,16 +514,16 @@ const postValidationChecks = () => {
     }
   }
 
-  const rowNums = [...mismatchedRows].map((row) => row.number);
+  const rowNums = [...mismatchedRows].map((item) => item.row.number);
   const rowString = '(Row: ' + rowNums.join(', ') + ')';
-  mismatchedRows.forEach((row) => {
-    const detailsColumnMessage = `| ERROR - Mismatch in information for Booking at Venue ${row
-      .getCell(tableColMaps.VenueCode)
-      .value.toString()} on ${dateToSimple(row.getCell(tableColMaps.BookingDate).value.toString())}, on Sales Date ${
-      dateToSimple(row.getCell(tableColMaps.SalesDate).value.toString()) + ' ' + rowString
+  mismatchedRows.forEach((item) => {
+    const detailsColumnMessage = `| ERROR - Mismatch in information for Booking at Venue ${
+      item.venueCode
+    } on ${dateToSimple(item.bookingDate.toString())}, on Sales Date ${
+      dateToSimple(item.salesDate.toString()) + ' ' + rowString
     }`;
-    updateResponseDetailsCells(row, detailsColumnMessage, true, false);
-    errorRows.push(row);
+    updateResponseDetailsCells(item.row, detailsColumnMessage, true, false);
+    errorRows.push(item.row);
   });
 };
 

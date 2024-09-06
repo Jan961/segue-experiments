@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import prisma from 'lib/prisma';
-import { SpreadsheetDataClean , SalesTypeMap } from 'types/SpreadsheetValidationTypes';
+import { SpreadsheetDataClean, SalesTypeMap } from 'types/SpreadsheetValidationTypes';
 import { getDateBlockForProduction, deleteAllDateBlockEvents } from 'services/dateBlockService';
 import { nanoid } from 'nanoid';
 import { createNewBooking } from 'services/bookingService';
@@ -101,6 +101,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
               SetNotOnSale: false,
               SetIsFinalFigures: sale.isFinal.toString().toUpperCase() === 'Y',
               SetIsCopy: false,
+              // adjust this to create multiple sales of potential different types when i fix the spreadsheet validation
               Sale: {
                 create: {
                   SaleSaleTypeId: SalesTypeMap[sale.salesType],
