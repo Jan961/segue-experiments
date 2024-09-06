@@ -29,6 +29,14 @@ export default function StandardSeatKillsTable({ rowData, tableData }: Contracts
     getRowStyle: (params) => {
       return params.data.status === 'U' ? { fontStyle: 'italic' } : '';
     },
+    getRowNodeId: (data) => {
+      return data.data.type;
+    },
+    onRowDataUpdated: (params) => {
+      params.api.forEachNode((rowNode) => {
+        rowNode.id = rowNode.data.type;
+      });
+    },
   };
 
   const handleValueData = (value, first, second, third) => {
