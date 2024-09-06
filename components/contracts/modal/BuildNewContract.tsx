@@ -42,6 +42,11 @@ export const BuildNewContract = ({
     () => productions.find(({ Id }) => Id === contractSchedule.production),
     [contractSchedule?.production, productions],
   );
+  const personName = useMemo(() => {
+    const { personDetails } = contractPerson || {};
+    const { firstName, lastName } = personDetails || {};
+    return firstName || lastName ? `${firstName} ${lastName}` : 'Person';
+  }, [contractPerson]);
   const router = useRouter();
   const cancelToken = useAxiosCancelToken();
 
@@ -185,7 +190,7 @@ export const BuildNewContract = ({
             style={{ background: activeViewIndex === 0 ? '#0093C0' : 'white' }}
             onClick={() => setActiveViewIndex(0)}
           >
-            First Name Details
+            {personName} Details
           </div>
           <div
             className="w-[24vw] border-solid border-2 border-primary-navy text-center rounded cursor-pointer"
