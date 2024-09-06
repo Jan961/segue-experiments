@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import prisma from 'lib/prisma';
-import { SpreadsheetDataClean } from 'types/SpreadsheetValidationTypes';
+import { SpreadsheetDataClean , SalesTypeMap } from 'types/SpreadsheetValidationTypes';
 import { getDateBlockForProduction, deleteAllDateBlockEvents } from 'services/dateBlockService';
 import { nanoid } from 'nanoid';
 import { createNewBooking } from 'services/bookingService';
@@ -86,6 +86,34 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     });
 
     console.log(bookingsWithSales);
+
+    // // create a sales set for each booking, and add all sales
+    await prisma.$transaction(async (tx) => {
+      for (const { booking, sales } of bookingsWithSales) {
+        for (const sale of sales) {
+          await tx.SalesSet.create({
+            data: {
+              SetBookingId: booking.Id,
+              SetPerformanceId: null,
+              SetSalesFiguresDate: sale.salesDate,
+              SetBrochureReleased: false,
+              SetSingleSeats: false,
+              SetNotOnSale: false,
+              SetIsFinalFigures: sale.isFinal.toString().toUpperCase() === 'Y',
+              SetIsCopy: false,
+              Sale: {
+                create: {
+                  SaleSaleTypeId: SalesTypeMap[sale.salesType],
+                  SaleSeats: sale.seats,
+                  SaleValue: sale.value,
+                },
+              },
+            },
+          });
+          // console.log(result)
+        }
+      }
+    });
 
     res.status(200).json({ status: 'Success' });
   } catch (err) {

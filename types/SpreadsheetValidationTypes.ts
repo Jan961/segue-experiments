@@ -61,6 +61,13 @@ export enum SalesType {
   'School Reservations',
 }
 
+export const SalesTypeMap = {
+  'General Sales': 1,
+  'General Reservations': 2,
+  'School Sales': 3,
+  'School Reservations': 4,
+};
+
 export enum isFinalType {
   'Y',
   'y',
