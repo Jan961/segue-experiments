@@ -24,6 +24,7 @@ export interface TextInputProps {
   onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   min?: number;
   max?: number;
+  autoComplete?: 'on' | 'off';
 }
 
 const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
@@ -41,6 +42,7 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
       inputClassName,
       onKeyDown,
       testId,
+      autoComplete = 'off',
       ...rest
     },
     ref,
@@ -72,6 +74,7 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
           disabled={disabled}
           value={value || ''}
           onKeyDown={onKeyDown}
+          autoComplete={autoComplete}
           {...rest}
         />
         {iconName && (

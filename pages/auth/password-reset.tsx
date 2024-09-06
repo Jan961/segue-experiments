@@ -119,6 +119,7 @@ const PasswordReset = () => {
                 placeholder="Enter Code"
                 className="w-full"
                 value={loginDetails.code}
+                autoComplete="off"
                 onChange={handleLoginDetailsChange}
               />
               {validationError?.includes('Code') && <AuthError error={validationError} />}
@@ -141,6 +142,7 @@ const PasswordReset = () => {
                 inputClassName="w-full"
                 className="w-full"
                 value={loginDetails.password}
+                autoComplete="off"
                 onChange={handleLoginDetailsChange}
               />
             </div>
