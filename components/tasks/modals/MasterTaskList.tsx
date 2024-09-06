@@ -80,8 +80,8 @@ const MasterTaskList = ({ visible, onClose, productionId }: MasterTaskListProps)
   }, [users]);
 
   const usersList = useMemo(() => {
-    return Object.values(users).map(({ Id, FirstName = '', LastName = '' }) => ({
-      value: Id,
+    return Object.values(users).map(({ AccUserId, FirstName = '', LastName = '' }) => ({
+      value: AccUserId,
       text: `${FirstName || ''} ${LastName || ''}`,
     }));
   }, [users]);

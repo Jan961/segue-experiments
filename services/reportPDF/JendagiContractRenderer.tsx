@@ -1,37 +1,12 @@
-import { Document, Page, Text, View, StyleSheet, Image } from '@react-pdf/renderer';
+import { Document, Page, Text, View, StyleSheet, Image, Font } from '@react-pdf/renderer';
 import { dateToSimple } from 'services/dateService';
-import { useRecoilValue } from 'recoil';
-import { contractsVenueState } from 'state/contracts/contractsVenueState';
-import { productionJumpState } from 'state/booking/productionJumpState';
 import { JendagiContractProps } from 'components/contracts/JendagiContract';
+import { select } from 'radash';
 
-const defaultContractDetails = {
-  currency: null,
-  firstDayOfWork: null,
-  lastDayOfWork: null,
-  specificAvailabilityNotes: '',
-  publicityEventList: null,
-  rehearsalVenue: {
-    townCity: '',
-    venue: null,
-    notes: '',
-  },
-  isAccomodationProvided: false,
-  accomodationNotes: '',
-  isTransportProvided: false,
-  transportNotes: '',
-  isNominatedDriver: false,
-  nominatedDriverNotes: '',
-  paymentType: null,
-  weeklyPayDetails: null,
-  totalPayDetails: null,
-  paymentBreakdownList: null,
-  cancellationFee: 0,
-  cancellationFeeNotes: '',
-  includeAdditionalClauses: false,
-  additionalClause: null,
-  customClauseList: null,
-};
+Font.register({
+  family: 'Times-Roman',
+  src: 'https://fonts.cdnfonts.com/s/57197/times.woff',
+});
 
 const styles = StyleSheet.create({
   page: {
@@ -39,12 +14,21 @@ const styles = StyleSheet.create({
     padding: 40,
     fontFamily: 'Times-Roman',
   },
+  title: {
+    fontSize: 12,
+    textAlign: 'center',
+    fontFamily: 'Times-Roman',
+    textDecoration: 'underline',
+    marginBottom: 10,
+    marginTop: 10,
+  },
   titleContainer: {
     paddingBottom: 40,
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
+    fontSize: 16,
   },
   table: {
     width: '100%',
@@ -61,16 +45,34 @@ const styles = StyleSheet.create({
     textAlign: 'left',
     flex: 1,
   },
+  tableCellNum: {
+    border: '1px solid black',
+    padding: 5,
+    fontSize: 12,
+    textAlign: 'left',
+    width: '30px',
+  },
+  tableCellTitle: {
+    border: '1px solid black',
+    padding: 5,
+    fontSize: 12,
+    textAlign: 'left',
+    width: '150px',
+  },
   highlight: {
     color: 'red',
     fontWeight: 'bold',
   },
   detailsContainer: {
     marginTop: 20,
+    fontSize: 12,
   },
   detailsTitle: {
     flexDirection: 'row',
     gap: 45,
+  },
+  detailsParagraph: {
+    marginBottom: 15,
   },
   detailsSection: {
     marginTop: 20,
@@ -100,21 +102,23 @@ const styles = StyleSheet.create({
 const JendagiContract = ({
   contractPerson,
   contractSchedule,
-  contractDetails = defaultContractDetails,
+  contractDetails = {},
   productionCompany,
-  currency,
+  currency = '£',
+  showName,
+  venueName,
+  schedule = [],
 }: JendagiContractProps) => {
-  const { productions } = useRecoilValue(productionJumpState);
-  const venueMap = useRecoilValue(contractsVenueState);
-
   const currentDate = dateToSimple(new Date().toISOString());
-
-  const getVenueNameFromId = (venueId) => {
-    return Object.values(venueMap).find((venue) => venue.Id === venueId).Name;
-  };
-
+  const firstPerformance = schedule.find((day) => day.type === 'Performance');
+  const performanceVenues = select(
+    schedule,
+    (day) => day.location,
+    (day) => day.type === 'Performance',
+  );
+  const allSameVenue = performanceVenues.every((venue) => venue === venue[0]);
   const formatPayment = (payment) => {
-    return (contractDetails.currency ? currency : '') + (payment || 'N/A');
+    return (currency || '') + (payment || 'N/A');
   };
 
   const filterPaymentBreakdownList = (breakdownArray) => {
@@ -129,17 +133,12 @@ const JendagiContract = ({
     });
   };
 
-  const getShowNameFromId = (id) => {
-    const result = productions.find((prod) => prod.Id === id);
-    return result.ShowName;
-  };
-
   return (
     <Document>
       <Page size="A4" style={styles.page}>
         {/* Title Section */}
         <View style={styles.titleContainer}>
-          <Text style={{ fontWeight: 'bold' }}>{contractSchedule.department} - CONTRACT SCHEDULE</Text>
+          <Text style={{ fontFamily: 'Times-Bold' }}>{contractSchedule.department} - CONTRACT SCHEDULE</Text>
           <Text>THIS SCHEDULE SHALL BE DEEMED ANNEXED</Text>
           <Text>AND FORMS PART OF THE CONTRACT BELOW</Text>
         </View>
@@ -147,13 +146,13 @@ const JendagiContract = ({
         {/* Contract Details Table */}
         <View style={styles.table}>
           <View style={styles.tableRow}>
-            <Text style={styles.tableCell}>1</Text>
-            <Text style={styles.tableCell}>DOCUMENT ISSUE DATE</Text>
+            <Text style={styles.tableCellNum}>1</Text>
+            <Text style={styles.tableCellTitle}>DOCUMENT ISSUE DATE</Text>
             <Text style={styles.tableCell}>{currentDate}</Text>
           </View>
           <View style={styles.tableRow}>
-            <Text style={styles.tableCell}>2</Text>
-            <Text style={styles.tableCell}>{contractSchedule.department} - NAME/ADDRESS</Text>
+            <Text style={styles.tableCellNum}>2</Text>
+            <Text style={styles.tableCellTitle}>{contractSchedule.department} - NAME/ADDRESS</Text>
             <Text style={styles.tableCell}>
               {[
                 contractPerson.personDetails.firstName + ' ' + contractPerson.personDetails.lastName,
@@ -168,8 +167,8 @@ const JendagiContract = ({
             </Text>
           </View>
           <View style={styles.tableRow}>
-            <Text style={styles.tableCell}>3</Text>
-            <Text style={styles.tableCell}>AGENT NAME/ADDRESS</Text>
+            <Text style={styles.tableCellNum}>3</Text>
+            <Text style={styles.tableCellTitle}>AGENT NAME/ADDRESS</Text>
             <Text style={styles.tableCell}>
               {contractPerson.agencyDetails
                 ? [
@@ -187,43 +186,43 @@ const JendagiContract = ({
             </Text>
           </View>
           <View style={styles.tableRow}>
-            <Text style={styles.tableCell}>4</Text>
-            <Text style={styles.tableCell}>The PRODUCTION</Text>
-            <Text style={styles.tableCell}>{getShowNameFromId(contractSchedule.production)}</Text>
+            <Text style={styles.tableCellNum}>4</Text>
+            <Text style={styles.tableCellTitle}>The PRODUCTION</Text>
+            <Text style={styles.tableCell}>{showName}</Text>
           </View>
           <View style={styles.tableRow}>
-            <Text style={styles.tableCell}>5</Text>
-            <Text style={styles.tableCell}>ENGAGED AS</Text>
+            <Text style={styles.tableCellNum}>5</Text>
+            <Text style={styles.tableCellTitle}>ENGAGED AS</Text>
             <Text style={styles.tableCell}>{contractSchedule.role}</Text>
           </View>
           <View style={styles.tableRow}>
-            <Text style={styles.tableCell}>6</Text>
-            <Text style={styles.tableCell}>FIRST DAY OF WORK</Text>
+            <Text style={styles.tableCellNum}>6</Text>
+            <Text style={styles.tableCellTitle}>FIRST DAY OF WORK</Text>
             <Text style={styles.tableCell}>
               {contractDetails.firstDayOfWork ? 'On or around ' + dateToSimple(contractDetails.firstDayOfWork) : 'N/A'}
             </Text>
           </View>
           <View style={styles.tableRow}>
-            <Text style={styles.tableCell}>7</Text>
-            <Text style={styles.tableCell}>REHEARSAL TOWN/CITY</Text>
+            <Text style={styles.tableCellNum}>7</Text>
+            <Text style={styles.tableCellTitle}>REHEARSAL TOWN/CITY</Text>
             <Text style={styles.tableCell}>
-              {contractDetails.rehearsalVenue.townCity ? contractDetails.rehearsalVenue.townCity : 'N/A'}
+              {contractDetails.rehearsalVenue?.townCity ? contractDetails.rehearsalVenue?.townCity : 'N/A'}
             </Text>
           </View>
           <View style={styles.tableRow}>
-            <Text style={styles.tableCell}>8</Text>
-            <Text style={styles.tableCell}>REHEARSAL VENUES</Text>
+            <Text style={styles.tableCellNum}>8</Text>
+            <Text style={styles.tableCellTitle}>REHEARSAL VENUES</Text>
             <Text style={styles.tableCell}>
-              {contractDetails.rehearsalVenue.venue
+              {contractDetails.rehearsalVenue?.venue
                 ? 'Likely to be ' +
-                  getVenueNameFromId(contractDetails.rehearsalVenue.venue) +
-                  (contractDetails.rehearsalVenue.notes !== '' ? ' - ' + contractDetails.rehearsalVenue.notes : '')
+                  venueName +
+                  (contractDetails.rehearsalVenue?.notes !== '' ? ' - ' + contractDetails.rehearsalVenue?.notes : '')
                 : 'N/A'}
             </Text>
           </View>
           <View style={styles.tableRow}>
-            <Text style={styles.tableCell}>9</Text>
-            <Text style={styles.tableCell}>REHEARSAL SALARY</Text>
+            <Text style={styles.tableCellNum}>9</Text>
+            <Text style={styles.tableCellTitle}>REHEARSAL SALARY</Text>
             <Text style={styles.tableCell}>
               {contractDetails.paymentType
                 ? contractDetails.paymentType === 'W'
@@ -236,21 +235,21 @@ const JendagiContract = ({
             </Text>
           </View>
           <View style={styles.tableRow}>
-            <Text style={styles.tableCell}>10</Text>
-            <Text style={styles.tableCell}>FIRST PAID PERFORMANCE DATE</Text>
-            <Text style={styles.tableCell}>On or around !FIRST PERFORMANCE DATE!</Text>
+            <Text style={styles.tableCellNum}>10</Text>
+            <Text style={styles.tableCellTitle}>FIRST PAID PERFORMANCE DATE</Text>
+            <Text style={styles.tableCell}>On or around {firstPerformance?.date || 'N/A'}</Text>
           </View>
           <View style={styles.tableRow}>
-            <Text style={styles.tableCell}>11</Text>
-            <Text style={styles.tableCell}>NORMAL PLACE OF WORK</Text>
+            <Text style={styles.tableCellNum}>11</Text>
+            <Text style={styles.tableCellTitle}>NORMAL PLACE OF WORK</Text>
             <Text style={styles.tableCell}>
-              At [REHEARSAL VENUE] as required and at [Either !VENUE! if all performance bookings are at the same venue
-              or ‘On Tour’]
+              At {contractDetails.rehearsalVenue?.venue || 'REHEARSAL VENUE'} as required and{' '}
+              {allSameVenue ? `at ${performanceVenues?.[0]}` : 'on Tour'}
             </Text>
           </View>
           <View style={styles.tableRow}>
-            <Text style={styles.tableCell}>12</Text>
-            <Text style={styles.tableCell}>END DATE</Text>
+            <Text style={styles.tableCellNum}>12</Text>
+            <Text style={styles.tableCellTitle}>END DATE</Text>
             <Text style={styles.tableCell}>
               {contractDetails.lastDayOfWork
                 ? dateToSimple(contractDetails.lastDayOfWork) +
@@ -259,15 +258,15 @@ const JendagiContract = ({
             </Text>
           </View>
           <View style={styles.tableRow}>
-            <Text style={styles.tableCell}>13</Text>
-            <Text style={styles.tableCell}>NOMINATED DRIVER STATUS</Text>
+            <Text style={styles.tableCellNum}>13</Text>
+            <Text style={styles.tableCellTitle}>NOMINATED DRIVER STATUS</Text>
             <Text style={styles.tableCell}>
               {contractDetails.isNominatedDriver ? contractDetails.nominatedDriverNotes : 'N/A'}
             </Text>
           </View>
           <View style={styles.tableRow}>
-            <Text style={styles.tableCell}>14</Text>
-            <Text style={styles.tableCell}>
+            <Text style={styles.tableCellNum}>14</Text>
+            <Text style={styles.tableCellTitle}>
               {contractDetails.paymentType
                 ? contractDetails.paymentType === 'W'
                   ? 'PERFORMANCE FEE'
@@ -296,8 +295,8 @@ const JendagiContract = ({
             </Text>
           </View>
           <View style={styles.tableRow}>
-            <Text style={styles.tableCell}>15</Text>
-            <Text style={styles.tableCell}>TOURING ALLOWANCE</Text>
+            <Text style={styles.tableCellNum}>15</Text>
+            <Text style={styles.tableCellTitle}>TOURING ALLOWANCE</Text>
             <Text style={styles.tableCell}>
               {contractDetails.weeklyPayDetails?.touringAllowance
                 ? formatPayment(contractDetails.weeklyPayDetails.touringAllowance) +
@@ -307,8 +306,8 @@ const JendagiContract = ({
             </Text>
           </View>
           <View style={styles.tableRow}>
-            <Text style={styles.tableCell}>16</Text>
-            <Text style={styles.tableCell}>PAYMENTS</Text>
+            <Text style={styles.tableCellNum}>16</Text>
+            <Text style={styles.tableCellTitle}>PAYMENTS</Text>
             <Text style={styles.tableCell}>
               {contractDetails.paymentType && (
                 <>
@@ -340,14 +339,15 @@ const JendagiContract = ({
                   {'\n'}
                 </>
               )}
-              Holidays may be declared by {productionCompany?.Name ? productionCompany.Name : '!PRODUCTION COMPANY!'}.
-              Holiday pay shall be accrued and paid during declared holidays. Any outstanding holiday pay will be paid
-              at the end of the contract. Holiday pay shall be at the rate stated in Clause 14.
+              Holidays may be declared by{' '}
+              {productionCompany?.ProdCoName ? productionCompany.ProdCoName : '!PRODUCTION COMPANY!'}. Holiday pay shall
+              be accrued and paid during declared holidays. Any outstanding holiday pay will be paid at the end of the
+              contract. Holiday pay shall be at the rate stated in Clause 14.
             </Text>
           </View>
           <View style={styles.tableRow}>
-            <Text style={styles.tableCell}>17</Text>
-            <Text style={styles.tableCell}>ACCOMMODATION</Text>
+            <Text style={styles.tableCellNum}>17</Text>
+            <Text style={styles.tableCellTitle}>ACCOMMODATION</Text>
             <Text style={styles.tableCell}>
               {contractDetails.isAccomodationProvided
                 ? contractDetails.accomodationNotes ?? ''
@@ -355,8 +355,8 @@ const JendagiContract = ({
             </Text>
           </View>
           <View style={styles.tableRow}>
-            <Text style={styles.tableCell}>18</Text>
-            <Text style={styles.tableCell}>TRANSPORT</Text>
+            <Text style={styles.tableCellNum}>18</Text>
+            <Text style={styles.tableCellTitle}>TRANSPORT</Text>
             <Text style={styles.tableCell}>
               {contractDetails.isTransportProvided
                 ? contractDetails.transportNotes ?? ''
@@ -364,8 +364,8 @@ const JendagiContract = ({
             </Text>
           </View>
           <View style={styles.tableRow}>
-            <Text style={styles.tableCell}>19</Text>
-            <Text style={styles.tableCell}>{contractSchedule.department} AVAILABILITY</Text>
+            <Text style={styles.tableCellNum}>19</Text>
+            <Text style={styles.tableCellTitle}>Department AVAILABILITY</Text>
             <Text style={styles.tableCell}>
               The Contractor shall make themselves available on such dates and times as the producer may reasonably
               request in order that they may discuss matters pertaining to the production. The Contractor may also be
@@ -388,8 +388,8 @@ const JendagiContract = ({
             </Text>
           </View>
           <View style={styles.tableRow}>
-            <Text style={styles.tableCell}>20</Text>
-            <Text style={styles.tableCell}>PUBLICITY AND SPONSORSHIP</Text>
+            <Text style={styles.tableCellNum}>20</Text>
+            <Text style={styles.tableCellTitle}>PUBLICITY AND SPONSORSHIP</Text>
             <Text style={styles.tableCell}>
               {contractDetails.publicityEventList && (
                 <>
@@ -416,29 +416,29 @@ const JendagiContract = ({
             </Text>
           </View>
           <View style={styles.tableRow}>
-            <Text style={styles.tableCell}>21</Text>
-            <Text style={styles.tableCell}>DRIVING COMPANY VEHICLES</Text>
+            <Text style={styles.tableCellNum}>21</Text>
+            <Text style={styles.tableCellTitle}>DRIVING COMPANY VEHICLES</Text>
             <Text style={styles.tableCell}>!YES/NO!</Text>
           </View>
           <View style={styles.tableRow}>
-            <Text style={styles.tableCell}>22</Text>
-            <Text style={styles.tableCell}>PERFORMANCE DATES</Text>
+            <Text style={styles.tableCellNum}>22</Text>
+            <Text style={styles.tableCellTitle}>PERFORMANCE DATES</Text>
             <Text style={styles.tableCell}>
               The dates listed below are for information purposes only, are not exhaustive, are subject to changes,
               additions, and deletions.
             </Text>
           </View>
           <View style={styles.tableRow}>
-            <Text style={styles.tableCell}>23</Text>
-            <Text style={styles.tableCell}>EUROPEAN WORKTIME DIRECTIVE OPT-OUT</Text>
+            <Text style={styles.tableCellNum}>23</Text>
+            <Text style={styles.tableCellTitle}>EUROPEAN WORKTIME DIRECTIVE OPT-OUT</Text>
             <Text style={styles.tableCell}>
               By signing this contract, you agree that you have waived your right to the European work-time directive
               (and its successors) limit on a 48hr working week.
             </Text>
           </View>
           <View style={styles.tableRow}>
-            <Text style={styles.tableCell}>24</Text>
-            <Text style={styles.tableCell}>ADDITIONAL CLAUSES</Text>
+            <Text style={styles.tableCellNum}>24</Text>
+            <Text style={styles.tableCellTitle}>ADDITIONAL CLAUSES</Text>
             <Text style={styles.tableCell}>
               {contractDetails.includeAdditionalClauses
                 ? contractDetails.customClauseList &&
@@ -447,41 +447,80 @@ const JendagiContract = ({
             </Text>
           </View>
           <View style={styles.tableRow}>
-            <Text style={styles.tableCell}>25</Text>
-            <Text style={styles.tableCell}>MANAGER OR PRODUCER</Text>
+            <Text style={styles.tableCellNum}>25</Text>
+            <Text style={styles.tableCellTitle}>MANAGER OR PRODUCER</Text>
             <Text style={styles.tableCell}>
-              {productionCompany?.Name ? productionCompany.Name : '!PRODUCTION COMPANY!'}
+              {productionCompany?.ProdCoName ? productionCompany.ProdCoName : '!PRODUCTION COMPANY!'}
             </Text>
           </View>
         </View>
+      </Page>
 
+      <Page size="A4" style={styles.page}>
+        <View>
+          <Text style={styles.title}>All dates and performance times remain subject to change at any time.</Text>
+        </View>
+        <View style={styles.table}>
+          <View style={styles.tableRow}>
+            {['PROD', 'DAY', 'DATE', 'WK', 'VENUE/DETAILS', 'Perf/DAY', 'TIME', 'TIME'].map((th, i) => (
+              <Text key={i} style={styles.tableCell}>
+                {th}
+              </Text>
+            ))}
+          </View>
+          {schedule.map(
+            ({ productionCode, day, date, week, venue, performancesPerDay, performance1, performance2 }, i) => (
+              <View key={i} style={styles.tableRow}>
+                <Text style={styles.tableCell}>{productionCode}</Text>
+                <Text style={styles.tableCell}>{day}</Text>
+                <Text style={styles.tableCell}>{date}</Text>
+                <Text style={styles.tableCell}>{week}</Text>
+                <Text style={styles.tableCell}>{venue}</Text>
+                <Text style={styles.tableCell}>{performancesPerDay}</Text>
+                <Text style={styles.tableCell}>{performance1}</Text>
+                <Text style={styles.tableCell}>{performance2}</Text>
+              </View>
+            ),
+          )}
+        </View>
+        <View>
+          <Text>All dates and performance times remain subject to change at any time.</Text>
+        </View>
+      </Page>
+
+      <Page size="A4" style={styles.page}>
         {/* Additional Clauses */}
         <View style={styles.detailsContainer}>
+          <Text style={styles.detailsParagraph}>
+            “The Producer” hereby engages The Contractor to render their services in connection with The Producer’s
+            production (“the Production”) of the dramatic work as detailed at clause 4 of the foregoing schedule, on the
+            terms and subject to the conditions set out in this Agreement.
+          </Text>
           <Text style={styles.detailsTitle}>NOW IT IS HEREBY AGREED as follows:</Text>
           <View style={styles.detailsSection}>
             <Text style={styles.detailsTitle}>A. ENGAGEMENT</Text>
-            <Text>
+            <Text style={styles.detailsParagraph}>
               The Producer hereby engages The Contractor to perform the role as detailed at clause 5 of the foregoing
               schedule in The Production.
             </Text>
-            <Text>
+            <Text style={styles.detailsParagraph}>
               The Contractor’s engagement hereunder shall commence upon the start of rehearsals, or as detailed at
               clause 6 of the foregoing schedule and shall continue for the run of the Production.
             </Text>
-            <Text>
+            <Text style={styles.detailsParagraph}>
               The contract ends as detailed at clauses 12 and 24 of the foregoing schedule or upon 2 weeks’ notice by
               The Producer - whichever shall come first.
             </Text>
-            <Text>
+            <Text style={styles.detailsParagraph}>
               A fee as detailed at clauses 9 and 14 of the foregoing schedule shall be paid. This payment is fully
               inclusive of all additional payments including (but not restricted to) an allowance for push and pull and
               EPK, and any statutory pay resulting from Annual Leave or Bank Holidays.
             </Text>
-            <Text>
+            <Text style={styles.detailsParagraph}>
               Payments can be made in Euro to an Irish bank or in Sterling to a UK bank – however the same currency and
               bank account must be used for the duration of the contract.
             </Text>
-            <Text>
+            <Text style={styles.detailsParagraph}>
               The Contractor undertakes that they will perform their duties in accordance with the Company’s
               requirements as outlined in this agreement and as directed by the Creative and Production team. They will
               do so willingly and to the best of their skill and ability, and with due regard to the efficient creation
@@ -492,23 +531,23 @@ const JendagiContract = ({
 
           <View style={styles.detailsSection}>
             <Text style={styles.detailsTitle}>B. COMPENSATION DETAILS</Text>
-            <Text>
+            <Text style={styles.detailsParagraph}>
               Subject to The Contractor providing their services as required by this Agreement and to the performance by
               The Contractor of all their other obligations under this agreement, The Producer shall pay to The
               Contractor a salary as follows:
             </Text>
-            <Text>
+            <Text style={styles.detailsParagraph}>
               Fees and Subsistence/Touring Allowance as detailed at clauses 9 and 14 of the foregoing schedule. Unless
               otherwise stated, payment made weekly one full week in arrears, on Fridays. Where a full-week holiday is
               declared, payment shall be made for a full week if sufficient holiday pay has been accrued, or up to the
               amount accrued if there is an insufficient amount for a full week’s fee.
             </Text>
-            <Text>Please see attached Rehearsal/performance schedule.</Text>
+            <Text style={styles.detailsParagraph}>Please see attached Rehearsal/performance schedule.</Text>
           </View>
 
           <View style={styles.detailsSection}>
             <Text style={styles.detailsTitle}>C. CREDIT</Text>
-            <Text>
+            <Text style={styles.detailsParagraph}>
               The Contractor hereby consents to the use by The Producer of their name, likeness, and biographical
               material in connection with publicity for the Production.
             </Text>
@@ -516,12 +555,12 @@ const JendagiContract = ({
 
           <View style={styles.detailsSection}>
             <Text style={styles.detailsTitle}>D. PUBLICITY</Text>
-            <Text>
+            <Text style={styles.detailsParagraph}>
               The Contractor shall participate without additional payment in publicising the production through press
               and publicity interviews, photocalls etc. Any such commitments will be scheduled in consultation with The
               Contractor, whose agreement shall not be unreasonably withheld.
             </Text>
-            <Text>
+            <Text style={styles.detailsParagraph}>
               The Contractor shall not seize publicity opportunities without the prior permission of the Producer. This
               includes, but is not limited to, any portrayal of the production (or any associated persons or venues) on
               Social Media. Marketing materials containing The Contractor’s image (but not their name) may be used
@@ -531,11 +570,11 @@ const JendagiContract = ({
 
           <View style={styles.detailsSection}>
             <Text style={styles.detailsTitle}>E. THE CONTRACTOR’S WARRANTIES AND UNDERTAKINGS</Text>
-            <Text>
+            <Text style={styles.detailsParagraph}>
               The Contractor hereby warrants and represents that they have the full power and authority to enter into
               this Agreement and to perform their services as herein provided.
             </Text>
-            <Text>The Contractor undertakes and agrees:</Text>
+            <Text style={styles.detailsParagraph}>The Contractor undertakes and agrees:</Text>
             <View style={styles.ul}>
               <View style={styles.ulLi}>
                 <Text>-</Text>
@@ -671,9 +710,9 @@ const JendagiContract = ({
 
           <View style={styles.detailsSection}>
             <Text style={styles.detailsTitle}>F. ABSENCE</Text>
-            <View style={{ marginLeft: 20 }}>
-              <Text>1. Notification</Text>
-              <Text>
+            <View>
+              <Text style={{ marginLeft: 20, marginBottom: 10 }}>1. Notification</Text>
+              <Text style={styles.detailsParagraph}>
                 If The Contractor is unable to attend rehearsals or performances, they must advise The Producer as soon
                 as possible for cover to be arranged. The Contractor should let The Producer know as soon as possible on
                 each day of a continued absence (unless The Producer already knows how long The Contractor shall be
@@ -681,11 +720,11 @@ const JendagiContract = ({
                 Contractor during the absence.
               </Text>
             </View>
-            <View style={{ marginLeft: 20 }}>
-              <Text>2. Illness and Injury</Text>
-              <View style={{ marginLeft: 20 }}>
-                <Text>i. Certificates</Text>
-                <Text>
+            <View>
+              <Text style={{ marginLeft: 20, marginBottom: 10 }}>2. Illness and Injury</Text>
+              <View>
+                <Text style={{ marginLeft: 40 }}>i. Certificates</Text>
+                <Text style={styles.detailsParagraph}>
                   As soon as practicable The Contractor should provide The Producer with a self-certificate indicating
                   the nature of illness or injury and the likely date of their return. In any event, if the absence is
                   longer than seven days, The Contractor must provide The Producer with a doctor’s certificate. If at
@@ -693,15 +732,15 @@ const JendagiContract = ({
                   costs, The Contractor agrees to be examined by them.
                 </Text>
               </View>
-              <View style={{ marginLeft: 20 }}>
-                <Text>ii. Payment During Absence – Initial rehearsals</Text>
-                <Text>
+              <View>
+                <Text style={{ marginLeft: 40 }}>ii. Payment During Absence – Initial rehearsals</Text>
+                <Text style={styles.detailsParagraph}>
                   If The Contractor is absent from work in the rehearsal period as a result of illness or injury, and
                   provided that they have followed the procedure above, The Producer shall continue to pay The
                   Contractor at 1/6 (one-sixth) of their basic rehearsal salary for each day of absence to a maximum of
                   three days in each absence period.
                 </Text>
-                <Text>
+                <Text style={styles.detailsParagraph}>
                   This rate shall be payable for a maximum of 24 days (four weeks) of absence in each twelve-month
                   period (pro-rated for shorter contracts) running from the date of The Contractor’s first attendance.
                   If The Contractor reaches the maximum number of days of absence, then the right to terminate as set
@@ -712,37 +751,37 @@ const JendagiContract = ({
                   of the time missed or the illness or injury persisting, then The Producer will be entitled to end the
                   contract at that time with no notice due.
                 </Text>
-                <Text>
+                <Text style={styles.detailsParagraph}>
                   In no event, however, shall The Contractor be entitled to more weeks of paid absence than the number
                   of weeks for which they have been employed.
                 </Text>
               </View>
-              <View style={{ marginLeft: 20 }}>
-                <Text>iii. Payment during absence – Performance</Text>
-                <Text>
+              <View>
+                <Text style={{ marginLeft: 40 }}>iii. Payment during absence – Performance</Text>
+                <Text style={styles.detailsParagraph}>
                   If The Contractor is absent from work after their first paid performance as a result of illness or
                   injury and provided they have followed the procedure above, The Contractor shall continue to be paid
                   on a pro-rata basis of their basic performance salary (inclusive of any contractual responsibility
                   payments due to The Contractor), capped at pro-rata of The Contractor’s Ceiling Salary, for each
                   performance missed.
                 </Text>
-                <Text>
+                <Text style={styles.detailsParagraph}>
                   This rate shall be payable for a maximum of 24 days (four weeks) of absence in each twelve-month
                   period (pro-rated for shorter contracts) running from the date of The Contractor’s first rehearsal. If
                   The Contractor reaches the maximum number of days, the right to terminate the Contract as set out
                   below can be exercised. However, any absence payments made during the rehearsal periods for illness or
                   injury will be deducted from the total allowances.
                 </Text>
-                <Text>
+                <Text style={styles.detailsParagraph}>
                   In the exceptional circumstance when The Contractor is too ill to attend some calls in a day, but well
                   enough to attend others, they shall be paid a combination of full pay and illness pay. This shall be
                   proportional to the calls that The Contractor did attend in relation to those for which they were
                   called, calculated in units of fifteen minutes.
                 </Text>
               </View>
-              <View style={{ marginLeft: 20 }}>
-                <Text>iv. Ongoing absence</Text>
-                <Text>
+              <View>
+                <Text style={{ marginLeft: 40 }}>iv. Ongoing absence</Text>
+                <Text style={styles.detailsParagraph}>
                   In the event that The Contractor is absent from work as a result of illness or injury for more than
                   the 24 (twenty four) days (pro-rated for shorter contracts) for which payment is made as above, The
                   Producer may either continue to pay The Contractor’s basic performance salary (exclusive of any
@@ -753,9 +792,9 @@ const JendagiContract = ({
                   continue.
                 </Text>
               </View>
-              <View style={{ marginLeft: 20 }}>
-                <Text>v. Statutory Sick Pay (SSP)</Text>
-                <Text>
+              <View>
+                <Text style={{ marginLeft: 40 }}>v. Statutory Sick Pay (SSP)</Text>
+                <Text style={styles.detailsParagraph}>
                   The payments described above in relation to absence from rehearsals and performances due to illness or
                   injury shall be deemed to be inclusive of any SSP that The Contractor may be entitled to receive. For
                   the avoidance of doubt, The Contractor is not entitled to SSP in addition to the payments set out in
@@ -763,27 +802,27 @@ const JendagiContract = ({
                   payable.
                 </Text>
               </View>
-              <View style={{ marginLeft: 20 }}>
-                <Text>vi. Treatment Costs</Text>
-                <Text>
+              <View>
+                <Text style={{ marginLeft: 40 }}>vi. Treatment Costs</Text>
+                <Text style={styles.detailsParagraph}>
                   The Contractor must consult with The Producer and receive The Producer’s approval in advance of any
                   treatment being carried out. The Producer has the right of approval of the healthcare provider, the
                   type of treatment. (including whether treatment is to be provided privately or by the NHS) and any
                   costs of the treatment.
                 </Text>
-                <Text>
+                <Text style={styles.detailsParagraph}>
                   In the highly unlikely event of The Producer electing to meet the costs of treatment; only where their
                   prior approval has been given of the healthcare provider, the type of treatment and of any costs if
                   applicable, may treatment be booked. The Contractor must provide The Producer with full information
                   relating to treatment, including details of any ongoing treatment where applicable.
                 </Text>
-                <Text>
+                <Text style={styles.detailsParagraph}>
                   Where it is the opinion (given in writing) of The Contractor’s medical professional (e.g. (but not
                   limited to) physician, dentist, chiropractor, physiotherapist or osteopath) that treatment needs to
                   continue after the end of the Contract with The Producer, The Producer will not pay ongoing treatment
                   once The Contractor has ceased to be employed.
                 </Text>
-                <Text>
+                <Text style={styles.detailsParagraph}>
                   The Producer may, in the interests of The Production and, at The Producer’s sole discretion, elect to
                   meet the cost of any treatment required. This does not, in any way, indicate The Producer’s
                   responsibility or liability for the injury nor create an ongoing liability to pay for such treatment.
@@ -794,7 +833,7 @@ const JendagiContract = ({
 
           <View style={styles.detailsSection}>
             <Text style={styles.detailsTitle}>G. CONSENTS</Text>
-            <Text>
+            <Text style={styles.detailsParagraph}>
               The Contractor hereby grants the company the right, without making additional payment, to record their
               performance for archival purposes. Furthermore, The Contractor will allow The Producer at no cost to
               arrange television or radio performances of excerpts of the Production for publicity purposes, provided
@@ -834,35 +873,35 @@ const JendagiContract = ({
 
           <View style={styles.detailsSection}>
             <Text style={styles.detailsTitle}>I. ENTIRE AGREEMENT</Text>
-            <Text>
+            <Text style={styles.detailsParagraph}>
               This Agreement constitutes the entire understanding between the parties and replaces all prior
               understandings and agreements between the parties in respect of the subject matter of this Agreement and
               may not be modified orally.
             </Text>
-            <Text>
+            <Text style={styles.detailsParagraph}>
               The parties agree that this Agreement may be signed in counterparts, all of which, taken together, shall
               be deemed an original. Executed copies of this Agreement transmitted electronically in Portable Document
               Format (PDF) shall be treated as originals, fully binding and with full legal force and effect and the
               parties waive any rights they may have to object to such treatment.
             </Text>
-            <Text>
+            <Text style={styles.detailsParagraph}>
               The waiver by any party hereto of the breach of any one or more of the provisions of this Agreement shall
               not be construed to be a waiver or consent by such party to any prior or subsequent breaches by the other
               party of the same or any other provision of this Agreement.
             </Text>
-            <Text>
+            <Text style={styles.detailsParagraph}>
               In the event of a dispute between parties which cannot be resolved internally, the dispute shall be
               presented to the President of UK Theatre who will convene an independent panel and its decision will be
               final.
             </Text>
-            <Text>
+            <Text style={styles.detailsParagraph}>
               The Producer shall have the right to assign all or any part of its rights hereunder to any person, firm or
               corporation, provided (i) such assignee assumes the obligations of The Producer hereunder, and (ii) The
               Contractor consents to such assignment, such consent not to be unreasonably withheld or refused. The
               Producer shall remain fully liable for all of its obligations hereunder in the event of any such
               assignment. The Contractor shall not have the right to assign any of their obligations hereunder.
             </Text>
-            <Text>
+            <Text style={styles.detailsParagraph}>
               This contract is governed by Scots law. Both parties hereby prorogate the jurisdiction of the Sheriffdom
               at Glasgow and Strathkelvin.
             </Text>
@@ -871,17 +910,22 @@ const JendagiContract = ({
 
         {/* Signature Section */}
         <View style={styles.footer}>
-          <Text>SIGNED by</Text>
-          <Text style={{ fontWeight: 'bold' }}>Robert C Kelly</Text>
+          <Text style={{ marginBottom: '10px', fontSize: 12 }}>SIGNED by</Text>
+          <Text style={{ marginBottom: '10px', fontSize: 12 }}>Robert C Kelly</Text>
           <Image style={styles.signatureImage} src="/segue/contracts/rcksignature.jpg" />
-          <Text>SIGNED by</Text>
-          <Text>
-            <Text style={{ fontWeight: 'bold' }}>THE CONTRACTOR _________________________________________________</Text>
+          <Text style={{ fontSize: 12 }}>for and on behalf of</Text>
+          <Text style={{ fontSize: 12 }}>
+            {productionCompany?.ProdCoName ? productionCompany.ProdCoName : '!PRODUCTION COMPANY!'}
           </Text>
-          <Text>
+          <Text style={{ marginBottom: '20px', fontSize: 12 }}>DATE IS AS PER SCHEDULE CLAUSE 1</Text>
+          <Text style={{ marginBottom: '20px', fontSize: 12 }}>SIGNED by</Text>
+          <Text style={{ marginBottom: '30px', fontSize: 12 }}>
+            <Text>THE CONTRACTOR _________________________________________________</Text>
+          </Text>
+          <Text style={{ marginBottom: '30px', fontSize: 12 }}>
             <Text style={{ fontWeight: 'bold' }}>NAME _________________________________________________</Text>
           </Text>
-          <Text>
+          <Text style={{ marginBottom: '30px', fontSize: 12 }}>
             <Text style={{ fontWeight: 'bold' }}>DATE _________________________________________________</Text>
           </Text>
         </View>

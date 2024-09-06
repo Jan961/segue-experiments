@@ -2,7 +2,7 @@ import Button from 'components/core-ui-lib/Button';
 import PopupModal from 'components/core-ui-lib/PopupModal';
 import Table from 'components/core-ui-lib/Table';
 import { getProductionTasksColumnDefs } from './tableConfig';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useRecoilValue } from 'recoil';
 import { userState } from 'state/account/userState';
 import { useEffect, useMemo, useState } from 'react';
 import { tileColors } from 'config/global';
@@ -36,14 +36,13 @@ const ProductionTaskList = ({ visible, onClose, productionId, isMaster = false }
   const styleProps = { headerColor: tileColors.tasks };
   const [rowData, setRowData] = useState([]);
   const [loading, setLoading] = useState<boolean>(false);
-  const [productionJump, setProductionJump] = useRecoilState(productionJumpState);
+  const productionJump = useRecoilValue(productionJumpState);
   const [selected, setSelected] = useState(null);
-  const [includeArchived, setIncludeArchived] = useState<boolean>(productionJump?.includeArchived || false);
+  const [includeArchived, setIncludeArchived] = useState<boolean>(false);
   const [showExistingTaskModal, setShowExistingTaskModal] = useState<boolean>(false);
   const [duplicateTasks, setDuplicateTasks] = useState([]);
   const unfilteredTasks = useRecoilValue(productionState).filter((prod) => prod.Id === productionId)[0]?.Tasks || [];
   const router = useRouter();
-
   const productionsData = useMemo(() => {
     const productionOptions = [];
     for (const production of productionJump.productions) {
@@ -77,8 +76,8 @@ const ProductionTaskList = ({ visible, onClose, productionId, isMaster = false }
   }, [productionJump.productions, includeArchived]);
 
   const usersList = useMemo(() => {
-    return Object.values(users).map(({ Id, FirstName = '', LastName = '' }) => ({
-      value: Id,
+    return Object.values(users).map(({ AccUserId, FirstName = '', LastName = '' }) => ({
+      value: AccUserId,
       text: `${FirstName || ''} ${LastName || ''}`,
     }));
   }, [users]);
@@ -160,7 +159,7 @@ const ProductionTaskList = ({ visible, onClose, productionId, isMaster = false }
           StartByIsPostProduction: false,
           StartByWeekNum: task.StartByWeekNum,
           CompleteByWeekNum: task.CompleteByWeekNum,
-          AssignedToUserId: task.AssignedToUserId,
+          TaskAssignedToAccUserId: task.TaskAssignedToAccUserId,
           Progress: 0,
           Priority: task.Priority,
           PRTId: task.PRTId,
@@ -195,7 +194,6 @@ const ProductionTaskList = ({ visible, onClose, productionId, isMaster = false }
   };
 
   const onIncludeArchiveChange = (e) => {
-    setProductionJump({ ...productionJump, includeArchived: e.target.value });
     setIncludeArchived(e.target.value);
   };
 
@@ -224,6 +222,7 @@ const ProductionTaskList = ({ visible, onClose, productionId, isMaster = false }
           isSearchable
           isClearable={false}
           testId="sel-production"
+          key={includeArchived.toString()}
         />
         <div className="flex  items-center ml-1 mr-4">
           <Checkbox

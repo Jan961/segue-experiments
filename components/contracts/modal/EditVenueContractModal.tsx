@@ -35,7 +35,7 @@ import { attachmentMimeTypes } from 'components/core-ui-lib/UploadModal/interfac
 import { headlessUploadMultiple } from 'requests/upload';
 import { getFileUrl } from 'lib/s3';
 import charCodeToCurrency from 'utils/charCodeToCurrency';
-import { UiVenue, transformVenues } from 'utils/venue';
+import { UiVenue, VenueData, transformVenues } from 'utils/venue';
 import { ConfDialogVariant } from 'components/core-ui-lib/ConfirmationDialog/ConfirmationDialog';
 import { parseAndSortDates, checkDecimalStringFormat } from '../utils';
 
@@ -47,7 +47,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
   const [saveDealMemoFormData, setSaveDealMemoFormData] = useState<Partial<DealMemoContractFormData>>({});
   const [editDealMemoModal, setEditDealMemoModal] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [venue, setVenue] = useState<Partial<UiVenue>>({});
+  const [venue, setVenue] = useState<Partial<VenueData>>({});
   const [barredVenues, setBarredVenues] = useState<Partial<UiVenue>[]>([]);
   const [dealHoldType, setDealHoldType] = useState<Partial<DealMemoHoldType>>({});
   const [formData, setFormData] = useState<Partial<VenueContractFormData>>({
@@ -102,7 +102,8 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
     const demoModalData = await axios.get<DealMemoContractFormData>(
       `/api/dealMemo/getDealMemo/${selectedTableCell.contract.Id ? selectedTableCell.contract.Id : 1}`,
     );
-    if (!demoModalData.data) {
+
+    if (isNullOrEmpty(demoModalData.data)) {
       setDealMemoCreated(false);
       setDealMemoButtonText('Create Deal Memo');
     } else {
@@ -112,12 +113,12 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
     const getHoldType = await axios.get<DealMemoHoldType>(`/api/dealMemo/hold-type/read`);
     setDealHoldType(getHoldType.data as DealMemoHoldType);
     if (demoModalData.data && demoModalData.data.BookingId) {
-      setDemoModalData(demoModalData.data as unknown as DealMemoContractFormData);
-      setDealMemoFormData(demoModalData.data as unknown as DealMemoContractFormData);
+      setDemoModalData(demoModalData.data as DealMemoContractFormData);
+      setDealMemoFormData(demoModalData.data as DealMemoContractFormData);
     }
     if (selectedTableCell.contract && selectedTableCell.contract.venueId) {
       const venueData = await axios.get(`/api/venue/${selectedTableCell.contract.venueId}`);
-      setVenue(venueData.data as unknown as UiVenue);
+      setVenue(venueData.data as VenueData);
     }
   };
 
@@ -125,7 +126,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
     try {
       if (selectedTableCell.contract && selectedTableCell.contract.venueId) {
         const { data } = await axios.get(`/api/venue/${selectedTableCell.contract.venueId}`);
-        setVenue(transformVenues([data])[0]);
+        setVenue(data as VenueData);
         const barredVenues = await axios.get(`/api/venue/barredVenues/${selectedTableCell.contract.venueId}`);
         setBarredVenues(transformVenues(barredVenues.data));
       }
@@ -752,17 +753,21 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
               <div className="w-4/5 flex gap-x-5">
                 <div className="flex">
                   <div className=" text-primary-input-text font-bold text-sm mr-2">Pre Show</div>
-                  <div className=" text-primary-input-text  text-sm">{venue.preShow ? venue.preShow : '-'}</div>
+                  <div className=" text-primary-input-text  text-sm">
+                    {venue.BarringWeeksPre ? venue.BarringWeeksPre : '-'}
+                  </div>
                 </div>
 
                 <div className="flex ">
                   <div className=" text-primary-input-text font-bold text-sm mr-2">Post Show</div>
-                  <div className=" text-primary-input-text  text-sm">{venue.postShow ? venue.postShow : '-'}</div>
+                  <div className=" text-primary-input-text  text-sm">
+                    {venue.BarringWeeksPost ? venue.BarringWeeksPost : '-'}
+                  </div>
                 </div>
                 <div className="flex ">
                   <div className=" text-primary-input-text font-bold text-sm mr-2">Miles</div>
                   <div className=" text-primary-input-text  text-sm">
-                    {venue.barringMiles ? venue.barringMiles : '-'}
+                    {venue.BarringMiles ? venue.BarringMiles : '-'}
                   </div>
                 </div>
               </div>

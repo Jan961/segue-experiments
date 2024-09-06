@@ -2,7 +2,6 @@ import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import Layout from 'components/Layout';
 import { InitialState } from 'lib/recoil';
 import { getProductionJumpState } from 'utils/getProductionJumpState';
-import { getAccountIdFromReq } from 'services/userService';
 import ContractFilters from 'components/contracts/ContractsFilters';
 import ContractsTable from 'components/contracts/table/ContractsTable';
 import {
@@ -23,6 +22,8 @@ import { getDayTypes } from 'services/dayTypeService';
 import { getAllCurrencylist, getProductionsWithContent } from 'services/productionService';
 import { getAllContractStatus } from 'services/contractStatus';
 import { DateType } from 'prisma/generated/prisma-client';
+import { getAccountContacts } from 'services/contactService';
+import { getAccountIdFromReq } from 'services/userService';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const ContractsPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
@@ -48,17 +49,19 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
     The itinery or miles will be different however, as this relies on the preview booking, and has to be generateed programatically
   */
-  const AccountId = await getAccountIdFromReq(ctx.req);
-  const productionJump = await getProductionJumpState(ctx, 'contracts', AccountId);
+  const productionJump = await getProductionJumpState(ctx, 'contracts');
   const ProductionId = -1;
   productionJump.selected = -1;
 
-  const [venues, productions, dateTypeRaw, contractStatus, currencyList] = await all([
+  const accountId = await getAccountIdFromReq(ctx.req);
+
+  const [venues, productions, dateTypeRaw, contractStatus, currencyList, contacts] = await all([
     getAllVenuesMin(),
     getProductionsWithContent(null, false),
     getDayTypes(),
     getAllContractStatus(),
     getAllCurrencylist(),
+    getAccountContacts(accountId),
   ]);
   const dateBlock = [];
   const rehearsal = {};
@@ -152,6 +155,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       }),
       venue,
       contractStatus: contractStatusData,
+      accountContacts: contacts,
     },
   };
 

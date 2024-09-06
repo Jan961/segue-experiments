@@ -1,4 +1,4 @@
-import { Performance, Prisma } from 'prisma/generated/prisma-client';
+import { Performance } from 'prisma/generated/prisma-client';
 import ExcelJS from 'exceljs';
 import prisma from 'lib/prisma';
 import moment from 'moment';
@@ -14,8 +14,8 @@ import { addWidthAsPerContent } from 'services/reportsService';
 import { makeRowTextBoldAndAllignLeft } from './promoter-holds';
 import { convertToPDF } from 'utils/report';
 import { bookingStatusMap } from 'config/bookings';
-import { toSql } from 'services/dateService';
 import { addBorderToAllCells } from 'utils/export';
+import { addTime, getSheduleReport } from 'services/reports/schedule-report';
 
 type SCHEDULE_VIEW = {
   ProductionId: number;
@@ -41,10 +41,6 @@ type SCHEDULE_VIEW = {
   AffectsAvailability: number;
   SeqNo: number;
 };
-// type UniqueHeadersObject = {
-//   FullProductionCode: string,
-//   ShowName: string
-// }
 
 interface PerformanceInfo {
   performanceId: number;
@@ -55,10 +51,12 @@ interface PerformanceInfo {
 const makeRowBold = ({ worksheet, row }: { worksheet: any; row: number }) => {
   worksheet.getRow(row).font = { bold: true };
 };
+
 const firstRowFormatting = ({ worksheet }: { worksheet: any }) => {
   worksheet.getRow(1).font = { bold: true, size: 16 };
   worksheet.getRow(1).alignment = { horizontal: 'left' };
 };
+
 const styleHeader = ({ worksheet, row, numberOfColumns }: { worksheet: any; row: number; numberOfColumns: number }) => {
   for (let col = 1; col <= numberOfColumns; col++) {
     const cell = worksheet.getCell(row, col);
@@ -66,49 +64,58 @@ const styleHeader = ({ worksheet, row, numberOfColumns }: { worksheet: any; row:
     cell.alignment = { horizontal: 'center' };
   }
 };
-const addTime = (timeArr: string[] = []) => {
-  if (!timeArr?.length) {
-    return '00:00';
-  }
-  const { hour, min } = timeArr.reduce(
-    (acc, x) => {
-      const [h, m] = x.split(':');
-      return {
-        hour: Number(h) + acc.hour,
-        min: Number(m) + acc.min,
-      };
-    },
-    { hour: 0, min: 0 },
-  );
-  const minsTime = minutesInHHmmFormat(min);
-  const [h, m] = minsTime.split(':');
-  return `${hour + Number(h)}:${Number(m)}`;
-};
+
 const getKey = ({ FullProductionCode, ShowName, EntryDate }) => `${FullProductionCode} - ${ShowName} - ${EntryDate}`;
 
 const handler = async (req, res) => {
   const { ProductionId, startDate: from, endDate: to, status, format } = req.body;
 
-  const formatedFromDate = toSql(from);
-  const formatedToDate = toSql(to);
+  if (format === 'json') {
+    const data = await getSheduleReport({ from, to, status, ProductionId });
+    res.status(200).json(data);
+    return;
+  }
+
+  const formatedFromDate = new Date(from);
+  const formatedToDate = new Date(to);
+
   if (!ProductionId) {
     throw new Error('Params are missing');
   }
-  const conditions: Prisma.Sql[] = [];
+
+  // Construct the Prisma query
+  const data: SCHEDULE_VIEW[] = await prisma.scheduleView.findMany({
+    where: {
+      AND: [
+        from && to
+          ? {
+              EntryDate: {
+                gte: formatedFromDate,
+                lte: formatedToDate,
+              },
+            }
+          : {},
+        ProductionId
+          ? {
+              ProductionId,
+            }
+          : {},
+        status && status !== 'all'
+          ? {
+              EntryStatusCode: status,
+            }
+          : {},
+      ],
+    },
+    orderBy: {
+      EntryDate: 'asc',
+    },
+  });
+
   const bookingIdPerformanceMap: Record<number, PerformanceInfo[]> = {};
-  if (from && to) {
-    conditions.push(Prisma.sql`EntryDate BETWEEN ${formatedFromDate} AND ${formatedToDate}`);
-  }
-  if (ProductionId) {
-    conditions.push(Prisma.sql` ProductionId=${ProductionId}`);
-  }
-  if (status && status !== 'all') {
-    conditions.push(Prisma.sql` EntryStatusCode=${status}`);
-  }
-  const where: Prisma.Sql = conditions.length ? Prisma.sql` where ${Prisma.join(conditions, ' and ')}` : Prisma.empty;
-  const data: SCHEDULE_VIEW[] = await prisma.$queryRaw`select * FROM ScheduleView ${where} order by EntryDate;`;
   const bookingIdList: number[] =
     data.map((entry) => (entry.EntryType === 'Booking' ? entry.EntryId : null)).filter((id) => id) || [];
+
   const performances: Performance[] = await prisma.performance.findMany({
     where: {
       BookingId: {
@@ -116,6 +123,7 @@ const handler = async (req, res) => {
       },
     },
   });
+
   performances.forEach((performance) => {
     const { Id, BookingId, Time, Date } = performance;
 
@@ -129,7 +137,7 @@ const handler = async (req, res) => {
       performanceDate: Date ? Date.toISOString() : null,
     });
   });
-  // const { RehearsalStartDate: fromDate, ProductionEndDate: toDate } = data?.[0] || {};
+
   const workbook = new ExcelJS.Workbook();
   const formattedData = data.map((x) => ({
     ...x,
@@ -137,10 +145,12 @@ const handler = async (req, res) => {
     ProductionStartDate: moment(x.ProductionStartDate).format('YYYY-MM-DD'),
     ProductionEndDate: moment(x.ProductionEndDate).format('YYYY-MM-DD'),
   }));
+
   const worksheet = workbook.addWorksheet('Tour Schedule', {
     pageSetup: { fitToPage: true, fitToHeight: 5, fitToWidth: 7 },
     views: [{ state: 'frozen', xSplit: 0, ySplit: 5 }],
   });
+
   if (!formattedData?.length) {
     const filename = 'Booking Report.xlsx';
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
@@ -150,23 +160,28 @@ const handler = async (req, res) => {
     });
     return;
   }
+
   const { ShowName, FullProductionCode } = data[0];
   const title = `${FullProductionCode} ${ShowName} Tour Schedule - ${moment().format('DD.MM.YY')}`;
   let headerRowsLength = 4;
   worksheet.addRow([title]);
   worksheet.addRow([`Exported: ${moment().format('DD/MM/YY [at] HH:mm')} - Layout: Standard`]);
+
   if (from) {
-    worksheet.addRow([`Start Date: ${formatedFromDate}`]);
+    worksheet.addRow([`Start Date: ${moment(formatedFromDate).format('YYYY-MM-DD')}`]);
     headerRowsLength++;
   }
+
   if (to) {
-    worksheet.addRow([`End Date: ${formatedToDate}`]);
+    worksheet.addRow([`End Date: ${moment(formatedToDate).format('YYYY-MM-DD')}`]);
     headerRowsLength++;
   }
+
   if (status) {
     worksheet.addRow([`Status: ${status === 'all' ? 'All' : bookingStatusMap[status]}`]);
     headerRowsLength++;
   }
+
   worksheet.addRow(['', '', '', '', '', '', '', 'BOOKING', '', 'PERFS', 'PERF1', 'PERF2', '']);
   worksheet.addRow([
     'PROD',
@@ -185,6 +200,7 @@ const handler = async (req, res) => {
     'TIME',
   ]);
   worksheet.addRow([]);
+
   const map: { [key: string]: SCHEDULE_VIEW } = formattedData.reduce((acc, x) => ({ ...acc, [getKey(x)]: x }), {});
   const daysDiff = moment(to).diff(moment(from), 'days');
   let rowNo = 5;
@@ -199,6 +215,7 @@ const handler = async (req, res) => {
   let totalMileage: number[] = [];
   const seats: number[] = [];
   const performancesPerDay: number[] = [];
+
   for (let i = 1; i <= daysDiff; i++) {
     lastWeekMetaInfo = { ...lastWeekMetaInfo, weekTotalPrinted: false };
     const weekDay = moment(moment(from).add(i - 1, 'day')).format('dddd');
@@ -214,6 +231,7 @@ const handler = async (req, res) => {
       'Declared Holiday',
     ].includes(value?.EntryName);
     const isCancelled = value?.EntryStatusCode === 'X';
+
     if (!value) {
       worksheet.addRow([
         FullProductionCode,
@@ -300,6 +318,7 @@ const handler = async (req, res) => {
     }
     lastWeekMetaInfo = { ...lastWeekMetaInfo, prevProductionWeekNum };
   }
+
   if (time.length) {
     totalTime = [...totalTime, ...time];
   }
@@ -321,6 +340,7 @@ const handler = async (req, res) => {
     totalMileage.reduce((acc, m) => acc + Number(m || 0), 0),
     addTime(totalTime),
   ]);
+
   rowNo++;
   makeRowBold({ worksheet, row: rowNo });
   const numberOfColumns = worksheet.columnCount;
@@ -328,6 +348,7 @@ const handler = async (req, res) => {
 
   worksheet.mergeCells('F3:G3');
   worksheet.mergeCells('A1:G1');
+
   for (let char = 'A', i = 0; i <= numberOfColumns; i++, char = String.fromCharCode(char.charCodeAt(0) + 1)) {
     if (char === 'A' || char === 'B') {
       worksheet.getColumn(char).width = 12;
@@ -336,14 +357,17 @@ const handler = async (req, res) => {
       alignColumnTextHorizontally({ worksheet, colAsChar: char, align: 'center' });
     }
   }
+
   firstRowFormatting({ worksheet });
   for (let row = 2; row <= headerRowsLength; row++) {
     styleHeader({ worksheet, row, numberOfColumns });
   }
   worksheet.getCell(1, 1).font = { size: 20, color: { argb: COLOR_HEXCODE.WHITE }, bold: true };
+
   for (let row = 1; row <= headerRowsLength; row++) {
     makeRowTextBoldAndAllignLeft({ worksheet, row, numberOfColumns });
   }
+
   addWidthAsPerContent({
     worksheet,
     fromColNumber: 1,
@@ -354,6 +378,7 @@ const handler = async (req, res) => {
     rowsToIgnore: 2,
     maxColWidth: Infinity,
   });
+
   worksheet.getColumn('A').width = 7;
   worksheet.getColumn('B').width = 5;
   worksheet.getColumn('C').width = 12;
@@ -365,7 +390,9 @@ const handler = async (req, res) => {
   worksheet.getColumn('L').width = 7;
   worksheet.getColumn('M').width = 7;
   addBorderToAllCells({ worksheet });
+
   const filename = `${title}.xlsx`;
+
   if (format === 'pdf') {
     worksheet.pageSetup.printArea = `A1:${worksheet.getColumn(11).letter}${worksheet.rowCount}`;
     worksheet.pageSetup.fitToWidth = 1;
@@ -386,6 +413,7 @@ const handler = async (req, res) => {
     res.end(pdf);
     return;
   }
+
   res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
   res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
   workbook.xlsx.write(res).then(() => {

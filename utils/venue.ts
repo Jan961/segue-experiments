@@ -48,6 +48,39 @@ export interface UiBarredVenue {
 
 type UiVenueAddress = PrimaryAddress | DeliveryAddress;
 
+export interface VenueData {
+  AddressLoadingW3W: string;
+  AddressStageDoorW3W: string;
+  BarringClause: number;
+  BarringMiles: number;
+  BarringWeeksPost: number;
+  BarringWeeksPre: number;
+  Code: string;
+  CulturallyExempt: boolean;
+  ExcludeFromChecks: boolean;
+  FamilyId: number;
+  GridHeight: number;
+  Id: number;
+  IsDeleted: boolean;
+  LXDesk: string;
+  LXNotes: string;
+  Name: string;
+  Seats: number;
+  SoundDesk: string;
+  SoundNotes: string;
+  StageSize: string;
+  StatusCode: string;
+  TechSpecsURL: string;
+  TownPopulation: number;
+  VATIndicator: boolean;
+  VenueAccountId: number;
+  VenueAddress?: VenueAddress[];
+  VenueContact?: VenueContact[];
+  VenueFlags: number;
+  VenueNotes: number;
+  VenueWarningNotes: number;
+  Website: string;
+}
 export interface UiVenue {
   id?: number;
   venueCode: string;

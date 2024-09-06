@@ -1,16 +1,16 @@
-import prisma from 'lib/prisma';
+import prisma from 'lib/prisma_master';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getAccountId, getEmailFromReq } from 'services/userService';
 
 const formatCompanyDetails = (company: any) => {
   return {
-    id: company.Id,
-    companyName: company.Name,
+    id: company.ProdCoId,
+    companyName: company.ProdCoName,
     companyVATNo: company.ProdCoVATCode || '',
-    fileName: company.File?.OriginalFilename || '',
-    fileLocation: company.File?.Location || '',
-    fileId: company.File?.Id,
-    webSite: company.WebSite,
+    fileName: company.File?.FileOriginalFilename || '',
+    fileLocation: company.File?.FileLocation || '',
+    fileId: company.File?.FileId,
+    webSite: company.ProdCoWebSite,
     hasProductions: company.Production?.length > 0,
   };
 };
@@ -21,20 +21,19 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const AccountId = await getAccountId(email);
     const productionCompanyList = await prisma.ProductionCompany.findMany({
       where: {
-        AccountId,
+        ProdCoAccountId: AccountId,
       },
       include: {
         File: true,
-        Production: true,
       },
       orderBy: [
         {
-          Id: 'desc',
+          ProdCoId: 'desc',
         },
       ],
     });
-
-    return res.status(200).json(productionCompanyList.map(formatCompanyDetails));
+    const formattedList = productionCompanyList?.map(formatCompanyDetails) || [];
+    return res.status(200).json(formattedList);
   } catch (err) {
     res
       .status(500)

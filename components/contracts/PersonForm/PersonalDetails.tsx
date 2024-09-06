@@ -3,7 +3,7 @@ import { DateInput, Icon, Select, TextInput } from 'components/core-ui-lib';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import { workTypeOptions } from 'config/contracts';
 import { insertAtPos, removeAtPos, replaceAtPos } from 'utils';
-import { IPersonDetails } from '../types';
+import { IOtherWorkType, IPersonDetails } from '../types';
 
 export const defaultPersonDetails = {
   firstName: '',
@@ -17,17 +17,17 @@ export const defaultPersonDetails = {
   mobileNumber: '',
   passportName: '',
   passportNumber: '',
-  hasUKWorkPermit: null,
+  hasUKWorkPermit: false,
   passportExpiryDate: null,
   postcode: '',
   checkedBy: null,
   country: null,
-  isFEURequired: null,
+  isFEURequired: false,
   workType: [],
   advisoryNotes: '',
   generalNotes: '',
   healthDetails: '',
-  otherWorkTypes: [''],
+  otherWorkTypes: [{ name: '' }],
   notes: '',
 };
 
@@ -36,7 +36,7 @@ interface PersonalDetailsProps {
   booleanOptions: SelectOption[];
   userOptionList: SelectOption[];
   details: Partial<IPersonDetails>;
-  onChange: (data: IPersonDetails) => void;
+  onChange: (data: Partial<IPersonDetails>) => void;
 }
 
 const PersonalDetails = ({
@@ -73,12 +73,12 @@ const PersonalDetails = ({
     notes,
   } = formData;
   const handleChange = useCallback(
-    (key: string, value: number | string | string[] | number[] | null) => {
+    (key: string, value: number | string | string[] | number[] | IOtherWorkType[] | null) => {
       const updatedData = { ...formData, [key]: value };
       setFormData(updatedData);
-      onChange(updatedData);
+      onChange({ ...details, [key]: value });
     },
-    [onChange, setFormData, formData],
+    [onChange, setFormData, formData, details],
   );
   return (
     <>
@@ -310,7 +310,7 @@ const PersonalDetails = ({
       </div>
       <div className="flex items-center mb-2">
         <div className="w-[11vw] mr-4 text-primary-input-text font-bold">Relevant Health Details</div>
-        <div className="w-full ml-14  pr-5">
+        <div className="w-full ml-14 pr-5">
           <TextInput
             testId="person-health-details"
             className="w-full text-primary-input-text font-bold"
@@ -334,36 +334,48 @@ const PersonalDetails = ({
         </div>
       </div>
       <div className="w-1/2 flex mt-2 items-center">
-        <div className="flex items-start">
+        <div className=" grow flex items-start">
           <div className="text-primary-input-text font-bold mr-4 w-[11vw]">Type of Work</div>
-          <div className="w-[22vw] ml-4 flex flex-col gap-4">
+          <div className="grow ml-4 flex flex-col gap-4">
             <Select
               testId="person-roles"
               onChange={(value) => handleChange('workType', value as number[])}
               value={workType}
-              className="bg-primary-white w-full"
+              className="bg-primary-white w-full max-w-96"
               placeholder="Please select.."
               options={workTypeOptions}
               isMulti
               isClearable
               isSearchable
             />
-            {otherWorkTypes.map((otherWorkType, i) => (
+            {otherWorkTypes.map((otherWorkType: IOtherWorkType, i) => (
               <div key={i} className="flex items-center gap-2 w-full">
                 <TextInput
                   key={i}
                   testId={`person-other-role-${i + 1}`}
-                  className="text-primary-input-text font-bold w-full"
+                  className="text-primary-input-text font-bold w-full max-w-96"
                   onChange={(event) =>
-                    handleChange('otherWorkTypes', replaceAtPos(otherWorkTypes, event.target.value as string, i))
+                    handleChange(
+                      'otherWorkTypes',
+                      replaceAtPos(
+                        otherWorkTypes,
+                        { ...otherWorkType, name: event.target.value },
+                        i,
+                      ) as IOtherWorkType[],
+                    )
                   }
                   placeholder="Other Type of Work"
-                  value={otherWorkType}
+                  value={otherWorkType.name}
                 />
                 {i === 0 && (
                   <div
                     className="cursor-pointer"
-                    onClick={() => handleChange('otherWorkTypes', insertAtPos(otherWorkTypes, '', i + 1) as string[])}
+                    onClick={() =>
+                      handleChange(
+                        'otherWorkTypes',
+                        insertAtPos(otherWorkTypes, { name: '' }, i + 1) as IOtherWorkType[],
+                      )
+                    }
                   >
                     <Icon iconName="plus-circle-solid" />
                   </div>
@@ -381,7 +393,7 @@ const PersonalDetails = ({
 
             <TextInput
               testId="person-notes"
-              className=" text-primary-input-text font-bold w-full"
+              className=" text-primary-input-text font-bold w-full max-w-96"
               onChange={(event) => handleChange('notes', event.target.value)}
               value={notes}
               placeholder="Notes Field"

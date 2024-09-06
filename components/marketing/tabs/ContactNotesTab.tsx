@@ -113,8 +113,8 @@ const ContactNotesTab = forwardRef<ContactNoteTabRef, ContactNotesTabProps>((pro
   };
 
   useEffect(() => {
-    const userTempList = Object.values(users).map(({ Id, FirstName = '', LastName = '' }) => ({
-      value: Id,
+    const userTempList = Object.values(users).map(({ AccUserId, FirstName = '', LastName = '' }) => ({
+      value: AccUserId,
       text: `${FirstName || ''} ${LastName || ''}`,
     }));
 

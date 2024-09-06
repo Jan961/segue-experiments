@@ -128,6 +128,7 @@ const GlobalActivityView = () => {
         cost: data.Cost,
         notes: data.Notes,
         followUpDt: data.DueByDate,
+        id: data.Id,
       };
 
       const rowIndex = rowData.findIndex((act) => act.id === data.Id);
@@ -255,19 +256,20 @@ const GlobalActivityView = () => {
           />
         </div>
       )}
-
-      <GlobalActivityModal
-        show={showGlobalActivityModal}
-        onCancel={() => setShowGlobalActivityModal(false)}
-        variant={actModalVariant}
-        activityTypes={activityTypes}
-        onSave={(variant, data) => updateGlobalActivity(variant, data)}
-        data={actRow}
-        productionId={productionId}
-        productionCurrency={currency.symbol}
-        venues={venueList}
-        tourWeeks={tourWeeks}
-      />
+      {showGlobalActivityModal && (
+        <GlobalActivityModal
+          show={showGlobalActivityModal}
+          onCancel={() => setShowGlobalActivityModal(false)}
+          variant={actModalVariant}
+          activityTypes={activityTypes}
+          onSave={(variant, data) => updateGlobalActivity(variant, data)}
+          data={actRow}
+          productionId={productionId}
+          productionCurrency={currency.symbol}
+          venues={venueList}
+          tourWeeks={tourWeeks}
+        />
+      )}
 
       <ConfirmationDialog
         variant="delete"

@@ -23,11 +23,30 @@ export type CountryDTO = {
 };
 
 export type CurrencyDTO = {
-  Code: string;
-  Name: string;
-  SymbolUnicode: string;
-  CountryList: CountryDTO[];
+  CurrencyCode: string;
+  CurrencyName: string;
+  CurrencySymbolUnicode: string;
+  CurrencyCountryList: CountryDTO[];
 };
+
+export interface ICurrency {
+  code: string;
+  name: string;
+  symbolUniCode: string;
+}
+
+export interface IRegion {
+  id: number;
+  name: string;
+}
+
+export interface ICurrencyCountry {
+  id: number;
+  code: string;
+  name: string;
+  currencyCode: string;
+  regionList: IRegion[];
+}
 
 export type UICurrency = {
   code: number;
@@ -87,7 +106,7 @@ export type ProductionTaskDTO = {
   CompleteByWeekNum?: number;
   CompleteByIsPostProduction: boolean;
   StartByIsPostProduction: boolean;
-  AssignedToUserId?: number;
+  TaskAssignedToAccUserId?: number;
   StartDate?: string;
   CompleteDate?: string;
   TaskCompletedDate: Date;
@@ -112,7 +131,7 @@ export type MasterTaskDTO = {
   AssignedTo?: string;
   StartByWeekNum?: number;
   CompleteByWeekNum?: number;
-  AssignedToUserId?: number;
+  TaskAssignedToAccUserId?: number;
   MasterTaskRepeat?: any;
   MTRId?: number;
   RepeatInterval?: string;
@@ -197,6 +216,15 @@ export type ContractsDTO = {
   ContactInfoReceived: boolean;
 };
 
+export type AccountContactDTO = {
+  AccContId: number;
+  AccContAccountId: number;
+  AccContFirstName: string;
+  AccContLastName: string;
+  AccContPhone: string;
+  AccContMainEmail: string;
+};
+
 export type GetInFitUpDTO = {
   Id: number;
   VenueId?: number; // check field name
@@ -248,13 +276,13 @@ export interface FileDTO {
 }
 
 export interface ProductionCompanyDTO {
-  AccountId?: number;
-  Id?: number;
-  Logo?: string;
-  Name?: string;
+  ProdCoAccountId?: number;
+  ProdCoId?: number;
+  ProdCoLogoFileId?: number;
+  ProdCoName?: string;
   ProdCoSaleStartWeek?: number;
   ProdCoVATCode?: number;
-  WebSite?: string;
+  ProdCoWebSite?: string;
 }
 export type ConversionRateDTO = {
   Id: number;
@@ -397,7 +425,7 @@ export type BookingContactNoteDTO = {
   CoContactName: string;
   ContactDate: string;
   Notes: string;
-  UserId: number;
+  ActionAccUserId: number;
 };
 
 export type AllocatedHoldDTO = {
@@ -424,6 +452,7 @@ export type UserDto = {
   Email: string;
   FirstName: string;
   LastName?: string;
+  AccUserId: number;
 };
 
 export type Venue = {
@@ -687,17 +716,7 @@ export interface SaveContractBookingFormState {
 export interface ContactDemoFormData {
   phone: string;
   email: string;
-}
-
-export interface ContactDemoFormAccountData {
-  // phone: string;
-  Email?: string;
-  AccountUser?: any;
-  companyContact?: string;
-}
-
-export interface ContactsFormData {
-  data: ContactDemoFormAccountData;
+  id: number;
 }
 
 export interface DealMemoCall {
@@ -764,6 +783,7 @@ export interface DealMemoContractFormData {
   SellWho?: string;
   SellProgrammes?: boolean;
   PrintDelUseVenueAddress?: boolean;
+  PrintDelUseVenueAddressline?: string;
   SellMerch?: boolean;
   SellNotes?: string;
   SellProgCommPercent?: number;
@@ -793,6 +813,8 @@ export interface DealMemoContractFormData {
   ApprovedBy?: string;
   DateReturned?: Date;
   Notes?: string;
+  CompAccContId?: number;
+  SendTo?: Array<number>;
 }
 
 export interface DealMemoHoldType {

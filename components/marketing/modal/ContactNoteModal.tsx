@@ -55,8 +55,8 @@ export default function ContactNoteModal({
     setVisible(show);
     initForm();
 
-    const userTempList = Object.values(users).map(({ Id, FirstName = '', LastName = '' }) => ({
-      value: Id,
+    const userTempList = Object.values(users).map(({ AccUserId, FirstName = '', LastName = '' }) => ({
+      value: AccUserId,
       text: `${FirstName || ''} ${LastName || ''}`,
     }));
     setUserList(userTempList);
@@ -74,7 +74,7 @@ export default function ContactNoteModal({
       setPersonContacted(data.CoContactName);
       setDate(new Date(data.ContactDate));
       setTime(getTimeFromDateAndTime(new Date(data.ContactDate)));
-      setActionedBy(data.UserId);
+      setActionedBy(data.ActionAccUserId);
       setNotes(data.Notes);
       setId(data.Id);
     }
@@ -85,7 +85,7 @@ export default function ContactNoteModal({
     if (variant === 'edit') {
       const newRow: BookingContactNoteDTO = {
         BookingId: bookingId,
-        UserId: actionedBy,
+        ActionAccUserId: actionedBy,
         CoContactName: personContacted,
         ContactDate: toISO(date),
         Notes: notes,
@@ -105,7 +105,7 @@ export default function ContactNoteModal({
   const handleSave = () => {
     let data: BookingContactNoteDTO = {
       BookingId: bookingId,
-      UserId: actionedBy,
+      ActionAccUserId: actionedBy,
       CoContactName: personContacted,
       ContactDate: toISO(date),
       Notes: notes,

@@ -1,28 +1,39 @@
-import { UserDto } from 'interfaces';
-import { userMapper } from 'lib/mappers';
-import prisma from 'lib/prisma';
+import prismaMaster from 'lib/prisma_master';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getAccountId, getEmailFromReq } from 'services/userService';
+import { replaceProudctionPermissions, replaceUserPermissions } from 'services/permissionService';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const user = req.body as UserDto;
+    const userDetails = req.body;
 
-    const email = await getEmailFromReq(req);
-    const AccountId = await getAccountId(email);
-
-    const updatedUser = await prisma.user.update({
+    const updatedUSer = await prismaMaster.user.update({
       data: {
-        FirstName: user.FirstName,
-        LastName: user.LastName,
+        UserFirstName: userDetails.firstName,
+        UserLastName: userDetails.lastName,
+        AccountUser: {
+          update: {
+            where: {
+              AccUserId: userDetails.accountUserId,
+            },
+            data: {
+              AccUserIsAdmin: userDetails.isSystemAdmin,
+              AccUserPIN: userDetails.pin,
+            },
+          },
+        },
+      },
+      include: {
+        AccountUser: true,
       },
       where: {
-        AccountId,
-        Id: user.Id,
+        UserEmail: userDetails.email,
       },
     });
 
-    return res.json(userMapper(updatedUser));
+    await replaceUserPermissions(userDetails.accountUserId, userDetails.permissions);
+    await replaceProudctionPermissions(userDetails.accountUserId, userDetails.productions);
+
+    return res.json(updatedUSer);
   } catch (err) {
     console.log(err);
     res.status(500).json({ err: 'Error occurred while updating the user.' });

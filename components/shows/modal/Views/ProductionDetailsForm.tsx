@@ -106,6 +106,10 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
     runningTimeNote,
   } = formData;
 
+  const timeFieldValue =
+    runningTime?.length === 5
+      ? { hrs: runningTime.slice(0, 2), min: runningTime.slice(3, 5) }
+      : { hrs: '00', min: '00' };
   const onChange = useCallback((key: string, value: string | number | DateBlockDTO) => {
     setFormData((data) => ({ ...data, [key]: value }));
     setValidationErrors((prev) => ({ ...prev, [key]: null }));
@@ -143,6 +147,13 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
         },
       );
     }
+  };
+
+  const handleTimeInput = (e) => {
+    const { name, value } = e.target;
+    timeFieldValue[name] = value;
+    formData.runningTime = `${timeFieldValue.hrs}:${timeFieldValue.min}`;
+    return { name, value };
   };
 
   async function validateProduction(data: ProductionFormData) {
@@ -360,7 +371,12 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
           <Label className="w-[200px]" text="Running Time (inc Intervals)" />
           <TimeInput
             className="w-28 placeholder-primary"
-            onChange={({ hrs, min }) => onChange('runningTime', `${hrs || ''}:${min || ''}`)}
+            onChange={(e) => {
+              handleTimeInput(e);
+            }}
+            onInput={(e) => {
+              return handleTimeInput(e);
+            }}
             value={runningTime}
             disabled={isArchived}
           />

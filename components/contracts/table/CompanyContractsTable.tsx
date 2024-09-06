@@ -37,7 +37,7 @@ export default function CompanyContractsTable({ rowData = [] }: ContractsTablePr
         Object.values(users),
         null,
         'Id',
-        ({ FirstName = '', LastName = '' }) => `${FirstName} ${LastName}`,
+        ({ FirstName = '', LastName = '' }) => `${FirstName || ''} ${LastName || ''}`,
       ),
     [users],
   );
@@ -76,6 +76,7 @@ export default function CompanyContractsTable({ rowData = [] }: ContractsTablePr
         setContracts({ ...contracts, [id]: { ...contracts[id], ...contract } });
         callback?.();
       } catch (error) {
+        console.log(error);
         notify.error('Error updating contract');
       }
     },

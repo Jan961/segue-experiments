@@ -84,10 +84,10 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
 
         setAllocRows(
           promData.allocations.map((allocRow) => {
-            const user = Object.values(users).find((user) => user.Id === allocRow.ArrangedById);
+            const user = Object.values(users).find((user) => user.AccUserId === allocRow.ArrangedByAccUserId);
             const firstname = isNullOrEmpty(user.FirstName) ? '' : user.FirstName;
             const surname = isNullOrEmpty(user.LastName) ? '' : user.LastName;
-            return { ...allocRow, ArrangedById: firstname + ' ' + surname };
+            return { ...allocRow, ArrangedByAccUserId: firstname + ' ' + surname };
           }),
         );
 

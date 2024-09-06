@@ -11,7 +11,7 @@ import { currencyListState } from 'state/productions/currencyState';
 import PublicityEventDetails, { IPublicityEventDetails, defaultPublicityEventDetails } from './PublicityEventDetails';
 import { contractsVenueState } from 'state/contracts/contractsVenueState';
 import { standardClauseState } from 'state/contracts/standardClauseState';
-import { IContractDetails } from '../types';
+import { IContractDetails, IWeeklyPayDetails } from '../types';
 
 const defaultContractDetails = {
   currency: null,
@@ -84,12 +84,15 @@ const ContractDetails = ({ contract = {}, onChange = noop }: ContractDetailsProp
   const currencySymbol = useMemo(() => '£', [currency]);
 
   const handleChange = useCallback(
-    (key: string, value: number | string | boolean | string[] | TPaymentBreakdown[] | IPublicityEventDetails[]) => {
+    (
+      key: string,
+      value: number | string | boolean | string[] | TPaymentBreakdown[] | IPublicityEventDetails[] | IWeeklyPayDetails,
+    ) => {
       const updatedData = { ...contractDetails, [key]: value };
       setContractDetails(updatedData);
-      onChange(updatedData);
+      onChange({ ...contract, [key]: value });
     },
-    [onChange, contractDetails],
+    [onChange, contractDetails, contract],
   );
 
   const onRehearsalVenueChange = useCallback(
@@ -137,20 +140,23 @@ const ContractDetails = ({ contract = {}, onChange = noop }: ContractDetailsProp
           onChange={(value) => handleChange('lastDayOfWork', value?.toISOString?.() || '')}
         />
       </div>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 w-full">
         <Label className="w-36 !font-bold text-sm" text="Specific Availability" />
-        <TextInput
-          testId="contract-details-specific-availability-notes"
-          placeholder="Specific availability notes"
-          value={specificAvailabilityNotes}
-          onChange={(event) => handleChange('specificAvailabilityNotes', event.target.value)}
-        />
+        <div className="grow max-w-96">
+          <TextInput
+            className="grow"
+            testId="contract-details-specific-availability-notes"
+            placeholder="Specific availability notes"
+            value={specificAvailabilityNotes}
+            onChange={(event) => handleChange('specificAvailabilityNotes', event.target.value)}
+          />
+        </div>
       </div>
       <div className="flex flex-row gap-2">
         <Label className="!font-bold text-sm w-36" text="Required at Specific Publicity Events" />
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2 w-full">
           {publicityEventList.map((publicityEvent, i) => (
-            <div key={i} className="flex gap-2 items-center">
+            <div key={i} className="flex gap-2 items-center w-full">
               <PublicityEventDetails
                 testId={`contract-details-publicity-event-${i}`}
                 details={publicityEvent}
@@ -289,7 +295,7 @@ const ContractDetails = ({ contract = {}, onChange = noop }: ContractDetailsProp
             <WeeklyPayDetails
               testId="contract-details-weekly-payment"
               details={weeklyPayDetails}
-              onChange={(value) => handleChange('weeklyPayDetails', value as boolean)}
+              onChange={(value) => handleChange('weeklyPayDetails', value)}
             />
           </div>
           <div className="flex flex-col gap-4">
@@ -350,7 +356,7 @@ const ContractDetails = ({ contract = {}, onChange = noop }: ContractDetailsProp
                 placeholder="00.00"
                 type="number"
                 value={cancellationFee}
-                onChange={(event) => handleChange('cancellationFee', parseInt(event.target.value, 10))}
+                onChange={(event) => handleChange('cancellationFee', parseFloat(event.target.value))}
               />
             </div>
             <TextInput

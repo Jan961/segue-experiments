@@ -22,7 +22,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         Priority: task.Priority,
         Notes: task.Notes,
         Progress: task.Progress,
-        AssignedToUserId: task.AssignedToUserId,
+        TaskAssignedToAccUserId: task.TaskAssignedToAccUserId,
         StartByWeekNum: task.StartByWeekNum,
         CompleteByWeekNum: task.CompleteByWeekNum,
         StartByIsPostProduction: task.StartByIsPostProduction,

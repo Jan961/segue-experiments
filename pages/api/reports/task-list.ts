@@ -58,7 +58,7 @@ const handler = async (req, res) => {
     where: {
       ...where,
       ...(production && { ProductionId: production }),
-      ...(assignee && { AssignedToUserId: assignee }),
+      ...(assignee && { TaskAssignedToAccUserId: assignee }),
       ...(taskText && {
         Name: {
           contains: taskText,
@@ -77,7 +77,7 @@ const handler = async (req, res) => {
       StartByWeekNum: true,
       CompleteByWeekNum: true,
       Priority: true,
-      AssignedToUserId: true,
+      TaskAssignedToAccUserId: true,
       Notes: true,
       ProductionId: true,
       User: {

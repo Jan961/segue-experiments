@@ -48,8 +48,8 @@ const useTasksFilter = () => {
       return [];
     }
 
-    return Object.values(users).map(({ Id, FirstName = '', LastName = '' }) => ({
-      value: Id,
+    return Object.values(users).map(({ AccUserId, FirstName = '', LastName = '' }) => ({
+      value: AccUserId,
       text: `${FirstName || ''} ${LastName || ''}`,
     }));
   }, [users]);
@@ -69,7 +69,7 @@ const useTasksFilter = () => {
         const tasksFilteredByAssignedUser = productionData.Tasks.map((task) => {
           return {
             ...task,
-            userName: task.AssignedToUserId !== -1 ? userIdToNameMap[task.AssignedToUserId] : null,
+            userName: task.TaskAssignedToAccUserId !== -1 ? userIdToNameMap[task.TaskAssignedToAccUserId] : null,
           };
         });
 
@@ -86,12 +86,12 @@ const useTasksFilter = () => {
           ...productionData,
 
           Tasks: productionTasks
-            .filter(({ AssignedToUserId, CompleteDate, Status }) => {
+            .filter(({ TaskAssignedToAccUserId, CompleteDate, Status }) => {
               return (
                 (!filters.endDueDate || new Date(CompleteDate) <= new Date(filters.endDueDate)) &&
                 (!filters.startDueDate || new Date(CompleteDate) >= new Date(filters.startDueDate)) &&
                 (!filters.status || filters.status === 'all' || getStatusBool(Status, filters.status, CompleteDate)) &&
-                (filters.assignee === -1 || AssignedToUserId === filters.assignee)
+                (filters.assignee === -1 || TaskAssignedToAccUserId === filters.assignee)
               );
             })
             .map((task) => ({
@@ -112,6 +112,7 @@ const useTasksFilter = () => {
     filters.taskText,
     usersList,
   ]);
+
   return { filteredProductions };
 };
 

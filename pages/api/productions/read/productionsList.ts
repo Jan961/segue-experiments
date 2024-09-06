@@ -1,12 +1,9 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getAllProductions } from 'services/productionService';
-import { getAccountId, getEmailFromReq } from 'services/userService';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const email = await getEmailFromReq(req);
-    const accountId = await getAccountId(email);
-    const productionsRaw = await getAllProductions(accountId);
+    const productionsRaw = await getAllProductions();
 
     const values = {
       productions: productionsRaw.map((t: any) => ({

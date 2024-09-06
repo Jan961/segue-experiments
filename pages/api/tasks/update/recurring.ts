@@ -77,7 +77,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
               'Name',
               'Priority',
               'Notes',
-              'AssignedToUserId',
+              'TaskAssignedToAccUserId',
               'StartByWeekNum',
               'CompleteByWeekNum',
               'TaskCompletedDate',
@@ -187,12 +187,8 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
                 },
               },
             }),
-            ...(task.AssignedToUserId && {
-              User: {
-                connect: {
-                  Id: task.AssignedToUserId,
-                },
-              },
+            ...(task.TaskAssignedToAccUserId && {
+              TaskAssignedToAccUserId: task.TaskAssignedToAccUserId,
             }),
           },
         });

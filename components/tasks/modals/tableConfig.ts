@@ -59,10 +59,10 @@ export const getMasterTasksColumnDefs = (usersList = []) => {
     { headerName: 'Priority', field: 'Priority', cellRenderer: DefaultCellRenderer, width: 100 },
     {
       headerName: 'Assigned to',
-      field: 'AssignedToUserId',
+      field: 'TaskAssignedToAccUserId',
       valueGetter: function (params) {
-        return params.data?.AssignedToUserId && usersList.length > 0
-          ? getUser(usersList, params.data?.AssignedToUserId)
+        return params.data?.TaskAssignedToAccUserId && usersList.length > 0
+          ? getUser(usersList, params.data?.TaskAssignedToAccUserId)
           : null;
       },
       cellRenderer: DefaultCellRenderer,
@@ -131,10 +131,10 @@ export const getProductionTasksColumnDefs = (usersList = []) => {
     { headerName: 'Priority', field: 'Priority', cellRenderer: DefaultCellRenderer, width: 100 },
     {
       headerName: 'Assigned to',
-      field: 'AssignedToUserId',
+      field: 'TaskAssignedToAccUserId',
       valueGetter: function (params) {
-        return params.data?.AssignedToUserId && usersList.length > 0
-          ? getUser(usersList, params.data?.AssignedToUserId)
+        return params.data?.TaskAssignedToAccUserId && usersList.length > 0
+          ? getUser(usersList, params.data?.TaskAssignedToAccUserId)
           : null;
       },
       cellRenderer: DefaultCellRenderer,

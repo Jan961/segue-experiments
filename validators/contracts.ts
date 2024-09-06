@@ -1,5 +1,28 @@
 import * as yup from 'yup';
 
+export const scheduleDaySchema = yup.object().shape({
+  productionCode: yup.string().required('Production code is required'),
+  day: yup.string().required('Day is required'),
+  date: yup.string().required('Date is required'),
+  // .matches(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in the format YYYY-MM-DD'),
+  week: yup.number().required('Week is required').integer('Week must be an integer'),
+  venue: yup.string().nullable(),
+  isOtherDay: yup.boolean().nullable(),
+  isCancelled: yup.boolean().nullable(),
+  location: yup.string().nullable(),
+  type: yup.string().nullable(),
+  status: yup.string().nullable(),
+  capacity: yup.number().integer('Capacity must be an integer').nullable(),
+  performancesPerDay: yup.number().integer('Performances per day must be an integer').nullable(),
+  performance1: yup.string().nullable(),
+  performance2: yup.string().nullable(),
+  mileage: yup.number().min(0, 'Mileage must be a positive number').nullable(),
+  time: yup
+    .string()
+    // .matches(/^([01]\d|2[0-3]):([0-5]\d)$/, 'Time must be in the format HH:mm')
+    .nullable(),
+});
+
 export const contractDetailsSchema = yup.object().shape({
   currency: yup.string().length(3).required(),
   firstDayOfWork: yup.date().nullable(),
@@ -53,8 +76,8 @@ export const contractDetailsSchema = yup.object().shape({
     .array()
     .of(
       yup.object().shape({
-        date: yup.date().required(),
-        amount: yup.number().required(),
+        date: yup.date().nullable(),
+        amount: yup.number().nullable(),
         notes: yup.string().nullable(),
       }),
     )
@@ -74,6 +97,7 @@ export const contractSchema = yup.object().shape({
   personId: yup.number().integer().required(),
   templateId: yup.number().integer().required(),
   contractDetails: contractDetailsSchema.required(),
+  accScheduleJson: yup.array().nullable(),
 });
 
 export const updateContractSchema = yup.object().shape({
@@ -113,4 +137,5 @@ export const updateContractSchema = yup.object().shape({
   personId: yup.number().integer().nullable(),
   currency: yup.string().length(3).nullable(),
   venueId: yup.number().integer().nullable(),
+  accScheduleJson: yup.array().nullable(),
 });

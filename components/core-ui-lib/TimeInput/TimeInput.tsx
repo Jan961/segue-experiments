@@ -1,6 +1,6 @@
 import { forwardRef, useEffect, useRef, useState } from 'react';
-import Label from '../Label';
 import classNames from 'classnames';
+import { isNullOrEmpty } from 'utils';
 
 export type Time = {
   hrs?: string;
@@ -22,7 +22,10 @@ export interface TimeInputProps {
 }
 
 const baseClass =
-  'h-comp-height flex items-center justify-around text-sm p-1 text-primary-input-text rounded-md border border-primary-border focus:ring-2 focus:ring-primary-input-text ring-inset';
+  'h-comp-height flex items-center justify-around text-sm p-1 text-primary-input-text rounded-md border border-primary-border ring-inset';
+
+const focusClass = 'focus:ring-2 focus:ring-primary-input-text';
+
 const DEFAULT_TIME = { hrs: '', min: '', sec: '' };
 
 const isOfTypTime = (t: any): t is Time => t.hrs !== undefined && t.min !== undefined;
@@ -30,26 +33,25 @@ const isOfTypTime = (t: any): t is Time => t.hrs !== undefined && t.min !== unde
 const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
   ({ onChange, value, onBlur, disabled, className, tabIndexShow, index, onInput }: TimeInputProps, ref) => {
     const [time, setTime] = useState<Time>(DEFAULT_TIME);
-    const [isFocused, setIsFocused] = useState(false);
-    const disabledClass = disabled ? `!bg-disabled-input !cursor-not-allowed !pointer-events-none` : '';
     const hrsRef = useRef(null);
     const minsRef = useRef(null);
-
-    const handleBlur = () => {
-      if (isFocused) {
-        onChange(time);
-        onBlur?.({ ...time, sec: time.sec || '' });
-        setIsFocused(false);
-      }
-    };
-
-    const handleFocus = () => {
-      setIsFocused(true);
-    };
 
     const handleMinKeyDown = (e) => {
       if (e.shiftKey && e.code === 'Tab') {
         hrsRef.current.select();
+      }
+    };
+
+    const handleBlur = (e) => {
+      const { name, value } = e.target;
+
+      // Add leading zero if needed
+      const paddedValue = value.length === 1 ? `0${value}` : value;
+
+      if (!isNullOrEmpty(onBlur)) {
+        onBlur({ ...e, target: { ...e.target, value: paddedValue } });
+      } else {
+        filterTimeInput(name, paddedValue);
       }
     };
 
@@ -71,8 +73,10 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
     };
 
     const handleInputChange = (e) => {
-      const { name, value } = onInput(e);
-      filterTimeInput(name, value);
+      if (!isNullOrEmpty(onInput)) {
+        const { name, value } = onInput(e);
+        filterTimeInput(name, value);
+      }
     };
 
     useEffect(() => {
@@ -91,16 +95,9 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
         setTime(DEFAULT_TIME);
       }
     }, [value]);
-    return disabled ? (
-      <Label text={`${time.hrs} : ${time.min}`} className={`${baseClass} ${disabledClass}`} />
-    ) : (
-      <div
-        ref={ref}
-        onFocus={handleFocus}
-        onBlur={handleBlur}
-        className={classNames(baseClass, className)}
-        tabIndex={-1} // Make the div focusable
-      >
+
+    return (
+      <div ref={ref} className={classNames(baseClass, className, disabled ? '' : focusClass)} tabIndex={-1}>
         <input
           data-testid="hourInput"
           data-index={index}
@@ -111,7 +108,7 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
           type="text"
           className="w-8 h-5/6 border-none focus:ring-0 text-center ring-0 p-0"
           onChange={handleChange}
-          onBlur={onBlur}
+          onBlur={handleBlur}
           onFocus={(e) => e.target.select()}
           disabled={disabled}
           tabIndex={tabIndexShow ? 0 : 1}
@@ -126,7 +123,7 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
           placeholder="mm"
           className="w-8 h-5/6 border-none focus:ring-0 text-center ring-0 p-0"
           onChange={handleChange}
-          onBlur={onBlur}
+          onBlur={handleBlur}
           onFocus={(e) => e.target.select()}
           disabled={disabled}
           tabIndex={tabIndexShow ? 0 : 2}

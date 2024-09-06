@@ -27,8 +27,8 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
       return [];
     }
 
-    return Object.values(users).map(({ Id, FirstName = '', LastName = '' }) => ({
-      value: Id,
+    return Object.values(users).map(({ AccUserId, FirstName = '', LastName = '' }) => ({
+      value: AccUserId,
       text: `${FirstName || ''} ${LastName || ''}`,
     }));
   }, [users]);
@@ -68,7 +68,7 @@ export default TasksPage;
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const AccountId = await getAccountIdFromReq(ctx.req);
-  const productionJump = await getProductionJumpState(ctx, 'tasks', AccountId);
+  const productionJump = await getProductionJumpState(ctx, 'tasks');
   const productionsWithTasks = await getProductionsAndTasks(AccountId);
   const users = await getUsers(AccountId);
 

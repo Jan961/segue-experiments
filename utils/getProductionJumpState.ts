@@ -1,5 +1,6 @@
 import { dateBlockMapper } from 'lib/mappers';
 import { ParsedUrlQuery } from 'querystring';
+// import { pick } from 'radash';
 import { dateTimeToTime } from 'services/dateService';
 import { getAllProductions, getAllProductionRegions } from 'services/productionService';
 import { ProductionJump } from 'state/booking/productionJumpState';
@@ -9,9 +10,9 @@ interface Params extends ParsedUrlQuery {
   ProductionCode: string;
 }
 
-export const getProductionJumpState = async (ctx, path: string, AccountId: number): Promise<ProductionJump> => {
+export const getProductionJumpState = async (ctx, path: string): Promise<ProductionJump> => {
   const { ProductionCode, ShowCode } = (ctx.params || {}) as Params;
-  const productionsRaw = await getAllProductions(AccountId);
+  const productionsRaw = await getAllProductions();
   const allProductionRegions: any = await getAllProductionRegions();
   const selectedProduction = productionsRaw.find(
     (production: any) => production.Code === ProductionCode && production.Show.Code === ShowCode,
@@ -24,6 +25,7 @@ export const getProductionJumpState = async (ctx, path: string, AccountId: numbe
         if (db) {
           db = dateBlockMapper(db);
         }
+
         return {
           Id: t.Id,
           Code: t.Code,
@@ -39,6 +41,7 @@ export const getProductionJumpState = async (ctx, path: string, AccountId: numbe
           RunningTimeNote: t.RunningTimeNote,
           SalesFrequency: t.SalesFrequency,
           ProductionCompany: t.ProductionCompany,
+          SalesEmail: t.SalesEmail,
         };
       })
       .sort((a, b) => {

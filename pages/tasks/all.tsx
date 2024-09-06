@@ -25,8 +25,8 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
 
   const usersList = useMemo(
     () =>
-      Object.values(users).map(({ Id, FirstName = '', LastName = '' }) => ({
-        value: Id,
+      Object.values(users).map(({ AccUserId, FirstName = '', LastName = '' }) => ({
+        value: AccUserId,
         text: `${FirstName || ''} ${LastName || ''}`,
       })),
     [users],
@@ -82,7 +82,7 @@ export default TasksPage;
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const AccountId = await getAccountIdFromReq(ctx.req);
-  const productionJump = await getProductionJumpState(ctx, 'tasks', AccountId);
+  const productionJump = await getProductionJumpState(ctx, 'tasks');
   productionJump.selected = -1;
   const users = await getUsers(AccountId);
   const productionsWithTasks = await getProductionsAndTasks(AccountId);

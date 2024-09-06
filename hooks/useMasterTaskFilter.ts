@@ -8,8 +8,8 @@ const useMasterTasksFilter = (tasks = []) => {
   const { users } = useRecoilValue(userState);
 
   const usersList = useMemo(() => {
-    return Object.values(users).map(({ Id, FirstName = '', LastName = '' }) => ({
-      value: Id,
+    return Object.values(users).map(({ AccUserId, FirstName = '', LastName = '' }) => ({
+      value: AccUserId,
       text: `${FirstName || ''} ${LastName || ''}`,
     }));
   }, [users]);
@@ -22,7 +22,7 @@ const useMasterTasksFilter = (tasks = []) => {
     const tasksFilteredByAssignedUser = tasks.map((task) => {
       return {
         ...task,
-        userName: task.AssignedToUserId !== -1 ? userIdToNameMap[task.AssignedToUserId] : null,
+        userName: task.TaskAssignedToAccUserId !== -1 ? userIdToNameMap[task.TaskAssignedToAccUserId] : null,
       };
     });
 
