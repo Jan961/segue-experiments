@@ -2,9 +2,8 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import prisma from 'lib/prisma';
 import { SpreadsheetDataClean } from 'types/SpreadsheetValidationTypes';
 import { getDateBlockForProduction, deleteAllDateBlockEvents } from 'services/dateBlockService';
-import { AddBookingsParams } from 'pages/api/bookings/interface/add.interface';
 import { nanoid } from 'nanoid';
-import { BookingService } from 'pages/api/bookings/services/add.bookings';
+import { createNewBooking } from 'services/bookingService';
 
 interface RequestBody {
   spreadsheetData: SpreadsheetDataClean;
@@ -36,34 +35,57 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       },
     });
 
-    // Create Bookings for each listed Booking in the spreadsheetData
-    const bookingsToCreate: AddBookingsParams[] = [];
-    for (const venue of spreadsheetData.venues) {
-      for (const booking of venue.bookings) {
-        const venueId = venueIDs.find((venueID) => venueID.Code === venue.venueCode)?.Id;
-        if (venueId) {
-          bookingsToCreate.push({
-            DateBlockId: primaryDateBlockID,
-            VenueId: venueId,
-            isBooking: true,
-            Notes: '',
-            BookingDate: booking.bookingDate,
-            StatusCode: 'C',
-            PencilNum: null,
-            Performances: [
+    spreadsheetData.venues = spreadsheetData.venues.map((venue) => {
+      const matchingVenue = venueIDs.find((v) => v.Code === venue.venueCode);
+      return {
+        ...venue,
+        venueId: matchingVenue ? matchingVenue.Id : null,
+      };
+    });
+
+    const bookingsWithSales = await prisma.$transaction(async (tx) => {
+      const bookingsWithSales = [];
+      for (const venue of spreadsheetData.venues) {
+        for (const booking of venue.bookings) {
+          if (venue.venueId) {
+            const bookingPromise = createNewBooking(
               {
-                Time: null,
-                Date: booking.bookingDate,
+                DateBlockId: primaryDateBlockID,
+                VenueId: venue.venueId,
+                Notes: '',
+                BookingDate: booking.bookingDate,
+                StatusCode: 'C',
+                PencilNum: null,
+                Performances: [
+                  {
+                    Time: null,
+                    Date: booking.bookingDate,
+                  },
+                ],
+                RunTag: nanoid(8),
               },
-            ],
-            RunTag: nanoid(8),
-          });
+              tx,
+            );
+            bookingsWithSales.push({ booking: bookingPromise, sales: booking.sales });
+          }
         }
       }
-    }
 
-    const { bookings } = await BookingService.createBookings(bookingsToCreate);
-    console.log(bookings);
+      const createdBookings = await Promise.allSettled(bookingsWithSales.map((item) => item.booking));
+
+      // Update bookingsWithSales with the resolved bookings
+      createdBookings.forEach((result, index) => {
+        if (result.status === 'fulfilled') {
+          bookingsWithSales[index].booking = result.value;
+        } else {
+          res.status(200).json({ status: 'Error creating bookings for Sales History Data' });
+        }
+      });
+
+      return bookingsWithSales;
+    });
+
+    console.log(bookingsWithSales);
 
     res.status(200).json({ status: 'Success' });
   } catch (err) {
