@@ -230,7 +230,9 @@ const Filters = () => {
           {/* Iframe placed next to buttons but in the same flex container */}
           <div className=" -mt-[50px] cursor-pointer w-[150px] h-[81px]">
             {!landingUrlValid ? (
-              <div className="bg-gray-400 h-[81px]">{landingURL.length === 0 ? `No URL` : `Invalid URL`} provided</div>
+              <div className="bg-gray-300 rounded-lg h-[81px] flex items-center justify-center text-white text-sm">
+                {!(landingURL?.length > 0) ? `No URL` : `Invalid URL`} provided
+              </div>
             ) : isNullOrEmpty(ogImage) ? (
               <Iframe src={landingURL} variant="xs" />
             ) : (
