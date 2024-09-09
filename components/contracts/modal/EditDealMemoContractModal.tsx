@@ -26,7 +26,6 @@ import {
   defaultDemoCall,
   filterCurrencyNum,
   filterHoldTypeData,
-  filterPercentage,
   filterPrice,
   filterTechProvision,
   parseAndSortDates,
@@ -77,6 +76,16 @@ export const EditDealMemoContractModal = ({
   const [seatKillsData, setSeatKillsData] = useState([]);
   const [currency, setCurrency] = useState('');
   const accountContacts = useRecoilValue(accountContactState);
+
+  const [errors, setErrors] = useState({
+    royaltyVal: false,
+    prsVal: false,
+    promSplitVal: false,
+    venueSplitVal: false,
+    ccCommVal: false,
+    progComm: false,
+    merchComm: false,
+  });
 
   const companyContactList = useMemo(
     () =>
@@ -345,11 +354,6 @@ export const EditDealMemoContractModal = ({
       ...prevDealMemo,
       DealMemoHold: data,
     }));
-  };
-
-  const testAssign = (value) => {
-    editDemoModalData('SendTo', value, 'dealMemo');
-    console.log(value);
   };
 
   return (
@@ -688,30 +692,49 @@ export const EditDealMemoContractModal = ({
           <div className="text-xl text-primary-navy font-bold -mt-2.5">Deal</div>
           <div className="flex items-center">
             <div className="w-1/5 text-primary-input-text font-bold">Royalty Off The Top</div>
-            <div className="w-4/5 flex items-center">
-              <TextInput
-                testId="deal-royalty-percentage"
-                className="w-[100px]"
-                value={formData.ROTTPercentage}
-                type="number"
-                onChange={(value) =>
-                  editDemoModalData('ROTTPercentage', filterPercentage(parseFloat(value.target.value)), 'dealMemo')
-                }
-              />{' '}
-              <div className=" text-primary-input-text font-bold ml-2">%</div>
-              <div className=" text-primary-input-text font-bold ml-12 mr-4">PRS</div>
-              <TextInput
-                testId="deal-prs-percentage"
-                className="w-[100px]"
-                value={formData.PRSPercentage}
-                type="number"
-                onChange={(value) =>
-                  editDemoModalData('PRSPercentage', filterPercentage(parseFloat(value.target.value)), 'dealMemo')
-                }
-              />
-              <div className=" text-primary-input-text font-bold ml-2">%</div>
+            <div className="flex flex-row">
+              <div className="w-4/5 flex items-center">
+                <TextInput
+                  testId="deal-royalty-percentage"
+                  className={classNames('w-[100px]', errors.royaltyVal ? 'text-primary-red' : '')}
+                  value={formData.ROTTPercentage}
+                  type="number"
+                  onChange={(value) => {
+                    if (parseFloat(value.target.value) < 0 || parseFloat(value.target.value) > 100) {
+                      setErrors({ ...errors, royaltyVal: true });
+                    } else {
+                      setErrors({ ...errors, royaltyVal: false });
+                    }
+                    editDemoModalData('ROTTPercentage', parseFloat(value.target.value), 'dealMemo');
+                  }}
+                />{' '}
+                <div className=" text-primary-input-text font-bold ml-2">%</div>
+                <div className=" text-primary-input-text font-bold ml-12 mr-4">PRS</div>
+                <TextInput
+                  testId="deal-prs-percentage"
+                  className={classNames('w-[100px]', errors.prsVal ? 'text-primary-red' : '')}
+                  value={formData.PRSPercentage}
+                  type="number"
+                  onChange={(value) => {
+                    if (parseFloat(value.target.value) < 0 || parseFloat(value.target.value) > 100) {
+                      setErrors({ ...errors, prsVal: true });
+                    } else {
+                      setErrors({ ...errors, prsVal: false });
+                    }
+                    editDemoModalData('PRSPercentage', parseFloat(value.target.value), 'dealMemo');
+                  }}
+                />
+                <div className=" text-primary-input-text font-bold ml-2">%</div>
+              </div>
             </div>
           </div>
+          {(errors.royaltyVal || errors.prsVal) && (
+            <div className="ml-[20%] flex flex-row">
+              <div className="w-4/5 flex items-center mt-2 text-primary-red">
+                Pecentage value must be between 0 and 100
+              </div>
+            </div>
+          )}
           <div className="flex items-center mt-4">
             <div className="w-1/5 text-primary-input-text font-bold">Guarantee</div>
             <div className="w-4/5 flex items-center">
@@ -726,7 +749,7 @@ export const EditDealMemoContractModal = ({
                 value={formData.Guarantee}
                 testId="select-deal-guarantee"
               />
-              <div className="text-primary-input-text font-bold ml-14 mr-5">{currency}</div>
+              <div className="text-primary-input-text font-bold ml-[5.8%] mr-3">{currency}</div>
 
               <TextInput
                 testId="deal-guarntee-amount"
@@ -838,42 +861,51 @@ export const EditDealMemoContractModal = ({
               </div>
             </div>
           </div>
-          <div className="flex items-center mt-4">
-            <div className="w-1/5 text-primary-input-text font-bold">Promoter Split</div>
-            <div className="w-4/5 flex items-center">
+          <div className="flex items-center mt-3">
+            <div className="w-[20%] text-primary-input-text font-bold">Deal Split</div>
+            <div className="flex items-center">
+              <div className="text-primary-input-text font-bold mr-2">Promoter</div>
               <TextInput
                 testId="promoter-split-percentage"
-                className="w-[100px] ml-6"
+                className={classNames('w-[100px]', errors.promSplitVal ? 'text-primary-red' : '')}
                 type="number"
                 value={formData.PromoterSplitPercentage}
-                onChange={(value) =>
-                  editDemoModalData(
-                    'PromoterSplitPercentage',
-                    filterPercentage(parseFloat(value.target.value)),
-                    'dealMemo',
-                  )
-                }
+                onChange={(value) => {
+                  if (parseFloat(value.target.value) < 0 || parseFloat(value.target.value) > 100) {
+                    setErrors({ ...errors, promSplitVal: true });
+                  } else {
+                    setErrors({ ...errors, promSplitVal: false });
+                  }
+                  editDemoModalData('PromoterSplitPercentage', parseFloat(value.target.value), 'dealMemo');
+                }}
               />
 
               <div className="text-primary-input-text font-bold ml-2 mr-2">%</div>
-
-              <div className="text-primary-input-text font-bold ml-20 mr-2">Venue Split</div>
+              <div className="text-primary-input-text font-bold ml-20 mr-2">Venue</div>
 
               <TextInput
                 testId="venue-split-percentage"
-                className="w-[100px]"
+                className={classNames('w-[100px]', errors.venueSplitVal ? 'text-primary-red' : '')}
                 value={formData.VenueSplitPercentage}
-                onChange={(value) =>
-                  editDemoModalData(
-                    'VenueSplitPercentage',
-                    filterPercentage(parseFloat(value.target.value)),
-                    'dealMemo',
-                  )
-                }
+                onChange={(value) => {
+                  if (parseFloat(value.target.value) < 0 || parseFloat(value.target.value) > 100) {
+                    setErrors({ ...errors, venueSplitVal: true });
+                  } else {
+                    setErrors({ ...errors, venueSplitVal: false });
+                  }
+                  editDemoModalData('VenueSplitPercentage', parseFloat(value.target.value), 'dealMemo');
+                }}
               />
               <div className="text-primary-input-text font-bold ml-2 mr-2">%</div>
             </div>
           </div>
+          {(errors.promSplitVal || errors.venueSplitVal) && (
+            <div className="ml-[20%] flex flex-row">
+              <div className="w-4/5 flex items-center mt-2 text-primary-red">
+                Pecentage value must be between 0 and 100
+              </div>
+            </div>
+          )}
           {[
             ['Venue Rental', 'VenueRental', 'VenueRentalNotes'],
             ['Staffing Contra', 'StaffingContra', 'StaffingContraNotes'],
@@ -881,9 +913,9 @@ export const EditDealMemoContractModal = ({
           ].map((inputData) => {
             return (
               <div key={inputData[0]} className="flex items-center mt-4">
-                <div className="w-1/5 text-primary-input-text font-bold">{inputData[0]}</div>
-                <div className="w-4/5 flex items-center">
-                  <div className="text-primary-input-text font-bold  mr-4">{currency}</div>
+                <div className="w-[19%] text-primary-input-text font-bold">{inputData[0]}</div>
+                <div className="flex items-center">
+                  <div className="text-primary-input-text font-bold  mr-2">{currency}</div>
 
                   <TextInput
                     testId={`${inputData[1]}-amount`}
@@ -1300,16 +1332,26 @@ export const EditDealMemoContractModal = ({
               <div className="text-primary-input-text font-bold ml-14 mr-2">Credit Card Commission</div>
               <TextInput
                 testId="credit-card-commission-percentage"
-                className="w-auto"
+                className={classNames('w-auto', errors.ccCommVal ? 'text-primary-red' : '')}
                 type="number"
                 value={formData.CCCommissionPercent}
-                onChange={(value) =>
-                  editDemoModalData('CCCommissionPercent', filterPercentage(parseFloat(value.target.value)), 'dealMemo')
-                }
+                onChange={(value) => {
+                  if (parseFloat(value.target.value) < 0 || parseFloat(value.target.value) > 100) {
+                    setErrors({ ...errors, ccCommVal: true });
+                  } else {
+                    setErrors({ ...errors, ccCommVal: false });
+                  }
+                  editDemoModalData('CCCommissionPercent', parseFloat(value.target.value), 'dealMemo');
+                }}
               />
               <div className="text-primary-input-text font-bold ml-2">%</div>
             </div>
           </div>
+          {errors.ccCommVal && (
+            <div className="ml-[67.8%] flex flex-row">
+              <div className="w-4/5 flex items-center text-primary-red">Pecentage value must be between 0 and 100</div>
+            </div>
+          )}
           <div className="flex items-center mt-4">
             <div className="w-1/5 text-primary-input-text font-bold">Transaction Charges</div>
             <div className="w-4/5 flex items-center">
@@ -1447,7 +1489,7 @@ export const EditDealMemoContractModal = ({
             <div className="w-1/5"> </div>
             <div className="w-4/5 flex">
               <Select
-                onChange={(value) => testAssign(value)}
+                onChange={(value) => editDemoModalData('SendTo', value, 'dealMemo')}
                 isMulti
                 className="bg-primary-white w-full"
                 placeholder="Please select assignee..."
@@ -1661,35 +1703,41 @@ export const EditDealMemoContractModal = ({
           </div>
           <div className="flex items-center mt-4">
             <div className="w-1/5 text-primary-input-text font-bold">Venue Commission</div>
-            <div className="w-4/5 flex text-primary-input-text font-bold items-center">
-              <div className="mr-4">Programmes</div>
+            <div className="w-4/5 flex text-primary-input-text items-center">
+              <div className="mr-4 font-bold">Programmes</div>
               <TextInput
                 testId="venue-commission-for-programmes"
-                className="w-[150px]"
+                className={classNames('w-[150px]', errors.progComm ? 'text-primary-red' : '')}
                 type="number"
                 value={formData.SellProgCommPercent}
-                onChange={(value) =>
-                  editDemoModalData('SellProgCommPercent', filterPercentage(parseFloat(value.target.value)), 'dealMemo')
-                }
+                onChange={(value) => {
+                  if (parseFloat(value.target.value) < 0 || parseFloat(value.target.value) > 100) {
+                    setErrors({ ...errors, progComm: true });
+                  } else {
+                    setErrors({ ...errors, progComm: false });
+                  }
+                  editDemoModalData('SellProgCommPercent', parseFloat(value.target.value), 'dealMemo');
+                }}
               />
-              <div className="ml-2">%</div>
-              <div className="mr-2 ml-16">Merchandise</div>
+              <div className="ml-2 font-bold">%</div>
+              <div className="mr-2 ml-16 font-bold">Merchandise</div>
               <TextInput
                 testId="venue-commission-for-merchandise"
-                className="w-[150px]"
+                className={classNames('w-[150px]', errors.merchComm ? 'text-primary-red' : '')}
                 type="number"
                 value={formData.SellMerchCommPercent}
-                onChange={(value) =>
-                  editDemoModalData(
-                    'SellMerchCommPercent',
-                    filterPercentage(parseFloat(value.target.value)),
-                    'dealMemo',
-                  )
-                }
+                onChange={(value) => {
+                  if (parseFloat(value.target.value) < 0 || parseFloat(value.target.value) > 100) {
+                    setErrors({ ...errors, merchComm: true });
+                  } else {
+                    setErrors({ ...errors, merchComm: false });
+                  }
+                  editDemoModalData('SellMerchCommPercent', parseFloat(value.target.value), 'dealMemo');
+                }}
               />
-              <div className="ml-2">%</div>
-              <div className="ml-14">Fixed Pitch Fee</div>
-              <div className="ml-2 mr-2">{currency}</div>
+              <div className="ml-2 font-bold">%</div>
+              <div className="ml-14 font-bold">Fixed Pitch Fee</div>
+              <div className="ml-2 mr-2 font-bold">{currency}</div>
 
               <TextInput
                 testId="fixed-pitch-fee"
@@ -1702,6 +1750,13 @@ export const EditDealMemoContractModal = ({
               />
             </div>
           </div>
+          {(errors.progComm || errors.merchComm) && (
+            <div className="ml-[20%] flex flex-row">
+              <div className="w-4/5 flex items-center mt-2 text-primary-red">
+                Pecentage value must be between 0 and 100
+              </div>
+            </div>
+          )}
           <hr className="bg-primary h-[3px] mt-4 mb-4" />
           <div className="text-xl text-primary-navy font-bold -mt-2.5">Technical</div>
           <div className="flex items-center">
