@@ -127,6 +127,7 @@ export default function AddEditVenueModal({
             setAddressAttempted(true);
           }
         } else {
+          formData.primaryCoordinates = { latitude: result[0]?.lat, longitude: result[0]?.lon };
           setShowAddressMessage('Located');
         }
         setShowAddressPopup(true);

@@ -4,6 +4,7 @@ import { getAccountId, getEmailFromReq } from 'services/userService';
 import { createVenue } from 'services/venueService';
 import { mapVenueContactToPrisma } from 'utils/venue';
 import { addVenueToMilageCalculator } from 'services/addVenueToMilageCalculator';
+import { formatCoords } from 'utils/formatCoords';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
@@ -44,6 +45,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       primaryCountry,
       primaryPhoneNumber,
       primaryEMail,
+      primaryCoordinates,
       deliveryAddress1,
       deliveryAddress2,
       deliveryAddress3,
@@ -55,6 +57,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       barredVenues,
       venueContacts,
     } = req.body;
+    const { latitude, longitude } = formatCoords(primaryCoordinates);
     const primaryAddress = {
       Line1: primaryAddress1,
       Line2: primaryAddress2,
@@ -65,6 +68,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       TypeName: 'Main',
       Phone: primaryPhoneNumber,
       Email: primaryEMail,
+      Latitude: latitude,
+      Longitude: longitude,
     };
 
     const deliveryAddress = {
