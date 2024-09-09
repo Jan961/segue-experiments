@@ -9,6 +9,9 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   try {
     const { productionID }: RequestBody = req.body;
 
+    if (!productionID) {
+      res.status(400).json({ error: 'Invalid Production ID provided' });
+    }
     // Find DateBlock for ProductionID that isPrimary
     const primaryDateBlock = await getDateBlockForProduction(productionID, true);
     const primaryDateBlockID = primaryDateBlock[0].Id;
