@@ -701,9 +701,11 @@ const cleanSpreadsheetData = (data: SpreadsheetData): SpreadsheetDataCleaned => 
   return {
     venues: data.venues.map((venue) => ({
       venueCode: venue.venueCode,
+      venueId: null,
       bookings: venue.bookings.map((booking) => ({
-        bookingDate: booking.bookingDate,
+        bookingDate: booking.bookingDate.toISOString(),
         finalSalesDate: booking.finalSalesDate,
+        bookingId: null,
         sales: booking.sales.reduce((acc: any, sale) => {
           const { salesDate, salesType, seats, value, isFinal } = sale;
 
@@ -731,7 +733,7 @@ const cleanSpreadsheetData = (data: SpreadsheetData): SpreadsheetDataCleaned => 
               salesForDate.schoolSales = { seats, value };
               break;
             case 'School Reservations':
-              salesForDate.schoolReservations = { seats, value, isFinal };
+              salesForDate.schoolReservations = { seats, value };
               break;
           }
 

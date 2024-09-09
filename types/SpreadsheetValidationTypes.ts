@@ -38,11 +38,13 @@ export interface SpreadsheetData {
 export interface SpreadsheetDataCleaned {
   venues: {
     venueCode: string;
+    venueId: number | null;
     bookings: {
-      bookingDate: Date;
+      bookingDate: string;
       finalSalesDate: Date;
+      bookingId: number | null;
       sales: {
-        salesDate: Date;
+        salesDate: string;
         isFinal: string;
         generalSales: {
           seats: number;

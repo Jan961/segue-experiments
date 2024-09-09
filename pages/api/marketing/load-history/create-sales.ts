@@ -1,12 +1,12 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import prisma from 'lib/prisma';
-import { SpreadsheetDataClean, SalesTypeMap } from 'types/SpreadsheetValidationTypes';
+import { SpreadsheetDataCleaned } from 'types/SpreadsheetValidationTypes';
 import { getDateBlockForProduction, deleteAllDateBlockEvents } from 'services/dateBlockService';
 import { nanoid } from 'nanoid';
 import { createNewBooking } from 'services/bookingService';
 
 interface RequestBody {
-  spreadsheetData: SpreadsheetDataClean;
+  spreadsheetData: SpreadsheetDataCleaned;
   productionID: number;
 }
 
@@ -83,10 +83,62 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
 
       return bookingsWithSales;
     });
-    console.log(bookingsWithSales);
-    console.log(SalesTypeMap);
 
     // Create the sales set and sales:
+    for (const { booking, sales } of bookingsWithSales) {
+      console.log(booking);
+      for (const sale of sales) {
+        const setResult = await prisma.SalesSet.create({
+          data: {
+            SetBookingId: booking.Id,
+            SetPerformanceId: null,
+            SetSalesFiguresDate: sale.salesDate,
+            SetBrochureReleased: false,
+            SetSingleSeats: false,
+            SetNotOnSale: false,
+            SetIsFinalFigures: false,
+            SetIsCopy: false,
+          },
+        });
+        const setID = setResult.SetId;
+        const sales = [];
+        if (sale.generalSales) {
+          sales.push({
+            SaleSaleTypeId: 1,
+            SaleSeats: sale.generalSales.seats,
+            SaleValue: sale.generalSales.value,
+            SaleSetId: setID,
+          });
+        }
+        if (sale.generalReservations) {
+          sales.push({
+            SaleSaleTypeId: 2,
+            SaleSeats: sale.generalReservations.seats,
+            SaleValue: sale.generalReservations.value,
+            SaleSetId: setID,
+          });
+        }
+        if (sale.schoolSales) {
+          sales.push({
+            SaleSaleTypeId: 3,
+            SaleSeats: sale.schoolSales.seats,
+            SaleValue: sale.schoolSales.value,
+            SaleSetId: setID,
+          });
+        }
+        if (sale.schoolReservations) {
+          sales.push({
+            SaleSaleTypeId: 4,
+            SaleSeats: sale.schoolSales.seats,
+            SaleValue: sale.schoolSales.value,
+            SaleSetId: setID,
+          });
+        }
+        await prisma.Sale.createMany({
+          data: sales,
+        });
+      }
+    }
 
     res.status(200).json({ status: 'Success' });
   } catch (err) {
