@@ -109,11 +109,11 @@ export default function AddEditVenueModal({
                 searchTerm: primaryWhat3Words,
                 countryId: primaryCountry,
               });
-
-              if (wordsResponse.status >= 400) {
-                setShowAddressMessage(wordsResponse.data.message);
+              const { status, data } = wordsResponse;
+              if (status >= 400) {
+                setShowAddressMessage(data.message);
               } else {
-                formData.primaryCoordinates = wordsResponse.data.coordinates;
+                formData.primaryCoordinates = data.coordinates;
               }
               setAddressAttempted(false);
               setShowAddressMessage('UsingWhat3Words');
