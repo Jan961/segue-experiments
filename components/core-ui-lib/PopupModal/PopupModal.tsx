@@ -77,7 +77,7 @@ export default function PopupModal({
             >
               <Dialog.Panel
                 className={classNames(
-                  'px-7 pt-7 pb-5 transform bg-primary-white text-left align-middle shadow-xl transition-all',
+                  'px-7 pt-7 pb-5 transform bg-primary-white text-left align-middle shadow-xl transition-all max-w-full overflow-x-auto',
                   panelClass,
                 )}
               >
