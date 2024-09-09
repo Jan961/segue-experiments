@@ -380,6 +380,7 @@ export const EditDealMemoContractModal = ({
                   className="w-full text-primary-input-text font-bold"
                   disabled
                   value={productionJumpState.ShowName}
+                  testId="show-name-in-deal-memo"
                 />
               </div>
             </div>
@@ -392,6 +393,7 @@ export const EditDealMemoContractModal = ({
                   className="w-full text-primary-input-text font-bold"
                   disabled
                   value={selectedTableCell.contract.venue}
+                  testId="venue-name-in-deal-memo"
                 />
               </div>
             </div>
@@ -646,7 +648,7 @@ export const EditDealMemoContractModal = ({
             <div className="w-1/5 text-primary-input-text font-bold">Phone</div>
             <div className="w-4/5">
               <TextInput
-                testId="venue-programmer-Phone-no"
+                testId="venue-programmer-phone-no"
                 className="w-full text-primary-input-text font-bold"
                 disabled
                 placeholder={
@@ -666,7 +668,7 @@ export const EditDealMemoContractModal = ({
             <div className="w-1/5 text-primary-input-text font-bold">Email</div>
             <div className="w-4/5">
               <TextInput
-                testId="venue-programmer-Phone-email"
+                testId="venue-programmer-email"
                 className="w-full text-primary-input-text font-bold"
                 disabled
                 placeholder={
