@@ -110,8 +110,8 @@ const LoadSalesHistory = () => {
           location: response.location,
         };
         setSalesHistoryRows([newFile]);
-        onUploadSuccess({ fileId: response.id });
-        updateProductionSales(spreadsheetData);
+        onUploadSuccess({ fileId: response.id }); // update ProductionFile table with new file
+        updateProductionSales(spreadsheetData); // create bookings, salesset, and sales from spreadsheetdata
       }
     } catch (error) {
       onError(file[0].file, 'Error uploading file. Please try again.');

@@ -8,7 +8,7 @@ export const getDateBlockForProduction = async (productionId: number, isPrimary:
   });
 };
 
-export const deleteAllDateBlockEvents = async (dateBlockID: number, tx) => {
+export const deleteAllDateBlockEvents = async (dateBlockID: number, tx = prisma) => {
   if (dateBlockID) {
     // important to Check DateBlockID is not null
     await tx.Booking.deleteMany({

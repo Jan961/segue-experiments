@@ -14,6 +14,9 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   try {
     const { spreadsheetData, productionID }: RequestBody = req.body;
 
+    // Create New File using existing upload API.
+
+    // Update Bookings, SalesSet, and Sales
     const result = await prisma.$transaction(async (tx) => {
       try {
         // Find DateBlock for ProductionID that isPrimary
