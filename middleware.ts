@@ -37,7 +37,6 @@ export default authMiddleware({
     const { userId } = auth;
 
     if (!userId) {
-      // redirect the users to /pages/sign-in/[[...index]].ts
       const signInUrl = new URL('/auth/sign-in', request.url);
       return NextResponse.redirect(signInUrl);
     }
@@ -53,7 +52,7 @@ export default authMiddleware({
     const { data } = await axios(`${request.url}/api/user/session/verify?email=${userEmail}`);
 
     if (!data.isActive) {
-      const signInUrl = new URL('/auth/sign-in?seg-session-expired=true', request.url);
+      const signInUrl = new URL('/auth/sign-in?selectAccount=true', request.url);
       return NextResponse.redirect(signInUrl);
     }
 

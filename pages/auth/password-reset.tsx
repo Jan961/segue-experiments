@@ -1,4 +1,4 @@
-import { Button, Icon, Label, PasswordInput, TextInput, Tooltip } from 'components/core-ui-lib';
+import { Button, Icon, Label, Loader, PasswordInput, TextInput, Tooltip } from 'components/core-ui-lib';
 import Image from 'next/image';
 import { useState } from 'react';
 import { calibri } from 'lib/fonts';
@@ -12,8 +12,15 @@ import { EMAIL_NOT_FOUND, SESSION_ALREADY_EXISTS } from 'utils/authUtils';
 import Head from 'next/head';
 import useAuth from 'hooks/useAuth';
 
+export const LoadingOverlay = () => (
+  <div className="inset-0 absolute bg-white bg-opacity-50 z-50 flex justify-center items-center top-20 left-20 right-20 bottom-20">
+    <Loader variant="lg" iconProps={{ stroke: '#FFF' }} />
+  </div>
+);
+
 const PasswordReset = () => {
   const { logout } = useAuth();
+  const [isBusy, setIsBusy] = useState(false);
   const { isLoaded, signIn, setActive } = useSignIn();
   const [showLogout, setShowLogout] = useState(false);
   const [error, setError] = useState('');
@@ -36,6 +43,7 @@ const PasswordReset = () => {
     setShowLogout(false);
     if (isLoaded) {
       try {
+        setIsBusy(true);
         await emailSchema.validate(loginDetails);
         await signIn.create({
           strategy: 'reset_password_email_code',
@@ -48,6 +56,7 @@ const PasswordReset = () => {
           setValidationError({ errors: error.errors, path: error.path });
         } else if (!isNullOrEmpty(error.errors)) {
           const errorCode = error.errors[0].code;
+          console.log('Error code is', errorCode);
           if (errorCode === EMAIL_NOT_FOUND) {
             setError('Email not found. Please contact your system administrator');
           } else if (errorCode === SESSION_ALREADY_EXISTS) {
@@ -57,12 +66,15 @@ const PasswordReset = () => {
             setError(error.errors[0].messsage);
           }
         }
+      } finally {
+        setIsBusy(false);
       }
     }
   };
 
   const resetPassword = async () => {
     setError('');
+    setIsBusy(true);
     try {
       await passwordResetSchema.validate(loginDetails, { abortEarly: false });
 
@@ -77,9 +89,10 @@ const PasswordReset = () => {
         // the newly created session (user is now signed in)
         setActive({ session: result.createdSessionId });
         setError('');
-        router.push('/');
+        router.push('/auth/sign-in?selectAccount=true');
       }
     } catch (error) {
+      setIsBusy(false);
       console.error('Error resetting password:', error);
       if (error instanceof yup.ValidationError) {
         const formattedErrors = error.inner.reduce((acc, err) => {
@@ -88,7 +101,6 @@ const PasswordReset = () => {
             [err.path]: acc[err.path] ? [...acc[err.path], err.errors[0]] : [err.errors[0]],
           };
         }, {});
-        console.log('formattedErrors', formattedErrors);
         setValidationError(formattedErrors);
       } else if (!isNullOrEmpty(error.errors)) {
         setError(error.errors[0].longMessage);
@@ -97,12 +109,20 @@ const PasswordReset = () => {
   };
 
   const handleLogout = async () => {
-    await logout(loginDetails.email);
-    setIsAuthenticated(false);
-    setError('');
-    setShowLogout(false);
-    setLoginDetails({ email: '', password: '', confirmPassword: '', code: '' });
-    router.replace(router.asPath);
+    setIsBusy(true);
+    try {
+      // Sign out from Clerk
+      await logout(loginDetails.email);
+      setIsAuthenticated(false);
+      setError('');
+      setShowLogout(false);
+      setLoginDetails({ email: '', password: '', confirmPassword: '', code: '' });
+      router.replace(router.asPath);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsBusy(false);
+    }
   };
 
   return (
@@ -114,14 +134,14 @@ const PasswordReset = () => {
         <link rel="icon" href="/segue/segue_mini_icon.png" type="image/png" />
       </Head>
       <Image className="mx-auto mb-2" height={160} width={310} src="/segue/segue_logo_full.png" alt="Segue" />
-
+      <h1 className="my-4 text-2xl font-bold text-center text-primary-input-text">Reset Password</h1>
       <div className="text-primary-input-text w-[364px] mx-auto">
         <div>
           <Label text="Email Address" required />
           <TextInput
             name="email"
             placeholder="Enter Email Address"
-            className="w-full"
+            className="w-full mb-2"
             value={loginDetails.email}
             onChange={handleLoginDetailsChange}
             disabled={isAuthenticated}
@@ -142,7 +162,7 @@ const PasswordReset = () => {
               <TextInput
                 name="code"
                 placeholder="Enter Code"
-                className="w-full"
+                className="w-full mb-2"
                 value={loginDetails.code}
                 autoComplete="off"
                 onChange={handleLoginDetailsChange}
@@ -165,7 +185,7 @@ const PasswordReset = () => {
                 name="password"
                 placeholder="Enter Password"
                 inputClassName="w-full"
-                className="w-full"
+                className="w-full mb-2"
                 value={loginDetails.password}
                 autoComplete="off"
                 onChange={handleLoginDetailsChange}
@@ -174,12 +194,13 @@ const PasswordReset = () => {
                 ? validationError.password.map((error) => <AuthError key={error} error={error} />)
                 : null}
             </div>
-            <div>
+            <div className="w-full mt-4">
               <Label text="Confirm Password" required />
-              <TextInput
+              <PasswordInput
                 name="confirmPassword"
                 placeholder="Enter Password"
-                className="w-full"
+                inputClassName="w-full"
+                className="w-full mb-2"
                 value={loginDetails.confirmPassword}
                 autoComplete="off"
                 onChange={handleLoginDetailsChange}
@@ -198,6 +219,7 @@ const PasswordReset = () => {
           </div>
         )}
       </div>
+      {isBusy && <LoadingOverlay />}
     </div>
   );
 };
