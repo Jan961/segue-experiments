@@ -94,6 +94,9 @@ const LoadSalesHistory = () => {
     formData.append('file', file[0].file);
     formData.append('path', `marketing/salesHistory`);
 
+    // need to send:
+    // formData, onProgress, onError, onUploadImage, spreadsheetData
+
     try {
       const response = await uploadFile(formData, onProgress, onError, onUploadingImage, {
         onSuccess: 'Spreadsheet uploaded successfully',
