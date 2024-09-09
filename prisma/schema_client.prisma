@@ -1555,7 +1555,6 @@ view ACCContractListView {
   @@ignore
 }
 
-/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view VenueVenueTravelView {
   Venue1Id Int  @map("VVVenue1Id")
   Venue2Id Int  @map("VVVenue2Id")
