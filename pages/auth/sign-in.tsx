@@ -2,7 +2,7 @@ import { Button, Icon, Label, Loader, PasswordInput, Select, TextInput, Tooltip 
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { calibri } from 'lib/fonts';
-import { useSignIn, useClerk, useAuth } from '@clerk/nextjs';
+import { useSignIn, useClerk, useUser } from '@clerk/nextjs';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import axios from 'axios';
@@ -11,6 +11,7 @@ import { accountLoginSchema, loginSchema } from 'validators/auth';
 import * as yup from 'yup';
 import AuthError from 'components/auth/AuthError';
 import Spinner from 'components/core-ui-lib/Spinner';
+import Head from 'next/head';
 
 export const LoadingOverlay = () => (
   <div className="inset-0 absolute bg-white bg-opacity-50 z-50 flex justify-center items-center top-20 left-20 right-20 bottom-20">
@@ -20,12 +21,12 @@ export const LoadingOverlay = () => (
 
 const SignIn = () => {
   const { isLoaded, signIn, setActive } = useSignIn();
+  const { user } = useUser();
   const [isBusy, setIsBusy] = useState(false);
   const { signOut } = useClerk();
   const [validationError, setValidationError] = useState<string>('');
   const [accounts, setAccounts] = useState([]);
   const router = useRouter();
-  const { isSignedIn } = useAuth();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loginDetails, setLoginDetails] = useState({
     email: '',
@@ -33,12 +34,6 @@ const SignIn = () => {
     company: '',
     pin: '',
   });
-
-  useEffect(() => {
-    if (isSignedIn) {
-      router.push('/');
-    }
-  }, [isSignedIn]);
 
   const handleLoginDetailsChange = (e) => {
     setLoginDetails((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -61,7 +56,7 @@ const SignIn = () => {
         if (signInAttempt.status === 'complete') {
           await setActive({ session: signInAttempt.createdSessionId, organization: 'Jendagi' });
           setIsAuthenticated(true);
-          fetchAccounts();
+          fetchAccounts(loginDetails.email);
         } else {
           // If the status is not complete, check why. User may need to
           // complete further steps.
@@ -78,9 +73,9 @@ const SignIn = () => {
     }
   };
 
-  const fetchAccounts = async () => {
+  const fetchAccounts = async (email: string) => {
     try {
-      const { data } = await axios(`/api/account-user/read?email=${loginDetails.email}`);
+      const { data } = await axios(`/api/account-user/read?email=${email}`);
       setAccounts(data);
     } catch (err) {
       console.error(err);
@@ -141,10 +136,36 @@ const SignIn = () => {
     }
   };
 
+  const handleSessionExpired = async () => {
+    try {
+      setIsAuthenticated(true);
+      const email = user?.primaryEmailAddress.emailAddress;
+      console.log('email', email, user);
+      if (email) {
+        await fetchAccounts(email);
+        setLoginDetails((prev) => ({ ...prev, email, password: 'XXXXXXXX' }));
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    if (router?.query['seg-session-expired'] && user) {
+      handleSessionExpired();
+    }
+  }, [router, user]);
+
   return !isLoaded ? (
     <Spinner size="lg" />
   ) : (
     <div className={`${calibri.variable} font-calibri background-gradient flex flex-col py-20  px-6`}>
+      <Head>
+        <title>Sign In | Segue</title>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+        <link rel="icon" href="/segue/segue_mini_icon.png" type="image/png" />
+      </Head>
       <Image className="mx-auto mb-2" height={160} width={310} src="/segue/segue_logo_full.png" alt="Segue" />
 
       <div className="text-primary-input-text w-[364px] mx-auto">

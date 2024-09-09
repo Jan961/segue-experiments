@@ -6,7 +6,7 @@ const AuthError = ({ error }: { error: string }) => {
     return null;
   }
   const errorMessage = errorsMap[error] || error;
-  return <Label variant="sm" className="ml-2 text-primary-red" text={errorMessage} />;
+  return <Label variant="sm" className="ml-2 text-primary-red flex justify-end wrap" text={errorMessage} />;
 };
 
 export default AuthError;
