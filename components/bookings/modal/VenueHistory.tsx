@@ -28,7 +28,7 @@ type TableWrapperProps = {
 };
 
 const TableWrapper = styled.div<TableWrapperProps>`
-  width: ${(props) => (props.multiplier > 4 ? '1300px' : `${props.multiplier * 300 + 100}px`)};
+  width: ${(props) => (props.multiplier > 4 ? '1345px' : `${props.multiplier * 300 + 100}px`)};
   max-width: 100%; /* Ensure it doesn't exceed the viewport width */
   overflow-x: auto; /* Show horizontal scrollbar when content overflows */
 `;
@@ -233,7 +233,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
         <div className="w-[417px]">
           {venueSelectView === 'select' ? (
             <div>
-              <div className="text text-primary-navy">Please select a venue for comparision</div>
+              <div className="text text-primary-navy">Please select a venue for comparison</div>
 
               <Select
                 className={classNames('my-2 w-full !border-0 text-primary-navy')}
