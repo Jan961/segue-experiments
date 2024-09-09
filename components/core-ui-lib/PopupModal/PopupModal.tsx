@@ -65,7 +65,7 @@ export default function PopupModal({
           )}
           data-testid="overlay"
         >
-          <div className="flex min-h-full items-center justify-center p-4 text-center">
+          <div className="flex min-h-full items-center justify-center p-4 text-center ">
             <Transition.Child
               as={Fragment}
               enter="ease-out duration-300"
