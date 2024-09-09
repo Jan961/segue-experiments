@@ -24,6 +24,19 @@ export const booleanOptions = [
   { text: 'NO', value: false },
 ];
 
+export const gradeOptions = [
+  { text: 'Grade 1', value: 1 },
+  { text: 'Grade 2', value: 2 },
+  { text: 'Grade 3', value: 3 },
+];
+
+export const instrumentOptions = [
+  { text: '0', value: 0 },
+  { text: '1', value: 1 },
+  { text: '2', value: 2 },
+  { text: '3+', value: 3 },
+];
+
 export const callOptions = [
   { text: 'PROMOTER', value: 'p' },
   { text: 'VENUE', value: 'v' },
