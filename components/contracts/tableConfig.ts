@@ -216,8 +216,8 @@ export const standardSeatKillsColumnDefs = (onChangeData, handleBlur, currencySy
     cellRendererParams: () => ({
       placeholder: '',
       inline: true,
-      onChange: (value, holdTypeValue, holdTypeName, field) => {
-        onChangeData(value, holdTypeValue, holdTypeName, field);
+      onChange: (value, holdData, holdTypeName, field) => {
+        onChangeData(value, holdData, holdTypeName, field);
       },
       holdValue,
     }),
@@ -235,14 +235,14 @@ export const standardSeatKillsColumnDefs = (onChangeData, handleBlur, currencySy
     headerName: 'Value',
     field: 'value',
     cellRenderer: InputRenderer,
-    cellRendererParams: (params) => ({
+    cellRendererParams: () => ({
       placeholder: '',
       inline: true,
       onChange: (value, holdTypeValue, holdTypeName, field) => {
         onChangeData(value, holdTypeValue, holdTypeName, field);
       },
-      onBlur: () => {
-        handleBlur(params.data.value);
+      onBlur: (value, holdTypeValue, holdTypeName, field) => {
+        handleBlur(value, holdTypeValue, holdTypeName, field);
       },
       currency: currencySymbol,
       holdValue,

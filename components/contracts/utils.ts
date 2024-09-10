@@ -1,5 +1,6 @@
 import { nanoid } from 'nanoid';
 import { DateTimeEntry } from 'types/ContractTypes';
+import { formatDecimalValue } from 'utils';
 
 const defaultPrice = {
   Premium: { DMPTicketName: 'Premium', DMPTicketPrice: 0, DMPNumTickets: 0, DMPDeMoId: 0, DMPNotes: '' },
@@ -108,6 +109,11 @@ export const filterPercentage = (num: number) => {
     return Math.floor(num * 100) / 100;
   }
   return 100;
+};
+
+export const formatDecimalOnBlur = (event: any) => {
+  const value = event.target.value;
+  return formatDecimalValue(value);
 };
 
 export const filterCurrencyNum = (num: number) => {

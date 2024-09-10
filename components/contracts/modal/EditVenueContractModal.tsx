@@ -7,7 +7,7 @@ import TextArea from 'components/core-ui-lib/TextArea/TextArea';
 import Checkbox from 'components/core-ui-lib/Checkbox';
 import TextInput from 'components/core-ui-lib/TextInput';
 import { statusOptions, dealTypeOptions, initialEditContractFormData } from 'config/contracts';
-import { useRecoilValue } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { useRouter } from 'next/router';
 import { currentProductionSelector } from 'state/booking/selectors/currentProductionSelector';
 import { addEditContractsState } from 'state/contracts/contractsState';
@@ -38,6 +38,7 @@ import charCodeToCurrency from 'utils/charCodeToCurrency';
 import { UiVenue, VenueData, transformVenues } from 'utils/venue';
 import { ConfDialogVariant } from 'components/core-ui-lib/ConfirmationDialog/ConfirmationDialog';
 import { parseAndSortDates, checkDecimalStringFormat } from '../utils';
+import { currencyState } from 'state/global/currencyState';
 
 const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClose: () => void }) => {
   const productionJumpState = useRecoilValue(currentProductionSelector);
@@ -87,6 +88,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
   const [confirmationVariant, setConfirmationVariant] = useState<string>('cancel');
   const [dealMemoCreated, setDealMemoCreated] = useState<boolean>(true);
   const [dealMemoButtonText, setDealMemoButtonText] = useState<string>('Deal Memo');
+  const [, setCurrency] = useRecoilState(currencyState);
 
   const producerList = useMemo(() => {
     const list = {};
@@ -202,6 +204,23 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
     }
     if (type === 'contract') {
       setSaveContractFormData({ ...saveContractFormData, [key]: value });
+    }
+  };
+
+  useEffect(() => {
+    getCurrency(selectedTableCell.contract.Id);
+  }, [selectedTableCell.contract.Id]);
+
+  const getCurrency = async (bookingId) => {
+    try {
+      const response = await axios.get(`/api/marketing/currency/booking/${bookingId}`);
+
+      if (response.data && typeof response.data === 'object') {
+        const currencyObject = response.data as { currency: string };
+        setCurrency({ symbol: currencyObject.currency });
+      }
+    } catch (error) {
+      console.error('Error retrieving currency:', error);
     }
   };
 

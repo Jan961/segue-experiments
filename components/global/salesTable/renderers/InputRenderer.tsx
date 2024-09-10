@@ -1,6 +1,6 @@
 import { TextInput } from 'components/core-ui-lib';
 import { ChangeEvent } from 'react';
-import { isNullOrEmpty } from 'utils';
+import { isNullOrEmpty, isUndefined } from 'utils';
 interface Standard {
   field: string;
 }
@@ -13,6 +13,7 @@ interface SelectRendererProps {
   holdValue?: any;
   data?: any;
   currency?: string;
+  onBlur?: (value: ChangeEvent<HTMLInputElement>, holdValue: any, HoldTypeName: any, field: string) => void;
 }
 
 const formatValue = (value: any) => {
@@ -39,6 +40,10 @@ const InputRenderer = (props: SelectRendererProps) => {
             : ''
         }
         onChange={(value) => props.onChange(value, props.holdValue, props.data.HoldTypeName, props.colDef.field)}
+        onBlur={(value) =>
+          !isUndefined(props.onBlur) &&
+          props.onBlur(value, props.holdValue, props.data.HoldTypeName, props.colDef.field)
+        }
       />
     </div>
   );

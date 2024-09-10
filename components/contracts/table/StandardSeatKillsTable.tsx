@@ -3,12 +3,12 @@ import { contractsStyleProps, standardSeatKillsColumnDefs } from 'components/con
 import { useEffect, useRef, useState } from 'react';
 import { formatRowsForMultipeBookingsAtSameVenue, formatRowsForPencilledBookings } from '../../bookings/utils';
 import { StandardSeatRowType } from 'interfaces';
-import { isNullOrEmpty } from 'utils';
+import { isNullOrEmpty, formatDecimalValue } from 'utils';
 
 interface SeatKillProps {
   rowData?: StandardSeatRowType[];
   tableData?: any;
-  currency: string;
+  currency?: string;
 }
 
 export default function StandardSeatKillsTable({ rowData, tableData, currency }: SeatKillProps) {
@@ -48,8 +48,13 @@ export default function StandardSeatKillsTable({ rowData, tableData, currency }:
     tableData(tableValue);
   };
 
-  const handleBlur = () => {
-    console.log('to add display formatting here');
+  const handleBlur = (event, first, second, third) => {
+    const tableValue = JSON.parse(JSON.stringify(holdValue));
+    const value = event.target.value;
+    const formattedValue = formatDecimalValue(value);
+    tableValue[second][third] = formattedValue;
+    setHoldValue(tableValue);
+    tableData(tableValue);
   };
 
   useEffect(() => {

@@ -156,3 +156,17 @@ export const checkDecimalStringFormat = (decimalString: string, precision: numbe
   if (integerPart.length > precision - scale || (fractionalPart && fractionalPart.length > scale)) return false;
   return true;
 };
+
+export const formatDecimalValue = (decimalString: string) => {
+  if (isNullOrUndefined(decimalString)) {
+    return '';
+  }
+
+  const floatValue = parseFloat(decimalString);
+
+  if (isNaN(floatValue)) {
+    return '';
+  }
+
+  return floatValue.toFixed(2);
+};
