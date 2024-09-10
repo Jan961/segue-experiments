@@ -17,9 +17,8 @@ interface ContractPreviewDetailsFormProps {
 }
 
 export const ContractPreviewDetailsForm = ({
-  height,
-} // contractPerson,
-// production,
+  height, // contractPerson,
+} // production,
 // contractSchedule,
 // contractDetails,
 // schedule,
@@ -43,7 +42,7 @@ export const ContractPreviewDetailsForm = ({
             schedule={schedule}
           />
         </PDFViewer> */}
-        <iframe className="w-full h-full" src="/segue/contracts/EquityContractTempFake.pdf" />
+        <iframe className="w-full h-full" src="/segue/contracts/EquityContract.pdf" />
       </div>
     </div>
   );
