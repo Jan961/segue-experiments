@@ -1,12 +1,29 @@
-import Label from 'components/core-ui-lib/Label';
+import { useMemo } from 'react';
 import { errorsMap } from 'utils/authUtils';
+const regex = /(?<=\.\s)(?=[A-Z])/;
 
-const AuthError = ({ error }: { error: string }) => {
-  if (!error) {
+const AuthError = ({ error, className = '' }: { error: string; className?: string }) => {
+  const errors = useMemo(() => {
+    if (!error) {
+      return null;
+    }
+    const errorMessage = errorsMap[error] || error;
+    return errorMessage?.split(regex) || [];
+  }, [error]);
+
+  if (!errors) {
     return null;
   }
-  const errorMessage = errorsMap[error] || error;
-  return <Label variant="sm" className="ml-2 text-primary-red" text={errorMessage} />;
+
+  return (
+    <div className={`flex flex-col w-full ${className}`} data-testid="auth-error">
+      {errors.map((err) => (
+        <p key={err} className="text-responsive-sm text-primary-red">
+          {err}
+        </p>
+      ))}
+    </div>
+  );
 };
 
 export default AuthError;
