@@ -44,6 +44,7 @@ const ContractFilters = () => {
               iconName="search"
               value={filter.contractText}
               onChange={onChange}
+              testId="search-contracts"
             />
           </GlobalToolbar>
         </div>
@@ -59,6 +60,7 @@ const ContractFilters = () => {
             options={allStatusOptions}
             isClearable
             isSearchable
+            testId="select-deal-memo-status"
           />
           <div className=" text-primary-input-text">Contract Status</div>
           <Select
@@ -70,6 +72,7 @@ const ContractFilters = () => {
             options={allStatusOptions}
             isClearable
             isSearchable
+            testId="select-contract-status"
           />
           <Button className="text-sm leading-8 w-[120px]" text="Clear Filters" onClick={onClearFilters} />
         </div>

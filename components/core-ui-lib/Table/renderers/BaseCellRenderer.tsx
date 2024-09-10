@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, forwardRef } from 'react';
 
 const emptyFn = () => null;
 
@@ -9,20 +9,23 @@ interface BaseCellRendererProps {
   children: React.ReactNode;
 }
 
-const BaseCellRenderer = ({ children, eGridCell, onBlur = emptyFn, onFocus = emptyFn }: BaseCellRendererProps) => {
-  useEffect(() => {
-    if (eGridCell) {
-      eGridCell.addEventListener('focusin', onFocus);
-      eGridCell.addEventListener('focusout', onBlur);
+const BaseCellRenderer = forwardRef<HTMLDivElement, BaseCellRendererProps>(
+  ({ children, eGridCell, onBlur = emptyFn, onFocus = emptyFn }, ref) => {
+    useEffect(() => {
+      if (eGridCell) {
+        eGridCell.addEventListener('focusin', onFocus);
+        eGridCell.addEventListener('focusout', onBlur);
 
-      return () => {
-        eGridCell.removeEventListener('focusin', onFocus);
-        eGridCell.removeEventListener('focusout', onBlur);
-      };
-    }
-  }, [eGridCell]);
+        return () => {
+          eGridCell.removeEventListener('focusin', onFocus);
+          eGridCell.removeEventListener('focusout', onBlur);
+        };
+      }
+    }, [eGridCell]);
 
-  return <div>{children}</div>;
-};
+    return <div ref={ref}>{children}</div>;
+  },
+);
+BaseCellRenderer.displayName = 'BaseCellRenderer';
 
 export default BaseCellRenderer;

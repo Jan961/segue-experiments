@@ -95,7 +95,6 @@ export default function SalesTable({
     });
 
     setRowData(processedBookings);
-
     if (variant === 'prodComparision') {
       setColumnDefs(
         prodComparisionColDefs(
