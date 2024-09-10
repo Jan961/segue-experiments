@@ -1,4 +1,4 @@
-import { Button, Icon, Label, Loader, PasswordInput, Select, TextInput, Tooltip } from 'components/core-ui-lib';
+import { Button, Icon, Label, PasswordInput, Select, TextInput, Tooltip } from 'components/core-ui-lib';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { calibri } from 'lib/fonts';
@@ -17,7 +17,7 @@ import { SESSION_ALREADY_EXISTS } from 'utils/authUtils';
 
 export const LoadingOverlay = () => (
   <div className="inset-0 absolute bg-white bg-opacity-50 z-50 flex justify-center items-center top-20 left-20 right-20 bottom-20">
-    <Loader variant="lg" iconProps={{ stroke: '#FFF' }} />
+    <Spinner size="lg" />
   </div>
 );
 
@@ -101,7 +101,6 @@ const SignIn = () => {
           if (errorCode === SESSION_ALREADY_EXISTS) {
             setShowLogout(true);
           }
-          console.log('Error code is', errorCode);
           setError(errorCode);
         }
         console.error('Error signing in:', error);
@@ -145,6 +144,8 @@ const SignIn = () => {
         } else {
           console.error('Error setting redis');
         }
+      } else {
+        setError('Invalid Pin');
       }
     } catch (error) {
       if (error instanceof yup.ValidationError) {

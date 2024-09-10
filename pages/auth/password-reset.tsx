@@ -1,4 +1,4 @@
-import { Button, Icon, Label, Loader, PasswordInput, TextInput, Tooltip } from 'components/core-ui-lib';
+import { Button, Icon, Label, PasswordInput, TextInput, Tooltip } from 'components/core-ui-lib';
 import Image from 'next/image';
 import { useState } from 'react';
 import { calibri } from 'lib/fonts';
@@ -8,13 +8,14 @@ import * as yup from 'yup';
 import { emailSchema, passwordResetSchema } from 'validators/auth';
 import AuthError from 'components/auth/AuthError';
 import { isNullOrEmpty } from 'utils';
-import { EMAIL_NOT_FOUND, SESSION_ALREADY_EXISTS } from 'utils/authUtils';
+import { SESSION_ALREADY_EXISTS } from 'utils/authUtils';
 import Head from 'next/head';
 import useAuth from 'hooks/useAuth';
+import Spinner from 'components/core-ui-lib/Spinner';
 
 export const LoadingOverlay = () => (
   <div className="inset-0 absolute bg-white bg-opacity-50 z-50 flex justify-center items-center top-20 left-20 right-20 bottom-20">
-    <Loader variant="lg" iconProps={{ stroke: '#FFF' }} />
+    <Spinner size="lg" />
   </div>
 );
 
@@ -40,6 +41,7 @@ const PasswordReset = () => {
 
   const attemptClerkAuth = async () => {
     setError('');
+    setValidationError(null);
     setShowLogout(false);
     if (isLoaded) {
       try {
@@ -56,15 +58,10 @@ const PasswordReset = () => {
           setValidationError({ errors: error.errors, path: error.path });
         } else if (!isNullOrEmpty(error.errors)) {
           const errorCode = error.errors[0].code;
-          console.log('Error code is', errorCode);
-          if (errorCode === EMAIL_NOT_FOUND) {
-            setError('Email not found. Please contact your system administrator');
-          } else if (errorCode === SESSION_ALREADY_EXISTS) {
+          if (errorCode === SESSION_ALREADY_EXISTS) {
             setShowLogout(true);
-            setError('Please log out of the current session and try again');
-          } else {
-            setError(error.errors[0].messsage);
           }
+          setError(errorCode);
         }
       } finally {
         setIsBusy(false);
@@ -207,14 +204,15 @@ const PasswordReset = () => {
               />
               {validationError?.confirmPassword && <AuthError error={validationError.confirmPassword[0]} />}
             </div>
+
             <div className="flex justify-end mt-5">
               <Button text="Submit" onClick={resetPassword} className="w-32" />
             </div>
           </div>
         )}
         {!!error && (
-          <div className="flex gap-3 items-center mt-5">
-            <AuthError error={error} />
+          <div className="flex gap-3 items-center mt-5 mb-2">
+            <AuthError error={error} className="items-end" />
             {showLogout && <Button variant="secondary" text="Logout" onClick={handleLogout} />}
           </div>
         )}
