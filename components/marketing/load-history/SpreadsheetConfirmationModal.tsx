@@ -3,6 +3,7 @@ import { UploadedFile } from 'components/core-ui-lib/UploadModal/interface';
 import { UploadParamType } from 'types/SpreadsheetValidationTypes';
 import TextBoxConfirmation from 'components/core-ui-lib/TextBoxConfirmation';
 import { useState } from 'react';
+import LoadingOverlay from 'components/shows/LoadingOverlay';
 
 interface SpreadsheetModalProps {
   visible: boolean;
@@ -25,6 +26,7 @@ const SpreadsheetConfirmationModal = ({
 }: SpreadsheetModalProps) => {
   const [validConfirmationMessage, setValidConfirmationMessage] = useState<boolean>(null);
   const [displayErrorMessage, setDisplayErrorMessage] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const statusMessage = () => {
     if (uploadParams.spreadsheetIssues.spreadsheetErrorOccurred) {
@@ -109,9 +111,11 @@ const SpreadsheetConfirmationModal = ({
         <Button
           className="w-[128px] mt-3"
           text="Upload"
-          onClick={() => {
+          onClick={async () => {
             if (validConfirmationMessage) {
-              handleUpload();
+              setIsLoading(true);
+              await handleUpload();
+              setIsLoading(false);
               closeModals();
             } else {
               setDisplayErrorMessage(true);
@@ -144,6 +148,7 @@ const SpreadsheetConfirmationModal = ({
   return (
     <PopupModal show={visible} title="Load Sales History" onClose={closeModals} panelClass="w-1/3">
       {statusMessage()}
+      {isLoading && <LoadingOverlay />}
     </PopupModal>
   );
 };
