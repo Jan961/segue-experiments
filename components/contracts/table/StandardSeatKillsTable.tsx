@@ -4,12 +4,14 @@ import { useEffect, useRef, useState } from 'react';
 import { formatRowsForMultipeBookingsAtSameVenue, formatRowsForPencilledBookings } from '../../bookings/utils';
 import { StandardSeatRowType } from 'interfaces';
 import { isNullOrEmpty } from 'utils';
-interface ContractsTableProps {
+
+interface SeatKillProps {
   rowData?: StandardSeatRowType[];
   tableData?: any;
+  currency: string;
 }
 
-export default function StandardSeatKillsTable({ rowData, tableData }: ContractsTableProps) {
+export default function StandardSeatKillsTable({ rowData, tableData, currency }: SeatKillProps) {
   const tableRef = useRef(null);
   const [rows, setRows] = useState([]);
   const [columnDefs, setColumnDefs] = useState([]);
@@ -46,6 +48,10 @@ export default function StandardSeatKillsTable({ rowData, tableData }: Contracts
     tableData(tableValue);
   };
 
+  const handleBlur = () => {
+    console.log('to add display formatting here');
+  };
+
   useEffect(() => {
     if (rowData) {
       let formattedRows = formatRowsForPencilledBookings(rowData);
@@ -56,7 +62,7 @@ export default function StandardSeatKillsTable({ rowData, tableData }: Contracts
   }, [rowData]);
 
   useEffect(() => {
-    setColumnDefs(standardSeatKillsColumnDefs(handleValueData, holdValue));
+    setColumnDefs(standardSeatKillsColumnDefs(handleValueData, handleBlur, currency, holdValue));
   }, [holdValue]);
   return (
     <>

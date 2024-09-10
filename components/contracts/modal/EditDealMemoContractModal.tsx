@@ -8,7 +8,7 @@ import Checkbox from 'components/core-ui-lib/Checkbox';
 import Button from 'components/core-ui-lib/Button';
 import { ContactDemoFormData, DealMemoContractFormData, DealMemoHoldType, ProductionDTO } from 'interfaces';
 import { AddEditContractsState } from 'state/contracts/contractsState';
-import { useEffect, useMemo, useState } from 'react';
+import { createRef, useEffect, useMemo, useState } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { userState } from 'state/account/userState';
 import {
@@ -85,7 +85,10 @@ export const EditDealMemoContractModal = ({
     ccCommVal: false,
     progComm: false,
     merchComm: false,
+    sellCapacity: false,
   });
+
+  const sellCapacityRef = createRef<HTMLInputElement>();
 
   const companyContactList = useMemo(
     () =>
@@ -1053,22 +1056,58 @@ export const EditDealMemoContractModal = ({
             </div>
           </div>
           <div className="flex items-center mt-4">
-            <div className="w-1/5 text-primary-input-text font-bold">Venue Capacity</div>
+            <div className="w-1/5 text-primary-input-text font-bold">Capacity</div>
             <div className="w-4/5 flex items-center">
+              <div className="text-primary-input-text font-bold mr-2">Venue</div>
               <TextInput
                 testId="box-office-venueCapacity"
                 className="w-auto text-primary-input-text font-bold"
                 value={venueData ? venueData.Seats : null}
                 disabled
               />
-              <div className="text-primary-input-text font-bold ml-8 mr-2">Sellable Capacity</div>
+              <div className="text-primary-input-text font-bold ml-8 mr-2">Sellable</div>
 
               <TextInput
                 testId="box-office-sellable-capacity"
                 className="w-auto"
                 value={formData.SellableSeats}
-                onChange={(value) => editDemoModalData('SellableSeats', parseFloat(value.target.value), 'dealMemo')}
+                ref={sellCapacityRef}
+                onChange={(value) => {
+                  if (parseFloat(value.target.value) > parseFloat(venueData.Seats)) {
+                    setErrors({ ...errors, sellCapacity: true });
+                  } else {
+                    setErrors({ ...errors, sellCapacity: false });
+                  }
+                  editDemoModalData('SellableSeats', parseFloat(value.target.value), 'dealMemo');
+                }}
               />
+
+              {errors.sellCapacity && (
+                <div className="flex flex-row space-x-4">
+                  <div className="flex flex-col">
+                    <div className="flex items-center ml-3 text-primary-red">Are you sure?</div>
+                  </div>
+                  <div className="flex flex-col">
+                    <div className="flex flex-row space-x-2">
+                      <Button
+                        onClick={() => setErrors({ ...errors, sellCapacity: false })}
+                        className="w-20"
+                        variant="secondary"
+                        text="Yes"
+                      />
+                      <Button
+                        onClick={() => {
+                          sellCapacityRef.current && sellCapacityRef?.current?.select();
+                          setErrors({ ...errors, sellCapacity: false });
+                        }}
+                        className="w-20"
+                        variant="secondary"
+                        text="No"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
           <div className="flex mt-4">
@@ -1079,6 +1118,7 @@ export const EditDealMemoContractModal = ({
                   <StandardSeatKillsTable
                     rowData={seatKillsData}
                     tableData={(value) => handleStandardSeatsTableData(value)}
+                    currency="£"
                   />
                 </div>
               </div>

@@ -198,7 +198,7 @@ export const getCompanyContractsColumnDefs = (userList = []) => [
   },
 ];
 
-export const standardSeatKillsColumnDefs = (onChangeData, holdValue) => [
+export const standardSeatKillsColumnDefs = (onChangeData, handleBlur, currencySymbol, holdValue) => [
   {
     headerName: 'Type',
     field: 'type',
@@ -235,12 +235,16 @@ export const standardSeatKillsColumnDefs = (onChangeData, holdValue) => [
     headerName: 'Value',
     field: 'value',
     cellRenderer: InputRenderer,
-    cellRendererParams: () => ({
+    cellRendererParams: (params) => ({
       placeholder: '',
       inline: true,
       onChange: (value, holdTypeValue, holdTypeName, field) => {
         onChangeData(value, holdTypeValue, holdTypeName, field);
       },
+      onBlur: () => {
+        handleBlur(params.data.value);
+      },
+      currency: currencySymbol,
       holdValue,
     }),
     width: 120,
