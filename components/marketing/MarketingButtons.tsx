@@ -11,9 +11,10 @@ import { MarketingReports } from './modal/MarketingReportsModal';
 type MarketingBtnProps = {
   venueName: string;
   venueId: number;
+  setModalLandingURL: (url: string) => void;
 };
 
-export const MarketingButtons: React.FC<MarketingBtnProps> = ({ venueName, venueId }) => {
+export const MarketingButtons: React.FC<MarketingBtnProps> = ({ venueName, venueId, setModalLandingURL }) => {
   const { selected: productionId } = useRecoilValue(productionJumpState);
   const [bookingJump, setBookingJump] = useRecoilState(bookingJumpState);
   const [showEditUrlModal, setShowEditUrl] = useState<boolean>(false);
@@ -44,7 +45,7 @@ export const MarketingButtons: React.FC<MarketingBtnProps> = ({ venueName, venue
         method: 'POST',
         data: { landingPageUrl: website },
       });
-
+      setModalLandingURL(website);
       setBookingJump({
         ...bookingJump,
         bookings: bookingJump.bookings.map((booking) => {
