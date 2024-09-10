@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { authMiddleware, clerkClient } from '@clerk/nextjs';
-import axios from 'axios';
+import { authMiddleware } from '@clerk/nextjs';
+// import axios from 'axios';
 
 const publicPaths = [
   '/api/user*',
@@ -15,13 +15,13 @@ const publicPaths = [
   '/auth/**',
 ];
 
-const checkAccessPaths = ['/api/account-user/read', '/api/account-user/verify'];
+// const checkAccessPaths = ['/api/account-user/read', '/api/account-user/verify'];
 
-const getEmailAddressForClerkId = async (userId: string): Promise<string> => {
+/* const getEmailAddressForClerkId = async (userId: string): Promise<string> => {
   const user = await clerkClient.users.getUser(userId);
   const matching = user.emailAddresses.filter((x) => x.id === user.primaryEmailAddressId)[0];
   return matching.emailAddress;
-};
+}; */
 
 const isPublic = (path: string) => {
   return publicPaths.find((x) => path.match(new RegExp(`^${x}$`.replace('*$', '($|/)'))));
@@ -41,7 +41,7 @@ export default authMiddleware({
       return NextResponse.redirect(signInUrl);
     }
 
-    const userEmail = await getEmailAddressForClerkId(userId);
+    /* const userEmail = await getEmailAddressForClerkId(userId);
 
     // User has a clerk session so any api calls to get account details should be allowed
     if (userEmail && checkAccessPaths.includes(request.nextUrl.pathname)) {
@@ -54,7 +54,7 @@ export default authMiddleware({
     if (!data.isActive) {
       const signInUrl = new URL('/auth/sign-in?selectAccount=true', request.url);
       return NextResponse.redirect(signInUrl);
-    }
+    } */
 
     return NextResponse.next();
   },
