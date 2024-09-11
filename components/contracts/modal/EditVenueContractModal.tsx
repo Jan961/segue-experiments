@@ -524,10 +524,10 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
               <div className=" text-primary-input-text text-sm ml-5">{formData.performanceCount}</div>
               <div className=" text-primary-input-text font-bold text-sm ml-4">Times</div>
               <div>
-                {parseAndSortDates(formData.PerformanceTimes).map((dateTimeEntry) => {
+                {parseAndSortDates(formData.PerformanceTimes).showArray.map((dateTimeEntry, index) => {
                   return (
-                    <div key={dateTimeEntry.id} className=" text-primary-input-text  text-sm ml-4">
-                      {dateTimeEntry.formattedDate}
+                    <div key={index} className="text-primary-input-text  text-sm ml-4">
+                      {dateTimeEntry}
                     </div>
                   );
                 })}

@@ -157,8 +157,8 @@ export const checkDecimalStringFormat = (decimalString: string, precision: numbe
   return true;
 };
 
-export const formatDecimalValue = (decimalString: string) => {
-  if (isNullOrUndefined(decimalString)) {
+export const formatDecimalValue = (decimalString: any) => {
+  if (isNullOrEmpty(decimalString)) {
     return '';
   }
 
@@ -169,4 +169,13 @@ export const formatDecimalValue = (decimalString: string) => {
   }
 
   return floatValue.toFixed(2);
+};
+
+export const validateWhat3Words = (input: string) => {
+  const wordParts = input.replace('/', '').split('.');
+  if (wordParts.length === 3) {
+    return true;
+  } else {
+    return false;
+  }
 };

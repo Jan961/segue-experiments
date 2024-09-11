@@ -1,6 +1,7 @@
-import { nanoid } from 'nanoid';
-import { DateTimeEntry } from 'types/ContractTypes';
+import { startOfDay } from 'date-fns';
+import { getShortWeekFormat, getTimeFromDateAndTime } from 'services/dateService';
 import { formatDecimalValue } from 'utils';
+import formatInputDate from 'utils/dateInputFormat';
 
 const defaultPrice = {
   Premium: { DMPTicketName: 'Premium', DMPTicketPrice: 0, DMPNumTickets: 0, DMPDeMoId: 0, DMPNotes: '' },
@@ -57,7 +58,7 @@ export const filterPrice = (dealMemoPrice) => {
     if (defaultPrice[price.DMPTicketName]) {
       defaultPrice[price.DMPTicketName] = {
         DMPTicketName: price.DMPTicketName,
-        DMPTicketPrice: price.DMPTicketPrice,
+        DMPTicketPrice: formatDecimalValue(price.DMPTicketPrice),
         DMPNumTickets: price.DMPNumTickets,
         DMPId: price.DMPId,
         DMPDeMoId: price.DMPDeMoId,
@@ -90,7 +91,8 @@ export const filterHoldTypeData = (dealHoldType, dealMemoHoldData) => {
   }
   const holdTypeTableData = dealHoldType.map((holdData) => {
     if (dealHoldObj[holdData.HoldTypeId]) {
-      holdData.value = dealHoldObj[holdData.HoldTypeId].DMHoldValue;
+      const decimalPrice = formatDecimalValue(dealHoldObj[holdData.HoldTypeId].DMHoldValue);
+      holdData.value = decimalPrice === '0.00' ? '' : decimalPrice;
       holdData.seats = dealHoldObj[holdData.HoldTypeId].DMHoldSeats;
       holdData.DMHoldDeMoId = holdData.HoldTypeId;
     } else {
@@ -217,34 +219,36 @@ export const salaryDetailsData = [
   { first: 'Country', second: 'Country', type: 'select' },
 ];
 
-// Expect string to come in format "HH:MM? YYYY-MM-DD" - where HH:MM may not be included
-export const parseAndSortDates = (arr: string[]): DateTimeEntry[] => {
-  const parsedEntries = arr.map((str) => {
-    const [timePart, isoDatePart] = str.split('? ');
-    return { timePart: timePart.trim(), date: new Date(isoDatePart.trim()) };
+export const parseAndSortDates = (arr: string[]): { showArray: Array<string>; maxWidth: number } => {
+  // if the entry has a time pre-pended - remove this and use the datetime in JS date format
+  const parsedEntries = arr.map((show) => {
+    return show.includes('?') ? new Date(show.split('? ')[1]) : new Date(show);
   });
 
-  parsedEntries.sort((a, b) => a.date.getTime() - b.date.getTime());
+  // Sort dates in ascending order
+  parsedEntries.sort((a, b) => a.getTime() - b.getTime());
 
-  const groupedByDate = parsedEntries.reduce(
+  // Group by date and format as object - e.g. {dd-mm-yy: {dt: js date, times: [array of times in hh:mm]}}
+  const groupedByDate: { [key: number]: string[] } = parsedEntries.reduce(
     (acc, entry) => {
-      const dateKey = entry.date.toISOString().split('T')[0];
-      if (!acc[dateKey]) {
-        acc[dateKey] = [];
-      }
-      acc[dateKey].push(entry.timePart);
+      const dateKey = startOfDay(entry).getTime();
+      acc[dateKey] = acc[dateKey] || [];
+      acc[dateKey].push(getTimeFromDateAndTime(entry));
       return acc;
     },
-    {} as Record<string, string[]>,
+    {} as { [key: number]: string[] },
   );
 
-  const result = Object.entries(groupedByDate).map(([date, times]) => {
-    const sortedTimes = times.filter(Boolean).sort();
-    const formattedDate = sortedTimes.length > 0 ? `${date} ${sortedTimes.join(' ')}` : date;
-    return { formattedDate, id: nanoid() };
+  // Process groupedByDate to format for UI
+  const dayArray: string[] = [];
+  Object.entries(groupedByDate).forEach(([dateKey, times]) => {
+    const epochTime = parseInt(dateKey);
+    const date = new Date(epochTime);
+    dayArray.push(`${getShortWeekFormat(date)} ${formatInputDate(date)} ${times.join('; ')}`);
   });
 
-  return result;
+  // Join and return as a break line delimited string
+  return { showArray: dayArray, maxWidth: Math.max(...dayArray.map((line) => line.length)) };
 };
 
 export const checkDecimalStringFormat = (decimalString, precision, scale) => {
