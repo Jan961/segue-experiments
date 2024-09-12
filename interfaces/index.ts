@@ -831,3 +831,8 @@ export interface DealMemoPriceState {
   DMPDeMoId: number;
   DMPNotes: string;
 }
+
+export interface UserPermission {
+  permissionId: number;
+  permissionName: string;
+}
