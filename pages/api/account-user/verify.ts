@@ -22,12 +22,23 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       },
       select: {
         Account: true,
+        AccountUserPermission: {
+          select: {
+            Permission: true,
+          },
+        },
       },
     });
 
-    return res.status(200).json({ isValid: accountUser !== null });
+    const formattedPermissions =
+      accountUser?.AccountUserPermission.map(({ Permission }) => ({
+        permissionId: Permission.PermissionId,
+        permissionName: Permission.PermissionName,
+      })) || [];
+
+    return res.status(200).json({ isValid: accountUser !== null, permissions: formattedPermissions });
   } catch (err) {
     console.log(err);
-    res.status(500).json({ err: 'Error occurred while validating pin' });
+    res.status(500).json({ err: 'Error occurred while verifying user' });
   }
 }
