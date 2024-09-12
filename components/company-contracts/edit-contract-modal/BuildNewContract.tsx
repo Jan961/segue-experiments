@@ -13,7 +13,7 @@ import { IContractSchedule, IScheduleDay } from '../../contracts/types';
 import { useRecoilValue } from 'recoil';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import { transformContractData } from 'transformers/contracts';
-import ContractScheduleTable from './tabs/ScheduleTab';
+import ScheduleTab from './tabs/ScheduleTab';
 import { ERROR_CODES } from 'config/apiConfig';
 import { contractDepartmentState } from 'state/contracts/contractDepartmentState';
 import { getDepartmentNameByID } from '../utils';
@@ -240,7 +240,7 @@ export const BuildNewContract = ({
             )}
             {activeViewIndex === 2 && (
               <div className="flex flex-col gap-8">
-                <ContractScheduleTable updateSchedule={updateSchedule} schedule={schedule} />
+                <ScheduleTab updateSchedule={updateSchedule} schedule={schedule} />
               </div>
             )}
             {activeViewIndex === 3 && (

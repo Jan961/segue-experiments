@@ -3,12 +3,12 @@ import { useRef, useState } from 'react';
 import { contractTourScheduleColumns, contractsStyleProps } from '../../../contracts/tableConfig';
 import { IScheduleDay } from '../../../contracts/types';
 
-interface ContractScheduleTableProps {
+interface ScheduleTabProps {
   schedule: IScheduleDay[];
   updateSchedule: (schedule: IScheduleDay[]) => void;
 }
 
-const ContractScheduleTable = ({ schedule, updateSchedule }: ContractScheduleTableProps) => {
+const ScheduleTab = ({ schedule, updateSchedule }: ScheduleTabProps) => {
   const [rows, setRows] = useState(schedule);
   const tableRef = useRef(null);
   const onCellValueChange = (e) => {
@@ -42,4 +42,4 @@ const ContractScheduleTable = ({ schedule, updateSchedule }: ContractScheduleTab
   );
 };
 
-export default ContractScheduleTable;
+export default ScheduleTab;
