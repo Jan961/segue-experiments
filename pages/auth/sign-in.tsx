@@ -7,7 +7,7 @@ import { useRouter } from 'next/router';
 import Link from 'next/link';
 import axios from 'axios';
 import { accountLoginSchema, loginSchema } from 'validators/auth';
-
+import { useSession } from '@clerk/clerk-react';
 import * as yup from 'yup';
 import AuthError from 'components/auth/AuthError';
 import Spinner from 'components/core-ui-lib/Spinner';
@@ -26,6 +26,7 @@ const SignIn = () => {
   const { user } = useUser();
   const [isBusy, setIsBusy] = useState(false);
   const { signOut } = useClerk();
+  const { session } = useSession();
   const [error, setError] = useState('');
   const [validationError, setValidationError] = useState(null);
   const [showLogout, setShowLogout] = useState(false);
@@ -134,15 +135,20 @@ const SignIn = () => {
       });
       if (data.isValid) {
         // Set organisation id on redis
-
         const { data } = await axios.post('/api/user/session/create', {
           email: loginDetails.email,
           organisationId: loginDetails.company,
         });
         if (data.success) {
+          session.user.update({
+            unsafeMetadata: {
+              organisationId: loginDetails.company,
+            },
+          });
           router.push('/');
         } else {
           console.error('Error setting redis');
+          router.reload();
         }
       } else {
         setError('Invalid Pin');

@@ -1,8 +1,9 @@
 import { useCallback, useMemo, useState } from 'react';
 import { DateInput, Icon, Label, Select, TextInput } from 'components/core-ui-lib';
-import { booleanOptions, gradeOptions, instrumentOptions, paymentTypes } from 'config/contracts';
+import { booleanOptions, paymentTypes } from 'config/contracts';
 import { insertAtPos, noop, removeAtPos, replaceAtPos, transformToOptions } from 'utils';
 import WeeklyPayDetails from '../contractDetails/WeeklyPayDetails';
+import TotalPayDetails from '../contractDetails/TotalPayDetails';
 import PaymentBreakdown, { TPaymentBreakdown, defaultPaymentBreakdown } from '../contractDetails/PaymentBreakdown';
 import { replace } from 'radash';
 import { useRecoilValue } from 'recoil';
@@ -75,6 +76,7 @@ const ContractDetails = ({ contract = {}, onChange = noop }: ContractDetailsProp
     additionalClause,
     customClauseList,
     weeklyPayDetails,
+    totalPayDetails,
   } = contractDetails;
   const { townCity, notes, venue } = rehearsalVenue;
   const currencyList = useRecoilValue(currencyListState);
@@ -106,27 +108,8 @@ const ContractDetails = ({ contract = {}, onChange = noop }: ContractDetailsProp
     [rehearsalVenue, contractDetails, setContractDetails],
   );
 
-  const [contractReference, setContractReference] = useState('');
-  const [typeofRole, setTypeofRole] = useState('');
-  const [perfPerWeek, setPerfPerWeek] = useState<string>();
-  const [mrslGrade, setMRSLGrade] = useState<number>();
-  const [numOfInstruments, setNumOfInstruments] = useState<number>();
-  const [sundayPerfFee, setSundayPerfFee] = useState('');
-  const [memberOfPensionScheme, setMemberofPensionScheme] = useState<boolean>();
-  const [equityPenNumber, setEquityPenNumber] = useState('');
-
   return (
     <form className="flex flex-col gap-4 mb-7">
-      <div className="flex items-center gap-2">
-        <Label className="w-36 !font-bold text-sm" text="Contract Reference" />
-        <TextInput
-          className="grow"
-          testId="contract-details-specific-availability-notes"
-          placeholder="Contract Reference"
-          value={contractReference}
-          onChange={(e) => setContractReference(e.target.value)}
-        />
-      </div>
       <div className="flex items-center gap-2">
         <Label className="w-36 !font-bold text-sm" text="Currency for contract" />
         <Select
@@ -157,24 +140,20 @@ const ContractDetails = ({ contract = {}, onChange = noop }: ContractDetailsProp
           onChange={(value) => handleChange('lastDayOfWork', value?.toISOString?.() || '')}
         />
       </div>
-      <div className="flex items-center gap-2 w-full">
+      <div className="flex items-center gap-2">
         <Label className="w-36 !font-bold text-sm" text="Specific Availability" />
-        <div className="grow max-w-96">
-          <TextInput
-            className="grow"
-            testId="contract-details-specific-availability-notes"
-            placeholder="Specific availability notes"
-            value={specificAvailabilityNotes}
-            onChange={(event) => handleChange('specificAvailabilityNotes', event.target.value)}
-          />
-        </div>
+        <TextInput
+          testId="contract-details-specific-availability-notes"
+          placeholder="Specific availability notes"
+          value={specificAvailabilityNotes}
+          onChange={(event) => handleChange('specificAvailabilityNotes', event.target.value)}
+        />
       </div>
-
       <div className="flex flex-row gap-2">
         <Label className="!font-bold text-sm w-36" text="Required at Specific Publicity Events" />
-        <div className="flex flex-col gap-2 w-full">
+        <div className="flex flex-col gap-2">
           {publicityEventList.map((publicityEvent, i) => (
-            <div key={i} className="flex gap-2 items-center w-full">
+            <div key={i} className="flex gap-2 items-center">
               <PublicityEventDetails
                 testId={`contract-details-publicity-event-${i}`}
                 details={publicityEvent}
@@ -202,46 +181,6 @@ const ContractDetails = ({ contract = {}, onChange = noop }: ContractDetailsProp
             </div>
           ))}
         </div>
-      </div>
-      <div className="flex items-center gap-2">
-        <Label className="w-36 !font-bold text-sm" text="Type of Role" />
-        <TextInput
-          className="grow"
-          testId="contract-details-specific-availability-notes"
-          placeholder="Type of Role"
-          value={typeofRole}
-          onChange={(e) => setTypeofRole(e.target.value)}
-        />
-      </div>
-      <div className="flex items-center gap-2">
-        <Label className="w-36 !font-bold text-sm" text="Performances Per Week" />
-        <TextInput
-          className="grow"
-          testId="contract-details-specific-availability-notes"
-          placeholder="Performances Per Week"
-          value={perfPerWeek}
-          onChange={(e) => setPerfPerWeek(e.target.value)}
-        />
-      </div>
-      <div className="flex items-center gap-2">
-        <Label className="w-36 !font-bold text-sm" text="MRSL Grade" />
-        <Select
-          testId="contract-details-is-nominated-driver"
-          placeholder="MRSL Grade"
-          value={mrslGrade}
-          onChange={(value) => setMRSLGrade(value as number)}
-          options={gradeOptions}
-        />
-      </div>
-      <div className="flex items-center gap-2">
-        <Label className="w-36 !font-bold text-sm" text="Number of Instruments" />
-        <Select
-          testId="contract-details-is-nominated-driver"
-          placeholder="Playing Instruments?"
-          value={numOfInstruments}
-          onChange={(value) => setNumOfInstruments(value as number)}
-          options={instrumentOptions}
-        />
       </div>
       <div className="flex items-start gap-2">
         <Label className="!font-bold text-sm w-36" text="Rehearsal Venue" />
@@ -317,7 +256,7 @@ const ContractDetails = ({ contract = {}, onChange = noop }: ContractDetailsProp
 
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-2">
-          <Label className="!font-bold text-sm w-36" text="Nominated Driver?" />
+          <Label className="!font-bold text-sm w-36" text="Nomnated Driver?" />
           <Select
             testId="contract-details-is-nominated-driver"
             placeholder="Yes | No"
@@ -347,38 +286,6 @@ const ContractDetails = ({ contract = {}, onChange = noop }: ContractDetailsProp
             options={paymentTypes}
           />
         </div>
-        <div className="flex items-center gap-2">
-          <Label className="w-36 !font-bold text-sm" text="Sunday Performance Fee" />
-          <TextInput
-            className="grow"
-            testId="contract-details-specific-availability-notes"
-            placeholder="Sunday Performance Fee"
-            value={sundayPerfFee}
-            onChange={(e) => setSundayPerfFee(e.target.value)}
-          />
-        </div>
-        <div className="flex items-center gap-2">
-          <Label className="w-36 !font-bold text-sm" text="Member of Equity Pension Scheme" />
-          <Select
-            testId="contract-details-is-nominated-driver"
-            placeholder="Yes | No"
-            value={memberOfPensionScheme}
-            onChange={(value) => setMemberofPensionScheme(value as boolean)}
-            options={booleanOptions}
-          />
-        </div>
-        {memberOfPensionScheme && (
-          <div className="flex items-center gap-2">
-            <Label className="w-36 !font-bold text-sm" text="Equity Pension Number" />
-            <TextInput
-              className="grow"
-              testId="contract-details-specific-availability-notes"
-              placeholder="Equity Pension Number"
-              value={equityPenNumber}
-              onChange={(e) => setEquityPenNumber(e.target.value)}
-            />
-          </div>
-        )}
         <div className="flex gap-14">
           <div className="flex flex-col gap-4">
             <Label className="!font-bold text-sm w-52" text="If Weekly payment:" />
@@ -386,6 +293,14 @@ const ContractDetails = ({ contract = {}, onChange = noop }: ContractDetailsProp
               testId="contract-details-weekly-payment"
               details={weeklyPayDetails}
               onChange={(value) => handleChange('weeklyPayDetails', value)}
+            />
+          </div>
+          <div className="flex flex-col gap-4">
+            <Label className="!font-bold text-sm w-52" text="If Total Pay:" />
+            <TotalPayDetails
+              testId="contract-details-total-payment"
+              details={totalPayDetails}
+              onChange={(value) => handleChange('totalPayDetails', value as boolean)}
             />
           </div>
         </div>

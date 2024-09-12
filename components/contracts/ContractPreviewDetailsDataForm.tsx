@@ -1,11 +1,10 @@
 import { IContractSchedule, IContractDetails, IScheduleDay } from './types';
-import { useRef } from 'react';
-// import { useMemo } from 'react';
-// import { useRecoilValue } from 'recoil';
-// import { productionJumpState } from 'state/booking/productionJumpState';
+import { useRef, useMemo } from 'react';
+import { useRecoilValue } from 'recoil';
+import { productionJumpState } from 'state/booking/productionJumpState';
 import { ProductionDTO } from 'interfaces';
-// import { PDFViewer } from '@react-pdf/renderer';
-// import JendagiContractRenderer from 'services/reportPDF/JendagiContractRenderer';
+import { PDFViewer } from '@react-pdf/renderer';
+import JendagiContractRenderer from 'services/reportPDF/JendagiContractRenderer';
 
 interface ContractPreviewDetailsFormProps {
   height: string;
@@ -18,22 +17,22 @@ interface ContractPreviewDetailsFormProps {
 
 export const ContractPreviewDetailsForm = ({
   height,
-} // contractPerson,
-// production,
-// contractSchedule,
-// contractDetails,
-// schedule,
-: ContractPreviewDetailsFormProps) => {
+  contractPerson,
+  production,
+  contractSchedule,
+  contractDetails,
+  schedule,
+}: ContractPreviewDetailsFormProps) => {
   const contractRef = useRef(null);
-  // const { productions = [] } = useRecoilValue(productionJumpState);
-  // const productionCompany = useMemo(
-  //   () => productions.find((production) => production.Id === contractSchedule.production)?.ProductionCompany,
-  //   [productions, contractSchedule],
-  // );
+  const { productions = [] } = useRecoilValue(productionJumpState);
+  const productionCompany = useMemo(
+    () => productions.find((production) => production.Id === contractSchedule.production)?.ProductionCompany,
+    [productions, contractSchedule],
+  );
   return (
     <div className="w-full relative">
       <div ref={contractRef} className={`h-[${height}] w-full justify-center flex`}>
-        {/* <PDFViewer style={{ width: '100%' }}>
+        <PDFViewer style={{ width: '100%' }}>
           <JendagiContractRenderer
             contractPerson={contractPerson}
             contractSchedule={contractSchedule}
@@ -42,8 +41,7 @@ export const ContractPreviewDetailsForm = ({
             showName={production?.ShowName}
             schedule={schedule}
           />
-        </PDFViewer> */}
-        <iframe className="w-full h-full" src="/segue/contracts/EquityContractTempFake.pdf" />
+        </PDFViewer>
       </div>
     </div>
   );

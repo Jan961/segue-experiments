@@ -15,6 +15,8 @@ import { DATE_PATTERN, getWeekDayShort } from 'services/dateService';
 import { currencyState } from 'state/global/currencyState';
 import axios from 'axios';
 import { LastPerfDate } from 'types/MarketingTypes';
+import { isNullOrEmpty } from 'utils';
+import { validateUrl } from 'utils/validateUrl';
 
 type FutureBooking = {
   hasFutureBooking: boolean;
@@ -34,6 +36,9 @@ const Filters = () => {
   const [landingURL, setLandingURL] = useState('');
   const [futureBookings, setFutureBookings] = useState<FutureBooking>({ hasFutureBooking: false, nextBooking: null });
   const [lastDates, setLastDates] = useState([]);
+  const [ogImage, setOgImage] = useState(null);
+  const [ogTitle, setOgTitle] = useState(null);
+  const [landingUrlValid, setLandingUrlValid] = useState<boolean>(false);
 
   const bookingOptions = useMemo(() => {
     const initialOptions = bookings.bookings ? mapBookingsToProductionOptions(bookings.bookings) : [];
@@ -128,6 +133,28 @@ const Filters = () => {
   };
 
   useEffect(() => {
+    const getOpenGraphInfo = async () => {
+      try {
+        const response = await axios.post('/api/marketing/openGraphInfo/read', { url: landingURL });
+        const result = await response.data;
+        const { ogImage, ogTitle } = result;
+        if (!isNullOrEmpty(ogImage)) {
+          setOgImage(ogImage);
+          setOgTitle(ogTitle);
+        }
+      } catch (exception) {
+        //  If you print the exceptions here then it will give an error whenever this isnt an image preview
+      }
+    };
+
+    setOgImage(null);
+
+    const urlValid = validateUrl(landingURL);
+    setLandingUrlValid(urlValid);
+    if (!isNullOrEmpty(landingURL) && urlValid) getOpenGraphInfo();
+  }, [landingURL]);
+
+  useEffect(() => {
     fetchLastDates();
     setSelectedIndex(-1);
     setSelectedValue(null);
@@ -201,13 +228,23 @@ const Filters = () => {
           />
 
           {/* Iframe placed next to buttons but in the same flex container */}
-          <div className="self-end -mt-[60px] cursor-pointer">
-            <Iframe variant="xs" src={landingURL} />
+          <div className=" -mt-[50px] cursor-pointer w-[150px] h-[81px]">
+            {!landingUrlValid ? (
+              <div className="bg-gray-300 rounded-lg h-[81px] flex items-center justify-center text-white text-sm">
+                {!(landingURL?.length > 0) ? `No URL` : `Invalid URL`} provided
+              </div>
+            ) : isNullOrEmpty(ogImage) ? (
+              <Iframe src={landingURL} variant="xs" />
+            ) : (
+              <a href={landingURL} target="_blank" rel="noreferrer">
+                <img src={ogImage.url} alt={ogTitle} key={landingURL} />
+              </a>
+            )}
           </div>
         </div>
       </div>
 
-      <MarketingButtons venueName={venueName} venueId={venueId} />
+      <MarketingButtons venueName={venueName} venueId={venueId} setModalLandingURL={setLandingURL} />
     </div>
   );
 };
