@@ -176,7 +176,7 @@ export const BuildNewContract = ({
   return (
     <PopupModal
       show={visible}
-      title="Contract Details"
+      title={'Contract Details - ' + contractId}
       titleClass="text-xl text-primary-navy font-bold -mt-2"
       panelClass="h-[95vh] w-[100vw]"
       hasOverflow={false}
