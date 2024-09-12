@@ -1,20 +1,19 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 import axios from 'axios';
-import { Button, Label, notify } from 'components/core-ui-lib';
+import { Button, notify } from 'components/core-ui-lib';
 import PopupModal from 'components/core-ui-lib/PopupModal';
 import { noop } from 'utils';
 import useAxiosCancelToken from 'hooks/useCancelToken';
-
-import { ContractPersonDataForm } from '../ContractPersonDataForm';
-import { ContractPreviewDetailsForm } from '../ContractPreviewDetailsDataForm';
-import ContractDetails from './ContractDetails';
+import { PersonDetailsTab } from './tabs/PersonDetailsTab';
+import { PreviewTab } from './tabs/PreviewTab';
+import ContractDetailsTab from './tabs/ContractDetailsTab';
 import LoadingOverlay from 'components/shows/LoadingOverlay';
-import { IContractSchedule, IScheduleDay } from '../types';
+import { IContractSchedule, IScheduleDay } from '../../contracts/types';
 import { useRecoilValue } from 'recoil';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import { transformContractData } from 'transformers/contracts';
-import ContractScheduleTable from './ContractScheduleTable';
+import ContractScheduleTable from './tabs/ScheduleTab';
 import { ERROR_CODES } from 'config/apiConfig';
 
 export interface BuildNewContractProps {
@@ -225,12 +224,13 @@ export const BuildNewContract = ({
               </div>
             )}
             {activeViewIndex === 0 && contractPerson && (
-              <ContractPersonDataForm person={contractPerson} height="" updateFormData={setContractPerson} />
+              <div className="flex flex-col gap-8 px-16">
+                <PersonDetailsTab person={contractPerson} height="" updateFormData={setContractPerson} />
+              </div>
             )}
             {activeViewIndex === 1 && (
               <div className="flex flex-col gap-8 px-16">
-                <Label className="!text-base !font-bold" text="Complete the below to generate the contract" />
-                <ContractDetails contract={contractDetails} onChange={setContractDetails} />
+                <ContractDetailsTab />
               </div>
             )}
             {activeViewIndex === 2 && (
@@ -239,7 +239,7 @@ export const BuildNewContract = ({
               </div>
             )}
             {activeViewIndex === 3 && (
-              <ContractPreviewDetailsForm
+              <PreviewTab
                 contractPerson={contractPerson}
                 contractSchedule={contractSchedule}
                 contractDetails={contractDetails}

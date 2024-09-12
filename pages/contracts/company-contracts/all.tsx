@@ -3,7 +3,7 @@ import Layout from 'components/Layout';
 import { InitialState } from 'lib/recoil';
 import { getProductionJumpState } from 'utils/getProductionJumpState';
 import { getAccountIdFromReq, getUsers } from 'services/userService';
-import ContractFilters from 'components/contracts/ContractFilters';
+import ContractFilters from 'components/company-contracts/ContractFilters';
 import CompanyContractsTable from 'components/contracts/table/CompanyContractsTable';
 import { getAllVenuesMin, getUniqueVenueCountrylist } from 'services/venueService';
 import { intialContractsFilterState } from 'state/contracts/contractsFilterState';

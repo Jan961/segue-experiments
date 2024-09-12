@@ -2,7 +2,7 @@ import { Button, Select, TextInput, notify } from 'components/core-ui-lib';
 import PopupModal from 'components/core-ui-lib/PopupModal';
 import { useCallback, useMemo, useState } from 'react';
 import { ContractNewPersonModal } from './ContractNewPersonModal';
-import { BuildNewContract } from './BuildNewContract';
+import { BuildNewContract } from './edit-contract-modal/BuildNewContract';
 import { transformToOptions } from 'utils';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { productionJumpState } from 'state/booking/productionJumpState';
@@ -11,7 +11,7 @@ import { personState } from 'state/contracts/PersonState';
 import axios from 'axios';
 import { objectify } from 'radash';
 import { PersonMinimalDTO } from 'interfaces';
-import { IContractSchedule } from '../types';
+import { IContractSchedule } from '../contracts/types';
 import { contractDepartmentState } from 'state/contracts/contractDepartmentState';
 
 export const defaultContractSchedule = {

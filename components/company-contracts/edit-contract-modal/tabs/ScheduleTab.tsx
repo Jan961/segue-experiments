@@ -1,7 +1,7 @@
 import Table from 'components/core-ui-lib/Table';
 import { useRef, useState } from 'react';
-import { contractTourScheduleColumns, contractsStyleProps } from '../tableConfig';
-import { IScheduleDay } from '../types';
+import { contractTourScheduleColumns, contractsStyleProps } from '../../../contracts/tableConfig';
+import { IScheduleDay } from '../../../contracts/types';
 
 interface ContractScheduleTableProps {
   schedule: IScheduleDay[];

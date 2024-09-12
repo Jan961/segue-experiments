@@ -7,7 +7,7 @@ import { useRecoilState, useRecoilValue } from 'recoil';
 import { contractsFilterState, intialContractsFilterState } from 'state/contracts/contractsFilterState';
 import { allStatusOptions } from 'config/contracts';
 import { productionJumpState } from 'state/booking/productionJumpState';
-import { ContractScheduleModal } from './modal/ContractSchedule';
+import { ContractScheduleModal } from './ContractSchedule';
 import { useState } from 'react';
 
 const CompanyContractFilters = () => {

@@ -10,8 +10,8 @@ import NotesPopup from 'components/NotesPopup';
 import { notify } from 'components/core-ui-lib';
 import useAxiosCancelToken from 'hooks/useCancelToken';
 import axios from 'axios';
-import { BuildNewContract, BuildNewContractProps } from '../modal/BuildNewContract';
-import { defaultContractSchedule } from '../modal/ContractSchedule';
+import { BuildNewContract, BuildNewContractProps } from './edit-contract-modal/BuildNewContract';
+import { defaultContractSchedule } from './ContractSchedule';
 
 interface ContractsTableProps {
   rowData?: IContractSummary[];

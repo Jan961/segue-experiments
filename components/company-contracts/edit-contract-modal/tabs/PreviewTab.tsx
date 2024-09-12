@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { IContractSchedule, IContractDetails, IScheduleDay } from './types';
+import { IContractSchedule, IContractDetails, IScheduleDay } from '../../../contracts/types';
 import { ProductionDTO } from 'interfaces';
 
 interface ContractPreviewDetailsFormProps {
@@ -10,14 +10,12 @@ interface ContractPreviewDetailsFormProps {
   schedule: IScheduleDay[];
 }
 
-export const ContractPreviewDetailsForm = (_props: ContractPreviewDetailsFormProps) => {
+export const PreviewTab = (_props: ContractPreviewDetailsFormProps) => {
   const contractRef = useRef(null);
 
   return (
     <div className="w-full h-full">
-      <div ref={contractRef} className="h-full w-full justify-center flex">
-        <iframe className="w-full h-full" src="/segue/contracts/EquityContract.pdf" />
-      </div>
+      <div ref={contractRef} className="h-full w-full justify-center flex" />
     </div>
   );
 };

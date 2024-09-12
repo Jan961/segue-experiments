@@ -5,11 +5,11 @@ import { countryState } from 'state/global/countryState';
 import { transformToOptions } from 'utils';
 import { userState } from 'state/account/userState';
 import { Checkbox } from 'components/core-ui-lib';
-import AgencyDetails from './PersonForm/AgencyDetails';
-import PersonalDetails from './PersonForm/PersonalDetails';
-import AccountDetailsForm from './PersonForm/AccountDetailsForm';
-import EmergencyContact from './PersonForm/EmergencyContact';
-import { IPerson } from './types';
+import AgencyDetails from '../../../contracts/PersonForm/AgencyDetails';
+import PersonalDetails from '../../../contracts/PersonForm/PersonalDetails';
+import AccountDetailsForm from '../../../contracts/PersonForm/AccountDetailsForm';
+import EmergencyContact from '../../../contracts/PersonForm/EmergencyContact';
+import { IPerson } from '../../../contracts/types';
 
 const defaultContractDetails = {
   personDetails: null,
@@ -26,7 +26,7 @@ interface ContractPersonDataFormProps {
   updateFormData: (data: Partial<IPerson>) => void;
 }
 
-export const ContractPersonDataForm = ({ person = {}, height, updateFormData }: ContractPersonDataFormProps) => {
+export const PersonDetailsTab = ({ person = {}, height, updateFormData }: ContractPersonDataFormProps) => {
   const [personData, setPersonData] = useState<IPerson>({ ...defaultContractDetails, ...person });
   const {
     personDetails,
