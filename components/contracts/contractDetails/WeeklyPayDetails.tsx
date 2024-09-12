@@ -37,7 +37,8 @@ const WeeklyPayDetails = ({
     ...defaultWeeklyPayDetails,
     ...details,
   });
-  const { rehearsalFee, performanceFee, touringAllowance, subsNotes } = weeklyPayDetails;
+  const { rehearsalFee, rehearsalHolidayPay, performanceFee, performanceHolidayPay, touringAllowance, subsNotes } =
+    weeklyPayDetails;
   const handleChange = useCallback(
     (key: string, value: number | string | boolean | null) => {
       const updatedData = { ...weeklyPayDetails, [key]: value };
@@ -62,6 +63,19 @@ const WeeklyPayDetails = ({
         </div>
       </div>
       <div className="flex items-center gap-2">
+        <Label className="w-56 text-sm" text="Rehearsal Holiday Fee (per week)" />
+        <div className="flex items-center">
+          <Label className="text-sm" text={currencySymbol} />
+          <TextInput
+            testId={`${testId}-reh-hol-pay`}
+            placeholder="00.00"
+            type="number"
+            value={rehearsalHolidayPay}
+            onChange={(event) => handleChange('rehearsalHolidayPay', parseFloat(event.target.value))}
+          />
+        </div>
+      </div>
+      <div className="flex items-center gap-2">
         <Label className="w-56 text-sm" text="Performance Fee (per week)" />
         <div className="flex items-center">
           <Label className="text-sm" text={currencySymbol} />
@@ -71,6 +85,19 @@ const WeeklyPayDetails = ({
             type="number"
             value={performanceFee}
             onChange={(event) => handleChange('performanceFee', parseFloat(event.target.value))}
+          />
+        </div>
+      </div>
+      <div className="flex items-center gap-2">
+        <Label className="w-56 text-sm" text="Performance Holiday Fee (per week)" />
+        <div className="flex items-center">
+          <Label className="text-sm" text={currencySymbol} />
+          <TextInput
+            testId={`${testId}-perf-hol-fee`}
+            placeholder="00.00"
+            type="number"
+            value={performanceHolidayPay}
+            onChange={(event) => handleChange('performanceHolidayPay', parseFloat(event.target.value))}
           />
         </div>
       </div>
