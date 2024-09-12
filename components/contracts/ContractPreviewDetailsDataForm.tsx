@@ -1,17 +1,16 @@
 import { useRef } from 'react';
-// import { IContractSchedule, IContractDetails, IScheduleDay } from './types';
-// import { ProductionDTO } from 'interfaces';
+import { IContractSchedule, IContractDetails, IScheduleDay } from './types';
+import { ProductionDTO } from 'interfaces';
 
-// interface ContractPreviewDetailsFormProps {
-//   height: string;
-//   contractPerson: any;
-//   production: Partial<ProductionDTO>;
-//   contractSchedule: Partial<IContractSchedule>;
-//   contractDetails: Partial<IContractDetails>;
-//   schedule: IScheduleDay[];
-// }
+interface ContractPreviewDetailsFormProps {
+  contractPerson: any;
+  production: Partial<ProductionDTO>;
+  contractSchedule: Partial<IContractSchedule>;
+  contractDetails: Partial<IContractDetails>;
+  schedule: IScheduleDay[];
+}
 
-export const ContractPreviewDetailsForm = () => {
+export const ContractPreviewDetailsForm = (_props: ContractPreviewDetailsFormProps) => {
   const contractRef = useRef(null);
 
   return (

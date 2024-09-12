@@ -245,7 +245,6 @@ export const BuildNewContract = ({
                 contractDetails={contractDetails}
                 production={selectedProduction}
                 schedule={schedule}
-                height="h-[100%]"
               />
             )}
           </div>
