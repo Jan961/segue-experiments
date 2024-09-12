@@ -59,7 +59,7 @@ export const filterPrice = (dealMemoPrice) => {
     if (defaultPrice[price.DMPTicketName]) {
       defaultPrice[price.DMPTicketName] = {
         DMPTicketName: price.DMPTicketName,
-        DMPTicketPrice: formatDecimalValue(price.DMPTicketPrice),
+        DMPTicketPrice: price.DMPTicketPrice === '0' ? formatDecimalValue(price.DMPTicketPrice) : '',
         DMPNumTickets: price.DMPNumTickets,
         DMPId: price.DMPId,
         DMPDeMoId: price.DMPDeMoId,

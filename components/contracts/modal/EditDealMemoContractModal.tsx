@@ -136,6 +136,7 @@ export const EditDealMemoContractModal = ({
     const holdTypeData = filterHoldTypeData(dealHoldType, demoModalData.DealMemoHold);
     setSeatKillsData(holdTypeData);
     setdealMemoPriceFormData(priceData[0]);
+
     setDealMemoCustomPriceFormData(priceData[1]);
     const techProvisionData = demoModalData.DealMemoTechProvision ? demoModalData.DealMemoTechProvision : [];
     const techProvision = filterTechProvision(techProvisionData);
