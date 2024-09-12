@@ -15,6 +15,8 @@ import { productionJumpState } from 'state/booking/productionJumpState';
 import { transformContractData } from 'transformers/contracts';
 import ContractScheduleTable from './tabs/ScheduleTab';
 import { ERROR_CODES } from 'config/apiConfig';
+import { contractDepartmentState } from 'state/contracts/contractDepartmentState';
+import { getDepartmentNameByID } from '../utils';
 
 export interface BuildNewContractProps {
   contractSchedule?: Partial<IContractSchedule>;
@@ -48,6 +50,7 @@ export const BuildNewContract = ({
   }, [contractPerson]);
   const router = useRouter();
   const cancelToken = useAxiosCancelToken();
+  const departmentMap = useRecoilValue(contractDepartmentState);
 
   const fetchPersonDetails = useCallback(
     async (id: number) => {
@@ -183,7 +186,9 @@ export const BuildNewContract = ({
         <div>
           <div className="">
             <div className="text-xl text-primary-navy font-bold w-[50vw]">{`${selectedProduction.ShowCode}${selectedProduction.Code}`}</div>
-            <div className="text-xl text-primary-navy font-bold w-[50vw]">Department</div>
+            <div className="text-xl text-primary-navy font-bold w-[50vw]">
+              Department - {getDepartmentNameByID(contractSchedule.department, departmentMap)}
+            </div>
           </div>
 
           <div className="flex justify-center w-[100%] pt-2 pb-2">
