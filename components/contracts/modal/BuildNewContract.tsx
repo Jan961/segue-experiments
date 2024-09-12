@@ -176,79 +176,84 @@ export const BuildNewContract = ({
       show={visible}
       title="Contract Details"
       titleClass="text-xl text-primary-navy font-bold -mt-2"
+      panelClass="h-[95vh] w-[100vw]"
       hasOverflow={false}
       onClose={onClose}
     >
-      <div>
-        <div className="w-[82vw]">
-          <div className="text-xl text-primary-navy font-bold w-[50vw]">{`${selectedProduction.ShowCode}${selectedProduction.Code}`}</div>
-          <div className="text-xl text-primary-navy font-bold w-[50vw]">Department</div>
-        </div>
-        <div className="flex justify-center w-[100%] pt-2 pb-2">
-          <div
-            className="w-[24vw] border-solid border-2 border-primary-navy text-center rounded cursor-pointer"
-            style={{ background: activeViewIndex === 0 ? '#0093C0' : 'white' }}
-            onClick={() => setActiveViewIndex(0)}
-          >
-            {personName} Details
+      <div className="flex flex-col justify-between ">
+        <div>
+          <div className="">
+            <div className="text-xl text-primary-navy font-bold w-[50vw]">{`${selectedProduction.ShowCode}${selectedProduction.Code}`}</div>
+            <div className="text-xl text-primary-navy font-bold w-[50vw]">Department</div>
           </div>
-          <div
-            className="w-[24vw] border-solid border-2 border-primary-navy text-center rounded cursor-pointer"
-            style={{ background: activeViewIndex === 1 ? '#0093C0' : 'white' }}
-            onClick={() => setActiveViewIndex(1)}
-          >
-            Contract Details
-          </div>
-          <div
-            className="w-[24vw] border-solid border-2 border-primary-navy text-center rounded cursor-pointer"
-            style={{ background: activeViewIndex === 2 ? '#0093C0' : 'white' }}
-            onClick={() => setActiveViewIndex(2)}
-          >
-            Schedule
-          </div>
-          <div
-            className="w-[24vw] border-solid border-2 border-primary-navy text-center rounded cursor-pointer"
-            style={{ background: activeViewIndex === 3 ? '#0093C0' : 'white' }}
-            onClick={() => setActiveViewIndex(3)}
-          >
-            Contract Preview
-          </div>
-        </div>
-        <div className="border-solid border-2 border-primary-navy rounded p-2 max-h-[70vh] overflow-scroll">
-          {loading && (
-            <div className="w-full h-96">
-              <LoadingOverlay />
+
+          <div className="flex justify-center w-[100%] pt-2 pb-2">
+            <div
+              className="w-[24vw] border-solid border-2 border-primary-navy text-center rounded cursor-pointer"
+              style={{ background: activeViewIndex === 0 ? '#0093C0' : 'white' }}
+              onClick={() => setActiveViewIndex(0)}
+            >
+              {personName} Details
             </div>
-          )}
-          {activeViewIndex === 0 && contractPerson && (
-            <ContractPersonDataForm person={contractPerson} height="h-[70vh]" updateFormData={setContractPerson} />
-          )}
-          {activeViewIndex === 1 && (
-            <div className="flex flex-col gap-8 px-16">
-              <Label className="!text-base !font-bold" text="Complete the below to generate the contract" />
-              <ContractDetails contract={contractDetails} onChange={setContractDetails} />
+            <div
+              className="w-[24vw] border-solid border-2 border-primary-navy text-center rounded cursor-pointer"
+              style={{ background: activeViewIndex === 1 ? '#0093C0' : 'white' }}
+              onClick={() => setActiveViewIndex(1)}
+            >
+              Contract Details
             </div>
-          )}
-          {activeViewIndex === 2 && (
-            <div className="flex flex-col gap-8">
-              <ContractScheduleTable updateSchedule={updateSchedule} schedule={schedule} />
+            <div
+              className="w-[24vw] border-solid border-2 border-primary-navy text-center rounded cursor-pointer"
+              style={{ background: activeViewIndex === 2 ? '#0093C0' : 'white' }}
+              onClick={() => setActiveViewIndex(2)}
+            >
+              Schedule
             </div>
-          )}
-          {activeViewIndex === 3 && (
-            <ContractPreviewDetailsForm
-              contractPerson={contractPerson}
-              contractSchedule={contractSchedule}
-              contractDetails={contractDetails}
-              production={selectedProduction}
-              schedule={schedule}
-              height="70vh"
-            />
-          )}
+            <div
+              className="w-[24vw] border-solid border-2 border-primary-navy text-center rounded cursor-pointer"
+              style={{ background: activeViewIndex === 3 ? '#0093C0' : 'white' }}
+              onClick={() => setActiveViewIndex(3)}
+            >
+              Contract Preview
+            </div>
+          </div>
+
+          <div className="border-solid border-2 border-primary-navy rounded p-2 h-[70vh] overflow-y-scroll">
+            {loading && (
+              <div className="w-full h-96">
+                <LoadingOverlay />
+              </div>
+            )}
+            {activeViewIndex === 0 && contractPerson && (
+              <ContractPersonDataForm person={contractPerson} height="" updateFormData={setContractPerson} />
+            )}
+            {activeViewIndex === 1 && (
+              <div className="flex flex-col gap-8 px-16">
+                <Label className="!text-base !font-bold" text="Complete the below to generate the contract" />
+                <ContractDetails contract={contractDetails} onChange={setContractDetails} />
+              </div>
+            )}
+            {activeViewIndex === 2 && (
+              <div className="flex flex-col gap-8">
+                <ContractScheduleTable updateSchedule={updateSchedule} schedule={schedule} />
+              </div>
+            )}
+            {activeViewIndex === 3 && (
+              <ContractPreviewDetailsForm
+                contractPerson={contractPerson}
+                contractSchedule={contractSchedule}
+                contractDetails={contractDetails}
+                production={selectedProduction}
+                schedule={schedule}
+                height="h-[100%]"
+              />
+            )}
+          </div>
         </div>
 
         <div className="w-full mt-4 flex justify-end items-center">
           <Button className="w-33" variant="secondary" text="Cancel" onClick={onClose} />
-          {activeViewIndex !== 3 && <Button className="ml-4 w-33" variant="primary" text="next" onClick={goToNext} />}
+          {activeViewIndex !== 3 && <Button className="ml-4 w-33" variant="primary" text="Next" onClick={goToNext} />}
           <Button className="ml-4 w-33" variant="primary" text="Save and Close" onClick={onSave} />
         </div>
       </div>

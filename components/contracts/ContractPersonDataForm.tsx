@@ -65,7 +65,7 @@ export const ContractPersonDataForm = ({ person = {}, height, updateFormData }: 
 
   return (
     <>
-      <div className={`${height} w-full overflow-y-scroll`}>
+      <div className={`${height} w-full`}>
         <div className="text-xl text-primary-navy font-bold mb-3">Person Details</div>
         <PersonalDetails
           details={personDetails}

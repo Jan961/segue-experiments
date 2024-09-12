@@ -35,6 +35,7 @@ const ContractScheduleTable = ({ schedule, updateSchedule }: ContractScheduleTab
           styleProps={contractsStyleProps}
           onCellValueChange={onCellValueChange}
           onCellClicked={handleCellClick}
+          tableHeight={650}
         />
       </div>
     </>
