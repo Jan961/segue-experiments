@@ -4,7 +4,7 @@ import { InitialState } from 'lib/recoil';
 import { getProductionJumpState } from 'utils/getProductionJumpState';
 import { getAccountIdFromReq, getUsers } from 'services/userService';
 import ContractFilters from 'components/company-contracts/ContractFilters';
-import CompanyContractsTable from 'components/contracts/table/CompanyContractsTable';
+import CompanyContractsTable from 'components/company-contracts/CompanyContractsTable';
 import { getAllVenuesMin, getUniqueVenueCountrylist } from 'services/venueService';
 import { intialContractsFilterState } from 'state/contracts/contractsFilterState';
 import { fetchAllMinPersonsList } from 'services/personService';
