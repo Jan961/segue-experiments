@@ -30,6 +30,8 @@ import {
   parseAndSortDates,
   filterCurrencyNum,
   formatDecimalOnBlur,
+  timeToDateTime,
+  dtToTime,
 } from '../utils';
 import { DealMemoHold, DealMemoTechProvision } from 'prisma/generated/prisma-client';
 import { dealMemoInitialState } from 'state/contracts/contractsFilterState';
@@ -39,7 +41,7 @@ import LoadingOverlay from 'components/shows/LoadingOverlay';
 import { CustomOption } from 'components/core-ui-lib/Table/renderers/SelectCellRenderer';
 import { trasformVenueAddress } from 'utils/venue';
 import { accountContactState } from 'state/contracts/accountContactState';
-import { formatDecimalValue, isNullOrUndefined, isUndefined } from 'utils';
+import { formatDecimalValue, isNullOrEmpty, isNullOrUndefined, isUndefined } from 'utils';
 import { currencyState } from 'state/global/currencyState';
 
 export const EditDealMemoContractModal = ({
@@ -103,7 +105,10 @@ export const EditDealMemoContractModal = ({
       venueData && venueData.VenueContact
         ? venueData.VenueContact.map(({ Id, FirstName = '', LastName = '', VenueRole }) => ({
             value: Id,
-            text: `${FirstName || ''} ${LastName || ''} | ${VenueRole.Name}`,
+            text:
+              isNullOrEmpty(FirstName) && isNullOrEmpty(LastName)
+                ? VenueRole.Name
+                : `${FirstName || ''} ${LastName || ''} | ${VenueRole.Name}`,
           }))
         : [],
     [venueData],
@@ -124,6 +129,7 @@ export const EditDealMemoContractModal = ({
     setFormData({
       ...demoModalData,
       DateIssued: isUndefined(demoModalData.DateIssued) ? new Date() : demoModalData.DateIssued,
+      RunningTime: timeToDateTime(productionJumpState.RunningTime),
     });
 
     const priceData = filterPrice(demoModalData.DealMemoPrice);
@@ -208,7 +214,6 @@ export const EditDealMemoContractModal = ({
     };
 
     if (type === 'dealMemo') {
-      console.log({ [key]: value });
       setFormData({ ...updatedFormData });
     }
     setFormEdited(true);
@@ -365,6 +370,7 @@ export const EditDealMemoContractModal = ({
         onClose={() => handleCancelForm(false)}
         hasOverlay={true}
         hasOverflow={false}
+        panelClass="overflow-y-hidden"
       >
         <div className="h-[80vh] w-[82vw] overflow-y-scroll pr-2">
           <p className="text-primary-red ">PLEASE NOTE:</p>{' '}
@@ -430,7 +436,7 @@ export const EditDealMemoContractModal = ({
                 }}
                 className="bg-primary-white w-3/12 ml-2 mr-2"
                 placeholder="Please select..."
-                options={[{ text: 'Select Assignee', value: null }, ...companyContactList]}
+                options={[...companyContactList]}
                 isClearable
                 isSearchable
                 value={formData.AccContId}
@@ -457,7 +463,7 @@ export const EditDealMemoContractModal = ({
                 }}
                 className="bg-primary-white wfull"
                 placeholder="Please select..."
-                options={[{ text: 'Select Assignee', value: null }, ...companyContactList]}
+                options={[...companyContactList]}
                 isClearable
                 isSearchable
                 value={formData.CompAccContId}
@@ -520,7 +526,7 @@ export const EditDealMemoContractModal = ({
               <TextArea
                 testId="performance times"
                 className="h-auto w-full overflow-y-hidden"
-                value={parseAndSortDates(selectedTableCell.contract.PerformanceTimes).showArray.join('\n')}
+                value={parseAndSortDates(selectedTableCell.contract.PerformanceTimes).join('\n')}
                 disabled
               />
             </div>
@@ -530,15 +536,9 @@ export const EditDealMemoContractModal = ({
             <div className="w-4/5 flex items-center" data-testid="perf-running-time">
               <TimeInput
                 className="w-fit h-[31px] [&>input]:!h-[25px] [&>input]:!w-11 !justify-center shadow-input-shadow"
-                value={
-                  productionJumpState && productionJumpState.RunningTime
-                    ? dateToTimeString(productionJumpState.RunningTime)
-                    : null
-                }
+                value={dtToTime(formData.RunningTime)}
+                onChange={() => null}
                 disabled
-                onChange={() => {
-                  return null;
-                }}
                 tabIndexShow={true}
               />
               <div className=" text-primary-input-text font-bold ml-8 mr-4">Notes</div>
@@ -620,7 +620,7 @@ export const EditDealMemoContractModal = ({
             <div className="w-4/5">
               <Select
                 onChange={(value) => editDemoModalData('ProgrammerVenueContactId', value, 'dealMemo')}
-                options={[{ text: 'Select Assignee', value: null }, ...venueUserList]}
+                options={[...venueUserList]}
                 className="bg-primary-white w-full"
                 placeholder="Please select..."
                 isClearable
@@ -1544,7 +1544,7 @@ export const EditDealMemoContractModal = ({
                 onChange={(value) => editDemoModalData('SendTo', value, 'dealMemo')}
                 isMulti
                 className="bg-primary-white w-full"
-                placeholder="Please select assignee..."
+                placeholder="Please select..."
                 options={[{ text: 'Select All', value: 'select_all' }, ...userList]}
                 isClearable
                 isSearchable
@@ -1561,7 +1561,7 @@ export const EditDealMemoContractModal = ({
             <div className="w-4/5 flex">
               <Select
                 onChange={(value) => editDemoModalData('MMVenueContactId', value, 'dealMemo')}
-                options={[{ text: 'Select Assignee', value: null }, ...venueUserList]}
+                options={[...venueUserList]}
                 className="bg-primary-white w-full"
                 placeholder="Please select..."
                 isClearable
@@ -1812,7 +1812,7 @@ export const EditDealMemoContractModal = ({
             <div className="w-4/5 flex">
               <Select
                 onChange={(value) => editDemoModalData('TechVenueContactId', value, 'dealMemo')}
-                options={[{ text: 'Select Assignee', value: null }, ...venueUserList]}
+                options={[...venueUserList]}
                 className="bg-primary-white w-full"
                 placeholder="Please select..."
                 isClearable

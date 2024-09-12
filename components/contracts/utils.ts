@@ -1,6 +1,7 @@
+import { Time } from 'components/core-ui-lib/TimeInput/TimeInput';
 import { startOfDay } from 'date-fns';
-import { getShortWeekFormat, getTimeFromDateAndTime } from 'services/dateService';
-import { formatDecimalValue } from 'utils';
+import { getShortWeekFormat } from 'services/dateService';
+import { formatDecimalValue, isNullOrEmpty } from 'utils';
 import formatInputDate from 'utils/dateInputFormat';
 
 const defaultPrice = {
@@ -219,21 +220,28 @@ export const salaryDetailsData = [
   { first: 'Country', second: 'Country', type: 'select' },
 ];
 
-export const parseAndSortDates = (arr: string[]): { showArray: Array<string>; maxWidth: number } => {
+export const parseAndSortDates = (arr: string[]): Array<string> => {
+  // if input array length is false, return emptry array
+  if (arr.length === 0) {
+    return [];
+  }
+
   // if the entry has a time pre-pended - remove this and use the datetime in JS date format
   const parsedEntries = arr.map((show) => {
-    return show.includes('?') ? new Date(show.split('? ')[1]) : new Date(show);
+    const [time, date] = show.split('? ');
+    return { time, date: new Date(date) };
   });
 
   // Sort dates in ascending order
-  parsedEntries.sort((a, b) => a.getTime() - b.getTime());
+  parsedEntries.sort((a, b) => a.date.getTime() - b.date.getTime());
 
   // Group by date and format as object - e.g. {dd-mm-yy: {dt: js date, times: [array of times in hh:mm]}}
   const groupedByDate: { [key: number]: string[] } = parsedEntries.reduce(
     (acc, entry) => {
-      const dateKey = startOfDay(entry).getTime();
+      const dateKey = startOfDay(entry.date).getTime();
       acc[dateKey] = acc[dateKey] || [];
-      acc[dateKey].push(getTimeFromDateAndTime(entry));
+
+      acc[dateKey].push(entry.time === '' ? 'TBC' : entry.time);
       return acc;
     },
     {} as { [key: number]: string[] },
@@ -247,12 +255,43 @@ export const parseAndSortDates = (arr: string[]): { showArray: Array<string>; ma
     dayArray.push(`${getShortWeekFormat(date)} ${formatInputDate(date)} ${times.join('; ')}`);
   });
 
-  // Join and return as a break line delimited string
-  return { showArray: dayArray, maxWidth: Math.max(...dayArray.map((line) => line.length)) };
+  return dayArray;
 };
 
 export const checkDecimalStringFormat = (decimalString, precision, scale) => {
   const [integerPart, fractionalPart] = decimalString.split('.');
   if (integerPart.length > precision - scale || (fractionalPart && fractionalPart.length > scale)) return false;
   return true;
+};
+
+export const dtToTime = (datetime: Date): Time => {
+  if (datetime === null) {
+    return null;
+  }
+
+  return {
+    hrs: datetime.getHours().toString(),
+    min: datetime.getMinutes().toString(),
+    sec: datetime.getSeconds().toString(),
+  };
+};
+
+export const timeToDateTime = (inputTime: Time | string): Date => {
+  if (isNullOrEmpty(inputTime)) {
+    return null;
+  }
+
+  let time: Time = {};
+
+  if (typeof inputTime === 'string') {
+    const timeSplit = inputTime.split(':');
+    time = { hrs: timeSplit[0], min: timeSplit[1] };
+  } else {
+    time = inputTime;
+  }
+
+  const datetime = new Date();
+  datetime.setHours(parseInt(time.hrs), parseInt(time.min), 0);
+
+  return datetime;
 };

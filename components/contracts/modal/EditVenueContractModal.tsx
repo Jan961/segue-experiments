@@ -112,12 +112,14 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
       setDealMemoCreated(true);
       setDealMemoButtonText('Edit Deal Memo');
     }
+
     const getHoldType = await axios.get<DealMemoHoldType>(`/api/dealMemo/hold-type/read`);
     setDealHoldType(getHoldType.data as DealMemoHoldType);
     if (demoModalData.data && demoModalData.data.BookingId) {
       setDemoModalData(demoModalData.data as DealMemoContractFormData);
       setDealMemoFormData(demoModalData.data as DealMemoContractFormData);
     }
+
     if (selectedTableCell.contract && selectedTableCell.contract.venueId) {
       const venueData = await axios.get(`/api/venue/${selectedTableCell.contract.venueId}`);
       setVenue(venueData.data as VenueData);
@@ -524,7 +526,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
               <div className=" text-primary-input-text text-sm ml-5">{formData.performanceCount}</div>
               <div className=" text-primary-input-text font-bold text-sm ml-4">Times</div>
               <div>
-                {parseAndSortDates(formData.PerformanceTimes).showArray.map((dateTimeEntry, index) => {
+                {parseAndSortDates(formData.PerformanceTimes).map((dateTimeEntry, index) => {
                   return (
                     <div key={index} className="text-primary-input-text  text-sm ml-4">
                       {dateTimeEntry}
