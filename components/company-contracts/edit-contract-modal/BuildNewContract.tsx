@@ -17,6 +17,7 @@ import ScheduleTab from './tabs/ScheduleTab';
 import { ERROR_CODES } from 'config/apiConfig';
 import { contractDepartmentState } from 'state/contracts/contractDepartmentState';
 import { getDepartmentNameByID } from '../utils';
+// import { TemplateFormComponent } from '../types';
 
 export interface BuildNewContractProps {
   contractSchedule?: Partial<IContractSchedule>;
@@ -52,8 +53,14 @@ export const BuildNewContract = ({
   const cancelToken = useAxiosCancelToken();
   const departmentMap = useRecoilValue(contractDepartmentState);
 
-  // const fetchTemplateStructure = () => {
+  // const fetchTemplateFormStructure = async () => {
+  //   // Using the loaded AccContractID, get the corresponding template, then get the components associated with that template
+  //   try {
+  //     const response = await axios.get('/api/company-contracts/read-template/' + contractId);
 
+  //   } catch (err) {
+  //     console.log(err, "Error - failed to retrieve template form structure")
+  //   }
   // }
 
   // const populateForm = () => {
