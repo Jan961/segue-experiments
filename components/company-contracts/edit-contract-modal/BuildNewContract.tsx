@@ -52,6 +52,14 @@ export const BuildNewContract = ({
   const cancelToken = useAxiosCancelToken();
   const departmentMap = useRecoilValue(contractDepartmentState);
 
+  // const fetchTemplateStructure = () => {
+
+  // }
+
+  // const populateForm = () => {
+
+  // }
+
   const fetchPersonDetails = useCallback(
     async (id: number) => {
       setLoading(true);
