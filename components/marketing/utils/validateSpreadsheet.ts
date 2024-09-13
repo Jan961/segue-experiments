@@ -119,8 +119,6 @@ export const validateSpreadsheetFile = async (file, prodCode, venueList, prodDat
   convertWorkbookToFile(workbook, file);
   const cleanedSpreadsheetData = cleanSpreadsheetData(spreadsheetData);
 
-  console.log(cleanedSpreadsheetData);
-
   return { file, spreadsheetIssues, spreadsheetData: cleanedSpreadsheetData };
 };
 
