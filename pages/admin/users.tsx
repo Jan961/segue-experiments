@@ -2,6 +2,7 @@ import axios from 'axios';
 import { permissionGroupColDef, styleProps, usersColDef } from 'components/admin/tableConfig';
 import { Button, Table } from 'components/core-ui-lib';
 import AddEditUser from 'components/admin/modals/AddEditUser';
+import AddEditPermissionGroup from 'components/admin/modals/AddEditPermissionGroup';
 import Layout from 'components/Layout';
 import { useEffect, useState } from 'react';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
@@ -14,6 +15,7 @@ export default function Users({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const [userRowData, setUserRowData] = useState([]);
   const [showUsersModal, setShowUsersModal] = useState(false);
+  const [showPermissionGroupModal, setShowPermissionGroupModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
 
   const populateUserTable = async () => {
@@ -49,9 +51,17 @@ export default function Users({
     }
   }, [userRowData]);
 
-  const handleModalClose = (refresh = false) => {
+  const handleUsersModalClose = (refresh = false) => {
     setSelectedUser(null);
     setShowUsersModal(false);
+    if (refresh) {
+      populateUserTable();
+    }
+  };
+
+  const handlePermissionGroupModalClose = (refresh = false) => {
+    setSelectedUser(null);
+    setShowPermissionGroupModal(false);
     if (refresh) {
       populateUserTable();
     }
@@ -134,7 +144,12 @@ export default function Users({
           <div className="flex flex-row justify-between items-center my-4">
             <div className="text-primary-navy text-xl font-bold">Your Permission Groups</div>
             <div className="flex flex-row gap-4">
-              <Button className="px-8 mt-2 -mb-1" variant="secondary" text="Add New Permission Group" />
+              <Button
+                className="px-8 mt-2 -mb-1"
+                variant="secondary"
+                text="Add New Permission Group"
+                onClick={() => setShowPermissionGroupModal(true)}
+              />
             </div>
           </div>
 
@@ -150,7 +165,16 @@ export default function Users({
       {showUsersModal && (
         <AddEditUser
           visible={showUsersModal}
-          onClose={handleModalClose}
+          onClose={handleUsersModalClose}
+          permissions={permissionsList}
+          productions={productionsList}
+          selectedUser={selectedUser}
+        />
+      )}
+      {showPermissionGroupModal && (
+        <AddEditPermissionGroup
+          visible={showPermissionGroupModal}
+          onClose={handlePermissionGroupModalClose}
           permissions={permissionsList}
           productions={productionsList}
           selectedUser={selectedUser}
