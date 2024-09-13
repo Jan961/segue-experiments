@@ -46,7 +46,7 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
     }, [showIntermediate]);
 
     return (
-      <div className={`${checked || showIntermediate ? 'flex' : ''} flex items-center gap-2 ${className}`}>
+      <div className={`${checked || showIntermediate ? 'flex' : ''} flex items-center gap-2 relative ${className}`}>
         <input
           ref={ref}
           id={`form-input-checkbox-${id}`}
@@ -73,11 +73,11 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
         {showIntermediate && (
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            width="19"
-            height="19"
-            viewBox="0 0 19 19"
+            width="20"
+            height="20"
+            viewBox="0 0 20 20"
             fill="none"
-            className="absolute w-4 h-4 pointer-events-none stroke-white"
+            className="absolute w-5 h-5 pointer-events-none"
           >
             <g clipPath="url(#clip0_41_113)">
               <rect x="1.1875" y="1.78125" width="16.625" height="15.4375" fill="white" />
@@ -88,7 +88,7 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
             </g>
             <defs>
               <clipPath id="clip0_41_113">
-                <rect width="19" height="19" fill="white" />
+                <rect width="20" height="20" fill="white" />
               </clipPath>
             </defs>
           </svg>

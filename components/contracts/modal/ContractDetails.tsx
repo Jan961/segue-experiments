@@ -140,23 +140,20 @@ const ContractDetails = ({ contract = {}, onChange = noop }: ContractDetailsProp
           onChange={(value) => handleChange('lastDayOfWork', value?.toISOString?.() || '')}
         />
       </div>
-      <div className="flex items-center gap-2 w-full">
+      <div className="flex items-center gap-2">
         <Label className="w-36 !font-bold text-sm" text="Specific Availability" />
-        <div className="grow max-w-96">
-          <TextInput
-            className="grow"
-            testId="contract-details-specific-availability-notes"
-            placeholder="Specific availability notes"
-            value={specificAvailabilityNotes}
-            onChange={(event) => handleChange('specificAvailabilityNotes', event.target.value)}
-          />
-        </div>
+        <TextInput
+          testId="contract-details-specific-availability-notes"
+          placeholder="Specific availability notes"
+          value={specificAvailabilityNotes}
+          onChange={(event) => handleChange('specificAvailabilityNotes', event.target.value)}
+        />
       </div>
       <div className="flex flex-row gap-2">
         <Label className="!font-bold text-sm w-36" text="Required at Specific Publicity Events" />
-        <div className="flex flex-col gap-2 w-full">
+        <div className="flex flex-col gap-2">
           {publicityEventList.map((publicityEvent, i) => (
-            <div key={i} className="flex gap-2 items-center w-full">
+            <div key={i} className="flex gap-2 items-center">
               <PublicityEventDetails
                 testId={`contract-details-publicity-event-${i}`}
                 details={publicityEvent}

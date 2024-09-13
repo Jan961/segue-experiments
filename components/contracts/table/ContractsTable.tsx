@@ -22,6 +22,14 @@ export default function ContractsTable({ rowData }: ContractsTableProps) {
     getRowStyle: (params) => {
       return params.data.status === 'U' ? { fontStyle: 'italic' } : '';
     },
+    getRowNodeId: (data) => {
+      return data.id;
+    },
+    onRowDataUpdated: (params) => {
+      params.api.forEachNode((rowNode) => {
+        rowNode.id = rowNode.data.date;
+      });
+    },
   };
 
   useEffect(() => {
@@ -60,7 +68,7 @@ export default function ContractsTable({ rowData }: ContractsTableProps) {
 
   return (
     <>
-      <div className="w-full h-[calc(100%-140px)]">
+      <div className="w-full h-[calc(100%-140px)]" data-testid="venue-contracts-table">
         <Table
           columnDefs={contractsColumnDefs}
           rowData={rows}

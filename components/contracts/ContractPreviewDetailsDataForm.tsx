@@ -1,5 +1,5 @@
 import { IContractSchedule, IContractDetails, IScheduleDay } from './types';
-import { useMemo, useRef } from 'react';
+import { useRef, useMemo } from 'react';
 import { useRecoilValue } from 'recoil';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import { ProductionDTO } from 'interfaces';

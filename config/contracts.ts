@@ -279,7 +279,7 @@ export const contractDepartmentOptions = [
 
 export const contractTemplateOptions = [
   {
-    text: 'Jendagi Template',
+    text: 'Contract Template',
     value: 1,
   },
 ];
