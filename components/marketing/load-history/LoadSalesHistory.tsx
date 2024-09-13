@@ -85,7 +85,7 @@ const LoadSalesHistory = () => {
       }
 
       const fileID = fileCreateResponse.id;
-      const DBUpdateResponse = await axios.post('/api/marketing/load-history/entire-create', {
+      const DBUpdateResponse = await axios.post('/api/marketing/load-history/create', {
         spreadsheetData,
         selectedProdId: selected,
         fileID,
