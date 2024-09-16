@@ -3,6 +3,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { getEmailFromReq, checkAccess } from 'services/userService';
 import { getDealMemoCall, getPrice, getTechProvision, getContactIdData, getDealMemoHold } from '../utils';
 import { omit } from 'radash';
+import { isUndefined } from 'utils';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -55,25 +56,29 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         },
       });
 
-      // create sales email list
-      const emailSalesRecipients = data.SendTo.map((accId) => {
-        return {
-          DMSRDeMoId: existingDealMemo.Id,
-          DMSRAccUserId: accId,
-        };
-      });
+      if (!isUndefined(data.SendTo)) {
+        // create sales email list
+        const emailSalesRecipients = data.SendTo.filter(
+          (accId) => accId !== 'select_all' && typeof accId !== 'string',
+        ).map((accId) => {
+          return {
+            DMSRDeMoId: existingDealMemo.Id,
+            DMSRAccUserId: accId,
+          };
+        });
 
-      // first delete DealMemoSalesEmailRecipient records with matching deal memo id
-      await prisma.DealMemoSalesEmailRecipient.deleteMany({
-        where: {
-          DMSRDeMoId: existingDealMemo.Id,
-        },
-      });
+        // first delete DealMemoSalesEmailRecipient records with matching deal memo id
+        await prisma.DealMemoSalesEmailRecipient.deleteMany({
+          where: {
+            DMSRDeMoId: existingDealMemo.Id,
+          },
+        });
 
-      // create records for emails attached to this deal memo now
-      await prisma.DealMemoSalesEmailRecipient.createMany({
-        data: emailSalesRecipients,
-      });
+        // create records for emails attached to this deal memo now
+        await prisma.DealMemoSalesEmailRecipient.createMany({
+          data: emailSalesRecipients,
+        });
+      }
     } else {
       updateCreateDealMemo = await prisma.dealMemo.create({
         data: {
@@ -96,15 +101,18 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         },
       });
 
-      const emailSalesRecipients = data.SendTo.map((accId) => {
-        return {
-          DMSRDeMoId: updateCreateDealMemo.Id,
-          DMSRAccUserId: accId,
-        };
-      });
-
-      // create sales email link list
-      await prisma.DealMemoSalesEmailRecipient.createMany(emailSalesRecipients);
+      if (!isUndefined(data.SendTo)) {
+        const emailSalesRecipients = data.SendTo.filter(
+          (accId) => accId !== 'select_all' && typeof accId !== 'string',
+        ).map((accId) => {
+          return {
+            DMSRDeMoId: existingDealMemo.Id,
+            DMSRAccUserId: accId,
+          };
+        });
+        // create sales email link list
+        await prisma.DealMemoSalesEmailRecipient.createMany(emailSalesRecipients);
+      }
     }
 
     res.status(200).json(updateCreateDealMemo);

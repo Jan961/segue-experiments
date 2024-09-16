@@ -9,7 +9,7 @@ import useAxios from 'hooks/useAxios';
 import { SelectOption } from './MarketingHome';
 import { getWeekDayShort, DATE_PATTERN } from 'services/dateService';
 import formatInputDate from 'utils/dateInputFormat';
-import { currencyState } from 'state/marketing/currencyState';
+import { currencyState } from 'state/global/currencyState';
 import axios from 'axios';
 
 type TourResponse = {

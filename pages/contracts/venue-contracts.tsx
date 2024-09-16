@@ -38,6 +38,9 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     global: {
       productionJump,
     },
+    contracts: {
+      currencySymbol: { symbol: '' },
+    },
   };
 
   return {

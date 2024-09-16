@@ -8,7 +8,7 @@ import { SelectOption } from '../MarketingHome';
 import { addDurationToDate, getMonday, toISO } from 'services/dateService';
 import { isNullOrEmpty } from 'utils';
 import { Spinner } from 'components/global/Spinner';
-import { currencyState } from 'state/marketing/currencyState';
+import { currencyState } from 'state/global/currencyState';
 import { UpdateWarningModal } from '../modal/UpdateWarning';
 import axios from 'axios';
 
