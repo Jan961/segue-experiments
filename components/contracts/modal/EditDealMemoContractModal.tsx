@@ -2138,9 +2138,16 @@ export const EditDealMemoContractModal = ({
             text="Export"
             iconProps={{ className: 'h-4 w-3' }}
             sufixIconName="excel"
+            testId="deal-memo-export"
           />
 
-          <Button onClick={() => saveDemoModalData()} className="ml-4 w-33" variant="primary" text="Save and Close" />
+          <Button
+            onClick={() => saveDemoModalData()}
+            className="ml-4 w-33"
+            variant="primary"
+            text="Save and Close"
+            testId="deal-memo-save-and-close"
+          />
         </div>
         {isLoading && <LoadingOverlay />}
         <ConfirmationDialog
