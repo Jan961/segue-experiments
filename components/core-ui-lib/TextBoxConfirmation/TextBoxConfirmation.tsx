@@ -11,11 +11,7 @@ const TextBoxConfirmation = ({ requiredMessage, setValid }: TextBoxConfirmationP
 
   const onChange = (e) => {
     setInputMessage(e.target.value);
-    if (e.target.value !== requiredMessage) {
-      setValid(false);
-    } else {
-      setValid(true);
-    }
+    setValid(e.target.value !== requiredMessage);
   };
 
   return (

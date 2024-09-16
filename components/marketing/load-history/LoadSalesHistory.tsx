@@ -60,14 +60,18 @@ const LoadSalesHistory = () => {
   };
 
   const onSave = async (file, onProgress, onError, onUploadingImage) => {
-    const {
-      file: validateFile,
-      spreadsheetIssues,
-      spreadsheetData,
-    } = await validateSpreadsheetFile(file, prodCode, venueList, dateRange);
-    setUploadedFile(validateFile);
-    setUploadParams({ onProgress, onError, onUploadingImage, spreadsheetIssues, spreadsheetData });
-    setConfirmationModalVisible(true);
+    try {
+      const {
+        file: validateFile,
+        spreadsheetIssues,
+        spreadsheetData,
+      } = await validateSpreadsheetFile(file, prodCode, venueList, dateRange);
+      setUploadedFile(validateFile);
+      setUploadParams({ onProgress, onError, onUploadingImage, spreadsheetIssues, spreadsheetData });
+      setConfirmationModalVisible(true);
+    } catch (err) {
+      console.error(err, 'An error occured when trying to validate the spreadsheet data');
+    }
   };
 
   const handleUpload = async (file, spreadsheetData, onProgress, onError, onUploadingImage) => {
