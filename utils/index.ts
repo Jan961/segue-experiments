@@ -156,3 +156,26 @@ export const checkDecimalStringFormat = (decimalString: string, precision: numbe
   if (integerPart.length > precision - scale || (fractionalPart && fractionalPart.length > scale)) return false;
   return true;
 };
+
+export const formatDecimalValue = (decimalString: any) => {
+  if (isNullOrEmpty(decimalString)) {
+    return '';
+  }
+
+  const floatValue = parseFloat(decimalString);
+
+  if (isNaN(floatValue)) {
+    return '';
+  }
+
+  return floatValue.toFixed(2);
+};
+
+export const validateWhat3Words = (input: string) => {
+  const wordParts = input.replace('/', '').split('.');
+  if (wordParts.length === 3) {
+    return true;
+  } else {
+    return false;
+  }
+};
