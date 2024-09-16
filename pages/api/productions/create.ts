@@ -1,11 +1,19 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { pick } from 'radash';
 import * as yup from 'yup';
-import { ProductionDTO } from 'interfaces';
 import prisma from 'lib/prisma';
 import { getEmailFromReq, checkAccess } from 'services/userService';
 import { isNullOrUndefined } from 'utils';
 import { productionSchema } from 'validators/production';
+
+const processRunningTm = (strTime) => {
+  if (isNullOrUndefined(strTime)) {
+    return null;
+  }
+
+  const [hours, minutes] = strTime.split(':');
+  return new Date(Date.UTC(1970, 0, 1, hours, minutes));
+};
 
 export const mapToPrismaFields = ({
   code: Code,
@@ -32,7 +40,7 @@ export const mapToPrismaFields = ({
   Image,
   ProdCoId,
   ReportCurrencyCode,
-  RunningTime,
+  RunningTime: processRunningTm(RunningTime),
   RunningTimeNote,
   DateBlock: dateBlockList.map(
     ({ name: Name, startDate: StartDate, endDate: EndDate, isPrimary: IsPrimary, id: Id }) => ({
@@ -46,7 +54,7 @@ export const mapToPrismaFields = ({
 });
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
-  const production: Partial<ProductionDTO> = mapToPrismaFields(req.body);
+  const production = mapToPrismaFields(req.body);
   const { ShowId, Image } = production;
   const email = await getEmailFromReq(req);
   const access = await checkAccess(email, { ShowId });
@@ -60,6 +68,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           'IsArchived',
           'SalesFrequency',
           'SalesEmail',
+          'RunningTime',
           'RunningTimeNote',
           'ReportCurrencyCode',
           'ProdCoId',
