@@ -5,7 +5,7 @@ export const getPrice = (dealMemoPrice) => {
     if (priceData.DMPId) {
       const price = {
         where: { DMPId: priceData.DMPId },
-        data: priceData,
+        data: { ...priceData, DMPTicketPrice: parseFloat(priceData.DMPTicketPrice) },
       };
       delete price.data.DMPId;
       delete price.data.DMPDeMoId;
