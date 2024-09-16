@@ -58,7 +58,6 @@ const createExcelFromData = (data, bookingInfo, productionName, venueAndDate) =>
   dataHeaderRow3.height = 30;
 
   createHeaderCell(dataHeaderRow3.getCell(1), 'Week', 1, 12);
-  // createHeaderCell(dataHeaderRow3.getCell(2), 'Week of', 1, 12);
 
   let columnIndex = 2;
   bookingIds.forEach((bookingId) => {
@@ -73,10 +72,7 @@ const createExcelFromData = (data, bookingInfo, productionName, venueAndDate) =>
 
   data.forEach((item, index) => {
     const isLastRow = index === data.length - 1;
-    const rowData = [
-      isLastRow ? 'Final' : `Week ${item.SetBookingWeekNum}`,
-      // moment(item.SetProductionWeekDate).format('DD/MM/YYYY'),
-    ];
+    const rowData = [isLastRow ? 'Final' : `Week ${item.SetBookingWeekNum}`];
     const currencySymbols = [];
     bookingIds.forEach((bookingId) => {
       const bookingData = item.data.find((d) => d.BookingId === bookingId) || {};
