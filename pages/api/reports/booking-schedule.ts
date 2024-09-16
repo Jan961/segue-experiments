@@ -159,7 +159,7 @@ const handler = async (req, res) => {
 
   const map: { [key: string]: SCHEDULE_VIEW } = formattedData.reduce((acc, x) => ({ ...acc, [getKey(x)]: x }), {});
   const daysDiff = moment(to).diff(moment(from), 'days');
-  let rowNo = 5;
+  let rowNo = 8;
   let prevProductionWeekNum = '';
   let lastWeekMetaInfo = {
     weekTotalPrinted: false,
@@ -169,13 +169,15 @@ const handler = async (req, res) => {
   let mileage: number[] = [];
   let totalTime: string[] = [];
   let totalMileage: number[] = [];
-
   for (let i = 1; i <= daysDiff; i++) {
     lastWeekMetaInfo = { ...lastWeekMetaInfo, weekTotalPrinted: false };
     const weekDay = moment(moment(from).add(i - 1, 'day')).format('dddd');
+    const nextDate = moment(moment(from).add(i, 'day'));
     const dateInIncomingFormat = moment(moment(from).add(i - 1, 'day'));
     const key = getKey({ FullProductionCode, ShowName, EntryDate: dateInIncomingFormat.format('YYYY-MM-DD') });
+    const nextDayKey = getKey({ FullProductionCode, ShowName, EntryDate: nextDate.format('YYYY-MM-DD') });
     const value: SCHEDULE_VIEW = map[key];
+    const nextDayValue: SCHEDULE_VIEW = map[nextDayKey];
 
     if (!value) {
       worksheet.addRow([weekDay.substring(0, 3), dateInIncomingFormat.format('DD/MM/YY'), `${prevProductionWeekNum}`]);
@@ -187,7 +189,8 @@ const handler = async (req, res) => {
         cellColor: null,
       });
     } else {
-      const { ProductionWeekNum, Location, EntryName, TimeMins, Mileage } = value;
+      const { ProductionWeekNum, Location, EntryName, TimeMins, Mileage } = value || {};
+      const { Location: nextDayLocation } = nextDayValue || {};
       const formattedTime = TimeMins ? minutesInHHmmFormat(Number(TimeMins)) : '';
       time.push(formattedTime || '00:00');
       mileage.push(Number(Mileage) || 0);
@@ -199,8 +202,7 @@ const handler = async (req, res) => {
         `${ProductionWeekNum}`,
         EntryName || '',
         Location || '',
-        formattedTime,
-        Number(Mileage) || '',
+        ...((nextDayLocation !== Location && [formattedTime, Number(Mileage) || '']) || []),
       ]);
     }
     rowNo++;
@@ -248,6 +250,7 @@ const handler = async (req, res) => {
       colorCell({ worksheet, row: rowNo, col: 3, argbColor: COLOR_HEXCODE.CREAM });
     }
     lastWeekMetaInfo = { ...lastWeekMetaInfo, prevProductionWeekNum };
+    console.table(lastWeekMetaInfo);
   }
 
   if (time.length) {
@@ -314,7 +317,7 @@ const handler = async (req, res) => {
   for (let row = 2; row <= headerRowsLength; row++) {
     styleHeader({ worksheet, row, numberOfColumns });
   }
-  for (let row = 1; row <= 4; row++) {
+  for (let row = 1; row <= headerRowsLength; row++) {
     makeRowTextBoldAndAllignLeft({ worksheet, row, numberOfColumns });
   }
   addBorderToAllCells({ worksheet });

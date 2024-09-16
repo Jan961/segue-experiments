@@ -1,5 +1,4 @@
 import ExcelJS from 'exceljs';
-import moment from 'moment';
 import { getArchivedSalesList } from 'pages/api/marketing/sales/read/archived';
 import { isArray } from 'radash';
 import { COLOR_HEXCODE } from 'services/salesSummaryService';
@@ -13,7 +12,7 @@ const createExcelFromData = (data, bookingInfo, productionName, venueAndDate) =>
   const worksheet = workbook.addWorksheet('Archived Sales');
 
   const bookingToProdCode = bookingInfo.reduce((acc, item) => {
-    acc[item.bookingId] = item.prodCode;
+    acc[item.bookingId] = item;
     return acc;
   }, {});
 
@@ -25,7 +24,7 @@ const createExcelFromData = (data, bookingInfo, productionName, venueAndDate) =>
       pattern: 'solid',
       fgColor: { argb: '41A29A' },
     };
-    cell.alignment = { vertical: 'middle', horizontal: 'center' };
+    cell.alignment = { vertical: 'top', horizontal: 'center' };
     cell.border = {
       bottom: { style: 'thin', color: { argb: COLOR_HEXCODE.WHITE } },
       right: { style: 'thin', color: { argb: COLOR_HEXCODE.WHITE } },
@@ -37,7 +36,7 @@ const createExcelFromData = (data, bookingInfo, productionName, venueAndDate) =>
 
   const bookingIds = [...new Set(data.flatMap((item) => item.data.map((d) => d.BookingId)))];
 
-  const totalColumns = 2 + bookingIds.length * 3;
+  const totalColumns = 1 + bookingIds.length * 3;
 
   const headerRow1 = worksheet.addRow(['Venue Archived Sales Report']);
   const headerRow2 = worksheet.addRow([productionName]);
@@ -51,21 +50,24 @@ const createExcelFromData = (data, bookingInfo, productionName, venueAndDate) =>
   headerRow2.height = 30;
   headerRow3.height = 30;
 
-  const dataHeaderRow1 = worksheet.addRow(['', '']);
-  const dataHeaderRow2 = worksheet.addRow(['Week', 'Week of']);
+  const dataHeaderRow1 = worksheet.addRow(['']);
+  const dataHeaderRow2 = worksheet.addRow(['']);
+  const dataHeaderRow3 = worksheet.addRow(['Week']);
   dataHeaderRow1.height = 30;
   dataHeaderRow2.height = 30;
+  dataHeaderRow3.height = 30;
 
-  createHeaderCell(dataHeaderRow2.getCell(1), 'Week', 1, 12);
-  createHeaderCell(dataHeaderRow2.getCell(2), 'Week of', 1, 12);
+  createHeaderCell(dataHeaderRow3.getCell(1), 'Week', 1, 12);
+  // createHeaderCell(dataHeaderRow3.getCell(2), 'Week of', 1, 12);
 
-  let columnIndex = 3;
+  let columnIndex = 2;
   bookingIds.forEach((bookingId) => {
-    const prodCode = bookingToProdCode[bookingId as string] || `Unknown (${bookingId})`;
-    createHeaderCell(dataHeaderRow1.getCell(columnIndex), prodCode, 3, 12);
-    createHeaderCell(dataHeaderRow2.getCell(columnIndex), 'Date', 1, 12);
-    createHeaderCell(dataHeaderRow2.getCell(columnIndex + 1), 'Seats', 1, 12);
-    createHeaderCell(dataHeaderRow2.getCell(columnIndex + 2), 'Value', 1, 12);
+    const info = bookingToProdCode[bookingId as string] || `Unknown (${bookingId})`;
+    createHeaderCell(dataHeaderRow1.getCell(columnIndex), `${info.prodName}`, 3, 12);
+    createHeaderCell(dataHeaderRow2.getCell(columnIndex), `No. of Performances: ${info.numPerfs}`, 3, 12);
+    createHeaderCell(dataHeaderRow3.getCell(columnIndex), 'Date', 1, 12);
+    createHeaderCell(dataHeaderRow3.getCell(columnIndex + 1), 'Seats', 1, 12);
+    createHeaderCell(dataHeaderRow3.getCell(columnIndex + 2), 'Value', 1, 12);
     columnIndex += 3;
   });
 
@@ -73,7 +75,7 @@ const createExcelFromData = (data, bookingInfo, productionName, venueAndDate) =>
     const isLastRow = index === data.length - 1;
     const rowData = [
       isLastRow ? 'Final' : `Week ${item.SetBookingWeekNum}`,
-      moment(item.SetProductionWeekDate).format('DD/MM/YYYY'),
+      // moment(item.SetProductionWeekDate).format('DD/MM/YYYY'),
     ];
     const currencySymbols = [];
     bookingIds.forEach((bookingId) => {
@@ -91,7 +93,7 @@ const createExcelFromData = (data, bookingInfo, productionName, venueAndDate) =>
       // column number starts from 1
       // subtract first two cells for week and weekof
       const salesIndex = colNumber - 2;
-      cell.alignment = { vertical: 'middle', horizontal: 'center' };
+      cell.alignment = { vertical: 'top', horizontal: 'center' };
       if (colNumber <= 2) {
         cell.font = { bold: true };
       }
@@ -109,6 +111,7 @@ const createExcelFromData = (data, bookingInfo, productionName, venueAndDate) =>
         const isValueCol = salesIndex % 3 === 0;
         if (isSeatsCol || isValueCol) {
           cell.alignment = {
+            vertical: 'top',
             horizontal: ALIGNMENT.RIGHT,
           };
           cell.numFmt = '#,##0';
