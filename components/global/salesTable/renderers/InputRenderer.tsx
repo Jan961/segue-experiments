@@ -1,7 +1,6 @@
 import { TextInput } from 'components/core-ui-lib';
-import { VENUE_CURRENCY_SYMBOLS } from 'types/MarketingTypes';
 import { ChangeEvent } from 'react';
-import { isNullOrEmpty } from 'utils';
+import { isNullOrEmpty, isUndefined } from 'utils';
 interface Standard {
   field: string;
 }
@@ -13,6 +12,8 @@ interface SelectRendererProps {
   colDef?: Standard;
   holdValue?: any;
   data?: any;
+  currency?: string;
+  onBlur?: (value: ChangeEvent<HTMLInputElement>, holdValue: any, HoldTypeName: any, field: string) => void;
 }
 
 const formatValue = (value: any) => {
@@ -28,9 +29,7 @@ const formatValue = (value: any) => {
 const InputRenderer = (props: SelectRendererProps) => {
   return (
     <div className={`pl-1 pr-2 ${props.colDef.field === 'value' ? 'mt-0' : 'mt-1'} flex `}>
-      {props.colDef.field === 'value' && (
-        <div className="text-primary-input-text mr-2">{VENUE_CURRENCY_SYMBOLS.POUND}</div>
-      )}
+      {props.colDef.field === 'value' && <div className="text-primary-input-text mr-2">{props.currency || ''}</div>}
       <TextInput
         id="venueText"
         type="number"
@@ -41,6 +40,10 @@ const InputRenderer = (props: SelectRendererProps) => {
             : ''
         }
         onChange={(value) => props.onChange(value, props.holdValue, props.data.HoldTypeName, props.colDef.field)}
+        onBlur={(value) =>
+          !isUndefined(props.onBlur) &&
+          props.onBlur(value, props.holdValue, props.data.HoldTypeName, props.colDef.field)
+        }
       />
     </div>
   );

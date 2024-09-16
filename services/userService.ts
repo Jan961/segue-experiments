@@ -148,3 +148,34 @@ export const createClerkUserWithoutSession = async (
   });
   return response;
 };
+
+export const getUserPermisisons = async (email: string, organisationId: string) => {
+  const accountUser = await prisma.AccountUser.findFirst({
+    where: {
+      User: {
+        UserEmail: {
+          equals: email,
+        },
+      },
+      Account: {
+        AccountOrganisationId: {
+          equals: organisationId,
+        },
+      },
+    },
+    select: {
+      Account: true,
+      AccountUserPermission: {
+        select: {
+          Permission: true,
+        },
+      },
+    },
+  });
+  const formattedPermissions =
+    accountUser?.AccountUserPermission.map(({ Permission }) => ({
+      permissionId: Permission.PermissionId,
+      permissionName: Permission.PermissionName,
+    })) || [];
+  return formattedPermissions;
+};
