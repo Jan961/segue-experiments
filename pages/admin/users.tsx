@@ -6,17 +6,21 @@ import AddEditPermissionGroup from 'components/admin/modals/AddEditPermissionGro
 import Layout from 'components/Layout';
 import { useEffect, useState } from 'react';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
-import { getPermissionsList } from 'services/permissionService';
+import { getPermissionGroupsList, getPermissionsList } from 'services/permissionService';
 import { getAllProductions } from 'services/productionService';
+import { useRouter } from 'next/router';
 
 export default function Users({
   permissionsList,
   productionsList,
+  permisisonGroups,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const [userRowData, setUserRowData] = useState([]);
   const [showUsersModal, setShowUsersModal] = useState(false);
   const [showPermissionGroupModal, setShowPermissionGroupModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [selectedGroup, setSelectedGroup] = useState(null);
+  const router = useRouter();
 
   const populateUserTable = async () => {
     try {
@@ -63,13 +67,18 @@ export default function Users({
     setSelectedUser(null);
     setShowPermissionGroupModal(false);
     if (refresh) {
-      populateUserTable();
+      router.replace(router.asPath);
     }
   };
 
   const handleUserEdit = ({ data }) => {
     setSelectedUser(data);
     setShowUsersModal(true);
+  };
+
+  const handlePermissionGroupEdit = ({ data }) => {
+    setSelectedGroup(data);
+    setShowPermissionGroupModal(true);
   };
 
   return (
@@ -156,9 +165,10 @@ export default function Users({
           <Table
             testId="admin-permission-group-table"
             columnDefs={permissionGroupColDef(null)}
-            rowData={[]}
+            rowData={permisisonGroups}
             styleProps={styleProps}
             tableHeight={300}
+            onRowDoubleClicked={handlePermissionGroupEdit}
           />
         </div>
       </div>
@@ -177,14 +187,16 @@ export default function Users({
           onClose={handlePermissionGroupModalClose}
           permissions={permissionsList}
           productions={productionsList}
-          selectedUser={selectedUser}
+          groups={permisisonGroups}
+          selectedGroup={selectedGroup}
         />
       )}
     </Layout>
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async () => {
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const permisisonGroups = await getPermissionGroupsList(ctx.req);
   const permissionsList = await getPermissionsList();
   const productions = await getAllProductions();
   const formattedProductions = productions.map((t: any) => ({
@@ -201,6 +213,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
     props: {
       productionsList: formattedProductions || [],
       permissionsList: permissionsList || [],
+      permisisonGroups: permisisonGroups || [],
     },
   };
 };
