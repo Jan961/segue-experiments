@@ -1,5 +1,8 @@
-import { nanoid } from 'nanoid';
-import { DateTimeEntry } from 'types/ContractTypes';
+import { Time } from 'components/core-ui-lib/TimeInput/TimeInput';
+import { startOfDay } from 'date-fns';
+import { getShortWeekFormat } from 'services/dateService';
+import { formatDecimalValue, isNullOrEmpty } from 'utils';
+import formatInputDate from 'utils/dateInputFormat';
 
 const defaultPrice = {
   Premium: { DMPTicketName: 'Premium', DMPTicketPrice: 0, DMPNumTickets: 0, DMPDeMoId: 0, DMPNotes: '' },
@@ -56,7 +59,7 @@ export const filterPrice = (dealMemoPrice) => {
     if (defaultPrice[price.DMPTicketName]) {
       defaultPrice[price.DMPTicketName] = {
         DMPTicketName: price.DMPTicketName,
-        DMPTicketPrice: price.DMPTicketPrice,
+        DMPTicketPrice: formatDecimalValue(price.DMPTicketPrice),
         DMPNumTickets: price.DMPNumTickets,
         DMPId: price.DMPId,
         DMPDeMoId: price.DMPDeMoId,
@@ -89,7 +92,8 @@ export const filterHoldTypeData = (dealHoldType, dealMemoHoldData) => {
   }
   const holdTypeTableData = dealHoldType.map((holdData) => {
     if (dealHoldObj[holdData.HoldTypeId]) {
-      holdData.value = dealHoldObj[holdData.HoldTypeId].DMHoldValue;
+      const decimalPrice = formatDecimalValue(dealHoldObj[holdData.HoldTypeId].DMHoldValue);
+      holdData.value = decimalPrice === '0.00' ? '' : decimalPrice;
       holdData.seats = dealHoldObj[holdData.HoldTypeId].DMHoldSeats;
       holdData.DMHoldDeMoId = holdData.HoldTypeId;
     } else {
@@ -108,6 +112,11 @@ export const filterPercentage = (num: number) => {
     return Math.floor(num * 100) / 100;
   }
   return 100;
+};
+
+export const formatDecimalOnBlur = (event: any) => {
+  const value = event.target.value;
+  return formatDecimalValue(value);
 };
 
 export const filterCurrencyNum = (num: number) => {
@@ -211,38 +220,78 @@ export const salaryDetailsData = [
   { first: 'Country', second: 'Country', type: 'select' },
 ];
 
-// Expect string to come in format "HH:MM? YYYY-MM-DD" - where HH:MM may not be included
-export const parseAndSortDates = (arr: string[]): DateTimeEntry[] => {
-  const parsedEntries = arr.map((str) => {
-    const [timePart, isoDatePart] = str.split('? ');
-    return { timePart: timePart.trim(), date: new Date(isoDatePart.trim()) };
+export const parseAndSortDates = (arr: string[]): Array<string> => {
+  // if input array length is false, return emptry array
+  if (arr.length === 0) {
+    return [];
+  }
+
+  // if the entry has a time pre-pended - remove this and use the datetime in JS date format
+  const parsedEntries = arr.map((show) => {
+    const [time, date] = show.split('? ');
+    return { time, date: new Date(date) };
   });
 
+  // Sort dates in ascending order
   parsedEntries.sort((a, b) => a.date.getTime() - b.date.getTime());
 
-  const groupedByDate = parsedEntries.reduce(
+  // Group by date and format as object - e.g. {dd-mm-yy: {dt: js date, times: [array of times in hh:mm]}}
+  const groupedByDate: { [key: number]: string[] } = parsedEntries.reduce(
     (acc, entry) => {
-      const dateKey = entry.date.toISOString().split('T')[0];
-      if (!acc[dateKey]) {
-        acc[dateKey] = [];
-      }
-      acc[dateKey].push(entry.timePart);
+      const dateKey = startOfDay(entry.date).getTime();
+      acc[dateKey] = acc[dateKey] || [];
+
+      acc[dateKey].push(entry.time === '' ? 'TBC' : entry.time);
       return acc;
     },
-    {} as Record<string, string[]>,
+    {} as { [key: number]: string[] },
   );
 
-  const result = Object.entries(groupedByDate).map(([date, times]) => {
-    const sortedTimes = times.filter(Boolean).sort();
-    const formattedDate = sortedTimes.length > 0 ? `${date} ${sortedTimes.join(' ')}` : date;
-    return { formattedDate, id: nanoid() };
+  // Process groupedByDate to format for UI
+  const dayArray: string[] = [];
+  Object.entries(groupedByDate).forEach(([dateKey, times]) => {
+    const epochTime = parseInt(dateKey);
+    const date = new Date(epochTime);
+    dayArray.push(`${getShortWeekFormat(date)} ${formatInputDate(date)} ${times.join('; ')}`);
   });
 
-  return result;
+  return dayArray;
 };
 
 export const checkDecimalStringFormat = (decimalString, precision, scale) => {
   const [integerPart, fractionalPart] = decimalString.split('.');
   if (integerPart.length > precision - scale || (fractionalPart && fractionalPart.length > scale)) return false;
   return true;
+};
+
+export const dtToTime = (datetime: Date): Time => {
+  if (datetime === null) {
+    return null;
+  }
+
+  return {
+    hrs: datetime.getHours().toString(),
+    min: datetime.getMinutes().toString(),
+    sec: datetime.getSeconds().toString(),
+  };
+};
+
+export const timeToDateTime = (inputTime: Time | string): Date => {
+  if (isNullOrEmpty(inputTime)) {
+    return null;
+  }
+
+  let time: Time = {};
+
+  if (typeof inputTime === 'string') {
+    const timeSplit = inputTime.split(':');
+    time = { hrs: timeSplit[0], min: timeSplit[1] };
+  } else {
+    time = inputTime;
+  }
+
+  const datetime = new Date();
+  datetime.setHours(parseInt(time.hrs), parseInt(time.min), 0);
+
+  return datetime;
 };

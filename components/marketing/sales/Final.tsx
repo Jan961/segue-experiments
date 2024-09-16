@@ -4,7 +4,7 @@ import { useRecoilState, useRecoilValue } from 'recoil';
 import { bookingJumpState } from 'state/marketing/bookingJumpState';
 import { isNullOrEmpty } from 'utils';
 import { Spinner } from 'components/global/Spinner';
-import { currencyState } from 'state/marketing/currencyState';
+import { currencyState } from 'state/global/currencyState';
 import { currentUserState } from 'state/marketing/currentUserState';
 import { TourResponse } from './Entry';
 import { productionJumpState } from 'state/booking/productionJumpState';
