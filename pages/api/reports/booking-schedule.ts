@@ -1,6 +1,5 @@
 import ExcelJS from 'exceljs';
 import prisma from 'lib/prisma';
-import moment from 'moment';
 import {
   COLOR_HEXCODE,
   colorCell,
@@ -14,6 +13,8 @@ import { makeRowTextBoldAndAllignLeft } from './promoter-holds';
 import { convertToPDF } from 'utils/report';
 import { addBorderToAllCells } from 'utils/export';
 import { bookingStatusMap } from 'config/bookings';
+import { add, parseISO, format as dateFormat, differenceInDays } from 'date-fns';
+import { formatDate } from 'services/dateService';
 
 type SCHEDULE_VIEW = {
   ProductionId: number;
@@ -116,9 +117,9 @@ const handler = async (req, res) => {
   const workbook = new ExcelJS.Workbook();
   const formattedData = data.map((x) => ({
     ...x,
-    EntryDate: moment(x.EntryDate).format('YYYY-MM-DD'),
-    ProductionStartDate: moment(x.ProductionStartDate).format('YYYY-MM-DD'),
-    ProductionEndDate: moment(x.ProductionEndDate).format('YYYY-MM-DD'),
+    EntryDate: formatDate(x.EntryDate, 'yyyy-MM-dd'),
+    ProductionStartDate: formatDate(x.ProductionStartDate, 'yyyy-MM-dd'),
+    ProductionEndDate: formatDate(x.ProductionEndDate, 'yyyy-MM-dd'),
   }));
 
   const worksheet = workbook.addWorksheet('Travel Summary', {
@@ -136,16 +137,16 @@ const handler = async (req, res) => {
   }
 
   const { ShowName, FullProductionCode } = data[0];
-  const title = `${FullProductionCode} ${ShowName} Travel Summary - ${moment().format('DD.MM.YY')}`;
+  const title = `${FullProductionCode} ${ShowName} Travel Summary - ${formatDate(new Date(), 'dd.MM.yy')}`;
   let headerRowsLength = 4;
   worksheet.addRow([title]);
   worksheet.addRow([]);
   if (from) {
-    worksheet.addRow([`Start Date: ${moment(formatedFromDate).format('YYYY-MM-DD')}`]);
+    worksheet.addRow([`Start Date: ${formatDate(formatedFromDate, 'yyyy-MM-dd')}`]);
     headerRowsLength++;
   }
   if (to) {
-    worksheet.addRow([`End Date: ${moment(formatedToDate).format('YYYY-MM-DD')}`]);
+    worksheet.addRow([`End Date: ${formatDate(formatedToDate, 'yyyy-MM-dd')}`]);
     headerRowsLength++;
   }
   if (status) {
@@ -158,8 +159,8 @@ const handler = async (req, res) => {
   worksheet.addRow([]);
 
   const map: { [key: string]: SCHEDULE_VIEW } = formattedData.reduce((acc, x) => ({ ...acc, [getKey(x)]: x }), {});
-  const daysDiff = moment(to).diff(moment(from), 'days');
-  let rowNo = 5;
+  const daysDiff = differenceInDays(parseISO(to), parseISO(from));
+  let rowNo = 8;
   let prevProductionWeekNum = '';
   let lastWeekMetaInfo = {
     weekTotalPrinted: false,
@@ -169,16 +170,22 @@ const handler = async (req, res) => {
   let mileage: number[] = [];
   let totalTime: string[] = [];
   let totalMileage: number[] = [];
-
   for (let i = 1; i <= daysDiff; i++) {
     lastWeekMetaInfo = { ...lastWeekMetaInfo, weekTotalPrinted: false };
-    const weekDay = moment(moment(from).add(i - 1, 'day')).format('dddd');
-    const dateInIncomingFormat = moment(moment(from).add(i - 1, 'day'));
-    const key = getKey({ FullProductionCode, ShowName, EntryDate: dateInIncomingFormat.format('YYYY-MM-DD') });
+    const weekDay = dateFormat(add(parseISO(from), { days: i - 1 }), 'eeee');
+    const nextDate = add(parseISO(from), { days: i });
+    const dateInIncomingFormat = add(parseISO(from), { days: i - 1 });
+    const key = getKey({ FullProductionCode, ShowName, EntryDate: formatDate(dateInIncomingFormat, 'yyyy-MM-dd') });
+    const nextDayKey = getKey({ FullProductionCode, ShowName, EntryDate: formatDate(nextDate, 'yyyy-MM-dd') });
     const value: SCHEDULE_VIEW = map[key];
+    const nextDayValue: SCHEDULE_VIEW = map[nextDayKey];
 
     if (!value) {
-      worksheet.addRow([weekDay.substring(0, 3), dateInIncomingFormat.format('DD/MM/YY'), `${prevProductionWeekNum}`]);
+      worksheet.addRow([
+        weekDay.substring(0, 3),
+        formatDate(dateInIncomingFormat, 'dd/MM/yy'),
+        `${prevProductionWeekNum}`,
+      ]);
       colorTextAndBGCell({
         worksheet,
         row: rowNo + 1,
@@ -187,7 +194,8 @@ const handler = async (req, res) => {
         cellColor: null,
       });
     } else {
-      const { ProductionWeekNum, Location, EntryName, TimeMins, Mileage } = value;
+      const { ProductionWeekNum, Location, EntryName, TimeMins, Mileage } = value || {};
+      const { Location: nextDayLocation } = nextDayValue || {};
       const formattedTime = TimeMins ? minutesInHHmmFormat(Number(TimeMins)) : '';
       time.push(formattedTime || '00:00');
       mileage.push(Number(Mileage) || 0);
@@ -195,12 +203,11 @@ const handler = async (req, res) => {
 
       worksheet.addRow([
         weekDay.substring(0, 3),
-        dateInIncomingFormat.format('DD/MM/YY'),
+        formatDate(dateInIncomingFormat, 'dd/MM/yy'),
         `${ProductionWeekNum}`,
         EntryName || '',
         Location || '',
-        formattedTime,
-        Number(Mileage) || '',
+        ...((nextDayLocation !== Location && [formattedTime, Number(Mileage) || '']) || []),
       ]);
     }
     rowNo++;
@@ -314,7 +321,7 @@ const handler = async (req, res) => {
   for (let row = 2; row <= headerRowsLength; row++) {
     styleHeader({ worksheet, row, numberOfColumns });
   }
-  for (let row = 1; row <= 4; row++) {
+  for (let row = 1; row <= headerRowsLength; row++) {
     makeRowTextBoldAndAllignLeft({ worksheet, row, numberOfColumns });
   }
   addBorderToAllCells({ worksheet });
