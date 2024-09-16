@@ -1099,7 +1099,7 @@ export const EditDealMemoContractModal = ({
               />
 
               {errors.sellCapacity && (
-                <div className="flex flex-row space-x-4">
+                <div className="flex flex-row space-x-4" data-testid="seat-capacity-confirmation-warning">
                   <div className="flex flex-col">
                     <div className="flex items-center ml-3 text-primary-red">Are you sure?</div>
                   </div>
@@ -2138,9 +2138,16 @@ export const EditDealMemoContractModal = ({
             text="Export"
             iconProps={{ className: 'h-4 w-3' }}
             sufixIconName="excel"
+            testId="deal-memo-export"
           />
 
-          <Button onClick={() => saveDemoModalData()} className="ml-4 w-33" variant="primary" text="Save and Close" />
+          <Button
+            onClick={() => saveDemoModalData()}
+            className="ml-4 w-33"
+            variant="primary"
+            text="Save and Close"
+            testId="deal-memo-save-and-close"
+          />
         </div>
         {isLoading && <LoadingOverlay />}
         <ConfirmationDialog
