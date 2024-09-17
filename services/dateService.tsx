@@ -1,4 +1,4 @@
-import { startOfWeek, differenceInWeeks, addWeeks, isBefore, isValid, format } from 'date-fns';
+import { startOfWeek, differenceInWeeks, addWeeks, isBefore, isValid, format, parseISO } from 'date-fns';
 import { toZonedTime } from 'date-fns-tz';
 import moment from 'moment';
 
@@ -378,4 +378,39 @@ export const dateToTimeString = (dateStr) => {
 
 export const getTimezonOffset = () => {
   return new Date().getTimezoneOffset();
+};
+
+/**
+ * Formats a date according to the specified format.
+ *
+ * @param {Date | number | string} date - The date to format.
+ * @param {string} dateFormat - The format string.
+ * @returns {string} The formatted date.
+ */
+export const formatDate = (date: Date | number | string, dateFormat: string): string => {
+  let parsedDate: number | Date;
+
+  if (date instanceof Date) {
+    // If date is already a Date object, use it directly
+    parsedDate = date;
+  } else if (typeof date === 'number') {
+    // If date is a timestamp, convert it to a Date object
+    parsedDate = new Date(date);
+  } else if (typeof date === 'string') {
+    // If date is a string, try to parse it as an ISO string first
+    parsedDate = parseISO(date);
+
+    // If parsing as ISO fails, try to parse it using the default parser
+    if (!isValid(parsedDate)) {
+      parsedDate = new Date(date);
+    }
+  } else {
+    return '';
+  }
+
+  if (!isValid(parsedDate)) {
+    return '';
+  }
+
+  return format(parsedDate, dateFormat);
 };
