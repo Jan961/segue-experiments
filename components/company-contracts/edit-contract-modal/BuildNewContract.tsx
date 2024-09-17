@@ -17,9 +17,8 @@ import ScheduleTab from './tabs/ScheduleTab';
 import { ERROR_CODES } from 'config/apiConfig';
 import { contractDepartmentState } from 'state/contracts/contractDepartmentState';
 import { getDepartmentNameByID } from '../utils';
-import { contractTemplateState } from 'state/contracts/contractTemplateState';
-import { getFileUrl } from 'lib/s3';
-// import { TemplateFormComponent } from '../types';
+import { TemplateFormStructure } from '../types';
+// import { contractTemplateState } from 'state/contracts/contractTemplateState';
 
 export interface BuildNewContractProps {
   contractSchedule?: Partial<IContractSchedule>;
@@ -54,24 +53,38 @@ export const BuildNewContract = ({
   const router = useRouter();
   const cancelToken = useAxiosCancelToken();
   const departmentMap = useRecoilValue(contractDepartmentState);
-  const selectedTemplateID = contractSchedule.templateId;
-  const templateMap = useRecoilValue(contractTemplateState);
+  // const selectedTemplateID = contractSchedule.templateId;
+  // const templateMap = useRecoilValue(contractTemplateState);
+
+  const [templateForm, setTemplateForm] = useState<TemplateFormStructure>(null);
   // const [templateDOC, setTemplateDOC] = useState<File>(null);
 
   useEffect(() => {
-    const fetchTemplateDocument = async () => {
+    // const fetchTemplateDocument = async () => {
+    //   try {
+    //     const selectedTemplateLocation = getFileUrl(
+    //       Object.values(templateMap).find((template) => template.id === selectedTemplateID).location,
+    //     );
+    //     const response = axios.get(`/api/file/download?location=${encodeURIComponent(selectedTemplateLocation)}`)
+    //     console.log(selectedTemplateLocation);
+    //   } catch (err) {
+    //     console.error(err, 'Error - failed to fetch template document.');
+    //   }
+    // };
+
+    const fetchTemplateFormStructure = async () => {
       try {
-        const selectedTemplateLocation = getFileUrl(
-          Object.values(templateMap).find((template) => template.id === selectedTemplateID).location,
-        );
-        // const response = axios.get(`/api/file/download?location=${encodeURIComponent(selectedTemplateLocation)}`)
-        console.log(selectedTemplateLocation);
+        const response = await axios.get('/api/company-contracts/read-template/' + contractSchedule.templateId);
+        if (response.data) {
+          setTemplateForm(response.data);
+        }
       } catch (err) {
-        console.error(err, 'Error - failed to fetch template document.');
+        console.error(err, 'Error - failed to fetch template form structure.');
       }
     };
 
-    fetchTemplateDocument();
+    // fetchTemplateDocument();
+    fetchTemplateFormStructure();
   }, []);
 
   const fetchPersonDetails = useCallback(
@@ -257,7 +270,7 @@ export const BuildNewContract = ({
             )}
             {activeViewIndex === 1 && (
               <div className="flex flex-col gap-8 px-16">
-                <ContractDetailsTab />
+                <ContractDetailsTab form={templateForm} />
               </div>
             )}
             {activeViewIndex === 2 && (

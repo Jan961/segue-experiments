@@ -1,11 +1,14 @@
-export interface TemplateFormComponent {
-  CompID: number;
-  RowNum: number;
-  RowLabel: string;
-  isArray: boolean;
-  ArrayName: string;
-  TypeName: string;
-  DocumentTag: string;
-  OrderInRow: number;
-  InputLabel: string;
+export interface TemplateFormStructure {
+  rowID: number;
+  rowNum: number;
+  rowLabel: string;
+  isAList: boolean;
+  listName: string | null;
+  components: {
+    id: number;
+    label: string;
+    orderInRow: number;
+    tag: string;
+    type: string;
+  }[];
 }

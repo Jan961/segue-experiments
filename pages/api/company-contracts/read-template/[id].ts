@@ -12,33 +12,41 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    const contractID = Number(id);
+    const templateID = Number(id);
 
-    const contract = await prisma.ACCContract.findUnique({
-      where: { ContractId: contractID },
-      include: {
-        TemplateID: true,
+    const result = await prisma.templateRow.findMany({
+      where: {
+        TemplateRowTemplateId: templateID,
       },
-    });
-
-    if (!contract) {
-      return res.status(404).json({ message: 'Contract with ID ' + contractID + ' not found' });
-    }
-
-    const TemplateID = contract.TemplateID;
-
-    const formComponents = await prisma.TemplateStructure.findMany({
-      where: { TemplateID },
       include: {
-        types: {
-          select: {
-            TypeName: true,
+        TemplateComponent: {
+          include: {
+            TemplateEntryType: {
+              select: {
+                TETypeName: true,
+              },
+            },
           },
         },
       },
     });
 
-    return res.status(200).json(formComponents);
+    const templatestructure = result.map((row) => ({
+      rowID: row.TemplateRowId,
+      rowNum: row.TemplateRowNum,
+      rowLabel: row.TemplateRowLabel,
+      isAList: row.TemplateRowIsAList,
+      listName: row.TemplateRowListName,
+      components: row.TemplateComponent.map((component) => ({
+        id: component.ComponentId,
+        label: component.ComponentLabel,
+        orderInRow: component.ComponentSeqNo,
+        tag: component.ComponentTag,
+        type: component.TemplateEntryType.TETypeName,
+      })),
+    }));
+
+    return res.status(200).json(templatestructure);
   } catch (err) {
     console.error(err, 'Error - Failed to retrieve Template Form Components');
     return res.status(500).json(err);
