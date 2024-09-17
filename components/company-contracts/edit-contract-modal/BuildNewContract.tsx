@@ -17,7 +17,8 @@ import ScheduleTab from './tabs/ScheduleTab';
 import { ERROR_CODES } from 'config/apiConfig';
 import { contractDepartmentState } from 'state/contracts/contractDepartmentState';
 import { getDepartmentNameByID } from '../utils';
-// import { contractTemplateState } from 'state/contracts/contractTemplateState';
+import { contractTemplateState } from 'state/contracts/contractTemplateState';
+import { getFileUrl } from 'lib/s3';
 // import { TemplateFormComponent } from '../types';
 
 export interface BuildNewContractProps {
@@ -53,25 +54,25 @@ export const BuildNewContract = ({
   const router = useRouter();
   const cancelToken = useAxiosCancelToken();
   const departmentMap = useRecoilValue(contractDepartmentState);
-  // const templateMap = useRecoilValue(contractTemplateState)
+  const selectedTemplateID = contractSchedule.templateId;
+  const templateMap = useRecoilValue(contractTemplateState);
+  // const [templateDOC, setTemplateDOC] = useState<File>(null);
 
-  // const fetchTemplateFormStructure = async () => {
-  //   // Using the loaded AccContractID, get the corresponding template, then get the components associated with that template
-  //   try {
-  //     const response = await axios.get('/api/company-contracts/read-template/' + contractId);
+  useEffect(() => {
+    const fetchTemplateDocument = async () => {
+      try {
+        const selectedTemplateLocation = getFileUrl(
+          Object.values(templateMap).find((template) => template.id === selectedTemplateID).location,
+        );
+        // const response = axios.get(`/api/file/download?location=${encodeURIComponent(selectedTemplateLocation)}`)
+        console.log(selectedTemplateLocation);
+      } catch (err) {
+        console.error(err, 'Error - failed to fetch template document.');
+      }
+    };
 
-  //   } catch (err) {
-  //     console.log(err, "Error - failed to retrieve template form structure")
-  //   }
-  // }
-
-  // const populateForm = () => {
-
-  // }
-
-  // const fetchTemplateDocument = () => {
-
-  // }
+    fetchTemplateDocument();
+  }, []);
 
   const fetchPersonDetails = useCallback(
     async (id: number) => {

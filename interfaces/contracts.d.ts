@@ -22,4 +22,5 @@ export interface IContractSummary {
 export interface IContractTemplate {
   id: number;
   name: string;
+  location: string;
 }

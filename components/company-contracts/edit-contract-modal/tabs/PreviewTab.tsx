@@ -10,10 +10,6 @@ interface ContractPreviewDetailsFormProps {
 }
 
 export const PreviewTab = (_props: ContractPreviewDetailsFormProps) => {
-  // useEffect(()=>{
-  //   // call
-  // })
-
   return (
     <div className="w-full h-full">
       <div className="h-full w-full justify-center flex" />

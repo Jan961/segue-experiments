@@ -12,7 +12,7 @@ import { objectify } from 'radash';
 import { PersonMinimalDTO } from 'interfaces';
 import { IContractSchedule } from '../contracts/types';
 import { contractDepartmentState } from 'state/contracts/contractDepartmentState';
-// import { contractTemplateState } from 'state/contracts/contractTemplateState';
+import { contractTemplateState } from 'state/contracts/contractTemplateState';
 
 export const defaultContractSchedule = {
   production: null,
@@ -26,6 +26,7 @@ export const ContractScheduleModal = ({ openContract, onClose }: { openContract:
   const { productions } = useRecoilValue(productionJumpState);
   const [personMap, setPersonMap] = useRecoilState(personState);
   const departmentMap = useRecoilValue(contractDepartmentState);
+  const templateMap = useRecoilValue(contractTemplateState);
 
   const departmentOptions = useMemo(
     () => transformToOptions(Object.values(departmentMap), 'name', 'id'),
@@ -41,6 +42,8 @@ export const ContractScheduleModal = ({ openContract, onClose }: { openContract:
       transformToOptions(productions, null, 'Id', ({ ShowCode, Code, ShowName }) => `${ShowCode}${Code} ${ShowName}`),
     [productions],
   );
+
+  const templateOptions = useMemo(() => transformToOptions(Object.values(templateMap), 'name', 'id'), [templateMap]);
 
   const [openNewPersonContract, setOpenNewPersonContract] = useState(false);
   const [openNewBuildContract, setOpenNewBuildContract] = useState(false);
@@ -148,7 +151,7 @@ export const ContractScheduleModal = ({ openContract, onClose }: { openContract:
             value={templateId}
             disabled={!production}
             placeholder="Please select a template"
-            options={[]}
+            options={templateOptions}
             isClearable
             isSearchable
           />

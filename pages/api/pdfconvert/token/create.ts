@@ -3,10 +3,12 @@ import jwt from 'jsonwebtoken';
 export default function handler(req, res) {
   const secretKey = process.env.FILE_CONVERSION_SECRET_KEY;
 
+  const EXPIRE_IN = 300 * 60; // currently 5 hours untill token expires
+
   if (req.method === 'POST') {
     const payload = {
       iat: Math.floor(Date.now() / 1000),
-      exp: Math.floor(Date.now() / 1000) + 300 * 60,
+      exp: Math.floor(Date.now() / 1000) + EXPIRE_IN,
     };
 
     const token = jwt.sign(payload, secretKey);
