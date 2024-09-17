@@ -184,7 +184,7 @@ export const getCompanyContractsColumnDefs = (userList = []) => [
     headerClass: ['bgOrangeTextWhite'],
     cellRendererParams: {
       tpActive: true,
-      activeFillColor: '#082B4B',
+      activeFillColor: '#D41818',
       strokeColor: '#082B4B',
     },
     resizable: false,
