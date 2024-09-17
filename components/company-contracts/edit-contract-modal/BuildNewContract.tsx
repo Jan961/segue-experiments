@@ -17,7 +17,7 @@ import ScheduleTab from './tabs/ScheduleTab';
 import { ERROR_CODES } from 'config/apiConfig';
 import { contractDepartmentState } from 'state/contracts/contractDepartmentState';
 import { getDepartmentNameByID } from '../utils';
-import { TemplateFormStructure } from '../types';
+import { TemplateFormRow } from '../types';
 // import { contractTemplateState } from 'state/contracts/contractTemplateState';
 
 export interface BuildNewContractProps {
@@ -56,7 +56,7 @@ export const BuildNewContract = ({
   // const selectedTemplateID = contractSchedule.templateId;
   // const templateMap = useRecoilValue(contractTemplateState);
 
-  const [templateForm, setTemplateForm] = useState<TemplateFormStructure>(null);
+  const [templateForm, setTemplateForm] = useState<TemplateFormRow[]>(null);
   // const [templateDOC, setTemplateDOC] = useState<File>(null);
 
   useEffect(() => {
@@ -211,7 +211,7 @@ export const BuildNewContract = ({
   return (
     <PopupModal
       show={visible}
-      title={'Contract Details - ' + contractId}
+      title="Contract Details"
       titleClass="text-xl text-primary-navy font-bold -mt-2"
       panelClass="h-[95vh] w-[100vw]"
       hasOverflow={false}

@@ -1,4 +1,4 @@
-export interface TemplateFormStructure {
+export interface TemplateFormRow {
   rowID: number;
   rowNum: number;
   rowLabel: string;
