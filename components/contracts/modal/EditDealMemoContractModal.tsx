@@ -24,7 +24,6 @@ import { ConfirmationDialog, Icon, TimeInput } from 'components/core-ui-lib';
 import axios from 'axios';
 import {
   defaultDemoCall,
-  filterHoldTypeData,
   filterPrice,
   filterTechProvision,
   parseAndSortDates,
@@ -32,11 +31,13 @@ import {
   formatDecimalOnBlur,
   timeToDateTime,
   dtToTime,
+  formatDecimalFields,
+  formatSeatKillValues,
 } from '../utils';
-import { DealMemoHold, DealMemoTechProvision } from 'prisma/generated/prisma-client';
+import { DealMemoTechProvision } from 'prisma/generated/prisma-client';
 import { dealMemoInitialState } from 'state/contracts/contractsFilterState';
 import { convertTimeToTodayDateFormat, dateToTimeString } from 'services/dateService';
-import StandardSeatKillsTable from '../table/StandardSeatKillsTable';
+import StandardSeatKillsTable, { SeatKillRow } from '../table/StandardSeatKillsTable';
 import LoadingOverlay from 'components/shows/LoadingOverlay';
 import { CustomOption } from 'components/core-ui-lib/Table/renderers/SelectCellRenderer';
 import { trasformVenueAddress } from 'utils/venue';
@@ -59,7 +60,7 @@ export const EditDealMemoContractModal = ({
   selectedTableCell: AddEditContractsState;
   demoModalData: Partial<DealMemoContractFormData>;
   venueData;
-  dealHoldType: DealMemoHoldType;
+  dealHoldType: Array<DealMemoHoldType>;
 }) => {
   const [formData, setFormData] = useRecoilState(dealMemoInitialState);
   const [contractCheckBox, setContractCheckBox] = useState<boolean>(false);
@@ -71,7 +72,8 @@ export const EditDealMemoContractModal = ({
   const [dealMemoTechProvision, setDealMemoTechProvision] = useState<DealMemoTechProvision[]>([]);
   const [formEdited, setFormEdited] = useState<boolean>(false);
   const [disableDate, setDisableDate] = useState<boolean>(true);
-  const [seatKillsData, setSeatKillsData] = useState([]);
+  const [seatKillsData, setSeatKillsData] = useState(null);
+  const [holdTypeData, setHoldTypeData] = useState<Array<DealMemoHoldType>>();
   const currency = useRecoilValue(currencyState);
   const accountContacts = useRecoilValue(accountContactState);
 
@@ -130,13 +132,20 @@ export const EditDealMemoContractModal = ({
       ...demoModalData,
       DateIssued: isUndefined(demoModalData.DateIssued) ? new Date() : demoModalData.DateIssued,
       RunningTime: timeToDateTime(productionJumpState.RunningTime),
+      ...formatDecimalFields(demoModalData, 'string'),
     });
 
     const priceData = filterPrice(demoModalData.DealMemoPrice);
-    const holdTypeData = filterHoldTypeData(dealHoldType, demoModalData.DealMemoHold);
-    setSeatKillsData(holdTypeData);
-    setdealMemoPriceFormData(priceData[0]);
+    setHoldTypeData(dealHoldType);
 
+    // format seat kill data if undefined
+    if (!isUndefined(demoModalData.DealMemoHold)) {
+      setSeatKillsData(formatSeatKillValues(demoModalData.DealMemoHold));
+    } else {
+      setSeatKillsData([]);
+    }
+
+    setdealMemoPriceFormData(priceData[0]);
     setDealMemoCustomPriceFormData(priceData[1]);
     const techProvisionData = demoModalData.DealMemoTechProvision ? demoModalData.DealMemoTechProvision : [];
     const techProvision = filterTechProvision(techProvisionData);
@@ -234,9 +243,15 @@ export const EditDealMemoContractModal = ({
 
   const saveDemoModalData = async () => {
     setIsLoading(true);
+
+    const dealMemoData = {
+      ...formData,
+      ...formatDecimalFields(formData, 'float'),
+    };
+
     try {
       await axios.post(`/api/dealMemo/updateDealMemo/${selectedTableCell.contract.Id}`, {
-        formData,
+        formData: dealMemoData,
       });
 
       setIsLoading(false);
@@ -354,11 +369,36 @@ export const EditDealMemoContractModal = ({
     }
   };
 
-  const handleStandardSeatsTableData = (value) => {
-    const data = [...(Object.values(value) as unknown as DealMemoHold[])];
+  const handleStandardSeatsTableData = (row: SeatKillRow, field: string, rows: Array<SeatKillRow>) => {
+    // Initialize dealMemoRecs as a deep copy to ensure no references to the original formData
+    let dealMemoRecs = [];
+
+    // If formData.DealMemoHold is undefined, use the rows array; otherwise, deep copy formData.DealMemoHold
+    if (isUndefined(formData.DealMemoHold)) {
+      dealMemoRecs = rows.map((item) => ({ ...item }));
+    } else {
+      dealMemoRecs = formData.DealMemoHold.map((item) => ({ ...item }));
+    }
+
+    // Find the index of the row to update
+    const rowIndex = dealMemoRecs.findIndex((holdObj) => holdObj.DMHoldHoldTypeId === row.typeId);
+
+    // Ensure row exists before trying to update it
+    if (rowIndex > -1) {
+      // Determine the field to update based on the field argument
+      const dbField = field === 'seats' ? 'DMHoldSeats' : 'DMHoldValue';
+
+      // Create a new object for the updated row to avoid direct mutation of the object
+      dealMemoRecs[rowIndex] = {
+        ...dealMemoRecs[rowIndex],
+        [dbField]: row[field], // Assign the new value to the appropriate field
+      };
+    }
+
+    // Push the updated dealMemoRecs back to the form
     setFormData((prevDealMemo) => ({
       ...prevDealMemo,
-      DealMemoHold: data,
+      DealMemoHold: dealMemoRecs,
     }));
   };
 
@@ -833,8 +873,6 @@ export const EditDealMemoContractModal = ({
                               callDataErrors[index.toString()] = false;
                             }
 
-                            console.log(errors);
-
                             setErrors({ ...errors, callData: callDataErrors });
                             editDemoCallModalData('DMCValue', value.target.value, index);
                           }
@@ -1134,8 +1172,11 @@ export const EditDealMemoContractModal = ({
                 <div>
                   <StandardSeatKillsTable
                     rowData={seatKillsData}
-                    tableData={(value) => handleStandardSeatsTableData(value)}
+                    handleFormUpdate={(rowToUpd, field, initRows) =>
+                      handleStandardSeatsTableData(rowToUpd, field, initRows)
+                    }
                     currency={currency.symbol}
+                    holdTypeList={holdTypeData}
                   />
                 </div>
               </div>
@@ -2035,7 +2076,6 @@ export const EditDealMemoContractModal = ({
               <Select
                 onChange={(value) => {
                   if (!value) {
-                    console.log('clearing payment amount');
                     editDemoModalData('AdvancePaymentAmount', 0, 'dealMemo');
                   }
                   editDemoModalData('AdvancePaymentRequired', value, 'dealMemo');

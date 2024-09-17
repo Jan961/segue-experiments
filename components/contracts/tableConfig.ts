@@ -3,7 +3,6 @@ import DefaultCellRenderer from '../bookings/table/DefaultCellRenderer';
 import VenueColumnRenderer from './table/VenueColumnRenderer';
 import DateColumnRenderer from './table/DateColumnRenderer';
 import { tileColors } from 'config/global';
-import InputRenderer from 'components/global/salesTable/renderers/InputRenderer';
 import DefaultTextRenderer from 'components/core-ui-lib/Table/renderers/DefaultTextRenderer';
 import formatInputDate from 'utils/dateInputFormat';
 import { getTimeFromDateAndTime } from 'services/dateService';
@@ -14,6 +13,9 @@ import { companyContractStatusOptions, statusToBgColorMap } from 'config/contrac
 import DateRenderer from 'components/core-ui-lib/Table/renderers/DateRenderer';
 import NotesRenderer from 'components/core-ui-lib/Table/renderers/NotesRenderer';
 import DownloadButtonRenderer from 'components/core-ui-lib/Table/renderers/DownloadButtonRenderer';
+import TextInputRenderer from 'components/core-ui-lib/Table/renderers/TextInputRenderer';
+import CurrencyInputRenderer from 'components/core-ui-lib/Table/renderers/CurrencyInputRenderer';
+import { formatValue } from './utils';
 
 export const contractsStyleProps = { headerColor: tileColors.contracts };
 
@@ -198,7 +200,7 @@ export const getCompanyContractsColumnDefs = (userList = []) => [
   },
 ];
 
-export const standardSeatKillsColumnDefs = (onChangeData, handleBlur, currencySymbol, holdValue) => [
+export const seatKillsColDefs = (handleChange, currencySymbol) => [
   {
     headerName: 'Type',
     field: 'type',
@@ -212,20 +214,14 @@ export const standardSeatKillsColumnDefs = (onChangeData, handleBlur, currencySy
   {
     headerName: 'Seats',
     field: 'seats',
-    cellRenderer: InputRenderer,
-    cellRendererParams: () => ({
-      placeholder: '',
+    cellRenderer: TextInputRenderer,
+    cellRendererParams: (params) => ({
       inline: true,
-      onChange: (value, holdData, holdTypeName, field) => {
-        onChangeData(value, holdData, holdTypeName, field);
-      },
-      holdValue,
+      onChange: (value) => handleChange(params.data, value, 'seats'),
+      className: 'w-[108px] ml-1 mt-1 font-bold',
+      value: formatValue(params.data.seats),
     }),
     width: 120,
-    cellStyle: {
-      textAlign: 'center',
-      overflow: 'visible',
-    },
     headerClass: 'right-border-full',
     suppressMovable: true,
     sortable: false,
@@ -234,24 +230,15 @@ export const standardSeatKillsColumnDefs = (onChangeData, handleBlur, currencySy
   {
     headerName: 'Value',
     field: 'value',
-    cellRenderer: InputRenderer,
-    cellRendererParams: () => ({
-      placeholder: '',
+    cellRenderer: CurrencyInputRenderer,
+    cellRendererParams: (params) => ({
       inline: true,
-      onChange: (value, holdTypeValue, holdTypeName, field) => {
-        onChangeData(value, holdTypeValue, holdTypeName, field);
-      },
-      onBlur: (value, holdTypeValue, holdTypeName, field) => {
-        handleBlur(value, holdTypeValue, holdTypeName, field);
-      },
+      onChange: (value) => handleChange(params.data, value, 'value'),
       currency: currencySymbol,
-      holdValue,
+      value: formatValue(params.data.value),
+      className: 'w-24 font-bold',
     }),
     width: 120,
-    cellStyle: {
-      textAlign: 'center',
-      overflow: 'visible',
-    },
     suppressMovable: true,
     sortable: false,
     resizable: false,
