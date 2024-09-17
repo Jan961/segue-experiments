@@ -9,12 +9,13 @@ import { getAllVenuesMin, getUniqueVenueCountrylist } from 'services/venueServic
 import { intialContractsFilterState } from 'state/contracts/contractsFilterState';
 import { fetchAllMinPersonsList } from 'services/personService';
 import { all, objectify } from 'radash';
-import { PersonMinimalDTO, StandardClauseDTO, UserDto } from 'interfaces';
+import { PersonMinimalDTO, StandardClauseDTO, TemplateMinimalDTO, UserDto } from 'interfaces';
 import { getAllCurrencylist } from 'services/productionService';
 import { fetchAllContracts, fetchAllStandardClauses, fetchDepartmentList } from 'services/contracts';
 import { IContractDepartment, IContractSummary } from 'interfaces/contracts';
 import useCompanyContractsFilter from 'hooks/useCompanyContractsFilters';
 import { getAccountContacts } from 'services/contactService';
+import { fetchAllTemplates } from 'services/templateService';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const ContractsPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
@@ -43,6 +44,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     countryList,
     venues,
     personsList,
+    templateList,
     currencyList,
     standardClauses,
     departmentList,
@@ -53,6 +55,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     getUniqueVenueCountrylist(),
     getAllVenuesMin(),
     fetchAllMinPersonsList(),
+    fetchAllTemplates(),
     getAllCurrencylist(),
     fetchAllStandardClauses(),
     fetchDepartmentList(),
@@ -94,6 +97,13 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       (v) => v,
     ) ?? {};
 
+  const template =
+    objectify(
+      templateList,
+      (v: TemplateMinimalDTO) => v.id,
+      (v) => v,
+    ) ?? {};
+
   // See _app.tsx for how this is picked up
   const initialState: InitialState = {
     global: {
@@ -113,6 +123,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       },
       venue,
       person,
+      template,
       standardClause,
       contract,
       department,

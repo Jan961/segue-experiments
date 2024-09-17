@@ -18,3 +18,8 @@ export interface IContractSummary {
   departmentId: number;
   productionId: number;
 }
+
+export interface IContractTemplate {
+  id: number;
+  name: string;
+}

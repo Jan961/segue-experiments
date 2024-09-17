@@ -17,6 +17,7 @@ import ScheduleTab from './tabs/ScheduleTab';
 import { ERROR_CODES } from 'config/apiConfig';
 import { contractDepartmentState } from 'state/contracts/contractDepartmentState';
 import { getDepartmentNameByID } from '../utils';
+// import { contractTemplateState } from 'state/contracts/contractTemplateState';
 // import { TemplateFormComponent } from '../types';
 
 export interface BuildNewContractProps {
@@ -52,6 +53,7 @@ export const BuildNewContract = ({
   const router = useRouter();
   const cancelToken = useAxiosCancelToken();
   const departmentMap = useRecoilValue(contractDepartmentState);
+  // const templateMap = useRecoilValue(contractTemplateState)
 
   // const fetchTemplateFormStructure = async () => {
   //   // Using the loaded AccContractID, get the corresponding template, then get the components associated with that template
@@ -64,6 +66,10 @@ export const BuildNewContract = ({
   // }
 
   // const populateForm = () => {
+
+  // }
+
+  // const fetchTemplateDocument = () => {
 
   // }
 

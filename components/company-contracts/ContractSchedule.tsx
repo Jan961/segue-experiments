@@ -6,13 +6,13 @@ import { BuildNewContract } from './edit-contract-modal/BuildNewContract';
 import { transformToOptions } from 'utils';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { productionJumpState } from 'state/booking/productionJumpState';
-import { contractTemplateOptions } from 'config/contracts';
 import { personState } from 'state/contracts/PersonState';
 import axios from 'axios';
 import { objectify } from 'radash';
 import { PersonMinimalDTO } from 'interfaces';
 import { IContractSchedule } from '../contracts/types';
 import { contractDepartmentState } from 'state/contracts/contractDepartmentState';
+// import { contractTemplateState } from 'state/contracts/contractTemplateState';
 
 export const defaultContractSchedule = {
   production: null,
@@ -26,6 +26,7 @@ export const ContractScheduleModal = ({ openContract, onClose }: { openContract:
   const { productions } = useRecoilValue(productionJumpState);
   const [personMap, setPersonMap] = useRecoilState(personState);
   const departmentMap = useRecoilValue(contractDepartmentState);
+
   const departmentOptions = useMemo(
     () => transformToOptions(Object.values(departmentMap), 'name', 'id'),
     [departmentMap],
@@ -40,6 +41,7 @@ export const ContractScheduleModal = ({ openContract, onClose }: { openContract:
       transformToOptions(productions, null, 'Id', ({ ShowCode, Code, ShowName }) => `${ShowCode}${Code} ${ShowName}`),
     [productions],
   );
+
   const [openNewPersonContract, setOpenNewPersonContract] = useState(false);
   const [openNewBuildContract, setOpenNewBuildContract] = useState(false);
   const [contractSchedule, setContractSchedule] = useState<IContractSchedule>(defaultContractSchedule);
@@ -146,7 +148,7 @@ export const ContractScheduleModal = ({ openContract, onClose }: { openContract:
             value={templateId}
             disabled={!production}
             placeholder="Please select a template"
-            options={contractTemplateOptions}
+            options={[]}
             isClearable
             isSearchable
           />

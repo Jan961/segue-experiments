@@ -290,13 +290,6 @@ export const contractDepartmentOptions = [
   },
 ];
 
-export const contractTemplateOptions = [
-  {
-    text: 'Contract Template',
-    value: 1,
-  },
-];
-
 export enum CompanyContractStatus {
   NotYetIssued = 'CNI',
   Issued = 'CI',

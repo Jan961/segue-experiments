@@ -496,20 +496,22 @@ model ContractAttachedFile {
 }
 
 model VenueAddress {
-  Id        Int      @id @default(autoincrement()) @map("VenueAddressId")
-  VenueId   Int      @map("VenueAddressVenueId")
-  TypeName  String   @map("VenueAddressTypeName") @db.VarChar(15)
-  Line1     String?  @map("VenueAddress1") @db.VarChar(50)
-  Line2     String?  @map("VenueAddress2") @db.VarChar(50)
-  Line3     String?  @map("VenueAddress3") @db.VarChar(50)
-  Town      String?  @map("VenueAddressTown") @db.VarChar(50)
-  County    String?  @map("VenueAddressCounty") @db.VarChar(50)
-  Postcode  String?  @map("VenueAddressPostcode") @db.VarChar(12)
-  CountryId Int?     @map("VenueAddressCountryId")
-  Phone     String?  @map("VenueAddressPhone") @db.VarChar(30)
-  Email     String?  @map("VenueAddressEmail") @db.VarChar(80)
-  Country   Country? @relation(fields: [CountryId], references: [Id], onDelete: Restrict, map: "CountryVenueAddress")
-  Venue     Venue    @relation(fields: [VenueId], references: [Id], onDelete: Cascade, map: "Venue_VenueAddress")
+  Id               Int      @id @default(autoincrement()) @map("VenueAddressId")
+  VenueId          Int      @map("VenueAddressVenueId")
+  TypeName         String   @map("VenueAddressTypeName") @db.VarChar(15)
+  Line1            String?  @map("VenueAddress1") @db.VarChar(50)
+  Line2            String?  @map("VenueAddress2") @db.VarChar(50)
+  Line3            String?  @map("VenueAddress3") @db.VarChar(50)
+  Town             String?  @map("VenueAddressTown") @db.VarChar(50)
+  County           String?  @map("VenueAddressCounty") @db.VarChar(50)
+  Postcode         String?  @map("VenueAddressPostcode") @db.VarChar(12)
+  CountryId        Int?     @map("VenueAddressCountryId")
+  Phone            String?  @map("VenueAddressPhone") @db.VarChar(30)
+  Email            String?  @map("VenueAddressEmail") @db.VarChar(80)
+  VenueAddressLat  Int?     @db.MediumInt
+  VenueAddressLong Int?     @db.MediumInt
+  Country          Country? @relation(fields: [CountryId], references: [Id], onDelete: Restrict, map: "CountryVenueAddress")
+  Venue            Venue    @relation(fields: [VenueId], references: [Id], onDelete: Cascade, map: "Venue_VenueAddress")
 
   @@index([VenueId], map: "Venue_VenueAddress")
   @@index([CountryId], map: "CountryVenueAddress")
@@ -828,6 +830,7 @@ model File {
   ACCContract      ACCContract[]
   Production       Production[]
   ProductionFile   ProductionFile[]
+  Template         Template[]
 
   @@index([UploadUserId], map: "UserAttachedFile")
 }
@@ -858,49 +861,52 @@ model GlobalBookingActivity {
 }
 
 model ACCContract {
-  ContractId           Int           @id @default(autoincrement()) @map("ACCContractId")
-  PersonId             Int           @map("ACCCPersonId")
-  RoleName             String        @map("ACCCRoleName") @db.VarChar(50)
-  ContractStatus       String        @map("ACCCContractStatus") @db.VarChar(4)
-  CompletedByAccUserId Int?          @map("ACCCCompletedByAccUserId")
-  CheckedByAccUserId   Int?          @map("ACCCCheckedByAccUserId")
-  DateIssued           DateTime?     @map("ACCCDateIssued") @db.Date
-  DateReturned         DateTime?     @map("ACCCDateReturned") @db.Date
+  ContractId           Int               @id @default(autoincrement()) @map("ACCContractId")
+  PersonId             Int               @map("ACCCPersonId")
+  RoleName             String            @map("ACCCRoleName") @db.VarChar(50)
+  ContractStatus       String            @map("ACCCContractStatus") @db.VarChar(4)
+  CompletedByAccUserId Int?              @map("ACCCCompletedByAccUserId")
+  CheckedByAccUserId   Int?              @map("ACCCCheckedByAccUserId")
+  DateIssued           DateTime?         @map("ACCCDateIssued") @db.Date
+  DateReturned         DateTime?         @map("ACCCDateReturned") @db.Date
   ACCContractFileId    Int?
-  ACCScheduleJSON      String?       @db.LongText
-  Notes                String?       @map("ACCCNotes") @db.LongText
-  CurrencyCode         String?       @map("ACCCCurrencyCode") @db.VarChar(3)
-  FirstDay             DateTime?     @map("ACCCFirstDay") @db.Date
-  LastDay              DateTime?     @map("ACCCLastDay") @db.Date
-  Availability         String?       @map("ACCCAvailability") @db.LongText
-  RehearsalLocation    String?       @map("ACCCRehearsalLocation") @db.VarChar(30)
-  RehearsalVenueId     Int?          @map("ACCCRehearsalVenueId")
-  RehearsalVenueNotes  String?       @map("ACCCRehearsalVenueNotes") @db.LongText
-  IsAccomProvided      Boolean       @default(dbgenerated("(b'0')")) @map("ACCCIsAccomProvided") @db.Bit(1)
-  AccomNotes           String?       @map("ACCCAccomNotes") @db.LongText
-  IsTransportProvided  Boolean       @default(dbgenerated("(b'0')")) @map("ACCCIsTransportProvided") @db.Bit(1)
-  TransportNotes       String?       @map("ACCCTransportNotes") @db.LongText
-  IsNominatedDriver    Boolean       @default(dbgenerated("(b'0')")) @map("ACCCIsNominatedDriver") @db.Bit(1)
-  NominatedDriverNotes String?       @map("ACCCNominatedDriverNotes") @db.LongText
-  PaymentType          String?       @map("ACCCPaymentType") @db.VarChar(1)
-  WeeklyRehFee         Decimal?      @map("ACCCWeeklyRehFee") @db.Decimal(10, 2)
-  WeeklyRehHolPay      Decimal?      @map("ACCCWeeklyRehHolPay") @db.Decimal(10, 2)
-  WeeklyPerfFee        Decimal?      @map("ACCCWeeklyPerfFee") @db.Decimal(10, 2)
-  WeeklyPerfHolPay     Decimal?      @map("ACCCWeeklyPerfHolPay") @db.Decimal(10, 2)
-  WeeklySubs           Decimal?      @map("ACCCWeeklySubs") @db.Decimal(10, 2)
-  WeeklySubsNotes      String?       @map("ACCCWeeklySubsNotes") @db.LongText
-  TotalFee             Decimal?      @map("ACCCTotalFee") @db.Decimal(10, 2)
-  TotalHolPay          Decimal?      @map("ACCCTotalHolPay") @db.Decimal(10, 2)
-  TotalFeeNotes        String?       @map("ACCCTotalFeeNotes") @db.LongText
-  CancelFee            Decimal?      @map("ACCCCancelFee") @db.Decimal(10, 2)
-  ProductionId         Int           @map("ACCCProductionId")
+  ACCScheduleJSON      String?           @db.LongText
+  Notes                String?           @map("ACCCNotes") @db.LongText
+  CurrencyCode         String?           @map("ACCCCurrencyCode") @db.VarChar(3)
+  FirstDay             DateTime?         @map("ACCCFirstDay") @db.Date
+  LastDay              DateTime?         @map("ACCCLastDay") @db.Date
+  Availability         String?           @map("ACCCAvailability") @db.LongText
+  RehearsalLocation    String?           @map("ACCCRehearsalLocation") @db.VarChar(30)
+  RehearsalVenueId     Int?              @map("ACCCRehearsalVenueId")
+  RehearsalVenueNotes  String?           @map("ACCCRehearsalVenueNotes") @db.LongText
+  IsAccomProvided      Boolean           @default(dbgenerated("(b'0')")) @map("ACCCIsAccomProvided") @db.Bit(1)
+  AccomNotes           String?           @map("ACCCAccomNotes") @db.LongText
+  IsTransportProvided  Boolean           @default(dbgenerated("(b'0')")) @map("ACCCIsTransportProvided") @db.Bit(1)
+  TransportNotes       String?           @map("ACCCTransportNotes") @db.LongText
+  IsNominatedDriver    Boolean           @default(dbgenerated("(b'0')")) @map("ACCCIsNominatedDriver") @db.Bit(1)
+  NominatedDriverNotes String?           @map("ACCCNominatedDriverNotes") @db.LongText
+  PaymentType          String?           @map("ACCCPaymentType") @db.VarChar(1)
+  WeeklyRehFee         Decimal?          @map("ACCCWeeklyRehFee") @db.Decimal(10, 2)
+  WeeklyRehHolPay      Decimal?          @map("ACCCWeeklyRehHolPay") @db.Decimal(10, 2)
+  WeeklyPerfFee        Decimal?          @map("ACCCWeeklyPerfFee") @db.Decimal(10, 2)
+  WeeklyPerfHolPay     Decimal?          @map("ACCCWeeklyPerfHolPay") @db.Decimal(10, 2)
+  WeeklySubs           Decimal?          @map("ACCCWeeklySubs") @db.Decimal(10, 2)
+  WeeklySubsNotes      String?           @map("ACCCWeeklySubsNotes") @db.LongText
+  TotalFee             Decimal?          @map("ACCCTotalFee") @db.Decimal(10, 2)
+  TotalHolPay          Decimal?          @map("ACCCTotalHolPay") @db.Decimal(10, 2)
+  TotalFeeNotes        String?           @map("ACCCTotalFeeNotes") @db.LongText
+  CancelFee            Decimal?          @map("ACCCCancelFee") @db.Decimal(10, 2)
+  ProductionId         Int               @map("ACCCProductionId")
   ACCCDeptId           Int
+  ACCCTemplateId       Int?
   ACCClause            ACCClause[]
-  ACCDepartment        ACCDepartment @relation(fields: [ACCCDeptId], references: [ACCDeptId], map: "ACCDepartment_ACCContract")
-  File                 File?         @relation(fields: [ACCContractFileId], references: [Id], onDelete: Cascade, map: "File_ACCContract")
-  Person               Person        @relation(fields: [PersonId], references: [PersonId], map: "Person_ACCContract")
-  Production           Production    @relation(fields: [ProductionId], references: [Id], onDelete: Cascade, map: "Production_ACCContract")
-  Venue                Venue?        @relation(fields: [RehearsalVenueId], references: [Id], onDelete: Cascade, map: "Venue_ACCContract")
+  ACCDepartment        ACCDepartment     @relation(fields: [ACCCDeptId], references: [ACCDeptId], map: "ACCDepartment_ACCContract")
+  File                 File?             @relation(fields: [ACCContractFileId], references: [Id], onDelete: Cascade, map: "File_ACCContract")
+  Person               Person            @relation(fields: [PersonId], references: [PersonId], map: "Person_ACCContract")
+  Production           Production        @relation(fields: [ProductionId], references: [Id], onDelete: Cascade, map: "Production_ACCContract")
+  Template             Template?         @relation(fields: [ACCCTemplateId], references: [TemplateId], onDelete: NoAction, map: "Template_ACCContract")
+  Venue                Venue?            @relation(fields: [RehearsalVenueId], references: [Id], onDelete: Cascade, map: "Venue_ACCContract")
+  ACCContractData      ACCContractData[]
   ACCPayment           ACCPayment[]
   ACCPubEvent          ACCPubEvent[]
 
@@ -912,6 +918,7 @@ model ACCContract {
   @@index([CurrencyCode], map: "Master_Currency_ACCContract")
   @@index([PersonId], map: "Person_ACCContract")
   @@index([ACCContractFileId], map: "File_ACCContract")
+  @@index([ACCCTemplateId], map: "Template_ACCContract")
 }
 
 model Address {
@@ -1136,7 +1143,7 @@ model ContractFile {
 
 model ACCDepartment {
   ACCDeptId   Int           @id @default(autoincrement())
-  ACCDeptName String        @db.VarChar(8)
+  ACCDeptName String        @db.VarChar(20)
   ACCContract ACCContract[]
 }
 
@@ -1160,6 +1167,64 @@ model DealMemoSalesEmailRecipient {
 
   @@id([DMSRDeMoId, DMSRAccUserId])
   @@index([DMSRAccUserId], map: "Master_AccountUser_DeMoSalesRecipient")
+}
+
+model ACCContractData {
+  DataId            Int               @id @default(autoincrement())
+  DataACCContractId Int
+  DataComponentId   Int
+  DataIndexNum      Int?              @db.UnsignedSmallInt
+  Value             String?           @db.Text
+  ACCContract       ACCContract       @relation(fields: [DataACCContractId], references: [ContractId], onDelete: Cascade, map: "ACCContract_ACCContractData")
+  TemplateComponent TemplateComponent @relation(fields: [DataComponentId], references: [ComponentId], onDelete: Cascade, map: "TemplateComponent_ACCContractData")
+
+  @@index([DataACCContractId], map: "ACCContract_ACCContractData")
+  @@index([DataComponentId], map: "TemplateComponent_ACCContractData")
+}
+
+model Template {
+  TemplateId     Int           @id @default(autoincrement())
+  TemplateName   String        @db.VarChar(80)
+  TemplateFileId Int
+  ACCContract    ACCContract[]
+  File           File          @relation(fields: [TemplateFileId], references: [Id], onDelete: Cascade, map: "File_Template")
+  TemplateRow    TemplateRow[]
+
+  @@index([TemplateFileId], map: "File_Template")
+}
+
+model TemplateComponent {
+  ComponentId       Int               @id @default(autoincrement())
+  ComponentRowId    Int
+  ComponentTypeId   Int
+  ComponentSeqNo    Int               @db.UnsignedSmallInt
+  ComponentTag      String            @db.VarChar(30)
+  ComponentLabel    String?           @db.VarChar(50)
+  ACCContractData   ACCContractData[]
+  TemplateEntryType TemplateEntryType @relation(fields: [ComponentTypeId], references: [TETypeId], onDelete: Cascade, map: "TemplateEntryType_TemplateComponent")
+  TemplateRow       TemplateRow       @relation(fields: [ComponentRowId], references: [TemplateRowId], onDelete: Cascade, map: "TemplateRow_TemplateComponent")
+
+  @@index([ComponentTypeId], map: "TemplateEntryType_TemplateComponent")
+  @@index([ComponentRowId], map: "TemplateRow_TemplateComponent")
+}
+
+model TemplateEntryType {
+  TETypeId          Int                 @id @default(autoincrement())
+  TETypeName        String              @db.VarChar(50)
+  TemplateComponent TemplateComponent[]
+}
+
+model TemplateRow {
+  TemplateRowId         Int                 @id @default(autoincrement())
+  TemplateRowTemplateId Int
+  TemplateRowNum        Int                 @db.SmallInt
+  TemplateRowLabel      String              @db.VarChar(50)
+  TemplateRowIsAList    Boolean             @default(dbgenerated("(b'0')")) @db.Bit(1)
+  TemplateRowListName   String?             @db.VarChar(30)
+  TemplateComponent     TemplateComponent[]
+  Template              Template            @relation(fields: [TemplateRowTemplateId], references: [TemplateId], onDelete: Cascade, map: "Template_TemplateRow")
+
+  @@index([TemplateRowTemplateId], map: "Template_TemplateRow")
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
@@ -1467,7 +1532,7 @@ view SalesView {
   VenueCurrencySymbolUnicode  String?   @db.VarChar(30)
   ConversionToCurrencyCode    String?   @db.VarChar(3)
   ConversionRate              Decimal?  @db.Decimal(8, 4)
-  SetId                       Int       @default(0)
+  SetId                       Int      @default(0)
   SetSalesFiguresDate         DateTime? @db.Date
   SetBookingWeekNum           Int?      @db.SmallInt
   SetProductionWeekDate       DateTime? @db.Date
@@ -1479,7 +1544,7 @@ view SalesView {
   SetSingleSeats              Boolean?  @default(dbgenerated("(b'0')")) @db.Bit(1)
   SetBrochureReleased         Boolean?  @default(dbgenerated("(b'0')")) @db.Bit(1)
   SetIsCopy                   Boolean?  @default(dbgenerated("(b'0')")) @db.Bit(1)
-  SaleTypeName                String    @db.VarChar(45)
+  SaleTypeName                String   @db.VarChar(45)
   Seats                       Decimal?  @db.Decimal(32, 0)
   Value                       Decimal?  @db.Decimal(32, 2)
   TotalCapacity               Float?
@@ -1549,6 +1614,16 @@ view ACCContractListView {
   DateIssued               DateTime? @db.Date
   DateReturned             DateTime? @db.Date
   ACCCNotes                String?   @db.LongText
+
+  @@ignore
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view VenueVenueTravelView {
+  VVVenue1Id Int
+  VVVenue2Id Int
+  VVMileage  Int? @db.UnsignedSmallInt
+  VVTimeMins Int? @db.UnsignedSmallInt
 
   @@ignore
 }

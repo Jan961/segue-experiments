@@ -332,6 +332,12 @@ export type PersonMinimalDTO = {
   email: string;
 };
 
+export type TemplateMinimalDTO = {
+  id: number;
+  name: string;
+  location: string;
+};
+
 export type VenueMinimalDTO = {
   Id: number;
   Name: string;
