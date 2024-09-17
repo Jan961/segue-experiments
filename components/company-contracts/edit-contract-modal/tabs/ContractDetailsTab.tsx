@@ -1,16 +1,26 @@
-import { TemplateFormRow } from 'components/company-contracts/types';
+import { TemplateFormRow, ContractData } from 'components/company-contracts/types';
 import { createFormInput } from '../utils';
 
 interface ContractDetailsTabProps {
-  form: TemplateFormRow[];
+  templateFormStructure: TemplateFormRow[];
+  contractData: ContractData[];
 }
 
-const ContractDetailsTab = ({ form }: ContractDetailsTabProps) => {
-  console.log(form);
+const ContractDetailsTab = ({ templateFormStructure }: ContractDetailsTabProps) => {
+  console.log(templateFormStructure);
+
+  // const templateStructureWithValues = templateFormStructure.map(row => ({
+  //   rowID: row.rowID,
+  //   rowNum: row.rowNum,
+  //   rowLabel: row.rowLabel,
+  //   isAList: row.isAList,
+  //   listName: row.listName,
+  //   componentValueArray:
+  // }))
 
   return (
     <div>
-      {form.map((row) => (
+      {templateFormStructure.map((row) => (
         <div key={row.rowID} className="mb-10">
           <div className="font-semibold"> {row.rowLabel} </div>
           <div className="w-full h-[1px] bg-slate-300 mb-2" />

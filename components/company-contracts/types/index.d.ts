@@ -12,3 +12,9 @@ export interface TemplateFormRow {
     type: string;
   }[];
 }
+
+export interface ContractData {
+  compID: number;
+  index: number;
+  value: number;
+}

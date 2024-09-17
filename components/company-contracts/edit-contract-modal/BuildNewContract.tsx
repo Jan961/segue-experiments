@@ -17,8 +17,9 @@ import ScheduleTab from './tabs/ScheduleTab';
 import { ERROR_CODES } from 'config/apiConfig';
 import { contractDepartmentState } from 'state/contracts/contractDepartmentState';
 import { getDepartmentNameByID } from '../utils';
-import { TemplateFormRow } from '../types';
-// import { contractTemplateState } from 'state/contracts/contractTemplateState';
+import { TemplateFormRow, ContractData } from '../types';
+import { contractTemplateState } from 'state/contracts/contractTemplateState';
+import { getFileUrl } from 'lib/s3';
 
 export interface BuildNewContractProps {
   contractSchedule?: Partial<IContractSchedule>;
@@ -53,37 +54,55 @@ export const BuildNewContract = ({
   const router = useRouter();
   const cancelToken = useAxiosCancelToken();
   const departmentMap = useRecoilValue(contractDepartmentState);
-  // const selectedTemplateID = contractSchedule.templateId;
-  // const templateMap = useRecoilValue(contractTemplateState);
 
-  const [templateForm, setTemplateForm] = useState<TemplateFormRow[]>(null);
-  // const [templateDOC, setTemplateDOC] = useState<File>(null);
+  const selectedTemplateID = contractSchedule.templateId;
+  const templateMap = useRecoilValue(contractTemplateState);
+  const [docXTemplateFile, setDocXTemplateFile] = useState<File>(null);
+
+  const [templateFormStructure, setTemplateFormStructure] = useState<TemplateFormRow[]>(null);
+  const [contractData] = useState<ContractData[]>(null);
 
   useEffect(() => {
-    // const fetchTemplateDocument = async () => {
-    //   try {
-    //     const selectedTemplateLocation = getFileUrl(
-    //       Object.values(templateMap).find((template) => template.id === selectedTemplateID).location,
-    //     );
-    //     const response = axios.get(`/api/file/download?location=${encodeURIComponent(selectedTemplateLocation)}`)
-    //     console.log(selectedTemplateLocation);
-    //   } catch (err) {
-    //     console.error(err, 'Error - failed to fetch template document.');
-    //   }
-    // };
+    const fetchTemplateDocument = async () => {
+      try {
+        const selectedTemplateLocation = getFileUrl(
+          Object.values(templateMap).find((template) => template.id === selectedTemplateID).location,
+        );
+        const response = await axios.get(
+          `/api/file/download?location=${encodeURIComponent(selectedTemplateLocation)}`,
+          {
+            responseType: 'arraybuffer',
+          },
+        );
+        const file = new File([response.data], 'template.docx', {
+          type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        });
+        setDocXTemplateFile(file);
+      } catch (err) {
+        console.error(err, 'Error - failed to fetch template document.');
+      }
+    };
 
     const fetchTemplateFormStructure = async () => {
       try {
         const response = await axios.get('/api/company-contracts/read-template/' + contractSchedule.templateId);
         if (response.data) {
-          setTemplateForm(response.data);
+          setTemplateFormStructure(response.data);
         }
       } catch (err) {
         console.error(err, 'Error - failed to fetch template form structure.');
       }
     };
 
-    // fetchTemplateDocument();
+    // const fetchContractData = async () => {
+    //   try {
+
+    //   } catch (err) {
+    //     console.error(err, 'Error - failed to fetch contract data.');
+    //   }
+    // };
+
+    fetchTemplateDocument();
     fetchTemplateFormStructure();
   }, []);
 
@@ -220,7 +239,9 @@ export const BuildNewContract = ({
       <div className="flex flex-col justify-between ">
         <div>
           <div className="">
-            <div className="text-xl text-primary-navy font-bold w-[50vw]">{`${selectedProduction.ShowCode}${selectedProduction.Code}`}</div>
+            <div className="text-xl text-primary-navy font-bold w-[50vw]">
+              Production - {`${selectedProduction.ShowCode}${selectedProduction.Code}`}
+            </div>
             <div className="text-xl text-primary-navy font-bold w-[50vw]">
               Department - {getDepartmentNameByID(contractSchedule.department, departmentMap)}
             </div>
@@ -270,7 +291,7 @@ export const BuildNewContract = ({
             )}
             {activeViewIndex === 1 && (
               <div className="flex flex-col gap-8 px-16">
-                <ContractDetailsTab form={templateForm} />
+                <ContractDetailsTab templateFormStructure={templateFormStructure} contractData={contractData} />
               </div>
             )}
             {activeViewIndex === 2 && (
@@ -285,6 +306,7 @@ export const BuildNewContract = ({
                 contractDetails={contractDetails}
                 production={selectedProduction}
                 schedule={schedule}
+                templateFile={docXTemplateFile}
               />
             )}
           </div>
