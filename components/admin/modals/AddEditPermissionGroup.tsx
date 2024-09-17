@@ -48,14 +48,14 @@ const AdEditPermissionGroup = ({
   const [showConfirmationDialog, setShowConfirmationDialog] = useState(false);
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [allProductionsChecked, setAllProductionsChecked] = useState(false);
-
+  console.log(selectedGroup);
   const handleInputChange = (e) => {
     setIsFormDirty(true);
     setGroupDetails({ ...groupDetails, [e.target.name]: e.target.value });
   };
 
   useEffect(() => {
-    if (!selectedGroup) {
+    if (selectedGroup) {
       setGroupDetails({ groupName: selectedGroup.groupName, permissions, productions });
     }
   }, [productions, permissions, selectedGroup]);
@@ -165,6 +165,7 @@ const AdEditPermissionGroup = ({
                   options={groupDetails.permissions}
                   onChange={(permissions) => setGroupDetails({ ...groupDetails, permissions })}
                   selectAllLabel="Select All Areas"
+                  values={selectedGroup?.permissions || []}
                 />
               </div>
             </div>

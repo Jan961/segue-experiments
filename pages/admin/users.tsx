@@ -64,7 +64,7 @@ export default function Users({
   };
 
   const handlePermissionGroupModalClose = (refresh = false) => {
-    setSelectedUser(null);
+    setSelectedGroup(null);
     setShowPermissionGroupModal(false);
     if (refresh) {
       router.replace(router.asPath);
