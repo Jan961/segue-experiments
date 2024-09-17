@@ -105,7 +105,7 @@ const NewBookingView = ({
     fetchData({
       url: '/api/bookings/conflict',
       method: 'POST',
-      data: { ...formData, ProductionId: currentProduction?.Id },
+      data: { ...formData, productionId: currentProduction?.Id },
     })
       .then(async (data: any) => {
         updateBookingConflicts(data);
