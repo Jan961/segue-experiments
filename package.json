@@ -79,6 +79,7 @@
     "emailjs": "^4.0.1",
     "exceljs": "^4.3.0",
     "express-jwt": "^6.1.0",
+    "file-saver": "^2.0.5",
     "formidable": "^2.0.1",
     "framer-motion": "^11.0.3",
     "fs": "^0.0.1-security",
