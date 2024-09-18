@@ -60,7 +60,7 @@ export const BuildNewContract = ({
   const [docXTemplateFile, setDocXTemplateFile] = useState<File>(null);
 
   const [templateFormStructure, setTemplateFormStructure] = useState<TemplateFormRow[]>(null);
-  const [contractData] = useState<ContractData[]>(null);
+  const [contractData, setContractData] = useState<ContractData[]>(null);
 
   useEffect(() => {
     const fetchTemplateDocument = async () => {
@@ -94,16 +94,20 @@ export const BuildNewContract = ({
       }
     };
 
-    // const fetchContractData = async () => {
-    //   try {
-
-    //   } catch (err) {
-    //     console.error(err, 'Error - failed to fetch contract data.');
-    //   }
-    // };
+    const fetchContractData = async () => {
+      try {
+        const response = await axios.get('/api/company-contracts/read-data/' + contractId);
+        if (response.data) {
+          setContractData(response.data);
+        }
+      } catch (err) {
+        console.error(err, 'Error - failed to fetch contract data.');
+      }
+    };
 
     fetchTemplateDocument();
     fetchTemplateFormStructure();
+    fetchContractData();
   }, []);
 
   const fetchPersonDetails = useCallback(

@@ -8,7 +8,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   const { id } = req.query;
   if (!id) {
-    return res.status(400).json({ message: 'Contract ID is required to retrieve template form structure' });
+    return res.status(400).json({ message: 'Template ID is required to retrieve template form structure' });
   }
 
   try {
