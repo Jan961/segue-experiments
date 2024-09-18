@@ -3,13 +3,15 @@ import { contractsStyleProps, standardSeatKillsColumnDefs } from 'components/con
 import { useEffect, useRef, useState } from 'react';
 import { formatRowsForMultipeBookingsAtSameVenue, formatRowsForPencilledBookings } from '../../bookings/utils';
 import { StandardSeatRowType } from 'interfaces';
-import { isNullOrEmpty } from 'utils';
-interface ContractsTableProps {
+import { isNullOrEmpty, formatDecimalValue } from 'utils';
+
+interface SeatKillProps {
   rowData?: StandardSeatRowType[];
   tableData?: any;
+  currency?: string;
 }
 
-export default function StandardSeatKillsTable({ rowData, tableData }: ContractsTableProps) {
+export default function StandardSeatKillsTable({ rowData, tableData, currency }: SeatKillProps) {
   const tableRef = useRef(null);
   const [rows, setRows] = useState([]);
   const [columnDefs, setColumnDefs] = useState([]);
@@ -46,6 +48,15 @@ export default function StandardSeatKillsTable({ rowData, tableData }: Contracts
     tableData(tableValue);
   };
 
+  const handleBlur = (event, first, second, third) => {
+    const tableValue = JSON.parse(JSON.stringify(holdValue));
+    const value = event.target.value;
+    const formattedValue = formatDecimalValue(value);
+    tableValue[second][third] = formattedValue;
+    setHoldValue(tableValue);
+    tableData(tableValue);
+  };
+
   useEffect(() => {
     if (rowData) {
       let formattedRows = formatRowsForPencilledBookings(rowData);
@@ -56,7 +67,7 @@ export default function StandardSeatKillsTable({ rowData, tableData }: Contracts
   }, [rowData]);
 
   useEffect(() => {
-    setColumnDefs(standardSeatKillsColumnDefs(handleValueData, holdValue));
+    setColumnDefs(standardSeatKillsColumnDefs(handleValueData, handleBlur, currency, holdValue));
   }, [holdValue]);
   return (
     <>

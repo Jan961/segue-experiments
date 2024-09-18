@@ -117,7 +117,7 @@ export default function Users({
           <div className="text-primary-navy text-xl font-bold">Number of User Licences</div>
         </div>
         <div className="flex flex-col">
-          <Button className="ml-4 w-32 mr-1" variant="primary" text="Add Licences" />
+          <Button className="ml-4 w-32 mr-1" variant="primary" text="Add Licences" testId="add-licences-button" />
         </div>
       </div>
 
@@ -126,14 +126,18 @@ export default function Users({
           <div className="text-base primary-dark-blue">Total Number of Full Licences:</div>
         </div>
         <div className="flex flex-col mr-[60px]">
-          <div className="text-base primary-dark-blue font-bold">0</div>
+          <div className="text-base primary-dark-blue font-bold" data-testid="no-of-full-licences">
+            0
+          </div>
         </div>
 
         <div className="flex flex-col mr-2">
           <div className="text-base primary-dark-blue">Total Number of Touring Management Licences:</div>
         </div>
         <div className="flex flex-col">
-          <div className="text-base primary-dark-blue font-bold">0</div>
+          <div className="text-base primary-dark-blue font-bold" data-testid="no-of-touring-licences">
+            0
+          </div>
         </div>
       </div>
 
@@ -142,26 +146,36 @@ export default function Users({
           <div className="text-base primary-dark-blue">Total Number of Full Licences Used:</div>
         </div>
         <div className="flex flex-col mr-[24px]">
-          <div className="text-base primary-dark-blue font-bold">0</div>
+          <div className="text-base primary-dark-blue font-bold" data-testid="no-of-full-licences-used">
+            0
+          </div>
         </div>
 
         <div className="flex flex-col mr-2">
           <div className="text-base primary-dark-blue">Total Number of Touring Management Licences Used:</div>
         </div>
         <div className="flex flex-col">
-          <div className="text-base primary-dark-blue font-bold">0</div>
+          <div className="text-base primary-dark-blue font-bold" data-testid="no-of-touring-licences-used">
+            0
+          </div>
         </div>
       </div>
 
       <div className="flex flex-row justify-between items-center my-4">
         <div className="text-primary-navy text-xl font-bold">All Users</div>
         <div className="flex flex-row gap-4">
-          <Button className="px-8 mt-2 -mb-1" variant="secondary" text="Add New Touring Management User" />
+          <Button
+            className="px-8 mt-2 -mb-1"
+            variant="secondary"
+            text="Add New Touring Management User"
+            testId="add-new-touring-mgmt-user-button"
+          />
           <Button
             className="px-8 mt-2 -mb-1"
             variant="secondary"
             text="Add New Full User"
             onClick={() => setShowUsersModal(true)}
+            testId="add-new-full-user-button"
           />
         </div>
       </div>
@@ -185,6 +199,7 @@ export default function Users({
                 variant="secondary"
                 text="Add New Permission Group"
                 onClick={() => setShowPermissionGroupModal(true)}
+                testId="add-new-permission-group-button"
               />
             </div>
           </div>

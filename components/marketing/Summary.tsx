@@ -7,7 +7,7 @@ import { SummaryResponseDTO } from 'pages/api/marketing/summary/[BookingId]';
 import classNames from 'classnames';
 import SummaryRow from './SummaryRow';
 import { useRecoilValue } from 'recoil';
-import { currencyState } from 'state/marketing/currencyState';
+import { currencyState } from 'state/global/currencyState';
 
 export interface SummaryRef {
   resetData: () => void;
