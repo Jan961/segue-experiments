@@ -50,7 +50,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [venue, setVenue] = useState<Partial<VenueData>>({});
   const [barredVenues, setBarredVenues] = useState<Partial<UiVenue>[]>([]);
-  const [dealHoldType, setDealHoldType] = useState<Partial<DealMemoHoldType>>({});
+  const [dealHoldType, setDealHoldType] = useState<Array<DealMemoHoldType>>([]);
   const [formData, setFormData] = useState<Partial<VenueContractFormData>>({
     ...initialEditContractFormData,
     ...selectedTableCell.contract,
@@ -114,7 +114,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
     }
 
     const getHoldType = await axios.get<DealMemoHoldType>(`/api/dealMemo/hold-type/read`);
-    setDealHoldType(getHoldType.data as DealMemoHoldType);
+    setDealHoldType(getHoldType.data as Array<DealMemoHoldType>);
     if (demoModalData.data && demoModalData.data.BookingId) {
       setDemoModalData(demoModalData.data as DealMemoContractFormData);
       setDealMemoFormData(demoModalData.data as DealMemoContractFormData);

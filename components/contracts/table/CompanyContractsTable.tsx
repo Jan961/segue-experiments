@@ -38,7 +38,7 @@ export default function CompanyContractsTable({ rowData = [] }: ContractsTablePr
         null,
         'Id',
         ({ FirstName = '', LastName = '' }) => `${FirstName || ''} ${LastName || ''}`,
-      ),
+      ).sort((a, b) => a.text.localeCompare(b.text)),
     [users],
   );
   const columnDefs = useMemo(() => getCompanyContractsColumnDefs(userOptionList), [userOptionList]);

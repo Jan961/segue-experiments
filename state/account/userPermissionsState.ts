@@ -1,9 +1,17 @@
 import { UserPermission } from 'interfaces';
 import { atom } from 'recoil';
 
-const intialState: UserPermission[] = [];
+export interface UserPermissionsState {
+  permissions: UserPermission[];
+  accountId: string;
+}
+
+const intialState: UserPermissionsState = {
+  permissions: [],
+  accountId: '',
+};
 
 export const userPermissionsState = atom({
-  key: 'userPermissions',
+  key: 'userPermissionsState',
   default: intialState,
 });
