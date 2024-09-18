@@ -1,22 +1,23 @@
 import { TemplateFormRow, ContractData } from 'components/company-contracts/types';
-import { createFormInput } from '../utils';
+import { createFormInput, populateValueListWithPlaceholders, populateTemplateWithValues } from '../utils';
 
 interface ContractDetailsTabProps {
   templateFormStructure: TemplateFormRow[];
   contractData: ContractData[];
 }
 
-const ContractDetailsTab = ({ templateFormStructure }: ContractDetailsTabProps) => {
-  console.log(templateFormStructure);
+const ContractDetailsTab = ({ templateFormStructure, contractData }: ContractDetailsTabProps) => {
+  // const tempContractData = [
+  //   {compID: 28, index: 1, value: new Date()},
+  //   {compID: 29, index: 1, value: "abc"},
+  //   {compID: 28, index: 2, value: "bud"},
+  //   {compID: 29, index: 2, value: "dfsdf"}
+  // ];
 
-  // const templateStructureWithValues = templateFormStructure.map(row => ({
-  //   rowID: row.rowID,
-  //   rowNum: row.rowNum,
-  //   rowLabel: row.rowLabel,
-  //   isAList: row.isAList,
-  //   listName: row.listName,
-  //   componentValueArray:
-  // }))
+  const populatedValueList = populateValueListWithPlaceholders(templateFormStructure, contractData);
+  const templateStructureWithValues = populateTemplateWithValues(templateFormStructure, populatedValueList);
+
+  console.log(templateStructureWithValues);
 
   return (
     <div>
