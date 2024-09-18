@@ -2,6 +2,7 @@ import { useSignUp } from '@clerk/nextjs';
 import axios from 'axios';
 import { useState } from 'react';
 import { isNullOrEmpty } from 'utils';
+import { generateRandomHash } from 'utils/crypto';
 
 type UserDetails = {
   email: string;
@@ -22,7 +23,10 @@ const useUser = () => {
     try {
       setError('');
       // Create the user within clerk
-      const { data } = await axios.post('/api/auth/create-clerk-user', userDetails);
+      const { data } = await axios.post('/api/auth/create-clerk-user', {
+        ...userDetails,
+        password: generateRandomHash(4),
+      });
       if (data.error) {
         setError(data.error);
         return false;
