@@ -13,18 +13,22 @@ export const LoadingOverlay = () => (
   </div>
 );
 
-const publicPaths = ['/account/sign-up', '/access-denied', '/auth/sign-in', '/auth/sign-up', '/auth/forgot-password'];
+const publicPaths = ['/account/sign-up', '/access-denied', '/auth/sign-in', '/auth/sign-up', '/auth/password-reset'];
 
 const PermissionsProvider = ({ children }: { children: React.ReactNode }) => {
   const { isSignedIn, user } = useUser();
-  const [permissions, setPermissions] = useRecoilState(userPermissionsState);
+  const [permissionsState, setPermissionsState] = useRecoilState(userPermissionsState);
   const router = useRouter();
 
   const fetchPermissions = async (organisationId: string) => {
-    if (isNullOrEmpty(permissions)) {
+    if (isNullOrEmpty(permissionsState.permissions)) {
       try {
         const { data } = await axios(`/api/user/permissions/read?organisationId=${organisationId}`);
-        setPermissions(data);
+
+        setPermissionsState({
+          permissions: data,
+          accountId: organisationId,
+        });
       } catch (err) {
         console.error(err);
       }

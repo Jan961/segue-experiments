@@ -664,7 +664,10 @@ export interface StandardSeatRowType {
   type: string;
   seats: string;
   value: string;
+  id: number | null;
+  typeId: number;
 }
+
 export interface VenueContractFormData {
   StatusCode: string;
   SignedDate: Date;
@@ -745,27 +748,26 @@ export interface DealMemoContractFormData {
   ROTTPercentage?: number;
   PRSPercentage?: number;
   Guarantee?: boolean;
-  GuaranteeAmount?: number;
+  GuaranteeAmount?: string;
   HasCalls?: boolean;
   PromoterSplitPercentage?: number;
   VenueSplitPercentage?: number;
-  VenueRental?: number;
+  VenueRental?: string;
   VenueRentalNotes?: string;
-  StaffingContra?: number;
+  StaffingContra?: string;
   StaffingContraNotes?: string;
-  AgreedContraItems?: number;
+  AgreedContraItems?: string;
   AgreedContraItemsNotes?: string;
   BOMVenueContactId?: number;
   OnSaleDate?: Date;
   SettlementVenueContactId?: number;
   SellableSeats?: number;
   MixerDeskPosition?: string;
-  StandardSeatKills?: string;
-  RestorationLevy?: number;
-  BookingFees?: number;
+  RestorationLevy?: string;
+  BookingFees?: string;
   CCCommissionPercent?: number;
   TxnChargeOption?: string;
-  TxnChargeAmount?: number;
+  TxnChargeAmount?: string;
   AgreedDiscounts?: string;
   MaxTAAlloc?: string;
   TAAlloc?: string;
@@ -778,8 +780,8 @@ export interface DealMemoContractFormData {
   BrochureDeadline?: Date;
   FinalProofBy?: Date;
   PrintReqs?: string;
-  LocalMarketingBudget?: number;
-  LocalMarketingContra?: number;
+  LocalMarketingBudget?: string;
+  LocalMarketingContra?: string;
   SellWho?: string;
   SellProgrammes?: boolean;
   PrintDelUseVenueAddress?: boolean;
@@ -788,7 +790,7 @@ export interface DealMemoContractFormData {
   SellNotes?: string;
   SellProgCommPercent?: number;
   SellMerchCommPercent?: number;
-  SellPitchFee?: number;
+  SellPitchFee?: string;
   TechVenueContactId?: number;
   TechArrivalDate?: Date;
   TechArrivalTime?: Date;
@@ -800,7 +802,7 @@ export interface DealMemoContractFormData {
   NumCateringNotes?: string;
   BarringClause?: string;
   AdvancePaymentRequired?: boolean;
-  AdvancePaymentAmount?: number;
+  AdvancePaymentAmount?: string;
   AdvancePaymentDueBy?: Date;
   SettlementDays?: number;
   ContractClause?: string;
@@ -816,97 +818,6 @@ export interface DealMemoContractFormData {
   CompAccContId?: number;
   SendTo?: Array<number>;
 }
-
-// export interface DealMemoContractCosts {
-//   GuaranteeAmount?: number;
-
-//   Id?: number;
-//   BookingId?: number;
-//   AgreementDate?: Date;
-//   AccContId?: number;
-//   RunningTime?: Date;
-//   DateIssued?: Date;
-//   VatCode?: string;
-//   RunningTimeNotes?: string;
-//   PrePostShowEvents?: string;
-//   DressingRooms?: string;
-//   VenueCurfewTime?: Date;
-//   PerformanceNotes?: string;
-//   ProgrammerVenueContactId?: number;
-//   ROTTPercentage?: number;
-//   PRSPercentage?: number;
-//   Guarantee?: boolean;
-
-//   HasCalls?: boolean;
-//   PromoterSplitPercentage?: number;
-//   VenueSplitPercentage?: number;
-//   VenueRental?: number;
-//   VenueRentalNotes?: string;
-//   StaffingContra?: number;
-//   StaffingContraNotes?: string;
-//   AgreedContraItems?: number;
-//   AgreedContraItemsNotes?: string;
-//   BOMVenueContactId?: number;
-//   OnSaleDate?: Date;
-//   SettlementVenueContactId?: number;
-//   SellableSeats?: number;
-//   MixerDeskPosition?: string;
-//   StandardSeatKills?: string;
-//   RestorationLevy?: number;
-//   BookingFees?: number;
-//   CCCommissionPercent?: number;
-//   TxnChargeOption?: string;
-//   TxnChargeAmount?: number;
-//   AgreedDiscounts?: string;
-//   MaxTAAlloc?: string;
-//   TAAlloc?: string;
-//   TicketCopy?: string;
-//   ProducerCompCount?: number;
-//   OtherHolds?: string;
-//   AgeNotes?: string;
-//   SalesDayNum?: number;
-//   MMVenueContactId?: number;
-//   BrochureDeadline?: Date;
-//   FinalProofBy?: Date;
-//   PrintReqs?: string;
-//   LocalMarketingBudget?: number;
-//   LocalMarketingContra?: number;
-//   SellWho?: string;
-//   SellProgrammes?: boolean;
-//   PrintDelUseVenueAddress?: boolean;
-//   PrintDelUseVenueAddressline?: string;
-//   SellMerch?: boolean;
-//   SellNotes?: string;
-//   SellProgCommPercent?: number;
-//   SellMerchCommPercent?: number;
-//   SellPitchFee?: number;
-//   TechVenueContactId?: number;
-//   TechArrivalDate?: Date;
-//   TechArrivalTime?: Date;
-//   NumDressingRooms?: number;
-//   NumFacilitiesLaundry?: boolean;
-//   NumFacilitiesDrier?: boolean;
-//   NumFacilitiesLaundryRoom?: boolean;
-//   NumFacilitiesNotes?: string;
-//   NumCateringNotes?: string;
-//   BarringClause?: string;
-//   AdvancePaymentRequired?: boolean;
-//   AdvancePaymentAmount?: number;
-//   AdvancePaymentDueBy?: Date;
-//   SettlementDays?: number;
-//   ContractClause?: string;
-//   DealMemoPrice?: DealMemoPrice[];
-//   DealMemoTechProvision?: DealMemoTechProvision[];
-//   DealMemoCall?: any;
-//   DealMemoHold?: DealMemoHold[];
-//   Status?: string;
-//   CompletedBy?: string;
-//   ApprovedBy?: string;
-//   DateReturned?: Date;
-//   Notes?: string;
-//   CompAccContId?: number;
-//   SendTo?: Array<number>;
-// }
 
 export interface DealMemoHoldType {
   HoldTypeCode?: string;

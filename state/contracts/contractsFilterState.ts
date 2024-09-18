@@ -64,7 +64,6 @@ export const initialDealMemoDataState: DealMemoContractFormData = {
   SettlementVenueContactId: null,
   SellableSeats: null,
   MixerDeskPosition: '',
-  StandardSeatKills: '',
   RestorationLevy: null,
   BookingFees: null,
   CCCommissionPercent: null,

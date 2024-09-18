@@ -273,6 +273,8 @@ export default forwardRef(function Select(
     return false;
   };
 
+  const closeMenuOnSelectValue = isMulti ? false : closeMenuOnSelect;
+
   return (
     <div
       className={classNames(
@@ -304,7 +306,7 @@ export default forwardRef(function Select(
           getOptionLabel={(props: SelectOption) => props.text}
           windowThreshold={50}
           isDisabled={disabled}
-          closeMenuOnSelect={closeMenuOnSelect}
+          closeMenuOnSelect={closeMenuOnSelectValue}
           options={options}
           styles={colourStyles}
           placeholder={placeholder}
