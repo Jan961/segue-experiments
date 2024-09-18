@@ -171,13 +171,25 @@ export const getCompanyContractsColumnDefs = (userList = []) => [
       isSearchable: true,
     }),
   },
-  { headerName: 'Date Issued', field: 'dateIssue', cellRenderer: DateRenderer, width: 120 },
+  {
+    headerName: 'Date Issued',
+    field: 'dateIssue',
+    cellRenderer: DateRenderer,
+    width: 120,
+    cellStyle: {
+      overflow: 'visible',
+    },
+  },
   {
     headerName: 'Date Returned',
     field: 'dateReturned',
     cellRenderer: DateRenderer,
     resizable: false,
     width: 120,
+    cellStyle: {
+      overflow: 'visible',
+    },
+    cellEditorParams: { popupParent: document.body },
   },
   {
     headerName: '',
@@ -186,7 +198,7 @@ export const getCompanyContractsColumnDefs = (userList = []) => [
     headerClass: ['bgOrangeTextWhite'],
     cellRendererParams: {
       tpActive: true,
-      activeFillColor: '#082B4B',
+      activeFillColor: '#D41818',
       strokeColor: '#082B4B',
     },
     resizable: false,
