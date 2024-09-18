@@ -1,4 +1,4 @@
-import { Button, Checkbox, ConfirmationDialog, PopupModal, TextInput } from 'components/core-ui-lib';
+import { Button, ConfirmationDialog, PopupModal, TextInput } from 'components/core-ui-lib';
 import TreeSelect from 'components/global/TreeSelect';
 import { TreeItemOption } from 'components/global/TreeSelect/types';
 import { useEffect, useState } from 'react';
@@ -10,7 +10,6 @@ import { userPermissionsState } from 'state/account/userPermissionsState';
 type GroupDetails = {
   groupName: string;
   permissions: TreeItemOption[];
-  productions: TreeItemOption[];
 };
 
 type PermissionGroup = {
@@ -21,7 +20,6 @@ type PermissionGroup = {
 
 interface AdEditPermissionGroupProps {
   permissions: TreeItemOption[];
-  productions: TreeItemOption[];
   groups: PermissionGroup[];
   onClose: (refresh?: boolean) => void;
   visible: boolean;
@@ -31,14 +29,12 @@ interface AdEditPermissionGroupProps {
 const DEFAULT_GROUP_DETAILS: GroupDetails = {
   groupName: '',
   permissions: [],
-  productions: [],
 };
 
 const AdEditPermissionGroup = ({
   visible,
   onClose,
   permissions,
-  productions = [],
   selectedGroup,
   groups = [],
 }: AdEditPermissionGroupProps) => {
@@ -47,8 +43,7 @@ const AdEditPermissionGroup = ({
   const [isFormDirty, setIsFormDirty] = useState(false);
   const [showConfirmationDialog, setShowConfirmationDialog] = useState(false);
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
-  const [allProductionsChecked, setAllProductionsChecked] = useState(false);
-  console.log(selectedGroup);
+
   const handleInputChange = (e) => {
     setIsFormDirty(true);
     setGroupDetails({ ...groupDetails, [e.target.name]: e.target.value });
@@ -56,26 +51,22 @@ const AdEditPermissionGroup = ({
 
   useEffect(() => {
     if (selectedGroup) {
-      setGroupDetails({ groupName: selectedGroup.groupName, permissions, productions });
+      setGroupDetails(selectedGroup as GroupDetails);
+    } else {
+      setGroupDetails((prev) => ({ ...prev, permissions }));
     }
-  }, [productions, permissions, selectedGroup]);
-
-  const handleProductionToggle = (e) => {
-    setIsFormDirty(true);
-    const { id, checked } = e.target;
-    const updatedProductions = groupDetails.productions.map((p) => (p.id === id ? { ...p, checked } : p));
-    setGroupDetails({ ...groupDetails, productions: updatedProductions });
-    if (!checked) {
-      setAllProductionsChecked(false);
-    }
-  };
+  }, [permissions, selectedGroup]);
 
   const handleConfirmClick = () => {
     setShowConfirmationDialog(false);
     onClose();
   };
 
-  const savePermissionGroup = async () => {
+  const savePermissionGroup = async (isNew = true) => {
+    if (!groupDetails.groupName) {
+      setValidationErrors({ groupName: 'Group name is required' });
+      return;
+    }
     // check if group name already exists
     const existingGroup = groups.find(
       (g) => g.groupName.trim().toLowerCase() === groupDetails.groupName.trim().toLowerCase(),
@@ -90,21 +81,16 @@ const AdEditPermissionGroup = ({
         .filter(({ checked }) => checked)
         .map(({ id }) => id);
 
-      const selectedProductions = groupDetails.productions.filter(({ checked }) => checked).map(({ id }) => id);
-      const payload = { ...groupDetails, permissions, productions: selectedProductions };
-      await axios.post('/api/admin/permissions-group/create', { permissionGroup: payload, accountId });
+      const payload = { ...groupDetails, permissions };
+      await axios.post(`/api/admin/permissions-group/${isNew ? 'create' : 'update'}`, {
+        permissionGroup: payload,
+        accountId,
+      });
     } catch (error) {
       console.log(error);
     }
     setGroupDetails(DEFAULT_GROUP_DETAILS);
     onClose(true);
-  };
-
-  const handleAllProductionsToggle = (e) => {
-    setIsFormDirty(true);
-    setAllProductionsChecked(e.target.checked);
-    const updatedProductions = groupDetails.productions.map((p) => ({ ...p, checked: e.target.checked }));
-    setGroupDetails({ ...groupDetails, productions: updatedProductions });
   };
 
   const handleModalClose = () => {
@@ -126,7 +112,7 @@ const AdEditPermissionGroup = ({
             <div className="w-full">
               <TextInput
                 name="groupName"
-                placeholder="Enter Name of Group, e.g. Admin, Standard, Management"
+                placeholder="Enter Name of Group, e.g. Admin; Bookings; Marketing Team"
                 className="w-full"
                 value={groupDetails.groupName}
                 onChange={handleInputChange}
@@ -136,28 +122,6 @@ const AdEditPermissionGroup = ({
             </div>
           </div>
           <div className="flex flex-row gap-4 w-full">
-            <div className="w-full max-h-[400px] overflow-y-hidden">
-              <h2 className="text-xl text-bold mb-2">Productions</h2>
-              <div className="w-full max-h-[400px] overflow-y-auto">
-                <Checkbox
-                  id="allProductions"
-                  name="allProductions"
-                  label="All Productions"
-                  checked={allProductionsChecked}
-                  onChange={handleAllProductionsToggle}
-                />
-                {groupDetails.productions.map((production) => (
-                  <Checkbox
-                    key={production.id}
-                    id={`${production.label}${production.id}`}
-                    name={production.id}
-                    label={production.label}
-                    checked={production.checked}
-                    onChange={handleProductionToggle}
-                  />
-                ))}
-              </div>
-            </div>
             <div className="w-full max-h-[400px]  overflow-y-hidden">
               <h2 className="text-xl text-bold mb-2">Permissions</h2>
               <div className="w-full max-h-[400px] overflow-y-auto">
@@ -165,17 +129,20 @@ const AdEditPermissionGroup = ({
                   options={groupDetails.permissions}
                   onChange={(permissions) => setGroupDetails({ ...groupDetails, permissions })}
                   selectAllLabel="Select All Areas"
-                  values={selectedGroup?.permissions || []}
                 />
               </div>
             </div>
           </div>
-
+          {selectedGroup && (
+            <div className="flex justify-end mt-5">
+              <Button onClick={() => savePermissionGroup()}>Save as New Permission Group</Button>
+            </div>
+          )}
           <div className="flex justify-end gap-4 mt-5">
             <Button onClick={handleModalClose} variant="secondary">
               Cancel
             </Button>
-            <Button onClick={savePermissionGroup}>Save and Close</Button>
+            <Button onClick={() => savePermissionGroup(!selectedGroup)}>Save and Close</Button>
           </div>
         </div>
       </PopupModal>

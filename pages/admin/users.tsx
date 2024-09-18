@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { permissionGroupColDef, styleProps, usersColDef } from 'components/admin/tableConfig';
-import { Button, Table } from 'components/core-ui-lib';
+import { Button, ConfirmationDialog, Table } from 'components/core-ui-lib';
 import AddEditUser from 'components/admin/modals/AddEditUser';
 import AddEditPermissionGroup from 'components/admin/modals/AddEditPermissionGroup';
 import Layout from 'components/Layout';
@@ -9,6 +9,8 @@ import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import { getPermissionGroupsList, getPermissionsList } from 'services/permissionService';
 import { getAllProductions } from 'services/productionService';
 import { useRouter } from 'next/router';
+import { mapRecursive } from 'utils';
+import { TreeItemOption } from 'components/global/TreeSelect/types';
 
 export default function Users({
   permissionsList,
@@ -20,6 +22,7 @@ export default function Users({
   const [showPermissionGroupModal, setShowPermissionGroupModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [selectedGroup, setSelectedGroup] = useState(null);
+  const [showConfirmationDialog, setShowConfirmationDialog] = useState(false);
   const router = useRouter();
 
   const populateUserTable = async () => {
@@ -49,6 +52,14 @@ export default function Users({
     }
   };
 
+  const updatePermissions = (options: TreeItemOption[], values: TreeItemOption[]) => {
+    const updatedOptions = mapRecursive(options, (o) => {
+      const value = values.find((v) => v.id === o.id);
+      return { ...o, checked: !!value };
+    });
+    return updatedOptions;
+  };
+
   useEffect(() => {
     if (userRowData.length === 0) {
       populateUserTable();
@@ -76,9 +87,25 @@ export default function Users({
     setShowUsersModal(true);
   };
 
-  const handlePermissionGroupEdit = ({ data }) => {
-    setSelectedGroup(data);
-    setShowPermissionGroupModal(true);
+  const handlePermissionGroupEdit = async (type, data) => {
+    if (type === 'edit') {
+      const updatedPermissions = updatePermissions(permissionsList, data.permissions);
+      setSelectedGroup({ ...data, permissions: updatedPermissions });
+      setShowPermissionGroupModal(true);
+    } else if (type === 'delete') {
+      setSelectedGroup(data);
+      setShowConfirmationDialog(true);
+    }
+  };
+  const handleConfirmClick = async () => {
+    setShowConfirmationDialog(false);
+    await axios.delete('/api/admin/permissions-group/delete', {
+      data: {
+        groupId: selectedGroup.groupId,
+      },
+    });
+    setSelectedGroup(null);
+    router.replace(router.asPath);
   };
 
   return (
@@ -164,11 +191,10 @@ export default function Users({
 
           <Table
             testId="admin-permission-group-table"
-            columnDefs={permissionGroupColDef(null)}
+            columnDefs={permissionGroupColDef(handlePermissionGroupEdit)}
             rowData={permisisonGroups}
             styleProps={styleProps}
             tableHeight={300}
-            onRowDoubleClicked={handlePermissionGroupEdit}
           />
         </div>
       </div>
@@ -186,9 +212,18 @@ export default function Users({
           visible={showPermissionGroupModal}
           onClose={handlePermissionGroupModalClose}
           permissions={permissionsList}
-          productions={productionsList}
           groups={permisisonGroups}
           selectedGroup={selectedGroup}
+        />
+      )}
+      {showConfirmationDialog && (
+        <ConfirmationDialog
+          testId="confirmation-dialog"
+          show={showConfirmationDialog}
+          onNoClick={() => setShowConfirmationDialog(false)}
+          onYesClick={handleConfirmClick}
+          hasOverlay={false}
+          variant="delete"
         />
       )}
     </Layout>
