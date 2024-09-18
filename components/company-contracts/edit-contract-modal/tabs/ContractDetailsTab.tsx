@@ -1,6 +1,8 @@
 import { TemplateFormRow, ContractData, TemplateFormWithValues } from 'components/company-contracts/types';
-import { createFormInput, populateValueListWithPlaceholders, populateTemplateWithValues } from '../utils';
+import { populateValueListWithPlaceholders, populateTemplateWithValues } from '../utils';
 import { useState } from 'react';
+import { createFormInput } from '../formTypeMap';
+import { PlusCircleSolidIcon } from 'components/core-ui-lib/assets/svg';
 
 interface ContractDetailsTabProps {
   templateFormStructure: TemplateFormRow[];
@@ -16,16 +18,16 @@ const ContractDetailsTab = ({ templateFormStructure, contractData }: ContractDet
 
   console.log(templateStructureWithValues);
 
-  const handleAddEntry = (rowID: number) => {
+  const handleAddEntry = (rowID: number, valueIndex: number) => {
     setFormData((prevStructure) =>
       prevStructure.map((row) => {
         if (row.rowID === rowID) {
+          // Create a new entry based on the components of the value at valueIndex
           const newIndex = row.values.length > 0 ? row.values[row.values.length - 1].index + 1 : 1;
-
           const newComponents =
-            row.values[0]?.components.map((component) => ({
+            row.values[valueIndex]?.components.map((component) => ({
               ...component,
-              value: null,
+              value: null, // Default value for new entry
             })) || [];
 
           const newValueEntry = {
@@ -33,9 +35,16 @@ const ContractDetailsTab = ({ templateFormStructure, contractData }: ContractDet
             components: newComponents,
           };
 
+          // Add the new entry right after the current valueIndex
+          const updatedValues = [
+            ...row.values.slice(0, valueIndex + 1),
+            newValueEntry,
+            ...row.values.slice(valueIndex + 1),
+          ];
+
           return {
             ...row,
-            values: [...row.values, newValueEntry],
+            values: updatedValues,
           };
         }
         return row;
@@ -51,7 +60,7 @@ const ContractDetailsTab = ({ templateFormStructure, contractData }: ContractDet
           <div className="w-full h-[1px] bg-slate-300 mb-2" />
 
           {row.values.map((value, valueIndex) => (
-            <div key={valueIndex} className="mb-4">
+            <div key={valueIndex} className="mb-4 flex items-center">
               <div className="flex gap-x-4">
                 {value.components
                   .sort((a, b) => a.orderInRow - b.orderInRow)
@@ -61,14 +70,15 @@ const ContractDetailsTab = ({ templateFormStructure, contractData }: ContractDet
                     </div>
                   ))}
               </div>
+
+              {row.isAList && (
+                <PlusCircleSolidIcon
+                  className="hover:cursor-pointer"
+                  onClick={() => handleAddEntry(row.rowID, valueIndex)} // Pass rowID and valueIndex
+                />
+              )}
             </div>
           ))}
-
-          {row.isAList && (
-            <button className="mt-2 bg-blue-500 text-white py-1 px-4 rounded" onClick={() => handleAddEntry(row.rowID)}>
-              Add
-            </button>
-          )}
         </div>
       ))}
     </div>

@@ -1,7 +1,8 @@
-import { TextInput , Select , DateInput } from 'components/core-ui-lib';
+import { ReactNode } from 'react';
+import { TextInput, Select, DateInput } from 'components/core-ui-lib';
 import { noop } from 'utils';
 
-const BooleanInput = () => {
+const BooleanInput = ({ value }: { value: string }) => {
   return (
     <Select
       className="w-32"
@@ -10,15 +11,25 @@ const BooleanInput = () => {
         { text: 'No', value: false },
       ]}
       onChange={noop}
+      value={value}
     />
   );
 };
 
 const formTypeMap = {
-  Number: (_props: { value: string }) => <TextInput />,
-  String: (_props: { value: string }) => <TextInput />,
-  Boolean: (_props: { value: string }) => <BooleanInput />,
-  Date: (_props: { value: string }) => <DateInput onChange={noop} />,
+  Number: ({ value }: { value: string }) => <TextInput value={value} />,
+  String: ({ value }: { value: string }) => <TextInput value={value} />,
+  Boolean: ({ value }: { value: string }) => <BooleanInput value={value} />,
+  Date: ({ value }: { value: string }) => <DateInput onChange={noop} value={value} />,
 };
 
-export default formTypeMap;
+export const createFormInput = (type: string, label: string, value: string): ReactNode => {
+  const Component = formTypeMap[type];
+  if (!Component) return null;
+  return (
+    <div>
+      <div className="w-52">{label}</div>
+      <Component value={value} />
+    </div>
+  );
+};

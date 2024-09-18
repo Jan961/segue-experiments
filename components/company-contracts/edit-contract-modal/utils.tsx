@@ -1,17 +1,4 @@
-import { ReactNode } from 'react';
-import formTypeMap from './formTypeMap';
 import { TemplateFormRow, TemplateFormWithValues, ContractData } from 'components/company-contracts/types';
-
-export const createFormInput = (type: string, label: string, value: string): ReactNode => {
-  const Component = formTypeMap[type];
-  if (!Component) return null;
-  return (
-    <div>
-      <div className="w-52">{label}</div>
-      <Component value={value} />
-    </div>
-  );
-};
 
 export const populateValueListWithPlaceholders = (
   templateFormRows: TemplateFormRow[],
