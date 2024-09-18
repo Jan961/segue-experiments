@@ -1,5 +1,6 @@
 import { Time } from 'components/core-ui-lib/TimeInput/TimeInput';
 import { startOfDay } from 'date-fns';
+import { pick } from 'radash';
 import { getShortWeekFormat } from 'services/dateService';
 import { formatDecimalValue, isNullOrEmpty } from 'utils';
 import formatInputDate from 'utils/dateInputFormat';
@@ -59,7 +60,7 @@ export const filterPrice = (dealMemoPrice) => {
     if (defaultPrice[price.DMPTicketName]) {
       defaultPrice[price.DMPTicketName] = {
         DMPTicketName: price.DMPTicketName,
-        DMPTicketPrice: formatDecimalValue(price.DMPTicketPrice),
+        DMPTicketPrice: price.DMPTicketPrice === '0' ? formatDecimalValue(price.DMPTicketPrice) : '',
         DMPNumTickets: price.DMPNumTickets,
         DMPId: price.DMPId,
         DMPDeMoId: price.DMPDeMoId,
@@ -81,30 +82,6 @@ export const filterTechProvision = (techProvision) => {
     }
   });
   return techData;
-};
-
-export const filterHoldTypeData = (dealHoldType, dealMemoHoldData) => {
-  const dealHoldObj = {};
-  if (dealMemoHoldData && dealMemoHoldData.length > 0) {
-    dealMemoHoldData.forEach((hold) => {
-      dealHoldObj[hold.DMHoldHoldTypeId] = hold;
-    });
-  }
-  const holdTypeTableData = dealHoldType.map((holdData) => {
-    if (dealHoldObj[holdData.HoldTypeId]) {
-      const decimalPrice = formatDecimalValue(dealHoldObj[holdData.HoldTypeId].DMHoldValue);
-      holdData.value = decimalPrice === '0.00' ? '' : decimalPrice;
-      holdData.seats = dealHoldObj[holdData.HoldTypeId].DMHoldSeats;
-      holdData.DMHoldDeMoId = holdData.HoldTypeId;
-    } else {
-      holdData.value = '';
-      holdData.seats = '';
-    }
-    holdData.type = holdData.HoldTypeName;
-    return holdData;
-  });
-
-  return holdTypeTableData;
 };
 
 export const filterPercentage = (num: number) => {
@@ -295,3 +272,41 @@ export const timeToDateTime = (inputTime: Time | string): Date => {
 
   return datetime;
 };
+
+export const formatDecimalFields = (dealMemoData: any, type: string) => {
+  const costObj = pick(dealMemoData, [
+    'GuaranteeAmount',
+    'VenueRental',
+    'StaffingContra',
+    'AgreedContraItems',
+    'RestorationLevy',
+    'BookingFees',
+    'TxnChargeAmount',
+    'LocalMarketingBudget',
+    'LocalMarketingContra',
+    'SellPitchFee',
+    'AdvancePaymentAmount',
+  ]);
+
+  Object.entries(costObj).forEach(([key, value]) => {
+    costObj[key] = type === 'string' ? formatDecimalValue(value) : parseFloat(value);
+  });
+
+  return costObj;
+};
+
+export const formatValue = (value: any) => {
+  if (isNullOrEmpty(value)) {
+    return '';
+  } else if (value === '0') {
+    return '';
+  } else {
+    return value;
+  }
+};
+
+export const formatSeatKillValues = (dmHoldData: any) =>
+  dmHoldData.map((hold) => ({
+    ...hold,
+    DMHoldValue: formatValue(hold.DMHoldValue) === '' ? '' : formatDecimalValue(hold.DMHoldValue),
+  }));
