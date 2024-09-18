@@ -110,7 +110,7 @@ export const permissionGroupColDef = (updateGroup) => {
   return [
     {
       headerName: 'Name of Permission Group',
-      field: 'name',
+      field: 'groupName',
       cellRenderer: DefaultTextRenderer,
       width: 600,
     },
