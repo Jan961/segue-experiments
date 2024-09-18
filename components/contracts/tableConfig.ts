@@ -169,13 +169,25 @@ export const getCompanyContractsColumnDefs = (userList = []) => [
       isSearchable: true,
     }),
   },
-  { headerName: 'Date Issued', field: 'dateIssue', cellRenderer: DateRenderer, width: 120 },
+  {
+    headerName: 'Date Issued',
+    field: 'dateIssue',
+    cellRenderer: DateRenderer,
+    width: 120,
+    cellStyle: {
+      overflow: 'visible',
+    },
+  },
   {
     headerName: 'Date Returned',
     field: 'dateReturned',
     cellRenderer: DateRenderer,
     resizable: false,
     width: 120,
+    cellStyle: {
+      overflow: 'visible',
+    },
+    cellEditorParams: { popupParent: document.body },
   },
   {
     headerName: '',
