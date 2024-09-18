@@ -53,7 +53,7 @@ export const populateTemplateWithValues = (
     row.components.forEach((component) => {
       Object.keys(valueMap).forEach((indexStr) => {
         const index = parseInt(indexStr, 10);
-        if (valueMap[index][component.id] !== undefined) {
+        if (valueMap[index] && valueMap[index][component.id] !== undefined) {
           allIndexes.add(index);
         }
       });

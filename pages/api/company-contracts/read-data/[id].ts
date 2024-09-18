@@ -18,7 +18,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       where: { DataACCContractId: contractID },
     });
 
-    return res.status(200).json(data);
+    const mappedData = data.map((item) => ({
+      compID: item.DataComponentId,
+      index: item.DataIndexNum,
+      value: item.Value,
+    }));
+
+    return res.status(200).json(mappedData);
   } catch (err) {
     console.error(err, 'Error - Failed to retrieve Template Form Components');
     return res.status(500).json(err);
