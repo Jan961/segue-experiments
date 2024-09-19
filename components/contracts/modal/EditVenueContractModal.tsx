@@ -34,10 +34,9 @@ import { UploadModal } from 'components/core-ui-lib';
 import { attachmentMimeTypes } from 'components/core-ui-lib/UploadModal/interface';
 import { headlessUploadMultiple } from 'requests/upload';
 import { getFileUrl } from 'lib/s3';
-import charCodeToCurrency from 'utils/charCodeToCurrency';
 import { UiVenue, VenueData, transformVenues } from 'utils/venue';
 import { ConfDialogVariant } from 'components/core-ui-lib/ConfirmationDialog/ConfirmationDialog';
-import { parseAndSortDates, checkDecimalStringFormat } from '../utils';
+import { parseAndSortDates, checkDecimalStringFormat, formatDecimalOnBlur } from '../utils';
 import { currencyState } from 'state/global/currencyState';
 
 const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClose: () => void }) => {
@@ -88,8 +87,12 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
   const [confirmationVariant, setConfirmationVariant] = useState<string>('cancel');
   const [dealMemoCreated, setDealMemoCreated] = useState<boolean>(true);
   const [dealMemoButtonText, setDealMemoButtonText] = useState<string>('Deal Memo');
-  const [, setCurrency] = useRecoilState(currencyState);
+  const [currency, setCurrency] = useRecoilState(currencyState);
 
+  const [errors, setErrors] = useState({
+    royaltyPerc: false,
+    promoterPerc: false,
+  });
   const producerList = useMemo(() => {
     const list = {};
     Object.values(users).forEach((listData) => {
@@ -480,7 +483,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                 <div className=" text-primary-input-text font-bold text-sm mt-6">Notes</div>
                 <TextArea
                   onChange={(e) => editDealMemoData('Notes', e.target.value)}
-                  className="h-[125px] w-[400px]"
+                  className="h-auto w-[400px]"
                   value={dealMemoFormData.Notes}
                 />
               </div>
@@ -655,7 +658,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
               <div className="w-4/5 flex">
                 <Select
                   onChange={(value) => editContractModalData('DealType', value, 'contract')}
-                  className="bg-primary-white w-52"
+                  className="bg-primary-white w-60"
                   value={formData.DealType ? formData.DealType : 'NULL'}
                   placeholder="Deal Type"
                   options={dealTypeOptions}
@@ -670,7 +673,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
               </div>
               <div className="w-4/5">
                 <TextArea
-                  className="mt-2.5 h-[58px] w-[498px]"
+                  className="mt-2.5 h-auto w-[498px]"
                   value={formData.DealNotes}
                   onChange={(value) => editContractModalData('DealNotes', value.target.value, 'booking')}
                   placeholder="Enter Deal Details"
@@ -683,9 +686,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
               </div>
               <div className="w-4/5 flex items-center justify-between">
                 <div className="flex  items-center">
-                  <div className=" text-primary-input-text font-bold text-sm mr-1">
-                    {charCodeToCurrency(formData.CurrencyCode)}
-                  </div>
+                  <div className=" text-primary-input-text font-bold text-sm mr-1">{currency?.symbol}</div>
                   <TextInput
                     type="number"
                     className="w-[100px]"
@@ -695,46 +696,62 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                         editContractModalData('GP', e.target.value, 'contract');
                       }
                     }}
+                    onBlur={(e) => {
+                      editContractModalData('GP', formatDecimalOnBlur(e), 'contract');
+                    }}
                   />
                 </div>
                 <div className="flex  items-center">
                   <div className=" text-primary-input-text font-bold text-sm mr-1">Royalty</div>
                   <TextInput
-                    type="number"
-                    className="w-[100px]"
+                    testId="deal-royalty-percentage"
+                    className={classNames('w-[100px]', errors.royaltyPerc ? 'text-primary-red' : '')}
                     value={formData.RoyaltyPercentage}
+                    type="number"
                     onChange={(e) => {
-                      if (checkDecimalStringFormat(e.target.value, 5, 2)) {
-                        editContractModalData('RoyaltyPercentage', e.target.value, 'contract');
+                      if (parseFloat(e.target.value) < 0 || parseFloat(e.target.value) > 100) {
+                        setErrors({ ...errors, royaltyPerc: true });
+                      } else {
+                        setErrors({ ...errors, royaltyPerc: false });
                       }
+
+                      editContractModalData('RoyaltyPercentage', e.target.value, 'contract');
                     }}
-                  />
+                  />{' '}
                   <div className=" text-primary-input-text font-bold text-sm ml-1">%</div>
                 </div>
-
                 <div className="flex  items-center">
                   <div className=" text-primary-input-text font-bold text-sm mr-1">Promoter</div>
                   <TextInput
-                    type="number"
-                    className="w-[100px]"
+                    testId="deal-promoter-percentage"
+                    className={classNames('w-[100px]', errors.promoterPerc ? 'text-primary-red' : '')}
                     value={formData.PromoterPercent}
+                    type="number"
                     onChange={(e) => {
-                      if (checkDecimalStringFormat(e.target.value, 6, 3)) {
-                        editContractModalData('PromoterPercent', e.target.value, 'contract');
+                      if (parseFloat(e.target.value) < 0 || parseFloat(e.target.value) > 100) {
+                        setErrors({ ...errors, promoterPerc: true });
+                      } else {
+                        setErrors({ ...errors, promoterPerc: false });
                       }
+                      editContractModalData('PromoterPercent', e.target.value, 'contract');
                     }}
-                  />
+                  />{' '}
                   <div className=" text-primary-input-text font-bold text-sm ml-1">%</div>
                 </div>
-              </div>
+              </div>{' '}
             </div>
+            {(errors.royaltyPerc || errors.promoterPerc) && (
+              <div className="w-full flex items-center mt-2 text-primary-red ml-[124px]">
+                Percentage value must be between 0 and 100
+              </div>
+            )}
             <div className="flex mt-2.5 items-center">
               <div className="w-1/5">
                 <div className=" text-primary-input-text font-bold text-sm">Ticket Pricing Notes</div>
               </div>
               <div className="w-4/5">
                 <TextArea
-                  className="mt-2.5 h-[58px] w-[498px]"
+                  className="mt-2.5 h-auto w-[498px]"
                   value={formData.TicketPriceNotes}
                   onChange={(value) => editContractModalData('TicketPriceNotes', value.target.value, 'booking')}
                   placeholder="Enter Ticket Pricing Notes"
@@ -747,7 +764,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
               </div>
               <div className="w-4/5">
                 <TextArea
-                  className="mt-2.5 h-[58px] w-[498px]"
+                  className="mt-2.5 h-auto w-[498px]"
                   value={formData.MarketingDealNotes}
                   onChange={(value) => editContractModalData('MarketingDealNotes', value.target.value, 'booking')}
                   placeholder="Enter Marketing Deal"
@@ -760,7 +777,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
               </div>
               <div className="w-4/5">
                 <TextArea
-                  className="mt-2.5 h-[58px] w-[498px]"
+                  className="mt-2.5 w-[498px] h-auto"
                   value={formData.CrewNotes}
                   onChange={(value) => editContractModalData('CrewNotes', value.target.value, 'booking')}
                   placeholder="Enter Crew Notes"
@@ -814,7 +831,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
               </div>
               <div className="w-4/5">
                 <TextArea
-                  className="mt-2.5 h-[58px] w-[498px]"
+                  className="mt-2.5 h-auto w-[498px]"
                   value={formData.Exceptions}
                   onChange={(value) => editContractModalData('Exceptions', value.target.value, 'contract')}
                   placeholder="Enter Exceptions Notes"
@@ -827,7 +844,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
               </div>
               <div className="w-4/5">
                 <TextArea
-                  className="mt-2.5 h-[58px] w-[498px]"
+                  className="mt-2.5 h-auto w-[498px]"
                   value={formData.Notes}
                   onChange={(value) => editContractModalData('Notes', value.target.value, 'contract')}
                   placeholder="Enter Contract Notes"
@@ -840,7 +857,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
               </div>
               <div className="w-4/5">
                 <TextArea
-                  className="mt-2.5 h-[58px] w-[498px]"
+                  className="mt-2.5 h-auto w-[498px]"
                   value={formData.MerchandiseNotes}
                   onChange={(value) => editContractModalData('MerchandiseNotes', value.target.value, 'booking')}
                   placeholder="Enter Merchandise Notes"
