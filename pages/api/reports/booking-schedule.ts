@@ -376,12 +376,11 @@ const handler = async (req, res) => {
     '',
     '',
     '',
-    '',
+    'PRODUCTION TOTALS',
     '',
     '',
     '',
     ...blankPerformances,
-    'PRODUCTION TOTALS',
     addTime(totalTime),
     totalMileage.reduce((acc, m) => acc + Number(m || 0), 0),
   ]);

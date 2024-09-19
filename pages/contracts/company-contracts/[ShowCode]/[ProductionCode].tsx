@@ -3,7 +3,7 @@ import Layout from 'components/Layout';
 import { InitialState } from 'lib/recoil';
 import { getProductionJumpState } from 'utils/getProductionJumpState';
 import { getAccountIdFromReq, getUsers } from 'services/userService';
-import CompanyContractFilters from 'components/contracts/ContractFilters';
+import CompanyContractFilters from 'components/contracts/CompanyContractsFilters';
 import CompanyContractsTable from 'components/contracts/table/CompanyContractsTable';
 import { getAllVenuesMin, getUniqueVenueCountrylist } from 'services/venueService';
 import { all, objectify } from 'radash';

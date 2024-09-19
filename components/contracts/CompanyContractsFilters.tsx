@@ -89,7 +89,6 @@ const ContractFilters = () => {
             isSearchable
           />
         </div>
-        <Button className="text-sm leading-8 ml-6 px-6" text="Clear Filters" onClick={onClearFilters} />
       </div>
       <div className="flex justify-between gap-2">
         <div className="px-4 flex items-center gap-4 flex-wrap  mt-2">
@@ -106,6 +105,7 @@ const ContractFilters = () => {
           />
           <Label className="!text-base text-primary-input-text !font-bold ml-6" text="Date Issued" />
           <ContractsDateFilter />
+          <Button className="text-sm leading-8 ml-6 px-6" text="Clear Filters" onClick={onClearFilters} />
         </div>
         <div className="flex">
           <Button className="text-sm leading-8 px-6" text="Start New Contract" onClick={openContractSchedule} />

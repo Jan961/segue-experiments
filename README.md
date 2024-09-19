@@ -81,6 +81,6 @@ Logging an error can be done by sending a string to the logging service with the
 
 ### Action Logging
 
-This service will log the action with the logged in user attached in the Logging Sevice to do this add..
+This service will log the action with the logged in user attached in the Logging Sevice to do this add.
 
 `loggingService.logAction("{Action or component }","{Details of the action to be logged}")`
