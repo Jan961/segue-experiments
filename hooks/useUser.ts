@@ -27,6 +27,7 @@ const useUser = () => {
         ...userDetails,
         password: generateRandomHash(4),
       });
+
       if (data.error) {
         setError(data.error);
         return false;

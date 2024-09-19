@@ -208,7 +208,7 @@ const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetails
             <TextInput
               testId="company-email"
               name="email"
-              placeholder="EnterCompany Email Addressr"
+              placeholder="Enter Company Email Address"
               className="w-full"
               value={accountDetails.email}
               onChange={handleAccountDetailsChange}

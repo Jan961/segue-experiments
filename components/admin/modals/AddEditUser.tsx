@@ -127,7 +127,10 @@ const AdEditUser = ({ visible, onClose, permissions, productions = [], selectedU
 
     const selectedProductions = userDetails.productions.filter(({ checked }) => checked).map(({ id }) => id);
     const payload = { ...userDetails, permissions, productions: selectedProductions };
-    selectedUser ? await updateUser(payload) : await createUser(payload);
+    const success = selectedUser ? await updateUser(payload) : await createUser(payload);
+    if (!success) {
+      return;
+    }
     // reset the state
     setUserDetails(DEFAULT_USER_DETAILS);
     onClose(true);
