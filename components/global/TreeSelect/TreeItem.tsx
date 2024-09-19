@@ -50,6 +50,8 @@ export default memo(function TreeItem({ value, onChange, defaultOpen }: TreeItem
   }, [checked]);
 
   useEffect(() => {
+    const isPartiallySelected = hasPartiallySelectedChildren(options);
+    setShowIntermediateState(isPartiallySelected);
     setItemOptions(options);
   }, [options]);
 

@@ -10,6 +10,7 @@ import {
   ignoreWarningType,
   tableColMaps,
   expectedHeaders,
+  SpreadsheetDataCleaned,
 } from 'types/SpreadsheetValidationTypes';
 
 let currentRow: SpreadsheetRow;
@@ -54,13 +55,15 @@ export const validateSpreadsheetFile = async (file, prodCode, venueList, prodDat
 
   validateHeaders(workbook);
   if (spreadsheetIssues.spreadsheetFormatIssue) {
-    return { file, spreadsheetIssues };
+    const cleanedSpreadsheetData = cleanSpreadsheetData(spreadsheetData);
+    return { file, spreadsheetIssues, spreadsheetData: cleanedSpreadsheetData };
   }
 
   const salesWorksheet = workbook.getWorksheet('Sales');
   if (!salesWorksheet) {
     spreadsheetIssues.spreadsheetFormatIssue = true;
-    return { file, spreadsheetIssues };
+    const cleanedSpreadsheetData = cleanSpreadsheetData(spreadsheetData);
+    return { file, spreadsheetIssues, spreadsheetData: cleanedSpreadsheetData };
   }
 
   salesWorksheet.eachRow((row, rowNumber) => {
@@ -114,8 +117,9 @@ export const validateSpreadsheetFile = async (file, prodCode, venueList, prodDat
   widenColumn(detailsColumn);
   createSummaryWorksheet(workbook);
   convertWorkbookToFile(workbook, file);
+  const cleanedSpreadsheetData = cleanSpreadsheetData(spreadsheetData);
 
-  return { file, spreadsheetIssues };
+  return { file, spreadsheetIssues, spreadsheetData: cleanedSpreadsheetData };
 };
 
 const validateRow = (
@@ -224,20 +228,31 @@ const updateValidateSpreadsheetData = (
     return { detailsColumnMessage, rowWarningOccurred, rowErrorOccurred, currentRowBooking: null };
   }
 
-  const sale = booking.sales.find((s) => s.salesDate.getTime() === new Date(currentRow.salesDate).getTime());
+  const sale = booking.sales.find(
+    (s) => s.salesDate.getTime() === new Date(currentRow.salesDate).getTime() && s.salesType === currentRow.salesType,
+  );
 
   if (sale) {
     // If there is already an identical VenueCode/BookingDate/SaleDate in SpreadsheetData, ensure they don't have conflicting data
     const isMismatch =
       sale.seats !== currentRow.seats ||
       sale.value !== currentRow.value ||
-      sale.salesType !== currentRow.salesType ||
       String(sale.isFinal).toUpperCase() !== currentRow.isFinal.toUpperCase() ||
       sale.ignoreWarning.toUpperCase() !== currentRow.ignoreWarning.toUpperCase();
 
     if (isMismatch) {
-      mismatchedRows.add(sale.salesRow);
-      mismatchedRows.add(currentRow.row);
+      mismatchedRows.add({
+        row: sale.salesRow,
+        bookingDate: currentBookingDate,
+        salesDate: sale.salesDate,
+        venueCode: currentVenue,
+      });
+      mismatchedRows.add({
+        row: currentRow.row,
+        bookingDate: currentBookingDate,
+        salesDate: sale.salesDate,
+        venueCode: currentVenue,
+      });
     }
   } else {
     booking.sales.push(createNewSale());
@@ -456,35 +471,11 @@ const postValidationChecks = () => {
         errorRows.push(booking.bookingFirstRow);
       }
 
-      let previousSale = null;
       const validSales = booking.sales.filter((sale) => !isNaN(sale.salesDate.getTime()));
       for (const sale of validSales.sort((a, b) => a.salesDate.getTime() - b.salesDate.getTime())) {
         let detailsColumnMessage = '';
-        let warningOccurred = sale.salesRow.getCell(10).value === 'WARNING';
+        const warningOccurred = sale.salesRow.getCell(10).value === 'WARNING';
         let errorOccurred = sale.salesRow.getCell(10).value === 'ERROR';
-
-        if (previousSale) {
-          if (sale.seats > previousSale.seats * 1.15) {
-            detailsColumnMessage +=
-              '| WARNING - Seats increased by more than 15% from previous sale (Row ' + previousSale.rowNumber + ')';
-            warningOccurred = true;
-          }
-          if (sale.seats < previousSale.seats) {
-            detailsColumnMessage +=
-              '| WARNING - Seats decreased from previous sale (Row ' + previousSale.rowNumber + ')';
-            warningOccurred = true;
-          }
-          if (parseFloat(sale.value) > parseFloat(previousSale.value) * 1.15) {
-            detailsColumnMessage +=
-              '| WARNING - Value increased by more than 15% from previous sale (Row ' + previousSale.rowNumber + ')';
-            warningOccurred = true;
-          }
-          if (parseFloat(sale.value) < parseFloat(previousSale.value)) {
-            detailsColumnMessage +=
-              '| WARNING - Value decreased from previous sale (Row ' + previousSale.rowNumber + ')';
-            warningOccurred = true;
-          }
-        }
 
         if (booking.finalSalesDate && booking.finalSalesDate < sale.salesDate) {
           detailsColumnMessage += '| ERROR - Cannot have additional sales after specified Final Sales Date';
@@ -495,23 +486,65 @@ const postValidationChecks = () => {
         if (warningOccurred) warningRows.push(sale.salesRow);
         const formattedDetailsMessage = formatDetailsMessage((sale.salesRow.getCell(11).value += detailsColumnMessage));
         updateResponseDetailsCells(sale.salesRow, formattedDetailsMessage, errorOccurred, warningOccurred);
-
-        previousSale = sale;
       }
+
+      checkSeatsValueWarnings(validSales, 'General Sales');
+      checkSeatsValueWarnings(validSales, 'General Reservations');
+      checkSeatsValueWarnings(validSales, 'School Sales');
+      checkSeatsValueWarnings(validSales, 'School Reservations');
     }
   }
 
-  const rowNums = [...mismatchedRows].map((row) => row.number);
+  const rowNums = [...mismatchedRows].map((item) => item.row.number);
   const rowString = '(Row: ' + rowNums.join(', ') + ')';
-  mismatchedRows.forEach((row) => {
-    const detailsColumnMessage = `| ERROR - Mismatch in information for Booking at Venue ${row
-      .getCell(tableColMaps.VenueCode)
-      .value.toString()} on ${dateToSimple(row.getCell(tableColMaps.BookingDate).value.toString())}, on Sales Date ${
-      dateToSimple(row.getCell(tableColMaps.SalesDate).value.toString()) + ' ' + rowString
+  mismatchedRows.forEach((item) => {
+    const detailsColumnMessage = `| ERROR - Mismatch in information for Booking at Venue ${
+      item.venueCode
+    } on ${dateToSimple(item.bookingDate.toString())}, on Sales Date ${
+      dateToSimple(item.salesDate.toString()) + ' ' + rowString
     }`;
-    updateResponseDetailsCells(row, detailsColumnMessage, true, false);
-    errorRows.push(row);
+    updateResponseDetailsCells(item.row, detailsColumnMessage, true, false);
+    errorRows.push(item.row);
   });
+};
+
+const checkSeatsValueWarnings = (salesArray, salesType: string) => {
+  let previousSale = null;
+  for (const sale of salesArray
+    .filter((sale) => sale.salesType === salesType)
+    .sort((a, b) => a.salesDate.getTime() - b.salesDate.getTime())) {
+    let detailsColumnMessage = '';
+    let warningOccurred = sale.salesRow.getCell(10).value === 'WARNING';
+    const errorOccurred = sale.salesRow.getCell(10).value === 'ERROR';
+
+    if (previousSale) {
+      if (sale.seats > previousSale.seats * 1.15) {
+        detailsColumnMessage +=
+          '| WARNING - Seats increased by more than 15% from previous sale (Row ' + previousSale.rowNumber + ')';
+        warningOccurred = true;
+      }
+      if (sale.seats < previousSale.seats) {
+        detailsColumnMessage += '| WARNING - Seats decreased from previous sale (Row ' + previousSale.rowNumber + ')';
+        warningOccurred = true;
+      }
+      if (parseFloat(sale.value) > parseFloat(previousSale.value) * 1.15) {
+        detailsColumnMessage +=
+          '| WARNING - Value increased by more than 15% from previous sale (Row ' + previousSale.rowNumber + ')';
+        warningOccurred = true;
+      }
+      if (parseFloat(sale.value) < parseFloat(previousSale.value)) {
+        detailsColumnMessage += '| WARNING - Value decreased from previous sale (Row ' + previousSale.rowNumber + ')';
+        warningOccurred = true;
+      }
+    }
+
+    if (errorOccurred) errorRows.push(sale.salesRow);
+    if (warningOccurred) warningRows.push(sale.salesRow);
+    const formattedDetailsMessage = formatDetailsMessage((sale.salesRow.getCell(11).value += detailsColumnMessage));
+    updateResponseDetailsCells(sale.salesRow, formattedDetailsMessage, errorOccurred, warningOccurred);
+
+    previousSale = sale;
+  }
 };
 
 const updateResponseDetailsCells = (row, message, rowErrorOccurred, rowWarningOccurred) => {
@@ -660,6 +693,53 @@ const checkForBlankRow = (currentRow) => {
     return value?.toString().trim() === '';
   });
   return isBlank;
+};
+
+const cleanSpreadsheetData = (data: SpreadsheetData): SpreadsheetDataCleaned => {
+  return {
+    venues: data.venues.map((venue) => ({
+      venueCode: venue.venueCode,
+      venueId: null,
+      bookings: venue.bookings.map((booking) => ({
+        bookingDate: booking.bookingDate.toISOString(),
+        finalSalesDate: booking.finalSalesDate,
+        bookingId: null,
+        sales: booking.sales.reduce((acc: any, sale) => {
+          const { salesDate, salesType, seats, value, isFinal } = sale;
+
+          let salesForDate = acc.find((s: any) => s.salesDate.getTime() === salesDate.getTime());
+          if (!salesForDate) {
+            salesForDate = {
+              salesDate,
+              isFinal,
+              generalSales: null,
+              generalReservations: null,
+              schoolSales: null,
+              schoolReservations: null,
+            };
+            acc.push(salesForDate);
+          }
+
+          switch (salesType) {
+            case 'General Sales':
+              salesForDate.generalSales = { seats, value };
+              break;
+            case 'General Reservations':
+              salesForDate.generalReservations = { seats, value };
+              break;
+            case 'School Sales':
+              salesForDate.schoolSales = { seats, value };
+              break;
+            case 'School Reservations':
+              salesForDate.schoolReservations = { seats, value };
+              break;
+          }
+
+          return acc;
+        }, []),
+      })),
+    })),
+  };
 };
 
 export default validateSpreadsheetFile;

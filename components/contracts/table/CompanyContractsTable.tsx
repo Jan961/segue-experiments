@@ -34,11 +34,11 @@ export default function CompanyContractsTable({ rowData = [] }: ContractsTablePr
   const userOptionList = useMemo(
     () =>
       transformToOptions(
-        Object.values(users),
+        Object.values(users || {}),
         null,
         'Id',
         ({ FirstName = '', LastName = '' }) => `${FirstName || ''} ${LastName || ''}`,
-      ),
+      ).sort((a, b) => a.text.localeCompare(b.text)),
     [users],
   );
   const columnDefs = useMemo(() => getCompanyContractsColumnDefs(userOptionList), [userOptionList]);
