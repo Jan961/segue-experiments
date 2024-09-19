@@ -63,7 +63,7 @@ export const BuildNewContract = ({
   const [formData, setFormData] = useState<TemplateFormRowPopulated[]>(null);
 
   const [contractData, setContractData] = useState<ContractData[]>(null);
-  const [contractDataDOC, setContractDataDOC] = useState(null);
+  // const [contractDataDOC, setContractDataDOC] = useState(null);
 
   useEffect(() => {
     const fetchTemplateDocument = async () => {
@@ -158,21 +158,39 @@ export const BuildNewContract = ({
     console.log(contractData);
   }, [contractData]);
 
-  // const updatePersonDetails = async () => {
-  //   const id = contractSchedule.personId;
-  //   await axios.post('/api/person/update/' + id, contractPerson);
-  // };
+  const updatePersonDetails = async () => {
+    const id = contractSchedule.personId;
+    await axios.post('/api/person/update/' + id, contractPerson);
+  };
+
+  const createContract = async () => {
+    try {
+      const response = axios.post('/api/company-contracts/create/contract/', {
+        production: contractSchedule.production,
+        department: contractSchedule.department,
+        role: contractSchedule.role,
+        personId: contractSchedule.personId,
+        contractData,
+        accScheduleJson: schedule,
+      });
+      console.log(response);
+    } catch (err) {
+      console.log(err, 'Error - failed to create contract');
+    }
+  };
+
+  const updateContract = async () => {
+    console.log(contractData);
+  };
 
   const onSave = async () => {
     try {
       let promise;
       if (isEdit) {
-        // await updatePersonDetails();
-        // promise = updateContract();
-        console.log('temp');
+        await updatePersonDetails();
+        promise = updateContract();
       } else {
-        // promise = createContract();
-        console.log('temp');
+        promise = createContract();
       }
       notify.promise(
         promise.then(() => {
@@ -264,13 +282,7 @@ export const BuildNewContract = ({
             )}
             {activeViewIndex === 1 && (
               <div className="flex flex-col gap-8 px-16">
-                <ContractDetailsTab
-                  formData={formData}
-                  setFormData={setFormData}
-                  setContractData={setContractData}
-                  contractDataDOC={contractDataDOC}
-                  setContractDataDOC={setContractDataDOC}
-                />
+                <ContractDetailsTab formData={formData} setFormData={setFormData} setContractData={setContractData} />
               </div>
             )}
             {activeViewIndex === 2 && (

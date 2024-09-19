@@ -6,8 +6,6 @@ interface ContractDetailsTabProps {
   formData: TemplateFormRowPopulated[];
   setFormData: React.Dispatch<React.SetStateAction<TemplateFormRowPopulated[]>>;
   setContractData: React.Dispatch<React.SetStateAction<ContractData[]>>;
-  contractDataDOC: any;
-  setContractDataDOC: React.Dispatch<React.SetStateAction<any>>;
 }
 
 const ContractDetailsTab = ({ formData, setFormData, setContractData }: ContractDetailsTabProps) => {
@@ -51,9 +49,7 @@ const ContractDetailsTab = ({ formData, setFormData, setContractData }: Contract
     );
   };
 
-  const handleFormInputChange = (value, compID, index, _tag) => {
-    // change contractData
-
+  const handleFormInputChange = (value, compID, index) => {
     setContractData((prevData) => {
       const existingEntryIndex = prevData.findIndex((entry) => entry.compID === compID && entry.index === index);
 
@@ -95,7 +91,7 @@ const ContractDetailsTab = ({ formData, setFormData, setContractData }: Contract
                         type={component.type}
                         label={component.label}
                         initialValue={component.value}
-                        handleChange={(val) => handleFormInputChange(val, component.id, value.index, component.tag)}
+                        handleChange={(val) => handleFormInputChange(val, component.id, value.index)}
                       />
                     </div>
                   ))}
