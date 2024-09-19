@@ -363,7 +363,8 @@ export const formatDateWithTimezoneOffset = ({
 };
 
 export const convertTimeToTodayDateFormat = (time) => {
-  const timeStr = `${time.hrs}:${time.min}`;
+  const value = time.target.value;
+  const timeStr = `${value.hrs}:${value.min}`;
   const today = moment();
   const [hours, minutes] = timeStr.split(':').map(Number);
   today.set({ hour: hours, minute: minutes, second: 0, millisecond: 0 });
