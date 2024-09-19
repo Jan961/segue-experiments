@@ -67,14 +67,17 @@ const AdEditPermissionGroup = ({
       setValidationErrors({ groupName: 'Group name is required' });
       return;
     }
-    // check if group name already exists
-    const existingGroup = groups.find(
-      (g) => g.groupName.trim().toLowerCase() === groupDetails.groupName.trim().toLowerCase(),
-    );
-    if (existingGroup) {
-      setValidationErrors({ groupName: 'Group name already exists' });
-      return;
+    // check if group name already exists if it is a new group
+    if (isNew) {
+      const existingGroup = groups.find(
+        (g) => g.groupName.trim().toLowerCase() === groupDetails.groupName.trim().toLowerCase(),
+      );
+      if (existingGroup) {
+        setValidationErrors({ groupName: 'Group name already exists' });
+        return;
+      }
     }
+
     try {
       const permissions = groupDetails.permissions
         .flatMap((perm) => [perm, ...perm.options])
