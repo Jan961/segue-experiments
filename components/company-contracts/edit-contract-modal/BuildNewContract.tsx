@@ -19,7 +19,7 @@ import { getDepartmentNameByID } from '../utils';
 import { TemplateFormRow, TemplateFormRowPopulated, ContractData } from '../types';
 import { contractTemplateState } from 'state/contracts/contractTemplateState';
 import { getFileUrl } from 'lib/s3';
-import { populateValueListWithPlaceholders, populateTemplateWithValues } from './utils';
+import { populateContractData, populateTemplateWithValues } from './utils';
 
 export interface BuildNewContractProps {
   contractSchedule?: Partial<IContractSchedule>;
@@ -61,6 +61,9 @@ export const BuildNewContract = ({
   // const [templateFormStructure, setTemplateFormStructure] = useState<TemplateFormRow[]>(null);
   // const [contractData, setContractData] = useState<ContractData[]>(null);
   const [formData, setFormData] = useState<TemplateFormRowPopulated[]>(null);
+
+  const [contractData, setContractData] = useState<ContractData[]>(null);
+  const [contractDataDOC, setContractDataDOC] = useState(null);
 
   useEffect(() => {
     const fetchTemplateDocument = async () => {
@@ -110,9 +113,10 @@ export const BuildNewContract = ({
       const templateFormStructure = await fetchTemplateFormStructure();
       const contractData = await fetchContractData();
       if (templateFormStructure) {
-        const populatedValueList = populateValueListWithPlaceholders(templateFormStructure, contractData);
-        const templateStructureWithValues = populateTemplateWithValues(templateFormStructure, populatedValueList);
-        setFormData(templateStructureWithValues);
+        const contractDataPopulated = populateContractData(templateFormStructure, contractData);
+        setContractData(contractDataPopulated);
+        const templateStructureWithData = populateTemplateWithValues(templateFormStructure, contractDataPopulated);
+        setFormData(templateStructureWithData);
       }
     };
 
@@ -261,7 +265,14 @@ export const BuildNewContract = ({
             )}
             {activeViewIndex === 1 && (
               <div className="flex flex-col gap-8 px-16">
-                <ContractDetailsTab formData={formData} setFormData={setFormData} />
+                <ContractDetailsTab
+                  formData={formData}
+                  setFormData={setFormData}
+                  contractData={contractData}
+                  setContractData={setContractData}
+                  contractDataDOC={contractDataDOC}
+                  setContractDataDOC={setContractDataDOC}
+                />
               </div>
             )}
             {activeViewIndex === 2 && (

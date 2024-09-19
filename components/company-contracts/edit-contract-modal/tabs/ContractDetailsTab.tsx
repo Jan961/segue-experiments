@@ -1,12 +1,16 @@
-import { TemplateFormRowPopulated } from 'components/company-contracts/types';
-import { createFormInput } from '../formTypeMap';
+import { TemplateFormRowPopulated, ContractData } from 'components/company-contracts/types';
+import { FormInputGeneral } from '../formTypeMap';
 import { PlusCircleSolidIcon } from 'components/core-ui-lib/assets/svg';
 
 interface ContractDetailsTabProps {
   formData: TemplateFormRowPopulated[];
   setFormData: React.Dispatch<React.SetStateAction<TemplateFormRowPopulated[]>>;
+  contractData: ContractData[];
+  setContractData: React.Dispatch<React.SetStateAction<ContractData[]>>;
+  contractDataDOC: any;
+  setContractDataDOC: React.Dispatch<React.SetStateAction<any>>;
 }
-
+// const ContractDetailsTab = ({ formData, contractData, contractDataDOC, setFormData, setContractData, setContractDataDOC }: ContractDetailsTabProps) => {
 const ContractDetailsTab = ({ formData, setFormData }: ContractDetailsTabProps) => {
   const handleAddEntry = (rowID: number, valueIndex: number) => {
     setFormData((prevStructure) =>
@@ -40,6 +44,10 @@ const ContractDetailsTab = ({ formData, setFormData }: ContractDetailsTabProps) 
     );
   };
 
+  // const handleFormInputChange = (compID, index, tag, value) => {
+
+  // }
+
   return (
     <div>
       {formData.map((row) => (
@@ -54,7 +62,7 @@ const ContractDetailsTab = ({ formData, setFormData }: ContractDetailsTabProps) 
                   .sort((a, b) => a.orderInRow - b.orderInRow)
                   .map((component) => (
                     <div key={component.id} className="mb-1">
-                      {createFormInput(component.type, component.label, component.value)}
+                      <FormInputGeneral type={component.type} label={component.label} initialValue={component.value} />
                     </div>
                   ))}
               </div>

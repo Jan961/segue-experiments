@@ -1,6 +1,6 @@
 import { TemplateFormRow, TemplateFormRowPopulated, ContractData } from 'components/company-contracts/types';
 
-export const populateValueListWithPlaceholders = (
+export const populateContractData = (
   templateFormRows: TemplateFormRow[],
   populatedValueList: ContractData[],
 ): ContractData[] => {
