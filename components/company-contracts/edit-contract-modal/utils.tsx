@@ -1,4 +1,4 @@
-import { TemplateFormRow, TemplateFormWithValues, ContractData } from 'components/company-contracts/types';
+import { TemplateFormRow, TemplateFormRowPopulated, ContractData } from 'components/company-contracts/types';
 
 export const populateValueListWithPlaceholders = (
   templateFormRows: TemplateFormRow[],
@@ -24,7 +24,7 @@ export const populateValueListWithPlaceholders = (
 export const populateTemplateWithValues = (
   templateFormRows: TemplateFormRow[],
   populatedValueList: ContractData[],
-): TemplateFormWithValues[] => {
+): TemplateFormRowPopulated[] => {
   return templateFormRows.map((row) => {
     const valueMap: { [index: number]: { [compID: number]: any } } = {};
 

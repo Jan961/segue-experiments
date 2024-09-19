@@ -17,9 +17,10 @@ import ScheduleTab from './tabs/ScheduleTab';
 import { ERROR_CODES } from 'config/apiConfig';
 import { contractDepartmentState } from 'state/contracts/contractDepartmentState';
 import { getDepartmentNameByID } from '../utils';
-import { TemplateFormRow, ContractData } from '../types';
+import { TemplateFormRow, TemplateFormRowPopulated, ContractData } from '../types';
 import { contractTemplateState } from 'state/contracts/contractTemplateState';
 import { getFileUrl } from 'lib/s3';
+import { populateValueListWithPlaceholders, populateTemplateWithValues } from './utils';
 
 export interface BuildNewContractProps {
   contractSchedule?: Partial<IContractSchedule>;
@@ -42,6 +43,9 @@ export const BuildNewContract = ({
   const [activeViewIndex, setActiveViewIndex] = useState(0);
   const [schedule, setSchedule] = useState<IScheduleDay[]>([]);
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
+  const cancelToken = useAxiosCancelToken();
+  const departmentMap = useRecoilValue(contractDepartmentState);
   const selectedProduction = useMemo(
     () => productions.find(({ Id }) => Id === contractSchedule.production),
     [contractSchedule?.production, productions],
@@ -51,16 +55,14 @@ export const BuildNewContract = ({
     const { firstName, lastName } = personDetails || {};
     return firstName || lastName ? `${firstName} ${lastName}` : 'Person';
   }, [contractPerson]);
-  const router = useRouter();
-  const cancelToken = useAxiosCancelToken();
-  const departmentMap = useRecoilValue(contractDepartmentState);
 
   const selectedTemplateID = contractSchedule.templateId;
   const templateMap = useRecoilValue(contractTemplateState);
   const [docXTemplateFile, setDocXTemplateFile] = useState<File>(null);
 
-  const [templateFormStructure, setTemplateFormStructure] = useState<TemplateFormRow[]>(null);
-  const [contractData, setContractData] = useState<ContractData[]>(null);
+  // const [templateFormStructure, setTemplateFormStructure] = useState<TemplateFormRow[]>(null);
+  // const [contractData, setContractData] = useState<ContractData[]>(null);
+  const [formData, setFormData] = useState<TemplateFormRowPopulated[]>(null);
 
   useEffect(() => {
     const fetchTemplateDocument = async () => {
@@ -83,31 +85,40 @@ export const BuildNewContract = ({
       }
     };
 
-    const fetchTemplateFormStructure = async () => {
+    const fetchTemplateFormStructure = async (): Promise<TemplateFormRow[]> => {
       try {
         const response = await axios.get('/api/company-contracts/read-template/' + contractSchedule.templateId);
         if (response.data) {
-          setTemplateFormStructure(response.data);
+          return response.data;
         }
       } catch (err) {
         console.error(err, 'Error - failed to fetch template form structure.');
       }
     };
 
-    const fetchContractData = async () => {
+    const fetchContractData = async (): Promise<ContractData[]> => {
       try {
         const response = await axios.get('/api/company-contracts/read-data/' + contractId);
         if (response.data) {
-          setContractData(response.data);
+          return response.data;
         }
       } catch (err) {
         console.error(err, 'Error - failed to fetch contract data.');
       }
     };
 
+    const populateTemplateFormWithValues = async () => {
+      const templateFormStructure = await fetchTemplateFormStructure();
+      const contractData = await fetchContractData();
+      if (templateFormStructure && contractData) {
+        const populatedValueList = populateValueListWithPlaceholders(templateFormStructure, contractData);
+        const templateStructureWithValues = populateTemplateWithValues(templateFormStructure, populatedValueList);
+        setFormData(templateStructureWithValues);
+      }
+    };
+
     fetchTemplateDocument();
-    fetchTemplateFormStructure();
-    fetchContractData();
+    populateTemplateFormWithValues();
   }, []);
 
   const fetchPersonDetails = useCallback(
@@ -295,7 +306,7 @@ export const BuildNewContract = ({
             )}
             {activeViewIndex === 1 && (
               <div className="flex flex-col gap-8 px-16">
-                <ContractDetailsTab templateFormStructure={templateFormStructure} contractData={contractData} />
+                <ContractDetailsTab formData={formData} setFormData={setFormData} />
               </div>
             )}
             {activeViewIndex === 2 && (

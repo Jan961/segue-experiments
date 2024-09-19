@@ -1,3 +1,9 @@
+export interface ContractData {
+  compID: number;
+  index: number;
+  value: any;
+}
+
 export interface TemplateFormRow {
   rowID: number;
   rowNum: number;
@@ -13,13 +19,7 @@ export interface TemplateFormRow {
   }[];
 }
 
-export interface ContractData {
-  compID: number;
-  index: number;
-  value: any;
-}
-
-export interface TemplateFormWithValues {
+export interface TemplateFormRowPopulated {
   rowID: number;
   rowNum: number;
   rowLabel: string;

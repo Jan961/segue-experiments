@@ -1,33 +1,22 @@
-import { TemplateFormRow, ContractData, TemplateFormWithValues } from 'components/company-contracts/types';
-import { populateValueListWithPlaceholders, populateTemplateWithValues } from '../utils';
-import { useState } from 'react';
+import { TemplateFormRowPopulated } from 'components/company-contracts/types';
 import { createFormInput } from '../formTypeMap';
 import { PlusCircleSolidIcon } from 'components/core-ui-lib/assets/svg';
 
 interface ContractDetailsTabProps {
-  templateFormStructure: TemplateFormRow[];
-  contractData: ContractData[];
+  formData: TemplateFormRowPopulated[];
+  setFormData: React.Dispatch<React.SetStateAction<TemplateFormRowPopulated[]>>;
 }
 
-const ContractDetailsTab = ({ templateFormStructure, contractData }: ContractDetailsTabProps) => {
-  console.log('ContractData:', contractData);
-
-  const populatedValueList = populateValueListWithPlaceholders(templateFormStructure, contractData);
-  const templateStructureWithValues = populateTemplateWithValues(templateFormStructure, populatedValueList);
-  const [formData, setFormData] = useState<TemplateFormWithValues[]>(templateStructureWithValues);
-
-  console.log(templateStructureWithValues);
-
+const ContractDetailsTab = ({ formData, setFormData }: ContractDetailsTabProps) => {
   const handleAddEntry = (rowID: number, valueIndex: number) => {
     setFormData((prevStructure) =>
       prevStructure.map((row) => {
         if (row.rowID === rowID) {
-          // Create a new entry based on the components of the value at valueIndex
           const newIndex = row.values.length > 0 ? row.values[row.values.length - 1].index + 1 : 1;
           const newComponents =
             row.values[valueIndex]?.components.map((component) => ({
               ...component,
-              value: null, // Default value for new entry
+              value: null,
             })) || [];
 
           const newValueEntry = {
@@ -35,7 +24,6 @@ const ContractDetailsTab = ({ templateFormStructure, contractData }: ContractDet
             components: newComponents,
           };
 
-          // Add the new entry right after the current valueIndex
           const updatedValues = [
             ...row.values.slice(0, valueIndex + 1),
             newValueEntry,
@@ -74,7 +62,7 @@ const ContractDetailsTab = ({ templateFormStructure, contractData }: ContractDet
               {row.isAList && (
                 <PlusCircleSolidIcon
                   className="hover:cursor-pointer"
-                  onClick={() => handleAddEntry(row.rowID, valueIndex)} // Pass rowID and valueIndex
+                  onClick={() => handleAddEntry(row.rowID, valueIndex)}
                 />
               )}
             </div>
