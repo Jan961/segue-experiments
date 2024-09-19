@@ -128,14 +128,7 @@ export const BuildNewContract = ({
       }
     };
 
-    fetchTemplateDocument();
-    populateTemplateFormWithValues();
-    fetchContractSchedule(contractSchedule.production);
-  }, []);
-
-  const fetchPersonDetails = useCallback(
-    async (id: number) => {
-      setLoading(true);
+    const fetchPersonDetails = async (id: number) => {
       try {
         const response = await axios.get('/api/person/' + id, { cancelToken });
         setContractPerson(response.data);
@@ -143,16 +136,19 @@ export const BuildNewContract = ({
         onClose();
         notify.error('Error fetching person details. Please try again');
       }
-      setLoading(false);
-    },
-    [setContractPerson, cancelToken],
-  );
+    };
 
-  useEffect(() => {
-    if (contractSchedule.personId) {
-      fetchPersonDetails(contractSchedule.personId);
-    }
-  }, [contractSchedule.personId, isEdit, contractId]);
+    const loadContract = async () => {
+      setLoading(true);
+      await fetchPersonDetails(contractSchedule.personId);
+      await fetchTemplateDocument();
+      await populateTemplateFormWithValues();
+      await fetchContractSchedule(contractSchedule.production);
+      setLoading(false);
+    };
+
+    loadContract();
+  }, []);
 
   // const updatePersonDetails = async () => {
   //   const id = contractSchedule.personId;
@@ -163,8 +159,11 @@ export const BuildNewContract = ({
     try {
       let promise;
       if (isEdit) {
+        // await updatePersonDetails();
+        // promise = updateContract();
         console.log('temp');
       } else {
+        // promise = createContract();
         console.log('temp');
       }
       notify.promise(
@@ -257,7 +256,7 @@ export const BuildNewContract = ({
             )}
             {activeViewIndex === 0 && contractPerson && (
               <div className="flex flex-col gap-8 px-16">
-                <PersonDetailsTab person={contractPerson} height="" updateFormData={setContractPerson} />
+                <PersonDetailsTab person={contractPerson} updateFormData={setContractPerson} />
               </div>
             )}
             {activeViewIndex === 1 && (

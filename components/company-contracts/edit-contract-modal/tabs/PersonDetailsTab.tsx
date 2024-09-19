@@ -22,11 +22,10 @@ const defaultContractDetails = {
 
 interface ContractPersonDataFormProps {
   person?: Partial<IPerson>;
-  height: string;
   updateFormData: (data: Partial<IPerson>) => void;
 }
 
-export const PersonDetailsTab = ({ person = {}, height, updateFormData }: ContractPersonDataFormProps) => {
+export const PersonDetailsTab = ({ person = {}, updateFormData }: ContractPersonDataFormProps) => {
   const [personData, setPersonData] = useState<IPerson>({ ...defaultContractDetails, ...person });
   const {
     personDetails,
@@ -65,7 +64,7 @@ export const PersonDetailsTab = ({ person = {}, height, updateFormData }: Contra
 
   return (
     <>
-      <div className={`${height} w-full`}>
+      <div className="w-full">
         <div className="text-xl text-primary-navy font-bold mb-3">Person Details</div>
         <PersonalDetails
           details={personDetails}
