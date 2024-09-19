@@ -1,19 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
-import { IContractSchedule, IContractDetails, IScheduleDay } from '../../../contracts/types';
-import { ProductionDTO } from 'interfaces';
 import axios from 'axios';
 import { Spinner } from 'components/global/Spinner';
 
-interface ContractPreviewDetailsFormProps {
-  contractPerson: any;
-  production: Partial<ProductionDTO>;
-  contractSchedule: Partial<IContractSchedule>;
-  contractDetails: Partial<IContractDetails>;
-  schedule: IScheduleDay[];
+interface PreviewTabProps {
   templateFile: File;
 }
 
-export const PreviewTab = ({ templateFile }: ContractPreviewDetailsFormProps) => {
+export const PreviewTab = ({ templateFile }: PreviewTabProps) => {
   const isMounted = useRef(false);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
 
@@ -34,7 +27,6 @@ export const PreviewTab = ({ templateFile }: ContractPreviewDetailsFormProps) =>
 
       const pdfBlob = new Blob([response.data], { type: 'application/pdf' });
       const pdfUrl = URL.createObjectURL(pdfBlob);
-      console.log(pdfUrl);
 
       setPdfUrl(pdfUrl);
     } catch (err) {
