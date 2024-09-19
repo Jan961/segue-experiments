@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { IContractSchedule, IContractDetails, IScheduleDay } from '../../../contracts/types';
 import { ProductionDTO } from 'interfaces';
 import axios from 'axios';
-import { Button } from 'components/core-ui-lib';
+import { Spinner } from 'components/global/Spinner';
 
 interface ContractPreviewDetailsFormProps {
   contractPerson: any;
@@ -14,11 +14,11 @@ interface ContractPreviewDetailsFormProps {
 }
 
 export const PreviewTab = ({ templateFile }: ContractPreviewDetailsFormProps) => {
-  const [pdfUrl, setPdfUrl] = useState<string | null>(null); // State to store the PDF URL
+  const isMounted = useRef(false);
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
 
   const fetchPDF = async () => {
     try {
-      console.log(templateFile);
       const tokenresponse = await axios.post('/api/pdfconvert/token/create/');
 
       const formData = new FormData();
@@ -33,24 +33,30 @@ export const PreviewTab = ({ templateFile }: ContractPreviewDetailsFormProps) =>
       });
 
       const pdfBlob = new Blob([response.data], { type: 'application/pdf' });
-      const pdfUrl = URL.createObjectURL(pdfBlob); // Create URL for PDF blob
+      const pdfUrl = URL.createObjectURL(pdfBlob);
       console.log(pdfUrl);
 
-      setPdfUrl(pdfUrl); // Set the URL in state
+      setPdfUrl(pdfUrl);
     } catch (err) {
       console.error(err, 'Error - failed to convert DOCX file to PDF');
     }
   };
 
+  useEffect(() => {
+    if (!isMounted.current) {
+      fetchPDF();
+      isMounted.current = true;
+    }
+  }, []);
+
   return (
-    <div className="w-full h-full">
-      <Button onClick={fetchPDF} />
+    <div className="w-full h-full flex items-center justify-center">
       {pdfUrl ? (
         <object data={pdfUrl} type="application/pdf" width="100%" height="100%">
           <p>PDF cannot be displayed.</p>
         </object>
       ) : (
-        <div>Loading PDF...</div>
+        <Spinner size="lg" className="" />
       )}
     </div>
   );
