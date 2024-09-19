@@ -1,6 +1,7 @@
 import prismaMaster from 'lib/prisma_master';
 import prismaClient from 'lib/prisma';
 import { isNullOrEmpty } from 'utils';
+import { getOrganizationIdFromReq } from './userService';
 
 const formatAccountUsers = (data) => {
   if (!data || data.length === 0) {
@@ -127,4 +128,41 @@ export const replaceProudctionPermissions = async (accountUserId: string, produc
       })),
     });
   });
+};
+
+const formatPermisisonGroups = (permissionGroups) => {
+  const formatted = permissionGroups.reduce((acc, group) => {
+    const { PermissionGroupPermission } = group;
+    const formattedGroup = {
+      groupId: group.PerGpId,
+      groupName: group.PerGpName,
+      permissions: PermissionGroupPermission.map(({ Permission }) => ({
+        id: Permission.PermissionId,
+        name: Permission.PermissionName,
+      })),
+    };
+    return [...acc, formattedGroup];
+  }, []);
+  return formatted;
+};
+
+export const getPermissionGroupsList = async (req) => {
+  try {
+    const organisationId = getOrganizationIdFromReq(req);
+    const results = await prismaMaster.PermissionGroup.findMany({
+      where: {
+        PerGpAccountId: organisationId,
+      },
+      include: {
+        PermissionGroupPermission: {
+          include: { Permission: { select: { PermissionId: true, PermissionName: true } } },
+        },
+      },
+    });
+    const formattedGroups = formatPermisisonGroups(results);
+
+    return formattedGroups;
+  } catch (err) {
+    console.log('Error fetching permission groups', err);
+  }
 };

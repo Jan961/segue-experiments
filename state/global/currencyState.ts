@@ -1,10 +1,10 @@
 import { atom } from 'recoil';
 
-export interface Currency {
+export interface TCurrencySymbol {
   symbol?: string;
 }
 
-const intialState: Currency = {
+const intialState: TCurrencySymbol = {
   symbol: '',
 };
 

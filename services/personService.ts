@@ -166,6 +166,9 @@ export const fetchAllMinPersonsList = async (): Promise<PersonMinimalDTO[]> => {
       PersonLastName: true,
       PersonEmail: true,
     },
+    orderBy: {
+      PersonFirstName: 'asc',
+    },
   });
   return persons.map((person) => ({
     id: person.PersonId ?? null,
