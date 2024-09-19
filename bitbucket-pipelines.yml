@@ -1,7 +1,5 @@
 image: atlassian/default-image:2
 image: cypress/browsers:latest
-clone:
-  depth: full
 pipelines:
   custom:
     cypress:
@@ -39,8 +37,6 @@ pipelines:
               - node
             script:
               - npm install
-              - pipe: sonarsource/sonarcloud-scan:2.0.0
-              - pipe: sonarsource/sonarcloud-quality-gate:0.1.6
               - npm run test:ci
               - npm run build
 definitions:

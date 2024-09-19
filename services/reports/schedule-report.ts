@@ -3,7 +3,32 @@ import prisma from 'lib/prisma';
 import moment from 'moment';
 import { minutesInHHmmFormat } from 'services/salesSummaryService';
 
-interface PerformanceInfo {
+export type SCHEDULE_VIEW = {
+  ProductionId: number;
+  FullProductionCode: string;
+  ShowName: string;
+  RehearsalStartDate: string;
+  ProductionStartDate: string;
+  ProductionEndDate: string;
+  EntryDate: string;
+  ProductionWeekNum: number;
+  EntryType: string;
+  EntryId: number;
+  EntryName: string;
+  EntryStatusCode: string;
+  Location: string;
+  PencilNum: number | null;
+  VenueId: number | null;
+  VenueSeats: number | null;
+  Mileage: number | null;
+  TimeMins: string | null;
+  DateTypeId: number | null;
+  DateTypeName: string;
+  AffectsAvailability: number;
+  SeqNo: number;
+};
+
+export interface PerformanceInfo {
   performanceId: number;
   performanceTime: string | null;
   performanceDate: string | null;
