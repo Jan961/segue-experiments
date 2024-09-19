@@ -103,9 +103,13 @@ export const getUserId = async (email: string) => {
   return UserId;
 };
 
+const THREE_HOURS_IN_SECONDS = 60 * 60 * 3;
 export const createUserSession = async (email: string, orgId: string) => {
   try {
-    const redisResonse = await redis.set(email, orgId);
+    // Set TTL for 3 hours (in seconds)
+    const redisResonse = await redis.set(email, orgId, {
+      ex: THREE_HOURS_IN_SECONDS,
+    });
     return redisResonse;
   } catch (err) {
     console.error(err);
@@ -116,6 +120,15 @@ export const deleteUserSession = async (email: string) => {
   try {
     const redisResonse = await redis.del(email);
     return redisResonse;
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+export const isSessionActive = async (email: string) => {
+  try {
+    const isActive = await redis.get(email);
+    return !!isActive;
   } catch (err) {
     console.error(err);
   }
@@ -134,4 +147,35 @@ export const createClerkUserWithoutSession = async (
     lastName,
   });
   return response;
+};
+
+export const getUserPermisisons = async (email: string, organisationId: string) => {
+  const accountUser = await prisma.AccountUser.findFirst({
+    where: {
+      User: {
+        UserEmail: {
+          equals: email,
+        },
+      },
+      Account: {
+        AccountOrganisationId: {
+          equals: organisationId,
+        },
+      },
+    },
+    select: {
+      Account: true,
+      AccountUserPermission: {
+        select: {
+          Permission: true,
+        },
+      },
+    },
+  });
+  const formattedPermissions =
+    accountUser?.AccountUserPermission.map(({ Permission }) => ({
+      permissionId: Permission.PermissionId,
+      permissionName: Permission.PermissionName,
+    })) || [];
+  return formattedPermissions;
 };

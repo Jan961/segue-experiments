@@ -7,7 +7,7 @@ import TextArea from 'components/core-ui-lib/TextArea/TextArea';
 import Checkbox from 'components/core-ui-lib/Checkbox';
 import TextInput from 'components/core-ui-lib/TextInput';
 import { statusOptions, dealTypeOptions, initialEditContractFormData } from 'config/contracts';
-import { useRecoilValue } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { useRouter } from 'next/router';
 import { currentProductionSelector } from 'state/booking/selectors/currentProductionSelector';
 import { addEditContractsState } from 'state/contracts/contractsState';
@@ -38,6 +38,7 @@ import charCodeToCurrency from 'utils/charCodeToCurrency';
 import { UiVenue, VenueData, transformVenues } from 'utils/venue';
 import { ConfDialogVariant } from 'components/core-ui-lib/ConfirmationDialog/ConfirmationDialog';
 import { parseAndSortDates, checkDecimalStringFormat } from '../utils';
+import { currencyState } from 'state/global/currencyState';
 
 const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClose: () => void }) => {
   const productionJumpState = useRecoilValue(currentProductionSelector);
@@ -87,6 +88,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
   const [confirmationVariant, setConfirmationVariant] = useState<string>('cancel');
   const [dealMemoCreated, setDealMemoCreated] = useState<boolean>(true);
   const [dealMemoButtonText, setDealMemoButtonText] = useState<string>('Deal Memo');
+  const [, setCurrency] = useRecoilState(currencyState);
 
   const producerList = useMemo(() => {
     const list = {};
@@ -110,12 +112,14 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
       setDealMemoCreated(true);
       setDealMemoButtonText('Edit Deal Memo');
     }
+
     const getHoldType = await axios.get<DealMemoHoldType>(`/api/dealMemo/hold-type/read`);
     setDealHoldType(getHoldType.data as DealMemoHoldType);
     if (demoModalData.data && demoModalData.data.BookingId) {
       setDemoModalData(demoModalData.data as DealMemoContractFormData);
       setDealMemoFormData(demoModalData.data as DealMemoContractFormData);
     }
+
     if (selectedTableCell.contract && selectedTableCell.contract.venueId) {
       const venueData = await axios.get(`/api/venue/${selectedTableCell.contract.venueId}`);
       setVenue(venueData.data as VenueData);
@@ -202,6 +206,23 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
     }
     if (type === 'contract') {
       setSaveContractFormData({ ...saveContractFormData, [key]: value });
+    }
+  };
+
+  useEffect(() => {
+    getCurrency(selectedTableCell.contract.Id);
+  }, [selectedTableCell.contract.Id]);
+
+  const getCurrency = async (bookingId) => {
+    try {
+      const response = await axios.get(`/api/marketing/currency/booking/${bookingId}`);
+
+      if (response.data && typeof response.data === 'object') {
+        const currencyObject = response.data as { currency: string };
+        setCurrency({ symbol: currencyObject.currency });
+      }
+    } catch (error) {
+      console.error('Error retrieving currency:', error);
     }
   };
 
@@ -505,10 +526,10 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
               <div className=" text-primary-input-text text-sm ml-5">{formData.performanceCount}</div>
               <div className=" text-primary-input-text font-bold text-sm ml-4">Times</div>
               <div>
-                {parseAndSortDates(formData.PerformanceTimes).map((dateTimeEntry) => {
+                {parseAndSortDates(formData.PerformanceTimes).map((dateTimeEntry, index) => {
                   return (
-                    <div key={dateTimeEntry.id} className=" text-primary-input-text  text-sm ml-4">
-                      {dateTimeEntry.formattedDate}
+                    <div key={index} className="text-primary-input-text  text-sm ml-4">
+                      {dateTimeEntry}
                     </div>
                   );
                 })}

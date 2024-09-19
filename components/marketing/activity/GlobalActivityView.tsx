@@ -3,7 +3,7 @@ import { Button, ConfirmationDialog, Table } from 'components/core-ui-lib';
 import { useRecoilValue } from 'recoil';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import { Spinner } from 'components/global/Spinner';
-import { currencyState } from 'state/marketing/currencyState';
+import { currencyState } from 'state/global/currencyState';
 import { globalActivityColDefs, styleProps } from '../table/tableConfig';
 import GlobalActivityModal, { ActivityModalVariant, GlobalActivity } from '../modal/GlobalActivityModal';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';

@@ -34,70 +34,58 @@ const getFileNameFromHeaders = (headers: AxiosResponseHeaders, defaultName: stri
 };
 
 export const onScheduleReport = async (ProductionId: number, filters: Partial<FilterState> = {}) => {
-  try {
-    const response = await axios.post(
-      '/api/reports/schedule-report',
-      { ProductionId, ...filters },
-      { responseType: 'blob' },
-    );
+  const response = await axios.post(
+    '/api/reports/schedule-report',
+    { ProductionId, ...filters },
+    { responseType: 'blob' },
+  );
 
-    if (response.status >= 200 && response.status < 300) {
-      const defaultName = `${ProductionId}`;
-      const suggestedName = getFileNameFromHeaders(response.headers as AxiosResponseHeaders, defaultName, 'xlsx');
-      const content = response.data;
-      if (content) {
-        downloadFromContent(content, suggestedName);
-      }
+  if (response.status >= 200 && response.status < 300) {
+    const defaultName = `${ProductionId}`;
+    const suggestedName = getFileNameFromHeaders(response.headers as AxiosResponseHeaders, defaultName, 'xlsx');
+    const content = response.data;
+    if (content) {
+      downloadFromContent(content, suggestedName);
     }
-  } catch (error) {
-    console.error(error);
   }
 };
 
 export const exportBookingSchedule = async (ProductionId: number, filters: Partial<FilterState> = {}) => {
-  try {
-    const response = await axios.post(
-      '/api/reports/booking-schedule',
-      { ProductionId, ...filters },
-      { responseType: 'blob' },
-    );
+  const response = await axios.post(
+    '/api/reports/booking-schedule',
+    { ProductionId, ...filters },
+    { responseType: 'blob' },
+  );
 
-    if (response.status >= 200 && response.status < 300) {
-      const defaultName = `${ProductionId}`;
-      const suggestedName = getFileNameFromHeaders(response.headers as AxiosResponseHeaders, defaultName, 'xlsx');
-      const content = response.data;
-      if (content) {
-        downloadFromContent(content, suggestedName);
-      }
+  if (response.status >= 200 && response.status < 300) {
+    const defaultName = `${ProductionId}`;
+    const suggestedName = getFileNameFromHeaders(response.headers as AxiosResponseHeaders, defaultName, 'xlsx');
+    const content = response.data;
+    if (content) {
+      downloadFromContent(content, suggestedName);
     }
-  } catch (error) {
-    console.log(error);
   }
 };
 
 export const exportMasterplanReport = async (fromDate: string, toDate: string) => {
-  try {
-    const response = await axios.post(
-      '/api/reports/masterplan',
-      {
-        fromDate: moment(getMonday(fromDate)),
-        toDate: moment(new Date(toDate)),
-        timezoneOffset: getTimezonOffset(),
-      },
-      { responseType: 'blob' },
-    );
+  const response = await axios.post(
+    '/api/reports/masterplan',
+    {
+      fromDate: moment(getMonday(fromDate)),
+      toDate: moment(new Date(toDate)),
+      timezoneOffset: getTimezonOffset(),
+    },
+    { responseType: 'blob' },
+  );
 
-    if (response.status >= 200 && response.status < 300) {
-      const defaultName = `Report`;
-      const suggestedName = getFileNameFromHeaders(response.headers as AxiosResponseHeaders, defaultName, 'xlsx');
+  if (response.status >= 200 && response.status < 300) {
+    const defaultName = `Report`;
+    const suggestedName = getFileNameFromHeaders(response.headers as AxiosResponseHeaders, defaultName, 'xlsx');
 
-      const content = response.data;
-      if (content) {
-        downloadFromContent(content, suggestedName);
-      }
+    const content = response.data;
+    if (content) {
+      downloadFromContent(content, suggestedName);
     }
-  } catch (error) {
-    console.log(error);
   }
 };
 
