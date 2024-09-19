@@ -44,7 +44,7 @@ export const ContractPersonDataForm = ({ person = {}, height, updateFormData }: 
       transformToOptions(
         Object.values(users),
         null,
-        'Id',
+        'AccUserId',
         ({ FirstName = '', LastName = '', Email = '' }) => `${FirstName || ''} ${LastName || ''} | ${Email || ''}`,
       ),
     [users],
