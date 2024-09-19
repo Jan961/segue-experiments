@@ -260,7 +260,7 @@ export const BuildNewContract = ({
             )}
             {activeViewIndex === 0 && contractPerson && (
               <div className="flex flex-col gap-8 px-16">
-                <PersonDetailsTab person={contractPerson} updateFormData={setContractPerson} />
+                <PersonDetailsTab person={contractPerson} updateFormData={setContractPerson} height="" />
               </div>
             )}
             {activeViewIndex === 1 && (
