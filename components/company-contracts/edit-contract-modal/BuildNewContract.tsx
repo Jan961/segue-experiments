@@ -154,6 +154,10 @@ export const BuildNewContract = ({
     loadContract();
   }, []);
 
+  useEffect(() => {
+    console.log(contractData);
+  }, [contractData]);
+
   // const updatePersonDetails = async () => {
   //   const id = contractSchedule.personId;
   //   await axios.post('/api/person/update/' + id, contractPerson);
@@ -263,7 +267,6 @@ export const BuildNewContract = ({
                 <ContractDetailsTab
                   formData={formData}
                   setFormData={setFormData}
-                  contractData={contractData}
                   setContractData={setContractData}
                   contractDataDOC={contractDataDOC}
                   setContractDataDOC={setContractDataDOC}

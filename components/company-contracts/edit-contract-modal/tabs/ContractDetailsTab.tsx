@@ -5,13 +5,12 @@ import { PlusCircleSolidIcon } from 'components/core-ui-lib/assets/svg';
 interface ContractDetailsTabProps {
   formData: TemplateFormRowPopulated[];
   setFormData: React.Dispatch<React.SetStateAction<TemplateFormRowPopulated[]>>;
-  contractData: ContractData[];
   setContractData: React.Dispatch<React.SetStateAction<ContractData[]>>;
   contractDataDOC: any;
   setContractDataDOC: React.Dispatch<React.SetStateAction<any>>;
 }
-// const ContractDetailsTab = ({ formData, contractData, contractDataDOC, setFormData, setContractData, setContractDataDOC }: ContractDetailsTabProps) => {
-const ContractDetailsTab = ({ formData, setFormData }: ContractDetailsTabProps) => {
+
+const ContractDetailsTab = ({ formData, setFormData, setContractData }: ContractDetailsTabProps) => {
   const handleAddEntry = (rowID: number, entryIndex: number) => {
     setFormData((prevStructure) =>
       prevStructure.map((row) => {
@@ -52,15 +51,30 @@ const ContractDetailsTab = ({ formData, setFormData }: ContractDetailsTabProps) 
     );
   };
 
-  const handleFormInputChange = (value, compID, index, tag) => {
-    console.log('changing value:', value);
-    console.log('changing compid:', compID);
-    console.log('changing index:', index);
-    console.log('changing tag:', tag);
-
+  const handleFormInputChange = (value, compID, index, _tag) => {
     // change contractData
 
-    // change contractDataDOC
+    setContractData((prevData) => {
+      const existingEntryIndex = prevData.findIndex((entry) => entry.compID === compID && entry.index === index);
+
+      if (existingEntryIndex !== -1) {
+        const updatedData = [...prevData];
+        updatedData[existingEntryIndex] = {
+          ...updatedData[existingEntryIndex],
+          value,
+        };
+        return updatedData;
+      } else {
+        return [
+          ...prevData,
+          {
+            compID,
+            index,
+            value,
+          },
+        ];
+      }
+    });
   };
 
   return (
