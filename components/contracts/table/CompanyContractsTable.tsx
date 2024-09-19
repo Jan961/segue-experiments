@@ -47,7 +47,7 @@ export default function CompanyContractsTable({ rowData = [] }: ContractsTablePr
       transformToOptions(
         Object.values(users || {}),
         null,
-        'Id',
+        'AccUserId',
         ({ FirstName = '', LastName = '' }) => `${FirstName || ''} ${LastName || ''}`,
       ).sort((a, b) => a.text.localeCompare(b.text)),
     [users],
