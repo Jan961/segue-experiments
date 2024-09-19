@@ -37,7 +37,7 @@ const useUser = () => {
 
       // create permissions for productions
       if (!isNullOrEmpty(userDetails.productions)) {
-        await axios.post('/api/permissions/production/create', {
+        await axios.post('/api/admin/permissions/production/create', {
           accountUserId: createResponse.AccUserId,
           productionIds: userDetails.productions,
         });

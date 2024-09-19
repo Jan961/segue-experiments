@@ -204,6 +204,7 @@ const AdEditUser = ({ visible, onClose, permissions, productions = [], selectedU
                     testId="user-password"
                   />
                   <Button
+                    testId="generate-pwd-button"
                     disabled={!!selectedUser}
                     onClick={() => setUserDetails({ ...userDetails, password: generateRandomHash(4) })}
                   >
@@ -222,7 +223,10 @@ const AdEditUser = ({ visible, onClose, permissions, productions = [], selectedU
                     value={userDetails.pin}
                     disabled
                   />
-                  <Button onClick={() => setUserDetails({ ...userDetails, pin: generateRandomHash(2) })}>
+                  <Button
+                    onClick={() => setUserDetails({ ...userDetails, pin: generateRandomHash(2) })}
+                    testId="generate-pin-button"
+                  >
                     Generate PIN
                   </Button>
                 </div>
@@ -249,6 +253,7 @@ const AdEditUser = ({ visible, onClose, permissions, productions = [], selectedU
                   label="All Productions"
                   checked={allProductionsChecked}
                   onChange={handleAllProductionsToggle}
+                  testId="all-productions-checkbox"
                 />
                 {userDetails.productions.map((production) => (
                   <Checkbox
@@ -258,6 +263,7 @@ const AdEditUser = ({ visible, onClose, permissions, productions = [], selectedU
                     label={production.label}
                     checked={production.checked}
                     onChange={handleProductionToggle}
+                    testId={`${production.label}-checkbox`}
                   />
                 ))}
               </div>
@@ -275,10 +281,12 @@ const AdEditUser = ({ visible, onClose, permissions, productions = [], selectedU
           </div>
 
           <div className="flex justify-end gap-4 mt-5">
-            <Button onClick={handleModalClose} variant="secondary">
+            <Button onClick={handleModalClose} variant="secondary" testId="cancel-edited-user-info">
               Cancel
             </Button>
-            <Button onClick={saveUser}>Save and Close</Button>
+            <Button onClick={saveUser} testId="save-edited-user-info">
+              Save and Close
+            </Button>
           </div>
           <FormError error={error} className="mt-2 flex justify-end" variant="md" />
         </div>

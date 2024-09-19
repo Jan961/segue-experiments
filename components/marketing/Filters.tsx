@@ -12,7 +12,7 @@ import MarketingButtons from './MarketingButtons';
 import formatInputDate from 'utils/dateInputFormat';
 import { reverseDate } from './utils';
 import { DATE_PATTERN, getWeekDayShort } from 'services/dateService';
-import { currencyState } from 'state/marketing/currencyState';
+import { currencyState } from 'state/global/currencyState';
 import axios from 'axios';
 import { LastPerfDate } from 'types/MarketingTypes';
 import { isNullOrEmpty } from 'utils';
