@@ -12,7 +12,6 @@ import LoadingOverlay from 'components/shows/LoadingOverlay';
 import { IContractSchedule, IScheduleDay } from '../../contracts/types';
 import { useRecoilValue } from 'recoil';
 import { productionJumpState } from 'state/booking/productionJumpState';
-import { transformContractData } from 'transformers/contracts';
 import ScheduleTab from './tabs/ScheduleTab';
 import { ERROR_CODES } from 'config/apiConfig';
 import { contractDepartmentState } from 'state/contracts/contractDepartmentState';
@@ -39,7 +38,6 @@ export const BuildNewContract = ({
 }: BuildNewContractProps) => {
   const { productions } = useRecoilValue(productionJumpState);
   const [contractPerson, setContractPerson] = useState(null);
-  const [contractDetails, setContractDetails] = useState({});
   const [activeViewIndex, setActiveViewIndex] = useState(0);
   const [schedule, setSchedule] = useState<IScheduleDay[]>([]);
   const [loading, setLoading] = useState(false);
@@ -98,6 +96,7 @@ export const BuildNewContract = ({
 
     const fetchContractData = async (): Promise<ContractData[]> => {
       try {
+        if (!contractId) return [];
         const response = await axios.get('/api/company-contracts/read-data/' + contractId);
         if (response.data) {
           return response.data;
@@ -110,15 +109,28 @@ export const BuildNewContract = ({
     const populateTemplateFormWithValues = async () => {
       const templateFormStructure = await fetchTemplateFormStructure();
       const contractData = await fetchContractData();
-      if (templateFormStructure && contractData) {
+      if (templateFormStructure) {
         const populatedValueList = populateValueListWithPlaceholders(templateFormStructure, contractData);
         const templateStructureWithValues = populateTemplateWithValues(templateFormStructure, populatedValueList);
         setFormData(templateStructureWithValues);
       }
     };
 
+    const fetchContractSchedule = async (productionId) => {
+      try {
+        const { data: schedule } = await axios.post('/api/reports/schedule-report', {
+          ProductionId: productionId,
+          format: 'json',
+        });
+        setSchedule(schedule.rows);
+      } catch (error) {
+        console.log('Error fetching contract schedule', error);
+      }
+    };
+
     fetchTemplateDocument();
     populateTemplateFormWithValues();
+    fetchContractSchedule(contractSchedule.production);
   }, []);
 
   const fetchPersonDetails = useCallback(
@@ -136,68 +148,24 @@ export const BuildNewContract = ({
     [setContractPerson, cancelToken],
   );
 
-  const fetchContractDetails = useCallback(
-    async (id: number) => {
-      setLoading(true);
-      try {
-        const { data } = await axios.get('/api/company-contracts/read/' + id, { cancelToken });
-        const { contractDetails } = data || {};
-        setContractDetails(contractDetails);
-        if (contractDetails?.accScheduleJson?.length) {
-          setSchedule(contractDetails.accScheduleJson);
-        } else {
-          fetchContractSchedule(contractSchedule.production);
-        }
-      } catch (error) {
-        onClose();
-        notify.error('Error fetching contract details. Please try again');
-      }
-      setLoading(false);
-    },
-    [setContractDetails, cancelToken],
-  );
-
   useEffect(() => {
     if (contractSchedule.personId) {
       fetchPersonDetails(contractSchedule.personId);
     }
-    if (isEdit && contractId) {
-      fetchContractDetails(contractId);
-    }
-    if (!isEdit) {
-      fetchContractSchedule(contractSchedule.production);
-    }
   }, [contractSchedule.personId, isEdit, contractId]);
 
-  const createContract = useCallback(
-    async () =>
-      axios.post('/api/company-contracts/create', { ...contractSchedule, contractDetails, accScheduleJson: schedule }),
-    [contractSchedule, contractDetails, schedule],
-  );
-
-  const updateContract = async () =>
-    axios.post(
-      '/api/company-contracts/update/' + contractId,
-      transformContractData({
-        ...contractSchedule,
-        ...contractDetails,
-        accScheduleJson: schedule,
-      }),
-    );
-
-  const updatePersonDetails = async () => {
-    const id = contractSchedule.personId;
-    await axios.post('/api/person/update/' + id, contractPerson);
-  };
+  // const updatePersonDetails = async () => {
+  //   const id = contractSchedule.personId;
+  //   await axios.post('/api/person/update/' + id, contractPerson);
+  // };
 
   const onSave = async () => {
     try {
       let promise;
       if (isEdit) {
-        await updatePersonDetails();
-        promise = updateContract();
+        console.log('temp');
       } else {
-        promise = createContract();
+        console.log('temp');
       }
       notify.promise(
         promise.then(() => {
@@ -216,18 +184,6 @@ export const BuildNewContract = ({
         const errors = error.response?.data?.errors || [];
         errors.map((error) => notify.error(error));
       }
-    }
-  };
-
-  const fetchContractSchedule = async (productionId) => {
-    try {
-      const { data: schedule } = await axios.post('/api/reports/schedule-report', {
-        ProductionId: productionId,
-        format: 'json',
-      });
-      setSchedule(schedule.rows);
-    } catch (error) {
-      console.log('Error fetching contract schedule', error);
     }
   };
 
