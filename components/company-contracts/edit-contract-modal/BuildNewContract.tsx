@@ -118,6 +118,7 @@ export const BuildNewContract = ({
         const contractDataPopulated = populateContractData(templateFormStructure, contractData);
         setContractData(contractDataPopulated);
         const templateStructureWithData = populateTemplateWithValues(templateFormStructure, contractDataPopulated);
+        console.log('tempalte structure with data:', templateStructureWithData);
         setFormData(templateStructureWithData);
       }
     };

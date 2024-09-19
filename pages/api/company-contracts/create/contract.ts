@@ -19,12 +19,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     console.log(contractData);
     console.log(templateId);
 
-    await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx) => {
       const result = await tx.ACCContract.create({
         data: {
           RoleName: role,
           ContractStatus: CompanyContractStatus.NotYetIssued,
           ACCScheduleJSON: JSON.stringify(accScheduleJson),
+          DateIssued: new Date(),
           ACCDepartment: {
             connect: { ACCDeptId: department },
           },
@@ -55,12 +56,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 ComponentId: contractDatum.compID,
               },
             },
-            DataIndexNum: contractDatum.DataIndexNum,
+            DataIndexNum: contractDatum.index,
             DataValue: contractDatum.value,
           },
         });
       }
+
+      return 'Success';
     });
+
+    res.status(200).json(result);
   } catch (err) {
     console.error(err, 'Error - failed to create contract');
   }

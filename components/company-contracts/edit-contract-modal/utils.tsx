@@ -2,14 +2,14 @@ import { TemplateFormRow, TemplateFormRowPopulated, ContractData } from 'compone
 
 export const populateContractData = (
   templateFormRows: TemplateFormRow[],
-  populatedValueList: ContractData[],
+  valueList: ContractData[],
 ): ContractData[] => {
   const allCompIDs = new Set(templateFormRows.flatMap((row) => row.components.map((c) => c.id)));
   console.log('allCompIDs:', allCompIDs);
 
   const populatedMap = new Map<number, ContractData[]>();
 
-  populatedValueList.forEach((valueItem) => {
+  valueList.forEach((valueItem) => {
     populatedMap.set(valueItem.compID, [...(populatedMap.get(valueItem.compID) || []), valueItem]);
   });
 

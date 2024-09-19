@@ -49,7 +49,7 @@ export default function CompanyContractsTable({ rowData = [] }: ContractsTablePr
       setNotesPopupContext({ visible: true, contract: e.data });
     }
     if (e.column.colId === 'edit') {
-      const { departmentId, productionId, personId, role, id } = e.data;
+      const { departmentId, productionId, personId, role, id, templateId } = e.data;
       setEditContract({
         visible: true,
         contractId: id,
@@ -58,7 +58,7 @@ export default function CompanyContractsTable({ rowData = [] }: ContractsTablePr
           production: productionId,
           department: departmentId,
           personId,
-          templateId: 1,
+          templateId,
         },
       });
     }

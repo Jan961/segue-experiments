@@ -37,6 +37,7 @@ export const fetchAllContracts = async (productionId?: number): Promise<IContrac
           PersonLastName: true,
         },
       },
+      ACCCTemplateId: true,
     },
   });
   return contracts.map(
@@ -52,6 +53,7 @@ export const fetchAllContracts = async (productionId?: number): Promise<IContrac
       Person,
       ACCCDeptId,
       ProductionId,
+      ACCCTemplateId,
     }) => ({
       id: ContractId,
       role: RoleName,
@@ -66,6 +68,7 @@ export const fetchAllContracts = async (productionId?: number): Promise<IContrac
       lastName: Person?.PersonLastName,
       departmentId: ACCCDeptId,
       productionId: ProductionId,
+      templateId: ACCCTemplateId,
     }),
   );
 };
