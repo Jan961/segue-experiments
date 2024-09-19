@@ -1,4 +1,4 @@
-import { VenueVenue } from 'prisma/generated/prisma-client';
+import { VenueVenueTravelView } from 'prisma/generated/prisma-client';
 import prisma from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { unique } from 'radash';
@@ -62,7 +62,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   const SLIDER_MIN = 25;
 
   try {
-    const initial = await prisma.venueVenue.findMany({
+    const initial = await prisma.venueVenueTravelView.findMany({
       select: {
         Mileage: true,
         TimeMins: true,
@@ -90,7 +90,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     if (!MinToMiles) MinToMiles = safeMin;
     if (!MaxToMiles) MaxToMiles = sliderMax;
 
-    const startVenue1Promise = prisma.venueVenue.findMany({
+    const startVenue1Promise = prisma.venueVenueTravelView.findMany({
       where: {
         Venue1Id: StartVenue,
         Mileage: { gte: MinFromMiles, lte: MaxFromMiles },
@@ -103,7 +103,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       },
     });
 
-    const startVenue2Promise = prisma.venueVenue.findMany({
+    const startVenue2Promise = prisma.venueVenueTravelView.findMany({
       where: {
         Venue2Id: StartVenue,
         Mileage: { gte: MinFromMiles, lte: MaxFromMiles },
@@ -116,7 +116,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       },
     });
 
-    const endVenue1Promise = prisma.venueVenue.findMany({
+    const endVenue1Promise = prisma.venueVenueTravelView.findMany({
       where: {
         Venue1Id: EndVenue,
         Mileage: { gte: MinToMiles, lte: MaxToMiles },
@@ -129,7 +129,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       },
     });
 
-    const endVenue2Promise = prisma.venueVenue.findMany({
+    const endVenue2Promise = prisma.venueVenueTravelView.findMany({
       where: {
         Venue2Id: EndVenue,
         Mileage: { gte: MinToMiles, lte: MaxToMiles },
@@ -151,12 +151,12 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
 
     // Combine the venue ids and mileages
     const startVenueRelations = [
-      ...startVenue1.map((v: VenueVenue) => ({ VenueId: v.Venue2Id, Mileage: v.Mileage, Mins: v.TimeMins })),
-      ...startVenue2.map((v: VenueVenue) => ({ VenueId: v.Venue1Id, Mileage: v.Mileage, Mins: v.TimeMins })),
+      ...startVenue1.map((v: VenueVenueTravelView) => ({ VenueId: v.Venue2Id, Mileage: v.Mileage, Mins: v.TimeMins })),
+      ...startVenue2.map((v: VenueVenueTravelView) => ({ VenueId: v.Venue1Id, Mileage: v.Mileage, Mins: v.TimeMins })),
     ];
     const endVenueRelations = [
-      ...endVenue1.map((v: VenueVenue) => ({ VenueId: v.Venue2Id, Mileage: v.Mileage, Mins: v.TimeMins })),
-      ...endVenue2.map((v: VenueVenue) => ({ VenueId: v.Venue1Id, Mileage: v.Mileage, Mins: v.TimeMins })),
+      ...endVenue1.map((v: VenueVenueTravelView) => ({ VenueId: v.Venue2Id, Mileage: v.Mileage, Mins: v.TimeMins })),
+      ...endVenue2.map((v: VenueVenueTravelView) => ({ VenueId: v.Venue1Id, Mileage: v.Mileage, Mins: v.TimeMins })),
     ];
 
     // Create a Map for endVenueRelations
