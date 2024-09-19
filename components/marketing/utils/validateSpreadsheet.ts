@@ -412,7 +412,7 @@ const validateIgnoreWarning = (currentRow: SpreadsheetRow) => {
   const warningOccurred = false;
 
   if (!Object.values(ignoreWarningType).includes(currentRow.ignoreWarning)) {
-    returnString += "| ERROR - Ignore Warning must either be 'Y', 'N', or blank";
+    returnString += "| ERROR - Ignore Warning must either be 'Y' or blank";
     errorOccurred = true;
   }
 

@@ -111,8 +111,6 @@ export enum isFinalType {
 export enum ignoreWarningType {
   'Y',
   'y',
-  'N',
-  'n',
   '',
 }
 
