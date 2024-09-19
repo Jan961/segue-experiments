@@ -741,7 +741,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
               </div>{' '}
             </div>
             {(errors.royaltyPerc || errors.promoterPerc) && (
-              <div className="w-4/5 flex items-center mt-2 text-primary-red justify-center">
+              <div className="w-full flex items-center mt-2 text-primary-red ml-[124px]">
                 Percentage value must be between 0 and 100
               </div>
             )}
