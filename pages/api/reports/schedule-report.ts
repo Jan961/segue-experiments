@@ -172,7 +172,7 @@ const handler = async (req, res) => {
 
   const map: { [key: string]: SCHEDULE_VIEW } = formattedData.reduce((acc, x) => ({ ...acc, [getKey(x)]: x }), {});
   const daysDiff = moment(to).diff(moment(from), 'days');
-  let rowNo = 5;
+  let rowNo = 8;
   let prevProductionWeekNum = '';
   let lastWeekMetaInfo = {
     weekTotalPrinted: false,
@@ -300,6 +300,7 @@ const handler = async (req, res) => {
     '',
     '',
     'PRODUCTION TOTALS',
+    '',
     '',
     '',
     seats.reduce((acc, m) => acc + Number(m || 0), 0),

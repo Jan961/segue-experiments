@@ -65,8 +65,8 @@ const createExcelFromData = (data, bookingInfo, productionName, venueAndDate) =>
     createHeaderCell(dataHeaderRow1.getCell(columnIndex), `${info.prodName}`, 3, 12);
     createHeaderCell(dataHeaderRow2.getCell(columnIndex), `No. of Performances: ${info.numPerfs}`, 3, 12);
     createHeaderCell(dataHeaderRow3.getCell(columnIndex), 'Date', 1, 12);
-    createHeaderCell(dataHeaderRow3.getCell(columnIndex + 1), 'Seats', 1, 12);
-    createHeaderCell(dataHeaderRow3.getCell(columnIndex + 2), 'Value', 1, 12);
+    createHeaderCell(dataHeaderRow3.getCell(columnIndex + 1), 'Seats Sold', 1, 12);
+    createHeaderCell(dataHeaderRow3.getCell(columnIndex + 2), 'Sales Value', 1, 12);
     columnIndex += 3;
   });
 
@@ -88,9 +88,10 @@ const createExcelFromData = (data, bookingInfo, productionName, venueAndDate) =>
     row.eachCell((cell, colNumber) => {
       // column number starts from 1
       // subtract first two cells for week and weekof
-      const salesIndex = colNumber - 2;
+      console.log(colNumber, cell.value);
+      const salesIndex = colNumber - 1;
       cell.alignment = { vertical: 'top', horizontal: 'center' };
-      if (colNumber <= 2) {
+      if (colNumber <= 1) {
         cell.font = { bold: true };
       }
       if (isLastRow) {
@@ -101,7 +102,7 @@ const createExcelFromData = (data, bookingInfo, productionName, venueAndDate) =>
         };
       }
 
-      if (colNumber > 2) {
+      if (colNumber > 1) {
         // Production Sales has 3 columns with date, seats, value
         const isSeatsCol = salesIndex % 3 === 2;
         const isValueCol = salesIndex % 3 === 0;
