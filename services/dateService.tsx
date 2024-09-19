@@ -1,4 +1,4 @@
-import { startOfWeek, differenceInWeeks, addWeeks, isBefore, isValid, format, parseISO } from 'date-fns';
+import { startOfWeek, differenceInWeeks, addWeeks, isBefore, isValid, format, parseISO, isSameDay } from 'date-fns';
 import { toZonedTime } from 'date-fns-tz';
 import moment from 'moment';
 
@@ -412,4 +412,60 @@ export const formatDate = (date: Date | number | string, dateFormat: string): st
   }
 
   return format(parsedDate, dateFormat);
+};
+
+/**
+ * Convert a date or time to UTC and format it to 'HH:mm'.
+ *
+ * @param {Date | number | string} time - The time to format.
+ * @returns {string} The formatted time in 'HH:mm' UTC.
+ */
+export const formatUtcTime = (time) => {
+  // Convert time to a Date object
+  const date = new Date(time);
+
+  // Get the hours and minutes in UTC
+  const utcHours = date.getUTCHours();
+  const utcMinutes = date.getUTCMinutes();
+
+  // Format the UTC time as 'HH:mm'
+  return `${String(utcHours).padStart(2, '0')}:${String(utcMinutes).padStart(2, '0')}`;
+};
+
+/**
+ * Converts the input (Date, number, or string) to a Date object.
+ *
+ * @param {Date | number | string} date - The date input to convert.
+ * @returns {Date} The corresponding Date object.
+ */
+export const getDateObject = (date: Date | number | string): Date => {
+  if (date instanceof Date) {
+    // If the input is already a Date object, return it
+    return date;
+  } else if (typeof date === 'number') {
+    // If the input is a timestamp (number), create a Date object from it
+    return new Date(date);
+  } else if (typeof date === 'string') {
+    // If the input is a string, attempt to parse it as a Date
+    const parsedDate = new Date(date);
+
+    // Check if the parsed date is valid
+    if (isNaN(parsedDate.getTime())) {
+      throw new Error('Invalid date string');
+    }
+    return parsedDate;
+  } else {
+    throw new TypeError('Invalid input type. Expected Date, number, or string.');
+  }
+};
+
+/**
+ * Compare if two dates are the same.
+ *
+ * @param {Date | number | string} date1 - The first date.
+ * @param {Date | number | string} date2 - The second date.
+ * @returns {boolean} Returns true if the two dates are the same day, otherwise false.
+ */
+export const areDatesSame = (date1: Date | number | string, date2: Date | number | string): boolean => {
+  return isSameDay(getDateObject(date1), getDateObject(date2));
 };
