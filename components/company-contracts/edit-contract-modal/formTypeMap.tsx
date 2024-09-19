@@ -44,9 +44,10 @@ interface FormInputGeneralProps {
   type: string;
   label: string;
   initialValue: string;
+  handleChange: (value: any) => void;
 }
 
-export const FormInputGeneral = ({ type, label, initialValue }: FormInputGeneralProps) => {
+export const FormInputGeneral = ({ type, label, initialValue, handleChange }: FormInputGeneralProps) => {
   const Component = formTypeMap[type];
   const [value, setValue] = useState(initialValue);
 
@@ -57,7 +58,7 @@ export const FormInputGeneral = ({ type, label, initialValue }: FormInputGeneral
       <Component
         value={value}
         handleChange={(value) => {
-          console.log('new value:', value);
+          handleChange(value);
           setValue(value);
         }}
       />
