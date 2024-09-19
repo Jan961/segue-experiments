@@ -1,7 +1,7 @@
 import { Button, PopupModal } from 'components/core-ui-lib';
 import { UploadedFile } from 'components/core-ui-lib/UploadModal/interface';
 import { UploadParamType } from 'types/SpreadsheetValidationTypes';
-import TextBoxConfirmation from 'components/core-ui-lib/TextBoxConfirmation';
+import TextBoxConfirmation from './TextBoxConfirmation/TextBoxConfirmation';
 import { useState } from 'react';
 import LoadingOverlay from 'components/shows/LoadingOverlay';
 
