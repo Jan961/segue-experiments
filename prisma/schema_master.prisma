@@ -35,6 +35,7 @@ model Account {
   AccountPhone               String?               @db.VarChar(30)
   AccountPaymentCurrencyCode String?               @db.VarChar(3)
   AccountW3WCount            Int?                  @db.UnsignedSmallInt
+  AccountW3WAllowance        Int?                  @db.UnsignedSmallInt
   Currency                   Currency?             @relation(fields: [AccountPaymentCurrencyCode], references: [CurrencyCode], onDelete: Restrict, map: "Currency_Account_Payment")
   File                       File?                 @relation(fields: [AccountLogoFileId], references: [FileId], map: "File_Account")
   AccountContact             AccountContact[]
