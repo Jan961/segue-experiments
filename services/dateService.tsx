@@ -1,4 +1,4 @@
-import { startOfWeek, differenceInWeeks, addWeeks, isBefore, isValid, format, parseISO } from 'date-fns';
+import { startOfWeek, differenceInWeeks, addWeeks, isBefore, isValid, format, parseISO, isSameDay } from 'date-fns';
 import { toZonedTime } from 'date-fns-tz';
 import moment from 'moment';
 
@@ -416,13 +416,31 @@ export const formatDate = (date: Date | number | string, dateFormat: string): st
 };
 
 /**
+ * Convert a date or time to UTC and format it to 'HH:mm'.
+ *
+ * @param {Date | number | string} time - The time to format.
+ * @returns {string} The formatted time in 'HH:mm' UTC.
+ */
+export const formatUtcTime = (time) => {
+  // Convert time to a Date object
+  const date = new Date(time);
+
+  // Get the hours and minutes in UTC
+  const utcHours = date.getUTCHours();
+  const utcMinutes = date.getUTCMinutes();
+
+  // Format the UTC time as 'HH:mm'
+  return `${String(utcHours).padStart(2, '0')}:${String(utcMinutes).padStart(2, '0')}`;
+};
+
+/**
  * Converts the input (Date, number, or string) to a Date object.
  * Returns null if the input is invalid.
  *
  * @param {Date | number | string} date - The date input to convert.
  * @returns {Date | null} The corresponding Date object or null if the input is invalid.
  */
-export const getDate = (date: Date | number | string): Date | null => {
+export const getDateObject = (date: Date | number | string): Date | null => {
   if (date instanceof Date) {
     // If the input is already a Date object, return it
     return date;
@@ -440,4 +458,15 @@ export const getDate = (date: Date | number | string): Date | null => {
     // If input type is not Date, number, or string, return null
     return null;
   }
+};
+
+/**
+ * Compare if two dates are the same.
+ *
+ * @param {Date | number | string} date1 - The first date.
+ * @param {Date | number | string} date2 - The second date.
+ * @returns {boolean} Returns true if the two dates are the same day, otherwise false.
+ */
+export const areDatesSame = (date1: Date | number | string, date2: Date | number | string): boolean => {
+  return isSameDay(getDateObject(date1), getDateObject(date2));
 };
