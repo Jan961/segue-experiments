@@ -127,7 +127,10 @@ const AdEditUser = ({ visible, onClose, permissions, productions = [], selectedU
 
     const selectedProductions = userDetails.productions.filter(({ checked }) => checked).map(({ id }) => id);
     const payload = { ...userDetails, permissions, productions: selectedProductions };
-    selectedUser ? await updateUser(payload) : await createUser(payload);
+    const success = selectedUser ? await updateUser(payload) : await createUser(payload);
+    if (!success) {
+      return;
+    }
     // reset the state
     setUserDetails(DEFAULT_USER_DETAILS);
     onClose(true);
@@ -192,46 +195,24 @@ const AdEditUser = ({ visible, onClose, permissions, productions = [], selectedU
               />
               <FormError error={validationErrors.email} className="mt-2 ml-2" />
             </div>
-            <div className="w-full flex items-center justify-between">
-              <div>
-                <Label text="Password" required />
-                <div className="flex items-center gap-3">
-                  <TextInput
-                    className="tracking-widest text-center"
-                    name="password"
-                    value={userDetails.password}
-                    disabled
-                    testId="user-password"
-                  />
-                  <Button
-                    testId="generate-pwd-button"
-                    disabled={!!selectedUser}
-                    onClick={() => setUserDetails({ ...userDetails, password: generateRandomHash(4) })}
-                  >
-                    Generate Password
-                  </Button>
-                </div>
-                <FormError error={validationErrors.password} className="mt-2 ml-2" />
+            <div className="mt-2 w-full flex items-center gap-3">
+              <Label text="PIN" required />
+              <div className="flex items-center gap-3">
+                <TextInput
+                  testId="user-pin"
+                  className="tracking-widest text-center w-24"
+                  name="pin"
+                  value={userDetails.pin}
+                  disabled
+                />
+                <Button
+                  onClick={() => setUserDetails({ ...userDetails, pin: generateRandomHash(2) })}
+                  testId="generate-pin-button"
+                >
+                  Generate PIN
+                </Button>
               </div>
-              <div>
-                <Label text="PIN" required />
-                <div className="flex items-center gap-3">
-                  <TextInput
-                    testId="user-pin"
-                    className="tracking-widest text-center w-24"
-                    name="pin"
-                    value={userDetails.pin}
-                    disabled
-                  />
-                  <Button
-                    onClick={() => setUserDetails({ ...userDetails, pin: generateRandomHash(2) })}
-                    testId="generate-pin-button"
-                  >
-                    Generate PIN
-                  </Button>
-                </div>
-                <FormError error={validationErrors.pin} className="mt-2 ml-2" />
-              </div>
+              <FormError error={validationErrors.pin} className="ml-2" />
             </div>
           </div>
           <Checkbox

@@ -93,6 +93,11 @@ const AdEditPermissionGroup = ({
     onClose(true);
   };
 
+  const handlePermissionsSelected = (permissions: TreeItemOption[]) => {
+    setIsFormDirty(true);
+    setGroupDetails({ ...groupDetails, permissions });
+  };
+
   const handleModalClose = () => {
     isFormDirty ? setShowConfirmationDialog(true) : onClose();
   };
@@ -127,7 +132,7 @@ const AdEditPermissionGroup = ({
               <div className="w-full max-h-[400px] overflow-y-auto">
                 <TreeSelect
                   options={groupDetails.permissions}
-                  onChange={(permissions) => setGroupDetails({ ...groupDetails, permissions })}
+                  onChange={handlePermissionsSelected}
                   selectAllLabel="Select All Areas"
                 />
               </div>
