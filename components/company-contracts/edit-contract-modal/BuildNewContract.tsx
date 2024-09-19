@@ -253,11 +253,6 @@ export const BuildNewContract = ({
           </div>
 
           <div className="border-solid border-2 border-primary-navy rounded p-2 h-[70vh] overflow-y-scroll">
-            {loading && (
-              <div className="w-full h-96">
-                <LoadingOverlay />
-              </div>
-            )}
             {activeViewIndex === 0 && contractPerson && (
               <div className="flex flex-col gap-8 px-16">
                 <PersonDetailsTab person={contractPerson} updateFormData={setContractPerson} height="" />
@@ -289,6 +284,12 @@ export const BuildNewContract = ({
           {activeViewIndex !== 3 && <Button className="ml-4 w-33" variant="primary" text="Next" onClick={goToNext} />}
           <Button className="ml-4 w-33" variant="primary" text="Save and Close" onClick={onSave} />
         </div>
+
+        {loading && (
+          <div className="w-full h-96">
+            <LoadingOverlay />
+          </div>
+        )}
       </div>
     </PopupModal>
   );
