@@ -86,10 +86,10 @@ export const getCompanyContractsColumnDefs = (userList = []) => [
     cellRenderer: DefaultCellRenderer,
     flex: 1,
     cellStyle: function (params) {
-      const { status } = params.data;
+      const { contractStatus } = params.data;
       return {
         backgroundColor: 'white',
-        ...(statusToBgColorMap[status] || {}),
+        ...(statusToBgColorMap[contractStatus] || {}),
       };
     },
   },
@@ -99,19 +99,19 @@ export const getCompanyContractsColumnDefs = (userList = []) => [
     cellRenderer: DefaultCellRenderer,
     flex: 1,
     cellStyle: function (params) {
-      const { status } = params.data;
+      const { contractStatus } = params.data;
       return {
         backgroundColor: 'white',
-        ...(statusToBgColorMap[status] || {}),
+        ...(statusToBgColorMap[contractStatus] || {}),
       };
     },
   },
   { headerName: 'Role', field: 'role', cellRenderer: DefaultCellRenderer, flex: 1 },
   {
     headerName: 'Contract Status',
-    field: 'status',
+    field: 'contractStatus',
     cellRenderer: SelectCellRenderer,
-    valueGetter: (params) => params?.data?.status,
+    valueGetter: (params) => params?.data?.contractStatus,
     flex: 1,
     editable: true,
     cellRendererParams: () => ({
@@ -173,7 +173,7 @@ export const getCompanyContractsColumnDefs = (userList = []) => [
   },
   {
     headerName: 'Date Issued',
-    field: 'dateIssue',
+    field: 'dateIssued',
     cellRenderer: DateRenderer,
     width: 120,
     cellStyle: {

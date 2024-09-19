@@ -414,3 +414,30 @@ export const formatDate = (date: Date | number | string, dateFormat: string): st
 
   return format(parsedDate, dateFormat);
 };
+
+/**
+ * Converts the input (Date, number, or string) to a Date object.
+ * Returns null if the input is invalid.
+ *
+ * @param {Date | number | string} date - The date input to convert.
+ * @returns {Date | null} The corresponding Date object or null if the input is invalid.
+ */
+export const getDate = (date: Date | number | string): Date | null => {
+  if (date instanceof Date) {
+    // If the input is already a Date object, return it
+    return date;
+  } else if (typeof date === 'number') {
+    // If the input is a timestamp (number), create a Date object from it
+    const newDate = new Date(date);
+    return isNaN(newDate.getTime()) ? null : newDate;
+  } else if (typeof date === 'string') {
+    // If the input is a string, attempt to parse it as a Date
+    const parsedDate = new Date(date);
+
+    // If the parsed date is invalid, return null
+    return isNaN(parsedDate.getTime()) ? null : parsedDate;
+  } else {
+    // If input type is not Date, number, or string, return null
+    return null;
+  }
+};
