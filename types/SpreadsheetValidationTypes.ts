@@ -30,10 +30,57 @@ export interface SpreadsheetData {
         ignoreWarning: string;
         rowNumber: number;
         salesRow: any;
-        mismatch?: {
-          isMismatch: boolean;
-          mismatchedWith: number;
+      }[];
+    }[];
+  }[];
+}
+
+export interface SpreadsheetDataCleaned {
+  venues: {
+    venueCode: string;
+    venueId: number | null;
+    bookings: {
+      bookingDate: string;
+      finalSalesDate: Date;
+      bookingId: number | null;
+      sales: {
+        salesDate: string;
+        isFinal: string;
+        generalSales: {
+          seats: number;
+          value: string;
         };
+        generalReservations: {
+          seats: number;
+          value: string;
+        };
+        schoolSales: {
+          seats: number;
+          value: string;
+        };
+        schoolReservations: {
+          seats: number;
+          value: string;
+        };
+      }[];
+    }[];
+  }[];
+}
+
+export interface SpreadsheetDataClean {
+  venues: {
+    venueCode: string;
+    venueId: number;
+    bookings: {
+      bookingDate: string;
+      finalSalesDate: string;
+      bookingId: number;
+      sales: {
+        salesDate: string;
+        salesType: string;
+        seats: number;
+        value: string;
+        isFinal: string;
       }[];
     }[];
   }[];
@@ -46,6 +93,13 @@ export enum SalesType {
   'School Reservations',
 }
 
+export const SalesTypeMap = {
+  'General Sales': 1,
+  'General Reservations': 2,
+  'School Sales': 3,
+  'School Reservations': 4,
+};
+
 export enum isFinalType {
   'Y',
   'y',
@@ -57,8 +111,6 @@ export enum isFinalType {
 export enum ignoreWarningType {
   'Y',
   'y',
-  'N',
-  'n',
   '',
 }
 
@@ -101,4 +153,5 @@ export interface UploadParamType {
   onError: (file: File, errorMessage: string) => void;
   onUploadingImage: (file: File, imageUrl: string) => void;
   spreadsheetIssues: SpreadsheetIssues;
+  spreadsheetData: SpreadsheetDataCleaned;
 }

@@ -15,38 +15,7 @@ import { makeRowTextBoldAndAllignLeft } from './promoter-holds';
 import { convertToPDF } from 'utils/report';
 import { bookingStatusMap } from 'config/bookings';
 import { addBorderToAllCells } from 'utils/export';
-import { addTime, getSheduleReport } from 'services/reports/schedule-report';
-
-type SCHEDULE_VIEW = {
-  ProductionId: number;
-  FullProductionCode: string;
-  ShowName: string;
-  RehearsalStartDate: string;
-  ProductionStartDate: string;
-  ProductionEndDate: string;
-  EntryDate: string;
-  ProductionWeekNum: number;
-  EntryType: string;
-  EntryId: number;
-  EntryName: string;
-  EntryStatusCode: string;
-  Location: string;
-  PencilNum: number | null;
-  VenueId: number | null;
-  VenueSeats: number | null;
-  Mileage: number | null;
-  TimeMins: string | null;
-  DateTypeId: number | null;
-  DateTypeName: string;
-  AffectsAvailability: number;
-  SeqNo: number;
-};
-
-interface PerformanceInfo {
-  performanceId: number;
-  performanceTime: string | null;
-  performanceDate: string | null;
-}
+import { PerformanceInfo, SCHEDULE_VIEW, addTime, getSheduleReport } from 'services/reports/schedule-report';
 
 const makeRowBold = ({ worksheet, row }: { worksheet: any; row: number }) => {
   worksheet.getRow(row).font = { bold: true };

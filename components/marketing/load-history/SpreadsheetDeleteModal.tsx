@@ -1,6 +1,7 @@
 import { Button, PopupModal, Checkbox } from 'components/core-ui-lib';
 import { useState } from 'react';
 import LoadingOverlay from 'components/shows/LoadingOverlay';
+import TextBoxConfirmation from './TextBoxConfirmation/TextBoxConfirmation';
 
 interface SpreadsheetDeleteModalProps {
   visible: boolean;
@@ -15,6 +16,8 @@ export const SpreadsheetDeleteModal = ({
   onDeleteClick,
   salesHistoryRows,
 }: SpreadsheetDeleteModalProps) => {
+  const [validConfirmationMessage, setValidConfirmationMessage] = useState<boolean>(null);
+  const [displayErrorMessage, setDisplayErrorMessage] = useState<boolean>(false);
   const [keepSpreadsheet, setKeepSpreadsheet] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -44,9 +47,26 @@ export const SpreadsheetDeleteModal = ({
         />
         <p className="text-sm">Download a copy of this spreadsheet to archive?</p>
       </div>
+      <div className="mt-3 mb-5">
+        <TextBoxConfirmation requiredMessage="DELETE" setValid={setValidConfirmationMessage} />
+        {displayErrorMessage && (
+          <p className="text-primary-red absolute">Please enter the text exactly as displayed to confirm.</p>
+        )}
+      </div>
       <div className="flex gap-x-2 justify-end">
         <Button className="w-[128px] mt-3" text="Close" variant="secondary" onClick={onNoClick} />
-        <Button className="w-[128px] mt-3" variant="tertiary" text="Delete" onClick={handleDelete} />
+        <Button
+          className="w-[128px] mt-3"
+          variant="tertiary"
+          text="Delete"
+          onClick={() => {
+            if (validConfirmationMessage) {
+              handleDelete();
+            } else {
+              setDisplayErrorMessage(true);
+            }
+          }}
+        />
       </div>
       {isLoading && <LoadingOverlay />}
     </PopupModal>

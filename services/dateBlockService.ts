@@ -7,3 +7,32 @@ export const getDateBlockForProduction = async (productionId: number, isPrimary:
     },
   });
 };
+
+export const deleteAllDateBlockEvents = async (dateBlockID: number, tx = prisma) => {
+  if (dateBlockID) {
+    // important to Check DateBlockID is not null
+    await tx.Booking.deleteMany({
+      where: {
+        DateBlockId: { equals: dateBlockID },
+      },
+    });
+
+    await tx.Rehearsal.deleteMany({
+      where: {
+        DateBlockId: { equals: dateBlockID },
+      },
+    });
+
+    await tx.GetInFitUp.deleteMany({
+      where: {
+        DateBlockId: { equals: dateBlockID },
+      },
+    });
+
+    await tx.Other.deleteMany({
+      where: {
+        DateBlockId: { equals: dateBlockID },
+      },
+    });
+  }
+};
