@@ -179,7 +179,10 @@ export const BuildNewContract = ({
   };
 
   const updateContract = async () => {
-    console.log(contractData);
+    await axios.post('/api/company-contracts/update-data/', {
+      contractId,
+      contractData,
+    });
   };
 
   const onSave = async () => {

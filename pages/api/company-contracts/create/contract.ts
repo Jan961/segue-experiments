@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import prisma from 'lib/prisma';
 import { CompanyContractStatus } from 'config/contracts';
-import { contractSchema } from 'validators/contracts';
+import { contractSchemaCreate } from 'validators/contracts';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -9,15 +9,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    const validatedData = await contractSchema.validate(req.body, { abortEarly: false });
+    const validatedData = await contractSchemaCreate.validate(req.body, { abortEarly: false });
 
     const { production, department, role, personId, contractData, accScheduleJson = [], templateId } = validatedData;
-    console.log(production);
-    console.log(department);
-    console.log(role);
-    console.log(personId);
-    console.log(contractData);
-    console.log(templateId);
 
     const result = await prisma.$transaction(async (tx) => {
       const result = await tx.ACCContract.create({

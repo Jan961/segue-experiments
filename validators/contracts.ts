@@ -38,7 +38,7 @@ export const contractDataSchema = yup.array().of(
   }),
 );
 
-export const contractSchema = yup.object().shape({
+export const contractSchemaCreate = yup.object().shape({
   production: yup.number().integer().required(),
   department: yup.number().required(),
   role: yup.string().required(),
@@ -46,4 +46,9 @@ export const contractSchema = yup.object().shape({
   templateId: yup.number().integer().required(),
   contractData: contractDataSchema.required(),
   accScheduleJson: yup.array().nullable(),
+});
+
+export const contractSchemaUpdate = yup.object().shape({
+  contractId: yup.number().integer().required(),
+  contractData: contractDataSchema.required(),
 });
