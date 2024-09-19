@@ -5,6 +5,7 @@ export const populateContractData = (
   populatedValueList: ContractData[],
 ): ContractData[] => {
   const allCompIDs = new Set(templateFormRows.flatMap((row) => row.components.map((c) => c.id)));
+  console.log('allCompIDs:', allCompIDs);
 
   const populatedMap = new Map<number, ContractData[]>();
 
@@ -17,6 +18,8 @@ export const populateContractData = (
       populatedMap.set(compID, [{ compID, index: 1, value: null }]);
     }
   });
+
+  console.log('POPULATED DATA FROM DB:', Array.from(populatedMap.values()).flat());
 
   return Array.from(populatedMap.values()).flat();
 };

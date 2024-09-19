@@ -35,9 +35,9 @@ export const contractDataSchema = yup.array().of(
       .required('Index is required')
       .integer('Index must be an integer')
       .min(0, 'Index cannot be negative'),
-    value: yup.mixed().required('Value is required').nullable(true), // Allows null or any value type
   }),
 );
+
 export const contractSchema = yup.object().shape({
   production: yup.number().integer().required(),
   department: yup.number().required(),

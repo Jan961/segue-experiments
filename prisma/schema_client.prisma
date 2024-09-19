@@ -1174,7 +1174,7 @@ model ACCContractData {
   DataACCContractId Int
   DataComponentId   Int
   DataIndexNum      Int?              @db.UnsignedSmallInt
-  Value             String?           @db.Text
+  DataValue         String?           @db.Text
   ACCContract       ACCContract       @relation(fields: [DataACCContractId], references: [ContractId], onDelete: Cascade, map: "ACCContract_ACCContractData")
   TemplateComponent TemplateComponent @relation(fields: [DataComponentId], references: [ComponentId], onDelete: Cascade, map: "TemplateComponent_ACCContractData")
 

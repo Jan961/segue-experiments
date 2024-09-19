@@ -88,6 +88,7 @@ export const BuildNewContract = ({
 
     const fetchTemplateFormStructure = async (): Promise<TemplateFormRow[]> => {
       try {
+        console.log(contractSchedule.templateId);
         const response = await axios.get('/api/company-contracts/read-template/' + contractSchedule.templateId);
         if (response.data) {
           return response.data;
@@ -102,6 +103,7 @@ export const BuildNewContract = ({
         if (!contractId) return [];
         const response = await axios.get('/api/company-contracts/read-data/' + contractId);
         if (response.data) {
+          console.log('DATA FROM DB:', response.data);
           return response.data;
         }
       } catch (err) {
@@ -164,19 +166,15 @@ export const BuildNewContract = ({
   };
 
   const createContract = async () => {
-    try {
-      const response = axios.post('/api/company-contracts/create/contract/', {
-        production: contractSchedule.production,
-        department: contractSchedule.department,
-        role: contractSchedule.role,
-        personId: contractSchedule.personId,
-        contractData,
-        accScheduleJson: schedule,
-      });
-      console.log(response);
-    } catch (err) {
-      console.log(err, 'Error - failed to create contract');
-    }
+    await axios.post('/api/company-contracts/create/contract/', {
+      production: contractSchedule.production,
+      department: contractSchedule.department,
+      role: contractSchedule.role,
+      personId: contractSchedule.personId,
+      contractData,
+      accScheduleJson: schedule,
+      templateId: contractSchedule.templateId,
+    });
   };
 
   const updateContract = async () => {
