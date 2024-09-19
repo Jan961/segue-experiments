@@ -88,7 +88,6 @@ const createExcelFromData = (data, bookingInfo, productionName, venueAndDate) =>
     row.eachCell((cell, colNumber) => {
       // column number starts from 1
       // subtract first two cells for week and weekof
-      console.log(colNumber, cell.value);
       const salesIndex = colNumber - 1;
       cell.alignment = { vertical: 'top', horizontal: 'center' };
       if (colNumber <= 1) {
