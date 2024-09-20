@@ -14,6 +14,7 @@ import Icon from '../Icon';
 import Label from '../Label';
 import classNames from 'classnames';
 import fuseFilter from 'utils/fuseFilter';
+import { isNullOrEmpty } from 'utils';
 
 export type SelectOption = { text: string; value: string | number | boolean; [key: string]: any };
 
@@ -46,6 +47,7 @@ export interface SelectProps extends WithTestId {
   onBlur?: () => void;
   menuPlacement?: MenuPlacement;
   error?: boolean;
+  closeMenuOnScroll?: boolean;
 }
 
 const Option = (props: OptionProps & { testId?: string }) => {
@@ -99,6 +101,7 @@ export default forwardRef(function Select(
     onBlur,
     menuPlacement = 'bottom',
     error,
+    closeMenuOnScroll = true,
   }: SelectProps,
   ref,
 ) {
@@ -248,6 +251,30 @@ export default forwardRef(function Select(
     setMenuPortalTarget(gridViewportElement);
   }, []);
 
+  const [menuIsOpen, setMenuIsOpen] = useState(false);
+
+  const handleCloseMenuOnScroll = (e) => {
+    if (menuIsOpen) {
+      //  Check if owner document is null since the menu is portaled so it is part of the main HTMLDocument so it will have no parent
+      if (!isNullOrEmpty(e?.target?.ownerDocument)) {
+        //  Checks if scroll event is coming from a dropdown menu. If it is then let it scroll, otherwise, close the select
+        const childNodeArray = e.target?.firstElementChild?.childNodes;
+        if (!isNullOrEmpty(childNodeArray) || childNodeArray instanceof NodeList) {
+          if (childNodeArray.length === 0) {
+            setMenuIsOpen(false);
+            return true;
+          }
+        }
+      } else {
+        setMenuIsOpen(false);
+        return true;
+      }
+    }
+    return false;
+  };
+
+  const closeMenuOnSelectValue = isMulti ? false : closeMenuOnSelect;
+
   return (
     <div
       className={classNames(
@@ -279,7 +306,7 @@ export default forwardRef(function Select(
           getOptionLabel={(props: SelectOption) => props.text}
           windowThreshold={50}
           isDisabled={disabled}
-          closeMenuOnSelect={closeMenuOnSelect}
+          closeMenuOnSelect={closeMenuOnSelectValue}
           options={options}
           styles={colourStyles}
           placeholder={placeholder}
@@ -289,8 +316,17 @@ export default forwardRef(function Select(
           hideSelectedOptions={false}
           onBlur={onBlur}
           menuPlacement={menuPlacement}
+          onMenuOpen={() => {
+            setMenuIsOpen(true);
+          }}
+          onMenuClose={() => {
+            setMenuIsOpen(false);
+          }}
           menuPortalTarget={menuPortalTarget}
           menuPosition="fixed"
+          closeMenuOnScroll={(e) => {
+            if (closeMenuOnScroll) return handleCloseMenuOnScroll(e);
+          }}
           menuShouldScrollIntoView={false}
           filterOption={(option, _inputValue) => {
             if (filteredOptions === null) {

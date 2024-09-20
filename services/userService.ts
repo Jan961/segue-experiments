@@ -47,9 +47,9 @@ export const getUserNameForClerkId = async (userId: string): Promise<string> => 
   const matching = user.emailAddresses.filter((x) => x.id === user.primaryEmailAddressId)[0];
   const accountId = await getAccountId(matching.emailAddress);
   const users = await getUsers(accountId);
-  const currentUser = users.find((user) => user.UserEmail === matching.emailAddress);
-  const firstname = isNullOrEmpty(currentUser.UserFirstName) ? '' : currentUser.UserFirstName;
-  const lastname = isNullOrEmpty(currentUser.UserLastName) ? '' : currentUser.UserLastName;
+  const currentUser = users.find((user) => user.Email === matching.emailAddress);
+  const firstname = isNullOrEmpty(currentUser.FirstName) ? '' : currentUser.FirstName;
+  const lastname = isNullOrEmpty(currentUser.LastName) ? '' : currentUser.LastName;
   return firstname + ' ' + lastname;
 };
 
@@ -86,6 +86,12 @@ export const getAccountIdFromReq = async (req: any) => {
   return getAccountId(email);
 };
 
+export const getOrganizationIdFromReq = async (req: any) => {
+  const { userId } = getAuth(req);
+  const user = await clerkClient.users.getUser(userId);
+  return user?.unsafeMetadata?.organizationId;
+};
+
 export const checkAccess = async (email: string, items: AccessCheck = null): Promise<boolean> => {
   return checkAccessDirect(email, items);
 };
@@ -103,9 +109,13 @@ export const getUserId = async (email: string) => {
   return UserId;
 };
 
+const THREE_HOURS_IN_SECONDS = 60 * 60 * 3;
 export const createUserSession = async (email: string, orgId: string) => {
   try {
-    const redisResonse = await redis.set(email, orgId);
+    // Set TTL for 3 hours (in seconds)
+    const redisResonse = await redis.set(email, orgId, {
+      ex: THREE_HOURS_IN_SECONDS,
+    });
     return redisResonse;
   } catch (err) {
     console.error(err);
@@ -119,4 +129,59 @@ export const deleteUserSession = async (email: string) => {
   } catch (err) {
     console.error(err);
   }
+};
+
+export const isSessionActive = async (email: string) => {
+  try {
+    const isActive = await redis.get(email);
+    return !!isActive;
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+export const createClerkUserWithoutSession = async (
+  emailAddress: string,
+  password: string,
+  firstName: string,
+  lastName: string,
+) => {
+  const response = await clerkClient.users.createUser({
+    emailAddress: [emailAddress],
+    password,
+    firstName,
+    lastName,
+  });
+  return response;
+};
+
+export const getUserPermisisons = async (email: string, organisationId: string) => {
+  const accountUser = await prisma.AccountUser.findFirst({
+    where: {
+      User: {
+        UserEmail: {
+          equals: email,
+        },
+      },
+      Account: {
+        AccountOrganisationId: {
+          equals: organisationId,
+        },
+      },
+    },
+    select: {
+      Account: true,
+      AccountUserPermission: {
+        select: {
+          Permission: true,
+        },
+      },
+    },
+  });
+  const formattedPermissions =
+    accountUser?.AccountUserPermission.map(({ Permission }) => ({
+      permissionId: Permission.PermissionId,
+      permissionName: Permission.PermissionName,
+    })) || [];
+  return formattedPermissions;
 };

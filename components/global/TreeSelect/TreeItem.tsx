@@ -2,21 +2,23 @@ import { Disclosure } from '@headlessui/react';
 import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/20/solid';
 import { TreeItemOption } from './types';
 import React, { useEffect, useState, memo } from 'react';
-import { FormInputCheckbox } from '../forms/FormInputCheckbox';
+
 import { mapRecursive } from 'utils';
+import { Checkbox, Label } from 'components/core-ui-lib';
 
 export interface TreeItemProps {
+  defaultOpen: boolean;
   value: TreeItemOption;
   onChange: (v: TreeItemOption) => void;
 }
 
-export default memo(function TreeItem({ value, onChange }: TreeItemProps) {
-  const { id, label, options, checked, groupHeader } = value;
+export default memo(function TreeItem({ value, onChange, defaultOpen }: TreeItemProps) {
+  const { id, label, options, checked, groupHeader, isPartiallySelected } = value;
   const isLeafNode = !options || options.length === 0;
   const labelClass = groupHeader ? 'text-responsive-sm font-semibold' : 'text-responsive-sm';
   const [itemOptions, setItemOptions] = useState(options || []);
   const [selected, setSelected] = useState<boolean>(checked || false);
-  const [showIntermediateState, setShowIntermediateState] = useState<boolean>(false);
+  const [showIntermediateState, setShowIntermediateState] = useState<boolean>(isPartiallySelected);
 
   const handleSelectionChange = (checked) => {
     let updatedOptions = [];
@@ -48,12 +50,20 @@ export default memo(function TreeItem({ value, onChange }: TreeItemProps) {
   }, [checked]);
 
   useEffect(() => {
+    const isPartiallySelected = hasPartiallySelectedChildren(options);
+    setShowIntermediateState(isPartiallySelected);
     setItemOptions(options);
   }, [options]);
 
   const handleGroupToggle = (e: React.ChangeEvent<HTMLInputElement>) => {
     const isChecked = e.target.checked;
     const updatedOptions = handleSelectionChange(isChecked);
+    if (isChecked) {
+      setShowIntermediateState(false);
+    } else {
+      setShowIntermediateState(areAllChildrenSelected(updatedOptions));
+    }
+
     onChange({ ...value, options: updatedOptions, checked: isChecked, isPartiallySelected: false });
   };
 
@@ -69,7 +79,7 @@ export default memo(function TreeItem({ value, onChange }: TreeItemProps) {
     if (isPartiallySelected) {
       setShowIntermediateState(true);
     } else {
-      // If this is not a leaf node, eavluate if this node should be partially selected
+      // If this is not a leaf node, evaluate if this node should be partially selected
       isPartiallySelected = hasPartiallySelectedChildren(updatedOptions);
       setShowIntermediateState(isPartiallySelected);
     }
@@ -87,26 +97,35 @@ export default memo(function TreeItem({ value, onChange }: TreeItemProps) {
 
   return isLeafNode ? (
     <div className="flex items-center gap-3">
-      <FormInputCheckbox testid={id} name={`${id}`} value={selected} onChange={handleLeafToggle} />
+      <Checkbox
+        id={id}
+        testId={label}
+        name={`${id}`}
+        checked={selected}
+        value={id}
+        onChange={groupHeader ? handleGroupToggle : handleLeafToggle}
+      />
 
-      <span className={labelClass}>{label}</span>
+      <Label text={label} className={labelClass} />
     </div>
   ) : (
     <div>
-      <Disclosure as="div" key={id} className="py-1">
+      <Disclosure as="div" key={id} className="py-1" defaultOpen={defaultOpen}>
         {({ open }) => (
           <>
             <div className="flex items-center gap-3">
-              <FormInputCheckbox
-                testid={id}
+              <Checkbox
+                id={id}
+                testId={label}
                 name={`${id}`}
-                value={selected}
+                checked={selected}
+                value={id}
                 onChange={handleGroupToggle}
                 showIntermediate={showIntermediateState}
               />
 
               <Disclosure.Button className="flex w-full items-center bg-white">
-                <span className={labelClass}>{label}</span>
+                <Label text={label} className={labelClass} />
                 <span className="flex items-center ml-2">
                   {open ? (
                     <ChevronUpIcon data-testid="tree-item-open" className="h-5 w-5" aria-hidden="true" />
@@ -119,7 +138,7 @@ export default memo(function TreeItem({ value, onChange }: TreeItemProps) {
 
             <Disclosure.Panel className="ml-7 mt-1">
               {itemOptions.map((option) => (
-                <TreeItem key={option.id} value={option} onChange={handleOptionToggle} />
+                <TreeItem key={option.id} value={option} onChange={handleOptionToggle} defaultOpen={defaultOpen} />
               ))}
             </Disclosure.Panel>
           </>

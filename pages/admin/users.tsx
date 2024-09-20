@@ -1,11 +1,29 @@
 import axios from 'axios';
 import { permissionGroupColDef, styleProps, usersColDef } from 'components/admin/tableConfig';
-import { Button, Table } from 'components/core-ui-lib';
+import { Button, ConfirmationDialog, Table } from 'components/core-ui-lib';
+import AddEditUser from 'components/admin/modals/AddEditUser';
+import AddEditPermissionGroup from 'components/admin/modals/AddEditPermissionGroup';
 import Layout from 'components/Layout';
 import { useEffect, useState } from 'react';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import { getPermissionGroupsList, getPermissionsList } from 'services/permissionService';
+import { getAllProductions } from 'services/productionService';
+import { useRouter } from 'next/router';
+import { mapRecursive } from 'utils';
+import { TreeItemOption } from 'components/global/TreeSelect/types';
 
-export default function Users() {
+export default function Users({
+  permissionsList,
+  productionsList,
+  permisisonGroups,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const [userRowData, setUserRowData] = useState([]);
+  const [showUsersModal, setShowUsersModal] = useState(false);
+  const [showPermissionGroupModal, setShowPermissionGroupModal] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [selectedGroup, setSelectedGroup] = useState(null);
+  const [showConfirmationDialog, setShowConfirmationDialog] = useState(false);
+  const router = useRouter();
 
   const populateUserTable = async () => {
     try {
@@ -14,11 +32,14 @@ export default function Users() {
       if (Array.isArray(users.data)) {
         setUserRowData(
           users.data.map((user) => {
-            const firstname = user.UserFirstName || '';
-            const lastname = user.UserLastName || '';
+            const firstName = user.UserFirstName || '';
+            const lastName = user.UserLastName || '';
 
             return {
-              name: `${firstname} ${lastname}`,
+              accountUserId: user.AccUserId,
+              firstName,
+              lastName,
+              name: `${firstName} ${lastName}`,
               email: user.UserEmail,
               permissionDesc: user.AllPermissions,
               licence: 'to be added later',
@@ -31,11 +52,61 @@ export default function Users() {
     }
   };
 
+  const updatePermissions = (options: TreeItemOption[], values: TreeItemOption[]) => {
+    const updatedOptions = mapRecursive(options, (o) => {
+      const value = values.find((v) => v.id === o.id);
+      return { ...o, checked: !!value };
+    });
+    return updatedOptions;
+  };
+
   useEffect(() => {
     if (userRowData.length === 0) {
       populateUserTable();
     }
   }, [userRowData]);
+
+  const handleUsersModalClose = (refresh = false) => {
+    setSelectedUser(null);
+    setShowUsersModal(false);
+    if (refresh) {
+      populateUserTable();
+    }
+  };
+
+  const handlePermissionGroupModalClose = (refresh = false) => {
+    setSelectedGroup(null);
+    setShowPermissionGroupModal(false);
+    if (refresh) {
+      router.replace(router.asPath);
+    }
+  };
+
+  const handleUserEdit = ({ data }) => {
+    setSelectedUser(data);
+    setShowUsersModal(true);
+  };
+
+  const handlePermissionGroupEdit = async (type, data) => {
+    if (type === 'edit') {
+      const updatedPermissions = updatePermissions(permissionsList, data.permissions);
+      setSelectedGroup({ ...data, permissions: updatedPermissions });
+      setShowPermissionGroupModal(true);
+    } else if (type === 'delete') {
+      setSelectedGroup(data);
+      setShowConfirmationDialog(true);
+    }
+  };
+  const handleConfirmClick = async () => {
+    setShowConfirmationDialog(false);
+    await axios.delete('/api/admin/permissions-group/delete', {
+      data: {
+        groupId: selectedGroup.groupId,
+      },
+    });
+    setSelectedGroup(null);
+    router.replace(router.asPath);
+  };
 
   return (
     <Layout title="Users | Segue" flush>
@@ -46,7 +117,7 @@ export default function Users() {
           <div className="text-primary-navy text-xl font-bold">Number of User Licences</div>
         </div>
         <div className="flex flex-col">
-          <Button className="ml-4 w-32 mr-1" variant="primary" text="Add Licences" />
+          <Button className="ml-4 w-32 mr-1" variant="primary" text="Add Licences" testId="add-licences-button" />
         </div>
       </div>
 
@@ -55,14 +126,18 @@ export default function Users() {
           <div className="text-base primary-dark-blue">Total Number of Full Licences:</div>
         </div>
         <div className="flex flex-col mr-[60px]">
-          <div className="text-base primary-dark-blue font-bold">0</div>
+          <div className="text-base primary-dark-blue font-bold" data-testid="no-of-full-licences">
+            0
+          </div>
         </div>
 
         <div className="flex flex-col mr-2">
           <div className="text-base primary-dark-blue">Total Number of Touring Management Licences:</div>
         </div>
         <div className="flex flex-col">
-          <div className="text-base primary-dark-blue font-bold">0</div>
+          <div className="text-base primary-dark-blue font-bold" data-testid="no-of-touring-licences">
+            0
+          </div>
         </div>
       </div>
 
@@ -71,22 +146,37 @@ export default function Users() {
           <div className="text-base primary-dark-blue">Total Number of Full Licences Used:</div>
         </div>
         <div className="flex flex-col mr-[24px]">
-          <div className="text-base primary-dark-blue font-bold">0</div>
+          <div className="text-base primary-dark-blue font-bold" data-testid="no-of-full-licences-used">
+            0
+          </div>
         </div>
 
         <div className="flex flex-col mr-2">
           <div className="text-base primary-dark-blue">Total Number of Touring Management Licences Used:</div>
         </div>
         <div className="flex flex-col">
-          <div className="text-base primary-dark-blue font-bold">0</div>
+          <div className="text-base primary-dark-blue font-bold" data-testid="no-of-touring-licences-used">
+            0
+          </div>
         </div>
       </div>
 
       <div className="flex flex-row justify-between items-center my-4">
         <div className="text-primary-navy text-xl font-bold">All Users</div>
         <div className="flex flex-row gap-4">
-          <Button className="px-8 mt-2 -mb-1" variant="secondary" text="Add New Touring Management User" />
-          <Button className="px-8 mt-2 -mb-1" variant="secondary" text="Add New Full User" />
+          <Button
+            className="px-8 mt-2 -mb-1"
+            variant="secondary"
+            text="Add New Touring Management User"
+            testId="add-new-touring-mgmt-user-button"
+          />
+          <Button
+            className="px-8 mt-2 -mb-1"
+            variant="secondary"
+            text="Add New Full User"
+            onClick={() => setShowUsersModal(true)}
+            testId="add-new-full-user-button"
+          />
         </div>
       </div>
 
@@ -96,6 +186,7 @@ export default function Users() {
         rowData={userRowData}
         styleProps={styleProps}
         tableHeight={300}
+        onRowDoubleClicked={handleUserEdit}
       />
 
       <div className="flex justify-end mt-5">
@@ -103,19 +194,76 @@ export default function Users() {
           <div className="flex flex-row justify-between items-center my-4">
             <div className="text-primary-navy text-xl font-bold">Your Permission Groups</div>
             <div className="flex flex-row gap-4">
-              <Button className="px-8 mt-2 -mb-1" variant="secondary" text="Add New Permission Group" />
+              <Button
+                className="px-8 mt-2 -mb-1"
+                variant="secondary"
+                text="Add New Permission Group"
+                onClick={() => setShowPermissionGroupModal(true)}
+                testId="add-new-permission-group-button"
+              />
             </div>
           </div>
 
           <Table
             testId="admin-permission-group-table"
-            columnDefs={permissionGroupColDef(null)}
-            rowData={[]}
+            columnDefs={permissionGroupColDef(handlePermissionGroupEdit)}
+            rowData={permisisonGroups}
             styleProps={styleProps}
             tableHeight={300}
           />
         </div>
       </div>
+      {showUsersModal && (
+        <AddEditUser
+          visible={showUsersModal}
+          onClose={handleUsersModalClose}
+          permissions={permissionsList}
+          productions={productionsList}
+          selectedUser={selectedUser}
+        />
+      )}
+      {showPermissionGroupModal && (
+        <AddEditPermissionGroup
+          visible={showPermissionGroupModal}
+          onClose={handlePermissionGroupModalClose}
+          permissions={permissionsList}
+          groups={permisisonGroups}
+          selectedGroup={selectedGroup}
+        />
+      )}
+      {showConfirmationDialog && (
+        <ConfirmationDialog
+          testId="confirmation-dialog"
+          show={showConfirmationDialog}
+          onNoClick={() => setShowConfirmationDialog(false)}
+          onYesClick={handleConfirmClick}
+          hasOverlay={false}
+          variant="delete"
+        />
+      )}
     </Layout>
   );
 }
+
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const permisisonGroups = await getPermissionGroupsList(ctx.req);
+  const permissionsList = await getPermissionsList();
+  const productions = await getAllProductions();
+  const formattedProductions = productions.map((t: any) => ({
+    id: t.Id,
+    code: t.Code,
+    isArchived: t.IsArchived,
+    showCode: t.Show.Code,
+    showName: t.Show.Name,
+    label: `${t.Show.Code}${t.Code} ${t.Show.Name}`,
+    checked: false,
+  }));
+
+  return {
+    props: {
+      productionsList: formattedProductions || [],
+      permissionsList: permissionsList || [],
+      permisisonGroups: permisisonGroups || [],
+    },
+  };
+};

@@ -17,7 +17,7 @@ export interface IPublicityEventDetails {
 interface PublicityEventDetailsProps {
   testId?: string;
   details: IPublicityEventDetails;
-  onChange: (data: IPublicityEventDetails) => void;
+  onChange: (data: Partial<IPublicityEventDetails>) => void;
 }
 
 const PublicityEventDetails: FC<PublicityEventDetailsProps> = ({ details, testId = 'publicity-event', onChange }) => {
@@ -31,13 +31,13 @@ const PublicityEventDetails: FC<PublicityEventDetailsProps> = ({ details, testId
     (key: string, value: number | string | boolean | null) => {
       const updatedData = { ...eventDetails, [key]: value };
       setEventDetails(updatedData);
-      onChange(updatedData);
+      onChange({ ...details, [key]: value });
     },
     [onChange, eventDetails, setEventDetails],
   );
 
   return (
-    <div className="flex items-start gap-4">
+    <div className="flex items-start gap-4 w-full">
       <div className="flex items-start gap-2">
         <Select
           testId={`${testId}-is-required`}
@@ -57,14 +57,16 @@ const PublicityEventDetails: FC<PublicityEventDetailsProps> = ({ details, testId
           onChange={(value) => handleChange('date', value?.toISOString?.() || '')}
         />
       </div>
-      <TextInput
-        disabled={!isRequired}
-        testId={`${testId}-notes`}
-        placeholder="Publicity Event Notes"
-        className="flex-1"
-        value={notes}
-        onChange={(event) => handleChange('notes', event.target.value)}
-      />
+      <div className="grow">
+        <TextInput
+          disabled={!isRequired}
+          testId={`${testId}-notes`}
+          placeholder="Publicity Event Notes"
+          className="grow"
+          value={notes}
+          onChange={(event) => handleChange('notes', event.target.value)}
+        />
+      </div>
     </div>
   );
 };

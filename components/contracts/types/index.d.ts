@@ -38,6 +38,11 @@ export interface EmergencyContact {
   mobileNumber: string;
 }
 
+export interface IOtherWorkType {
+  id: number;
+  name: string;
+}
+
 export interface IPersonDetails {
   id?: number;
   firstName: string;
@@ -61,8 +66,9 @@ export interface IPersonDetails {
   advisoryNotes: string;
   generalNotes: string;
   healthDetails: string;
-  otherWorkTypes: string[];
+  otherWorkTypes: Partial<IOtherWorkType>[];
   notes: string;
+  addressId?: string;
 }
 
 export interface IPerson {
@@ -125,4 +131,23 @@ interface IContractDetails {
   includeAdditionalClauses: boolean;
   additionalClause: string | null;
   customClauseList: string[];
+}
+
+export interface IScheduleDay {
+  productionCode: string;
+  day: string;
+  date: string;
+  week: number;
+  venue?: string;
+  isOtherDay?: boolean;
+  isCancelled?: boolean;
+  location?: string;
+  type?: string;
+  status?: string;
+  capacity?: number;
+  performancesPerDay?: number;
+  performance1?: string;
+  performance2?: string;
+  mileage?: number;
+  time?: string;
 }

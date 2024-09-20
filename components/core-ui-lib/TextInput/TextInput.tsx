@@ -24,6 +24,7 @@ export interface TextInputProps {
   onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   min?: number;
   max?: number;
+  autoComplete?: 'on' | 'off';
 }
 
 const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
@@ -41,29 +42,39 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
       inputClassName,
       onKeyDown,
       testId,
+      autoComplete = 'off',
       ...rest
     },
     ref,
   ) => {
-    const baseClass = `block w-fit-content pl-2 h-[1.9375rem] !border text-sm shadow-input-shadow text-primary-input-text rounded-md outline-none focus:ring-2 focus:ring-primary-input-text ring-inset autofill-white-bg`;
+    const baseClass = `block w-fit-content pl-2 h-[1.9375rem] text-sm shadow-input-shadow text-primary-input-text rounded-md outline-none autofill-white-bg`;
     const inputClass = error ? '!border-primary-red' : '!border-primary-border';
+    const disabledClass = disabled ? 'disabled-input !border-none !bg-gray-200 focus:outline-none' : '';
 
     return (
       <div
-        className={`flex justify-between items-center relative ${inputClassName} ${disabled ? 'disabled-input' : ''}`}
-        onClick={onClick}
+        className={classNames(
+          'flex justify-between items-center relative',
+          inputClassName,
+          disabled ? 'pointer-events-none' : '',
+        )}
+        onClick={disabled ? undefined : onClick}
       >
         <input
           data-testid={testId || 'core-ui-lib-text-input'}
           ref={ref}
           id={id}
           type={rest.type ? rest.type : 'text'}
-          className={classNames(baseClass, inputClass, `${iconName ? 'pr-6' : ''}`, className)}
+          className={classNames(baseClass, inputClass, disabledClass, `${iconName ? 'pr-6' : ''}`, className, {
+            'focus:ring-2 focus:ring-primary-input-text ring-inset': !disabled,
+            'cursor-not-allowed': disabled,
+          })}
           onChange={onChange}
           placeholder={placeholder}
           disabled={disabled}
           value={value || ''}
           onKeyDown={onKeyDown}
+          autoComplete={autoComplete}
           {...rest}
         />
         {iconName && (

@@ -1,9 +1,10 @@
 import { PersonMinimalDTO } from 'interfaces';
 import prisma from 'lib/prisma';
 import { Person } from 'prisma/generated/prisma-client';
-import { isUndefined } from 'utils';
-import { FieldMapping, prepareUpdateData } from 'utils/apiUtils';
+import { isNullOrEmpty, isUndefined } from 'utils';
+import { FieldMapping, prepareQuery } from 'utils/apiUtils';
 import { prepareAccountUpdateData } from './contracts';
+import { BankAccount, IPersonDetails } from 'components/contracts/types';
 
 interface AddressDetails {
   address1?: string;
@@ -14,8 +15,8 @@ interface AddressDetails {
   country?: number | null;
 }
 
-export const prepareAddressQueryData = (addressDetails: AddressDetails | null) => {
-  if (!addressDetails) return null;
+export const prepareAddressQueryData = (addressDetails: AddressDetails | null, isCreate = false) => {
+  if (isNullOrEmpty(addressDetails)) return null;
 
   const fieldMappings: FieldMapping[] = [
     { key: 'address1', updateKey: 'Address1' },
@@ -26,7 +27,7 @@ export const prepareAddressQueryData = (addressDetails: AddressDetails | null) =
     { key: 'country', updateKey: 'Country', isForeignKey: true, foreignKeyId: 'Id' },
   ];
 
-  return prepareUpdateData(addressDetails, fieldMappings);
+  return prepareQuery(addressDetails, fieldMappings, isCreate);
 };
 
 interface OrganisationDetails {
@@ -37,34 +38,27 @@ interface OrganisationDetails {
 export const prepareOrganisationQueryData = (
   orgDetails: OrganisationDetails | null,
   contactPersonId?: number | null,
+  isCreate = false,
 ) => {
-  if (!orgDetails) return null;
+  if (isNullOrEmpty(orgDetails)) return null;
 
-  const { name, website } = orgDetails;
+  const fieldMappings: FieldMapping[] = [
+    { key: 'name', updateKey: 'OrgName' },
+    { key: 'website', updateKey: 'OrgWebsite' },
+    {
+      key: 'contactPersonId',
+      updateKey: 'Person_Organisation_OrgContactPersonIdToPerson',
+      isForeignKey: true,
+      foreignKeyId: 'PersonId',
+    },
+  ];
 
-  const organisationData: any = {};
+  const detailsWithContactPerson = {
+    ...orgDetails,
+    contactPersonId,
+  };
 
-  if (!isUndefined(name)) {
-    organisationData.OrgName = name;
-  }
-
-  if (!isUndefined(website)) {
-    organisationData.OrgWebsite = website;
-  }
-
-  if (!isUndefined(contactPersonId)) {
-    if (contactPersonId === null) {
-      organisationData.OrgContactPersonId = {
-        disconnect: true,
-      };
-    } else {
-      organisationData.OrgContactPersonId = {
-        connect: { PersonId: contactPersonId },
-      };
-    }
-  }
-
-  return organisationData;
+  return prepareQuery(detailsWithContactPerson, fieldMappings, isCreate);
 };
 
 interface PersonPersonDetails {
@@ -73,63 +67,33 @@ interface PersonPersonDetails {
   roleName?: string;
 }
 
-export const preparePersonPersonQueryData = ({ mainPersonId, relatedPersonId, roleName }: PersonPersonDetails) => {
-  if (isUndefined(mainPersonId) || isUndefined(relatedPersonId) || isUndefined(roleName)) {
+export const preparePersonPersonQueryData = (personPersonDetails: PersonPersonDetails, isCreate = false) => {
+  if (
+    isUndefined(personPersonDetails.mainPersonId) ||
+    isUndefined(personPersonDetails.relatedPersonId) ||
+    isUndefined(personPersonDetails.roleName)
+  ) {
     return null;
   }
 
-  const personPersonData: any = {};
+  const fieldMappings: FieldMapping[] = [
+    { key: 'mainPersonId', updateKey: 'PPPersonId' },
+    { key: 'relatedPersonId', updateKey: 'PPPersonRoleId' },
+    { key: 'roleName', updateKey: 'PersonRoleType' },
+  ];
 
-  if (!isUndefined(mainPersonId)) {
-    personPersonData.PPPersonId = mainPersonId;
-  }
-
-  if (!isUndefined(relatedPersonId)) {
-    personPersonData.PPPersonRoleId = relatedPersonId;
-  }
-
-  if (!isUndefined(roleName)) {
-    personPersonData.PersonRoleType = roleName;
-  }
-
-  return personPersonData;
+  return prepareQuery(personPersonDetails, fieldMappings, isCreate);
 };
 
-interface AccountDetails {
-  paidTo?: string;
-  accountName?: string;
-  accountNumber?: string;
-  sortCode?: string;
-  swift?: string;
-  iban?: string;
-  country?: number | null;
-}
-
-interface PersonDetails {
-  firstName?: string;
-  lastName?: string;
-  email?: string;
-  landline?: string;
-  mobileNumber?: string;
-  passportName?: string;
-  passportExpiryDate?: string | null;
-  hasUKWorkPermit?: number;
-  isFEURequired?: number;
-  notes?: string;
-  healthDetails?: string;
-  advisoryNotes?: string;
-  workTypes?: number[];
-  otherWorkTypes?: string[];
-}
-
 export const preparePersonQueryData = (
-  personDetails: PersonDetails,
+  personDetails: Partial<IPersonDetails>,
   addressId?: number | null,
   organisationId?: number | null,
-  salaryAccountDetails?: AccountDetails,
-  expenseAccountDetails?: AccountDetails,
+  salaryAccountDetails?: Partial<BankAccount>,
+  expenseAccountDetails?: Partial<BankAccount>,
+  isCreate = false,
 ) => {
-  if (!personDetails) return null;
+  if (isNullOrEmpty(personDetails)) return null;
 
   const personFieldMappings: FieldMapping[] = [
     { key: 'firstName', updateKey: 'PersonFirstName' },
@@ -153,11 +117,11 @@ export const preparePersonQueryData = (
     },
   ];
 
-  let personData = prepareUpdateData({ ...personDetails, addressId, organisationId }, personFieldMappings);
+  let personData = prepareQuery({ ...personDetails, addressId, organisationId }, personFieldMappings, isCreate);
 
-  if (personDetails.workTypes && personDetails.workTypes.length > 0) {
+  if (personDetails.workType && personDetails.workType.length > 0) {
     personData.PersonPersonRole = {
-      create: personDetails.workTypes.map((workTypeId) => ({
+      create: personDetails.workType.map((workTypeId) => ({
         PersonRole: {
           connect: {
             PersonRoleId: workTypeId,
@@ -201,6 +165,9 @@ export const fetchAllMinPersonsList = async (): Promise<PersonMinimalDTO[]> => {
       PersonFirstName: true,
       PersonLastName: true,
       PersonEmail: true,
+    },
+    orderBy: {
+      PersonFirstName: 'asc',
     },
   });
   return persons.map((person) => ({

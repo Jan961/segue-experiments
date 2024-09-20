@@ -15,37 +15,7 @@ import { makeRowTextBoldAndAllignLeft } from './promoter-holds';
 import { convertToPDF } from 'utils/report';
 import { bookingStatusMap } from 'config/bookings';
 import { addBorderToAllCells } from 'utils/export';
-
-type SCHEDULE_VIEW = {
-  ProductionId: number;
-  FullProductionCode: string;
-  ShowName: string;
-  RehearsalStartDate: string;
-  ProductionStartDate: string;
-  ProductionEndDate: string;
-  EntryDate: string;
-  ProductionWeekNum: number;
-  EntryType: string;
-  EntryId: number;
-  EntryName: string;
-  EntryStatusCode: string;
-  Location: string;
-  PencilNum: number | null;
-  VenueId: number | null;
-  VenueSeats: number | null;
-  Mileage: number | null;
-  TimeMins: string | null;
-  DateTypeId: number | null;
-  DateTypeName: string;
-  AffectsAvailability: number;
-  SeqNo: number;
-};
-
-interface PerformanceInfo {
-  performanceId: number;
-  performanceTime: string | null;
-  performanceDate: string | null;
-}
+import { PerformanceInfo, SCHEDULE_VIEW, addTime, getSheduleReport } from 'services/reports/schedule-report';
 
 const makeRowBold = ({ worksheet, row }: { worksheet: any; row: number }) => {
   worksheet.getRow(row).font = { bold: true };
@@ -64,29 +34,16 @@ const styleHeader = ({ worksheet, row, numberOfColumns }: { worksheet: any; row:
   }
 };
 
-const addTime = (timeArr: string[] = []) => {
-  if (!timeArr?.length) {
-    return '00:00';
-  }
-  const { hour, min } = timeArr.reduce(
-    (acc, x) => {
-      const [h, m] = x.split(':');
-      return {
-        hour: Number(h) + acc.hour,
-        min: Number(m) + acc.min,
-      };
-    },
-    { hour: 0, min: 0 },
-  );
-  const minsTime = minutesInHHmmFormat(min);
-  const [h, m] = minsTime.split(':');
-  return `${hour + Number(h)}:${Number(m)}`;
-};
-
 const getKey = ({ FullProductionCode, ShowName, EntryDate }) => `${FullProductionCode} - ${ShowName} - ${EntryDate}`;
 
 const handler = async (req, res) => {
   const { ProductionId, startDate: from, endDate: to, status, format } = req.body;
+
+  if (format === 'json') {
+    const data = await getSheduleReport({ from, to, status, ProductionId });
+    res.status(200).json(data);
+    return;
+  }
 
   const formatedFromDate = new Date(from);
   const formatedToDate = new Date(to);
@@ -215,7 +172,7 @@ const handler = async (req, res) => {
 
   const map: { [key: string]: SCHEDULE_VIEW } = formattedData.reduce((acc, x) => ({ ...acc, [getKey(x)]: x }), {});
   const daysDiff = moment(to).diff(moment(from), 'days');
-  let rowNo = 5;
+  let rowNo = 8;
   let prevProductionWeekNum = '';
   let lastWeekMetaInfo = {
     weekTotalPrinted: false,
@@ -343,6 +300,7 @@ const handler = async (req, res) => {
     '',
     '',
     'PRODUCTION TOTALS',
+    '',
     '',
     '',
     seats.reduce((acc, m) => acc + Number(m || 0), 0),

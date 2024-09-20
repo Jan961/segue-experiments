@@ -8,6 +8,7 @@ import { createHeaderRow, getProductionAndVenueDetailsFromBookingId } from 'serv
 import { convertToPDF } from 'utils/report';
 import { getAccountId, getEmailFromReq, getUsers } from 'services/userService';
 import { objectify } from 'radash';
+import { ALIGNMENT } from '../../masterplan';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { bookingId, format } = req.query || {};
@@ -45,7 +46,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       fgColor: { argb: '41A29A' },
     };
     cell.font = { color: { argb: COLOR_HEXCODE.WHITE }, bold: true };
-    cell.alignment = { vertical: 'middle', horizontal: 'center' };
+    cell.alignment = { vertical: ALIGNMENT.MIDDLE, horizontal: ALIGNMENT.CENTER };
     cell.border = {
       bottom: { style: 'thin', color: { argb: COLOR_HEXCODE.WHITE } },
       right: { style: 'thin', color: { argb: COLOR_HEXCODE.WHITE } },
@@ -54,8 +55,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   headerRow.height = 30;
 
   data.map(bookingContactNoteMapper).forEach((note) => {
-    const { UserFirstName = '', UserLastName = '' } = usersMap[note.ActionAccUserId] || {};
-    const actionedBy = `${UserFirstName || ''} ${UserLastName || ''}`;
+    const { FirstName = '', LastName = '' } = usersMap[note.ActionAccUserId] || {};
+    const actionedBy = `${FirstName || ''} ${LastName || ''}`;
     const row = worksheet.addRow([
       note.CoContactName,
       moment(note.ContactDate).format('DD/MM/YY'),
@@ -64,9 +65,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       note.Notes,
     ]);
     row.eachCell((cell, colNumber) => {
-      cell.alignment = { vertical: 'middle', horizontal: 'center' };
+      cell.alignment = { vertical: ALIGNMENT.TOP, horizontal: ALIGNMENT.CENTER };
       if (colNumber === 5) {
-        cell.alignment = { vertical: 'top', horizontal: 'left', wrapText: true };
+        cell.alignment = { vertical: ALIGNMENT.TOP, horizontal: ALIGNMENT.LEFT, wrapText: true };
       }
     });
     row.height = 80;

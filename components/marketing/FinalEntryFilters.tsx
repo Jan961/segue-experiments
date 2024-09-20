@@ -7,7 +7,7 @@ import { bookingJumpState } from 'state/marketing/bookingJumpState';
 import { ProductionJumpMenu } from 'components/global/nav/ProductionJumpMenu';
 import { getWeekDayShort, DATE_PATTERN } from 'services/dateService';
 import formatInputDate from 'utils/dateInputFormat';
-import { currencyState } from 'state/marketing/currencyState';
+import { currencyState } from 'state/global/currencyState';
 import axios from 'axios';
 import { isNullOrEmpty } from 'utils';
 import { LastPerfDate } from 'types/MarketingTypes';

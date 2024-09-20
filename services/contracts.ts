@@ -1,7 +1,7 @@
 import { BankAccount } from 'components/contracts/types';
 import { IContractDepartment, IContractSummary } from 'interfaces/contracts';
 import prisma from 'lib/prisma';
-import { prepareUpdateData } from 'utils/apiUtils';
+import { prepareQuery } from 'utils/apiUtils';
 
 export const fetchAllStandardClauses = async () => {
   const clauses = await prisma.ACCStandardClause.findMany({});
@@ -55,10 +55,10 @@ export const fetchAllContracts = async (productionId?: number): Promise<IContrac
     }) => ({
       id: ContractId,
       role: RoleName,
-      status: ContractStatus,
+      contractStatus: ContractStatus,
       completedBy: CompletedByAccUserId,
       checkedBy: CheckedByAccUserId,
-      dateIssue: DateIssued?.toISOString?.() || null,
+      dateIssued: DateIssued?.toISOString?.() || null,
       dateReturned: DateReturned?.toISOString?.() || null,
       notes: Notes,
       personId: Person?.PersonId,
@@ -109,26 +109,17 @@ export const prepareContractUpdateData = (data: any) => {
     { key: 'totalHolPay', updateKey: 'TotalHolPay' },
     { key: 'totalFeeNotes', updateKey: 'TotalFeeNotes' },
     { key: 'cancelFee', updateKey: 'CancelFee' },
+    { key: 'checkedBy', updateKey: 'CheckedByAccUserId' },
+    { key: 'completedBy', updateKey: 'CompletedByAccUserId' },
+    { key: 'currency', updateKey: 'CurrencyCode' },
+    { key: 'accScheduleJson', updateKey: 'ACCScheduleJSON' },
     // Foreign key connections
     { key: 'departmentId', updateKey: 'ACCDepartment', isForeignKey: true, foreignKeyId: 'ACCDeptId' },
     { key: 'personId', updateKey: 'Person', isForeignKey: true, foreignKeyId: 'PersonId' },
     { key: 'productionId', updateKey: 'Production', isForeignKey: true, foreignKeyId: 'Id' },
-    { key: 'currency', updateKey: 'Currency', isForeignKey: true, foreignKeyId: 'Code' },
     { key: 'venueId', updateKey: 'Venue', isForeignKey: true, foreignKeyId: 'Id' },
-    {
-      key: 'checkedBy',
-      updateKey: 'AccountUser_ACCContract_ACCCCheckedByAccUserIdToAccountUser',
-      isForeignKey: true,
-      foreignKeyId: 'Id',
-    },
-    {
-      key: 'completedBy',
-      updateKey: 'AccountUser_ACCContract_ACCCCompletedByAccUserIdToAccountUser',
-      isForeignKey: true,
-      foreignKeyId: 'Id',
-    },
   ];
-  return prepareUpdateData(data, fieldMappings);
+  return prepareQuery(data, fieldMappings);
 };
 
 export const prepareAccountUpdateData = (accountDetails: Partial<BankAccount>, isSalary: boolean) => {
@@ -150,7 +141,7 @@ export const prepareAccountUpdateData = (accountDetails: Partial<BankAccount>, i
     },
   ];
 
-  return prepareUpdateData(accountDetails, fieldMappings);
+  return prepareQuery(accountDetails, fieldMappings);
 };
 
 export const prepareAgencyOrganisationUpdateData = (agencyDetails: any) => {
@@ -165,5 +156,20 @@ export const prepareAgencyOrganisationUpdateData = (agencyDetails: any) => {
     },
   ];
 
-  return prepareUpdateData(agencyDetails, fieldMappings);
+  return prepareQuery(agencyDetails, fieldMappings);
+};
+
+export const getContractDataById = async (contractId: number) => {
+  return prisma.ACCContract.findUnique({
+    where: { ContractId: contractId },
+    include: {
+      ACCClause: true,
+      ACCPayment: true,
+      ACCPubEvent: true,
+      ACCDepartment: true,
+      Person: true,
+      Production: true,
+      Venue: true,
+    },
+  });
 };

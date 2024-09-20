@@ -12,6 +12,7 @@ import {
   isNullOrUndefined,
   noop,
   transformToOptions,
+  formatDecimalValue,
 } from 'utils';
 
 describe('Tests for utility functions', () => {
@@ -359,5 +360,32 @@ describe('checkDecimalStringFormat', () => {
     expect(checkDecimalStringFormat('123', 5, 2)).toBe(true);
     expect(checkDecimalStringFormat('1234', 4, 0)).toBe(true);
     expect(checkDecimalStringFormat('12345', 5, 0)).toBe(true);
+  });
+});
+
+describe('formatDecimalValue', () => {
+  test('should return an empty string if input is null', () => {
+    expect(formatDecimalValue(null)).toBe('');
+  });
+
+  test('should return an empty string if input is undefined', () => {
+    expect(formatDecimalValue(undefined)).toBe('');
+  });
+
+  test('should return an empty string if input is not a valid number', () => {
+    expect(formatDecimalValue('abc')).toBe('');
+    expect(formatDecimalValue('')).toBe('');
+  });
+
+  test('should return a string formatted to 2 decimal places for valid number inputs', () => {
+    expect(formatDecimalValue('123')).toBe('123.00');
+    expect(formatDecimalValue('123.456')).toBe('123.46');
+    expect(formatDecimalValue('0.1')).toBe('0.10');
+    expect(formatDecimalValue('0')).toBe('0.00');
+  });
+
+  test('should handle negative numbers correctly', () => {
+    expect(formatDecimalValue('-123.456')).toBe('-123.46');
+    expect(formatDecimalValue('-0.1')).toBe('-0.10');
   });
 });

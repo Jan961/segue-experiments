@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { productionJumpState } from 'state/booking/productionJumpState';
-import { currencyState } from 'state/marketing/currencyState';
+import { currencyState } from 'state/global/currencyState';
 import axios from 'axios';
 import GlobalToolbar from 'components/toolbar';
 import { Button, DateRange, TextInput } from 'components/core-ui-lib';

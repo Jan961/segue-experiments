@@ -19,7 +19,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const contract = await prisma.ACCContract.findUnique({
       where: { ContractId: contractId },
       include: {
-        Currency: true,
         ACCClause: true,
         ACCPayment: true,
         ACCPubEvent: true,

@@ -23,7 +23,7 @@ interface IWeeklyPayDetails {
 interface WeeklyPayDetailsProps {
   testId?: string;
   details?: Partial<IWeeklyPayDetails>;
-  onChange: (data: any) => void;
+  onChange: (data: Partial<IWeeklyPayDetails>) => void;
   currencySymbol?: string;
 }
 
@@ -43,7 +43,7 @@ const WeeklyPayDetails = ({
     (key: string, value: number | string | boolean | null) => {
       const updatedData = { ...weeklyPayDetails, [key]: value };
       setWeeklyPayDetails(updatedData);
-      onChange(updatedData);
+      onChange({ ...details, [key]: value });
     },
     [onChange, weeklyPayDetails, setWeeklyPayDetails],
   );
@@ -58,7 +58,7 @@ const WeeklyPayDetails = ({
             placeholder="00.00"
             value={rehearsalFee}
             type="number"
-            onChange={(event) => handleChange('rehearsalFee', parseInt(event.target.value, 10))}
+            onChange={(event) => handleChange('rehearsalFee', parseFloat(event.target.value))}
           />
         </div>
       </div>
@@ -71,7 +71,7 @@ const WeeklyPayDetails = ({
             placeholder="00.00"
             type="number"
             value={rehearsalHolidayPay}
-            onChange={(event) => handleChange('rehearsalHolidayPay', parseInt(event.target.value, 10))}
+            onChange={(event) => handleChange('rehearsalHolidayPay', parseFloat(event.target.value))}
           />
         </div>
       </div>
@@ -84,7 +84,7 @@ const WeeklyPayDetails = ({
             placeholder="00.00"
             type="number"
             value={performanceFee}
-            onChange={(event) => handleChange('performanceFee', parseInt(event.target.value, 10))}
+            onChange={(event) => handleChange('performanceFee', parseFloat(event.target.value))}
           />
         </div>
       </div>
@@ -97,7 +97,7 @@ const WeeklyPayDetails = ({
             placeholder="00.00"
             type="number"
             value={performanceHolidayPay}
-            onChange={(event) => handleChange('performanceHolidayPay', parseInt(event.target.value, 10))}
+            onChange={(event) => handleChange('performanceHolidayPay', parseFloat(event.target.value))}
           />
         </div>
       </div>
@@ -111,7 +111,7 @@ const WeeklyPayDetails = ({
               placeholder="00.00"
               type="number"
               value={touringAllowance}
-              onChange={(event) => handleChange('touringAllowance', parseInt(event.target.value, 10))}
+              onChange={(event) => handleChange('touringAllowance', parseFloat(event.target.value))}
             />
             <TextInput
               testId={`${testId}-subs-notes`}

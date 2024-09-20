@@ -216,6 +216,15 @@ export type ContractsDTO = {
   ContactInfoReceived: boolean;
 };
 
+export type AccountContactDTO = {
+  AccContId: number;
+  AccContAccountId: number;
+  AccContFirstName: string;
+  AccContLastName: string;
+  AccContPhone: string;
+  AccContMainEmail: string;
+};
+
 export type GetInFitUpDTO = {
   Id: number;
   VenueId?: number; // check field name
@@ -439,10 +448,10 @@ export type VenueRoleDTO = {
 };
 
 export type UserDto = {
-  UserId?: number;
-  UserEmail: string;
-  UserFirstName: string;
-  UserLastName?: string;
+  Id?: number;
+  Email: string;
+  FirstName: string;
+  LastName?: string;
   AccUserId: number;
 };
 
@@ -655,7 +664,10 @@ export interface StandardSeatRowType {
   type: string;
   seats: string;
   value: string;
+  id: number | null;
+  typeId: number;
 }
+
 export interface VenueContractFormData {
   StatusCode: string;
   SignedDate: Date;
@@ -707,17 +719,7 @@ export interface SaveContractBookingFormState {
 export interface ContactDemoFormData {
   phone: string;
   email: string;
-}
-
-export interface ContactDemoFormAccountData {
-  // phone: string;
-  Email?: string;
-  AccountUser?: any;
-  companyContact?: string;
-}
-
-export interface ContactsFormData {
-  data: ContactDemoFormAccountData;
+  id: number;
 }
 
 export interface DealMemoCall {
@@ -746,27 +748,26 @@ export interface DealMemoContractFormData {
   ROTTPercentage?: number;
   PRSPercentage?: number;
   Guarantee?: boolean;
-  GuaranteeAmount?: number;
+  GuaranteeAmount?: string;
   HasCalls?: boolean;
   PromoterSplitPercentage?: number;
   VenueSplitPercentage?: number;
-  VenueRental?: number;
+  VenueRental?: string;
   VenueRentalNotes?: string;
-  StaffingContra?: number;
+  StaffingContra?: string;
   StaffingContraNotes?: string;
-  AgreedContraItems?: number;
+  AgreedContraItems?: string;
   AgreedContraItemsNotes?: string;
   BOMVenueContactId?: number;
   OnSaleDate?: Date;
   SettlementVenueContactId?: number;
   SellableSeats?: number;
   MixerDeskPosition?: string;
-  StandardSeatKills?: string;
-  RestorationLevy?: number;
-  BookingFees?: number;
+  RestorationLevy?: string;
+  BookingFees?: string;
   CCCommissionPercent?: number;
   TxnChargeOption?: string;
-  TxnChargeAmount?: number;
+  TxnChargeAmount?: string;
   AgreedDiscounts?: string;
   MaxTAAlloc?: string;
   TAAlloc?: string;
@@ -779,16 +780,17 @@ export interface DealMemoContractFormData {
   BrochureDeadline?: Date;
   FinalProofBy?: Date;
   PrintReqs?: string;
-  LocalMarketingBudget?: number;
-  LocalMarketingContra?: number;
+  LocalMarketingBudget?: string;
+  LocalMarketingContra?: string;
   SellWho?: string;
   SellProgrammes?: boolean;
   PrintDelUseVenueAddress?: boolean;
+  PrintDelUseVenueAddressline?: string;
   SellMerch?: boolean;
   SellNotes?: string;
   SellProgCommPercent?: number;
   SellMerchCommPercent?: number;
-  SellPitchFee?: number;
+  SellPitchFee?: string;
   TechVenueContactId?: number;
   TechArrivalDate?: Date;
   TechArrivalTime?: Date;
@@ -800,7 +802,7 @@ export interface DealMemoContractFormData {
   NumCateringNotes?: string;
   BarringClause?: string;
   AdvancePaymentRequired?: boolean;
-  AdvancePaymentAmount?: number;
+  AdvancePaymentAmount?: string;
   AdvancePaymentDueBy?: Date;
   SettlementDays?: number;
   ContractClause?: string;
@@ -813,6 +815,8 @@ export interface DealMemoContractFormData {
   ApprovedBy?: string;
   DateReturned?: Date;
   Notes?: string;
+  CompAccContId?: number;
+  SendTo?: Array<number>;
 }
 
 export interface DealMemoHoldType {
@@ -828,4 +832,9 @@ export interface DealMemoPriceState {
   DMPNumTickets: number;
   DMPDeMoId: number;
   DMPNotes: string;
+}
+
+export interface UserPermission {
+  permissionId: number;
+  permissionName: string;
 }

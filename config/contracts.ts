@@ -279,7 +279,7 @@ export const contractDepartmentOptions = [
 
 export const contractTemplateOptions = [
   {
-    text: 'Jendagi Template',
+    text: 'Contract Template',
     value: 1,
   },
 ];
@@ -290,6 +290,8 @@ export enum CompanyContractStatus {
   QuestionsRaised = 'CIQR',
   SignedAndReturned = 'CSR',
   Overdue = 'CO',
+  Voided = 'O',
+  Cancelled = 'X',
 }
 
 export const companyContractStatusOrder = {
@@ -298,6 +300,8 @@ export const companyContractStatusOrder = {
   [CompanyContractStatus.Issued]: 3,
   [CompanyContractStatus.NotYetIssued]: 4,
   [CompanyContractStatus.SignedAndReturned]: 5,
+  [CompanyContractStatus.Voided]: 6,
+  [CompanyContractStatus.Cancelled]: 7,
 };
 
 export const companyContractStatusOptions = [
@@ -320,6 +324,14 @@ export const companyContractStatusOptions = [
   {
     text: 'Overdue',
     value: CompanyContractStatus.Overdue,
+  },
+  {
+    text: 'Voided',
+    value: CompanyContractStatus.Voided,
+  },
+  {
+    text: 'Cancelled',
+    value: CompanyContractStatus.Cancelled,
   },
 ];
 

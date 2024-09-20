@@ -34,11 +34,13 @@ model Account {
   AccountTypeOfCompany       String?               @db.VarChar(30)
   AccountPhone               String?               @db.VarChar(30)
   AccountPaymentCurrencyCode String?               @db.VarChar(3)
+  AccountW3WCount            Int?                  @db.UnsignedSmallInt
   Currency                   Currency?             @relation(fields: [AccountPaymentCurrencyCode], references: [CurrencyCode], onDelete: Restrict, map: "Currency_Account_Payment")
   File                       File?                 @relation(fields: [AccountLogoFileId], references: [FileId], map: "File_Account")
   AccountContact             AccountContact[]
   AccountSubscription        AccountSubscription[]
   AccountUser                AccountUser[]
+  PermissionGroup            PermissionGroup[]
   ProductionCompany          ProductionCompany[]
 
   @@index([AccountLogoFileId], map: "File_Account")
@@ -126,12 +128,13 @@ model File {
 }
 
 model Permission {
-  PermissionId                 Int                     @id @default(autoincrement())
+  PermissionId                 Int                         @id @default(autoincrement())
   PermissionParentPermissionId Int?
-  PermissionName               String                  @db.VarChar(50)
-  PermissionDescription        String                  @db.LongText
-  PermissionSeqNo              Int?                    @db.TinyInt
+  PermissionName               String                      @db.VarChar(50)
+  PermissionDescription        String                      @db.LongText
+  PermissionSeqNo              Int?                        @db.TinyInt
   AccountUserPermission        AccountUserPermission[]
+  PermissionGroupPermission    PermissionGroupPermission[]
 }
 
 model ProductionCompany {
@@ -168,6 +171,27 @@ model User {
   AccountUser   AccountUser[]
 }
 
+model PermissionGroup {
+  PerGpId                   Int                         @id @default(autoincrement())
+  PerGpName                 String                      @db.VarChar(50)
+  PerGpAccountId            Int
+  Account                   Account                     @relation(fields: [PerGpAccountId], references: [AccountId], onDelete: Cascade, map: "Account_PermissionGroup")
+  PermissionGroupPermission PermissionGroupPermission[]
+
+  @@index([PerGpAccountId], map: "Account_PermissionGroup")
+}
+
+model PermissionGroupPermission {
+  PGPId           Int             @id @default(autoincrement())
+  PGPPerGpId      Int
+  PGPPermissionId Int
+  PermissionGroup PermissionGroup @relation(fields: [PGPPerGpId], references: [PerGpId], onDelete: Cascade, map: "PermissionGroup_PermissionGroupPermission")
+  Permission      Permission      @relation(fields: [PGPPermissionId], references: [PermissionId], onDelete: Cascade, map: "Permission_PermissionGroupPermission")
+
+  @@index([PGPPerGpId], map: "PermissionGroup_PermissionGroupPermission")
+  @@index([PGPPermissionId], map: "Permission_PermissionGroupPermission")
+}
+
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view AccountUserView {
   AccountId             Int     @default(0)
@@ -180,6 +204,19 @@ view AccountUserView {
   UserFirstName         String  @db.VarChar(50)
   UserLastName          String? @db.VarChar(50)
   UserEmail             String  @db.VarChar(120)
+
+  @@ignore
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view AccountUserPermissionsView {
+  AccountId      Int
+  UserId         Int     @default(0)
+  AccUserId      Int     @default(0)
+  UserFirstName  String  @db.VarChar(50)
+  UserLastName   String? @db.VarChar(50)
+  UserEmail      String  @db.VarChar(120)
+  AllPermissions String? @db.MediumText
 
   @@ignore
 }

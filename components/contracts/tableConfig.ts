@@ -3,7 +3,6 @@ import DefaultCellRenderer from '../bookings/table/DefaultCellRenderer';
 import VenueColumnRenderer from './table/VenueColumnRenderer';
 import DateColumnRenderer from './table/DateColumnRenderer';
 import { tileColors } from 'config/global';
-import InputRenderer from 'components/global/salesTable/renderers/InputRenderer';
 import DefaultTextRenderer from 'components/core-ui-lib/Table/renderers/DefaultTextRenderer';
 import formatInputDate from 'utils/dateInputFormat';
 import { getTimeFromDateAndTime } from 'services/dateService';
@@ -13,6 +12,10 @@ import SelectCellRenderer from 'components/core-ui-lib/Table/renderers/SelectCel
 import { companyContractStatusOptions, statusToBgColorMap } from 'config/contracts';
 import DateRenderer from 'components/core-ui-lib/Table/renderers/DateRenderer';
 import NotesRenderer from 'components/core-ui-lib/Table/renderers/NotesRenderer';
+import DownloadButtonRenderer from 'components/core-ui-lib/Table/renderers/DownloadButtonRenderer';
+import TextInputRenderer from 'components/core-ui-lib/Table/renderers/TextInputRenderer';
+import CurrencyInputRenderer from 'components/core-ui-lib/Table/renderers/CurrencyInputRenderer';
+import { formatValue } from './utils';
 
 export const contractsStyleProps = { headerColor: tileColors.contracts };
 
@@ -83,10 +86,10 @@ export const getCompanyContractsColumnDefs = (userList = []) => [
     cellRenderer: DefaultCellRenderer,
     flex: 1,
     cellStyle: function (params) {
-      const { status } = params.data;
+      const { contractStatus } = params.data;
       return {
         backgroundColor: 'white',
-        ...(statusToBgColorMap[status] || {}),
+        ...(statusToBgColorMap[contractStatus] || {}),
       };
     },
   },
@@ -96,19 +99,19 @@ export const getCompanyContractsColumnDefs = (userList = []) => [
     cellRenderer: DefaultCellRenderer,
     flex: 1,
     cellStyle: function (params) {
-      const { status } = params.data;
+      const { contractStatus } = params.data;
       return {
         backgroundColor: 'white',
-        ...(statusToBgColorMap[status] || {}),
+        ...(statusToBgColorMap[contractStatus] || {}),
       };
     },
   },
-  { headerName: 'Role', field: 'role', cellRenderer: DefaultCellRenderer, flex: 1, editable: true },
+  { headerName: 'Role', field: 'role', cellRenderer: DefaultCellRenderer, flex: 1 },
   {
     headerName: 'Contract Status',
-    field: 'status',
+    field: 'contractStatus',
     cellRenderer: SelectCellRenderer,
-    valueGetter: (params) => params?.data?.status,
+    valueGetter: (params) => params?.data?.contractStatus,
     flex: 1,
     editable: true,
     cellRendererParams: () => ({
@@ -133,11 +136,12 @@ export const getCompanyContractsColumnDefs = (userList = []) => [
     headerName: '',
     field: 'pdf',
     width: 100,
-    cellRenderer: ButtonRenderer,
-    cellRendererParams: () => ({
+    cellRenderer: DownloadButtonRenderer,
+    cellRendererParams: (params) => ({
       buttonText: 'Save as PDF',
       variant: 'primary',
       width: 90,
+      href: `/api/company-contracts/export/${params.data?.id}`,
     }),
     cellStyle: {
       paddingRight: '0.5em',
@@ -167,13 +171,25 @@ export const getCompanyContractsColumnDefs = (userList = []) => [
       isSearchable: true,
     }),
   },
-  { headerName: 'Date Issued', field: 'dateIssue', cellRenderer: DateRenderer, width: 120 },
+  {
+    headerName: 'Date Issued',
+    field: 'dateIssued',
+    cellRenderer: DateRenderer,
+    width: 120,
+    cellStyle: {
+      overflow: 'visible',
+    },
+  },
   {
     headerName: 'Date Returned',
     field: 'dateReturned',
     cellRenderer: DateRenderer,
     resizable: false,
     width: 120,
+    cellStyle: {
+      overflow: 'visible',
+    },
+    cellEditorParams: { popupParent: document.body },
   },
   {
     headerName: '',
@@ -182,7 +198,7 @@ export const getCompanyContractsColumnDefs = (userList = []) => [
     headerClass: ['bgOrangeTextWhite'],
     cellRendererParams: {
       tpActive: true,
-      activeFillColor: '#082B4B',
+      activeFillColor: '#D41818',
       strokeColor: '#082B4B',
     },
     resizable: false,
@@ -196,7 +212,7 @@ export const getCompanyContractsColumnDefs = (userList = []) => [
   },
 ];
 
-export const standardSeatKillsColumnDefs = (onChangeData, holdValue) => [
+export const seatKillsColDefs = (handleChange, currencySymbol) => [
   {
     headerName: 'Type',
     field: 'type',
@@ -210,20 +226,14 @@ export const standardSeatKillsColumnDefs = (onChangeData, holdValue) => [
   {
     headerName: 'Seats',
     field: 'seats',
-    cellRenderer: InputRenderer,
-    cellRendererParams: () => ({
-      placeholder: '',
+    cellRenderer: TextInputRenderer,
+    cellRendererParams: (params) => ({
       inline: true,
-      onChange: (value, holdTypeValue, holdTypeName, field) => {
-        onChangeData(value, holdTypeValue, holdTypeName, field);
-      },
-      holdValue,
+      onChange: (value) => handleChange(params.data, value, 'seats'),
+      className: 'w-[108px] ml-1 mt-1 font-bold',
+      value: formatValue(params.data.seats),
     }),
     width: 120,
-    cellStyle: {
-      textAlign: 'center',
-      overflow: 'visible',
-    },
     headerClass: 'right-border-full',
     suppressMovable: true,
     sortable: false,
@@ -232,20 +242,15 @@ export const standardSeatKillsColumnDefs = (onChangeData, holdValue) => [
   {
     headerName: 'Value',
     field: 'value',
-    cellRenderer: InputRenderer,
-    cellRendererParams: () => ({
-      placeholder: '',
+    cellRenderer: CurrencyInputRenderer,
+    cellRendererParams: (params) => ({
       inline: true,
-      onChange: (value, holdTypeValue, holdTypeName, field) => {
-        onChangeData(value, holdTypeValue, holdTypeName, field);
-      },
-      holdValue,
+      onChange: (value) => handleChange(params.data, value, 'value'),
+      currency: currencySymbol,
+      value: formatValue(params.data.value),
+      className: 'w-24 font-bold',
     }),
     width: 120,
-    cellStyle: {
-      textAlign: 'center',
-      overflow: 'visible',
-    },
     suppressMovable: true,
     sortable: false,
     resizable: false,
@@ -284,6 +289,121 @@ export const attachmentsColDefs = [
   {
     headerName: '',
     field: 'icons',
+    cellRenderer: IconRowRenderer,
+    cellRendererParams: {
+      iconList: [
+        {
+          name: 'delete',
+        },
+      ],
+    },
+    width: 80,
+    resizable: false,
+  },
+];
+
+export const contractTourScheduleColumns = [
+  {
+    headerName: 'PROD',
+    field: 'productionCode',
+    editable: true,
+    cellRenderer: DefaultTextRenderer,
+    width: 150,
+  },
+  {
+    headerName: 'DAY',
+    field: 'day',
+    editable: true,
+    cellRenderer: DefaultTextRenderer,
+    width: 150,
+  },
+  {
+    headerName: 'DATE',
+    field: 'date',
+    editable: true,
+    cellRenderer: DefaultTextRenderer,
+    width: 150,
+  },
+  {
+    headerName: 'Week',
+    field: 'week',
+    editable: true,
+    cellRenderer: DefaultTextRenderer,
+    width: 150,
+  },
+  {
+    headerName: 'VENUE/DETAILS',
+    field: 'venue',
+    editable: true,
+    cellRenderer: DefaultTextRenderer,
+    width: 150,
+  },
+  {
+    headerName: 'TOWN',
+    field: 'location',
+    editable: true,
+    cellRenderer: DefaultTextRenderer,
+    width: 150,
+  },
+  {
+    headerName: 'DAY TYPE',
+    field: 'type',
+    editable: true,
+    cellRenderer: DefaultTextRenderer,
+    width: 150,
+  },
+  {
+    headerName: 'STATUS',
+    field: 'status',
+    editable: true,
+    cellRenderer: DefaultTextRenderer,
+    width: 150,
+  },
+  {
+    headerName: 'CAPACITY',
+    field: 'capacity',
+    editable: true,
+    cellRenderer: DefaultTextRenderer,
+    width: 150,
+  },
+  {
+    headerName: 'Performances per day',
+    field: 'performancesPerDay',
+    editable: true,
+    cellRenderer: DefaultTextRenderer,
+    width: 150,
+  },
+  {
+    headerName: 'Performance 1 Time',
+    field: 'performance1',
+    editable: true,
+    cellRenderer: DefaultTextRenderer,
+    width: 150,
+  },
+  {
+    headerName: 'Performance 2 Time',
+    field: 'performance2',
+    editable: true,
+    cellRenderer: DefaultTextRenderer,
+    width: 150,
+  },
+  {
+    headerName: 'MILES',
+    field: 'mileage',
+    editable: true,
+    cellRenderer: DefaultTextRenderer,
+    width: 150,
+  },
+  {
+    headerName: 'TIME',
+    field: 'time',
+    editable: true,
+    cellRenderer: DefaultTextRenderer,
+    width: 150,
+  },
+  {
+    headerName: '',
+    field: 'delete',
     cellRenderer: IconRowRenderer,
     cellRendererParams: {
       iconList: [

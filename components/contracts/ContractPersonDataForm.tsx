@@ -5,19 +5,19 @@ import { countryState } from 'state/global/countryState';
 import { transformToOptions } from 'utils';
 import { userState } from 'state/account/userState';
 import { Checkbox } from 'components/core-ui-lib';
-import AgencyDetails, { defaultAgencyDetails } from './PersonForm/AgencyDetails';
-import PersonalDetails, { defaultPersonDetails } from './PersonForm/PersonalDetails';
-import AccountDetailsForm, { defaultBankAccount } from './PersonForm/AccountDetailsForm';
-import EmergencyContact, { defaultEmergencyContactData } from './PersonForm/EmergencyContact';
+import AgencyDetails from './PersonForm/AgencyDetails';
+import PersonalDetails from './PersonForm/PersonalDetails';
+import AccountDetailsForm from './PersonForm/AccountDetailsForm';
+import EmergencyContact from './PersonForm/EmergencyContact';
 import { IPerson } from './types';
 
 const defaultContractDetails = {
-  personDetails: defaultPersonDetails,
-  emergencyContact1: defaultEmergencyContactData,
-  emergencyContact2: defaultEmergencyContactData,
-  agencyDetails: defaultAgencyDetails,
-  salaryAccountDetails: defaultBankAccount,
-  expenseAccountDetails: defaultBankAccount,
+  personDetails: null,
+  emergencyContact1: null,
+  emergencyContact2: null,
+  agencyDetails: null,
+  salaryAccountDetails: null,
+  expenseAccountDetails: null,
 };
 
 interface ContractPersonDataFormProps {
@@ -44,7 +44,7 @@ export const ContractPersonDataForm = ({ person = {}, height, updateFormData }: 
       transformToOptions(
         Object.values(users),
         null,
-        'Id',
+        'AccUserId',
         ({ FirstName = '', LastName = '', Email = '' }) => `${FirstName || ''} ${LastName || ''} | ${Email || ''}`,
       ),
     [users],
@@ -65,7 +65,7 @@ export const ContractPersonDataForm = ({ person = {}, height, updateFormData }: 
 
   return (
     <>
-      <div className={`${height} w-[82vw] overflow-y-scroll`}>
+      <div className={`${height} w-full overflow-y-scroll`}>
         <div className="text-xl text-primary-navy font-bold mb-3">Person Details</div>
         <PersonalDetails
           details={personDetails}
@@ -74,7 +74,7 @@ export const ContractPersonDataForm = ({ person = {}, height, updateFormData }: 
           userOptionList={userOptionList}
           onChange={(data) => onChange('personDetails', data)}
         />
-        <div className="grid grid-cols-2 mt-10">
+        <div className="grid grid-cols-2 mt-10 gap-x-4">
           <div>
             <h3 className="text-xl text-primary-navy font-bold mb-3">Emergency Contact 1</h3>
             <EmergencyContact
@@ -109,7 +109,7 @@ export const ContractPersonDataForm = ({ person = {}, height, updateFormData }: 
           onChange={(data) => onChange('agencyDetails', data)}
         />
         <h3 className="text-xl text-primary-navy font-bold mt-10">Salary Details</h3>
-        <div className="grid grid-cols-2 my-8">
+        <div className="grid grid-cols-2 gap-x-4 my-8">
           <div>
             <h3 className="text-base text-primary-navy font-bold mb-3">Salary</h3>
             <AccountDetailsForm

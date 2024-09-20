@@ -3,7 +3,7 @@ import Layout from 'components/Layout';
 import { InitialState } from 'lib/recoil';
 import { getProductionJumpState } from 'utils/getProductionJumpState';
 import { getAccountIdFromReq, getUsers } from 'services/userService';
-import ContractFilters from 'components/contracts/ContractFilters';
+import ContractFilters from 'components/contracts/CompanyContractsFilters';
 import CompanyContractsTable from 'components/contracts/table/CompanyContractsTable';
 import { getAllVenuesMin, getUniqueVenueCountrylist } from 'services/venueService';
 import { intialContractsFilterState } from 'state/contracts/contractsFilterState';
@@ -14,6 +14,7 @@ import { getAllCurrencylist } from 'services/productionService';
 import { fetchAllContracts, fetchAllStandardClauses, fetchDepartmentList } from 'services/contracts';
 import { IContractDepartment, IContractSummary } from 'interfaces/contracts';
 import useCompanyContractsFilter from 'hooks/useCompanyContractsFilters';
+import { getAccountContacts } from 'services/contactService';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const ContractsPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
@@ -37,17 +38,27 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const productionJump = await getProductionJumpState(ctx, 'contracts/company-contracts');
   const ProductionId = -1;
   productionJump.selected = -1;
-  const [users, countryList, venues, personsList, currencyList, standardClauses, departmentList, contractList] =
-    await all([
-      getUsers(accountId),
-      getUniqueVenueCountrylist(),
-      getAllVenuesMin(),
-      fetchAllMinPersonsList(),
-      getAllCurrencylist(),
-      fetchAllStandardClauses(),
-      fetchDepartmentList(),
-      fetchAllContracts(),
-    ]);
+  const [
+    users,
+    countryList,
+    venues,
+    personsList,
+    currencyList,
+    standardClauses,
+    departmentList,
+    contractList,
+    contacts,
+  ] = await all([
+    getUsers(accountId),
+    getUniqueVenueCountrylist(),
+    getAllVenuesMin(),
+    fetchAllMinPersonsList(),
+    getAllCurrencylist(),
+    fetchAllStandardClauses(),
+    fetchDepartmentList(),
+    fetchAllContracts(),
+    getAccountContacts(accountId),
+  ]);
 
   const department = objectify(
     departmentList,
@@ -93,7 +104,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       currencyList,
     },
     account: {
-      user: { users: objectify(users, (user: UserDto) => user.UserId) },
+      user: { users: objectify(users, (user: UserDto) => user.Id) },
     },
     contracts: {
       filters: {
@@ -105,6 +116,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       standardClause,
       contract,
       department,
+      accountContacts: contacts,
     },
   };
 

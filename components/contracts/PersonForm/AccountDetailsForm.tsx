@@ -19,7 +19,7 @@ interface Props {
   details?: Partial<BankAccount>;
   accountType: string;
   countryOptionList: SelectOption[];
-  onChange: (data: BankAccount) => void;
+  onChange: (data: Partial<BankAccount>) => void;
 }
 
 const SalaryDetailsForm = ({ details, countryOptionList, onChange, accountType = 'Salary' }: Props) => {
@@ -29,18 +29,18 @@ const SalaryDetailsForm = ({ details, countryOptionList, onChange, accountType =
     (key: string, value: number | string | null) => {
       const updatedData = { ...formData, [key]: value };
       setFormData(updatedData);
-      onChange(updatedData);
+      onChange({ ...details, [key]: value });
     },
     [onChange, setFormData, formData],
   );
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-start">
-        <div className="text-primary-input-text font-bold mr-4 w-[11vw]">{`${accountType} to be Paid to`}</div>
-        <div className="w-[22vw] ml-4">
+        <div className="text-primary-input-text font-bold w-44">{`${accountType} to be Paid to`}</div>
+        <div className="grow">
           <RadioGroup
             testId={`${accountType}-paid-to`}
-            className=" text-primary-input-text font-bold w-full"
+            className=" text-primary-input-text font-bold w-full max-w-96"
             onChange={(value) => handleChange('paidTo', value)}
             value={paidTo}
             options={salaryPaidToOptions}
@@ -49,36 +49,36 @@ const SalaryDetailsForm = ({ details, countryOptionList, onChange, accountType =
         </div>
       </div>
       <div className="flex items-start">
-        <div className="text-primary-input-text font-bold mr-4 w-[11vw]">Bank Account Name</div>
-        <div className="w-[22vw] ml-4">
+        <div className="text-primary-input-text font-bold w-44">Bank Account Name</div>
+        <div className="grow">
           <TextInput
             testId={`${accountType}-bank-account-name`}
             placeholder="Enter Bank Account Name"
-            className=" text-primary-input-text font-bold w-full"
+            className=" text-primary-input-text font-bold w-full max-w-96"
             onChange={(e) => handleChange('accountName', e.target.value)}
             value={accountName}
           />
         </div>
       </div>
       <div className="flex items-start">
-        <div className="text-primary-input-text font-bold mr-4 w-[11vw]">Sort Code</div>
-        <div className="w-[22vw] ml-4">
+        <div className="text-primary-input-text font-bold w-44">Sort Code</div>
+        <div className="grow">
           <TextInput
             testId={`${accountType}-sort-code`}
             placeholder="Enter Sort Code"
-            className=" text-primary-input-text font-bold w-full"
+            className=" text-primary-input-text font-bold w-full max-w-96"
             onChange={(e) => handleChange('sortCode', e.target.value)}
             value={sortCode}
           />
         </div>
       </div>
       <div className="flex items-start">
-        <div className="text-primary-input-text font-bold mr-4 w-[11vw]">Account Number</div>
-        <div className="w-[22vw] ml-4">
+        <div className="text-primary-input-text font-bold w-44">Account Number</div>
+        <div className="grow">
           <TextInput
             testId={`${accountType}-account-number`}
             placeholder="Enter Account Number"
-            className=" text-primary-input-text font-bold w-full"
+            className=" text-primary-input-text font-bold w-full max-w-96"
             onChange={(e) => handleChange('accountNumber', e.target.value)}
             value={accountNumber}
             max={8}
@@ -86,12 +86,12 @@ const SalaryDetailsForm = ({ details, countryOptionList, onChange, accountType =
         </div>
       </div>
       <div className="flex items-start">
-        <div className="text-primary-input-text font-bold mr-4 w-[11vw]">SWIFT(if applicable)</div>
-        <div className="w-[22vw] ml-4">
+        <div className="text-primary-input-text font-bold w-44">SWIFT(if applicable)</div>
+        <div className="grow">
           <TextInput
             testId={`${accountType}-account-swift`}
             placeholder="Enter Bank Account Name"
-            className=" text-primary-input-text font-bold w-full"
+            className=" text-primary-input-text font-bold w-full max-w-96"
             onChange={(e) => handleChange('swift', e.target.value)}
             value={swift}
             max={11}
@@ -99,12 +99,12 @@ const SalaryDetailsForm = ({ details, countryOptionList, onChange, accountType =
         </div>
       </div>
       <div className="flex items-start">
-        <div className="text-primary-input-text font-bold mr-4 w-[11vw]">IBAN(if applicable)</div>
-        <div className="w-[22vw] ml-4">
+        <div className="text-primary-input-text font-bold w-44">IBAN(if applicable)</div>
+        <div className="grow">
           <TextInput
             testId={`${accountType}-account-iban`}
             placeholder="Enter Bank Account Name"
-            className=" text-primary-input-text font-bold w-full"
+            className=" text-primary-input-text font-bold w-full max-w-96"
             onChange={(e) => handleChange('iban', e.target.value)}
             value={iban}
             max={34}
@@ -112,12 +112,12 @@ const SalaryDetailsForm = ({ details, countryOptionList, onChange, accountType =
         </div>
       </div>
       <div className="flex items-start">
-        <div className="text-primary-input-text font-bold mr-4 w-[11vw]">Country</div>
-        <div className="w-[22vw] ml-4">
+        <div className="text-primary-input-text font-bold w-44">Country</div>
+        <div className="grow">
           <Select
             testId={`${accountType}-account-country`}
             placeholder="Select Country"
-            className=" text-primary-input-text font-bold w-full"
+            className=" text-primary-input-text font-bold w-full max-w-96"
             onChange={(value) => handleChange('country', value as number)}
             options={countryOptionList}
             value={country}

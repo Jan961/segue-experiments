@@ -8,6 +8,7 @@ import {
   ContractsDTO,
   ContractStatusType,
   ContractBookingStatusType,
+  AccountContactDTO,
 } from 'interfaces';
 import { RecoilState, useRecoilCallback } from 'recoil';
 import { bookingState } from 'state/booking/bookingState';
@@ -39,7 +40,7 @@ import { contractsVenueState } from 'state/contracts/contractsVenueState';
 import { contractsBookingStatusState, contractsStatusState } from 'state/contracts/contractsStatusState';
 import { contractRehearsalState } from 'state/contracts/contractRehearsalState';
 import { contractGetInFitUpState } from 'state/contracts/contractGetInFitUpState';
-import { currencyState } from 'state/marketing/currencyState';
+import { currencyState, TCurrencySymbol } from 'state/global/currencyState';
 import { CurrencyList, currencyListState } from 'state/productions/currencyState';
 import { ProductionCompanyList, productionCompanyState } from 'state/productions/productionCompanyState';
 import { currentUserState } from 'state/marketing/currentUserState';
@@ -49,6 +50,7 @@ import { TPersonState, personState } from 'state/contracts/PersonState';
 import { TStandardClauseState, standardClauseState } from 'state/contracts/standardClauseState';
 import { TContractListState, contractListState } from 'state/contracts/contractsListState';
 import { TContractDepartmentState, contractDepartmentState } from 'state/contracts/contractDepartmentState';
+import { accountContactState } from 'state/contracts/accountContactState';
 
 /*
   Experimental attempt to get Recoil.js working with SSR in React in a DRY manner.
@@ -96,6 +98,8 @@ export type InitialState = Partial<{
     standardClause?: TStandardClauseState;
     contract?: TContractListState;
     department?: TContractDepartmentState;
+    accountContacts?: Record<number, AccountContactDTO>;
+    currencySymbol?: TCurrencySymbol;
   };
   marketing?: {
     bookingJump?: BookingJump;
@@ -164,6 +168,8 @@ const states: {
     standardClause: standardClauseState,
     contract: contractListState,
     department: contractDepartmentState,
+    accountContacts: accountContactState,
+    currencySymbol: currencyState,
   },
   marketing: {
     bookingJump: bookingJumpState,

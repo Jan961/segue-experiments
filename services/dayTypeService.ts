@@ -6,3 +6,7 @@ export const getDayTypes = async () =>
       SeqNo: 'asc',
     },
   });
+
+export const getDateTypeFromId = async (id: number) => {
+  return (await prisma.DateType.findFirst({ where: { Id: id }, select: { Name: true } }))?.Name;
+};
