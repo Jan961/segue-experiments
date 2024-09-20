@@ -31,7 +31,7 @@ export default function AccountDetailsTab() {
 
         setCurrencyOptions(
           data.currencyList.map((currency) => {
-            return { text: currency.Code + ' | ' + currency.Name, value: currency.Code };
+            return { text: currency.CurrencyCode + ' | ' + currency.CurrencyName, value: currency.CurrencyCode };
           }),
         );
 
