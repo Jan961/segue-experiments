@@ -49,7 +49,7 @@ const AdEditUser = ({ visible, onClose, permissions, productions = [], selectedU
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [allProductionsChecked, setAllProductionsChecked] = useState(false);
 
-  const { isSignUpLoaded, createUser, updateUser, error } = useUser();
+  const { isSignUpLoaded, isBusy, createUser, updateUser, error } = useUser();
 
   const handleInputChange = (e) => {
     setIsFormDirty(true);
@@ -147,7 +147,7 @@ const AdEditUser = ({ visible, onClose, permissions, productions = [], selectedU
     isFormDirty ? setShowConfirmationDialog(true) : onClose();
   };
 
-  return isSignUpLoaded ? (
+  return isSignUpLoaded || isBusy ? (
     <>
       <PopupModal
         show={visible}
@@ -284,7 +284,9 @@ const AdEditUser = ({ visible, onClose, permissions, productions = [], selectedU
       )}
     </>
   ) : (
-    <Spinner size="md" />
+    <div className="inset-0 absolute bg-white bg-opacity-50 z-50 flex justify-center items-center top-20 left-20 right-20 bottom-20">
+      <Spinner size="lg" />
+    </div>
   );
 };
 

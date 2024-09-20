@@ -18,10 +18,16 @@ type UserDetails = {
 const useUser = () => {
   const { isLoaded: isSignUpLoaded } = useSignUp();
   const [error, setError] = useState('');
+  const [isBusy, setIsBusy] = useState(false);
 
   const createUser = async (userDetails: UserDetails): Promise<boolean> => {
     try {
+      setIsBusy(true);
       setError('');
+      // check if user already exists
+      const { data: userExists } = await axios.post('/api/user/exists', {
+        userDetails,
+      });
       // Create the user within clerk
       const { data } = await axios.post('/api/auth/create-clerk-user', {
         ...userDetails,
@@ -52,6 +58,8 @@ const useUser = () => {
       console.log(error);
       setError('Something went wrong, please try again');
       return false;
+    } finally {
+      setIsBusy(false);
     }
   };
 
@@ -71,7 +79,7 @@ const useUser = () => {
     }
   };
 
-  return { isSignUpLoaded, createUser, updateUser, error };
+  return { isSignUpLoaded, isBusy, createUser, updateUser, error };
 };
 
 export default useUser;
