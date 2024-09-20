@@ -235,12 +235,6 @@ export const parseAndSortDates = (arr: string[]): Array<string> => {
   return dayArray;
 };
 
-export const checkDecimalStringFormat = (decimalString, precision, scale) => {
-  const [integerPart, fractionalPart] = decimalString.split('.');
-  if (integerPart.length > precision - scale || (fractionalPart && fractionalPart.length > scale)) return false;
-  return true;
-};
-
 export const dtToTime = (datetime: Date): Time => {
   if (datetime === null) {
     return null;

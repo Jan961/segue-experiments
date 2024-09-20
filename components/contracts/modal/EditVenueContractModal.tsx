@@ -26,7 +26,7 @@ import {
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import { formattedDateWithDay, toISO } from 'services/dateService';
 import { EditDealMemoContractModal } from './EditDealMemoContractModal';
-import { isNullOrEmpty, transformToOptions } from 'utils';
+import { isNullOrEmpty, transformToOptions , checkDecimalStringFormat } from 'utils';
 import LoadingOverlay from 'components/shows/LoadingOverlay';
 import { attachmentsColDefs, contractsStyleProps } from '../tableConfig';
 import Table from 'components/core-ui-lib/Table';
@@ -36,7 +36,7 @@ import { headlessUploadMultiple } from 'requests/upload';
 import { getFileUrl } from 'lib/s3';
 import { UiVenue, VenueData, transformVenues } from 'utils/venue';
 import { ConfDialogVariant } from 'components/core-ui-lib/ConfirmationDialog/ConfirmationDialog';
-import { parseAndSortDates, checkDecimalStringFormat, formatDecimalOnBlur } from '../utils';
+import { formatDecimalOnBlur, parseAndSortDates } from '../utils';
 import { currencyState } from 'state/global/currencyState';
 
 const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClose: () => void }) => {

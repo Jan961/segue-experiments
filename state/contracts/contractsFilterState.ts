@@ -106,7 +106,7 @@ export const initialDealMemoDataState: DealMemoContractFormData = {
   AdvancePaymentDueBy: null,
   SettlementDays: null,
   ContractClause: '',
-  PrintDelUseVenueAddress: false,
+  PrintDelUseVenueAddress: true,
   PrintDelUseVenueAddressline: '',
   DealMemoPrice: [],
   DealMemoTechProvision: [],

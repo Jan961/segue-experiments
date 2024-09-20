@@ -214,7 +214,8 @@ export default forwardRef(function Select(
         setSelectedOption(selectedValues);
       }
     } else {
-      setSelectedOption(value && options ? options.find((o) => value === o.value) : null);
+      // Ensure false is treated as a valid selected option, and show placeholder when value is null/undefined
+      setSelectedOption(value !== null && value !== undefined ? options.find((o) => value === o.value) : null);
     }
   }, [value, options, isMulti]);
 
