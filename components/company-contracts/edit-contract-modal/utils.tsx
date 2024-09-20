@@ -25,6 +25,7 @@ export const populateContractData = (
   return Array.from(populatedMap.values()).flat();
 };
 
+// Populates the TemplateFormStructure object with actual values so that it can be rendered in the Contract Details tab
 export const populateTemplateWithValues = (
   templateFormRows: TemplateFormRow[],
   populatedValueList: ContractData[],

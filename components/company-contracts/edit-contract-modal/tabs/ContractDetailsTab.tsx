@@ -90,47 +90,50 @@ const ContractDetailsTab = ({
     });
   };
 
-  const handleDeleteEntry = (_rowID, _deleteIndex) => {
-    // setFormData((prevFormData) =>
-    //   prevFormData.map((row) => {
-    //     if (row.rowID === rowID) {
-    //       const valueListIndex = row.values.findIndex((value) => value.index === deleteIndex);
+  const handleDeleteEntry = (rowID, deleteIndex) => {
+    let removedCompIDs = [];
 
-    //       if (valueListIndex === -1) {
-    //         console.error('Entry not found with index', deleteIndex);
-    //         return row;
-    //       }
+    setFormData((prevFormData) =>
+      prevFormData.map((row) => {
+        if (row.rowID === rowID) {
+          const updatedValues = row.values
+            .filter((value) => {
+              if (value.index === deleteIndex) {
+                removedCompIDs = value.components.map((component) => component.id);
+                return false;
+              }
+              return true;
+            })
+            .map((value) => {
+              if (value.index > deleteIndex) {
+                return { ...value, index: value.index - 1 };
+              }
+              return value;
+            });
 
-    //       const updatedValues = [
-    //         ...row.values.slice(0, valueListIndex),
-    //         ...row.values.slice(valueListIndex + 1).map((obj) => ({
-    //           ...obj,
-    //           index: obj.index -1,
-    //         })),
-    //       ];
+          return {
+            ...row,
+            values: updatedValues,
+          };
+        }
+        return row;
+      }),
+    );
 
-    //       return {
-    //         ...row,
-    //         values: updatedValues,
-    //       };
-    //     }
-    //     return row;
-    //   }),
-    // );
+    setContractData((prevContractData) => {
+      let updatedContractData = prevContractData.filter(
+        (entry) => !removedCompIDs.includes(entry.compID) || entry.index !== deleteIndex,
+      );
 
-    // setContractData((prevContractData) => {
-    //   const updatedContractData = prevContractData.map((entry) => {
-    //     if (entry.index > deleteIndex) {
-    //       return { ...entry, index: entry.index-1 };
-    //     } else {
-    //       return entry
-    //     }
-    //   });
+      updatedContractData = updatedContractData.map((entry) => {
+        if (removedCompIDs.includes(entry.compID) && entry.index > deleteIndex) {
+          return { ...entry, index: entry.index - 1 };
+        }
+        return entry;
+      });
 
-    //   return [...updatedContractData];
-    // });
-
-    console.log('temp');
+      return updatedContractData;
+    });
   };
 
   const handleFormInputChange = (value, compID, index) => {
