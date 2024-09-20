@@ -42,15 +42,9 @@ import LoadingOverlay from 'components/shows/LoadingOverlay';
 import { CustomOption } from 'components/core-ui-lib/Table/renderers/SelectCellRenderer';
 import { trasformVenueAddress } from 'utils/venue';
 import { accountContactState } from 'state/contracts/accountContactState';
-import {
-  checkDecimalStringFormat,
-  formatDecimalValue,
-  formatPercentageValue,
-  isNullOrEmpty,
-  isNullOrUndefined,
-  isUndefined,
-} from 'utils';
+import { formatDecimalValue, formatPercentageValue, isNullOrEmpty, isNullOrUndefined, isUndefined } from 'utils';
 import { currencyState } from 'state/global/currencyState';
+import { decimalRegex, invalidPercentRegex } from 'utils/regexUtils';
 
 export const EditDealMemoContractModal = ({
   visible,
@@ -90,9 +84,9 @@ export const EditDealMemoContractModal = ({
     PromoterSplitPercentage: false,
     VenueSplitPercentage: false,
     dealSplitCombVal: false,
-    ccCommVal: false,
-    progComm: false,
-    merchComm: false,
+    CCCommissionPercent: false,
+    SellProgCommPercent: false,
+    SellMerchCommPercent: false,
     sellCapacity: false,
     callData: {},
   });
@@ -357,7 +351,6 @@ export const EditDealMemoContractModal = ({
       DMCPromoterOrVenue: '',
       DMCType: '',
       DMCValue: null,
-      error: false,
     };
     if (key) {
       const callData = [...dealCall, demoCallData];
@@ -478,20 +471,22 @@ export const EditDealMemoContractModal = ({
   };
 
   const handlePercentChange = (key: string, value: string, index?: number) => {
-    if (parseFloat(value) < 0 || parseFloat(value) > 100) {
-      setErrors({ ...errors, [key]: true });
-    } else {
-      setErrors({ ...errors, [key]: false });
+    if (invalidPercentRegex.test(value)) {
+      return;
     }
 
-    const validEntry = checkDecimalStringFormat(value, 6, 3, /^\d{1,3}(\.\d{0,4})?$/);
-    console.log(validEntry);
+    const isError = value !== '' && (parseFloat(value) < 0 || parseFloat(value) > 100);
 
-    if (validEntry || value === '') {
+    // if index is provided - set error status inside the callData array
+    // otherwise, store error status against the key as normal.
+    setErrors({
+      ...errors,
+      ...(isUndefined(index) ? { [key]: isError } : { callData: { ...errors.callData, [index!]: isError } }),
+    });
+
+    if (decimalRegex.test(value) || value === '') {
       // if index is provided - run editDemoCallModalData instead of editDemoModalData
-      console.log(index);
-      if (index) {
-        console.log({ key, value, index });
+      if (!isUndefined(index)) {
         editDemoCallModalData(key, value, index);
       } else {
         editDemoModalData(key, value, 'dealMemo');
@@ -957,7 +952,7 @@ export const EditDealMemoContractModal = ({
                         }}
                         onChange={(value) => {
                           if (dealCall[index].DMCType === 'v') {
-                            editDemoCallModalData('DMCValue', parseFloat(value.target.value), index);
+                            editDemoCallModalData('DMCValue', value.target.value, index);
                           } else {
                             handlePercentChange('DMCValue', value.target.value, index);
                           }
@@ -1516,21 +1511,17 @@ export const EditDealMemoContractModal = ({
               <div className="text-primary-input-text font-bold ml-14 mr-2">Credit Card Commission</div>
               <TextInput
                 testId="credit-card-commission-percentage"
-                className={classNames('w-auto', errors.ccCommVal ? 'text-primary-red' : '')}
+                className={classNames('w-auto', errors.CCCommissionPercent ? 'text-primary-red' : '')}
                 value={formData.CCCommissionPercent === 0 ? '0' : formData.CCCommissionPercent}
-                onChange={(value) => {
-                  if (parseFloat(value.target.value) < 0 || parseFloat(value.target.value) > 100) {
-                    setErrors({ ...errors, ccCommVal: true });
-                  } else {
-                    setErrors({ ...errors, ccCommVal: false });
-                  }
-                  editDemoModalData('CCCommissionPercent', parseFloat(value.target.value), 'dealMemo');
-                }}
+                onChange={(value) => handlePercentChange('CCCommissionPercent', value.target.value)}
+                onBlur={(value) =>
+                  editDemoModalData('CCCommissionPercent', formatPercentageValue(value.target.value), 'dealMemo')
+                }
               />
               <div className="text-primary-input-text font-bold ml-2">%</div>
             </div>
           </div>
-          {errors.ccCommVal && (
+          {errors.CCCommissionPercent && (
             <div className="ml-[67.8%] flex flex-row">
               <div className="w-4/5 flex items-center text-primary-red">Pecentage value must be between 0 and 100</div>
             </div>
@@ -1900,33 +1891,25 @@ export const EditDealMemoContractModal = ({
               <div className="mr-4 font-bold">Programmes</div>
               <TextInput
                 testId="venue-commission-for-programmes"
-                className={classNames('w-[150px]', errors.progComm ? 'text-primary-red' : '')}
+                className={classNames('w-[150px]', errors.SellProgCommPercent ? 'text-primary-red' : '')}
                 value={formData.SellProgCommPercent === 0 ? '0' : formData.SellProgCommPercent}
                 disabled={!formData.SellProgrammes}
-                onChange={(value) => {
-                  if (parseFloat(value.target.value) < 0 || parseFloat(value.target.value) > 100) {
-                    setErrors({ ...errors, progComm: true });
-                  } else {
-                    setErrors({ ...errors, progComm: false });
-                  }
-                  editDemoModalData('SellProgCommPercent', parseFloat(value.target.value), 'dealMemo');
-                }}
+                onChange={(value) => handlePercentChange('SellProgCommPercent', value.target.value)}
+                onBlur={(value) =>
+                  editDemoModalData('SellProgCommPercent', formatPercentageValue(value.target.value), 'dealMemo')
+                }
               />
               <div className="ml-2 font-bold">%</div>
               <div className="mr-2 ml-16 font-bold">Merchandise</div>
               <TextInput
                 testId="venue-commission-for-merchandise"
-                className={classNames('w-[150px]', errors.merchComm ? 'text-primary-red' : '')}
+                className={classNames('w-[150px]', errors.SellMerchCommPercent ? 'text-primary-red' : '')}
                 value={formData.SellMerchCommPercent === 0 ? '0' : formData.SellMerchCommPercent}
                 disabled={!formData.SellMerch}
-                onChange={(value) => {
-                  if (parseFloat(value.target.value) < 0 || parseFloat(value.target.value) > 100) {
-                    setErrors({ ...errors, merchComm: true });
-                  } else {
-                    setErrors({ ...errors, merchComm: false });
-                  }
-                  editDemoModalData('SellMerchCommPercent', parseFloat(value.target.value), 'dealMemo');
-                }}
+                onChange={(value) => handlePercentChange('SellMerchCommPercent', value.target.value)}
+                onBlur={(value) =>
+                  editDemoModalData('SellMerchCommPercent', formatPercentageValue(value.target.value), 'dealMemo')
+                }
               />
               <div className="ml-2 font-bold">%</div>
               <div className="ml-14 font-bold">Fixed Pitch Fee Per Performance</div>
@@ -1944,7 +1927,7 @@ export const EditDealMemoContractModal = ({
               />
             </div>
           </div>
-          {(errors.progComm || errors.merchComm) && (
+          {(errors.SellProgCommPercent || errors.SellMerchCommPercent) && (
             <div className="ml-[20%] flex flex-row">
               <div className="w-4/5 flex items-center mt-2 text-primary-red">
                 Pecentage value must be between 0 and 100
