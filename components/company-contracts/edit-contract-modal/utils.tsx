@@ -1,5 +1,6 @@
 import { TemplateFormRow, TemplateFormRowPopulated, ContractData } from 'components/company-contracts/types';
 
+// Populate ContractData array with entries with null values for CompIDs in the Template that didn't appear in the ContractData initially
 export const populateContractData = (
   templateFormRows: TemplateFormRow[],
   valueList: ContractData[],

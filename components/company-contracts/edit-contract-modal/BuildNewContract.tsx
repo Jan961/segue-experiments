@@ -58,12 +58,9 @@ export const BuildNewContract = ({
   const templateMap = useRecoilValue(contractTemplateState);
   const [docXTemplateFile, setDocXTemplateFile] = useState<File>(null);
 
-  // const [templateFormStructure, setTemplateFormStructure] = useState<TemplateFormRow[]>(null);
-  // const [contractData, setContractData] = useState<ContractData[]>(null);
+  const [templateFormStructure, setTemplateFormStructure] = useState<TemplateFormRow[]>(null);
   const [formData, setFormData] = useState<TemplateFormRowPopulated[]>(null);
-
   const [contractData, setContractData] = useState<ContractData[]>(null);
-  // const [contractDataDOC, setContractDataDOC] = useState(null);
 
   useEffect(() => {
     const fetchTemplateDocument = async () => {
@@ -113,13 +110,14 @@ export const BuildNewContract = ({
 
     const populateTemplateFormWithValues = async () => {
       const templateFormStructure = await fetchTemplateFormStructure();
+      setTemplateFormStructure(templateFormStructure);
       const contractData = await fetchContractData();
       if (templateFormStructure) {
         const contractDataPopulated = populateContractData(templateFormStructure, contractData);
         setContractData(contractDataPopulated);
-        const templateStructureWithData = populateTemplateWithValues(templateFormStructure, contractDataPopulated);
-        console.log('tempalte structure with data:', templateStructureWithData);
-        setFormData(templateStructureWithData);
+        const formData = populateTemplateWithValues(templateFormStructure, contractDataPopulated);
+        console.log('tempalte structure with data:', formData);
+        setFormData(formData);
       }
     };
 
@@ -156,10 +154,6 @@ export const BuildNewContract = ({
 
     loadContract();
   }, []);
-
-  useEffect(() => {
-    console.log('New Contract Data:', contractData);
-  }, [contractData]);
 
   useEffect(() => {
     console.log('New Form Data:', formData);
@@ -288,7 +282,13 @@ export const BuildNewContract = ({
             )}
             {activeViewIndex === 1 && (
               <div className="flex flex-col gap-8 px-16">
-                <ContractDetailsTab formData={formData} setFormData={setFormData} setContractData={setContractData} />
+                <ContractDetailsTab
+                  formData={formData}
+                  setFormData={setFormData}
+                  contractData={contractData}
+                  templateFormStructure={templateFormStructure}
+                  setContractData={setContractData}
+                />
               </div>
             )}
             {activeViewIndex === 2 && (

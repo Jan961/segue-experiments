@@ -1,14 +1,30 @@
-import { TemplateFormRowPopulated, ContractData } from 'components/company-contracts/types';
+import { TemplateFormRowPopulated, ContractData, TemplateFormRow } from 'components/company-contracts/types';
 import { FormInputGeneral } from '../formTypeMap';
 import { PlusCircleSolidIcon, MinusCircleSolidIcon } from 'components/core-ui-lib/assets/svg';
+import { useEffect } from 'react';
+import { populateTemplateWithValues } from '../utils';
 
 interface ContractDetailsTabProps {
   formData: TemplateFormRowPopulated[];
   setFormData: React.Dispatch<React.SetStateAction<TemplateFormRowPopulated[]>>;
+  contractData: ContractData[];
   setContractData: React.Dispatch<React.SetStateAction<ContractData[]>>;
+  templateFormStructure: TemplateFormRow[];
 }
 
-const ContractDetailsTab = ({ formData, setFormData, setContractData }: ContractDetailsTabProps) => {
+const ContractDetailsTab = ({
+  formData,
+  setFormData,
+  contractData,
+  setContractData,
+  templateFormStructure,
+}: ContractDetailsTabProps) => {
+  useEffect(() => {
+    console.log('New Contract Data:', contractData);
+    const formData = populateTemplateWithValues(templateFormStructure, contractData);
+    setFormData(formData);
+  }, [contractData]);
+
   const handleAddEntry = (rowID, entryIndex) => {
     let newComponents = [];
     const newIndex = entryIndex + 1;
@@ -53,8 +69,11 @@ const ContractDetailsTab = ({ formData, setFormData, setContractData }: Contract
     );
 
     setContractData((prevContractData) => {
+      const currentCompIDs = newComponents.map((component) => component.id);
+
       const updatedContractData = prevContractData.map((entry) => {
-        if (entry.index > entryIndex) {
+        if (currentCompIDs.includes(entry.compID) && entry.index > entryIndex) {
+          console.log('modifying:', entry);
           return { ...entry, index: entry.index + 1 };
         } else {
           return entry;
@@ -71,8 +90,47 @@ const ContractDetailsTab = ({ formData, setFormData, setContractData }: Contract
     });
   };
 
-  const handleDeleteEntry = (rowID, deleteIndex) => {
-    console.log(rowID, deleteIndex);
+  const handleDeleteEntry = (_rowID, _deleteIndex) => {
+    // setFormData((prevFormData) =>
+    //   prevFormData.map((row) => {
+    //     if (row.rowID === rowID) {
+    //       const valueListIndex = row.values.findIndex((value) => value.index === deleteIndex);
+
+    //       if (valueListIndex === -1) {
+    //         console.error('Entry not found with index', deleteIndex);
+    //         return row;
+    //       }
+
+    //       const updatedValues = [
+    //         ...row.values.slice(0, valueListIndex),
+    //         ...row.values.slice(valueListIndex + 1).map((obj) => ({
+    //           ...obj,
+    //           index: obj.index -1,
+    //         })),
+    //       ];
+
+    //       return {
+    //         ...row,
+    //         values: updatedValues,
+    //       };
+    //     }
+    //     return row;
+    //   }),
+    // );
+
+    // setContractData((prevContractData) => {
+    //   const updatedContractData = prevContractData.map((entry) => {
+    //     if (entry.index > deleteIndex) {
+    //       return { ...entry, index: entry.index-1 };
+    //     } else {
+    //       return entry
+    //     }
+    //   });
+
+    //   return [...updatedContractData];
+    // });
+
+    console.log('temp');
   };
 
   const handleFormInputChange = (value, compID, index) => {
