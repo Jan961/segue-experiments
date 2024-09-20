@@ -835,14 +835,6 @@ model File {
   @@index([UploadUserId], map: "UserAttachedFile")
 }
 
-model EmailTemplate {
-  EmTemId          String  @id @db.VarChar(34)
-  EmTemName        String  @unique(map: "EmTemName") @db.VarChar(50)
-  EmTemDescription String  @db.VarChar(100)
-  EmTemFrom        String  @db.VarChar(100)
-  EmTemFields      String? @db.VarChar(100)
-}
-
 model GlobalBookingActivity {
   Id                         Int                          @id @default(autoincrement()) @map("GlobalActivityId")
   ProductionId               Int                          @map("GlobalActivityProductionId")

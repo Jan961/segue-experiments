@@ -9,21 +9,22 @@ interface ContractDetailsTabProps {
 }
 
 const ContractDetailsTab = ({ formData, setFormData, setContractData }: ContractDetailsTabProps) => {
-  const handleAddEntry = (rowID: number, entryIndex: number) => {
-    setFormData((prevStructure) =>
-      prevStructure.map((row) => {
-        if (row.rowID === rowID) {
-          const valueIndex = row.values.findIndex((value) => value.index === entryIndex);
+  const handleAddEntry = (rowID, entryIndex) => {
+    let newComponents = [];
+    const newIndex = entryIndex + 1;
 
-          if (valueIndex === -1) {
+    setFormData((prevFormData) =>
+      prevFormData.map((row) => {
+        if (row.rowID === rowID) {
+          const valueListIndex = row.values.findIndex((value) => value.index === entryIndex);
+
+          if (valueListIndex === -1) {
             console.error('Entry not found with index', entryIndex);
             return row;
           }
 
-          const newIndex = row.values.length > 0 ? row.values[row.values.length - 1].index + 1 : 1;
-
-          const newComponents =
-            row.values[valueIndex]?.components.map((component) => ({
+          newComponents =
+            row.values[valueListIndex]?.components.map((component) => ({
               ...component,
               value: null,
             })) || [];
@@ -34,9 +35,12 @@ const ContractDetailsTab = ({ formData, setFormData, setContractData }: Contract
           };
 
           const updatedValues = [
-            ...row.values.slice(0, valueIndex + 1),
+            ...row.values.slice(0, valueListIndex + 1),
             newValueEntry,
-            ...row.values.slice(valueIndex + 1),
+            ...row.values.slice(valueListIndex + 1).map((obj) => ({
+              ...obj,
+              index: obj.index + 1,
+            })),
           ];
 
           return {
@@ -47,6 +51,24 @@ const ContractDetailsTab = ({ formData, setFormData, setContractData }: Contract
         return row;
       }),
     );
+
+    setContractData((prevContractData) => {
+      const updatedContractData = prevContractData.map((entry) => {
+        if (entry.index > entryIndex) {
+          return { ...entry, index: entry.index + 1 };
+        } else {
+          return entry;
+        }
+      });
+
+      const newContractDataEntries = newComponents.map((component) => ({
+        compID: component.id,
+        index: newIndex,
+        value: component.value,
+      }));
+
+      return [...updatedContractData, ...newContractDataEntries];
+    });
   };
 
   const handleFormInputChange = (value, compID, index) => {
@@ -80,31 +102,33 @@ const ContractDetailsTab = ({ formData, setFormData, setContractData }: Contract
           <div className="font-semibold"> {row.rowLabel} </div>
           <div className="w-full h-[1px] bg-slate-300 mb-2" />
 
-          {row.values.map((value) => (
-            <div key={value.index} className="mb-4 flex items-center">
-              <div className="flex gap-x-4">
-                {value.components
-                  .sort((a, b) => a.orderInRow - b.orderInRow)
-                  .map((component) => (
-                    <div key={component.id} className="mb-1">
-                      <FormInputGeneral
-                        type={component.type}
-                        label={component.label}
-                        initialValue={component.value}
-                        handleChange={(val) => handleFormInputChange(val, component.id, value.index)}
-                      />
-                    </div>
-                  ))}
-              </div>
+          {row.values
+            .sort((a, b) => a.index - b.index)
+            .map((value) => (
+              <div key={value.index} className="mb-4 flex items-center">
+                <div className="flex gap-x-4">
+                  {value.components
+                    .sort((a, b) => a.orderInRow - b.orderInRow)
+                    .map((component) => (
+                      <div key={`${row.rowID}-${value.index}-${component.id}-${component.orderInRow}`} className="mb-1">
+                        <FormInputGeneral
+                          type={component.type}
+                          label={component.label}
+                          initialValue={component.value}
+                          handleChange={(val) => handleFormInputChange(val, component.id, value.index)}
+                        />
+                      </div>
+                    ))}
+                </div>
 
-              {row.isAList && (
-                <PlusCircleSolidIcon
-                  className="hover:cursor-pointer"
-                  onClick={() => handleAddEntry(row.rowID, value.index)}
-                />
-              )}
-            </div>
-          ))}
+                {row.isAList && (
+                  <PlusCircleSolidIcon
+                    className="hover:cursor-pointer"
+                    onClick={() => handleAddEntry(row.rowID, value.index)}
+                  />
+                )}
+              </div>
+            ))}
         </div>
       ))}
     </div>

@@ -158,8 +158,12 @@ export const BuildNewContract = ({
   }, []);
 
   useEffect(() => {
-    console.log(contractData);
+    console.log('New Contract Data:', contractData);
   }, [contractData]);
+
+  useEffect(() => {
+    console.log('New Form Data:', formData);
+  }, [formData]);
 
   const updatePersonDetails = async () => {
     const id = contractSchedule.personId;

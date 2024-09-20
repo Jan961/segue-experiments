@@ -193,6 +193,14 @@ model PermissionGroupPermission {
   @@index([PGPPermissionId], map: "Permission_PermissionGroupPermission")
 }
 
+model EmailTemplate {
+  EmTemId          String  @id @db.VarChar(34)
+  EmTemName        String  @unique(map: "EmTemName") @db.VarChar(50)
+  EmTemDescription String  @db.VarChar(100)
+  EmTemFrom        String  @db.VarChar(100)
+  EmTemFields      String? @db.VarChar(100)
+}
+
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view AccountUserView {
   AccountId             Int     @default(0)

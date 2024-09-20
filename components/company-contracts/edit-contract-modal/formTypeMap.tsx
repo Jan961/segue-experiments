@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { TextInput, Select, DateInput } from 'components/core-ui-lib';
 
 interface BooleanInputProps {
@@ -50,6 +50,10 @@ interface FormInputGeneralProps {
 export const FormInputGeneral = ({ type, label, initialValue, handleChange }: FormInputGeneralProps) => {
   const Component = formTypeMap[type];
   const [value, setValue] = useState(initialValue);
+
+  useEffect(() => {
+    setValue(initialValue);
+  }, [initialValue]);
 
   if (!Component) return null;
   return (
