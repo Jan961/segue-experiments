@@ -71,6 +71,10 @@ const GridStyles = createGlobalStyle<StyleProps>`
 .ag-theme-quartz .ag-layout-auto-height .ag-center-cols-viewport {
     min-height: 0px!important;
 }
+
+.ag-root-wrapper, .ag-root.ag-layout-auto-height, .ag-theme-quartz .ag-center-cols-viewport{
+    overflow: visible !important;
+}
     
 .ag-ltr .ag-cell-focus:not(.ag-cell-range-selected):focus-within {
     border: none;

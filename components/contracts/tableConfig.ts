@@ -86,10 +86,10 @@ export const getCompanyContractsColumnDefs = (userList = []) => [
     cellRenderer: DefaultCellRenderer,
     flex: 1,
     cellStyle: function (params) {
-      const { status } = params.data;
+      const { contractStatus } = params.data;
       return {
         backgroundColor: 'white',
-        ...(statusToBgColorMap[status] || {}),
+        ...(statusToBgColorMap[contractStatus] || {}),
       };
     },
   },
@@ -99,19 +99,19 @@ export const getCompanyContractsColumnDefs = (userList = []) => [
     cellRenderer: DefaultCellRenderer,
     flex: 1,
     cellStyle: function (params) {
-      const { status } = params.data;
+      const { contractStatus } = params.data;
       return {
         backgroundColor: 'white',
-        ...(statusToBgColorMap[status] || {}),
+        ...(statusToBgColorMap[contractStatus] || {}),
       };
     },
   },
   { headerName: 'Role', field: 'role', cellRenderer: DefaultCellRenderer, flex: 1 },
   {
     headerName: 'Contract Status',
-    field: 'status',
+    field: 'contractStatus',
     cellRenderer: SelectCellRenderer,
-    valueGetter: (params) => params?.data?.status,
+    valueGetter: (params) => params?.data?.contractStatus,
     flex: 1,
     editable: true,
     cellRendererParams: () => ({
@@ -171,13 +171,25 @@ export const getCompanyContractsColumnDefs = (userList = []) => [
       isSearchable: true,
     }),
   },
-  { headerName: 'Date Issued', field: 'dateIssue', cellRenderer: DateRenderer, width: 120 },
+  {
+    headerName: 'Date Issued',
+    field: 'dateIssued',
+    cellRenderer: DateRenderer,
+    width: 120,
+    cellStyle: {
+      overflow: 'visible',
+    },
+  },
   {
     headerName: 'Date Returned',
     field: 'dateReturned',
     cellRenderer: DateRenderer,
     resizable: false,
     width: 120,
+    cellStyle: {
+      overflow: 'visible',
+    },
+    cellEditorParams: { popupParent: document.body },
   },
   {
     headerName: '',
@@ -186,7 +198,7 @@ export const getCompanyContractsColumnDefs = (userList = []) => [
     headerClass: ['bgOrangeTextWhite'],
     cellRendererParams: {
       tpActive: true,
-      activeFillColor: '#082B4B',
+      activeFillColor: '#D41818',
       strokeColor: '#082B4B',
     },
     resizable: false,

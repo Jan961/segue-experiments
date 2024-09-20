@@ -1,5 +1,6 @@
 import ExcelJS from 'exceljs';
 import prisma from 'lib/prisma';
+import { Performance } from 'prisma/generated/prisma-client';
 import {
   COLOR_HEXCODE,
   colorCell,
@@ -14,7 +15,8 @@ import { convertToPDF } from 'utils/report';
 import { addBorderToAllCells } from 'utils/export';
 import { bookingStatusMap } from 'config/bookings';
 import { add, parseISO, format as dateFormat, differenceInDays } from 'date-fns';
-import { formatDate } from 'services/dateService';
+import { formatDate, formatUtcTime } from 'services/dateService';
+import { PerformanceInfo } from 'services/reports/schedule-report';
 
 type SCHEDULE_VIEW = {
   ProductionId: number;
@@ -114,6 +116,36 @@ const handler = async (req, res) => {
     },
   });
 
+  const bookingIdPerformanceMap: Record<number, PerformanceInfo[]> = {};
+  const bookingIdList: number[] =
+    data.map((entry) => (entry.EntryType === 'Booking' ? entry.EntryId : null)).filter((id) => id) || [];
+
+  const performances: Performance[] = await prisma.performance.findMany({
+    where: {
+      BookingId: {
+        in: bookingIdList,
+      },
+    },
+  });
+
+  let maxNumOfPerformances = 0;
+  performances.forEach((performance) => {
+    const { Id, BookingId, Time, Date } = performance;
+    const formattedDate = formatDate(Date, 'yyyy-MM-dd');
+    const key = `${BookingId}/${formattedDate}`;
+    if (!bookingIdPerformanceMap[key]) {
+      bookingIdPerformanceMap[key] = [];
+    }
+    bookingIdPerformanceMap[key].push({
+      performanceId: Id,
+      performanceTime: Time ? formatUtcTime(Time) : null,
+      performanceDate: Date ? Date.toISOString() : null,
+    });
+    if (bookingIdPerformanceMap[key].length > maxNumOfPerformances) {
+      maxNumOfPerformances = bookingIdPerformanceMap[key].length;
+    }
+  });
+
   const workbook = new ExcelJS.Workbook();
   const formattedData = data.map((x) => ({
     ...x,
@@ -154,8 +186,21 @@ const handler = async (req, res) => {
     headerRowsLength++;
   }
 
-  worksheet.addRow(['', '', '', '', '', 'Onward Travel']);
-  worksheet.addRow(['Day', 'Date', 'Week', 'Venue', 'Town', 'Time', 'Miles']);
+  const performanceTimeCols = new Array(maxNumOfPerformances).fill(0).map((_, i) => `Perf ${i + 1}`);
+  const blankPerformances = new Array(maxNumOfPerformances).fill('');
+  worksheet.addRow(['', '', '', '', '', '', '', ...blankPerformances, 'Onward Travel']);
+  worksheet.addRow([
+    'Day',
+    'Date',
+    'Week',
+    'Venue',
+    'Town',
+    'Day Type',
+    'Status',
+    ...performanceTimeCols,
+    'Time',
+    'Miles',
+  ]);
   worksheet.addRow([]);
 
   const map: { [key: string]: SCHEDULE_VIEW } = formattedData.reduce((acc, x) => ({ ...acc, [getKey(x)]: x }), {});
@@ -175,10 +220,20 @@ const handler = async (req, res) => {
     const weekDay = dateFormat(add(parseISO(from), { days: i - 1 }), 'eeee');
     const nextDate = add(parseISO(from), { days: i });
     const dateInIncomingFormat = add(parseISO(from), { days: i - 1 });
-    const key = getKey({ FullProductionCode, ShowName, EntryDate: formatDate(dateInIncomingFormat, 'yyyy-MM-dd') });
+    const formattedDate = formatDate(dateInIncomingFormat, 'yyyy-MM-dd');
+    const key = getKey({ FullProductionCode, ShowName, EntryDate: formattedDate });
     const nextDayKey = getKey({ FullProductionCode, ShowName, EntryDate: formatDate(nextDate, 'yyyy-MM-dd') });
     const value: SCHEDULE_VIEW = map[key];
     const nextDayValue: SCHEDULE_VIEW = map[nextDayKey];
+    const isOtherDay = [
+      'Day Off',
+      'Travel Day',
+      'Get-In / Fit-Up Day',
+      'Tech / Dress Day',
+      'Rehearsal Day',
+      'Declared Holiday',
+    ].includes(value?.EntryName);
+    const isCancelled = value?.EntryStatusCode === 'X';
 
     if (!value) {
       worksheet.addRow([
@@ -194,21 +249,44 @@ const handler = async (req, res) => {
         cellColor: null,
       });
     } else {
-      const { ProductionWeekNum, Location, EntryName, TimeMins, Mileage } = value || {};
+      const {
+        ProductionWeekNum,
+        Location,
+        EntryName,
+        EntryType,
+        EntryId,
+        TimeMins,
+        Mileage,
+        EntryStatusCode,
+        PencilNum,
+      } = value || {};
       const { Location: nextDayLocation } = nextDayValue || {};
       const formattedTime = TimeMins ? minutesInHHmmFormat(Number(TimeMins)) : '';
-      time.push(formattedTime || '00:00');
-      mileage.push(Number(Mileage) || 0);
+      if (nextDayLocation !== Location && !isCancelled) {
+        time.push(formattedTime || '00:00');
+        mileage.push(Number(Mileage) || 0);
+      }
       prevProductionWeekNum = ProductionWeekNum ? String(ProductionWeekNum) : prevProductionWeekNum;
-
-      worksheet.addRow([
+      const dayType = isOtherDay ? EntryType : !isCancelled ? 'Performance' : '';
+      let row: (string | number)[] = [
         weekDay.substring(0, 3),
         formatDate(dateInIncomingFormat, 'dd/MM/yy'),
         `${ProductionWeekNum}`,
         EntryName || '',
         Location || '',
-        ...((nextDayLocation !== Location && [formattedTime, Number(Mileage) || '']) || []),
-      ]);
+        dayType,
+        `${bookingStatusMap?.[EntryStatusCode] || ''} ${PencilNum ? `(${PencilNum})` : ''}`,
+      ];
+      const performanceKey = `${EntryId}/${formattedDate}`;
+      const performanceTimes = new Array(maxNumOfPerformances)
+        .fill(0)
+        .map((_, i) => bookingIdPerformanceMap?.[performanceKey]?.[i]?.performanceTime ?? '');
+      row = [...row, ...performanceTimes];
+      if (nextDayLocation !== Location && !isCancelled) {
+        row.push(formattedTime);
+        row.push(Number(Mileage));
+      }
+      worksheet.addRow(row);
     }
     rowNo++;
 
@@ -230,12 +308,24 @@ const handler = async (req, res) => {
         cellColor: COLOR_HEXCODE.RED,
       });
     }
+    if (isCancelled) {
+      colorTextAndBGCell({
+        worksheet,
+        row: rowNo,
+        col: 5,
+        textColor: COLOR_HEXCODE.WHITE,
+        cellColor: COLOR_HEXCODE.BLACK,
+      });
+    }
     if (weekDay === 'Sunday') {
       worksheet.addRow([
         '',
         '',
         '',
         '',
+        '',
+        '',
+        ...blankPerformances,
         `Production Week ${value?.ProductionWeekNum || prevProductionWeekNum || ''}`,
         addTime(time),
         mileage.reduce((acc, m) => acc + Number(m || 0), 0),
@@ -270,6 +360,9 @@ const handler = async (req, res) => {
       '',
       '',
       '',
+      '',
+      '',
+      ...blankPerformances,
       `Production Week ${lastWeekMetaInfo?.prevProductionWeekNum || ''}`,
       addTime(time),
       mileage.reduce((acc, m) => acc + Number(m || 0), 0),
@@ -283,8 +376,11 @@ const handler = async (req, res) => {
     '',
     '',
     '',
-    '',
     'PRODUCTION TOTALS',
+    '',
+    '',
+    '',
+    ...blankPerformances,
     addTime(totalTime),
     totalMileage.reduce((acc, m) => acc + Number(m || 0), 0),
   ]);
@@ -295,17 +391,12 @@ const handler = async (req, res) => {
   const numberOfColumns = worksheet.columnCount;
   worksheet.mergeCells('F3:G3');
   worksheet.mergeCells('A1:G1');
-  for (let char = 'A', i = 0; i <= numberOfColumns; i++, char = String.fromCharCode(char.charCodeAt(0) + 1)) {
-    if (char === 'A' || char === 'B') {
-      worksheet.getColumn(char).width = 12;
-    } else {
-      worksheet.getColumn(char).width = 20;
-    }
-  }
-
+  worksheet.getColumn('A').width = 12;
+  worksheet.getColumn('B').width = 12;
   worksheet.getColumn('C').alignment = { horizontal: 'right' };
-  worksheet.getColumn('F').alignment = { horizontal: 'right' };
-  worksheet.getColumn('G').alignment = { horizontal: 'right' };
+  for (let char = 'H', i = 8; i <= numberOfColumns; i++, char = String.fromCharCode(char.charCodeAt(0) + 1)) {
+    worksheet.getColumn(char).alignment = { horizontal: 'right' };
+  }
 
   addWidthAsPerContent({
     worksheet,
@@ -317,6 +408,7 @@ const handler = async (req, res) => {
     rowsToIgnore: 4,
     maxColWidth: Infinity,
   });
+  worksheet.getColumn('F').width = 12;
   firstRowFormatting({ worksheet });
   for (let row = 2; row <= headerRowsLength; row++) {
     styleHeader({ worksheet, row, numberOfColumns });

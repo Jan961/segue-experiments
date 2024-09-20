@@ -19,7 +19,12 @@ const ContractFilters = () => {
   const personMap = useRecoilValue(personState);
   const personOptions = useMemo(
     () =>
-      transformToOptions(Object.values(personMap), null, 'id', ({ firstName, lastName }) => `${firstName} ${lastName}`),
+      transformToOptions(
+        Object.values(personMap),
+        null,
+        'id',
+        ({ firstName, lastName }) => `${firstName} ${lastName}`,
+      ).sort((a, b) => a.text.localeCompare(b.text)),
     [personMap],
   );
   const [openContract, setOpenContract] = useState(false);
@@ -46,15 +51,17 @@ const ContractFilters = () => {
           titleClassName="text-primary-blue"
           title="Company Contracts"
         >
-          <TextInput
-            id="contractText"
-            disabled={!productionId}
-            placeholder="Search contracts..."
-            className="w-full"
-            iconName="search"
-            value={filter.contractText}
-            onChange={onChange}
-          />
+          <div className="grow">
+            <TextInput
+              id="contractText"
+              disabled={!productionId}
+              placeholder="Search contracts..."
+              className="w-full"
+              iconName="search"
+              value={filter.contractText}
+              onChange={onChange}
+            />
+          </div>
         </GlobalToolbar>
       </div>
       <div className="flex justify-between gap-2">
@@ -82,7 +89,6 @@ const ContractFilters = () => {
             isSearchable
           />
         </div>
-        <Button className="text-sm leading-8 ml-6" text="Clear Filters" onClick={onClearFilters} />
       </div>
       <div className="flex justify-between gap-2">
         <div className="px-4 flex items-center gap-4 flex-wrap  mt-2">
@@ -99,10 +105,11 @@ const ContractFilters = () => {
           />
           <Label className="!text-base text-primary-input-text !font-bold ml-6" text="Date Issued" />
           <ContractsDateFilter />
+          <Button className="text-sm leading-8 ml-6 px-6" text="Clear Filters" onClick={onClearFilters} />
         </div>
         <div className="flex">
-          <Button className="text-sm leading-8" text="Start New Contract" onClick={openContractSchedule} />
-          <Button className="text-sm leading-8 ml-4" text="View / Edit Contract Templates" onClick={noop} />
+          <Button className="text-sm leading-8 px-6" text="Start New Contract" onClick={openContractSchedule} />
+          <Button className="text-sm leading-8 ml-4 px-6" text="View / Edit Contract Templates" onClick={noop} />
         </div>
       </div>
       {openContract && <ContractScheduleModal openContract={openContract} onClose={() => setOpenContract(false)} />}

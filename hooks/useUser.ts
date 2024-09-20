@@ -2,6 +2,7 @@ import { useSignUp } from '@clerk/nextjs';
 import axios from 'axios';
 import { useState } from 'react';
 import { isNullOrEmpty } from 'utils';
+import { generateRandomHash } from 'utils/crypto';
 
 type UserDetails = {
   email: string;
@@ -22,7 +23,11 @@ const useUser = () => {
     try {
       setError('');
       // Create the user within clerk
-      const { data } = await axios.post('/api/auth/create-clerk-user', userDetails);
+      const { data } = await axios.post('/api/auth/create-clerk-user', {
+        ...userDetails,
+        password: generateRandomHash(4),
+      });
+
       if (data.error) {
         setError(data.error);
         return false;
@@ -37,7 +42,7 @@ const useUser = () => {
 
       // create permissions for productions
       if (!isNullOrEmpty(userDetails.productions)) {
-        await axios.post('/api/permissions/production/create', {
+        await axios.post('/api/admin/permissions/production/create', {
           accountUserId: createResponse.AccUserId,
           productionIds: userDetails.productions,
         });

@@ -32,7 +32,12 @@ export const ContractScheduleModal = ({ openContract, onClose }: { openContract:
   );
   const personOptions = useMemo(
     () =>
-      transformToOptions(Object.values(personMap), null, 'id', ({ firstName, lastName }) => `${firstName} ${lastName}`),
+      transformToOptions(
+        Object.values(personMap),
+        null,
+        'id',
+        ({ firstName, lastName }) => `${firstName} ${lastName}`,
+      ).sort((a, b) => a.text.localeCompare(b.text)),
     [personMap],
   );
   const productionOptions = useMemo(
