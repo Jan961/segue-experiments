@@ -44,7 +44,7 @@ import { trasformVenueAddress } from 'utils/venue';
 import { accountContactState } from 'state/contracts/accountContactState';
 import { formatDecimalValue, formatPercentageValue, isNullOrEmpty, isNullOrUndefined, isUndefined } from 'utils';
 import { currencyState } from 'state/global/currencyState';
-import { decimalRegex, invalidPercentRegex } from 'utils/regexUtils';
+import { decimalRegex, stringRegex } from 'utils/regexUtils';
 
 export const EditDealMemoContractModal = ({
   visible,
@@ -303,6 +303,7 @@ export const EditDealMemoContractModal = ({
     index?: number,
     price?: string,
   ) => {
+    console.log({ key, data, dataKey, index, price });
     if (price === 'customPrice') {
       const dataDemo = [...dealMemoCustomPriceFormData];
       dataDemo[index] = {
@@ -471,7 +472,7 @@ export const EditDealMemoContractModal = ({
   };
 
   const handlePercentChange = (key: string, value: string, index?: number) => {
-    if (invalidPercentRegex.test(value)) {
+    if (stringRegex.test(value)) {
       return;
     }
 
@@ -1289,7 +1290,10 @@ export const EditDealMemoContractModal = ({
               <div className="w-1/5">
                 <span className="text-primary-input-text font-bold">No. of Tickets</span>
               </div>
-              <span className=" text-primary-input-text font-bold ml-4">Price</span>
+              <div className="w-1/6">
+                <span className=" text-primary-input-text font-bold ml-4">Price</span>
+              </div>
+              <span className=" text-primary-input-text font-bold ml-1">Notes</span>
             </div>
           </div>
           {Object.values(dealMemoPriceFormData as unknown).map((inputData) => {
@@ -1301,6 +1305,7 @@ export const EditDealMemoContractModal = ({
                     <TextInput
                       testId={`${inputData.DMPTicketName}-num-of-tickets`}
                       className="w-auto"
+                      regExp={/^\d*$/}
                       onChange={(value) =>
                         editDealMemoPrice(inputData.DMPTicketName, parseFloat(value.target.value), 'DMPNumTickets')
                       }
@@ -1317,6 +1322,7 @@ export const EditDealMemoContractModal = ({
                   <TextInput
                     testId={`${inputData.DMPTicketName}-ticketPrice`}
                     className="w-auto"
+                    regExp={/^\d*(\.\d*)?$/}
                     onChange={(value) =>
                       editDealMemoPrice(inputData.DMPTicketName, value.target.value, 'DMPTicketPrice')
                     }
