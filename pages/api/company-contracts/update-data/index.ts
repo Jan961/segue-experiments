@@ -50,5 +50,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     res.status(200).json({ message: 'Success' });
   } catch (err) {
     console.error(err, 'Error - failed to update contract');
+    res.status(500).json(err);
   }
 }

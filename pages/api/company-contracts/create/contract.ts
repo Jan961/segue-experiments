@@ -62,5 +62,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     res.status(200).json(result);
   } catch (err) {
     console.error(err, 'Error - failed to create contract');
+    res.status(500).json(err);
   }
 }

@@ -1,6 +1,6 @@
 import { TemplateFormRowPopulated, ContractData } from 'components/company-contracts/types';
 import { FormInputGeneral } from '../formTypeMap';
-import { PlusCircleSolidIcon } from 'components/core-ui-lib/assets/svg';
+import { PlusCircleSolidIcon, MinusCircleSolidIcon } from 'components/core-ui-lib/assets/svg';
 
 interface ContractDetailsTabProps {
   formData: TemplateFormRowPopulated[];
@@ -71,6 +71,10 @@ const ContractDetailsTab = ({ formData, setFormData, setContractData }: Contract
     });
   };
 
+  const handleDeleteEntry = (rowID, deleteIndex) => {
+    console.log(rowID, deleteIndex);
+  };
+
   const handleFormInputChange = (value, compID, index) => {
     setContractData((prevData) => {
       const existingEntryIndex = prevData.findIndex((entry) => entry.compID === compID && entry.index === index);
@@ -122,10 +126,18 @@ const ContractDetailsTab = ({ formData, setFormData, setContractData }: Contract
                 </div>
 
                 {row.isAList && (
-                  <PlusCircleSolidIcon
-                    className="hover:cursor-pointer"
-                    onClick={() => handleAddEntry(row.rowID, value.index)}
-                  />
+                  <div className="flex">
+                    {value.index !== 1 && (
+                      <MinusCircleSolidIcon
+                        className="hover:cursor-pointer"
+                        onClick={() => handleDeleteEntry(row.rowID, value.index)}
+                      />
+                    )}
+                    <PlusCircleSolidIcon
+                      className="hover:cursor-pointer"
+                      onClick={() => handleAddEntry(row.rowID, value.index)}
+                    />
+                  </div>
                 )}
               </div>
             ))}
