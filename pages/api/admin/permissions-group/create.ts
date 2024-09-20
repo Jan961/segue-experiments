@@ -9,7 +9,7 @@ const getPermissions = (PGPPerGpId, permissions) => {
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
     const { permissionGroup, accountId } = req.body;
-    prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx) => {
       const newPermissionGroup = await tx.PermissionGroup.create({
         data: {
           PerGpName: permissionGroup.groupName,

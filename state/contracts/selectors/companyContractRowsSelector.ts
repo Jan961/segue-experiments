@@ -20,15 +20,16 @@ export const companyContractSelector = selector({
           compareStrings(contract.lastName, contractText) ||
           compareStrings(contract.role, contractText)) &&
         (department === -1 || department === contract.departmentId) &&
-        (!endDate || new Date(contract.dateIssue) <= endDate) &&
-        (!startDate || new Date(contract.dateIssue) >= startDate) &&
-        (status === 'all' || status === contract.status)
+        (!endDate || new Date(contract.dateIssued) <= endDate) &&
+        (!startDate || new Date(contract.dateIssued) >= startDate) &&
+        (status === 'all' || status === contract.contractStatus)
       );
     });
 
     // Sort contracts by status order and then by lastName
     return filteredContracts.sort((a, b) => {
-      const statusComparison = companyContractStatusOrder[a.status] - companyContractStatusOrder[b.status];
+      const statusComparison =
+        companyContractStatusOrder[a.contractStatus] - companyContractStatusOrder[b.contractStatus];
       if (statusComparison !== 0) {
         return statusComparison;
       }

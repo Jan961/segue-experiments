@@ -102,13 +102,13 @@ export const contractSchema = yup.object().shape({
 
 export const updateContractSchema = yup.object().shape({
   roleName: yup.string().nullable(),
-  contractStatus: yup.string().length(4).nullable(),
+  contractStatus: yup.string().nullable(),
   completedByAccUserId: yup.number().integer().nullable(),
   checkedByAccUserId: yup.number().integer().nullable(),
   dateIssued: yup.date().nullable(),
   dateReturned: yup.date().nullable(),
   notes: yup.string().nullable(),
-  currencyCode: yup.string().length(3).nullable(),
+  currencyCode: yup.string().nullable(),
   firstDay: yup.date().nullable(),
   lastDay: yup.date().nullable(),
   availability: yup.string().nullable(),

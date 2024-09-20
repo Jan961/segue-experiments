@@ -33,14 +33,6 @@ const LoadSalesHistory = () => {
     ? dateToSimple(selectedProducton.StartDate) + '-' + dateToSimple(selectedProducton.EndDate)
     : null;
 
-  const onUploadSuccess = async ({ fileId }) => {
-    try {
-      await axios.post('/api/marketing/load-history/create', { fileId, selected });
-    } catch (error) {
-      console.log(error, 'Failed to update database with file.');
-    }
-  };
-
   const fetchSpreadsheet = async () => {
     if (!selected) {
       return;
@@ -68,42 +60,59 @@ const LoadSalesHistory = () => {
   };
 
   const onSave = async (file, onProgress, onError, onUploadingImage) => {
-    const { file: validateFile, spreadsheetIssues } = await validateSpreadsheetFile(
-      file,
-      prodCode,
-      venueList,
-      dateRange,
-    );
-    setUploadedFile(validateFile);
-    setUploadParams({ onProgress, onError, onUploadingImage, spreadsheetIssues });
-    setConfirmationModalVisible(true);
+    try {
+      const {
+        file: validateFile,
+        spreadsheetIssues,
+        spreadsheetData,
+      } = await validateSpreadsheetFile(file, prodCode, venueList, dateRange);
+      setUploadedFile(validateFile);
+      setUploadParams({ onProgress, onError, onUploadingImage, spreadsheetIssues, spreadsheetData });
+      setConfirmationModalVisible(true);
+    } catch (err) {
+      console.error(err, 'An error occured when trying to validate the spreadsheet data');
+    }
   };
 
-  const handleUpload = async (file, onProgress, onError, onUploadingImage) => {
+  const handleUpload = async (file, spreadsheetData, onProgress, onError, onUploadingImage) => {
     const formData = new FormData();
     formData.append('file', file[0].file);
     formData.append('path', `marketing/salesHistory`);
 
     try {
-      const response = await uploadFile(formData, onProgress, onError, onUploadingImage, {
+      const fileCreateResponse = await uploadFile(formData, onProgress, onError, onUploadingImage, {
         onSuccess: 'Spreadsheet uploaded successfully',
         onFailure: 'Spreadsheet failed to upload',
       });
-      if (response.status >= 400 && response.status < 600) {
-        onError(file[0].file, 'Error uploading file. Please try again.');
-      } else {
-        const newFile = {
-          name: response.originalFilename,
-          dateUploaded: response.uploadDateTime,
-          fileURL: getFileUrl(response.location),
-          fileId: response.id,
-          location: response.location,
-        };
-        setSalesHistoryRows([newFile]);
-        onUploadSuccess({ fileId: response.id });
+      if (fileCreateResponse.status >= 400 && fileCreateResponse.status < 600) {
+        throw new Error('Failed to upload Spreadsheet File to S3');
       }
+
+      const fileID = fileCreateResponse.id;
+      const DBUpdateResponse = await axios.post('/api/marketing/load-history/create', {
+        spreadsheetData,
+        selectedProdId: selected,
+        fileID,
+      });
+      // if there is an error when updating the DB, delete the file
+      if (DBUpdateResponse.status !== 200) {
+        try {
+          await axios.delete(`/api/file/delete?location=${fileCreateResponse.location}`);
+        } catch (error) {
+          console.error(error, 'Failed to delete file from S3 after DB operations failed.');
+        }
+      }
+
+      const newFile = {
+        name: fileCreateResponse.originalFilename,
+        dateUploaded: fileCreateResponse.uploadDateTime,
+        fileURL: getFileUrl(fileCreateResponse.location),
+        fileId: fileCreateResponse.id,
+        location: fileCreateResponse.location,
+      };
+      setSalesHistoryRows([newFile]);
     } catch (error) {
-      onError(file[0].file, 'Error uploading file. Please try again.');
+      console.error(error, 'Error attempting to modify Sales History Data');
     }
   };
 
@@ -112,13 +121,14 @@ const LoadSalesHistory = () => {
       const file = salesHistoryRows[0];
       try {
         await axios.delete(`/api/file/delete?location=${file.location}`);
+        await axios.post('/api/marketing/load-history/delete-sales', { productionID: selected });
+        setSalesHistoryRows([]);
+        setUploadedFile(null);
+        setShowConfirmDelete(false);
       } catch (err) {
         console.log(err, 'Failed to delete Sales History Spreadsheet');
       }
     }
-    setSalesHistoryRows([]);
-    setUploadedFile(null);
-    setShowConfirmDelete(false);
   };
 
   const handleCellClick = async (params) => {
@@ -198,9 +208,17 @@ const LoadSalesHistory = () => {
         <SpreadsheetConfirmationModal
           visible={confirmationModalVisible}
           onClose={() => setConfirmationModalVisible(false)}
-          handleUpload={handleUpload}
-          uploadedFile={uploadedFile}
+          handleUpload={() =>
+            handleUpload(
+              uploadedFile,
+              uploadParams.spreadsheetData,
+              uploadParams.onProgress,
+              uploadParams.onError,
+              uploadParams.onUploadingImage,
+            )
+          }
           uploadParams={uploadParams}
+          uploadedFile={uploadedFile}
           closeUploadModal={() => setUploadModalVisible(false)}
           prodCode={prodCode}
         />

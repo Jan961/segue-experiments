@@ -9,10 +9,10 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const { companyName, webSite, companyVATNo } = req.body;
     const newProdCompany = await master.ProductionCompany.create({
       data: {
-        AccountId,
-        WebSite: webSite,
-        Name: companyName,
+        ProdCoAccountId: AccountId,
+        ProdCoName: companyName,
         ProdCoVATCode: companyVATNo,
+        ProdCoWebSite: webSite,
       },
     });
 
