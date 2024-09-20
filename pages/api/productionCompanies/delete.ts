@@ -13,14 +13,14 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
 
     if (productionCount === 0) {
       const numProdCompanies = await master.productionCompany.count({
-        where: { AccountId },
+        where: { ProdCoAccountId: AccountId },
       });
 
       if (numProdCompanies > 1) {
         const deletedRecord = await master.ProductionCompany.delete({
           where: {
-            Id: Number(id),
-            AccountId,
+            ProdCoId: Number(id),
+            ProdCoAccountId: AccountId,
           },
         });
 

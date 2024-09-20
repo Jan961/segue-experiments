@@ -148,7 +148,7 @@ const PasswordReset = () => {
         <div className="mt-5 flex flex-col items-end gap-2">
           <div className="flex justify-end gap-2">
             <Button variant="secondary" text="Login" onClick={() => router.push('/auth/sign-in')} className="w-32" />
-            <Button text="Get Password Rest Code" onClick={attemptClerkAuth} className="w-32" />
+            <Button text="Get Password Reset Code" onClick={attemptClerkAuth} className="w-32" />
           </div>
         </div>
 
