@@ -74,7 +74,7 @@ export const ContractPersonDataForm = ({ person = {}, height, updateFormData }: 
           userOptionList={userOptionList}
           onChange={(data) => onChange('personDetails', data)}
         />
-        <div className="grid grid-cols-2 mt-10">
+        <div className="grid grid-cols-2 mt-10 gap-x-4">
           <div>
             <h3 className="text-xl text-primary-navy font-bold mb-3">Emergency Contact 1</h3>
             <EmergencyContact
@@ -109,7 +109,7 @@ export const ContractPersonDataForm = ({ person = {}, height, updateFormData }: 
           onChange={(data) => onChange('agencyDetails', data)}
         />
         <h3 className="text-xl text-primary-navy font-bold mt-10">Salary Details</h3>
-        <div className="grid grid-cols-2 my-8">
+        <div className="grid grid-cols-2 gap-x-4 my-8">
           <div>
             <h3 className="text-base text-primary-navy font-bold mb-3">Salary</h3>
             <AccountDetailsForm
