@@ -1,8 +1,8 @@
 import GeneralFormInputProps from './interface';
-import { DateInput } from 'components/core-ui-lib';
+import { DateInput as CoreDateInput } from 'components/core-ui-lib';
 
-const NumberInput = ({ value, handleChange }: GeneralFormInputProps) => {
-  return <DateInput value={value} onChange={(value) => handleChange(value)} />;
+const DateInput = ({ value, handleChange }: GeneralFormInputProps) => {
+  return <CoreDateInput value={value} onChange={(value) => handleChange(value)} disabled={false} />;
 };
 
-export default NumberInput;
+export default DateInput;
