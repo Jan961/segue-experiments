@@ -51,7 +51,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
               },
             },
             DataIndexNum: contractDatum.index,
-            DataValue: contractDatum.value,
+            DataValue: JSON.stringify(contractDatum.value),
           },
         });
       }

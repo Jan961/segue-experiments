@@ -21,7 +21,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const mappedData = data.map((item) => ({
       compID: item.DataComponentId,
       index: item.DataIndexNum,
-      value: item.DataValue,
+      value: JSON.parse(item.DataValue),
     }));
 
     return res.status(200).json(mappedData);

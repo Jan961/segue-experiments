@@ -24,7 +24,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
               },
             },
             update: {
-              DataValue: row.value,
+              DataValue: JSON.stringify(row.value),
             },
             create: {
               ACCContract: {
@@ -38,7 +38,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 },
               },
               DataIndexNum: row.index,
-              DataValue: row.value,
+              DataValue: JSON.stringify(row.value),
             },
           }).catch((err) => {
             throw new Error(err);
