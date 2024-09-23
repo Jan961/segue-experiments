@@ -13,20 +13,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     console.log(contractData);
 
     await prisma.$transaction(async (tx) => {
+      await tx.ACCContractData.deleteMany({
+        where: {
+          DataACCContractId: contractId,
+        },
+      });
+
       await Promise.all(
-        contractData.map(async (row) => {
-          await tx.ACCContractData.upsert({
-            where: {
-              DataACCContractId_DataComponentId_DataIndexNum: {
-                DataACCContractId: contractId,
-                DataComponentId: row.compID,
-                DataIndexNum: row.index,
-              },
-            },
-            update: {
-              DataValue: JSON.stringify(row.value),
-            },
-            create: {
+        contractData.map((row) =>
+          tx.ACCContractData.create({
+            data: {
               ACCContract: {
                 connect: {
                   ContractId: contractId,
@@ -42,8 +38,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             },
           }).catch((err) => {
             throw new Error(err);
-          });
-        }),
+          }),
+        ),
       );
     });
 

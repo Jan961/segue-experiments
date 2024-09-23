@@ -37,8 +37,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       const contractID = result.ContractId;
 
-      for (const contractDatum of contractData) {
-        await tx.ACCContractData.create({
+      const contractDataPromises = contractData.map((contractDatum) =>
+        tx.ACCContractData.create({
           data: {
             ACCContract: {
               connect: {
@@ -53,8 +53,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             DataIndexNum: contractDatum.index,
             DataValue: JSON.stringify(contractDatum.value),
           },
-        });
-      }
+        }),
+      );
+
+      await Promise.all(contractDataPromises);
 
       return 'Success';
     });
