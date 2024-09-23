@@ -1,4 +1,5 @@
 import prisma from 'lib/prisma';
+import { isNullOrEmpty } from 'utils';
 
 export default async function handle(req, res) {
   try {
@@ -19,6 +20,33 @@ export default async function handle(req, res) {
       });
 
       setId = setResult.SetId;
+    } else {
+      const saleSetRecord = await prisma.salesSet.findFirst({
+        where: {
+          SetSalesFiguresDate: salesDate,
+          SetBookingId: bookingId,
+        },
+        select: {
+          SetId: true,
+        },
+      });
+      if (isNullOrEmpty(saleSetRecord)) {
+        const setResult = await prisma.SalesSet.create({
+          data: {
+            SetBookingId: parseInt(bookingId),
+            SetPerformanceId: null,
+            SetSalesFiguresDate: salesDate,
+            SetBrochureReleased: false,
+            SetSingleSeats: false,
+            SetNotOnSale: false,
+            SetIsFinalFigures: false,
+            SetIsCopy: false,
+          },
+        });
+        setId = setResult.SetId;
+      } else {
+        setId = saleSetRecord.SetId;
+      }
     }
 
     const sales = [];
@@ -61,30 +89,20 @@ export default async function handle(req, res) {
       });
     }
 
-    if (action === 'create') {
-      await prisma.Sale.createMany({
-        data: sales,
+    for (const sale of sales) {
+      const recordFound = await prisma.Sale.findFirst({
+        where: {
+          SaleSetId: setId,
+          SaleSaleTypeId: sale.SaleSaleTypeId,
+        },
       });
-    } else if (action === 'update') {
-      const salesUpdates = [];
-
-      // even though only one record should match query, as we don't have the saleID, we need to use updateMany
-      sales.forEach((sale) => {
-        salesUpdates.push(
-          prisma.Sale.updateMany({
-            where: {
-              SaleSetId: sale.SaleSetId,
-              SaleSaleTypeId: sale.SaleSaleTypeId,
-            },
-            data: {
-              SaleSeats: sale.SaleSeats,
-              SaleValue: sale.SaleValue,
-            },
-          }),
-        );
-      });
-
-      await prisma.$transaction(salesUpdates);
+      if (isNullOrEmpty(recordFound)) {
+        await prisma.Sale.create({
+          data: sale,
+        });
+      } else {
+        await prisma.Sale.update({ where: { SaleId: recordFound.SaleId }, data: sale });
+      }
     }
 
     res.status(200).json({ setId, transaction: action });
