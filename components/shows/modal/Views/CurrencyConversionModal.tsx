@@ -30,7 +30,7 @@ const CurrencyConversionModal = ({
   const [editMap, setEditMap] = useState<Record<string, number>>({});
   const rowsData = useMemo(
     () =>
-      conversionRates.map(({ Rate, FromCurrencyCode, ToCurrencyCode, ...others }) => {
+      conversionRates?.map?.(({ Rate, FromCurrencyCode, ToCurrencyCode, ...others }) => {
         const allRegions = currencyCountryLookup[FromCurrencyCode].flatMap(({ regionList }) => regionList);
         const fromCurrency = currencyLookup[FromCurrencyCode];
         const toCurrency = currencyLookup[ToCurrencyCode];
