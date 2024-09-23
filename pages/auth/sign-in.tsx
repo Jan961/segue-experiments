@@ -58,9 +58,9 @@ const SignIn = () => {
   };
 
   const attemptClerkAuth = async () => {
-    setValidationError(null);
+    clearErrors();
     setShowLogout(false);
-    setError('');
+
     setIsBusy(true);
     if (isLoaded) {
       try {
@@ -79,7 +79,7 @@ const SignIn = () => {
           // If sign-in process is complete, set the created session as active
           // and redirect the user
           if (signInAttempt.status === 'complete') {
-            await setActive({ session: signInAttempt.createdSessionId, organization: 'Jendagi' });
+            await setActive({ session: signInAttempt.createdSessionId, organization: loginDetails.company });
             setIsAuthenticated(true);
             fetchAccounts(loginDetails.email);
           } else {
@@ -120,9 +120,13 @@ const SignIn = () => {
     }
   };
 
-  const handleSignIn = async () => {
+  const clearErrors = () => {
     setValidationError(null);
     setError('');
+  };
+
+  const handleSignIn = async () => {
+    clearErrors();
     setIsBusy(true);
     try {
       // validate inputs
@@ -171,16 +175,17 @@ const SignIn = () => {
 
   const handleLogout = async () => {
     try {
-      // Sign out from Clerk
-      await signOut();
+      clearErrors();
       // Remove organisation id on redis
-      const { data } = await axios.post('/api/user/session/create', {
-        email: loginDetails.email,
+      const { data } = await axios.post('/api/user/session/delete', {
+        email: user.primaryEmailAddress.emailAddress,
       });
-
       if (!data.success) {
         console.error('Error deleting user session');
       }
+      // Sign out from Clerk
+      await signOut();
+      setShowLogout(false);
       setIsAuthenticated(false);
       setLoginDetails({ email: '', password: '', company: '', pin: '' });
       router.replace(router.asPath);
@@ -223,6 +228,14 @@ const SignIn = () => {
         <div className="w-full">
           <div className="flex items-center gap-1">
             <Label text="Password" required />
+            <Tooltip
+              body="Password should be at least 8 characters long with at least one uppercase letter, one lowercase letter and one number."
+              position="right"
+              width="w-[140px]"
+              bgColorClass="primary-input-text"
+            >
+              <Icon iconName="info-circle-solid" variant="xs" />
+            </Tooltip>
           </div>
           <PasswordInput
             name="password"
@@ -232,6 +245,7 @@ const SignIn = () => {
             value={loginDetails.password}
             onChange={handleLoginDetailsChange}
             disabled={isAuthenticated}
+            autoComplete="off"
           />
           {validationError?.password
             ? validationError.password.map((error) => <AuthError key={error} error={error} />)
@@ -243,6 +257,13 @@ const SignIn = () => {
           </div>
         </div>
         <div className="flex justify-end gap-2 mt-5">
+          <Button
+            variant="secondary"
+            text="Sign Up"
+            onClick={() => router.push('/auth/sign-up')}
+            className="w-32"
+            disabled={isAuthenticated}
+          />
           <Button loading={isBusy} text="Next" onClick={attemptClerkAuth} className="w-32" disabled={isAuthenticated} />
         </div>
         {isAuthenticated && (
@@ -277,10 +298,8 @@ const SignIn = () => {
                 className="w-24 ml-4"
                 type="text"
                 maxlength={4}
+                autoComplete="off"
               />
-              <Link href="/auth/sign-in" passHref className="ml-4">
-                Forgotten PIN?
-              </Link>
             </div>
             {validationError?.pin && <AuthError error={validationError.pin[0]} />}
             <div className="flex justify-end mt-5">
