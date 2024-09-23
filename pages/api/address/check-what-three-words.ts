@@ -4,8 +4,8 @@ import { getAccountIdFromReq } from 'services/userService';
 import prisma from 'lib/prisma_master';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method === 'POST') {
-    const { searchTerm } = req.body;
+  if (req.method === 'GET') {
+    const { searchTerm } = req.query;
     const accountId = await getAccountIdFromReq(req);
     const queryResult = await prisma.Account.findFirst({
       where: { AccountId: accountId },
@@ -13,7 +13,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     });
     const numTokensLeft = queryResult?.AccountW3WCount;
     if (numTokensLeft > 0) {
-      const result = await getCoordFromWhat3Words(searchTerm);
+      const result = await getCoordFromWhat3Words(searchTerm as string);
       const { isError } = result;
       if (!isError) {
         await prisma.Account.update({ where: { AccountId: accountId }, data: { AccountW3WCount: numTokensLeft - 1 } });

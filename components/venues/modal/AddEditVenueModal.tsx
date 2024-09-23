@@ -100,14 +100,15 @@ export default function AddEditVenueModal({
         const addressUrl = `https://nominatim.openstreetmap.org/search?q=${query}&format=json&polygon=1&addressdetails=1`;
         const response = await fetch(addressUrl, { method: 'GET' });
         const result = await response.json();
-        const { primaryWhat3Words, primaryCountry } = formData;
+        const { primaryWhat3Words } = formData;
         if (result.length === 0) {
           //  address failed then they entered what3words
           if (primaryWhat3Words !== '' && addressAttempted) {
             if (primaryWhat3Words.split('.').length === 3) {
-              const wordsResponse = await axios.post('/api/address/checkWhat3Words', {
-                searchTerm: primaryWhat3Words,
-                countryId: primaryCountry,
+              const wordsResponse = await axios.get('/api/address/check-what-three-words', {
+                params: {
+                  searchTerm: primaryWhat3Words,
+                },
               });
               const { status, data } = wordsResponse;
               if (status >= 400) {
