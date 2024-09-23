@@ -1,6 +1,14 @@
 import { IPerson } from 'components/contracts/types';
 
 export const getPersonDetailsTags = (personDetailsData: IPerson) => {
+  return {
+    ...getDefinedPersonDetails(personDetailsData),
+    ...getCompositePersonDetails(personDetailsData),
+  };
+};
+
+// Function to map all of the data from the Person Details forms to tags
+const getDefinedPersonDetails = (personDetailsData: IPerson) => {
   const mapValuesToKeys = (obj: any, defaults: Record<string, string>) => {
     return Object.entries(defaults).reduce(
       (acc, [key, defaultKey]) => {
@@ -91,5 +99,20 @@ export const getPersonDetailsTags = (personDetailsData: IPerson) => {
     ...mapValuesToKeys(personDetailsData.agencyDetails, agencyDetailsDefaults),
     ...mapValuesToKeys(personDetailsData.salaryAccountDetails, salaryAccountDefaults),
     ...mapValuesToKeys(personDetailsData.expenseAccountDetails, expenseAccountDefaults),
+  };
+};
+
+// Function to create composite tags based on the data from the Person Details form such
+const getCompositePersonDetails = (personDetailsData: IPerson) => {
+  return {
+    ...getPersonFullName(personDetailsData),
+  };
+};
+
+const getPersonFullName = (personDetailsData: IPerson) => {
+  const firstName = personDetailsData.personDetails?.firstName || '';
+  const lastName = personDetailsData.personDetails?.lastName || '';
+  return {
+    PERSONFULLNAME: `${firstName} ${lastName}`,
   };
 };

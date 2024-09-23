@@ -1,7 +1,7 @@
 import { TemplateFormRowPopulated } from 'components/company-contracts/types';
 
 // Convert the Form Data object into the object used by easy-template-x for DOCX parsing
-export const convertFormData = (formData: TemplateFormRowPopulated[]) => {
+export const getContractDetailsTags = (formData: TemplateFormRowPopulated[]) => {
   return formData.reduce((acc, row) => {
     if (row.isAList) {
       acc['CD_' + row.listName] = row.values.map((index) => {
