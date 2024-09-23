@@ -316,7 +316,7 @@ export type ProductionDTO = {
   RunningTime?: string;
   RunningTimeNote?: string;
   ProdCoId?: number;
-  ConversionRateList?: ConversionRateDTO[];
+  ConversionRateList?: Partial<ConversionRateDTO>[];
 };
 
 export type StandardClauseDTO = {
