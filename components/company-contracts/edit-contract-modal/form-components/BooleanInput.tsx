@@ -6,11 +6,19 @@ const BooleanInput = ({ value, handleChange }: GeneralFormInputProps) => {
     <Select
       className="w-32"
       options={[
-        { text: 'Yes', value: true },
-        { text: 'No', value: false },
+        { text: 'Yes', value: 'true' },
+        { text: 'No', value: 'false' },
       ]}
-      onChange={(value) => handleChange(value)}
-      value={value}
+      onChange={(selectedValue) => {
+        if (selectedValue === 'true') {
+          handleChange(true);
+        } else if (selectedValue === 'false') {
+          handleChange(false);
+        } else {
+          handleChange(null);
+        }
+      }}
+      value={value === true ? 'true' : value === false ? 'false' : ''}
     />
   );
 };

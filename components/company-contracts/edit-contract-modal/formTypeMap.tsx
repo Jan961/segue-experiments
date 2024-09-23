@@ -11,7 +11,7 @@ const formTypeMap = {
 interface FormInputGeneralProps {
   type: string;
   label: string;
-  initialValue: string;
+  initialValue: any;
   handleChange: (value: any) => void;
 }
 

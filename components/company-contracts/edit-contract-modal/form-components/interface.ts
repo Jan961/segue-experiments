@@ -1,5 +1,5 @@
 interface GeneralFormInputProps {
-  value: string;
+  value: any;
   handleChange: (newValue: any) => void;
 }
 
