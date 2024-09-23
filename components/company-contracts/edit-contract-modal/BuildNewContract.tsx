@@ -296,7 +296,7 @@ export const BuildNewContract = ({
                 <ScheduleTab updateSchedule={updateSchedule} schedule={schedule} />
               </div>
             )}
-            {activeViewIndex === 3 && <PreviewTab templateFile={docXTemplateFile} />}
+            {activeViewIndex === 3 && <PreviewTab templateFile={docXTemplateFile} formData={formData} />}
           </div>
         </div>
 

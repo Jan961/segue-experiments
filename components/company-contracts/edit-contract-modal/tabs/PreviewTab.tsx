@@ -1,24 +1,30 @@
 import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { Spinner } from 'components/global/Spinner';
+import { populateDOCX } from '../docx-template/populateDOCX';
+import { TemplateFormRowPopulated } from 'components/company-contracts/types';
 
 interface PreviewTabProps {
   templateFile: File;
+  formData: TemplateFormRowPopulated[];
 }
 
-export const PreviewTab = ({ templateFile }: PreviewTabProps) => {
+export const PreviewTab = ({ templateFile, formData }: PreviewTabProps) => {
   const isMounted = useRef(false);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+  console.log(formData);
 
   const fetchPDF = async () => {
     try {
       const tokenresponse = await axios.post('/api/pdfconvert/token/create/');
 
-      const formData = new FormData();
-      formData.append('token', String(tokenresponse.data.token));
-      formData.append('file', templateFile);
+      const populatedDOCX = await populateDOCX(templateFile, formData);
 
-      const response = await axios.post('http://79.99.40.44:3000/api/convertDocxToPDF', formData, {
+      const convertFormData = new FormData();
+      convertFormData.append('token', String(tokenresponse.data.token));
+      convertFormData.append('file', populatedDOCX);
+
+      const response = await axios.post('http://79.99.40.44:3000/api/convertDocxToPDF', convertFormData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

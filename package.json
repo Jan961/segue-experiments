@@ -76,6 +76,8 @@
     "decimal.js": "^10.4.3",
     "devextreme-react": "^22.2.4",
     "dns": "file:./src/mock/dns",
+    "easy-template-x": "^4.1.1",
+    "easy-template-x-angular-expressions": "^0.1.0",
     "emailjs": "^4.0.1",
     "exceljs": "^4.3.0",
     "express-jwt": "^6.1.0",
