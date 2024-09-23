@@ -3,7 +3,7 @@ import Layout from 'components/Layout';
 import { InitialState } from 'lib/recoil';
 import { getProductionJumpState } from 'utils/getProductionJumpState';
 import { getAccountIdFromReq, getUsers } from 'services/userService';
-import ContractFilters from 'components/company-contracts/ContractFilters';
+import CompanyContractFilters from 'components/company-contracts/CompanyContractFilters';
 import CompanyContractsTable from 'components/company-contracts/CompanyContractsTable';
 import { getAllVenuesMin, getUniqueVenueCountrylist } from 'services/venueService';
 import { intialContractsFilterState } from 'state/contracts/contractsFilterState';
@@ -24,7 +24,7 @@ const ContractsPage = (props: InferGetServerSidePropsType<typeof getServerSidePr
   return (
     <Layout title="Contracts | Segue" flush>
       <div className="mb-8">
-        <ContractFilters />
+        <CompanyContractFilters />
       </div>
       <CompanyContractsTable rowData={rows} />
     </Layout>

@@ -13,7 +13,7 @@ import { Label } from 'components/core-ui-lib';
 import { personState } from 'state/contracts/PersonState';
 import { getAllOptions, noop, transformToOptions } from 'utils';
 
-const ContractFilters = () => {
+const CompanyContractFilters = () => {
   const [filter, setFilter] = useRecoilState(contractsFilterState);
   const { selected: productionId } = useRecoilValue(productionJumpState);
   const personMap = useRecoilValue(personState);
@@ -110,4 +110,4 @@ const ContractFilters = () => {
   );
 };
 
-export default ContractFilters;
+export default CompanyContractFilters;
