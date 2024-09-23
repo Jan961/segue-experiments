@@ -9,14 +9,17 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const accountId = await getAccountIdFromReq(req);
     const queryResult = await prisma.Account.findFirst({
       where: { AccountId: accountId },
-      select: { AccountW3WCount: true },
+      select: { AccountW3WCount: true, AccountW3WAllowance: true },
     });
-    const numTokensLeft = queryResult?.AccountW3WCount;
-    if (numTokensLeft > 0) {
+    const { AccountW3WCount, AccountW3WAllowance } = queryResult;
+    if (AccountW3WCount < AccountW3WAllowance) {
       const result = await getCoordFromWhat3Words(searchTerm as string);
       const { isError } = result;
       if (!isError) {
-        await prisma.Account.update({ where: { AccountId: accountId }, data: { AccountW3WCount: numTokensLeft - 1 } });
+        await prisma.Account.update({
+          where: { AccountId: accountId },
+          data: { AccountW3WCount: AccountW3WCount + 1 },
+        });
       }
       res.status(isError ? 401 : 200).json(result);
     } else {

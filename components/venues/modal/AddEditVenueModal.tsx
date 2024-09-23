@@ -97,7 +97,7 @@ export default function AddEditVenueModal({
     if (checkVenueAddrInfoChange()) {
       try {
         const query = venueAddressToUrl(data);
-        const addressUrl = `https://nominatim.openstreetmap.org/search?q=${query}&format=json&polygon=1&addressdetails=1`;
+        const addressUrl = `${process.env.NEXT_PUBLIC_ADDRESS_LOOKUP_URL_START}${query}${process.env.NEXT_PUBLIC_ADDRESS_LOOKUP_URL_END}`;
         const response = await fetch(addressUrl, { method: 'GET' });
         const result = await response.json();
         const { primaryWhat3Words } = formData;
