@@ -2,13 +2,24 @@ import { TemplateHandler } from 'easy-template-x';
 import { createResolver } from 'easy-template-x-angular-expressions';
 import { TemplateFormRowPopulated } from 'components/company-contracts/types';
 import { convertFormData } from './convertFormData';
+import { IPerson } from 'components/contracts/types';
+import { getPersonDetailsTags } from './persondetails';
 
-export const populateDOCX = async (templateFile: File, formData: TemplateFormRowPopulated[]) => {
-  const dataList = convertFormData(formData);
-  console.log('DATALIST:', dataList);
+export const populateDOCX = async (
+  templateFile: File,
+  formData: TemplateFormRowPopulated[],
+  personDetails: IPerson,
+) => {
+  const contractDetailsTags = convertFormData(formData);
+  const personDetailsTags = getPersonDetailsTags(personDetails);
+
+  console.log(personDetails);
+
+  console.log('DATALIST:', contractDetailsTags);
+  console.log('PERSON LIST:', personDetailsTags);
 
   const data = {
-    ...dataList,
+    ...contractDetailsTags,
   };
 
   const handler = new TemplateHandler({
