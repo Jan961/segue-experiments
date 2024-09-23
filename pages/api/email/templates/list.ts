@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import prisma from 'lib/prisma';
+import prisma from 'lib/prisma_master';
 import { EmailTemplate } from 'prisma/generated/prisma-master';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
