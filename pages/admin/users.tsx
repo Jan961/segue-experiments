@@ -220,6 +220,7 @@ export default function Users({
           permissions={permissionsList}
           productions={productionsList}
           selectedUser={selectedUser}
+          groups={permisisonGroups}
         />
       )}
       {showPermissionGroupModal && (

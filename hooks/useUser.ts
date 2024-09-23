@@ -1,4 +1,5 @@
-import { useSignUp } from '@clerk/nextjs';
+import { useSignUp, useSession } from '@clerk/nextjs';
+
 import axios from 'axios';
 import { useState } from 'react';
 import { isNullOrEmpty } from 'utils';
@@ -17,6 +18,7 @@ type UserDetails = {
 
 const useUser = () => {
   const { isLoaded: isSignUpLoaded } = useSignUp();
+  const { session } = useSession();
   const [error, setError] = useState('');
   const [isBusy, setIsBusy] = useState(false);
 
@@ -24,10 +26,24 @@ const useUser = () => {
     try {
       setIsBusy(true);
       setError('');
+      const organisationId = session.user.unsafeMetadata.organisationId as string;
       // check if user already exists
-      const { data: userExists } = await axios.post('/api/user/exists', {
-        userDetails,
-      });
+      const {
+        data: { users = [] },
+      } = await axios(
+        `/api/account-user/read?email=${userDetails.email}&firstName=${userDetails.firstName}&lastName=${userDetails.lastName}&organisationId=${organisationId}`,
+      );
+      const userName = `${userDetails.firstName} ${userDetails.lastName}`.trim().toLowerCase();
+      if (
+        users.find(
+          ({ email, firstName, lastName }) =>
+            email === userDetails.email || `${firstName} ${lastName}`.trim().toLowerCase() === userName,
+        )
+      ) {
+        setError('User with this email and/or name already exists');
+        return false;
+      }
+
       // Create the user within clerk
       const { data } = await axios.post('/api/auth/create-clerk-user', {
         ...userDetails,

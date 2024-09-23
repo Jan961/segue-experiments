@@ -1,4 +1,4 @@
-import { Button, Checkbox, ConfirmationDialog, Label, PopupModal, TextInput } from 'components/core-ui-lib';
+import { Button, Checkbox, ConfirmationDialog, Label, PopupModal, Select, TextInput } from 'components/core-ui-lib';
 import TreeSelect from 'components/global/TreeSelect';
 import { TreeItemOption } from 'components/global/TreeSelect/types';
 import { useEffect, useState } from 'react';
@@ -8,6 +8,10 @@ import Spinner from 'components/core-ui-lib/Spinner';
 import { newUserSchema } from 'validators/user';
 import FormError from 'components/core-ui-lib/FormError';
 import axios from 'axios';
+import { PermissionGroup } from './config';
+import { isNullOrEmpty, mapRecursive } from 'utils';
+import { SelectOption } from 'components/core-ui-lib/Select/Select';
+import { CustomOption } from 'components/core-ui-lib/Table/renderers/SelectCellRenderer';
 
 type UserDetails = {
   accountUserId?: number;
@@ -28,10 +32,11 @@ interface AdEditUserProps {
   onClose: (refresh?: boolean) => void;
   visible: boolean;
   selectedUser?: Partial<UserDetails>;
+  groups: PermissionGroup[];
 }
 
 const DEFAULT_USER_DETAILS: UserDetails = {
-  accountId: 1,
+  accountId: NaN,
   email: '',
   firstName: '',
   lastName: '',
@@ -42,13 +47,14 @@ const DEFAULT_USER_DETAILS: UserDetails = {
   isSystemAdmin: false,
 };
 
-const AdEditUser = ({ visible, onClose, permissions, productions = [], selectedUser }: AdEditUserProps) => {
+const AdEditUser = ({ visible, onClose, permissions, productions = [], selectedUser, groups }: AdEditUserProps) => {
   const [userDetails, setUserDetails] = useState<UserDetails>(DEFAULT_USER_DETAILS);
   const [isFormDirty, setIsFormDirty] = useState(false);
   const [showConfirmationDialog, setShowConfirmationDialog] = useState(false);
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [allProductionsChecked, setAllProductionsChecked] = useState(false);
-
+  const [permissionGroups, setPermissionGroups] = useState<SelectOption[]>([]);
+  const [selectedGroups, setSelectedGroups] = useState<number[]>([]);
   const { isSignUpLoaded, isBusy, createUser, updateUser, error } = useUser();
 
   const handleInputChange = (e) => {
@@ -56,11 +62,49 @@ const AdEditUser = ({ visible, onClose, permissions, productions = [], selectedU
     setUserDetails({ ...userDetails, [e.target.name]: e.target.value });
   };
 
+  const applyPermissionsForSelectedGroups = () => {
+    const permissionsForSelectedGroups = groups
+      .filter(({ groupId }) => selectedGroups.includes(groupId))
+      .map(({ permissions }) => permissions);
+
+    const perms = [...permissions];
+    const updatedPermissions = permissionsForSelectedGroups.reduce((acc, p) => {
+      const updatedPermissions = mapRecursive(acc, (o) => {
+        const value = p.find((v) => v.id === Number(o.id));
+        return { ...o, checked: !!value || o.checked };
+      });
+
+      acc = updatedPermissions;
+      return acc;
+    }, perms);
+
+    setUserDetails((prev) => ({ ...prev, permissions: updatedPermissions }));
+  };
+
   useEffect(() => {
     if (!selectedUser) {
       setUserDetails((prev) => ({ ...prev, productions, permissions }));
     }
   }, [productions, permissions, selectedUser]);
+
+  useEffect(() => {
+    if (isNullOrEmpty(selectedGroups)) {
+      setUserDetails((prev) => ({ ...prev, permissions }));
+    } else {
+      applyPermissionsForSelectedGroups();
+    }
+  }, [selectedGroups]);
+
+  useEffect(() => {
+    if (!isNullOrEmpty(groups)) {
+      setPermissionGroups(
+        groups.map((g: PermissionGroup) => ({
+          text: g.groupName,
+          value: g.groupId.toString(),
+        })),
+      );
+    }
+  }, [groups]);
 
   const fetchPermissionsForSelectedUser = async () => {
     const { data } = await axios.get(`/api/admin/user-permissions/${selectedUser.accountUserId}`);
@@ -214,7 +258,21 @@ const AdEditUser = ({ visible, onClose, permissions, productions = [], selectedU
               </div>
               <FormError error={validationErrors.pin} className="ml-2" />
             </div>
+            <div className="mt-5">
+              <div>
+                <Label text="Add to Permission Group(s)*" variant="lg" />
+                <Label text="Optional" variant="sm" />
+              </div>
+
+              <Select
+                isMulti
+                renderOption={(option) => <CustomOption option={option} isMulti />}
+                options={permissionGroups}
+                onChange={(values: string[]) => setSelectedGroups(values.map((v) => Number(v)))}
+              />
+            </div>
           </div>
+
           <Checkbox
             className="mb-4"
             id="isSystemAdmin"
