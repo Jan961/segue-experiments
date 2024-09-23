@@ -1,8 +1,9 @@
 import prisma from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getEmailFromReq, checkAccess } from 'services/userService';
-import { getDealMemoCall, getPrice, getTechProvision, getContactIdData, getDealMemoHold } from '../utils';
+import { getDealMemoCall, getPrice, getTechProvision, getContactIdData, getDealMemoHoldUpdQuery } from '../utils';
 import { omit } from 'radash';
+import { isUndefined } from 'utils';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -12,8 +13,16 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const access = await checkAccess(email, { BookingId });
     if (!access) return res.status(401).end();
     const data = getContactIdData(req.body.formData);
-    const demoIdData = data.Id;
-    const updatedData = omit(data, ['error', 'Id', 'BookingId', 'BOMVenueContactId', 'TechVenueContactId', 'SendTo']);
+
+    const updatedData = omit(data, [
+      'error',
+      'Id',
+      'BookingId',
+      'BOMVenueContactId',
+      'TechVenueContactId',
+      'SendTo',
+      'DealMemoHold',
+    ]);
     const existingDealMemo = await prisma.dealMemo.findFirst({
       where: {
         BookingId,
@@ -25,7 +34,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const techProvisionData = getTechProvision(updatedData.DealMemoTechProvision);
 
     const dealMemoCallData = getDealMemoCall(updatedData.DealMemoCall);
-    const dealMemoHoldData = getDealMemoHold(updatedData.DealMemoHold, demoIdData);
+
     if (existingDealMemo) {
       updateCreateDealMemo = await prisma.dealMemo.update({
         where: {
@@ -45,35 +54,44 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
             updateMany: dealMemoCallData[0],
             create: dealMemoCallData[1],
           },
-          DealMemoHold: {
-            updateMany: dealMemoHoldData[0],
-            create: dealMemoHoldData[1],
-          },
           Booking: {
             connect: { Id: BookingId },
           },
         },
       });
 
-      // create sales email list
-      const emailSalesRecipients = data.SendTo.map((accId) => {
-        return {
-          DMSRDeMoId: existingDealMemo.Id,
-          DMSRAccUserId: accId,
-        };
+      const dmHoldQueries = getDealMemoHoldUpdQuery(data.DealMemoHold);
+
+      // perform updates on deal memo hold
+      dmHoldQueries.forEach(async (updObj) => {
+        await prisma.dealMemoHold.update(updObj);
       });
 
-      // first delete DealMemoSalesEmailRecipient records with matching deal memo id
-      await prisma.DealMemoSalesEmailRecipient.deleteMany({
-        where: {
-          DMSRDeMoId: existingDealMemo.Id,
-        },
-      });
+      if (!isUndefined(data.SendTo)) {
+        // create sales email list
+        const emailSalesRecipients = data.SendTo.filter(
+          (accId) => accId !== 'select_all' && typeof accId !== 'string',
+        ).map((accId) => {
+          return {
+            DMSRDeMoId: existingDealMemo.Id,
+            DMSRAccUserId: accId,
+          };
+        });
 
-      // create records for emails attached to this deal memo now
-      await prisma.DealMemoSalesEmailRecipient.createMany({
-        data: emailSalesRecipients,
-      });
+        // first delete DealMemoSalesEmailRecipient records with matching deal memo id
+        await prisma.DealMemoSalesEmailRecipient.deleteMany({
+          where: {
+            DMSRDeMoId: existingDealMemo.Id,
+          },
+        });
+
+        // create records for emails attached to this deal memo now
+        await prisma.DealMemoSalesEmailRecipient.createMany({
+          data: emailSalesRecipients,
+        });
+      }
+
+      // if there is no deal memo record for this booking
     } else {
       updateCreateDealMemo = await prisma.dealMemo.create({
         data: {
@@ -88,7 +106,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
             create: data.DealMemoCall,
           },
           DealMemoHold: {
-            create: dealMemoHoldData[1],
+            create: data.DealMemoHold,
           },
           Booking: {
             connect: { Id: BookingId },
@@ -96,15 +114,18 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         },
       });
 
-      const emailSalesRecipients = data.SendTo.map((accId) => {
-        return {
-          DMSRDeMoId: updateCreateDealMemo.Id,
-          DMSRAccUserId: accId,
-        };
-      });
-
-      // create sales email link list
-      await prisma.DealMemoSalesEmailRecipient.createMany(emailSalesRecipients);
+      if (!isUndefined(data.SendTo)) {
+        const emailSalesRecipients = data.SendTo.filter(
+          (accId) => accId !== 'select_all' && typeof accId !== 'string',
+        ).map((accId) => {
+          return {
+            DMSRDeMoId: existingDealMemo.Id,
+            DMSRAccUserId: accId,
+          };
+        });
+        // create sales email link list
+        await prisma.DealMemoSalesEmailRecipient.createMany(emailSalesRecipients);
+      }
     }
 
     res.status(200).json(updateCreateDealMemo);

@@ -15,6 +15,7 @@ import TanstackProvider from 'components/providers/TanstackProvider';
 import ReferenceDataLoader from 'components/ReferenceDataLoader';
 import { LicenseManager } from 'ag-grid-enterprise';
 import Notifications from 'components/core-ui-lib/Notifications';
+import PermissionsProvider from 'components/auth/PermissionsProvider';
 
 export type NextPageWithLayout<P = object, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement) => ReactNode;
@@ -29,14 +30,15 @@ export default function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   LicenseManager.setLicenseKey(process.env.NEXT_PUBLIC_AG_GRID_LICENCE_KEY);
   const { initialState } = pageProps;
   const router = useRouter();
-
   return (
     <TanstackProvider>
       <ClerkProvider {...pageProps} navigate={(to) => router.push(to)}>
         <RecoilRoot initializeState={(snapshot) => setInitialStateServer(snapshot, initialState)}>
           <ClientStateSetter intitialState={initialState} />
           <ReferenceDataLoader />
-          <Component {...pageProps} />
+          <PermissionsProvider>
+            <Component {...pageProps} />
+          </PermissionsProvider>
           <Notifications />
         </RecoilRoot>
       </ClerkProvider>

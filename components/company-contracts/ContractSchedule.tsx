@@ -34,7 +34,12 @@ export const ContractScheduleModal = ({ openContract, onClose }: { openContract:
   );
   const personOptions = useMemo(
     () =>
-      transformToOptions(Object.values(personMap), null, 'id', ({ firstName, lastName }) => `${firstName} ${lastName}`),
+      transformToOptions(
+        Object.values(personMap),
+        null,
+        'id',
+        ({ firstName, lastName }) => `${firstName} ${lastName}`,
+      ).sort((a, b) => a.text.localeCompare(b.text)),
     [personMap],
   );
   const productionOptions = useMemo(
@@ -157,12 +162,12 @@ export const ContractScheduleModal = ({ openContract, onClose }: { openContract:
           />
         </div>
         <div className=" text-primary-input-text font-bold text-sm mr-1 mt-4 mb-4">
-          Please contact sales@seguetheatre.com to arrange upload of Contract Templates
+          Please contact sales@segue360.co.uk to arrange upload of Contract Templates
         </div>
         <div className="flex justify-end mr-2">
           <Button
             disabled={!production}
-            className="text-sm leading-8"
+            className="text-sm leading-8 px-6"
             text="Start Building Contract"
             onClick={onOpenBuildContract}
           />

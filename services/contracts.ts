@@ -57,10 +57,10 @@ export const fetchAllContracts = async (productionId?: number): Promise<IContrac
     }) => ({
       id: ContractId,
       role: RoleName,
-      status: ContractStatus,
+      contractStatus: ContractStatus,
       completedBy: CompletedByAccUserId,
       checkedBy: CheckedByAccUserId,
-      dateIssue: DateIssued?.toISOString?.() || null,
+      dateIssued: DateIssued?.toISOString?.() || null,
       dateReturned: DateReturned?.toISOString?.() || null,
       notes: Notes,
       personId: Person?.PersonId,

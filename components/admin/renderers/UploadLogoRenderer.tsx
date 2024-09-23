@@ -6,6 +6,7 @@ import axios from 'axios';
 import { UploadedFile } from 'components/core-ui-lib/UploadModal/interface';
 import { uploadFile } from 'requests/upload';
 import { getFileUrl } from 'lib/s3';
+import { isNullOrEmpty } from 'utils';
 
 export const UploadLogoRenderer = (params, fetchProductionCompanies, onUploadSucess) => {
   const { id, companyName, companyVATNo, webSite, fileLocation, fileName } = params.data;
@@ -64,7 +65,7 @@ export const UploadLogoRenderer = (params, fetchProductionCompanies, onUploadSuc
           text="Upload Logo"
           variant="secondary"
           onClick={() => setOpenUploadModal(true)}
-          disabled={!!fileLocation}
+          disabled={!!fileLocation || isNullOrEmpty(id)}
         />
       ) : (
         <Image

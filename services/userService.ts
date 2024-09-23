@@ -86,6 +86,12 @@ export const getAccountIdFromReq = async (req: any) => {
   return getAccountId(email);
 };
 
+export const getOrganizationIdFromReq = async (req: any) => {
+  const { userId } = getAuth(req);
+  const user = await clerkClient.users.getUser(userId);
+  return user?.unsafeMetadata?.organizationId;
+};
+
 export const checkAccess = async (email: string, items: AccessCheck = null): Promise<boolean> => {
   return checkAccessDirect(email, items);
 };
@@ -147,4 +153,35 @@ export const createClerkUserWithoutSession = async (
     lastName,
   });
   return response;
+};
+
+export const getUserPermisisons = async (email: string, organisationId: string) => {
+  const accountUser = await prisma.AccountUser.findFirst({
+    where: {
+      User: {
+        UserEmail: {
+          equals: email,
+        },
+      },
+      Account: {
+        AccountOrganisationId: {
+          equals: organisationId,
+        },
+      },
+    },
+    select: {
+      Account: true,
+      AccountUserPermission: {
+        select: {
+          Permission: true,
+        },
+      },
+    },
+  });
+  const formattedPermissions =
+    accountUser?.AccountUserPermission.map(({ Permission }) => ({
+      permissionId: Permission.PermissionId,
+      permissionName: Permission.PermissionName,
+    })) || [];
+  return formattedPermissions;
 };

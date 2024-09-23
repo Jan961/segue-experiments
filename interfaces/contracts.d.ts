@@ -6,10 +6,10 @@ export interface IContractDepartment {
 export interface IContractSummary {
   id: number;
   role: string;
-  status: string;
+  contractStatus: string;
   completedBy: number;
   checkedBy: number;
-  dateIssue: string;
+  dateIssued: string;
   dateReturned: string;
   notes: string;
   personId: number;

@@ -40,7 +40,7 @@ import { contractsVenueState } from 'state/contracts/contractsVenueState';
 import { contractsBookingStatusState, contractsStatusState } from 'state/contracts/contractsStatusState';
 import { contractRehearsalState } from 'state/contracts/contractRehearsalState';
 import { contractGetInFitUpState } from 'state/contracts/contractGetInFitUpState';
-import { currencyState } from 'state/marketing/currencyState';
+import { currencyState, TCurrencySymbol } from 'state/global/currencyState';
 import { CurrencyList, currencyListState } from 'state/productions/currencyState';
 import { ProductionCompanyList, productionCompanyState } from 'state/productions/productionCompanyState';
 import { currentUserState } from 'state/marketing/currentUserState';
@@ -101,6 +101,7 @@ export type InitialState = Partial<{
     contract?: TContractListState;
     department?: TContractDepartmentState;
     accountContacts?: Record<number, AccountContactDTO>;
+    currencySymbol?: TCurrencySymbol;
   };
   marketing?: {
     bookingJump?: BookingJump;
@@ -171,6 +172,7 @@ const states: {
     contract: contractListState,
     department: contractDepartmentState,
     accountContacts: accountContactState,
+    currencySymbol: currencyState,
   },
   marketing: {
     bookingJump: bookingJumpState,

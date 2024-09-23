@@ -30,15 +30,26 @@ export default function CompanyContractsTable({ rowData = [] }: ContractsTablePr
   const [contracts, setContracts] = useRecoilState(contractListState);
   const [notesPopupContext, setNotesPopupContext] = useState(defaultNotesPopupContext);
   const [editContract, setEditContract] = useState<Partial<BuildNewContractProps>>(defaultEditContractState);
+  const gridOptions = {
+    getRowNodeId: (data) => {
+      return data?.id;
+    },
+    onRowDataUpdated: (params) => {
+      params.api.forEachNode((rowNode) => {
+        rowNode.id = rowNode?.data?.date;
+      });
+    },
+    getPopupParent: () => document.body,
+  };
 
   const userOptionList = useMemo(
     () =>
       transformToOptions(
-        Object.values(users),
+        Object.values(users || {}),
         null,
-        'Id',
+        'AccUserId',
         ({ FirstName = '', LastName = '' }) => `${FirstName || ''} ${LastName || ''}`,
-      ),
+      ).sort((a, b) => a.text.localeCompare(b.text)),
     [users],
   );
   const columnDefs = useMemo(() => getCompanyContractsColumnDefs(userOptionList), [userOptionList]);
@@ -105,6 +116,7 @@ export default function CompanyContractsTable({ rowData = [] }: ContractsTablePr
           styleProps={contractsStyleProps}
           onCellValueChange={onCellValueChange}
           onCellClicked={handleCellClick}
+          gridOptions={gridOptions}
         />
         {notesPopupContext.visible && (
           <NotesPopup

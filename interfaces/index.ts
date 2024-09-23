@@ -670,7 +670,10 @@ export interface StandardSeatRowType {
   type: string;
   seats: string;
   value: string;
+  id: number | null;
+  typeId: number;
 }
+
 export interface VenueContractFormData {
   StatusCode: string;
   SignedDate: Date;
@@ -751,27 +754,26 @@ export interface DealMemoContractFormData {
   ROTTPercentage?: number;
   PRSPercentage?: number;
   Guarantee?: boolean;
-  GuaranteeAmount?: number;
+  GuaranteeAmount?: string;
   HasCalls?: boolean;
   PromoterSplitPercentage?: number;
   VenueSplitPercentage?: number;
-  VenueRental?: number;
+  VenueRental?: string;
   VenueRentalNotes?: string;
-  StaffingContra?: number;
+  StaffingContra?: string;
   StaffingContraNotes?: string;
-  AgreedContraItems?: number;
+  AgreedContraItems?: string;
   AgreedContraItemsNotes?: string;
   BOMVenueContactId?: number;
   OnSaleDate?: Date;
   SettlementVenueContactId?: number;
   SellableSeats?: number;
   MixerDeskPosition?: string;
-  StandardSeatKills?: string;
-  RestorationLevy?: number;
-  BookingFees?: number;
+  RestorationLevy?: string;
+  BookingFees?: string;
   CCCommissionPercent?: number;
   TxnChargeOption?: string;
-  TxnChargeAmount?: number;
+  TxnChargeAmount?: string;
   AgreedDiscounts?: string;
   MaxTAAlloc?: string;
   TAAlloc?: string;
@@ -784,8 +786,8 @@ export interface DealMemoContractFormData {
   BrochureDeadline?: Date;
   FinalProofBy?: Date;
   PrintReqs?: string;
-  LocalMarketingBudget?: number;
-  LocalMarketingContra?: number;
+  LocalMarketingBudget?: string;
+  LocalMarketingContra?: string;
   SellWho?: string;
   SellProgrammes?: boolean;
   PrintDelUseVenueAddress?: boolean;
@@ -794,7 +796,7 @@ export interface DealMemoContractFormData {
   SellNotes?: string;
   SellProgCommPercent?: number;
   SellMerchCommPercent?: number;
-  SellPitchFee?: number;
+  SellPitchFee?: string;
   TechVenueContactId?: number;
   TechArrivalDate?: Date;
   TechArrivalTime?: Date;
@@ -806,7 +808,7 @@ export interface DealMemoContractFormData {
   NumCateringNotes?: string;
   BarringClause?: string;
   AdvancePaymentRequired?: boolean;
-  AdvancePaymentAmount?: number;
+  AdvancePaymentAmount?: string;
   AdvancePaymentDueBy?: Date;
   SettlementDays?: number;
   ContractClause?: string;
@@ -836,4 +838,9 @@ export interface DealMemoPriceState {
   DMPNumTickets: number;
   DMPDeMoId: number;
   DMPNotes: string;
+}
+
+export interface UserPermission {
+  permissionId: number;
+  permissionName: string;
 }
