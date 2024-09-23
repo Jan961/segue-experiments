@@ -3,23 +3,23 @@ import { NextApiRequest, NextApiResponse } from 'next';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const { companyName, webSite, id, companyVATNo, fileId } = req.body;
+    const { companyName, id, webSite, companyVATNo, fileId } = req.body;
 
     const updated = await master.productionCompany.update({
       data: {
-        WebSite: webSite,
-        Name: companyName,
+        ProdCoName: companyName,
         ProdCoVATCode: companyVATNo,
+        ProdCoWebSite: webSite,
         ...(fileId && {
-          File: {
+          ProdCoLogoFileId: {
             connect: {
-              Id: fileId,
+              FileId: fileId,
             },
           },
         }),
       },
       where: {
-        Id: id,
+        ProdCoId: id,
       },
       include: { File: true },
     });
