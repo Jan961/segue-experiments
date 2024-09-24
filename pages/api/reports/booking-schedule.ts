@@ -15,8 +15,9 @@ import { convertToPDF } from 'utils/report';
 import { addBorderToAllCells } from 'utils/export';
 import { bookingStatusMap } from 'config/bookings';
 import { add, parseISO, format as dateFormat, differenceInDays } from 'date-fns';
-import { formatDate, formatUtcTime } from 'services/dateService';
+import { areDatesInSameWeek, formatDate, formatUtcTime } from 'services/dateService';
 import { PerformanceInfo } from 'services/reports/schedule-report';
+import { isValidNumber } from 'utils';
 
 type SCHEDULE_VIEW = {
   ProductionId: number;
@@ -234,12 +235,14 @@ const handler = async (req, res) => {
       'Declared Holiday',
     ].includes(value?.EntryName);
     const isCancelled = value?.EntryStatusCode === 'X';
-
     if (!value) {
+      const dateToCompare = add(parseISO(from), { days: i - 2 });
+      const isSameWeek = areDatesInSameWeek(dateInIncomingFormat, dateToCompare, 1);
+      const validPrevWeekNum = isValidNumber(prevProductionWeekNum) ? parseInt(prevProductionWeekNum, 10) : 0;
       worksheet.addRow([
         weekDay.substring(0, 3),
         formatDate(dateInIncomingFormat, 'dd/MM/yy'),
-        `${prevProductionWeekNum}`,
+        `${isSameWeek ? validPrevWeekNum : validPrevWeekNum + 1}`,
       ]);
       colorTextAndBGCell({
         worksheet,
@@ -286,6 +289,7 @@ const handler = async (req, res) => {
         row.push(formattedTime);
         row.push(Number(Mileage));
       }
+      // console.log(`Row ${i+1}: `, EntryName, ProductionWeekNum, EntryType, EntryStatusCode, formatDate(dateInIncomingFormat, 'dd/MM/yy'))
       worksheet.addRow(row);
     }
     rowNo++;
