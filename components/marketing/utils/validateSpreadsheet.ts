@@ -317,7 +317,7 @@ const validateBookingDate = (currentRow: SpreadsheetRow, prodDateRange, prodCode
   }
 
   if ((rowDate < prodStartDate || rowDate > prodEndDate) && currentRow.bookingDate) {
-    returnString += '| ERROR - Booking Date is outside range of ' + prodCode + ' start/end date';
+    returnString += '| ERROR - Booking Date is outside range of ' + prodCode + ' start/end Production Dates';
     errorOccurred = true;
   }
 
