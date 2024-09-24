@@ -167,6 +167,8 @@ export const initialVenueAddressDetails = {
   primaryEMail: '',
   what3WordsStage: '',
   what3WordsLoading: '',
+  primaryWhat3Words: '',
+  primaryCoordinates: { latitude: null, longitude: null },
 };
 
 export const initialVenueBarringRules = {

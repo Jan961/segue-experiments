@@ -23,7 +23,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   if (!access) return res.status(401).end();
 
   try {
-    const result = await prisma.VenueVenue.findMany({
+    const result = await prisma.venueVenueTravelView.findMany({
       where: {
         Venue1Id: venueId,
         Venue2: {

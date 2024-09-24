@@ -18,10 +18,10 @@ const ShowsTextInputRenderer = ({ value, setValue, eGridCell, placeholder }: Sho
   }, [value]);
 
   const handleChange = (e: any) => {
-    setInputValue(e.target.value);
-    setValue(e.target.value);
+    setInputValue(e);
+    setValue(e);
     setError('');
-    if (e.target.value.length === 0) {
+    if (e.length === 0) {
       setError('error');
     }
   };
