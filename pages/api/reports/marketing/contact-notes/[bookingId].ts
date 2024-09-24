@@ -38,7 +38,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   createHeaderRow(worksheet, venueAndDate, 14);
   createHeaderRow(worksheet, 'Contact Notes Report', 12);
 
-  const headerRow = worksheet.addRow(['Who', 'Date', 'Time', 'Actioned By', 'Notes']);
+  const headerRow = worksheet.addRow(['Person Contacted', 'Date', 'Time', 'Actioned By', 'Notes']);
   headerRow.eachCell((cell) => {
     cell.fill = {
       type: 'pattern',

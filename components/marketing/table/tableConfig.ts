@@ -122,7 +122,7 @@ export const activityColDefs = (updateActivity, currencySymbol) => [
 
 export const contactNoteColDefs = (updateContactNote, userList) => [
   {
-    headerName: 'Who',
+    headerName: 'Person Contacted',
     field: 'CoContactName',
     cellRenderer: DefaultCellRenderer,
     width: 300,
