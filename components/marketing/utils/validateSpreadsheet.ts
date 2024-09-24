@@ -11,6 +11,7 @@ import {
   tableColMaps,
   expectedHeaders,
   SpreadsheetDataCleaned,
+  MismatchRowData,
 } from 'types/SpreadsheetValidationTypes';
 
 let currentRow: SpreadsheetRow;
@@ -18,7 +19,7 @@ let spreadsheetIssues: SpreadsheetIssues;
 let spreadsheetData: SpreadsheetData;
 let errorRows = new Set();
 let warningRows = new Set();
-let mismatchedRows;
+let mismatchedRows = new Map<number, MismatchRowData>();
 
 export const validateSpreadsheetFile = async (file, prodCode, venueList, prodDateRange) => {
   const workbook = new ExcelJS.Workbook();
@@ -49,7 +50,7 @@ export const validateSpreadsheetFile = async (file, prodCode, venueList, prodDat
   };
   errorRows = new Set();
   warningRows = new Set();
-  mismatchedRows = new Set([]);
+  mismatchedRows = new Map<number, MismatchRowData>();
   let currentVenue = '';
   let currentBookingDate = '';
 
@@ -245,13 +246,13 @@ const updateValidateSpreadsheetData = (
       sale.ignoreWarning.toUpperCase() !== currentRow.ignoreWarning.toUpperCase();
 
     if (isMismatch) {
-      mismatchedRows.add({
+      mismatchedRows.set(sale.salesRow.number, {
         row: sale.salesRow,
         bookingDate: currentBookingDate,
         salesDate: sale.salesDate,
         venueCode: currentVenue,
       });
-      mismatchedRows.add({
+      mismatchedRows.set(currentRow.row.number, {
         row: currentRow.row,
         bookingDate: currentBookingDate,
         salesDate: sale.salesDate,
@@ -499,7 +500,7 @@ const postValidationChecks = () => {
     }
   }
 
-  const rowNums = [...mismatchedRows].map((item) => item.row.number);
+  const rowNums: number[] = [...mismatchedRows.keys()];
   const rowString = '(Row: ' + rowNums.join(', ') + ')';
   mismatchedRows.forEach((item) => {
     const newErrorMessage = `| ERROR - Mismatch in information for Booking at Venue ${item.venueCode} on ${dateToSimple(
@@ -507,7 +508,9 @@ const postValidationChecks = () => {
     )}, on Sales Date ${dateToSimple(item.salesDate.toString()) + ' ' + rowString}`;
     const currentDetailsMessage = item.row.getCell(11).value;
     const formattedDetailsMessage = formatDetailsMessage(currentDetailsMessage + newErrorMessage);
+
     updateResponseDetailsCells(item.row, formattedDetailsMessage, true, false);
+
     errorRows.add(item.row);
   });
 };
@@ -646,9 +649,6 @@ const createSummaryWorksheet = (workbook) => {
   }
 
   addSummaryStyling();
-
-  console.log(errorRows);
-  console.log(warningRows);
 
   let errorIndex = 0;
   (errorRows as Set<any>).forEach((row) => {
