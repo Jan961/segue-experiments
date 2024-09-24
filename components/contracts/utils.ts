@@ -2,22 +2,31 @@ import { Time } from 'components/core-ui-lib/TimeInput/TimeInput';
 import { startOfDay } from 'date-fns';
 import { pick } from 'radash';
 import { getShortWeekFormat } from 'services/dateService';
-import { formatDecimalValue, isNullOrEmpty } from 'utils';
+import { formatDecimalValue, isNullOrEmpty, isUndefined } from 'utils';
 import formatInputDate from 'utils/dateInputFormat';
+import { PriceState } from './modal/EditDealMemoContractModal';
 
-const defaultPrice = {
-  Premium: { DMPTicketName: 'Premium', DMPTicketPrice: 0, DMPNumTickets: 0, DMPDeMoId: 0, DMPNotes: '' },
-  Concession: { DMPTicketName: 'Concession', DMPTicketPrice: 0, DMPNumTickets: 0, DMPDeMoId: 0, DMPNotes: '' },
-  'Family Tickets (per four)': {
+const defaultPrice = [
+  { DMPTicketName: 'Premium', DMPTicketPrice: 0, DMPNumTickets: 0, DMPDeMoId: 0, DMPNotes: '' },
+  { DMPTicketName: 'Concession', DMPTicketPrice: 0, DMPNumTickets: 0, DMPDeMoId: 0, DMPNotes: '' },
+  {
     DMPTicketName: 'Family Tickets (per four)',
     DMPTicketPrice: 0,
     DMPNumTickets: 0,
     DMPDeMoId: 0,
     DMPNotes: '',
   },
-  Groups: { DMPTicketName: 'Groups', DMPTicketPrice: 0, DMPNumTickets: 0, DMPDeMoId: 0, DMPNotes: '' },
-  Schools: { DMPTicketName: 'Schools', DMPTicketPrice: 0, DMPNumTickets: 0, DMPDeMoId: 0, DMPNotes: '' },
-  'Babes in Arms': { DMPTicketName: 'Babes in Arms', DMPTicketPrice: 0, DMPNumTickets: 0, DMPDeMoId: 0, DMPNotes: '' },
+  { DMPTicketName: 'Groups', DMPTicketPrice: 0, DMPNumTickets: 0, DMPDeMoId: 0, DMPNotes: '' },
+  { DMPTicketName: 'Schools', DMPTicketPrice: 0, DMPNumTickets: 0, DMPDeMoId: 0, DMPNotes: '' },
+  { DMPTicketName: 'Babes in Arms', DMPTicketPrice: 0, DMPNumTickets: 0, DMPDeMoId: 0, DMPNotes: '' },
+];
+
+export const defaultCustomPrice = {
+  DMPTicketName: '',
+  DMPTicketPrice: 0,
+  DMPNumTickets: 0,
+  DMPDeMoId: 0,
+  DMPNotes: '',
 };
 
 const techProv = ['Lighting', 'Sound', 'Other', 'Technical Staff'];
@@ -52,24 +61,30 @@ export const defaultDemoCall = {
   DMCValue: null,
 };
 
-export const filterPrice = (dealMemoPrice) => {
-  if (!dealMemoPrice) return [defaultPrice, []];
-  if (dealMemoPrice.length === 0) return [defaultPrice, []];
-  const customePriceList = [];
-  dealMemoPrice.forEach((price) => {
-    if (defaultPrice[price.DMPTicketName]) {
-      defaultPrice[price.DMPTicketName] = {
-        DMPTicketName: price.DMPTicketName,
-        DMPTicketPrice: price.DMPTicketPrice === '0' ? formatDecimalValue(price.DMPTicketPrice) : '',
-        DMPNumTickets: price.DMPNumTickets,
-        DMPId: price.DMPId,
-        DMPDeMoId: price.DMPDeMoId,
-      };
-    } else {
-      customePriceList.push(price);
-    }
-  });
-  return [defaultPrice, customePriceList];
+export const filterPrice = (dealMemoPrice: any): PriceState => {
+  if (isUndefined(dealMemoPrice) || dealMemoPrice.length === 0) {
+    return { custom: [defaultCustomPrice], default: defaultPrice };
+  } else {
+    const customPriceList = [];
+    const defaultPriceList = [];
+
+    dealMemoPrice.forEach((price) => {
+      const defPriceIndex = defaultPrice.findIndex((defPrice) => defPrice.DMPTicketName === price.DMPTicketName);
+      if (defPriceIndex === -1) {
+        customPriceList.push({
+          ...price,
+          DMPTicketPrice: price.DMPTicketPrice !== '0' ? formatDecimalValue(price.DMPTicketPrice) : '',
+        });
+      } else {
+        defaultPriceList.push({
+          ...price,
+          DMPTicketPrice: price.DMPTicketPrice !== '0' ? formatDecimalValue(price.DMPTicketPrice) : '',
+        });
+      }
+    });
+
+    return { custom: customPriceList, default: defaultPriceList };
+  }
 };
 
 export const filterTechProvision = (techProvision) => {
@@ -233,12 +248,6 @@ export const parseAndSortDates = (arr: string[]): Array<string> => {
   });
 
   return dayArray;
-};
-
-export const checkDecimalStringFormat = (decimalString, precision, scale) => {
-  const [integerPart, fractionalPart] = decimalString.split('.');
-  if (integerPart.length > precision - scale || (fractionalPart && fractionalPart.length > scale)) return false;
-  return true;
 };
 
 export const dtToTime = (datetime: Date): Time => {
