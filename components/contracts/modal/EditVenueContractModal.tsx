@@ -245,7 +245,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
       const dealMemoData = Object.keys(saveDealMemoFormData).length > 0;
       if (contractData) {
         await fetchData({
-          url: `/api/contracts/update/venueContract/${selectedTableCell.contract.Id}`,
+          url: `/api/contracts/upsert/venueContract/${selectedTableCell.contract.Id}`,
           method: 'PATCH',
           data: saveContractFormData,
         });
