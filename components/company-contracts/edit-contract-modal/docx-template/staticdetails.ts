@@ -8,7 +8,6 @@ export const getStaticDetailsTags = (productionInfo: Partial<ProductionDTO>, pro
     FIRSTPERFORMANCEDATE: helpers.getFirstPerfDate(),
     DATEOFDOCCREATION: helpers.getDateOfDocumentCreation(),
     SHOWNAME: helpers.getShowName(),
-    CONTRACTCURRENCY: helpers.getContractCurrency(),
     PRODCOMPANYNAME: helpers.getProductionCompanyName(),
     ALLPERFORMANCESATSAMEVENUE: helpers.getAreAllPerformancesAtSameVenue(),
     SINGLEPERFORMANCEVENUE: helpers.getSinglePerformanceVenue(),
@@ -39,11 +38,6 @@ const createHelperFunctions = (productionInfo: Partial<ProductionDTO>, productio
       } else {
         return `${showCode} ${showName}`;
       }
-    },
-
-    // Questions need to be asked. Does this come from the Production selected? Or is it manually input
-    getContractCurrency: () => {
-      return '£';
     },
 
     getProductionCompanyName: () => {
