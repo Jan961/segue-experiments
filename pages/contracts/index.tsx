@@ -19,9 +19,10 @@ export default function index() {
       color: 'bg-primary-blue',
     },
     {
-      title: 'SM/Tech/Crew Contracts',
+      title: 'SM / Tech / Crew Contracts',
       route: '/contracts/company-contracts/all?d=3',
       color: 'bg-primary-blue',
+      smallerText: true,
     },
   ];
   return (

@@ -49,7 +49,14 @@ import LoadingOverlay from 'components/shows/LoadingOverlay';
 import { CustomOption } from 'components/core-ui-lib/Table/renderers/SelectCellRenderer';
 import { trasformVenueAddress } from 'utils/venue';
 import { accountContactState } from 'state/contracts/accountContactState';
-import { formatDecimalValue, formatPercentageValue, isNullOrEmpty, isNullOrUndefined, isUndefined } from 'utils';
+import {
+  formatDecimalValue,
+  formatPercentageValue,
+  isNull,
+  isNullOrEmpty,
+  isNullOrUndefined,
+  isUndefined,
+} from 'utils';
 import { currencyState } from 'state/global/currencyState';
 import { decimalRegex, stringRegex } from 'utils/regexUtils';
 
@@ -135,6 +142,12 @@ export const EditDealMemoContractModal = ({
         : [],
     [venueData],
   );
+
+  const vcSelectPlaceholder = () => {
+    return venueUserList.length === 0
+      ? 'No venue contacts held within system - these can be added through venue database'
+      : 'Please select...';
+  };
 
   const venueUserData = useMemo(() => {
     const venueContactData = {};
@@ -434,7 +447,12 @@ export const EditDealMemoContractModal = ({
   };
 
   const validateDealSplit = () => {
-    // if both values are no NaN
+    // if either value is null return
+    if (isNull(formData.PromoterSplitPercentage) || isNull(formData.VenueSplitPercentage)) {
+      return;
+    }
+
+    // if both values are not NaN
     if (!isNaN(formData.PromoterSplitPercentage) && !isNaN(formData.VenueSplitPercentage)) {
       const combinedTotal =
         parseFloat(formData.PromoterSplitPercentage.toString()) + parseFloat(formData.VenueSplitPercentage.toString());
@@ -771,10 +789,11 @@ export const EditDealMemoContractModal = ({
               <Select
                 onChange={(value) => editDemoModalData('ProgrammerVenueContactId', value, 'dealMemo')}
                 options={[...venueUserList]}
-                className="bg-primary-white w-full"
-                placeholder="Please select..."
+                className={classNames('bg-primary-white w-full', venueUserList.length === 0 && 'font-normal')}
+                placeholder={vcSelectPlaceholder()}
                 isClearable
                 isSearchable
+                disabled={venueUserList.length === 0}
                 value={formData.ProgrammerVenueContactId}
                 testId="select-venue-programmer"
               />
@@ -1103,9 +1122,10 @@ export const EditDealMemoContractModal = ({
             <div className="w-4/5 flex">
               <Select
                 onChange={(value) => editDemoModalData('BOMVenueContactId', value, 'dealMemo')}
-                className="bg-primary-white w-full"
-                placeholder="Please select..."
+                className={classNames('bg-primary-white w-full', venueUserList.length === 0 && 'font-normal')}
+                placeholder={vcSelectPlaceholder()}
                 options={venueUserList}
+                disabled={venueUserList.length === 0}
                 isClearable
                 isSearchable
                 value={formData.BOMVenueContactId}
@@ -1162,9 +1182,10 @@ export const EditDealMemoContractModal = ({
             <div className="w-4/5 flex">
               <Select
                 onChange={(value) => editDemoModalData('SettlementVenueContactId', value, 'dealMemo')}
-                className="bg-primary-white w-full"
-                placeholder="Please select..."
+                className={classNames('bg-primary-white w-full', venueUserList.length === 0 && 'font-normal')}
+                placeholder={vcSelectPlaceholder()}
                 options={venueUserList}
+                disabled={venueUserList.length === 0}
                 isClearable
                 isSearchable
                 value={formData.SettlementVenueContactId}
@@ -1651,8 +1672,9 @@ export const EditDealMemoContractModal = ({
               <Select
                 onChange={(value) => editDemoModalData('MMVenueContactId', value, 'dealMemo')}
                 options={[...venueUserList]}
-                className="bg-primary-white w-full"
-                placeholder="Please select..."
+                disabled={venueUserList.length === 0}
+                className={classNames('bg-primary-white w-full', venueUserList.length === 0 && 'font-normal')}
+                placeholder={vcSelectPlaceholder()}
                 isClearable
                 isSearchable
                 value={formData.MMVenueContactId}
@@ -1908,8 +1930,9 @@ export const EditDealMemoContractModal = ({
               <Select
                 onChange={(value) => editDemoModalData('TechVenueContactId', value, 'dealMemo')}
                 options={[...venueUserList]}
-                className="bg-primary-white w-full"
-                placeholder="Please select..."
+                disabled={venueUserList.length === 0}
+                className={classNames('bg-primary-white w-full', venueUserList.length === 0 && 'font-normal')}
+                placeholder={vcSelectPlaceholder()}
                 isClearable
                 isSearchable
                 value={formData.TechVenueContactId}
@@ -2207,7 +2230,9 @@ export const EditDealMemoContractModal = ({
                   testId="vat-no"
                   className="w-full"
                   value={
-                    productionJumpState.ProductionCompany ? productionJumpState.ProductionCompany.ProdCoVATCode : ''
+                    productionJumpState.ProductionCompany
+                      ? productionJumpState.ProductionCompany.ProdCoVATCode
+                      : 'To add a VAT number, please contact your system administrator'
                   }
                   disabled
                 />

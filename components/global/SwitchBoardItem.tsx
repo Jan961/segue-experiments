@@ -16,6 +16,7 @@ type ItemDefinition = {
   fill?: string;
   tooltipMessage?: string;
   tooltipPosition?: 'left' | 'right' | 'bottom' | 'top';
+  smallerText?: boolean;
 };
 
 interface SwitchBoardItemProps {
@@ -35,10 +36,11 @@ export const SwitchBoardItem = ({ link }: SwitchBoardItemProps) => {
         />
       ) : null}
       <span
-        className={classNames(
-          'text-center whitespace-break-spaces lg:text-responsive-lg md:text-base mt-0 !leading-[1.1875rem]',
-          { 'w-min': !link.iconName, 'lg:mt-3 md:mt-2': !!link.iconName },
-        )}
+        className={classNames('text-center whitespace-break-spaces w-full mt-0 !leading-[1.1875rem]', {
+          'text-lg': !link?.smallerText,
+          'text-md': link?.smallerText,
+          'lg:mt-3 md:mt-2': !!link.iconName,
+        })}
       >
         {link.title}
       </span>
