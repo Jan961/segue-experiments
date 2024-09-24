@@ -23,7 +23,6 @@ export const PreviewTab = ({
 }: PreviewTabProps) => {
   const isMounted = useRef(false);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
-  console.log(productionSchedule);
 
   const fetchPDF = async () => {
     try {

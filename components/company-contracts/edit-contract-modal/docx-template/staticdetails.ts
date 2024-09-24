@@ -8,13 +8,8 @@ export const getStaticDetailsTags = (productionInfo: Partial<ProductionDTO>, pro
     FIRSTPERFORMANCEDATE: helpers.getFirstPerfDate(),
     DATEOFDOCCREATION: helpers.getDateOfDocumentCreation(),
     SHOWNAME: helpers.getShowName(),
-    FIRSTDAYOFWORK: helpers.getFirstDayOfWork(),
     CONTRACTCURRENCY: helpers.getContractCurrency(),
-    CONTRACTENDDATE: helpers.getContractEndDate(),
     PRODCOMPANYNAME: helpers.getProductionCompanyName(),
-    REHEARSALTOWN: helpers.getRehearsalTown(),
-    REHEARSALVENUE: helpers.getRehearsalVenue(),
-    REHEARSALVENUENOTES: helpers.getRehearsalVenueNotes(),
     ALLPERFORMANCESATSAMEVENUE: helpers.getAreAllPerformancesAtSameVenue(),
     SINGLEPERFORMANCEVENUE: helpers.getSinglePerformanceVenue(),
   };
@@ -46,34 +41,13 @@ const createHelperFunctions = (productionInfo: Partial<ProductionDTO>, productio
       }
     },
 
-    getFirstDayOfWork: () => {
-      const firstDay = productionSchedule.find((day) => !day.isOtherDay && !day.isCancelled);
-      return firstDay ? firstDay.date : '{ FIRST DAY OF WORK UNAVAILABLE }';
-    },
-
+    // Questions need to be asked. Does this come from the Production selected? Or is it manually input
     getContractCurrency: () => {
-      return 'USD';
-    },
-
-    // Is this the Last Day of the Production? The Last Performance? Need to clarify
-    getContractEndDate: () => {
-      return '12/31/2024';
+      return '£';
     },
 
     getProductionCompanyName: () => {
-      return 'Production Company Name';
-    },
-
-    getRehearsalTown: () => {
-      return 'Rehearsal Town';
-    },
-
-    getRehearsalVenue: () => {
-      return 'Rehearsal Venue';
-    },
-
-    getRehearsalVenueNotes: () => {
-      return 'Venue Notes';
+      return productionInfo?.ProductionCompany?.ProdCoName || '{ PRODUCTION COMPANY NAME UNAVAILABLE }';
     },
 
     getAreAllPerformancesAtSameVenue: () => {
@@ -83,7 +57,11 @@ const createHelperFunctions = (productionInfo: Partial<ProductionDTO>, productio
     },
 
     getSinglePerformanceVenue: () => {
-      return 'Single Venue';
+      const venues = productionSchedule.filter((day) => day.type === 'Performance').map((day) => day.venue);
+      const uniqueVenue = new Set(venues);
+
+      const result = uniqueVenue.size === 1 ? uniqueVenue.values().next().value : '{ NO SINGLE VENUE }';
+      return result;
     },
   };
 };
