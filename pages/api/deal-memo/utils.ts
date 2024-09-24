@@ -1,21 +1,28 @@
 export const getPrice = (dealMemoPrice) => {
   const updatePrice = [];
   const createPrice = [];
-  dealMemoPrice.forEach((priceData) => {
-    if (priceData.DMPId) {
+
+  const priceData = [...dealMemoPrice.custom, ...dealMemoPrice.default];
+
+  priceData.forEach((priceRec) => {
+    if (priceRec.DMPId) {
       const price = {
-        where: { DMPId: priceData.DMPId },
-        data: { ...priceData, DMPTicketPrice: parseFloat(priceData.DMPTicketPrice) },
+        where: { DMPId: priceRec.DMPId },
+        data: { ...priceRec, DMPTicketPrice: priceRec.DMPTicketPrice === '' ? 0 : parseFloat(priceRec.DMPTicketPrice) },
       };
       delete price.data.DMPId;
       delete price.data.DMPDeMoId;
       updatePrice.push(price);
     } else {
-      delete priceData.DMPDeMoId;
-      createPrice.push(priceData);
+      delete priceRec.DMPDeMoId;
+      createPrice.push({
+        ...priceRec,
+        DMPTicketPrice: priceRec.DMPTicketPrice === '' ? 0 : parseFloat(priceRec.DMPTicketPrice),
+      });
     }
   });
-  return [updatePrice, createPrice];
+
+  return { create: createPrice, update: updatePrice };
 };
 
 export const getTechProvision = (techProvision) => {

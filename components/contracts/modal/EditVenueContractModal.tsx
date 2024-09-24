@@ -26,7 +26,7 @@ import {
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import { formattedDateWithDay, toISO } from 'services/dateService';
 import { EditDealMemoContractModal } from './EditDealMemoContractModal';
-import { isNullOrEmpty, transformToOptions } from 'utils';
+import { isNullOrEmpty, transformToOptions, checkDecimalStringFormat } from 'utils';
 import LoadingOverlay from 'components/shows/LoadingOverlay';
 import { attachmentsColDefs, contractsStyleProps } from '../tableConfig';
 import Table from 'components/core-ui-lib/Table';
@@ -36,7 +36,7 @@ import { headlessUploadMultiple } from 'requests/upload';
 import { getFileUrl } from 'lib/s3';
 import { UiVenue, VenueData, transformVenues } from 'utils/venue';
 import { ConfDialogVariant } from 'components/core-ui-lib/ConfirmationDialog/ConfirmationDialog';
-import { parseAndSortDates, checkDecimalStringFormat, formatDecimalOnBlur } from '../utils';
+import { formatDecimalOnBlur, parseAndSortDates } from '../utils';
 import { currencyState } from 'state/global/currencyState';
 
 const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClose: () => void }) => {
@@ -105,7 +105,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
 
   const callDealMemoApi = async () => {
     const demoModalData = await axios.get<DealMemoContractFormData>(
-      `/api/dealMemo/getDealMemo/${selectedTableCell.contract.Id ? selectedTableCell.contract.Id : 1}`,
+      `/api/deal-memo/read/${selectedTableCell.contract.Id ? selectedTableCell.contract.Id : 1}`,
     );
 
     if (isNullOrEmpty(demoModalData.data)) {
@@ -116,7 +116,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
       setDealMemoButtonText('Edit Deal Memo');
     }
 
-    const getHoldType = await axios.get<DealMemoHoldType>(`/api/dealMemo/hold-type/read`);
+    const getHoldType = await axios.get<DealMemoHoldType>(`/api/deal-memo/hold-type/read`);
     setDealHoldType(getHoldType.data as Array<DealMemoHoldType>);
     if (demoModalData.data && demoModalData.data.BookingId) {
       setDemoModalData(demoModalData.data as DealMemoContractFormData);
@@ -245,7 +245,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
       const dealMemoData = Object.keys(saveDealMemoFormData).length > 0;
       if (contractData) {
         await fetchData({
-          url: `/api/contracts/update/venueContract/${selectedTableCell.contract.Id}`,
+          url: `/api/contracts/upsert/venueContract/${selectedTableCell.contract.Id}`,
           method: 'PATCH',
           data: saveContractFormData,
         });
