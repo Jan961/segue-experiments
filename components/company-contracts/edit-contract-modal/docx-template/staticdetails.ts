@@ -1,7 +1,8 @@
 import { IScheduleDay } from 'components/contracts/types';
+import { ProductionDTO } from 'interfaces';
 
-export const getStaticDetailsTags = (productionSchedule: IScheduleDay[]) => {
-  const helpers = createHelperFunctions(productionSchedule);
+export const getStaticDetailsTags = (productionInfo: Partial<ProductionDTO>, productionSchedule: IScheduleDay[]) => {
+  const helpers = createHelperFunctions(productionInfo, productionSchedule);
 
   return {
     FIRSTPERFORMANCEDATE: helpers.getFirstPerfDate(),
@@ -19,7 +20,7 @@ export const getStaticDetailsTags = (productionSchedule: IScheduleDay[]) => {
   };
 };
 
-const createHelperFunctions = (productionSchedule: IScheduleDay[]) => {
+const createHelperFunctions = (productionInfo: Partial<ProductionDTO>, productionSchedule: IScheduleDay[]) => {
   return {
     getDateOfDocumentCreation: () => {
       return new Date().toISOString();
@@ -27,27 +28,40 @@ const createHelperFunctions = (productionSchedule: IScheduleDay[]) => {
 
     getFirstPerfDate: () => {
       const firstPerformance = productionSchedule.find((day) => !day.isCancelled && day.type === 'Performance');
-      return firstPerformance?.date || 'FIRST PERFORMANCE DATE UNAVAILABLE';
+      return firstPerformance?.date || '{ FIRST PERFORMANCE DATE UNAVAILABLE }';
     },
 
     getShowName: () => {
-      return 'Show';
+      return productionInfo?.ShowName || '{ SHOW NAME UNAVAILABLE }';
+    },
+
+    // Is this just the ShowCode + ShowName?
+    getProductionName: () => {
+      const showCode = productionInfo?.ShowCode;
+      const showName = productionInfo?.ShowName;
+      if (!showCode || !showName) {
+        return '{ PRODUCTION NAME UNAVAILABLE }';
+      } else {
+        return `${showCode} ${showName}`;
+      }
     },
 
     getFirstDayOfWork: () => {
-      return '01/01/2024';
+      const firstDay = productionSchedule.find((day) => !day.isOtherDay && !day.isCancelled);
+      return firstDay ? firstDay.date : '{ FIRST DAY OF WORK UNAVAILABLE }';
     },
 
     getContractCurrency: () => {
       return 'USD';
     },
 
+    // Is this the Last Day of the Production? The Last Performance? Need to clarify
     getContractEndDate: () => {
-      return '12/31/2024'; // Example
+      return '12/31/2024';
     },
 
     getProductionCompanyName: () => {
-      return 'Production Company Name'; // Example
+      return 'Production Company Name';
     },
 
     getRehearsalTown: () => {
@@ -63,7 +77,9 @@ const createHelperFunctions = (productionSchedule: IScheduleDay[]) => {
     },
 
     getAreAllPerformancesAtSameVenue: () => {
-      return true; // Example
+      const venues = productionSchedule.filter((day) => day.type === 'Performance').map((day) => day.venue);
+      const uniqueVenues = new Set(venues);
+      return uniqueVenues.size === 1;
     },
 
     getSinglePerformanceVenue: () => {

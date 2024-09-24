@@ -20,6 +20,7 @@ import { TemplateFormRow, TemplateFormRowPopulated, ContractData } from '../type
 import { contractTemplateState } from 'state/contracts/contractTemplateState';
 import { getFileUrl } from 'lib/s3';
 import { populateContractData, populateTemplateWithValues } from './utils';
+import { currencyState } from 'state/global/currencyState';
 
 export interface BuildNewContractProps {
   contractSchedule?: Partial<IContractSchedule>;
@@ -61,6 +62,10 @@ export const BuildNewContract = ({
   const [templateFormStructure, setTemplateFormStructure] = useState<TemplateFormRow[]>(null);
   const [formData, setFormData] = useState<TemplateFormRowPopulated[]>(null);
   const [contractData, setContractData] = useState<ContractData[]>(null);
+
+  const currency = useRecoilValue(currencyState);
+
+  console.log(currency);
 
   useEffect(() => {
     const fetchTemplateDocument = async () => {
@@ -294,6 +299,7 @@ export const BuildNewContract = ({
                 templateFile={docXTemplateFile}
                 formData={formData}
                 personDetails={contractPerson}
+                productionInfo={selectedProduction}
                 productionSchedule={schedule}
               />
             )}
