@@ -71,7 +71,11 @@ export const validateSpreadsheetFile = async (file, prodCode, venueList, prodDat
 
     currentRow.productionCode = row.getCell(tableColMaps.ProdCode).value as string;
     currentRow.venueCode = row.getCell(tableColMaps.VenueCode).value as string;
-    if (currentRow.venueCode) currentVenue = currentRow.venueCode; // allows for blank rows implying carrying on of venueCode from above
+    if (currentRow.venueCode && currentRow.venueCode !== currentVenue) {
+      // allows for blank rows implying carrying on of venueCode from above
+      currentVenue = currentRow.venueCode;
+      currentBookingDate = null;
+    }
     currentRow.bookingDate =
       typeof row.getCell(tableColMaps.BookingDate).value === 'object'
         ? (row.getCell(tableColMaps.BookingDate).value as string)
@@ -149,7 +153,7 @@ const validateRow = (
   const validations = [
     validateProductionCode(currentRow, prodCode),
     validateVenueCode(currentRow, venueList),
-    validateBookingDate(currentRow, prodDateRange, prodCode),
+    validateBookingDate(currentRow, currentBookingDate, prodDateRange, prodCode),
     validateSalesDate(currentRow),
     validateSalesType(currentRow),
     validateSeats(currentRow),
@@ -294,7 +298,7 @@ const validateVenueCode = (currentRow: SpreadsheetRow, venueList: Record<number,
   return { returnString, warningOccurred, errorOccurred };
 };
 
-const validateBookingDate = (currentRow: SpreadsheetRow, prodDateRange, prodCode) => {
+const validateBookingDate = (currentRow: SpreadsheetRow, currentBookingDate, prodDateRange, prodCode) => {
   let returnString = '';
   let errorOccurred = false;
   const warningOccurred = false;
@@ -304,7 +308,7 @@ const validateBookingDate = (currentRow: SpreadsheetRow, prodDateRange, prodCode
   const prodEndDate = simpleToDateDMY(productionDates[1]);
   const rowDate = new Date(currentRow.bookingDate);
 
-  if (!currentRow.bookingDate && currentRow.venueCode) {
+  if (!currentBookingDate && currentRow.venueCode) {
     returnString += '| ERROR - Must specify a valid Booking Date for a Venue Code';
     errorOccurred = true;
     return { returnString, warningOccurred, errorOccurred };
