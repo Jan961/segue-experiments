@@ -502,12 +502,12 @@ const postValidationChecks = () => {
   const rowNums = [...mismatchedRows].map((item) => item.row.number);
   const rowString = '(Row: ' + rowNums.join(', ') + ')';
   mismatchedRows.forEach((item) => {
-    const detailsColumnMessage = `| ERROR - Mismatch in information for Booking at Venue ${
-      item.venueCode
-    } on ${dateToSimple(item.bookingDate.toString())}, on Sales Date ${
-      dateToSimple(item.salesDate.toString()) + ' ' + rowString
-    }`;
-    updateResponseDetailsCells(item.row, detailsColumnMessage, true, false);
+    const newErrorMessage = `| ERROR - Mismatch in information for Booking at Venue ${item.venueCode} on ${dateToSimple(
+      item.bookingDate.toString(),
+    )}, on Sales Date ${dateToSimple(item.salesDate.toString()) + ' ' + rowString}`;
+    const currentDetailsMessage = item.row.getCell(11).value;
+    const formattedDetailsMessage = formatDetailsMessage(currentDetailsMessage + newErrorMessage);
+    updateResponseDetailsCells(item.row, formattedDetailsMessage, true, false);
     errorRows.add(item.row);
   });
 };
