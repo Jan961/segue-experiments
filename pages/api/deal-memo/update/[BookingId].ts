@@ -22,7 +22,9 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       'TechVenueContactId',
       'SendTo',
       'DealMemoHold',
+      'DealMemoPrice',
     ]);
+
     const existingDealMemo = await prisma.dealMemo.findFirst({
       where: {
         BookingId,
@@ -30,9 +32,8 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     });
 
     let updateCreateDealMemo;
-    const priceData = getPrice(updatedData.DealMemoPrice);
+    const priceData = getPrice(data.DealMemoPrice);
     const techProvisionData = getTechProvision(updatedData.DealMemoTechProvision);
-
     const dealMemoCallData = getDealMemoCall(updatedData.DealMemoCall);
 
     if (existingDealMemo) {
@@ -43,8 +44,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         data: {
           ...updatedData,
           DealMemoPrice: {
-            updateMany: priceData[0],
-            create: priceData[1],
+            create: priceData.create,
           },
           DealMemoTechProvision: {
             updateMany: techProvisionData[0],
@@ -61,6 +61,11 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       });
 
       const dmHoldQueries = getDealMemoHoldUpdQuery(data.DealMemoHold);
+
+      // price updates need to be run separately as they cannot be updated using updateMany
+      priceData.update.forEach(async (updObj) => {
+        await prisma.dealMemoPrice.update(updObj);
+      });
 
       // perform updates on deal memo hold
       dmHoldQueries.forEach(async (updObj) => {
@@ -97,7 +102,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         data: {
           ...updatedData,
           DealMemoPrice: {
-            create: priceData[1],
+            create: priceData.create,
           },
           DealMemoTechProvision: {
             create: data.DealMemoTechProvision,

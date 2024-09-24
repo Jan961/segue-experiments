@@ -59,7 +59,6 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
         onChange(e);
       } else {
         const valueStr = e.target.value.toString();
-        console.log(regExp.test(valueStr), regExp, e.target.value);
         regExp.test(valueStr) && onChange(e);
       }
     };

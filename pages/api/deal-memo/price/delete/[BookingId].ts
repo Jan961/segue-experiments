@@ -2,6 +2,10 @@ import prisma from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getEmailFromReq, checkAccess } from 'services/userService';
 
+/*
+    TO BE DEPRECATED - this functionality will be merged into deal-memo/upsert
+*/
+
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
     const BookingId: number = parseInt(req.query.BookingId as string);
