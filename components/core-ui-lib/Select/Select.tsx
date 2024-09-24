@@ -109,7 +109,7 @@ export default forwardRef(function Select(
     () => ({
       control: (styles, { isDisabled }) => ({
         ...styles,
-        fontWeight: 'bold',
+        fontWeight: className?.includes('font-normal') ? 'normal' : 'bold',
         fontSize: '1rem',
         lineHeight: '1.5rem',
         backgroundColor: isDisabled ? (variant === 'colored' ? '#E9EBF0CC' : '#FFF') : '#FFF',

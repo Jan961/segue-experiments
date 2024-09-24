@@ -83,7 +83,7 @@ export const filterPrice = (dealMemoPrice: any): PriceState => {
       }
     });
 
-    return { custom: customPriceList, default: defaultPriceList };
+    return { custom: customPriceList.length === 0 ? [defaultCustomPrice] : customPriceList, default: defaultPriceList };
   }
 };
 
