@@ -7,7 +7,7 @@ import ShowsTable from 'components/shows/ShowsTable';
 import { showMapper, showProductionMapper } from 'lib/mappers';
 import Checkbox from 'components/core-ui-lib/Checkbox';
 import Button from 'components/core-ui-lib/Button';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { getAllCurrencylist, getRegionlist } from 'services/productionService';
 
 export default function Index(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
@@ -15,6 +15,10 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
   const [isArchived, setIsArchived] = useState<boolean>(false);
   const [isAddRow, setIsAddRow] = useState<boolean>(false);
   const [isEdited, setIsEdited] = useState<boolean>(false);
+
+  useEffect(() => {
+    setIsAddRow(false);
+  }, [isArchived]);
 
   const unArchivedList = useMemo(() => {
     return showsList.filter((item) => !item.IsArchived);
@@ -32,7 +36,6 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
   const addNewRow = () => {
     setIsAddRow(!isAddRow);
   };
-
   return (
     <Layout title="Shows | Segue" flush>
       <div className="w-9/12 mx-auto">
