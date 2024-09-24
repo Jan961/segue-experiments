@@ -11,6 +11,7 @@ import { getAllProductions } from 'services/productionService';
 import { useRouter } from 'next/router';
 import { mapRecursive } from 'utils';
 import { TreeItemOption } from 'components/global/TreeSelect/types';
+import { dateBlockMapper } from 'lib/mappers';
 
 export default function Users({
   permissionsList,
@@ -250,15 +251,30 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const permisisonGroups = await getPermissionGroupsList(ctx.req);
   const permissionsList = await getPermissionsList();
   const productions = await getAllProductions();
-  const formattedProductions = productions.map((t: any) => ({
-    id: t.Id,
-    code: t.Code,
-    isArchived: t.IsArchived,
-    showCode: t.Show.Code,
-    showName: t.Show.Name,
-    label: `${t.Show.Code}${t.Code} ${t.Show.Name}`,
-    checked: false,
-  }));
+
+  const formattedProductions = productions
+    .map((t: any) => {
+      let db = t.DateBlock.find((block) => block.IsPrimary);
+      if (db) {
+        db = dateBlockMapper(db);
+      }
+      return {
+        id: t.Id,
+        code: t.Code,
+        isArchived: t.IsArchived,
+        showCode: t.Show.Code,
+        showName: t.Show.Name,
+        label: `${t.Show.Code}${t.Code} ${t.Show.Name}`,
+        startDate: db?.StartDate || null,
+        checked: false,
+      };
+    })
+    .sort((a, b) => {
+      if (a.isArchived !== b.isArchived) {
+        return a.isArchived ? 1 : -1;
+      }
+      return new Date(a.startDate).valueOf() > new Date(b.startDate).valueOf();
+    });
 
   return {
     props: {

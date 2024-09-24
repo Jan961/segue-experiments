@@ -8,10 +8,11 @@ import Spinner from 'components/core-ui-lib/Spinner';
 import { newUserSchema } from 'validators/user';
 import FormError from 'components/core-ui-lib/FormError';
 import axios from 'axios';
-import { PermissionGroup } from './config';
+import { PermissionGroup, Production } from './config';
 import { isNullOrEmpty, mapRecursive } from 'utils';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import { CustomOption } from 'components/core-ui-lib/Table/renderers/SelectCellRenderer';
+import classNames from 'classnames';
 
 type UserDetails = {
   accountUserId?: number;
@@ -23,12 +24,12 @@ type UserDetails = {
   permissions: TreeItemOption[];
   accountId: number;
   isSystemAdmin: boolean;
-  productions: TreeItemOption[];
+  productions: Production[];
 };
 
 interface AdEditUserProps {
   permissions: TreeItemOption[];
-  productions: TreeItemOption[];
+  productions: Production[];
   onClose: (refresh?: boolean) => void;
   visible: boolean;
   selectedUser?: Partial<UserDetails>;
@@ -189,8 +190,15 @@ const AdEditUser = ({ visible, onClose, permissions, productions = [], selectedU
 
   const handleIsSystemAdminToggle = (e) => {
     const checked = e.target.checked;
+    const updatedProductions = userDetails.productions.map((p) => ({ ...p, checked }));
     const updatedPermissions = mapRecursive(userDetails.permissions, (o) => ({ ...o, checked }));
-    setUserDetails({ ...userDetails, isSystemAdmin: checked, permissions: updatedPermissions });
+    setAllProductionsChecked(checked);
+    setUserDetails({
+      ...userDetails,
+      isSystemAdmin: checked,
+      permissions: updatedPermissions,
+      productions: updatedProductions,
+    });
   };
 
   const handleModalClose = () => {
@@ -293,6 +301,7 @@ const AdEditUser = ({ visible, onClose, permissions, productions = [], selectedU
               <h2 className="text-xl text-bold mb-2">Productions</h2>
               <div className="w-full max-h-[400px] overflow-y-auto">
                 <Checkbox
+                  className="p-1"
                   id="allProductions"
                   name="allProductions"
                   label="All Productions"
@@ -301,15 +310,19 @@ const AdEditUser = ({ visible, onClose, permissions, productions = [], selectedU
                   testId="all-productions-checkbox"
                 />
                 {userDetails.productions.map((production) => (
-                  <Checkbox
+                  <div
+                    className={classNames('p-1', 'w-full', production.isArchived ? 'bg-secondary-list-row' : '')}
                     key={production.id}
-                    id={`${production.label}${production.id}`}
-                    name={production.id}
-                    label={production.label}
-                    checked={production.checked}
-                    onChange={handleProductionToggle}
-                    testId={`${production.label}-checkbox`}
-                  />
+                  >
+                    <Checkbox
+                      id={`${production.label}${production.id}`}
+                      name={production.label}
+                      label={`${production.label}${production.isArchived ? ' (A)' : ''}`}
+                      checked={production.checked}
+                      onChange={handleProductionToggle}
+                      testId={`${production.label}-checkbox`}
+                    />
+                  </div>
                 ))}
               </div>
             </div>
