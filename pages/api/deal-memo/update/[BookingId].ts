@@ -37,22 +37,35 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const dealMemoCallData = getDealMemoCall(updatedData.DealMemoCall);
 
     if (existingDealMemo) {
+      // delete all existing price data for this deal memo
+      await prisma.dealMemoPrice.deleteMany({
+        where: {
+          DMPDeMoId: existingDealMemo.Id,
+        },
+      });
+
+      // delete existing dealMemoCall data for this deal memo
+      await prisma.dealMemoCall.deleteMany({
+        where: {
+          DMCDeMoId: existingDealMemo.Id,
+        },
+      });
+
       updateCreateDealMemo = await prisma.dealMemo.update({
         where: {
           BookingId,
         },
         data: {
           ...updatedData,
-          DealMemoPrice: {
-            create: priceData.create,
-          },
           DealMemoTechProvision: {
             updateMany: techProvisionData[0],
             create: techProvisionData[1],
           },
+          DealMemoPrice: {
+            create: priceData,
+          },
           DealMemoCall: {
-            updateMany: dealMemoCallData[0],
-            create: dealMemoCallData[1],
+            create: dealMemoCallData,
           },
           Booking: {
             connect: { Id: BookingId },
@@ -61,11 +74,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       });
 
       const dmHoldQueries = getDealMemoHoldUpdQuery(data.DealMemoHold);
-
-      // price updates need to be run separately as they cannot be updated using updateMany
-      priceData.update.forEach(async (updObj) => {
-        await prisma.dealMemoPrice.update(updObj);
-      });
 
       // perform updates on deal memo hold
       dmHoldQueries.forEach(async (updObj) => {
@@ -102,13 +110,13 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         data: {
           ...updatedData,
           DealMemoPrice: {
-            create: priceData.create,
+            create: priceData,
           },
           DealMemoTechProvision: {
             create: data.DealMemoTechProvision,
           },
           DealMemoCall: {
-            create: data.DealMemoCall,
+            create: dealMemoCallData,
           },
           DealMemoHold: {
             create: data.DealMemoHold,
