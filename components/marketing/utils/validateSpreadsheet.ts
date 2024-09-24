@@ -625,7 +625,7 @@ const createSummaryWorksheet = (workbook) => {
       summaryWorksheet.getCell('A1').font = { bold: true, size: 13 };
       summaryWorksheet.getCell('B3').value = 'Rows containing Errors - ';
       summaryWorksheet.getCell('B3').font = { bold: true };
-      summaryWorksheet.getCell('D3').value = 'Rows containing Errors - ';
+      summaryWorksheet.getCell('D3').value = 'Rows containing Warnings - ';
       summaryWorksheet.getCell('D3').font = { bold: true };
     } else {
       summaryWorksheet.getCell('A1').value = 'There were no Errors / Warnings found in the Sales data.';
