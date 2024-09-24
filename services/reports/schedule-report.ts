@@ -188,7 +188,7 @@ export const getSheduleReport = async ({ from, to, status, ProductionId }) => {
           !isCancelled && {
             location: Location || '',
             type: 'Performance',
-            status: `${bookingStatusMap?.[EntryStatusCode] || ''} ${PencilNum ? `(${PencilNum})` : ''}`,
+            status: `${bookingStatusMap?.[EntryStatusCode] || ''}${PencilNum ? `(${PencilNum})` : ''}`,
             capacity: VenueSeats,
             performancesPerDay: performancesOnThisDay?.length,
             performance1: performancesOnThisDay?.[0]?.performanceTime || '',

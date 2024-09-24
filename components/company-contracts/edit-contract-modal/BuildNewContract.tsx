@@ -290,7 +290,12 @@ export const BuildNewContract = ({
               </div>
             )}
             {activeViewIndex === 3 && (
-              <PreviewTab templateFile={docXTemplateFile} formData={formData} personDetails={contractPerson} />
+              <PreviewTab
+                templateFile={docXTemplateFile}
+                formData={formData}
+                personDetails={contractPerson}
+                productionSchedule={schedule}
+              />
             )}
           </div>
         </div>

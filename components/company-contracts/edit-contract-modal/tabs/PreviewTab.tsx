@@ -3,23 +3,25 @@ import axios from 'axios';
 import { Spinner } from 'components/global/Spinner';
 import { populateDOCX } from '../docx-template/populateDOCX';
 import { TemplateFormRowPopulated } from 'components/company-contracts/types';
-import { IPerson } from 'components/contracts/types';
+import { IPerson , IScheduleDay } from 'components/contracts/types';
 
 interface PreviewTabProps {
   templateFile: File;
   formData: TemplateFormRowPopulated[];
   personDetails: IPerson;
+  productionSchedule: IScheduleDay[];
 }
 
-export const PreviewTab = ({ templateFile, formData, personDetails }: PreviewTabProps) => {
+export const PreviewTab = ({ templateFile, formData, personDetails, productionSchedule }: PreviewTabProps) => {
   const isMounted = useRef(false);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+  console.log(productionSchedule);
 
   const fetchPDF = async () => {
     try {
       const tokenresponse = await axios.post('/api/pdfconvert/token/create/');
 
-      const populatedDOCX = await populateDOCX(templateFile, formData, personDetails);
+      const populatedDOCX = await populateDOCX(templateFile, formData, personDetails, productionSchedule);
 
       const convertFormData = new FormData();
       convertFormData.append('token', String(tokenresponse.data.token));
