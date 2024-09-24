@@ -55,6 +55,7 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
           isEdited={isEdited}
           isArchived={isArchived}
           isAddRow={isAddRow}
+          setIsAddRow={setIsAddRow}
           addNewRow={addNewRow}
           rowsData={rowsData}
         />
