@@ -187,6 +187,12 @@ const AdEditUser = ({ visible, onClose, permissions, productions = [], selectedU
     setUserDetails({ ...userDetails, productions: updatedProductions });
   };
 
+  const handleIsSystemAdminToggle = (e) => {
+    const checked = e.target.checked;
+    const updatedPermissions = mapRecursive(userDetails.permissions, (o) => ({ ...o, checked }));
+    setUserDetails({ ...userDetails, isSystemAdmin: checked, permissions: updatedPermissions });
+  };
+
   const handleModalClose = () => {
     isFormDirty ? setShowConfirmationDialog(true) : onClose();
   };
@@ -279,8 +285,8 @@ const AdEditUser = ({ visible, onClose, permissions, productions = [], selectedU
             testId="user-is-system-admin"
             checked={userDetails.isSystemAdmin}
             labelClassName="font-semibold"
-            label="This user wil be a System Administrator"
-            onChange={(e) => setUserDetails({ ...userDetails, isSystemAdmin: e.target.checked })}
+            label="This user will be a System Administrator"
+            onChange={handleIsSystemAdminToggle}
           />
           <div className="flex flex-row gap-4 w-full">
             <div className="w-full max-h-[400px] overflow-y-hidden">
