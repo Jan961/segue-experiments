@@ -5,6 +5,7 @@ import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import { IAgencyDetails } from '../types';
 
 export const defaultAgencyDetails = {
+  hasAgent: true,
   firstName: '',
   lastName: '',
   email: '',

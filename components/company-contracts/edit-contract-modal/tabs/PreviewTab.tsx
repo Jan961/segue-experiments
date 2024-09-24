@@ -14,7 +14,6 @@ interface PreviewTabProps {
 export const PreviewTab = ({ templateFile, formData, personDetails }: PreviewTabProps) => {
   const isMounted = useRef(false);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
-  console.log(formData);
 
   const fetchPDF = async () => {
     try {

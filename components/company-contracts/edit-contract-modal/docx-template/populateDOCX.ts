@@ -15,9 +15,6 @@ export const populateDOCX = async (
   const personDetailsTags = getPersonDetailsTags(personDetails);
   const staticDetailsTags = getStaticDetailsTags();
 
-  console.log('DATALIST:', contractDetailsTags);
-  console.log('PERSON LIST:', personDetailsTags);
-
   const data = {
     ...contractDetailsTags,
     ...personDetailsTags,

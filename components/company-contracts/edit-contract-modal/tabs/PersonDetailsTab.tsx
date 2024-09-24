@@ -5,19 +5,19 @@ import { countryState } from 'state/global/countryState';
 import { transformToOptions } from 'utils';
 import { userState } from 'state/account/userState';
 import { Checkbox } from 'components/core-ui-lib';
-import AgencyDetails from '../../../contracts/PersonForm/AgencyDetails';
-import PersonalDetails from '../../../contracts/PersonForm/PersonalDetails';
-import AccountDetailsForm from '../../../contracts/PersonForm/AccountDetailsForm';
-import EmergencyContact from '../../../contracts/PersonForm/EmergencyContact';
+import AgencyDetails, { defaultAgencyDetails } from '../../../contracts/PersonForm/AgencyDetails';
+import PersonalDetails, { defaultPersonDetails } from '../../../contracts/PersonForm/PersonalDetails';
+import AccountDetailsForm, { defaultBankAccount } from '../../../contracts/PersonForm/AccountDetailsForm';
+import EmergencyContact, { defaultEmergencyContactData } from '../../../contracts/PersonForm/EmergencyContact';
 import { IPerson } from '../../../contracts/types';
 
 const defaultContractDetails = {
-  personDetails: null,
-  emergencyContact1: null,
-  emergencyContact2: null,
-  agencyDetails: null,
-  salaryAccountDetails: null,
-  expenseAccountDetails: null,
+  personDetails: defaultPersonDetails,
+  emergencyContact1: defaultEmergencyContactData,
+  emergencyContact2: defaultEmergencyContactData,
+  agencyDetails: defaultAgencyDetails,
+  salaryAccountDetails: defaultBankAccount,
+  expenseAccountDetails: defaultBankAccount,
 };
 
 interface ContractPersonDataFormProps {
@@ -99,7 +99,18 @@ export const PersonDetailsTab = ({ person = {}, height, updateFormData }: Contra
             testId="toggle-agency-details"
             label="N/A"
             checked={hideAgencyDetails}
-            onChange={(e) => setHideAgencyDetails(e.target.checked)}
+            onChange={(e) => {
+              setHideAgencyDetails(e.target.checked);
+              const updatedFormData = {
+                ...personData,
+                agencyDetails: {
+                  ...personData.agencyDetails,
+                  hasAgent: e.target.checked,
+                },
+              };
+              setPersonData(updatedFormData);
+              updateFormData?.(updatedFormData);
+            }}
           />
         </div>
         <AgencyDetails

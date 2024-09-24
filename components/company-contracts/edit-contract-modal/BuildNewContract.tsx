@@ -85,7 +85,6 @@ export const BuildNewContract = ({
 
     const fetchTemplateFormStructure = async (): Promise<TemplateFormRow[]> => {
       try {
-        console.log(contractSchedule.templateId);
         const response = await axios.get('/api/company-contracts/read-template/' + contractSchedule.templateId);
         if (response.data) {
           return response.data;
@@ -100,7 +99,6 @@ export const BuildNewContract = ({
         if (!contractId) return [];
         const response = await axios.get('/api/company-contracts/read-data/' + contractId);
         if (response.data) {
-          console.log('DATA FROM DB:', response.data);
           return response.data;
         }
       } catch (err) {
@@ -116,7 +114,6 @@ export const BuildNewContract = ({
         const contractDataPopulated = populateContractData(templateFormStructure, contractData);
         setContractData(contractDataPopulated);
         const formData = populateTemplateWithValues(templateFormStructure, contractDataPopulated);
-        console.log('tempalte structure with data:', formData);
         setFormData(formData);
       }
     };
@@ -154,10 +151,6 @@ export const BuildNewContract = ({
 
     loadContract();
   }, []);
-
-  useEffect(() => {
-    console.log('New Form Data:', formData);
-  }, [formData]);
 
   const updatePersonDetails = async () => {
     const id = contractSchedule.personId;

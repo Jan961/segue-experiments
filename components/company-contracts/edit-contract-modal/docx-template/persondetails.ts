@@ -58,6 +58,7 @@ const getDefinedPersonDetails = (personDetailsData: IPerson) => {
   };
 
   const agencyDetailsDefaults = {
+    hasAgent: 'AGENCYHASAGENT',
     firstName: 'AGENTFIRSTNAME',
     lastName: 'AGENTLASTNAME',
     email: 'AGENCYEMAILADDRESS',
@@ -106,6 +107,7 @@ const getDefinedPersonDetails = (personDetailsData: IPerson) => {
 const getCompositePersonDetails = (personDetailsData: IPerson) => {
   return {
     ...getPersonFullName(personDetailsData),
+    ...getPersonFullAddress(personDetailsData),
   };
 };
 
@@ -114,5 +116,16 @@ const getPersonFullName = (personDetailsData: IPerson) => {
   const lastName = personDetailsData.personDetails?.lastName || '';
   return {
     PERSONFULLNAME: `${firstName} ${lastName}`,
+  };
+};
+
+const getPersonFullAddress = (personDetailsData: IPerson) => {
+  const address1 = personDetailsData.personDetails?.address1 || '';
+  const address2 = personDetailsData.personDetails?.address2 || '';
+  const address3 = personDetailsData.personDetails?.address3 || '';
+  return {
+    PERSONFULLADDRESS: `${address1 ? address1 + ', ' : ''}${address2 ? address2 + ', ' : ''}${
+      address3 ? address3 + ', ' : ''
+    }`,
   };
 };

@@ -9,6 +9,7 @@ export interface BankAccount {
 }
 
 export interface IAgencyDetails {
+  hasAgent: boolean;
   firstName: string;
   lastName: string;
   email: string;
