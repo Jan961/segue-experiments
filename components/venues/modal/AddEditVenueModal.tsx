@@ -19,6 +19,7 @@ import Loader from 'components/core-ui-lib/Loader';
 import useAxiosCancelToken from 'hooks/useCancelToken';
 import { isNullOrEmpty } from 'utils';
 import { headlessUploadMultiple } from 'requests/upload';
+import { AddressPopup } from './AddressPopup';
 
 interface AddEditVenueModalProps {
   visible: boolean;
@@ -49,6 +50,9 @@ export default function AddEditVenueModal({
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [fileList, setFileList] = useState<FormData[]>([]);
   const [deleteList, setDeleteList] = useState<number[]>([]);
+  const [showAddressPopup, setShowAddressPopup] = useState<boolean>(false);
+  const [showAddressMessage, setShowAddressMessage] = useState<string>('');
+  const [addressAttempted, setAddressAttempted] = useState<boolean>(false);
   const cancelToken = useAxiosCancelToken();
   const handleInputChange = (field: string, value: any) => {
     let sanitizedValue = value;
@@ -64,7 +68,6 @@ export default function AddEditVenueModal({
   const createVenue = async (venue: UiTransformedVenue) => {
     try {
       const { data } = await axios.post('/api/venue/create', venue, { cancelToken });
-      onClose(true);
       return data;
     } catch (e) {
       debug('Error creating venue', e);
@@ -74,25 +77,102 @@ export default function AddEditVenueModal({
   const updateVenue = async (venue: UiTransformedVenue) => {
     try {
       const { data } = await axios.post('/api/venue/update/' + venue.id, venue, { cancelToken });
-      onClose(true);
       return data;
     } catch (e) {
       debug('Error updating venue', e);
     }
   };
 
-  const handleSaveAndClose = async () => {
-    setIsSaving(true);
-    setIsLoading(true);
-    const isValid = await validateVenue(formData);
-    if (isValid) {
-      const apiResponse = formData.id ? await updateVenue(formData) : await createVenue(formData);
-      await deleteFiles();
-      await saveFiles(apiResponse);
-    }
+  const closeModal = async () => {
+    const apiResponse = formData.id ? await updateVenue(formData) : await createVenue(formData);
     await fetchVenues();
+    await deleteFiles();
+    await saveFiles(apiResponse);
     setIsLoading(false);
     setIsSaving(false);
+    onClose(true);
+  };
+
+  const findAddress = async (data) => {
+    if (checkVenueAddrInfoChange()) {
+      try {
+        const query = venueAddressToUrl(data);
+        const addressUrl = `${process.env.NEXT_PUBLIC_ADDRESS_LOOKUP_URL_START}${query}${process.env.NEXT_PUBLIC_ADDRESS_LOOKUP_URL_END}`;
+        const response = await fetch(addressUrl, { method: 'GET' });
+        const result = await response.json();
+        const { primaryWhat3Words } = formData;
+        if (result.length === 0) {
+          //  address failed then they entered what3words
+          if (primaryWhat3Words !== '' && addressAttempted) {
+            if (primaryWhat3Words.split('.').length === 3) {
+              const wordsResponse = await axios.get('/api/address/check-what-three-words', {
+                params: {
+                  searchTerm: primaryWhat3Words,
+                },
+              });
+              const { status, data } = wordsResponse;
+              if (status >= 400) {
+                setShowAddressMessage(data.message);
+              } else {
+                formData.primaryCoordinates = data.coordinates;
+              }
+              setAddressAttempted(false);
+              setShowAddressMessage('UsingWhat3Words');
+            }
+          } else if (primaryWhat3Words === '' && addressAttempted) {
+            setShowAddressMessage('NotUsingWhat3Words');
+          } else if (primaryWhat3Words !== '') {
+            // request server to check if the what3words is valid, if so then confirm usage
+          } else {
+            setShowAddressMessage('NotFound');
+            setAddressAttempted(true);
+          }
+        } else {
+          formData.primaryCoordinates = { latitude: result[0]?.lat, longitude: result[0]?.lon };
+          setShowAddressMessage('Located');
+        }
+        setShowAddressPopup(true);
+      } catch (exception) {
+        console.log(exception);
+      }
+      return false;
+    } else {
+      return true;
+    }
+  };
+
+  const handleSaveAndClose = async () => {
+    try {
+      setIsSaving(true);
+      setIsLoading(true);
+      const isValid = await validateVenue(formData);
+      if (isValid) {
+        const noPopup = await findAddress(formData);
+        if (noPopup) {
+          const apiResponse = await (formData.id ? updateVenue(formData) : createVenue(formData));
+          await deleteFiles();
+          await saveFiles(apiResponse);
+          await closeModal();
+        }
+      }
+    } catch (exception) {
+      console.log(exception);
+    }
+
+    setIsSaving(false);
+    setIsLoading(false);
+  };
+
+  const checkVenueAddrInfoChange = () => {
+    const keyList = [
+      'primaryAddress1',
+      'primaryAddress2',
+      'primaryAddress3',
+      'primaryCountry',
+      'primaryPostcode',
+      'primaryTown',
+    ];
+    return keyList.some((key) => venue[key] !== formData[key]);
   };
 
   const deleteFiles = async () => {
@@ -105,6 +185,15 @@ export default function AddEditVenueModal({
         }
       }),
     );
+  };
+
+  const venueAddressToUrl = (venueInfo: UiTransformedVenue) => {
+    const { primaryAddress1, primaryAddress2, primaryAddress3, primaryTown, primaryPostCode } = venueInfo;
+    const addressParts = [primaryAddress1, primaryAddress2, primaryAddress3, primaryTown, primaryPostCode].filter(
+      (part) => part && part.trim() !== '',
+    );
+
+    return encodeURI(addressParts.join(' '));
   };
 
   async function validateVenue(data: UiTransformedVenue) {
@@ -170,12 +259,21 @@ export default function AddEditVenueModal({
   };
   return (
     <>
+      <AddressPopup
+        show={showAddressPopup}
+        message={showAddressMessage}
+        closeModal={closeModal}
+        onYesClick={() => {
+          setShowAddressPopup(false);
+        }}
+      />
       <PopupModal
         onClose={onClose}
         title="Add / Edit Venue"
         show={visible}
         panelClass="relative h-[95vh] overflow-x-auto pb-4"
         titleClass="text-xl text-primary-navy"
+        hasOverlay={showAddressPopup}
       >
         <form className="w-[1026px]">
           <h2 className="text-xl text-primary-navy font-bold">Main</h2>
