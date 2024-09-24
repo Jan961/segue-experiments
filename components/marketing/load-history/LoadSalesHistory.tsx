@@ -146,7 +146,7 @@ const LoadSalesHistory = () => {
 
   const downloadExample = () => {
     const a = document.createElement('a');
-    a.href = getFileUrl('marketing/salesHistory/exampleTemplate/Example+Sales+History+Template.xlsx');
+    a.href = getFileUrl('marketing/salesHistory/exampleTemplate/ExampleSalesHistoryTemplate.xlsx');
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -176,14 +176,28 @@ const LoadSalesHistory = () => {
     <div>
       <div className="flex items-center justify-between mb-3">
         <LoadSalesHistoryFilters />
-        <div className="flex gap-x-3">
-          <Button text="Download Template" className="w-[155px]" onClick={() => downloadExample()} />
-          <Button
-            text="Upload Spreadsheet"
-            className="w-[155px]"
-            onClick={() => setUploadModalVisible(true)}
-            disabled={uploadDisabled}
-          />
+
+        <div className="">
+          {!selectedProducton ? (
+            <div className="text-gray-600 text-sm mb-1"> Please select a production to continue </div>
+          ) : uploadDisabled ? (
+            <div className="text-gray-600 text-sm mb-1">
+              {' '}
+              A file has already been uploaded for this production. Please delete the previous upload to continue{' '}
+            </div>
+          ) : (
+            <div className="text-gray-600 text-sm mb-1"> No Sales History has been added for this Production </div>
+          )}
+
+          <div className="flex gap-x-3 place-content-end">
+            <Button text="Download Template" className="w-[155px]" onClick={() => downloadExample()} />
+            <Button
+              text="Upload Spreadsheet"
+              className="w-[155px]"
+              onClick={() => setUploadModalVisible(true)}
+              disabled={uploadDisabled}
+            />
+          </div>
         </div>
       </div>
       <Table
