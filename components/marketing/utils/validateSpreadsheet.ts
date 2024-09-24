@@ -16,8 +16,8 @@ import {
 let currentRow: SpreadsheetRow;
 let spreadsheetIssues: SpreadsheetIssues;
 let spreadsheetData: SpreadsheetData;
-let errorRows;
-let warningRows;
+let errorRows = new Set();
+let warningRows = new Set();
 let mismatchedRows;
 
 export const validateSpreadsheetFile = async (file, prodCode, venueList, prodDateRange) => {
@@ -47,8 +47,8 @@ export const validateSpreadsheetFile = async (file, prodCode, venueList, prodDat
   spreadsheetData = {
     venues: [],
   };
-  errorRows = [];
-  warningRows = [];
+  errorRows = new Set();
+  warningRows = new Set();
   mismatchedRows = new Set([]);
   let currentVenue = '';
   let currentBookingDate = '';
@@ -109,8 +109,8 @@ export const validateSpreadsheetFile = async (file, prodCode, venueList, prodDat
       row,
     );
 
-    if (rowErrorOccurred) errorRows.push(row);
-    if (rowWarningOccurred) warningRows.push(row);
+    if (rowErrorOccurred) errorRows.add(row);
+    if (rowWarningOccurred) warningRows.add(row);
 
     const formattedDetailsMessage = formatDetailsMessage(detailsColumnMessage);
     updateResponseDetailsCells(row, formattedDetailsMessage, rowErrorOccurred, rowWarningOccurred);
@@ -472,7 +472,7 @@ const postValidationChecks = () => {
           booking.bookingFirstRow.getCell(10),
           formattedDetailsMessage,
         );
-        errorRows.push(booking.bookingFirstRow);
+        errorRows.add(booking.bookingFirstRow);
       }
 
       const validSales = booking.sales.filter((sale) => !isNaN(sale.salesDate.getTime()));
@@ -486,8 +486,8 @@ const postValidationChecks = () => {
           errorOccurred = true;
         }
 
-        if (errorOccurred) errorRows.push(sale.salesRow);
-        if (warningOccurred) warningRows.push(sale.salesRow);
+        if (errorOccurred) errorRows.add(sale.salesRow);
+        if (warningOccurred) warningRows.add(sale.salesRow);
         const formattedDetailsMessage = formatDetailsMessage((sale.salesRow.getCell(11).value += detailsColumnMessage));
         updateResponseDetailsCells(sale.salesRow, formattedDetailsMessage, errorOccurred, warningOccurred);
       }
@@ -508,7 +508,7 @@ const postValidationChecks = () => {
       dateToSimple(item.salesDate.toString()) + ' ' + rowString
     }`;
     updateResponseDetailsCells(item.row, detailsColumnMessage, true, false);
-    errorRows.push(item.row);
+    errorRows.add(item.row);
   });
 };
 
@@ -542,8 +542,8 @@ const checkSeatsValueWarnings = (salesArray, salesType: string) => {
       }
     }
 
-    if (errorOccurred) errorRows.push(sale.salesRow);
-    if (warningOccurred) warningRows.push(sale.salesRow);
+    if (errorOccurred) errorRows.add(sale.salesRow);
+    if (warningOccurred) warningRows.add(sale.salesRow);
     const formattedDetailsMessage = formatDetailsMessage((sale.salesRow.getCell(11).value += detailsColumnMessage));
     updateResponseDetailsCells(sale.salesRow, formattedDetailsMessage, errorOccurred, warningOccurred);
 
@@ -620,7 +620,7 @@ const writeOKCell = (detailsCell, responseCell) => {
 
 const createSummaryWorksheet = (workbook) => {
   const addSummaryStyling = () => {
-    if (errorRows.length > 0 || warningRows.length > 0) {
+    if (errorRows.size > 0 || warningRows.size > 0) {
       summaryWorksheet.getCell('A1').value = 'The uploaded Sales data contained Errors / Warnings -';
       summaryWorksheet.getCell('A1').font = { bold: true, size: 13 };
       summaryWorksheet.getCell('B3').value = 'Rows containing Errors - ';
@@ -647,25 +647,32 @@ const createSummaryWorksheet = (workbook) => {
 
   addSummaryStyling();
 
-  errorRows.forEach((row, index) => {
+  console.log(errorRows);
+  console.log(warningRows);
+
+  let errorIndex = 0;
+  (errorRows as Set<any>).forEach((row) => {
     const rowNumber = row.number;
-    const linkCell = summaryWorksheet.getCell(`B${index + 4}`);
+    const linkCell = summaryWorksheet.getCell(`B${errorIndex + 4}`);
     linkCell.value = {
       text: `• Link to error in row ${rowNumber} in Sales`,
       hyperlink: `#Sales!J${rowNumber}`,
     };
     linkCell.font = { color: { argb: 'FF0000FF' }, underline: true };
+    errorIndex++;
   });
   widenColumn(summaryWorksheet.getColumn(2));
 
-  warningRows.forEach((row, index) => {
+  let warningIndex = 0;
+  (warningRows as Set<any>).forEach((row) => {
     const rowNumber = row.number;
-    const linkCell = summaryWorksheet.getCell(`D${index + 4}`);
+    const linkCell = summaryWorksheet.getCell(`D${warningIndex + 4}`);
     linkCell.value = {
       text: `• Link to warning in row ${rowNumber} in Sales`,
       hyperlink: `#Sales!J${rowNumber}`,
     };
     linkCell.font = { color: { argb: 'FF0000FF' }, underline: true };
+    warningIndex++;
   });
   widenColumn(summaryWorksheet.getColumn(4));
 };
