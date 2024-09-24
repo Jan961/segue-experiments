@@ -1324,7 +1324,7 @@ export const EditDealMemoContractModal = ({
                     <TextInput
                       testId={`${inputData.DMPTicketName}-num-of-tickets`}
                       className="w-auto"
-                      regExp={/^\d*$/}
+                      pattern={/^\d*$/}
                       onChange={(value) =>
                         editDealMemoPrice(
                           inputData.DMPTicketName,
@@ -1342,7 +1342,7 @@ export const EditDealMemoContractModal = ({
                   <TextInput
                     testId={`${inputData.DMPTicketName}-ticketPrice`}
                     className="w-auto"
-                    regExp={/^\d*(\.\d*)?$/}
+                    pattern={/^\d*(\.\d*)?$/}
                     onChange={(value) =>
                       editDealMemoPrice(inputData.DMPTicketName, value.target.value, 'DMPTicketPrice', 'default')
                     }
@@ -1395,7 +1395,7 @@ export const EditDealMemoContractModal = ({
                     <TextInput
                       testId={`${inputData.DMPTicketName}-num-of-tickets`}
                       className="w-auto"
-                      regExp={/^\d*$/}
+                      pattern={/^\d*$/}
                       onChange={(value) =>
                         editDealMemoPrice('', parseFloat(value.target.value), 'DMPNumTickets', 'custom', index)
                       }
@@ -1408,7 +1408,7 @@ export const EditDealMemoContractModal = ({
                   <TextInput
                     testId={`${inputData.DMPTicketName}-ticketPrice`}
                     className="w-auto"
-                    regExp={/^\d*(\.\d*)?$/}
+                    pattern={/^\d*(\.\d*)?$/}
                     onChange={(value) => editDealMemoPrice('', value.target.value, 'DMPTicketPrice', 'custom', index)}
                     onBlur={(value) =>
                       editDealMemoPrice('', formatDecimalOnBlur(value), 'DMPTicketPrice', 'custom', index)

@@ -50,3 +50,33 @@ describe('TextInput Component', () => {
     expect(handleBlur).toHaveBeenCalled();
   });
 });
+
+describe('TextInput Component with pattern prop', () => {
+  test('allows input when value matches pattern', () => {
+    const handleChange = jest.fn();
+    const pattern = /^[0-9]+$/; // Only numbers are allowed
+    render(<TextInput onChange={handleChange} pattern={pattern} />);
+
+    const inputElement = screen.getByRole('textbox');
+
+    // Simulate entering a valid value (numeric)
+    fireEvent.change(inputElement, { target: { value: '123' } });
+
+    // Expect the onChange handler to be called
+    expect(handleChange).toHaveBeenCalled();
+  });
+
+  test('prevents input when value does not match pattern', () => {
+    const handleChange = jest.fn();
+    const pattern = /^[0-9]+$/; // Only numbers are allowed
+    render(<TextInput onChange={handleChange} pattern={pattern} />);
+
+    const inputElement = screen.getByRole('textbox');
+
+    // Simulate entering an invalid value (non-numeric)
+    fireEvent.change(inputElement, { target: { value: 'abc' } });
+
+    // Expect the onChange handler NOT to be called
+    expect(handleChange).not.toHaveBeenCalled();
+  });
+});

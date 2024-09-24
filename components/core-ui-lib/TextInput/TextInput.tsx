@@ -25,7 +25,7 @@ export interface TextInputProps {
   onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   min?: number;
   max?: number;
-  regExp?: RegExp;
+  pattern?: RegExp;
   autoComplete?: 'on' | 'off';
 }
 
@@ -45,7 +45,7 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
       onKeyDown,
       testId,
       autoComplete = 'off',
-      regExp,
+      pattern,
       ...rest
     },
     ref,
@@ -55,11 +55,11 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
     const disabledClass = disabled ? 'disabled-input !border-none !bg-gray-200 focus:outline-none' : '';
 
     const handleChange = (e) => {
-      if (isUndefined(regExp)) {
+      if (isUndefined(pattern)) {
         onChange(e);
       } else {
         const valueStr = e.target.value.toString();
-        regExp.test(valueStr) && onChange(e);
+        pattern.test(valueStr) && onChange(e);
       }
     };
 
