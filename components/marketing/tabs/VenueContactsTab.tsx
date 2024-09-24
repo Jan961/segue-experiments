@@ -92,7 +92,8 @@ const VenueContactsTab = forwardRef<VenueContactTabRef, VenueContactsProps>((pro
           return;
         }
 
-        const vcId = venueContacts.find((vc) => vc.venueRoleId === role.Id).id;
+        const contactIndex = venueContacts.findIndex((vc) => vc.venueRoleId === role.Id);
+        const vcId = contactIndex === -1 ? null : venueContacts[contactIndex].Id;
         const updatedRow = mapVenueContactToPrisma(data.updatedFormData);
         const dataToUpdate = { ...updatedRow, VenueId: booking.VenueId, Id: vcId, VenueRoleId: role.Id };
 
@@ -135,10 +136,10 @@ const VenueContactsTab = forwardRef<VenueContactTabRef, VenueContactsProps>((pro
         });
 
         setVenueContacts(venueContactUiList);
-        setDataAvailable(true);
-
-        setIsLoading(false);
       }
+
+      setIsLoading(false);
+      setDataAvailable(true);
     } catch (error) {
       console.log(error);
     }
