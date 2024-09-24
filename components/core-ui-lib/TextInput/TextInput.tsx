@@ -2,6 +2,7 @@ import React, { forwardRef } from 'react';
 import Icon from '../Icon';
 import { IconName } from '../Icon/Icon';
 import classNames from 'classnames';
+import { isUndefined } from 'utils';
 
 export interface TextInputProps {
   id?: string;
@@ -24,6 +25,7 @@ export interface TextInputProps {
   onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   min?: number;
   max?: number;
+  pattern?: RegExp;
   autoComplete?: 'on' | 'off';
 }
 
@@ -43,6 +45,7 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
       onKeyDown,
       testId,
       autoComplete = 'off',
+      pattern,
       ...rest
     },
     ref,
@@ -50,6 +53,15 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
     const baseClass = `block w-fit-content pl-2 h-[1.9375rem] text-sm shadow-input-shadow text-primary-input-text rounded-md outline-none autofill-white-bg`;
     const inputClass = error ? '!border-primary-red' : '!border-primary-border';
     const disabledClass = disabled ? 'disabled-input !border-none !bg-gray-200 focus:outline-none' : '';
+
+    const handleChange = (e) => {
+      if (isUndefined(pattern)) {
+        onChange(e);
+      } else {
+        const valueStr = e.target.value.toString();
+        pattern.test(valueStr) && onChange(e);
+      }
+    };
 
     return (
       <div
@@ -69,7 +81,7 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
             'focus:ring-2 focus:ring-primary-input-text ring-inset': !disabled,
             'cursor-not-allowed': disabled,
           })}
-          onChange={onChange}
+          onChange={handleChange}
           placeholder={placeholder}
           disabled={disabled}
           value={value || ''}

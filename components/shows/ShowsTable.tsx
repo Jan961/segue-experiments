@@ -12,6 +12,7 @@ import LoadingOverlay from './LoadingOverlay';
 import { showsTableConfig } from './table/tableConfig';
 import ProductionsView from './modal/Views/ProductionsView';
 import { notify } from 'components/core-ui-lib';
+import { isNullOrEmpty } from 'utils';
 
 const rowClassRules = {
   'custom-red-row': (params) => {
@@ -83,9 +84,12 @@ const ShowsTable = ({
     setShowId(e.data.Id);
     setRowIndex(e.rowIndex);
     if (e.column.colId === 'Id') {
-      // only allow deletion if show has productions
+      // only allow deletion if show has no productions
       // button is disabled if show has productions but has no effect on clicking cell
-      e.data?.productions.length === 0 && setConfirm(true);
+      const numProductions = e.data?.productions?.length;
+      if (numProductions === 0 || isNullOrEmpty(numProductions)) {
+        setConfirm(true);
+      }
     } else if (e.column.colId === 'productions' && e.data.Id) {
       setShowProductionsModal(true);
       setCurrentShow(e.data);
@@ -145,7 +149,9 @@ const ShowsTable = ({
     setConfirm(false);
     setIsLoading(true);
     try {
-      await axios.delete(`/api/shows/delete/${showId}`);
+      if (!isNullOrEmpty(showId)) {
+        await axios.delete(`/api/shows/delete/${showId}`);
+      }
       const gridApi = tableRef.current.getApi();
       const rowDataToRemove = gridApi.getDisplayedRowAtIndex(rowIndex).data;
       const transaction = {

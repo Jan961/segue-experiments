@@ -49,7 +49,7 @@ export default function Button({
 }: PropsWithChildren<ButtonProps>) {
   const variantClass = ClassMap.get(variant);
   const disabledClass = disabled
-    ? `!bg-disabled-button bg-opacity-65 text-white !cursor-not-allowed !pointer-events-none`
+    ? `!bg-disabled-button bg-opacity-65 text-white !cursor-not-allowed !pointer-events-none border-none`
     : '';
   const endClass = `${baseClass} ${variantClass} ${disabledClass} ${className}`;
 

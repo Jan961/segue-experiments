@@ -1,6 +1,7 @@
 import { Venue, VenueAddress, VenueBarredVenue, VenueContact, VenueVenue } from 'prisma/generated/prisma-client';
 import prisma from 'lib/prisma';
 import { omit } from 'radash';
+import { isNullOrEmpty } from 'utils';
 
 export const getAllVenuesMin = async () => {
   return prisma.venue.findMany({
@@ -106,7 +107,7 @@ export const getDistances = async (stops: DistanceStop[]): Promise<DateDistances
   const ids = stops.map((x) => x.Ids).flat();
 
   // Get the distances for all possible combinations (optimisation possible)
-  const distances = await prisma.venueVenue.findMany({
+  const distances = await prisma.VenueVenueTravelView.findMany({
     where: {
       Venue1Id: {
         in: ids,
@@ -114,6 +115,8 @@ export const getDistances = async (stops: DistanceStop[]): Promise<DateDistances
       Venue2Id: {
         in: ids,
       },
+      Mileage: { not: null },
+      TimeMins: { not: null },
     },
   });
 
@@ -133,7 +136,8 @@ export const getDistances = async (stops: DistanceStop[]): Promise<DateDistances
         // Get any distances that match (optimisation possible)
         const match = distances.filter(
           (x: VenueVenue) =>
-            (x.Venue2Id === id && x.Venue1Id === prev.Ids[0]) || (x.Venue1Id === id && x.Venue2Id === prev.Ids[0]),
+            (x.Venue2Id === id && x.Venue1Id === prev.Ids[0] && !isNullOrEmpty(x.Mileage)) ||
+            (x.Venue1Id === id && x.Venue2Id === prev.Ids[0] && !isNullOrEmpty(x.Mileage)),
         )[0];
         prev = stop;
 
@@ -160,10 +164,18 @@ export const getDistance = async (stop: DistanceStop): Promise<DateDistancesDTO>
     return { Date: stop.Date, option: [{ VenueId: id1, Mins: null, Miles: null }] };
   }
   // Get the distances for all possible combinations (optimisation possible)
-  const distance = await prisma.venueVenue.findMany({
+  const distance = await prisma.VenueVenueTravelView.findMany({
     where: {
-      Venue1Id: id1, // And
-      Venue2Id: id2,
+      OR: [
+        {
+          Venue1Id: id1,
+          Venue2Id: id2,
+        },
+        {
+          Venue1Id: id2,
+          Venue2Id: id1,
+        },
+      ],
     },
   });
 

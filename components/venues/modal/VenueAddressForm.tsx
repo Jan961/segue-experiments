@@ -166,6 +166,17 @@ const VenueAddressForm = ({
           />
         </label>
         <label htmlFor="" className="grid grid-cols-[170px_minmax(100px,_1fr)] gap-10 justify-between  w-full">
+          <p className="text-primary-input-text">What3Words Venue Entrance</p>
+          <TextInput
+            testId="primary-what-three-words"
+            placeholder="what.three.words"
+            className="w-full justify-between"
+            inputClassName="w-full"
+            value={formData.primaryWhat3Words}
+            onChange={(e) => handleInputChange('primaryWhat3Words', e.target.value)}
+          />
+        </label>
+        <label htmlFor="" className="grid grid-cols-[170px_minmax(100px,_1fr)] gap-10 justify-between  w-full">
           <p className="text-primary-input-text">What3Words Stage Door</p>
           <TextInput
             testId="primary-what-three-words"
@@ -174,6 +185,17 @@ const VenueAddressForm = ({
             inputClassName="w-full"
             value={formData.what3WordsStage}
             onChange={(e) => handleInputChange('what3WordsStage', e.target.value)}
+          />
+        </label>
+        <label htmlFor="" className="grid grid-cols-[170px_minmax(100px,_1fr)] gap-10 justify-between  w-full">
+          <p className="text-primary-input-text">What3Words Loading Bay</p>
+          <TextInput
+            testId="delivery-what-three-words"
+            placeholder="what.three.words"
+            className="w-full justify-between"
+            inputClassName="w-full"
+            value={formData.what3WordsLoading}
+            onChange={(e) => handleInputChange('what3WordsLoading', e.target.value)}
           />
         </label>
       </div>
@@ -280,18 +302,6 @@ const VenueAddressForm = ({
             inputClassName="w-full"
             value={formData.deliveryEMail}
             onChange={(e) => handleInputChange('deliveryEMail', e.target.value)}
-          />
-        </label>
-
-        <label htmlFor="" className="grid grid-cols-[170px_minmax(100px,_1fr)] gap-10 justify-between  w-full">
-          <p className="text-primary-input-text">What3Words Loading</p>
-          <TextInput
-            testId="delivery-what-three-words"
-            placeholder="what.three.words"
-            className="w-full justify-between"
-            inputClassName="w-full"
-            value={formData.what3WordsLoading}
-            onChange={(e) => handleInputChange('what3WordsLoading', e.target.value)}
           />
         </label>
       </div>
