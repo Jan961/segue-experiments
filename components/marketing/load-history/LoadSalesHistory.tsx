@@ -27,7 +27,7 @@ const LoadSalesHistory = () => {
 
   const { productions, selected } = useRecoilValue(productionJumpState);
   const selectedProducton = productions.filter((prod) => prod.Id === selected)[0];
-  const prodCode = selectedProducton ? selectedProducton.ShowCode : null;
+  const prodShowCode = selectedProducton ? selectedProducton.ShowCode + selectedProducton.Code : null;
   const venueList = useRecoilValue(venueState);
   const dateRange = selectedProducton
     ? dateToSimple(selectedProducton.StartDate) + '-' + dateToSimple(selectedProducton.EndDate)
@@ -65,7 +65,7 @@ const LoadSalesHistory = () => {
         file: validateFile,
         spreadsheetIssues,
         spreadsheetData,
-      } = await validateSpreadsheetFile(file, prodCode, venueList, dateRange);
+      } = await validateSpreadsheetFile(file, prodShowCode, venueList, dateRange);
       setUploadedFile(validateFile);
       setUploadParams({ onProgress, onError, onUploadingImage, spreadsheetIssues, spreadsheetData });
       setConfirmationModalVisible(true);
@@ -234,7 +234,7 @@ const LoadSalesHistory = () => {
           uploadParams={uploadParams}
           uploadedFile={uploadedFile}
           closeUploadModal={() => setUploadModalVisible(false)}
-          prodCode={prodCode}
+          prodShowCode={prodShowCode}
         />
       )}
       {showConfirmDelete && (

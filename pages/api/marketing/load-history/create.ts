@@ -19,12 +19,18 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     // Perform Prisma queries in one transaction so that if it fails previous changes are rolled back
     await prisma.$transaction(async (tx: PrismaClient) => {
       await updateCreateProductionFile(tx, selectedProdId, fileID);
+      console.log('1.');
       const primaryDateBlock = await getDateBlockForProduction(selectedProdId, true);
+      console.log('2.');
       const primaryDateBlockID = primaryDateBlock[0].Id;
       await deleteEvents(tx, primaryDateBlockID);
+      console.log('3.');
       await updateSpreadsheetDataWithVenueIDs(tx, spreadsheetData);
+      console.log('4.');
       const bookingsWithSales = await createBookings(tx, spreadsheetData, primaryDateBlockID);
+      console.log('5.');
       await createSalesSetWithSales(tx, bookingsWithSales);
+      console.log('6.');
     });
 
     res.status(200).json({ status: 'Success' });
