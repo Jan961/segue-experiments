@@ -26,8 +26,37 @@ interface ContractPersonDataFormProps {
   updateFormData: (data: Partial<IPerson>) => void;
 }
 
+const mergeContractData = (contractDetailsD, contractDetailsV) => {
+  const {
+    personDetails: personDetailsD,
+    emergencyContact1: emergencyContact1D,
+    emergencyContact2: emergencyContact2D,
+    agencyDetails: agencyDetailsD,
+    salaryAccountDetails: salaryAccountDetailsD,
+    expenseAccountDetails: expenseAccountDetailsD,
+  } = contractDetailsD;
+
+  const {
+    personDetails: personDetailsV,
+    emergencyContact1: emergencyContact1V,
+    emergencyContact2: emergencyContact2V,
+    agencyDetails: agencyDetailsV,
+    salaryAccountDetails: salaryAccountDetailsV,
+    expenseAccountDetails: expenseAccountDetailsV,
+  } = contractDetailsV;
+
+  return {
+    personDetails: { ...personDetailsD, ...personDetailsV },
+    emergencyContact1: { ...emergencyContact1D, ...emergencyContact1V },
+    emergencyContact2: { ...emergencyContact2D, ...emergencyContact2V },
+    agencyDetails: { ...agencyDetailsD, ...agencyDetailsV },
+    salaryAccountDetails: { ...salaryAccountDetailsD, ...salaryAccountDetailsV },
+    expenseAccountDetails: { ...expenseAccountDetailsD, ...expenseAccountDetailsV },
+  };
+};
+
 export const PersonDetailsTab = ({ person = {}, height, updateFormData }: ContractPersonDataFormProps) => {
-  const [personData, setPersonData] = useState<IPerson>({ ...defaultContractDetails, ...person });
+  const [personData, setPersonData] = useState<IPerson>(mergeContractData(defaultContractDetails, person));
   const {
     personDetails,
     emergencyContact1,
@@ -36,7 +65,7 @@ export const PersonDetailsTab = ({ person = {}, height, updateFormData }: Contra
     salaryAccountDetails,
     expenseAccountDetails,
   } = personData;
-  const [hideAgencyDetails, setHideAgencyDetails] = useState(false);
+  const [hideAgencyDetails, setHideAgencyDetails] = useState(!agencyDetails?.hasAgent && true);
   const countryList = useRecoilValue(countryState) || [];
   const { users = [] } = useRecoilValue(userState);
   const userOptionList = useMemo(
@@ -105,7 +134,7 @@ export const PersonDetailsTab = ({ person = {}, height, updateFormData }: Contra
                 ...personData,
                 agencyDetails: {
                   ...personData.agencyDetails,
-                  hasAgent: e.target.checked,
+                  hasAgent: !e.target.checked,
                 },
               };
               setPersonData(updatedFormData);
