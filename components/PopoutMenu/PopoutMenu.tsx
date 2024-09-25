@@ -370,7 +370,10 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
   useEffect(() => {
     isMenuPinned.current = state.menuPinned;
     if (!state.menuItems || state.menuItems.length === 0) {
-      setGlobalState({ ...state, menuItems });
+      const disabledRoutes = ['/touring'];
+      const filteredMenuItems = menuItems.filter((item) => !disabledRoutes.includes(item.value));
+
+      setGlobalState({ ...state, menuItems: filteredMenuItems });
     }
   }, [menuItems, state, setGlobalState]);
 

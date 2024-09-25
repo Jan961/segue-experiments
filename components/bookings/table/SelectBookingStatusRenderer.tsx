@@ -1,7 +1,7 @@
 import { ICellRendererParams, IRowNode } from 'ag-grid-community';
 import SelectRenderer from 'components/core-ui-lib/Table/renderers/SelectRenderer';
 import { statusOptions } from 'config/bookings';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
 
 interface SelectBookingStatusRendererProps extends ICellRendererParams {
@@ -37,12 +37,16 @@ const SelectBookingStatusRenderer = ({
     }
   }, [data, node]);
 
+  const bookingStatusOptions = useMemo(() => {
+    return statusOptions.filter((option) => option.text !== 'Available');
+  }, []);
+
   return (
     <div className="pl-1 pr-2 mt-1">
       <SelectRenderer
         eGridCell={eGridCell}
         onChange={handleValueChange}
-        options={statusOptions}
+        options={bookingStatusOptions}
         value={value}
         inline
         isSearchable={false}
