@@ -185,7 +185,7 @@ const ContractDetailsTab = ({
                 </div>
 
                 {row.isAList && (
-                  <div className="flex">
+                  <div className="flex gap-x-2">
                     {value.index !== 1 && (
                       <MinusCircleSolidIcon
                         className="hover:cursor-pointer"
