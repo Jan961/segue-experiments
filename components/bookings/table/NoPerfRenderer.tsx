@@ -26,7 +26,7 @@ const NoPerfRenderer = ({ eGridCell, value, setValue, data, api, node }: ICellRe
   }, [data.perf, value]);
 
   const handleChange = (event: any) => {
-    let newValue = event.target.value.replace(/\D/g, ''); // Remove non-numeric characters
+    let newValue = event?.replace(/\D/g, ''); // Remove non-numeric characters
     if (newValue === '') {
       setNoOfPerfs('');
       setValue(0);

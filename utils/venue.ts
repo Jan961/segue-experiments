@@ -12,6 +12,8 @@ export interface PrimaryAddress {
   primaryPostCode?: string;
   primaryPhoneNumber?: string;
   primaryEMail?: string;
+  primaryWhat3Words?: string;
+  primaryCoordinates?: { latitude: null; longitude: null };
 }
 
 export interface DeliveryAddress {
