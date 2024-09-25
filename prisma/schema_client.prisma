@@ -508,13 +508,14 @@ model VenueAddress {
   CountryId        Int?     @map("VenueAddressCountryId")
   Phone            String?  @map("VenueAddressPhone") @db.VarChar(30)
   Email            String?  @map("VenueAddressEmail") @db.VarChar(80)
-  VenueAddressLat  Int?     @db.MediumInt
-  VenueAddressLong Int?     @db.MediumInt
+  Latitude         Int?     @map("VenueAddressLat") @db.MediumInt
+  Longitude        Int?     @map("VenueAddressLong") @db.MediumInt
   Country          Country? @relation(fields: [CountryId], references: [Id], onDelete: Restrict, map: "CountryVenueAddress")
   Venue            Venue    @relation(fields: [VenueId], references: [Id], onDelete: Cascade, map: "Venue_VenueAddress")
 
   @@index([VenueId], map: "Venue_VenueAddress")
   @@index([CountryId], map: "CountryVenueAddress")
+  @@index([VenueId, TypeName], map: "VenueAddress_VenueAddressVenueId_VenueAddressTypeName_index")
 }
 
 model PerformanceReport {
@@ -1610,12 +1611,11 @@ view ACCContractListView {
   @@ignore
 }
 
-/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view VenueVenueTravelView {
-  VVVenue1Id Int
-  VVVenue2Id Int
-  VVMileage  Int? @db.UnsignedSmallInt
-  VVTimeMins Int? @db.UnsignedSmallInt
+  Venue1Id Int  @map("VVVenue1Id")
+  Venue2Id Int  @map("VVVenue2Id")
+  Mileage  Int? @map("VVMileage") @db.UnsignedSmallInt
+  TimeMins Int? @map("VVTimeMins") @db.UnsignedSmallInt
 
-  @@ignore
+  @@id([Venue1Id, Venue2Id])
 }

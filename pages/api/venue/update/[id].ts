@@ -4,6 +4,8 @@ import { getAccountId, getEmailFromReq } from 'services/userService';
 import { updateVenue } from 'services/venueService';
 import { mapVenueContactToPrisma } from 'utils/venue';
 import { all } from 'radash';
+import { addVenueToMilageCalculator } from 'services/addVenueToMilageCalculator';
+import { formatCoords } from 'utils/formatCoords';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -52,6 +54,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       primaryPhoneNumber,
       primaryEMail,
       primaryAddressId,
+      primaryCoordinates,
       deliveryAddressId,
       deliveryAddress1,
       deliveryAddress2,
@@ -64,6 +67,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       barredVenues,
       venueContacts,
     } = req.body;
+    const { latitude, longitude } = formatCoords(primaryCoordinates);
     const addresses = [];
     if (
       primaryAddressId ||
@@ -72,7 +76,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       primaryAddress3 ||
       primaryPostCode ||
       primaryTown ||
-      primaryCountry
+      primaryCountry ||
+      primaryCoordinates
     ) {
       addresses.push({
         Id: primaryAddressId,
@@ -85,6 +90,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         TypeName: 'Main',
         Phone: primaryPhoneNumber,
         Email: primaryEMail,
+        Latitude: latitude,
+        Longitude: longitude,
       });
     }
     if (
@@ -193,6 +200,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       ]);
       updatedVenue = updatedVenueData;
     });
+
+    await addVenueToMilageCalculator(req.body);
 
     res.status(200).json(updatedVenue);
   } catch (error) {

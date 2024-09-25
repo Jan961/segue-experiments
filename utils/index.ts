@@ -150,10 +150,18 @@ export const getAllOptions = (options: SelectOption[], allLabel?: string, allVal
   ...options,
 ];
 
-export const checkDecimalStringFormat = (decimalString: string, precision: number, scale: number, regex?: RegExp) => {
+export const checkDecimalStringFormat = (decimalString: string, precision: number, scale: number, pattern?: RegExp) => {
   const [integerPart, fractionalPart] = decimalString.split('.');
-  if (regex && !regex.test(decimalString)) return false;
-  if (integerPart.length > precision - scale || (fractionalPart && fractionalPart.length > scale)) return false;
+
+  // Check regex pattern if provided
+  if (pattern && !pattern.test(decimalString)) return false;
+
+  // Check if the integer part length is within allowed precision minus the scale
+  if (integerPart.length > precision - scale) return false;
+
+  // Check if fractional part length is within allowed scale
+  if (fractionalPart && fractionalPart.length > scale) return false;
+
   return true;
 };
 
@@ -168,7 +176,21 @@ export const formatDecimalValue = (decimalString: any) => {
     return '';
   }
 
-  return floatValue.toFixed(2);
+  return (Math.round(floatValue * 100) / 100).toFixed(2);
+};
+
+export const formatPercentageValue = (percentageString: any) => {
+  if (isNullOrEmpty(percentageString)) {
+    return '';
+  }
+
+  const floatValue = parseFloat(percentageString);
+
+  if (isNaN(floatValue)) {
+    return '';
+  }
+
+  return parseFloat((Math.round(floatValue * 100) / 100).toString());
 };
 
 export const validateWhat3Words = (input: string) => {

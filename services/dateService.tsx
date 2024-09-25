@@ -8,6 +8,7 @@ import {
   parseISO,
   isSameDay,
   isSameWeek,
+  set,
 } from 'date-fns';
 import { toZonedTime } from 'date-fns-tz';
 import moment from 'moment';
@@ -372,13 +373,12 @@ export const formatDateWithTimezoneOffset = ({
   return moment(date).utcOffset(-timezoneOffset).format(dateFormat);
 };
 
-export const convertTimeToTodayDateFormat = (time) => {
-  const value = time.target.value;
-  const timeStr = `${value.hrs}:${value.min}`;
-  const today = moment();
-  const [hours, minutes] = timeStr.split(':').map(Number);
-  today.set({ hour: hours, minute: minutes, second: 0, millisecond: 0 });
-  return today;
+export const convertTimeToTodayDateFormat = (time: string) => {
+  const today = new Date();
+  const [hours, minutes] = time.split(':').map(Number);
+
+  const updatedDate = set(today, { hours, minutes, seconds: 0, milliseconds: 0 });
+  return updatedDate;
 };
 
 export const dateToTimeString = (dateStr) => {

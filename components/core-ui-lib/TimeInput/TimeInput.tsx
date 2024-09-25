@@ -26,6 +26,10 @@ const baseClass =
   'h-comp-height flex items-center justify-around text-sm p-1 text-primary-input-text rounded-md border border-primary-border ring-inset';
 
 const focusClass = 'focus:ring-2 focus:ring-primary-input-text';
+const inputClass = 'w-8 h-5/6 border-none focus:ring-0 text-center ring-0 p-0';
+
+const disabledContainerClass = (disabled) => (disabled ? 'disabled-input !border-none !bg-gray-200' : focusClass);
+const disabledInputClass = (disabled) => disabled && '!bg-gray-200';
 
 const DEFAULT_TIME = { hrs: '', min: '', sec: '' };
 
@@ -149,7 +153,7 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
     }, [value]);
 
     return (
-      <div ref={ref} className={classNames(baseClass, className, disabled ? '' : focusClass)} tabIndex={-1}>
+      <div ref={ref} className={classNames(baseClass, className, disabledContainerClass(disabled))} tabIndex={-1}>
         <input
           data-testid="hourInput"
           data-index={index}
@@ -158,7 +162,7 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
           value={time.hrs}
           placeholder="hh"
           type="text"
-          className="w-8 h-5/6 border-none focus:ring-0 text-center ring-0 p-0"
+          className={classNames(inputClass, disabledInputClass(disabled))}
           onChange={(e) => handleChange(e)}
           onBlur={(e) => handleBlur(e, hrsRef)}
           onFocus={(e) => handleFocus(e, hrsRef, true)}
@@ -174,7 +178,7 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
           name="min"
           value={time.min}
           placeholder="mm"
-          className="w-8 h-5/6 border-none focus:ring-0 text-center ring-0 p-0"
+          className={classNames(inputClass, disabledInputClass(disabled))}
           onChange={(e) => handleChange(e, true)}
           onBlur={(e) => handleBlur(e, minsRef)}
           onFocus={(e) => handleFocus(e, minsRef, false)}

@@ -826,12 +826,13 @@ export interface DealMemoHoldType {
   HoldTypeSeqNo?: number;
 }
 
-export interface DealMemoPriceState {
+export interface DealMemoPriceType {
   DMPTicketName?: string;
   DMPTicketPrice: number;
   DMPNumTickets: number;
   DMPDeMoId: number;
   DMPNotes: string;
+  DMPId?: number;
 }
 
 export interface UserPermission {

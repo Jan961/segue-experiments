@@ -155,3 +155,10 @@ export interface UploadParamType {
   spreadsheetIssues: SpreadsheetIssues;
   spreadsheetData: SpreadsheetDataCleaned;
 }
+
+export interface MismatchRowData {
+  row: any;
+  bookingDate: string;
+  salesDate: Date;
+  venueCode: string;
+}

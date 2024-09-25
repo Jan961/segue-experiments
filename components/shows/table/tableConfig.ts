@@ -5,7 +5,7 @@ import ShowNameAndCodeRenderer from './ShowNameAndCodeRenderer';
 import { ICellRendererParams } from 'ag-grid-community';
 import React from 'react';
 import CurrencyExchangeRenderer from './CurrencyExchangeRenderer';
-import { isUndefined } from 'utils';
+import { isNullOrEmpty, isUndefined } from 'utils';
 
 export const generateChildCol = (
   headerName: string,
@@ -66,8 +66,15 @@ export const showsTableConfig = [
     headerName: 'Productions',
     field: 'productions',
     cellRenderer: ButtonRenderer,
-    cellRendererParams: {
-      buttonText: 'View/Edit',
+    cellRendererParams: (params) => {
+      return {
+        buttonText: 'View/Edit',
+        disabled: isNullOrEmpty(params?.data?.Id),
+        tpActive: isNullOrEmpty(params?.data?.Id),
+        body: 'Please save prior to adding production details',
+        position: 'right',
+        width: 'w-40',
+      };
     },
     width: 133,
     headerClass: 'text-center',
