@@ -105,27 +105,42 @@ const getDefinedPersonDetails = (personDetailsData: IPerson) => {
 
 // Function to create composite tags based on the data from the Person Details form such
 const getCompositePersonDetails = (personDetailsData: IPerson) => {
+  const helpers = createCompositeHelperFunctions(personDetailsData);
+
   return {
-    ...getPersonFullName(personDetailsData),
-    ...getPersonFullAddress(personDetailsData),
+    PERSONFULLNAME: helpers.getPersonFullName(),
+    PERSONFULLADDRESS: helpers.getPersonFullAddress(),
+    AGENTFULLNAME: helpers.getAgentFullName(),
+    AGENCYFULLADDRESS: helpers.getAgencyFullAddress(),
   };
 };
 
-const getPersonFullName = (personDetailsData: IPerson) => {
-  const firstName = personDetailsData.personDetails?.firstName || '';
-  const lastName = personDetailsData.personDetails?.lastName || '';
+const createCompositeHelperFunctions = (personDetailsData: IPerson) => {
   return {
-    PERSONFULLNAME: `${firstName} ${lastName}`,
-  };
-};
+    getPersonFullName: () => {
+      const firstName = personDetailsData.personDetails?.firstName || '';
+      const lastName = personDetailsData.personDetails?.lastName || '';
+      return `${firstName} ${lastName}`;
+    },
 
-const getPersonFullAddress = (personDetailsData: IPerson) => {
-  const address1 = personDetailsData.personDetails?.address1 || '';
-  const address2 = personDetailsData.personDetails?.address2 || '';
-  const address3 = personDetailsData.personDetails?.address3 || '';
-  return {
-    PERSONFULLADDRESS: `${address1 ? address1 + ', ' : ''}${address2 ? address2 + ', ' : ''}${
-      address3 ? address3 + ', ' : ''
-    }`,
+    getPersonFullAddress: () => {
+      const address1 = personDetailsData.personDetails?.address1 || '';
+      const address2 = personDetailsData.personDetails?.address2 || '';
+      const address3 = personDetailsData.personDetails?.address3 || '';
+      return `${address1 ? address1 + ', ' : ''}${address2 ? address2 + ', ' : ''}${address3 ? address3 + ', ' : ''}`;
+    },
+
+    getAgentFullName: () => {
+      const firstName = personDetailsData.agencyDetails?.firstName || '';
+      const lastName = personDetailsData.agencyDetails?.lastName || '';
+      return `${firstName} ${lastName}`;
+    },
+
+    getAgencyFullAddress: () => {
+      const address1 = personDetailsData.agencyDetails?.address1 || '';
+      const address2 = personDetailsData.agencyDetails?.address2 || '';
+      const address3 = personDetailsData.agencyDetails?.address3 || '';
+      return `${address1 ? address1 + ', ' : ''}${address2 ? address2 + ', ' : ''}${address3 ? address3 + ', ' : ''}`;
+    },
   };
 };
