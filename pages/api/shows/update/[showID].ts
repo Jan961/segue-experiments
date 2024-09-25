@@ -18,9 +18,9 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       },
       data: omit(show, ['Id']),
     });
-    return res.status(200).json(updatedShow);
+    res.status(200).json(updatedShow);
   } catch (e) {
     console.log(e);
-    return res.status(500).json({});
+    res.status(500).json({});
   }
 }
