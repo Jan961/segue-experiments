@@ -3,11 +3,12 @@ import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import { venueRoleState } from 'state/marketing/venueRoleState';
 import VenueContactForm from 'components/venues/modal/VenueContactsForm';
 import { styleProps } from '../table/tableConfig';
-import { UiVenueContact, mapVenueContactToPrisma } from 'utils/venue';
+import { UiVenueContact, mapVenueContactToPrisma, transformVenueContacts } from 'utils/venue';
 import { bookingJumpState } from 'state/marketing/bookingJumpState';
 import { VenueContactDTO } from 'interfaces';
 import { Spinner } from 'components/global/Spinner';
 import axios from 'axios';
+import { mapVenueRoleToPrisma } from 'mappers/marketing';
 
 interface VenueContactsProps {
   bookingId: string;
@@ -74,13 +75,12 @@ const VenueContactsTab = forwardRef<VenueContactTabRef, VenueContactsProps>((pro
         if (typeof newVenueContact === 'object') {
           const { Id } = newVenueContact;
 
-          const tempVenueContactUi: UiVenueContact = {
+          const tempVenueContactUi: UiVenueContact = transformVenueContacts({
             ...newContact,
-            venueId: parseInt(newVc.VenueId),
-            roleName: newContact.roleName,
-            venueRoleId: newVc.VenueRoleId,
-            id: Id,
-          };
+            VenueRole: venueRole,
+            VenueId: newVc.VenueId,
+            Id,
+          });
 
           setVenueContacts([...venueContacts, tempVenueContactUi]);
         }
@@ -88,16 +88,33 @@ const VenueContactsTab = forwardRef<VenueContactTabRef, VenueContactsProps>((pro
         // update fields
       } else if (variant === 'update') {
         const role = venueRoles.find((role) => role.Name === data.updatedFormData.roleName);
+
         if (!role || role.Id === undefined) {
           return;
         }
 
         const contactIndex = venueContacts.findIndex((vc) => vc.venueRoleId === role.Id);
-        const vcId = contactIndex === -1 ? null : venueContacts[contactIndex].Id;
+        const vcId = contactIndex === -1 ? null : venueContacts[contactIndex].id;
         const updatedRow = mapVenueContactToPrisma(data.updatedFormData);
         const dataToUpdate = { ...updatedRow, VenueId: booking.VenueId, Id: vcId, VenueRoleId: role.Id };
 
-        await axios.post('/api/marketing/venueContacts/update', dataToUpdate);
+        const { data: updResponse } = await axios.post('/api/marketing/venueContacts/update', dataToUpdate);
+
+        const tempVenueContactUi: UiVenueContact = transformVenueContacts({
+          ...updatedRow,
+          VenueRole: mapVenueRoleToPrisma(role),
+          Email: updatedRow.Email,
+          FirstName: updatedRow.FirstName,
+          Id: updResponse.Id,
+          LastName: updatedRow.LastName,
+          Phone: updatedRow.Phone,
+          Role: updatedRow.RoleName,
+          RoleIndex: role.Id.toString(),
+          VenueId: updatedRow.VenueId,
+          VenueRoleId: role.Id,
+        });
+
+        setVenueContacts([...venueContacts, tempVenueContactUi]);
 
         // delete venue contact
       } else if (variant === 'delete') {
