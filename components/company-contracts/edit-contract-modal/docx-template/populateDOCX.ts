@@ -24,6 +24,7 @@ export const populateDOCX = async (
     ...staticDetailsTags,
   };
 
+  // Need to include this so that Angular Expressions are supported
   const handler = new TemplateHandler({
     scopeDataResolver: createResolver({
       angularFilters: {
