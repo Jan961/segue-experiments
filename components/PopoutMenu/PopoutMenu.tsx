@@ -39,6 +39,7 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
   const menuItems = useMemo(
     () => [
       {
+        id: '1',
         label: getStrings('global.home'),
         value: '/',
         icon: homeIcon,
@@ -46,6 +47,7 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
         testId: 'sidepanel-home',
       },
       {
+        id: '2',
         label: getStrings('global.bookings'),
         value: '/bookings',
         icon: bookingsIcon,
@@ -68,6 +70,7 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
         ],
       },
       {
+        id: '3',
         label: getStrings('global.marketing'),
         value: '/marketing',
         icon: marketingIcon,
@@ -151,6 +154,7 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
         ],
       },
       {
+        id: '4',
         label: getStrings('global.projectManagement'),
         value: '/tasks',
         icon: tasksIcon,
@@ -172,6 +176,7 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
         ],
       },
       {
+        id: '5',
         label: getStrings('global.contracts'),
         value: '/contracts',
         icon: contractsIcon,
@@ -205,6 +210,7 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
         ],
       },
       {
+        id: '6',
         label: getStrings('global.touringManagement'),
         value: '/touring',
         icon: tourManagementIcon,
@@ -264,6 +270,7 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
       },
 
       {
+        id: '7',
         label: getStrings('global.admin'),
         value: '/admin',
         icon: systemAdminIcon,
@@ -363,7 +370,10 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
   useEffect(() => {
     isMenuPinned.current = state.menuPinned;
     if (!state.menuItems || state.menuItems.length === 0) {
-      setGlobalState({ ...state, menuItems });
+      const disabledRoutes = ['/touring'];
+      const filteredMenuItems = menuItems.filter((item) => !disabledRoutes.includes(item.value));
+
+      setGlobalState({ ...state, menuItems: filteredMenuItems });
     }
   }, [menuItems, state, setGlobalState]);
 
