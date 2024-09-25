@@ -65,7 +65,7 @@ const useUser = () => {
           to: userDetails.email,
           from: newUserEmailTemplate.emailFrom,
           templateId: newUserEmailTemplate.templateId,
-          data: {},
+          data: { password },
         });
       }
 
