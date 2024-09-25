@@ -1,4 +1,5 @@
 import { IScheduleDay } from 'components/contracts/types';
+import { dateToSimple } from 'services/dateService';
 import { ProductionDTO } from 'interfaces';
 
 export const getStaticDetailsTags = (productionInfo: Partial<ProductionDTO>, productionSchedule: IScheduleDay[]) => {
@@ -19,7 +20,7 @@ export const getStaticDetailsTags = (productionInfo: Partial<ProductionDTO>, pro
 const createHelperFunctions = (productionInfo: Partial<ProductionDTO>, productionSchedule: IScheduleDay[]) => {
   return {
     getDateOfDocumentCreation: () => {
-      return new Date().toISOString();
+      return dateToSimple(new Date());
     },
 
     getFirstPerfDate: () => {
