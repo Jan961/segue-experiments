@@ -7,15 +7,16 @@ import AccountDetailsForm, { Account } from 'components/account/AccountDetailsFo
 import PaymentDetailsForm from 'components/account/PaymentDetailsForm';
 import { useState } from 'react';
 import { GetServerSideProps } from 'next';
-import getAllPlans from 'services/subscriptionPlans';
+// import getAllPlans from 'services/subscriptionPlans';
 import AccountConfirmation from 'components/account/AccountConfirmation';
 import { Elements } from '@stripe/react-stripe-js';
 import axios from 'axios';
 import { notify } from 'components/core-ui-lib';
+import { getCurrenciesAsSelectOptions } from 'services/currencyService';
 
 export const getServerSideProps: GetServerSideProps = async () => {
   const planColors = ['#41a29a', '#0093c0', '#7b568d'];
-  const plans = await getAllPlans();
+  const plans = null; // await getAllPlans();
   let subscriptionPlans = [];
   if (plans) {
     const formattedPlans = plans.map((p, i) => {
@@ -32,9 +33,14 @@ export const getServerSideProps: GetServerSideProps = async () => {
     });
     subscriptionPlans = formattedPlans;
   }
+
+  // get countries and currencies
+  const currencies = await getCurrenciesAsSelectOptions();
+
   return {
     props: {
       plans: subscriptionPlans,
+      currencies,
     },
   };
 };
@@ -60,10 +66,9 @@ const DEFAULT_ACCOUNT_DETAILS = {
 };
 export type AccountDetails = typeof DEFAULT_ACCOUNT_DETAILS;
 const ACCOUNT_CREATION_FAILED_ERROR = 'Error creating new account';
-const NewAccount = ({ plans }: { stripeOptions: any; plans: Plan[] }) => {
+const NewAccount = ({ plans, currencies = [] }: { stripeOptions: any; plans: Plan[]; currencies: SelectOption[] }) => {
   const stripe = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
   const [accountDetails, setAccountDetails] = useState<Account>(DEFAULT_ACCOUNT_DETAILS);
-
   const [subcriptionDetails, seSubscriptionDetails] = useState<Plan>(null);
 
   const handleSaveAccountDetails = async (onSaveSuccess: () => void) => {
@@ -85,6 +90,7 @@ const NewAccount = ({ plans }: { stripeOptions: any; plans: Plan[] }) => {
       <Image className="mx-auto mb-2" height={160} width={310} src="/segue/segue_logo_full.png" alt="Segue" />
       <Wizard>
         <AccountDetailsForm
+          currencies={currencies}
           accountDetails={accountDetails}
           onChange={setAccountDetails}
           onSave={handleSaveAccountDetails}

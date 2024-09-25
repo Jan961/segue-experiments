@@ -7,3 +7,11 @@ export const getAllCurrencyList = () => {
     },
   });
 };
+
+export const getCurrenciesAsSelectOptions = async () => {
+  const currencies = await getAllCurrencyList();
+  return currencies.map(({ CurrencyCode, CurrencyName }) => ({
+    value: CurrencyCode,
+    text: CurrencyName,
+  }));
+};

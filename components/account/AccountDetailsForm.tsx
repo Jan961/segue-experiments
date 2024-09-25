@@ -27,12 +27,13 @@ export type Account = {
 };
 
 interface AccountDetailsFormProps {
+  currencies: SelectOption[];
   accountDetails: Account;
   onChange: (v: Account) => void;
   onSave: (callBack: () => void) => void;
 }
 
-const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetailsFormProps) => {
+const AccountDetailsForm = ({ currencies, accountDetails, onChange, onSave }: AccountDetailsFormProps) => {
   const { nextStep } = useWizard();
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [showModal, setShowModal] = useState(false);
@@ -50,7 +51,6 @@ const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetails
         errors[error.path] = error.message;
       });
       setValidationErrors(errors);
-      console.log('validation Errors', errors);
       return false;
     }
   }
@@ -222,7 +222,7 @@ const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetails
               name="currency"
               placeholder="Select currency"
               className="w-full h-[31px]"
-              options={[{ text: 'GBP', value: 'GBP' }]}
+              options={currencies}
               value={accountDetails.currency}
               onChange={(value) => onChange({ ...accountDetails, currency: value.toString() })}
               isClearable={false}
