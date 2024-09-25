@@ -20,7 +20,6 @@ const ContractDetailsTab = ({
   templateFormStructure,
 }: ContractDetailsTabProps) => {
   useEffect(() => {
-    console.log('New Contract Data:', contractData);
     const formData = populateTemplateWithValues(templateFormStructure, contractData);
     setFormData(formData);
   }, [contractData]);
@@ -73,7 +72,6 @@ const ContractDetailsTab = ({
 
       const updatedContractData = prevContractData.map((entry) => {
         if (currentCompIDs.includes(entry.compID) && entry.index > entryIndex) {
-          console.log('modifying:', entry);
           return { ...entry, index: entry.index + 1 };
         } else {
           return entry;

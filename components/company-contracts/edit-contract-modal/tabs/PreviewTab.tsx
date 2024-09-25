@@ -23,8 +23,10 @@ export const PreviewTab = ({
 }: PreviewTabProps) => {
   const isMounted = useRef(false);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const fetchPDF = async () => {
+    setIsLoading(true);
     try {
       const tokenresponse = await axios.post('/api/pdfconvert/token/create/');
 
@@ -54,6 +56,7 @@ export const PreviewTab = ({
     } catch (err) {
       console.error(err, 'Error - failed to convert DOCX file to PDF');
     }
+    setIsLoading(false);
   };
 
   useEffect(() => {
@@ -65,12 +68,14 @@ export const PreviewTab = ({
 
   return (
     <div className="w-full h-full flex items-center justify-center">
-      {pdfUrl ? (
+      {isLoading ? (
+        <Spinner size="lg" className="" />
+      ) : pdfUrl ? (
         <object data={pdfUrl} type="application/pdf" width="100%" height="100%">
-          <p>PDF cannot be displayed.</p>
+          <p>Error displaying PDF.</p>
         </object>
       ) : (
-        <Spinner size="lg" className="" />
+        <p>Error displaying PDF.</p>
       )}
     </div>
   );
