@@ -14,6 +14,7 @@ export const getStaticDetailsTags = (productionInfo: Partial<ProductionDTO>, pro
     ALLPERFORMANCESATSAMEVENUE: helpers.getAreAllPerformancesAtSameVenue(),
     SINGLEPERFORMANCEVENUE: helpers.getSinglePerformanceVenue(),
     PRODCOMPANYLOGO: helpers.getProdCompanyLogo(),
+    PERFORMANCETABLE: helpers.getPerformanceTable(),
   };
 };
 
@@ -49,6 +50,20 @@ const createHelperFunctions = (productionInfo: Partial<ProductionDTO>, productio
 
     getProdCompanyLogo: () => {
       return '';
+    },
+
+    getPerformanceTable: () => {
+      return productionSchedule
+        .filter((item) => item.type === 'Performance')
+        .map((row) => ({
+          Day: row.day,
+          Date: row.date,
+          Week: row.week,
+          Venue: row.venue,
+          NumPerfsPerDay: row.performancesPerDay,
+          Perf1Time: row.performance1,
+          Perf2Time: row.performance2,
+        }));
     },
 
     getAreAllPerformancesAtSameVenue: () => {
