@@ -7,7 +7,7 @@ export type PermissionGroup = {
 export type Production = {
   checked: boolean;
   code: string;
-  id: number;
+  id: string;
   isArchived: boolean;
   label: string;
   showCode: string;

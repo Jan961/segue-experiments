@@ -1,7 +1,7 @@
 import prismaMaster from 'lib/prisma_master';
 import prismaClient from 'lib/prisma';
 import { isNullOrEmpty } from 'utils';
-import { getOrganizationIdFromReq } from './userService';
+import { getOrganisationIdFromReq } from './userService';
 
 const formatAccountUsers = (data) => {
   if (!data || data.length === 0) {
@@ -148,7 +148,7 @@ const formatPermisisonGroups = (permissionGroups) => {
 
 export const getPermissionGroupsList = async (req) => {
   try {
-    const organisationId = getOrganizationIdFromReq(req);
+    const organisationId = getOrganisationIdFromReq(req);
     const results = await prismaMaster.PermissionGroup.findMany({
       where: {
         PerGpAccountId: organisationId,

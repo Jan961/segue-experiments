@@ -4,7 +4,7 @@ import { Button, ConfirmationDialog, Table } from 'components/core-ui-lib';
 import AddEditUser from 'components/admin/modals/AddEditUser';
 import AddEditPermissionGroup from 'components/admin/modals/AddEditPermissionGroup';
 import Layout from 'components/Layout';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import { getPermissionGroupsList, getPermissionsList } from 'services/permissionService';
 import { getAllProductions } from 'services/productionService';
@@ -18,6 +18,7 @@ export default function Users({
   productionsList,
   permisisonGroups,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  const deleteType = useRef<'user' | 'group'>(null);
   const [userRowData, setUserRowData] = useState([]);
   const [showUsersModal, setShowUsersModal] = useState(false);
   const [showPermissionGroupModal, setShowPermissionGroupModal] = useState(false);
@@ -83,9 +84,15 @@ export default function Users({
     }
   };
 
-  const handleUserEdit = ({ data }) => {
-    setSelectedUser(data);
-    setShowUsersModal(true);
+  const handleUserEdit = async (type, data) => {
+    if (type === 'edit') {
+      setSelectedUser(data);
+      setShowUsersModal(true);
+    } else if (type === 'delete') {
+      deleteType.current = 'user';
+      setSelectedGroup(data);
+      setShowConfirmationDialog(true);
+    }
   };
 
   const handlePermissionGroupEdit = async (type, data) => {
@@ -94,18 +101,29 @@ export default function Users({
       setSelectedGroup({ ...data, permissions: updatedPermissions });
       setShowPermissionGroupModal(true);
     } else if (type === 'delete') {
+      deleteType.current = 'group';
       setSelectedGroup(data);
       setShowConfirmationDialog(true);
     }
   };
-  const handleConfirmClick = async () => {
-    setShowConfirmationDialog(false);
+
+  const deletePermissionGroup = async () => {
     await axios.delete('/api/admin/permissions-group/delete', {
       data: {
         groupId: selectedGroup.groupId,
       },
     });
     setSelectedGroup(null);
+  };
+
+  const deleteUser = async () => {
+    // Add API call to deactivate user
+    setSelectedUser(null);
+  };
+
+  const handleConfirmClick = async () => {
+    setShowConfirmationDialog(false);
+    deleteType.current === 'user' ? deleteUser() : deletePermissionGroup();
     router.replace(router.asPath);
   };
 
@@ -183,11 +201,10 @@ export default function Users({
 
       <Table
         testId="admin-users-table"
-        columnDefs={usersColDef(null)}
+        columnDefs={usersColDef(handleUserEdit)}
         rowData={userRowData}
         styleProps={styleProps}
         tableHeight={300}
-        onRowDoubleClicked={handleUserEdit}
       />
 
       <div className="flex justify-end mt-5">
@@ -259,7 +276,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
         db = dateBlockMapper(db);
       }
       return {
-        id: t.Id,
+        id: t.Id.toString(),
         code: t.Code,
         isArchived: t.IsArchived,
         showCode: t.Show.Code,

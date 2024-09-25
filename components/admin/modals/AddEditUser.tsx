@@ -148,8 +148,12 @@ const AdEditUser = ({ visible, onClose, permissions, productions = [], selectedU
   const handleProductionToggle = (e) => {
     setIsFormDirty(true);
     const { id, checked } = e.target;
-    const updatedProductions = userDetails.productions.map((p) => (p.id === id ? { ...p, checked } : p));
-    setUserDetails({ ...userDetails, productions: updatedProductions });
+    const updatedProductions = userDetails.productions.map((p) => ({
+      ...p,
+      checked: p.id === id ? checked : p.checked,
+    }));
+
+    setUserDetails((prev) => ({ ...prev, productions: updatedProductions }));
     if (!checked) {
       setAllProductionsChecked(false);
     }
@@ -299,32 +303,36 @@ const AdEditUser = ({ visible, onClose, permissions, productions = [], selectedU
           <div className="flex flex-row gap-4 w-full">
             <div className="w-full max-h-[400px] overflow-y-hidden">
               <h2 className="text-xl text-bold mb-2">Productions</h2>
-              <div className="w-full max-h-[400px] overflow-y-auto">
-                <Checkbox
-                  className="p-1"
-                  id="allProductions"
-                  name="allProductions"
-                  label="All Productions"
-                  checked={allProductionsChecked}
-                  onChange={handleAllProductionsToggle}
-                  testId="all-productions-checkbox"
-                />
-                {userDetails.productions.map((production) => (
-                  <div
-                    className={classNames('p-1', 'w-full', production.isArchived ? 'bg-secondary-list-row' : '')}
-                    key={production.id}
-                  >
-                    <Checkbox
-                      id={`${production.label}${production.id}`}
-                      name={production.label}
-                      label={`${production.label}${production.isArchived ? ' (A)' : ''}`}
-                      checked={production.checked}
-                      onChange={handleProductionToggle}
-                      testId={`${production.label}-checkbox`}
-                    />
-                  </div>
-                ))}
-              </div>
+              {!isNullOrEmpty(userDetails.productions) ? (
+                <div className="w-full max-h-[400px] overflow-y-auto">
+                  <Checkbox
+                    className="p-1"
+                    id="allProductions"
+                    name="allProductions"
+                    label="All Productions"
+                    checked={allProductionsChecked}
+                    onChange={handleAllProductionsToggle}
+                    testId="all-productions-checkbox"
+                  />
+                  {userDetails.productions.map((production) => (
+                    <div
+                      className={classNames('p-1', 'w-full', production.isArchived ? 'bg-secondary-list-row' : '')}
+                      key={production.id}
+                    >
+                      <Checkbox
+                        id={production.id}
+                        name={production.id}
+                        label={`${production.label}${production.isArchived ? ' (A)' : ''}`}
+                        checked={production.checked}
+                        onChange={handleProductionToggle}
+                        testId={`${production.label}-checkbox`}
+                      />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <Label text="No productions have been added to this account" />
+              )}
             </div>
             <div className="w-full max-h-[400px]  overflow-y-hidden">
               <h2 className="text-xl text-bold mb-2">Permissions</h2>
