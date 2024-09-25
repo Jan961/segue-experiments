@@ -8,9 +8,11 @@ export const getStaticDetailsTags = (productionInfo: Partial<ProductionDTO>, pro
     FIRSTPERFORMANCEDATE: helpers.getFirstPerfDate(),
     DATEOFDOCCREATION: helpers.getDateOfDocumentCreation(),
     SHOWNAME: helpers.getShowName(),
+    PRODUCTIONNAME: helpers.getProductionName(),
     PRODCOMPANYNAME: helpers.getProductionCompanyName(),
     ALLPERFORMANCESATSAMEVENUE: helpers.getAreAllPerformancesAtSameVenue(),
     SINGLEPERFORMANCEVENUE: helpers.getSinglePerformanceVenue(),
+    PRODCOMPANYLOGO: helpers.getProdCompanyLogo(),
   };
 };
 
@@ -42,6 +44,10 @@ const createHelperFunctions = (productionInfo: Partial<ProductionDTO>, productio
 
     getProductionCompanyName: () => {
       return productionInfo?.ProductionCompany?.ProdCoName || '{ PRODUCTION COMPANY NAME UNAVAILABLE }';
+    },
+
+    getProdCompanyLogo: () => {
+      return '';
     },
 
     getAreAllPerformancesAtSameVenue: () => {
