@@ -207,7 +207,7 @@ export default function Users({
         tableHeight={300}
       />
 
-      <div className="flex justify-end mt-5">
+      <div className="flex justify-end mt-5 mb-5">
         <div className="w-[700px]">
           <div className="flex flex-row justify-between items-center my-4">
             <div className="text-primary-navy text-xl font-bold">Your Permission Groups</div>
@@ -228,6 +228,7 @@ export default function Users({
             rowData={permisisonGroups}
             styleProps={styleProps}
             tableHeight={300}
+            gridOptions={{ suppressHorizontalScroll: true }}
           />
         </div>
       </div>
