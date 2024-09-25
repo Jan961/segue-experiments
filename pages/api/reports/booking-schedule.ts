@@ -6,7 +6,6 @@ import {
   colorCell,
   colorTextAndBGAndItalicCell,
   colorTextAndBGCell,
-  minutesInHHmmFormat,
   topAndBottomBorder,
 } from 'services/salesSummaryService';
 import { addWidthAsPerContent } from 'services/reportsService';
@@ -18,6 +17,7 @@ import { add, parseISO, format as dateFormat, differenceInDays } from 'date-fns'
 import { areDatesInSameWeek, formatDate, formatUtcTime } from 'services/dateService';
 import { PerformanceInfo } from 'services/reports/schedule-report';
 import { isValidNumber } from 'utils';
+import { sum } from 'radash';
 
 type SCHEDULE_VIEW = {
   ProductionId: number;
@@ -61,23 +61,10 @@ const styleHeader = ({ worksheet, row, numberOfColumns }: { worksheet: any; row:
   }
 };
 
-const addTime = (timeArr: string[] = []) => {
-  if (!timeArr?.length) {
-    return '00:00';
-  }
-  const { hour, min } = timeArr.reduce(
-    (acc, x) => {
-      const [h, m] = x.split(':');
-      return {
-        hour: Number(h) + acc.hour,
-        min: Number(m) + acc.min,
-      };
-    },
-    { hour: 0, min: 0 },
-  );
-  const minsTime = minutesInHHmmFormat(min);
-  const [h, m] = minsTime.split(':');
-  return `${hour + Number(h)}:${Number(m)}`;
+const convertMinutesToHoursMins = (timeInMins: number) => {
+  const hours = Math.floor(timeInMins / 60);
+  const minutes = timeInMins % 60;
+  return `${hours}:${minutes < 10 ? '0' : ''}${minutes}`;
 };
 
 const getKey = ({ FullProductionCode, ShowName, EntryDate }) => `${FullProductionCode} - ${ShowName} - ${EntryDate}`;
@@ -212,9 +199,9 @@ const handler = async (req, res) => {
     weekTotalPrinted: false,
     prevProductionWeekNum: '',
   };
-  let time: string[] = [];
+  let time: number[] = [];
   let mileage: number[] = [];
-  let totalTime: string[] = [];
+  let totalTime: number[] = [];
   let totalMileage: number[] = [];
   for (let i = 1; i <= daysDiff; i++) {
     lastWeekMetaInfo = { ...lastWeekMetaInfo, weekTotalPrinted: false };
@@ -264,9 +251,9 @@ const handler = async (req, res) => {
         PencilNum,
       } = value || {};
       const { Location: nextDayLocation } = nextDayValue || {};
-      const formattedTime = TimeMins ? minutesInHHmmFormat(Number(TimeMins)) : '';
+      const formattedTime = TimeMins ? convertMinutesToHoursMins(Number(TimeMins)) : '';
       if (nextDayLocation !== Location && !isCancelled) {
-        time.push(formattedTime || '00:00');
+        time.push(Number(TimeMins));
         mileage.push(Number(Mileage) || 0);
       }
       prevProductionWeekNum = ProductionWeekNum ? String(ProductionWeekNum) : prevProductionWeekNum;
@@ -331,7 +318,7 @@ const handler = async (req, res) => {
         '',
         ...blankPerformances,
         `Production Week ${value?.ProductionWeekNum || prevProductionWeekNum || ''}`,
-        addTime(time),
+        convertMinutesToHoursMins(sum(time)),
         mileage.reduce((acc, m) => acc + Number(m || 0), 0),
       ]);
       totalTime = [...totalTime, ...time];
@@ -368,7 +355,7 @@ const handler = async (req, res) => {
       '',
       ...blankPerformances,
       `Production Week ${lastWeekMetaInfo?.prevProductionWeekNum || ''}`,
-      addTime(time),
+      convertMinutesToHoursMins(sum(time)),
       mileage.reduce((acc, m) => acc + Number(m || 0), 0),
     ]);
     rowNo++;
@@ -385,7 +372,7 @@ const handler = async (req, res) => {
     '',
     '',
     ...blankPerformances,
-    addTime(totalTime),
+    convertMinutesToHoursMins(sum(totalTime)),
     totalMileage.reduce((acc, m) => acc + Number(m || 0), 0),
   ]);
   rowNo++;
