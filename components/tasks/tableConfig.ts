@@ -142,7 +142,7 @@ export const getColumnDefs = (usersList = [], production) => {
       field: 'TaskAssignedToAccUserId',
       valueGetter: function (params) {
         return params.data?.TaskAssignedToAccUserId
-          ? usersList.filter((user) => user.value === params.data?.TaskAssignedToAccUserId)[0].text
+          ? usersList?.find((user) => user.value === params.data?.TaskAssignedToAccUserId)?.text || null
           : null;
       },
       cellRenderer: DefaultCellRenderer,
@@ -203,7 +203,7 @@ export const getMasterTasksColumnDefs = (usersList = []) => {
       field: 'TaskAssignedToAccUserId',
       valueGetter: function (params) {
         return params.data?.TaskAssignedToAccUserId
-          ? usersList.filter((user) => user.value === params.data?.TaskAssignedToAccUserId)[0].text
+          ? usersList?.find((user) => user?.value === params.data?.TaskAssignedToAccUserId)?.text || null
           : null;
       },
       cellRenderer: DefaultCellRenderer,
