@@ -20,7 +20,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const newAccountContact = await createAccountContact(mappedAccountContact);
 
     // Send an email to confirm new account
-    await sendEmail(account.email, process.env.MARKETING_EMAIL, NEW_ACCOUNT_CONFIRMATION_EMAIL_TEMPLATE, null);
+    await sendEmail(account.email, NEW_ACCOUNT_CONFIRMATION_EMAIL_TEMPLATE, {});
 
     // Create Database for the new account
     await createClientDB(newAccount.AccountOrganisationId);

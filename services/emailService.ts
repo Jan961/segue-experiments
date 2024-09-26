@@ -3,14 +3,11 @@ import prisma from 'lib/prisma_master';
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-export const sendEmail = async (to: string, from: string, templateName: string, data: any) => {
+export const sendEmail = async (to: string, templateName: string, data: any) => {
   // Get template id from DB
   const template = await prisma.emailTemplate.findFirst({
     where: {
       EmTemName: templateName,
-    },
-    select: {
-      EmTemId: true,
     },
   });
 
@@ -20,10 +17,10 @@ export const sendEmail = async (to: string, from: string, templateName: string, 
 
   const msg = {
     to,
-    from,
+    from: template.EmTemFrom,
     templateId: template.EmTemId,
     dynamicTemplateData: data || {},
   };
-  console.log(msg);
+
   await sgMail.send(msg);
 };
