@@ -105,6 +105,7 @@ model Currency {
   CurrencyName          String    @db.VarChar(30)
   CurrencySymbolUnicode String?   @db.VarChar(30)
   Account               Account[]
+  Country               Country[]
 }
 
 model DBSetting {
@@ -139,15 +140,22 @@ model Permission {
 }
 
 model ProductionCompany {
-  ProdCoId            Int     @id @default(autoincrement())
-  ProdCoAccountId     Int
-  ProdCoName          String  @db.VarChar(50)
-  ProdCoWebSite       String? @db.VarChar(80)
-  ProdCoSaleStartWeek Int?    @default(-50) @db.SmallInt
-  ProdCoVATCode       String? @db.VarChar(20)
-  ProdCoLogoFileId    Int?
-  Account             Account @relation(fields: [ProdCoAccountId], references: [AccountId], onDelete: Cascade, map: "Account_ProductionCompany")
-  File                File?   @relation(fields: [ProdCoLogoFileId], references: [FileId], map: "File_ProductionCompany")
+  ProdCoId              Int     @id @default(autoincrement())
+  ProdCoAccountId       Int
+  ProdCoName            String  @db.VarChar(50)
+  ProdCoWebSite         String? @db.VarChar(80)
+  ProdCoSaleStartWeek   Int?    @default(-50) @db.SmallInt
+  ProdCoVATCode         String? @db.VarChar(20)
+  ProdCoLogoFileId      Int?
+  ProdCoAddress1        String? @db.VarChar(50)
+  ProdCoAddress2        String? @db.VarChar(50)
+  ProdCoAddress3        String? @db.VarChar(50)
+  ProdCoAddressTown     String? @db.VarChar(50)
+  ProdCoAddressCounty   String? @db.VarChar(50)
+  ProdCoAddressPostcode String? @db.VarChar(20)
+  ProdCoAddressCountry  String? @db.VarChar(30)
+  Account               Account @relation(fields: [ProdCoAccountId], references: [AccountId], onDelete: Cascade, map: "Account_ProductionCompany")
+  File                  File?   @relation(fields: [ProdCoLogoFileId], references: [FileId], map: "File_ProductionCompany")
 
   @@index([ProdCoAccountId], map: "Account_ProductionCompany")
   @@index([ProdCoLogoFileId], map: "File_ProductionCompany")
@@ -199,6 +207,16 @@ model EmailTemplate {
   EmTemDescription String  @db.VarChar(100)
   EmTemFrom        String  @db.VarChar(100)
   EmTemFields      String? @db.VarChar(100)
+}
+
+model Country {
+  CountryId           Int       @id @default(autoincrement())
+  CountryCode         String    @db.VarChar(3)
+  CountryName         String    @db.VarChar(40)
+  CountryCurrencyCode String?   @db.VarChar(3)
+  Currency            Currency? @relation(fields: [CountryCurrencyCode], references: [CurrencyCode], onDelete: Restrict, map: "Master_Currency_Country")
+
+  @@index([CountryCurrencyCode], map: "Master_Currency_Country")
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.

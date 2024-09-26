@@ -2,10 +2,10 @@ import { useSignUp, useSession } from '@clerk/nextjs';
 
 import axios from 'axios';
 import { useState } from 'react';
-import { useRecoilValue } from 'recoil';
-import { globalState } from 'state/global/globalState';
 import { isNullOrEmpty } from 'utils';
 import { generateRandomHash } from 'utils/crypto';
+import { useUrl } from 'nextjs-current-url';
+import { NEW_USER_CONFIRMATION_EMAIL_TEMPLATE } from 'config/global';
 
 type UserDetails = {
   email: string;
@@ -20,11 +20,11 @@ type UserDetails = {
 
 const useUser = () => {
   const { isLoaded: isSignUpLoaded } = useSignUp();
+  const { href: currentUrl } = useUrl();
   const { session } = useSession();
   const [error, setError] = useState('');
   const [isBusy, setIsBusy] = useState(false);
-  const { emailTemplates } = useRecoilValue(globalState);
-  const newUserEmailTemplate = emailTemplates.find(({ templateName }) => templateName === 'New User');
+
   const createUser = async (userDetails: UserDetails): Promise<boolean> => {
     try {
       setIsBusy(true);
@@ -60,14 +60,11 @@ const useUser = () => {
       }
 
       // Send out an email with the newly generated password
-      if (newUserEmailTemplate) {
-        await axios.post('/api/email/send', {
-          to: userDetails.email,
-          from: newUserEmailTemplate.emailFrom,
-          templateId: newUserEmailTemplate.templateId,
-          data: { password },
-        });
-      }
+      await axios.post('/api/email/send', {
+        to: userDetails.email,
+        templateName: NEW_USER_CONFIRMATION_EMAIL_TEMPLATE,
+        data: { email: userDetails.email, password, Weblink: `${currentUrl}/auth/sign-in` },
+      });
 
       // Create the user in our database
       const { data: createResponse } = await axios.post('/api/user/create', userDetails);

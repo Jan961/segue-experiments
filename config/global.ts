@@ -72,3 +72,6 @@ export const pdfStandardColors = {
   Invalid values - username@domain, user@.com
 */
 export const emailRegex = /^[\w-\\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+
+export const NEW_ACCOUNT_CONFIRMATION_EMAIL_TEMPLATE = 'Confirm New Account';
+export const NEW_USER_CONFIRMATION_EMAIL_TEMPLATE = 'Confirm New User';
