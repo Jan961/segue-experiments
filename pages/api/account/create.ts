@@ -16,7 +16,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const newAccount = await createAccount(mappedAccount);
     const mappedAccountContact = mapToAccountContactPrismaFields({ ...account, accountId: newAccount.AccountId });
     const newAccountContact = await createAccountContact(mappedAccountContact);
-    console.log(`Created Account`, newAccount);
+
     // Create Database for the new account
     await createClientDB(newAccount.AccountOrganisationId);
 

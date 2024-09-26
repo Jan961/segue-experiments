@@ -6,16 +6,11 @@ import FormError from 'components/core-ui-lib/FormError';
 import axios from 'axios';
 import { useRecoilValue } from 'recoil';
 import { userPermissionsState } from 'state/account/userPermissionsState';
+import { PermissionGroup } from './config';
 
 type GroupDetails = {
   groupName: string;
   permissions: TreeItemOption[];
-};
-
-type PermissionGroup = {
-  groupId: number;
-  groupName: string;
-  permissions: { id: number; name: string }[];
 };
 
 interface AdEditPermissionGroupProps {
