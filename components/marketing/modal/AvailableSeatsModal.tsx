@@ -6,7 +6,7 @@ import Button from 'components/core-ui-lib/Button';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import formatInputDate from 'utils/dateInputFormat';
 import { getTimeFromDateAndTime } from 'services/dateService';
-import { UpdateAvailableSeatsParams } from 'pages/api/marketing/availableSeats/update';
+import { UpdateAvailableSeatsParams } from 'pages/api/marketing/available-seats/update';
 import { ConfDialogVariant } from 'components/core-ui-lib/ConfirmationDialog/ConfirmationDialog';
 
 interface AvailableSeatsModalProps {

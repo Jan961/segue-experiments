@@ -13,6 +13,7 @@ import { Elements } from '@stripe/react-stripe-js';
 import axios from 'axios';
 import { notify } from 'components/core-ui-lib';
 import { getCountriesAsSelectOptions, getCurrenciesAsSelectOptions } from 'services/globalService';
+import { SelectOption } from 'components/core-ui-lib/Select/Select';
 
 export const getServerSideProps: GetServerSideProps = async () => {
   const planColors = ['#41a29a', '#0093c0', '#7b568d'];
@@ -89,6 +90,7 @@ const NewAccount = ({
         accountDetails,
       );
       setAccountDetails(data);
+
       onSaveSuccess();
     } catch (error) {
       console.error(error);

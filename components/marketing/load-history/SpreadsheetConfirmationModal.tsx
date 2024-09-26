@@ -12,7 +12,7 @@ interface SpreadsheetModalProps {
   handleUpload: () => void;
   uploadParams: UploadParamType;
   uploadedFile: UploadedFile[];
-  prodCode: string | null;
+  prodShowCode: string | null;
 }
 
 const SpreadsheetConfirmationModal = ({
@@ -22,7 +22,7 @@ const SpreadsheetConfirmationModal = ({
   uploadParams,
   uploadedFile,
   closeUploadModal,
-  prodCode,
+  prodShowCode,
 }: SpreadsheetModalProps) => {
   const [validConfirmationMessage, setValidConfirmationMessage] = useState<boolean>(null);
   const [displayErrorMessage, setDisplayErrorMessage] = useState<boolean>(false);
@@ -74,11 +74,11 @@ const SpreadsheetConfirmationModal = ({
     return (
       <div>
         <p className="mb-5">
-          This data will be uploaded to {prodCode}. Any existing Booking/Sales data for {prodCode} will be{' '}
+          This data will be uploaded to {prodShowCode}. Any existing Booking/Sales data for {prodShowCode} will be{' '}
           <strong className="text-primary-red">OVERWRITTEN</strong>. Do you wish to proceed?
         </p>
         <div className="mb-5">
-          <TextBoxConfirmation requiredMessage={prodCode} setValid={setValidConfirmationMessage} />
+          <TextBoxConfirmation requiredMessage={prodShowCode} setValid={setValidConfirmationMessage} />
           {displayErrorMessage && (
             <p className="text-primary-red absolute">Please enter the text exactly as displayed to confirm.</p>
           )}

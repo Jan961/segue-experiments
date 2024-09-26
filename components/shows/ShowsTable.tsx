@@ -38,7 +38,6 @@ const ShowsTable = ({
   rowsData,
   isAddRow = false,
   addNewRow,
-  isEdited = false,
   handleEdit,
   isArchived = false,
   setIsAddRow,
@@ -47,7 +46,6 @@ const ShowsTable = ({
   isAddRow: boolean;
   addNewRow: () => void;
   isArchived: boolean;
-  isEdited: boolean;
   handleEdit: () => void;
   setIsAddRow: (value: boolean) => void;
 }) => {
@@ -95,7 +93,7 @@ const ShowsTable = ({
     } else if (e.column.colId === 'productions' && e.data.Id) {
       setShowProductionsModal(true);
       setCurrentShow(e.data);
-    } else if (e.column.colId === 'EditId' && currentShow?.Id && isEdited) {
+    } else if (e.column.colId === 'EditId' && currentShow?.Id) {
       if (!(currentShow?.Code?.length > 0)) {
         notify.error('Error Creating Show. Please enter a show code');
       } else if (!(currentShow?.Name?.length >= 2)) {
