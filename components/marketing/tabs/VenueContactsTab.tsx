@@ -69,7 +69,7 @@ const VenueContactsTab = forwardRef<VenueContactTabRef, VenueContactsProps>((pro
           VenueId: booking.VenueId,
         };
 
-        const response = await axios.post('/api/marketing/venueContacts/create', newVc);
+        const response = await axios.post('/api/marketing/venue-contacts/create', newVc);
         const newVenueContact = response.data;
 
         if (typeof newVenueContact === 'object') {
@@ -98,7 +98,7 @@ const VenueContactsTab = forwardRef<VenueContactTabRef, VenueContactsProps>((pro
         const updatedRow = mapVenueContactToPrisma(data.updatedFormData);
         const dataToUpdate = { ...updatedRow, VenueId: booking.VenueId, Id: vcId, VenueRoleId: role.Id };
 
-        const { data: updResponse } = await axios.post('/api/marketing/venueContacts/update', dataToUpdate);
+        const { data: updResponse } = await axios.post('/api/marketing/venue-contacts/update', dataToUpdate);
 
         const tempVenueContactUi: UiVenueContact = transformVenueContacts({
           ...updatedRow,
@@ -119,7 +119,7 @@ const VenueContactsTab = forwardRef<VenueContactTabRef, VenueContactsProps>((pro
         // delete venue contact
       } else if (variant === 'delete') {
         const updatedRow = mapVenueContactToPrisma(data.updatedFormData);
-        if (updatedRow.VenueRoleId) await axios.post('/api/marketing/venueContacts/delete', updatedRow);
+        if (updatedRow.VenueRoleId) await axios.post('/api/marketing/venue-contacts/delete', updatedRow);
       }
     } catch (error) {
       console.error(error, 'Error - failed updating Venue Contact');
@@ -130,7 +130,7 @@ const VenueContactsTab = forwardRef<VenueContactTabRef, VenueContactsProps>((pro
     try {
       setVenueContacts([]);
 
-      const response = await axios.get(`/api/marketing/venueContacts/${venueId}`);
+      const response = await axios.get(`/api/marketing/venue-contacts/${venueId}`);
       const venueContacts = response.data;
 
       if (venueContacts && Array.isArray(venueContacts) && venueContacts.length > 0) {
