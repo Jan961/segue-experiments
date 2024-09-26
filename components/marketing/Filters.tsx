@@ -135,7 +135,7 @@ const Filters = () => {
   useEffect(() => {
     const getOpenGraphInfo = async () => {
       try {
-        const response = await axios.post('/api/marketing/openGraphInfo/read', { url: landingURL });
+        const response = await axios.post('/api/marketing/open-graph-info/read', { url: landingURL });
         const result = await response.data;
         const { ogImage, ogTitle } = result;
         if (!isNullOrEmpty(ogImage)) {
