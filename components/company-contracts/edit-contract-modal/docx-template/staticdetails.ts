@@ -28,11 +28,11 @@ const createHelperFunctions = (productionInfo: Partial<ProductionDTO>, productio
 
     getFirstPerfDate: () => {
       const firstPerformance = productionSchedule.find((day) => !day.isCancelled && day.type === 'Performance');
-      return firstPerformance?.date || '{ FIRST PERFORMANCE DATE UNAVAILABLE }';
+      return firstPerformance?.date || 'FIRSTPERFORMANCEDATE';
     },
 
     getShowName: () => {
-      return productionInfo?.ShowName || '{ SHOW NAME UNAVAILABLE }';
+      return productionInfo?.ShowName || 'SHOWNAME';
     },
 
     // Is this just the ShowCode + ShowName?
@@ -40,19 +40,19 @@ const createHelperFunctions = (productionInfo: Partial<ProductionDTO>, productio
       const showCode = productionInfo?.ShowCode;
       const showName = productionInfo?.ShowName;
       if (!showCode || !showName) {
-        return '{ PRODUCTION NAME UNAVAILABLE }';
+        return 'PRODUCTIONNAME';
       } else {
         return `${showCode} ${showName}`;
       }
     },
 
     getProductionCompanyName: () => {
-      return productionInfo?.ProductionCompany?.ProdCoName || '{ PRODUCTION COMPANY NAME UNAVAILABLE }';
+      return productionInfo?.ProductionCompany?.ProdCoName || 'PRODCOMPANYNAME';
     },
 
     // TODO
     getProductionCompanyAddress: () => {
-      return '{ PRODUCTION COMPANY ADDRESS }';
+      return '';
     },
 
     // TODO
@@ -84,7 +84,7 @@ const createHelperFunctions = (productionInfo: Partial<ProductionDTO>, productio
       const venues = productionSchedule.filter((day) => day.type === 'Performance').map((day) => day.venue);
       const uniqueVenue = new Set(venues);
 
-      const result = uniqueVenue.size === 1 ? uniqueVenue.values().next().value : '{ NO SINGLE VENUE }';
+      const result = uniqueVenue.size === 1 ? uniqueVenue.values().next().value : 'SINGLEPERFORMANCEVENUE';
       return result;
     },
   };
