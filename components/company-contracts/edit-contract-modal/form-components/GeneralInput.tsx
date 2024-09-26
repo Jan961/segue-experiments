@@ -1,12 +1,5 @@
 import { useState, useEffect } from 'react';
-import { TextInput, BooleanInput, NumberInput, DateInput } from './form-components';
-
-const formTypeMap = {
-  Number: NumberInput,
-  String: TextInput,
-  Boolean: BooleanInput,
-  Date: DateInput,
-};
+import { FormTypeMap } from './FormTypeMap';
 
 interface FormInputGeneralProps {
   type: string;
@@ -16,7 +9,7 @@ interface FormInputGeneralProps {
 }
 
 export const FormInputGeneral = ({ type, label, initialValue, handleChange }: FormInputGeneralProps) => {
-  const Component = formTypeMap[type];
+  const Component = FormTypeMap[type];
   const [value, setValue] = useState(initialValue);
 
   useEffect(() => {

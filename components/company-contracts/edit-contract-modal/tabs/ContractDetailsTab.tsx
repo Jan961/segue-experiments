@@ -1,5 +1,5 @@
 import { TemplateFormRowPopulated, ContractData, TemplateFormRow } from 'components/company-contracts/types';
-import { FormInputGeneral } from '../formTypeMap';
+import { FormInputGeneral } from '../form-components/GeneralInput';
 import { PlusCircleSolidIcon, MinusCircleSolidIcon } from 'components/core-ui-lib/assets/svg';
 import { useEffect } from 'react';
 import { populateTemplateWithValues } from '../utils';
