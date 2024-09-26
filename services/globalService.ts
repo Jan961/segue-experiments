@@ -8,10 +8,26 @@ export const getAllCurrencyList = () => {
   });
 };
 
+export const getAllCountries = () => {
+  return prisma.Country.findMany({
+    orderBy: {
+      CountryName: 'asc',
+    },
+  });
+};
+
 export const getCurrenciesAsSelectOptions = async () => {
   const currencies = await getAllCurrencyList();
   return currencies.map(({ CurrencyCode, CurrencyName }) => ({
     value: CurrencyCode,
     text: CurrencyName,
+  }));
+};
+
+export const getCountriesAsSelectOptions = async () => {
+  const countries = await getAllCountries();
+  return countries.map(({ CountryCode, CountryName }) => ({
+    value: CountryCode,
+    text: CountryName,
   }));
 };

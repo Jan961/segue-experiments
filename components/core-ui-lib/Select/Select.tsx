@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useMemo, useState } from 'react';
+import React, { forwardRef, useEffect, useMemo, useState, useId } from 'react';
 import WindowedSelect, {
   components,
   StylesConfig,
@@ -293,6 +293,7 @@ export default forwardRef(function Select(
       <div className="w-full h-full" data-testid={testId || 'core-ui-lib-select'}>
         <WindowedSelect
           ref={ref}
+          instanceId={useId()} // eslint-disable-line react-hooks/exhaustive-deps
           className="w-full"
           onInputChange={(inputValue) => {
             if (inputValue) {

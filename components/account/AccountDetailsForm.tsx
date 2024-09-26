@@ -6,6 +6,7 @@ import { useWizard } from 'react-use-wizard';
 import Select from 'components/core-ui-lib/Select';
 import schema from './schema/accountDetailsFormSchema';
 import { Checkbox, PopupModal } from 'components/core-ui-lib';
+import { SelectOption } from 'components/core-ui-lib/Select/Select';
 
 export type Account = {
   accountId?: number;
@@ -28,12 +29,13 @@ export type Account = {
 
 interface AccountDetailsFormProps {
   currencies: SelectOption[];
+  countries: SelectOption[];
   accountDetails: Account;
   onChange: (v: Account) => void;
   onSave: (callBack: () => void) => void;
 }
 
-const AccountDetailsForm = ({ currencies, accountDetails, onChange, onSave }: AccountDetailsFormProps) => {
+const AccountDetailsForm = ({ currencies, countries, accountDetails, onChange, onSave }: AccountDetailsFormProps) => {
   const { nextStep } = useWizard();
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [showModal, setShowModal] = useState(false);
@@ -196,7 +198,7 @@ const AccountDetailsForm = ({ currencies, accountDetails, onChange, onSave }: Ac
               name="country"
               placeholder="Select country"
               className="w-full h-[31px]"
-              options={[{ text: 'United Kingdom', value: 'United Kingdom' }]}
+              options={countries}
               value={accountDetails.country}
               onChange={(value) => onChange({ ...accountDetails, country: value.toString() })}
               isClearable={false}

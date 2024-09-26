@@ -12,7 +12,7 @@ import AccountConfirmation from 'components/account/AccountConfirmation';
 import { Elements } from '@stripe/react-stripe-js';
 import axios from 'axios';
 import { notify } from 'components/core-ui-lib';
-import { getCurrenciesAsSelectOptions } from 'services/currencyService';
+import { getCountriesAsSelectOptions, getCurrenciesAsSelectOptions } from 'services/globalService';
 
 export const getServerSideProps: GetServerSideProps = async () => {
   const planColors = ['#41a29a', '#0093c0', '#7b568d'];
@@ -36,11 +36,13 @@ export const getServerSideProps: GetServerSideProps = async () => {
 
   // get countries and currencies
   const currencies = await getCurrenciesAsSelectOptions();
+  const countries = await getCountriesAsSelectOptions();
 
   return {
     props: {
       plans: subscriptionPlans,
       currencies,
+      countries,
     },
   };
 };
@@ -66,7 +68,16 @@ const DEFAULT_ACCOUNT_DETAILS = {
 };
 export type AccountDetails = typeof DEFAULT_ACCOUNT_DETAILS;
 const ACCOUNT_CREATION_FAILED_ERROR = 'Error creating new account';
-const NewAccount = ({ plans, currencies = [] }: { stripeOptions: any; plans: Plan[]; currencies: SelectOption[] }) => {
+const NewAccount = ({
+  plans,
+  currencies = [],
+  countries = [],
+}: {
+  stripeOptions: any;
+  plans: Plan[];
+  currencies: SelectOption[];
+  countries: SelectOption[];
+}) => {
   const stripe = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
   const [accountDetails, setAccountDetails] = useState<Account>(DEFAULT_ACCOUNT_DETAILS);
   const [subcriptionDetails, seSubscriptionDetails] = useState<Plan>(null);
@@ -91,6 +102,7 @@ const NewAccount = ({ plans, currencies = [] }: { stripeOptions: any; plans: Pla
       <Wizard>
         <AccountDetailsForm
           currencies={currencies}
+          countries={countries}
           accountDetails={accountDetails}
           onChange={setAccountDetails}
           onSave={handleSaveAccountDetails}
