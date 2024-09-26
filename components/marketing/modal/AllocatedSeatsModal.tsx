@@ -14,6 +14,7 @@ import useAxios from 'hooks/useAxios';
 import formatInputDate from 'utils/dateInputFormat';
 import { getTimeFromDateAndTime } from 'services/dateService';
 import { hasAllocSeatsChanged } from '../utils';
+import { isNull, isNullOrEmpty } from 'utils';
 
 interface AllocatedModalProps {
   show: boolean;
@@ -45,11 +46,19 @@ export default function AllocatedSeatsModal({
   const [seatNumList, setSeatNumList] = useState('');
   const [requestedBy, setRequestedBy] = useState('');
   const [comments, setComments] = useState('');
-  const [arrangedBy, setArrangedBy] = useState('');
+  const [arrangedBy, setArrangedBy] = useState(null);
   const [venueConfNotes, setVenueConfNotes] = useState('');
   const [showConfirm, setShowConfirm] = useState(false);
   const [confVariant, setConfVariant] = useState<ConfDialogVariant>('cancel');
   const [allocId, setAllocId] = useState(null);
+
+  const labelClass = 'text-base text-primary-input-text flex flex-col text-left w-1/3';
+
+  const [errors, setErrors] = useState({
+    performance: false,
+    numberOfSeats: false,
+    arrangedBy: false,
+  });
 
   const initForm = () => {
     const userTempList = Object.values(users).map(({ AccUserId, FirstName = '', LastName = '' }) => ({
@@ -63,8 +72,6 @@ export default function AllocatedSeatsModal({
       const perf = perfList.find(
         (perfRec) => formatInputDate(perfRec.date) === data.date && getTimeFromDateAndTime(perfRec.date) === data.time,
       );
-
-      console.log(data);
 
       setPerfSelected(perf.value);
       setCustName(data.TicketHolderName);
@@ -90,12 +97,21 @@ export default function AllocatedSeatsModal({
       setSeatNumList('');
       setRequestedBy('');
       setComments('');
-      setArrangedBy('');
+      setArrangedBy(null);
       setVenueConfNotes('');
     }
   };
 
   const handleSave = () => {
+    if (isNullOrEmpty(arrangedBy) || isNullOrEmpty(numSeatsReq) || isNullOrEmpty(perfSelected)) {
+      setErrors({
+        arrangedBy: isNullOrEmpty(arrangedBy),
+        numberOfSeats: isNullOrEmpty(numSeatsReq),
+        performance: isNullOrEmpty(perfSelected),
+      });
+      return;
+    }
+
     const perf = perfList.find((perfRec) => perfRec.value === parseInt(perfSelected));
     let data = {
       ArrangedByAccUserId: parseInt(arrangedBy),
@@ -146,6 +162,7 @@ export default function AllocatedSeatsModal({
       setShowConfirm(false);
       onSave(data, parseInt(perfSelected), 'delete');
     } else {
+      resetErrors();
       setShowConfirm(false);
       onCancel();
     }
@@ -167,6 +184,7 @@ export default function AllocatedSeatsModal({
         setConfVariant(confType);
         setShowConfirm(true);
       } else {
+        resetErrors();
         onCancel();
       }
     } else if (type === 'edit') {
@@ -193,6 +211,7 @@ export default function AllocatedSeatsModal({
           setConfVariant(confType);
           setShowConfirm(true);
         } else {
+          resetErrors();
           onCancel();
         }
       }
@@ -217,11 +236,38 @@ export default function AllocatedSeatsModal({
             time: perf.Time.substring(0, 5),
           });
         });
+
         setPerfList(optionList);
       }
     } catch (error) {
       console.log(error);
     }
+  };
+
+  const setPerfValue = (value) => {
+    if (isNull(value)) {
+      setPerfSelected(null);
+    } else {
+      setPerfSelected(value.toString());
+      setErrors({ ...errors, performance: false });
+    }
+  };
+
+  const setArrangedByVal = (value) => {
+    if (isNull(value)) {
+      setArrangedBy(null);
+    } else {
+      setArrangedBy(value.toString());
+      setErrors({ ...errors, arrangedBy: false });
+    }
+  };
+
+  const resetErrors = () => {
+    setErrors({
+      arrangedBy: false,
+      numberOfSeats: false,
+      performance: false,
+    });
   };
 
   useEffect(() => {
@@ -244,15 +290,16 @@ export default function AllocatedSeatsModal({
           <div className="text-xl text-primary-navy font-bold mb-4 -mt-3">Allocated Seats</div>
 
           <div className="flex flex-row">
-            <div className="text-base text-primary-input-text flex flex-col text-left w-1/3">For Performance</div>
+            <div className={labelClass}>For Performance</div>
             <div className="flex flex-col w-2/3">
               <Select
                 testId="perf-date-or-time"
-                className={classNames('w-full !border-0 text-primary-input-text mb-4')}
+                className={classNames('w-full mb-4')}
                 options={perfList}
                 value={perfSelected}
-                onChange={(value) => setPerfSelected(value.toString())}
+                onChange={setPerfValue}
                 placeholder="Select Date/Time"
+                error={errors.performance}
                 isClearable
                 isSearchable
               />
@@ -260,7 +307,7 @@ export default function AllocatedSeatsModal({
           </div>
 
           <div className="flex flex-row">
-            <div className="text-base text-primary-input-text flex flex-col text-left w-1/3">Customer Name</div>
+            <div className={labelClass}>Customer Name</div>
             <div className="flex flex-col w-2/3">
               <TextInput
                 className="w-full mb-4"
@@ -274,7 +321,7 @@ export default function AllocatedSeatsModal({
           </div>
 
           <div className="flex flex-row">
-            <div className="text-base text-primary-input-text flex flex-col text-left w-1/3">Email</div>
+            <div className={labelClass}>Email</div>
             <div className="flex flex-col w-2/3">
               <TextInput
                 className="w-full mb-4"
@@ -288,9 +335,7 @@ export default function AllocatedSeatsModal({
           </div>
 
           <div className="flex flex-row">
-            <div className="text-base text-primary-input-text flex flex-col text-left w-1/3">
-              Number of Seats Required
-            </div>
+            <div className={labelClass}>Number of Seats Required</div>
             <div className="flex flex-col w-2/3">
               <TextInput
                 className="w-full mb-4"
@@ -298,13 +343,17 @@ export default function AllocatedSeatsModal({
                 placeholder="Enter No. Seats"
                 id="seatsRequired"
                 value={numSeatsReq}
-                onChange={(event) => setNumericVal(event.target.value)}
+                onChange={(event) => {
+                  setNumericVal(event.target.value);
+                  setErrors({ ...errors, numberOfSeats: false });
+                }}
+                error={errors.numberOfSeats ? 'Seat number required' : ''}
               />
             </div>
           </div>
 
           <div className="flex flex-row">
-            <div className="text-base text-primary-input-text flex flex-col text-left w-1/3">Seat Numbers</div>
+            <div className={labelClass}>Seat Numbers</div>
             <div className="flex flex-col w-2/3">
               <TextInput
                 className="w-full mb-4"
@@ -318,7 +367,7 @@ export default function AllocatedSeatsModal({
           </div>
 
           <div className="flex flex-row">
-            <div className="text-base text-primary-input-text flex flex-col text-left w-1/3">Requested by</div>
+            <div className={labelClass}>Requested by</div>
             <div className="flex flex-col w-2/3">
               <TextInput
                 className="w-full mb-4"
@@ -332,7 +381,7 @@ export default function AllocatedSeatsModal({
           </div>
 
           <div className="flex flex-row">
-            <div className="text-base text-primary-input-text flex flex-col text-left w-1/3">Comments</div>
+            <div className={labelClass}>Comments</div>
             <div className="flex flex-col w-2/3">
               <TextInput
                 className="w-full mb-4"
@@ -346,23 +395,24 @@ export default function AllocatedSeatsModal({
           </div>
 
           <div className="flex flex-row">
-            <div className="text-base text-primary-input-text flex flex-col text-left w-1/3">Arranged by</div>
+            <div className={labelClass}>Arranged by</div>
             <div className="flex flex-col w-2/3">
               <Select
-                className={classNames('w-full !border-0 text-primary-input-text mb-4')}
+                className={classNames('w-full text-primary-input-text mb-4')}
                 testId="select-user"
                 options={userList}
                 value={arrangedBy}
-                onChange={(value) => setArrangedBy(value !== null ? value.toString() : '')}
+                onChange={setArrangedByVal}
                 placeholder="Select User"
                 isClearable
                 isSearchable
+                error={errors.arrangedBy}
               />
             </div>
           </div>
 
           <div className="flex flex-row">
-            <div className="text-base text-primary-input-text flex flex-col text-left w-1/3">
+            <div className={labelClass}>
               Venue
               <br />
               Confirmation
@@ -380,7 +430,13 @@ export default function AllocatedSeatsModal({
             </div>
           </div>
 
-          <div className="place-content-center flex flex-row mt-5 pb-5">
+          {(errors.arrangedBy || errors.numberOfSeats || errors.performance) && (
+            <div className="text-primary-red flex-row flex float-right mt-3 -mb-2">
+              Please ensure you fill in the required fields
+            </div>
+          )}
+
+          <div className="flex flex-row mt-5 pb-5 float-right">
             <Button className="w-32" variant="secondary" text="Cancel" onClick={() => handleConfirm('cancel')} />
             <Button className="ml-4 w-32" onClick={() => handleConfirm('delete')} variant="tertiary" text="Delete" />
             <Button className="ml-4 w-32" variant="primary" text="Save and Close" onClick={handleSave} />
