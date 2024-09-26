@@ -7,15 +7,17 @@ import AccountDetailsForm, { Account } from 'components/account/AccountDetailsFo
 import PaymentDetailsForm from 'components/account/PaymentDetailsForm';
 import { useState } from 'react';
 import { GetServerSideProps } from 'next';
-import getAllPlans from 'services/subscriptionPlans';
+// import getAllPlans from 'services/subscriptionPlans';
 import AccountConfirmation from 'components/account/AccountConfirmation';
 import { Elements } from '@stripe/react-stripe-js';
 import axios from 'axios';
 import { notify } from 'components/core-ui-lib';
+import { useRecoilValue } from 'recoil';
+import { globalState } from 'state/global/globalState';
 
 export const getServerSideProps: GetServerSideProps = async () => {
   const planColors = ['#41a29a', '#0093c0', '#7b568d'];
-  const plans = await getAllPlans();
+  const plans = []; // await getAllPlans(); - Temporarily disabled
   let subscriptionPlans = [];
   if (plans) {
     const formattedPlans = plans.map((p, i) => {
@@ -63,7 +65,7 @@ const ACCOUNT_CREATION_FAILED_ERROR = 'Error creating new account';
 const NewAccount = ({ plans }: { stripeOptions: any; plans: Plan[] }) => {
   const stripe = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
   const [accountDetails, setAccountDetails] = useState<Account>(DEFAULT_ACCOUNT_DETAILS);
-
+  const { emailTemplates } = useRecoilValue(globalState);
   const [subcriptionDetails, seSubscriptionDetails] = useState<Plan>(null);
 
   const handleSaveAccountDetails = async (onSaveSuccess: () => void) => {
@@ -73,6 +75,15 @@ const NewAccount = ({ plans }: { stripeOptions: any; plans: Plan[] }) => {
         accountDetails,
       );
       setAccountDetails(data);
+      console.log('data', data);
+      // Send an email for account confirmation
+      const emailTemplate = emailTemplates.find(({ templateName }) => templateName === 'Confirm New Account');
+      await axios.post('/api/email/send', {
+        to: data.email,
+        from: emailTemplate.emailFrom,
+        templateId: emailTemplate.templateId,
+        data: {},
+      });
       onSaveSuccess();
     } catch (error) {
       console.error(error);

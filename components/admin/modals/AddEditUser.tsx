@@ -1,4 +1,4 @@
-import { Button, Checkbox, ConfirmationDialog, Label, PopupModal, TextInput } from 'components/core-ui-lib';
+import { Button, Checkbox, ConfirmationDialog, Label, PopupModal, Select, TextInput } from 'components/core-ui-lib';
 import TreeSelect from 'components/global/TreeSelect';
 import { TreeItemOption } from 'components/global/TreeSelect/types';
 import { useEffect, useState } from 'react';
@@ -8,6 +8,11 @@ import Spinner from 'components/core-ui-lib/Spinner';
 import { newUserSchema } from 'validators/user';
 import FormError from 'components/core-ui-lib/FormError';
 import axios from 'axios';
+import { PermissionGroup, Production } from './config';
+import { isNullOrEmpty, mapRecursive } from 'utils';
+import { SelectOption } from 'components/core-ui-lib/Select/Select';
+import { CustomOption } from 'components/core-ui-lib/Table/renderers/SelectCellRenderer';
+import classNames from 'classnames';
 
 type UserDetails = {
   accountUserId?: number;
@@ -19,19 +24,20 @@ type UserDetails = {
   permissions: TreeItemOption[];
   accountId: number;
   isSystemAdmin: boolean;
-  productions: TreeItemOption[];
+  productions: Production[];
 };
 
 interface AdEditUserProps {
   permissions: TreeItemOption[];
-  productions: TreeItemOption[];
+  productions: Production[];
   onClose: (refresh?: boolean) => void;
   visible: boolean;
   selectedUser?: Partial<UserDetails>;
+  groups: PermissionGroup[];
 }
 
 const DEFAULT_USER_DETAILS: UserDetails = {
-  accountId: 1,
+  accountId: NaN,
   email: '',
   firstName: '',
   lastName: '',
@@ -42,18 +48,38 @@ const DEFAULT_USER_DETAILS: UserDetails = {
   isSystemAdmin: false,
 };
 
-const AdEditUser = ({ visible, onClose, permissions, productions = [], selectedUser }: AdEditUserProps) => {
+const AdEditUser = ({ visible, onClose, permissions, productions = [], selectedUser, groups }: AdEditUserProps) => {
   const [userDetails, setUserDetails] = useState<UserDetails>(DEFAULT_USER_DETAILS);
   const [isFormDirty, setIsFormDirty] = useState(false);
   const [showConfirmationDialog, setShowConfirmationDialog] = useState(false);
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [allProductionsChecked, setAllProductionsChecked] = useState(false);
-
-  const { isSignUpLoaded, createUser, updateUser, error } = useUser();
+  const [permissionGroups, setPermissionGroups] = useState<SelectOption[]>([]);
+  const [selectedGroups, setSelectedGroups] = useState<number[]>([]);
+  const { isSignUpLoaded, isBusy, createUser, updateUser, error } = useUser();
 
   const handleInputChange = (e) => {
     setIsFormDirty(true);
     setUserDetails({ ...userDetails, [e.target.name]: e.target.value });
+  };
+
+  const applyPermissionsForSelectedGroups = () => {
+    const permissionsForSelectedGroups = groups
+      .filter(({ groupId }) => selectedGroups.includes(groupId))
+      .map(({ permissions }) => permissions);
+
+    const perms = [...permissions];
+    const updatedPermissions = permissionsForSelectedGroups.reduce((acc, p) => {
+      const updatedPermissions = mapRecursive(acc, (o) => {
+        const value = p.find((v) => v.id === Number(o.id));
+        return { ...o, checked: !!value || o.checked };
+      });
+
+      acc = updatedPermissions;
+      return acc;
+    }, perms);
+
+    setUserDetails((prev) => ({ ...prev, permissions: updatedPermissions }));
   };
 
   useEffect(() => {
@@ -61,6 +87,25 @@ const AdEditUser = ({ visible, onClose, permissions, productions = [], selectedU
       setUserDetails((prev) => ({ ...prev, productions, permissions }));
     }
   }, [productions, permissions, selectedUser]);
+
+  useEffect(() => {
+    if (isNullOrEmpty(selectedGroups)) {
+      setUserDetails((prev) => ({ ...prev, permissions }));
+    } else {
+      applyPermissionsForSelectedGroups();
+    }
+  }, [selectedGroups]);
+
+  useEffect(() => {
+    if (!isNullOrEmpty(groups)) {
+      setPermissionGroups(
+        groups.map((g: PermissionGroup) => ({
+          text: g.groupName,
+          value: g.groupId.toString(),
+        })),
+      );
+    }
+  }, [groups]);
 
   const fetchPermissionsForSelectedUser = async () => {
     const { data } = await axios.get(`/api/admin/user-permissions/${selectedUser.accountUserId}`);
@@ -103,8 +148,12 @@ const AdEditUser = ({ visible, onClose, permissions, productions = [], selectedU
   const handleProductionToggle = (e) => {
     setIsFormDirty(true);
     const { id, checked } = e.target;
-    const updatedProductions = userDetails.productions.map((p) => (p.id === id ? { ...p, checked } : p));
-    setUserDetails({ ...userDetails, productions: updatedProductions });
+    const updatedProductions = userDetails.productions.map((p) => ({
+      ...p,
+      checked: p.id === id ? checked : p.checked,
+    }));
+
+    setUserDetails((prev) => ({ ...prev, productions: updatedProductions }));
     if (!checked) {
       setAllProductionsChecked(false);
     }
@@ -143,11 +192,24 @@ const AdEditUser = ({ visible, onClose, permissions, productions = [], selectedU
     setUserDetails({ ...userDetails, productions: updatedProductions });
   };
 
+  const handleIsSystemAdminToggle = (e) => {
+    const checked = e.target.checked;
+    const updatedProductions = userDetails.productions.map((p) => ({ ...p, checked }));
+    const updatedPermissions = mapRecursive(userDetails.permissions, (o) => ({ ...o, checked }));
+    setAllProductionsChecked(checked);
+    setUserDetails({
+      ...userDetails,
+      isSystemAdmin: checked,
+      permissions: updatedPermissions,
+      productions: updatedProductions,
+    });
+  };
+
   const handleModalClose = () => {
     isFormDirty ? setShowConfirmationDialog(true) : onClose();
   };
 
-  return isSignUpLoaded ? (
+  return isSignUpLoaded || isBusy ? (
     <>
       <PopupModal
         show={visible}
@@ -214,40 +276,63 @@ const AdEditUser = ({ visible, onClose, permissions, productions = [], selectedU
               </div>
               <FormError error={validationErrors.pin} className="ml-2" />
             </div>
+            <div className="mt-5">
+              <div>
+                <Label text="Add to Permission Group(s)*" variant="lg" />
+                <Label text="Optional" variant="sm" />
+              </div>
+
+              <Select
+                isMulti
+                renderOption={(option) => <CustomOption option={option} isMulti />}
+                options={permissionGroups}
+                onChange={(values: string[]) => setSelectedGroups(values.map((v) => Number(v)))}
+              />
+            </div>
           </div>
+
           <Checkbox
             className="mb-4"
             id="isSystemAdmin"
             testId="user-is-system-admin"
             checked={userDetails.isSystemAdmin}
             labelClassName="font-semibold"
-            label="This user wil be a System Administrator"
-            onChange={(e) => setUserDetails({ ...userDetails, isSystemAdmin: e.target.checked })}
+            label="This user will be a System Administrator"
+            onChange={handleIsSystemAdminToggle}
           />
           <div className="flex flex-row gap-4 w-full">
             <div className="w-full max-h-[400px] overflow-y-hidden">
               <h2 className="text-xl text-bold mb-2">Productions</h2>
-              <div className="w-full max-h-[400px] overflow-y-auto">
-                <Checkbox
-                  id="allProductions"
-                  name="allProductions"
-                  label="All Productions"
-                  checked={allProductionsChecked}
-                  onChange={handleAllProductionsToggle}
-                  testId="all-productions-checkbox"
-                />
-                {userDetails.productions.map((production) => (
+              {!isNullOrEmpty(userDetails.productions) ? (
+                <div className="w-full max-h-[400px] overflow-y-auto">
                   <Checkbox
-                    key={production.id}
-                    id={`${production.label}${production.id}`}
-                    name={production.id}
-                    label={production.label}
-                    checked={production.checked}
-                    onChange={handleProductionToggle}
-                    testId={`${production.label}-checkbox`}
+                    className="p-1"
+                    id="allProductions"
+                    name="allProductions"
+                    label="All Productions"
+                    checked={allProductionsChecked}
+                    onChange={handleAllProductionsToggle}
+                    testId="all-productions-checkbox"
                   />
-                ))}
-              </div>
+                  {userDetails.productions.map((production) => (
+                    <div
+                      className={classNames('p-1', 'w-full', production.isArchived ? 'bg-secondary-list-row' : '')}
+                      key={production.id}
+                    >
+                      <Checkbox
+                        id={production.id}
+                        name={production.id}
+                        label={`${production.label}${production.isArchived ? ' (A)' : ''}`}
+                        checked={production.checked}
+                        onChange={handleProductionToggle}
+                        testId={`${production.label}-checkbox`}
+                      />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <Label text="No productions have been added to this account" />
+              )}
             </div>
             <div className="w-full max-h-[400px]  overflow-y-hidden">
               <h2 className="text-xl text-bold mb-2">Permissions</h2>
@@ -284,7 +369,9 @@ const AdEditUser = ({ visible, onClose, permissions, productions = [], selectedU
       )}
     </>
   ) : (
-    <Spinner size="md" />
+    <div className="inset-0 absolute bg-white bg-opacity-50 z-50 flex justify-center items-center top-20 left-20 right-20 bottom-20">
+      <Spinner size="lg" />
+    </div>
   );
 };
 

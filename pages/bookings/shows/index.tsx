@@ -55,7 +55,6 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
         </div>
         <ShowsTable
           handleEdit={() => setIsEdited(!isEdited)}
-          isEdited={isEdited}
           isArchived={isArchived}
           isAddRow={isAddRow}
           setIsAddRow={setIsAddRow}

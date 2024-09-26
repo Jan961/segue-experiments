@@ -82,7 +82,7 @@ const GlobalActivityView = () => {
   };
 
   const deleteGlobalActivity = async () => {
-    await axios.post('/api/marketing/globalActivities/delete', actRow);
+    await axios.post('/api/marketing/global-activities/delete', actRow);
 
     const rowIndex = rowData.findIndex((gba) => gba.id === actRow.Id);
     const newRows = [...rowData];
@@ -98,7 +98,7 @@ const GlobalActivityView = () => {
   const updateGlobalActivity = async (type: string, data: GlobalActivity) => {
     if (type === 'add') {
       try {
-        const response = await axios.post('/api/marketing/globalActivities/create', data);
+        const response = await axios.post('/api/marketing/global-activities/create', data);
 
         const tableRow = {
           actName: data.Name,
@@ -118,7 +118,7 @@ const GlobalActivityView = () => {
         console.log(error);
       }
     } else if (type === 'edit') {
-      await axios.post('/api/marketing/globalActivities/update', data);
+      await axios.post('/api/marketing/global-activities/update', data);
 
       const updatedRow = {
         actName: data.Name,
@@ -144,7 +144,7 @@ const GlobalActivityView = () => {
 
   const toggleModal = async (type: ActivityModalVariant, data: any) => {
     try {
-      const response = await axios.get(`/api/marketing/globalActivities/production/${productionId.toString()}`);
+      const response = await axios.get(`/api/marketing/global-activities/production/${productionId.toString()}`);
 
       if (typeof response.data === 'object') {
         const globalActivities = response.data as GlobalActivitiesResponse;
@@ -176,7 +176,7 @@ const GlobalActivityView = () => {
 
   const getGlobalActivities = async () => {
     try {
-      const response = await axios.get(`/api/marketing/globalActivities/production/${productionId.toString()}`);
+      const response = await axios.get(`/api/marketing/global-activities/production/${productionId.toString()}`);
 
       if (typeof response.data === 'object') {
         const globalActivities = response.data as GlobalActivitiesResponse;

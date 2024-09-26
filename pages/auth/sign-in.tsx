@@ -113,8 +113,8 @@ const SignIn = () => {
 
   const fetchAccounts = async (email: string) => {
     try {
-      const { data } = await axios(`/api/account-user/read?email=${email}`);
-      setAccounts(data);
+      const { data } = await axios(`/api/account-user/get-accounts-for-user?email=${email}`);
+      setAccounts(data.accounts);
     } catch (err) {
       console.error(err);
     }

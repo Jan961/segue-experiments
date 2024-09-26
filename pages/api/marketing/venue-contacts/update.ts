@@ -2,7 +2,6 @@ import { loggingService } from 'services/loggingService';
 import prisma from 'lib/prisma';
 import { VenueContactDTO } from 'interfaces';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { venueRoleMapper } from 'lib/mappers';
 import { isNullOrUndefined } from 'utils';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
@@ -31,7 +30,8 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           },
         },
       });
-      res.status(200).json(venueRoleMapper(result));
+
+      res.status(200).json(result);
     } else {
       await prisma.venueContact.update({
         where: {
@@ -49,7 +49,8 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           },
         },
       });
-      res.status(200).json({});
+
+      res.status(200).json({ id: vc.Id });
     }
   } catch (err) {
     await loggingService.logError(err);
