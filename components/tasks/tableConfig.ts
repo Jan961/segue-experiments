@@ -5,18 +5,13 @@ import { tileColors } from 'config/global';
 import { TaskStatusLabelMap } from 'config/tasks';
 import { format } from 'date-fns';
 import getTaskDateStatusColor, { getWeekOptions } from 'utils/taskDate';
-import { calculateTaskStatus } from 'utils/tasks';
+import { calculateTaskStatus, generatePercentageOptions } from 'utils/tasks';
 import IconRenderer from 'components/bookings/table/IconRenderer';
 import MasterTaskNameRenderer from './modals/renderers/MasterTaskNameRenderer';
 import ButtonRenderer from '../core-ui-lib/Table/renderers/ButtonRenderer';
 import { isNullOrEmpty } from 'utils';
 
 export const styleProps = { headerColor: tileColors.tasks };
-
-const generatePercentageOptions = Array.from({ length: 101 }, (_, index) => ({
-  text: index,
-  value: index.toString(),
-}));
 
 export const getColumnDefs = (usersList = [], production) => {
   const weekOptions = getWeekOptions(production, false, false);
