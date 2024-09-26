@@ -2,6 +2,7 @@ import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import classNames from 'classnames';
 import Icon from 'components/core-ui-lib/Icon';
 import Link from 'next/link';
+import { Tooltip } from 'components/core-ui-lib';
 
 type ItemDefinition = {
   disabled?: boolean;
@@ -13,6 +14,9 @@ type ItemDefinition = {
   onClick?: () => void;
   stroke?: string;
   fill?: string;
+  tooltipMessage?: string;
+  tooltipPosition?: 'left' | 'right' | 'bottom' | 'top';
+  smallerText?: boolean;
 };
 
 interface SwitchBoardItemProps {
@@ -32,10 +36,11 @@ export const SwitchBoardItem = ({ link }: SwitchBoardItemProps) => {
         />
       ) : null}
       <span
-        className={classNames(
-          'text-center whitespace-break-spaces lg:text-responsive-lg md:text-base mt-0 !leading-[1.1875rem]',
-          { 'w-min': !link.iconName, 'lg:mt-3 md:mt-2': !!link.iconName },
-        )}
+        className={classNames('text-center whitespace-break-spaces w-full mt-0 !leading-[1.1875rem]', {
+          'text-lg': !link?.smallerText,
+          'text-md': link?.smallerText,
+          'lg:mt-3 md:mt-2': !!link.iconName,
+        })}
       >
         {link.title}
       </span>
@@ -48,13 +53,15 @@ export const SwitchBoardItem = ({ link }: SwitchBoardItemProps) => {
     } h-full flex flex-col items-center justify-center whitespace-nowrap text-white text-center rounded-md`;
 
   return (
-    <li key={link.title} className={'shadow-lg md:w-44 md:h-24 lg:w-56 lg:h-32'}>
-      {link.route && (
-        <Link href={link.disabled ? '#' : link.route} className={baseClass}>
-          {content}
-        </Link>
-      )}
-      {link.onClick && <button onClick={link.onClick}>{content}</button>}
-    </li>
+    <Tooltip body={link?.tooltipMessage} position={link?.tooltipPosition ? link?.tooltipPosition : 'bottom'}>
+      <li key={link.title} className="shadow-lg md:w-44 md:h-24 lg:w-56 lg:h-32">
+        {link.route && (
+          <Link href={link.disabled ? '#' : link.route} className={baseClass}>
+            {content}
+          </Link>
+        )}
+        {link.onClick && <button onClick={link.onClick}>{content}</button>}
+      </li>
+    </Tooltip>
   );
 };

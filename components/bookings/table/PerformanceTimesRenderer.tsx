@@ -41,7 +41,7 @@ const PerformanceTimesRenderer = ({ data, setValue, eGridCell }: CustomCellRende
     const currentlyFocussed = document.activeElement?.firstChild?.firstChild;
     //  If the focus is on the AGGrid cell (the initial state when tabbing into the field)
     if (cellTargetDiv === currentlyFocussed) {
-      cellTargetDiv?.firstChild.firstChild?.focus();
+      cellTargetDiv?.firstChild?.firstChild?.focus();
     } else {
       //  Find the index of the first hour field
       const childNodes = cellTargetDiv?.childNodes;

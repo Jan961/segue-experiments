@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useMemo, useState } from 'react';
+import React, { forwardRef, useEffect, useMemo, useState, useId } from 'react';
 import WindowedSelect, {
   components,
   StylesConfig,
@@ -109,7 +109,7 @@ export default forwardRef(function Select(
     () => ({
       control: (styles, { isDisabled }) => ({
         ...styles,
-        fontWeight: 'bold',
+        fontWeight: className?.includes('font-normal') ? 'normal' : 'bold',
         fontSize: '1rem',
         lineHeight: '1.5rem',
         backgroundColor: isDisabled ? (variant === 'colored' ? '#E9EBF0CC' : '#FFF') : '#FFF',
@@ -173,6 +173,14 @@ export default forwardRef(function Select(
       }),
       menu: (styles) => ({ ...styles, zIndex: 20 }),
       menuPortal: (styles) => ({ ...styles, zIndex: 50 }),
+      multiValue: (styles) => ({
+        ...styles,
+        backgroundColor: 'none',
+      }),
+      multiValueLabel: (styles) => ({
+        ...styles,
+        color: '#617293',
+      }),
       ...customStyles,
     }),
     [customStyles, variant],
@@ -214,7 +222,8 @@ export default forwardRef(function Select(
         setSelectedOption(selectedValues);
       }
     } else {
-      setSelectedOption(value && options ? options.find((o) => value === o.value) : null);
+      // Ensure false is treated as a valid selected option, and show placeholder when value is null/undefined
+      setSelectedOption(value !== null && value !== undefined ? options.find((o) => value === o.value) : null);
     }
   }, [value, options, isMulti]);
 
@@ -224,7 +233,7 @@ export default forwardRef(function Select(
       return null;
     }
     if (isMulti && selectedOption.length > 1) {
-      return <components.MultiValue {...props}>Multiple</components.MultiValue>;
+      return <components.MultiValue {...props}>{`${selectedOption.length} items selected`}</components.MultiValue>;
     }
     return <components.MultiValue {...props}>{data.text}</components.MultiValue>;
   };
@@ -292,6 +301,7 @@ export default forwardRef(function Select(
       <div className="w-full h-full" data-testid={testId || 'core-ui-lib-select'}>
         <WindowedSelect
           ref={ref}
+          instanceId={useId()} // eslint-disable-line react-hooks/exhaustive-deps
           className="w-full"
           onInputChange={(inputValue) => {
             if (inputValue) {

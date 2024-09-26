@@ -45,3 +45,14 @@ export const disabledNormal: Story = {
     className: 'w-128',
   },
 };
+
+export const error: Story = {
+  args: {
+    label: 'Production',
+    placeholder: 'Please select...',
+    options: values,
+    disabled: true,
+    className: 'w-128',
+    error: true,
+  },
+};

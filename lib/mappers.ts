@@ -211,8 +211,6 @@ export const conversionRateMapper = (
 ): ConversionRateDTO => ({
   ...c,
   Rate: c.Rate?.toNumber?.(),
-  // FromCurrency: currencyMapper(c.Currency_ConversionRate_ConversionFromCurrencyCodeToCurrency),
-  // ToCurrency: currencyMapper(c.Currency_ConversionRate_ConversionToCurrencyCodeToCurrency),
 });
 
 export const productionEditorMapper = (t: ProductionWithDateblocks): ProductionDTO => ({
@@ -233,6 +231,7 @@ export const productionEditorMapper = (t: ProductionWithDateblocks): ProductionD
   RegionList: t.ProductionRegion ? t.ProductionRegion.map((productionReg) => productionReg.PRRegionId) : [],
   ImageUrl: t?.File?.Location ? getFileUrlFromLocation(t.File.Location) : null,
   Image: t?.File ? FileMapper(t?.File) : null,
+  ConversionRateList: t.ConversionRate?.length > 0 ? t.ConversionRate.map(conversionRateMapper) : [],
 });
 
 export const DateTypeMapper = (dt: DateType): DateTypeDTO => ({

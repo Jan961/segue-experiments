@@ -65,7 +65,7 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
 
   const saveAvailSeats = async (data) => {
     try {
-      await axios.post('/api/marketing/availableSeats/update', data);
+      await axios.post('/api/marketing/available-seats/update', data);
 
       getPromoterHoldData(bookingIdVal);
       setShowAvailSeatModal(false);
@@ -76,7 +76,7 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
 
   const getPromoterHoldData = async (bookingId) => {
     try {
-      const response = await axios.get(`/api/marketing/promoterHolds/${bookingId}`);
+      const response = await axios.get(`/api/marketing/promoter-holds/${bookingId}`);
       const promData = response.data;
 
       if ((promData.allocations && Array.isArray(promData.allocations)) || Array.isArray(promData.holds)) {
@@ -111,7 +111,7 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
       delete: 'delete',
     };
 
-    await axios.post(`/api/marketing/allocatedSeats/${apiRoute[type]}`, recData);
+    await axios.post(`/api/marketing/allocated-seats/${apiRoute[type]}`, recData);
     getPromoterHoldData(bookingIdVal);
     setShowAllocSeatsModal(false);
   };

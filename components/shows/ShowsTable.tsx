@@ -1,7 +1,7 @@
 import { Show } from 'prisma/generated/prisma-client';
 import Table from 'components/core-ui-lib/Table';
 import { styleProps } from '../bookings/table/tableConfig';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import axios from 'axios';
 import applyTransactionToGrid from 'utils/applyTransactionToGrid';
@@ -12,6 +12,7 @@ import LoadingOverlay from './LoadingOverlay';
 import { showsTableConfig } from './table/tableConfig';
 import ProductionsView from './modal/Views/ProductionsView';
 import { notify } from 'components/core-ui-lib';
+import { isNullOrEmpty } from 'utils';
 
 const rowClassRules = {
   'custom-red-row': (params) => {
@@ -37,16 +38,16 @@ const ShowsTable = ({
   rowsData,
   isAddRow = false,
   addNewRow,
-  isEdited = false,
   handleEdit,
   isArchived = false,
+  setIsAddRow,
 }: {
   rowsData: (Show & { productions: ProductionDTO[] })[];
   isAddRow: boolean;
   addNewRow: () => void;
   isArchived: boolean;
-  isEdited: boolean;
   handleEdit: () => void;
+  setIsAddRow: (value: boolean) => void;
 }) => {
   const tableRef = useRef(null);
   const router = useRouter();
@@ -79,59 +80,73 @@ const ShowsTable = ({
     }
   }, [rowsData]);
 
+  const numArchivedShows = useMemo(() => {
+    return rowsData.reduce((acc, row) => {
+      return acc + row.productions.filter((prod) => prod.IsArchived).length;
+    }, 0);
+  }, [rowsData]);
+
+  const updateShowData = (showData) => {
+    rowsData = rowsData.map((show) => (show.Id === showData.Id ? showData : show));
+  };
+
   const handleCellClick = async (e) => {
     setShowId(e.data.Id);
     setRowIndex(e.rowIndex);
     if (e.column.colId === 'Id') {
-      // only allow deletion if show has productions
+      // only allow deletion if show has no productions
       // button is disabled if show has productions but has no effect on clicking cell
-      e.data?.productions.length === 0 && setConfirm(true);
+      const numProductions = e.data?.productions?.length;
+      if (numProductions === 0 || isNullOrEmpty(numProductions)) {
+        setConfirm(true);
+      }
     } else if (e.column.colId === 'productions' && e.data.Id) {
       setShowProductionsModal(true);
       setCurrentShow(e.data);
-    } else if (
-      e.column.colId === 'EditId' &&
-      currentShow?.Id &&
-      currentShow?.Name.length > 2 &&
-      currentShow?.Code.length > 1 &&
-      isEdited
-    ) {
-      setIsLoading(true);
-      try {
-        const payloadData = { ...currentShow, IsArchived: e.data.IsArchived };
-        await axios.put(`/api/shows/update/${currentShow?.Id}`, omit(payloadData, ['productions']));
-        if (payloadData.IsArchived && !isArchived) {
-          const gridApi = tableRef.current.getApi();
-          const rowDataToRemove = gridApi.getDisplayedRowAtIndex(e.rowIndex).data;
-          const transaction = {
-            remove: [rowDataToRemove],
-          };
-          applyTransactionToGrid(tableRef, transaction);
+    } else if (e.column.colId === 'EditId' && currentShow?.Id) {
+      if (!(currentShow?.Code?.length > 0)) {
+        notify.error('Error Creating Show. Please enter a show code');
+      } else if (!(currentShow?.Name?.length >= 2)) {
+        notify.error('Error Creating Show. Show Name needs to be at least 2 characters');
+      } else {
+        setIsLoading(true);
+        try {
+          const payloadData = { ...currentShow, IsArchived: e.data.IsArchived };
+          await axios.put(`/api/shows/update/${currentShow?.Id}`, omit(payloadData, ['productions']));
+          if (payloadData.IsArchived && !isArchived) {
+            const gridApi = tableRef.current.getApi();
+            const rowDataToRemove = gridApi.getDisplayedRowAtIndex(e.rowIndex).data;
+            const transaction = {
+              remove: [rowDataToRemove],
+            };
+            applyTransactionToGrid(tableRef, transaction);
+          }
+        } finally {
+          setIsLoading(false);
+          handleEdit();
+          setCurrentShow(intShowData);
+          router.replace(router.asPath);
         }
-      } finally {
-        setIsLoading(false);
-        handleEdit();
-        setCurrentShow(intShowData);
-        router.replace(router.asPath);
       }
-    } else if (
-      isAddRow &&
-      e.column.colId === 'EditId' &&
-      currentShow?.Name.length > 2 &&
-      currentShow?.Code.length > 1
-    ) {
-      setIsLoading(true);
-      try {
-        const data = { ...intShowData, Code: currentShow.Code, Name: currentShow.Name };
-        await axios.post(`/api/shows/create`, omit(data, ['productions', 'Id']));
-        handleEdit();
-        setCurrentShow(intShowData);
-        addNewRow();
-        router.replace(router.asPath);
-        setIsLoading(false);
-      } catch (error) {
-        notify.error('Error Creating Show. Please try again');
-        setIsLoading(false);
+    } else if (isAddRow && e.column.colId === 'EditId') {
+      if (!(currentShow?.Code?.length > 0)) {
+        notify.error('Error Creating Show. Please enter a show code');
+      } else if (!(currentShow?.Name?.length >= 2)) {
+        notify.error('Error Creating Show. Show Name needs to be at least 2 characters');
+      } else {
+        setIsLoading(true);
+        try {
+          const data = { ...intShowData, Code: currentShow.Code, Name: currentShow.Name };
+          await axios.post(`/api/shows/create`, omit(data, ['productions', 'Id']));
+          handleEdit();
+          setCurrentShow(intShowData);
+          addNewRow();
+          router.replace(router.asPath);
+          setIsLoading(false);
+        } catch (error) {
+          notify.error('Error Creating Show. Please try again');
+          setIsLoading(false);
+        }
       }
     }
   };
@@ -145,7 +160,11 @@ const ShowsTable = ({
     setConfirm(false);
     setIsLoading(true);
     try {
-      await axios.delete(`/api/shows/delete/${showId}`);
+      if (!isNullOrEmpty(showId)) {
+        await axios.delete(`/api/shows/delete/${showId}`);
+      } else {
+        setIsAddRow(false);
+      }
       const gridApi = tableRef.current.getApi();
       const rowDataToRemove = gridApi.getDisplayedRowAtIndex(rowIndex).data;
       const transaction = {
@@ -168,6 +187,7 @@ const ShowsTable = ({
         gridOptions={gridOptions}
         onCellValueChange={handleCellChanges}
         rowClassRules={rowClassRules}
+        key={numArchivedShows}
       />
       <ConfirmationDialog
         variant="delete"
@@ -181,7 +201,10 @@ const ShowsTable = ({
       {showProductionsModal && (
         <ProductionsView
           visible={showProductionsModal}
-          onClose={() => setShowProductionsModal(false)}
+          onClose={(showData) => {
+            updateShowData(showData);
+            setShowProductionsModal(false);
+          }}
           showData={currentShow}
         />
       )}

@@ -1,21 +1,24 @@
+import { isNullOrEmpty } from 'utils';
+
 export const getPrice = (dealMemoPrice) => {
-  const updatePrice = [];
-  const createPrice = [];
-  dealMemoPrice.forEach((priceData) => {
-    if (priceData.DMPId) {
-      const price = {
-        where: { DMPId: priceData.DMPId },
-        data: { ...priceData, DMPTicketPrice: parseFloat(priceData.DMPTicketPrice) },
-      };
-      delete price.data.DMPId;
-      delete price.data.DMPDeMoId;
-      updatePrice.push(price);
-    } else {
-      delete priceData.DMPDeMoId;
-      createPrice.push(priceData);
+  const priceData = [...dealMemoPrice.custom, ...dealMemoPrice.default];
+  const processedPrice = [];
+
+  priceData.forEach((priceRec) => {
+    const price = {
+      ...priceRec,
+      DMPTicketPrice: priceRec.DMPTicketPrice === '' ? 0 : parseFloat(priceRec.DMPTicketPrice),
+    };
+    delete price.DMPId;
+    delete price.DMPDeMoId;
+
+    // only process price if DMPTicketName is not blank
+    if (!isNullOrEmpty(price.DMPTicketName)) {
+      processedPrice.push(price);
     }
   });
-  return [updatePrice, createPrice];
+
+  return processedPrice;
 };
 
 export const getTechProvision = (techProvision) => {
@@ -38,23 +41,16 @@ export const getTechProvision = (techProvision) => {
 };
 
 export const getDealMemoCall = (dealMemoCall) => {
-  const updateCall = [];
-  const createCall = [];
+  const processedCalls = [];
 
-  dealMemoCall.forEach((memoCall) => {
-    if (memoCall.DMCId) {
-      const price = {
-        where: { DMCId: memoCall.DMCId },
-        data: memoCall,
-      };
-      delete price.data.DMCDeMoId;
-      updateCall.push(price);
-    } else {
-      delete memoCall.DMCDeMoId;
-      createCall.push(memoCall);
-    }
+  dealMemoCall.forEach((callRec) => {
+    const call = { ...callRec };
+    delete call.DMCDeMoId;
+
+    processedCalls.push(call);
   });
-  return [updateCall, createCall];
+
+  return processedCalls;
 };
 
 export const getDealMemoHoldUpdQuery = (dealMemoHold) => {

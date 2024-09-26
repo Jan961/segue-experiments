@@ -1,6 +1,7 @@
 import { Venue, VenueAddress, VenueBarredVenue, VenueContact, VenueRole } from 'prisma/generated/prisma-client';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import fileInterface from './fileInterface';
+import { isUndefined } from 'utils';
 
 export interface PrimaryAddress {
   primaryAddressId?: number;
@@ -12,6 +13,8 @@ export interface PrimaryAddress {
   primaryPostCode?: string;
   primaryPhoneNumber?: string;
   primaryEMail?: string;
+  primaryWhat3Words?: string;
+  primaryCoordinates?: { latitude: null; longitude: null };
 }
 
 export interface DeliveryAddress {
@@ -123,7 +126,7 @@ export const transformVenueContacts = (contacts?: VenueContact & { VenueRole: Ve
     email: Email,
     role: Role,
     roleIndex: RoleIndex,
-    venueRoleId: VenueRoleId,
+    venueRoleId: isUndefined(VenueRoleId) ? VenueRole.Id : VenueRoleId,
     roleName: VenueRole.Name,
   };
 };

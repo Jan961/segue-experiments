@@ -22,7 +22,7 @@ import { isNullOrEmpty } from 'utils';
 
 interface ProductionsViewProps {
   showData: any;
-  onClose: () => void;
+  onClose: (showData: any) => void;
   visible: boolean;
 }
 
@@ -174,6 +174,17 @@ const ProductionsView = ({ showData, visible, onClose }: ProductionsViewProps) =
     } else {
       createNewProduction(production, cb);
     }
+    showData.productions = showData.productions.map((prod) => {
+      if (prod.Id === production?.id) {
+        const prodId = production.id;
+
+        delete production.id;
+
+        return { ...production, Id: prodId };
+      }
+
+      return prod;
+    });
     setParentLoadingOverlay(false);
   };
 
@@ -269,7 +280,7 @@ const ProductionsView = ({ showData, visible, onClose }: ProductionsViewProps) =
       {showParentLoading && <LoadingOverlay />}
       <PopupModal
         show={visible}
-        onClose={() => onClose()}
+        onClose={() => onClose(showData)}
         titleClass="text-xl text-primary-navy text-bold"
         title="Productions"
         panelClass="relative"
@@ -301,6 +312,7 @@ const ProductionsView = ({ showData, visible, onClose }: ProductionsViewProps) =
             onCellValueChange={handleCellChanges}
             headerHeight={30}
             rowClassRules={rowClassRules}
+            key={`${unArchivedList.length}:${archivedList.length}`}
           />
 
           {isLoading && <LoadingOverlay />}
@@ -309,7 +321,7 @@ const ProductionsView = ({ showData, visible, onClose }: ProductionsViewProps) =
           <div />
           <div className="flex gap-3">
             {/* <Button className="w-33 " variant="secondary" onClick={onClose} text="Cancel" /> */}
-            <Button className=" w-33" text="Close" onClick={onClose} />
+            <Button className=" w-33" text="Close" onClick={() => onClose(showData)} />
           </div>
         </div>
         <ConfirmationDialog
