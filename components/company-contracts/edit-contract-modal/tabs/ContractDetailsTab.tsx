@@ -160,48 +160,53 @@ const ContractDetailsTab = ({
 
   return (
     <div>
-      {formData.map((row) => (
-        <div key={row.rowID} className="mb-10">
-          <div className="font-semibold"> {row.rowLabel} </div>
-          <div className="w-full h-[1px] bg-slate-300 mb-2" />
+      {formData
+        .sort((a, b) => a.rowNum - b.rowNum)
+        .map((row) => (
+          <div key={row.rowID} className="mb-10">
+            <div className="font-semibold"> {row.rowLabel} </div>
+            <div className="w-full h-[1px] bg-slate-300 mb-2" />
 
-          {row.values
-            .sort((a, b) => a.index - b.index)
-            .map((value) => (
-              <div key={value.index} className="mb-4 flex items-center">
-                <div className="flex gap-x-4">
-                  {value.components
-                    .sort((a, b) => a.orderInRow - b.orderInRow)
-                    .map((component) => (
-                      <div key={`${row.rowID}-${value.index}-${component.id}-${component.orderInRow}`} className="mb-1">
-                        <FormInputGeneral
-                          type={component.type}
-                          label={component.label}
-                          initialValue={component.value}
-                          handleChange={(val) => handleFormInputChange(val, component.id, value.index)}
-                        />
-                      </div>
-                    ))}
-                </div>
-
-                {row.isAList && (
-                  <div className="flex gap-x-2">
-                    {value.index !== 1 && (
-                      <MinusCircleSolidIcon
-                        className="hover:cursor-pointer"
-                        onClick={() => handleDeleteEntry(row.rowID, value.index)}
-                      />
-                    )}
-                    <PlusCircleSolidIcon
-                      className="hover:cursor-pointer"
-                      onClick={() => handleAddEntry(row.rowID, value.index)}
-                    />
+            {row.values
+              .sort((a, b) => a.index - b.index)
+              .map((value) => (
+                <div key={value.index} className="mb-4 flex items-center">
+                  <div className="flex gap-x-4">
+                    {value.components
+                      .sort((a, b) => a.orderInRow - b.orderInRow)
+                      .map((component) => (
+                        <div
+                          key={`${row.rowID}-${value.index}-${component.id}-${component.orderInRow}`}
+                          className="mb-1"
+                        >
+                          <FormInputGeneral
+                            type={component.type}
+                            label={component.label}
+                            initialValue={component.value}
+                            handleChange={(val) => handleFormInputChange(val, component.id, value.index)}
+                          />
+                        </div>
+                      ))}
                   </div>
-                )}
-              </div>
-            ))}
-        </div>
-      ))}
+
+                  {row.isAList && (
+                    <div className="flex gap-x-2">
+                      {value.index !== 1 && (
+                        <MinusCircleSolidIcon
+                          className="hover:cursor-pointer"
+                          onClick={() => handleDeleteEntry(row.rowID, value.index)}
+                        />
+                      )}
+                      <PlusCircleSolidIcon
+                        className="hover:cursor-pointer"
+                        onClick={() => handleAddEntry(row.rowID, value.index)}
+                      />
+                    </div>
+                  )}
+                </div>
+              ))}
+          </div>
+        ))}
     </div>
   );
 };
