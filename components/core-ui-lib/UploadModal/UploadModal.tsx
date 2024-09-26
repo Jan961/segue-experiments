@@ -181,7 +181,7 @@ const UploadModal: React.FC<UploadModalProps> = ({
         onClose?.();
       }}
     >
-      <div className="flex flex-col gap-2 w-full md:w-[592px] font-calibri non-italic pr-3">
+      <div className="flex flex-col gap-2 w-full md:w-[562px] font-calibri non-italic pr-3">
         <div data-testid={`${testId}-title`} className="text-primary text-xl font-bold">
           {title}
         </div>
