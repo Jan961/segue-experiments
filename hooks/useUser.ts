@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { isNullOrEmpty } from 'utils';
 import { generateRandomHash } from 'utils/crypto';
 import { useUrl } from 'nextjs-current-url';
+import { NEW_USER_CONFIRMATION_EMAIL_TEMPLATE } from 'config/global';
 
 type UserDetails = {
   email: string;
@@ -61,7 +62,7 @@ const useUser = () => {
       // Send out an email with the newly generated password
       await axios.post('/api/email/send', {
         to: userDetails.email,
-        templateName: 'Confirm New User',
+        templateName: NEW_USER_CONFIRMATION_EMAIL_TEMPLATE,
         data: { email: userDetails.email, password, Weblink: `${currentUrl}/auth/sign-in` },
       });
 
