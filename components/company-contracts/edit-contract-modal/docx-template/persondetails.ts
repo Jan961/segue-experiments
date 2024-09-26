@@ -94,6 +94,7 @@ const getDefinedPersonDetails = (personDetailsData: IPerson) => {
     country: 'EXPENSECOUNTRY',
   };
 
+  // Tags
   return {
     ...mapValuesToKeys(personDetailsData.personDetails, personDetailsDefaults),
     ...mapValuesToKeys(personDetailsData.emergencyContact1, emergencyContactDefaults),
@@ -107,6 +108,7 @@ const getDefinedPersonDetails = (personDetailsData: IPerson) => {
 const getCompositePersonDetails = (personDetailsData: IPerson) => {
   const helpers = createCompositeHelperFunctions(personDetailsData);
 
+  // Tags
   return {
     PERSONFULLNAME: helpers.getPersonFullName(),
     PERSONFULLADDRESS: helpers.getPersonFullAddress(),

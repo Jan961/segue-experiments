@@ -5,6 +5,7 @@ import { ProductionDTO } from 'interfaces';
 export const getStaticDetailsTags = (productionInfo: Partial<ProductionDTO>, productionSchedule: IScheduleDay[]) => {
   const helpers = createHelperFunctions(productionInfo, productionSchedule);
 
+  // Tags
   return {
     FIRSTPERFORMANCEDATE: helpers.getFirstPerfDate(),
     DATEOFDOCCREATION: helpers.getDateOfDocumentCreation(),
@@ -15,6 +16,7 @@ export const getStaticDetailsTags = (productionInfo: Partial<ProductionDTO>, pro
     SINGLEPERFORMANCEVENUE: helpers.getSinglePerformanceVenue(),
     PRODCOMPANYLOGO: helpers.getProdCompanyLogo(),
     PERFORMANCETABLE: helpers.getPerformanceTable(),
+    PRODCOMPANYADDRESS: helpers.getProductionCompanyAddress(),
   };
 };
 
@@ -48,6 +50,12 @@ const createHelperFunctions = (productionInfo: Partial<ProductionDTO>, productio
       return productionInfo?.ProductionCompany?.ProdCoName || '{ PRODUCTION COMPANY NAME UNAVAILABLE }';
     },
 
+    // TODO
+    getProductionCompanyAddress: () => {
+      return '{ PRODUCTION COMPANY ADDRESS }';
+    },
+
+    // TODO
     getProdCompanyLogo: () => {
       return '';
     },
