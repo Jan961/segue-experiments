@@ -362,8 +362,14 @@ const validateSeats = (currentRow: SpreadsheetRow) => {
   let errorOccurred = false;
   const warningOccurred = false;
 
-  if (!currentRow.seats) {
-    returnString += '| ERROR - Must specify a value for Seats';
+  if (currentRow.seats === null) {
+    returnString += '| ERROR - Must specify a value for seats';
+    errorOccurred = true;
+    return { returnString, errorOccurred, warningOccurred };
+  }
+
+  if (typeof currentRow.seats !== 'number') {
+    returnString += '| ERROR - Value for Seats must be a number';
     errorOccurred = true;
     return { returnString, errorOccurred, warningOccurred };
   }
@@ -376,8 +382,14 @@ const validateValue = (currentRow: SpreadsheetRow) => {
   let errorOccurred = false;
   const warningOccurred = false;
 
-  if (!currentRow.value) {
-    returnString += '| ERROR - Must specify a value for Value';
+  if (currentRow.value === null) {
+    returnString += '| ERROR - Must specify a value for value';
+    errorOccurred = true;
+    return { returnString, errorOccurred, warningOccurred };
+  }
+
+  if (Number.isNaN(parseInt(currentRow.value))) {
+    returnString += '| ERROR - Value for Value must be a number';
     errorOccurred = true;
     return { returnString, errorOccurred, warningOccurred };
   }
