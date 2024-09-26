@@ -13,11 +13,10 @@ import { isNullOrEmpty } from 'utils';
 
 export const styleProps = { headerColor: tileColors.tasks };
 
-const generatePercentageOptions = Array.from({ length: 101 }, (_, index) => ({
-  text: index,
-  value: index.toString(),
+const generatePercentageOptions = [0, 25, 50, 75, 100].map((value) => ({
+  text: value,
+  value: value.toString(),
 }));
-
 export const getColumnDefs = (usersList = [], production) => {
   const weekOptions = getWeekOptions(production, false, false);
   return [
