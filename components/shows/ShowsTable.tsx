@@ -1,7 +1,7 @@
 import { Show } from 'prisma/generated/prisma-client';
 import Table from 'components/core-ui-lib/Table';
 import { styleProps } from '../bookings/table/tableConfig';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import axios from 'axios';
 import applyTransactionToGrid from 'utils/applyTransactionToGrid';
@@ -79,6 +79,16 @@ const ShowsTable = ({
       }
     }
   }, [rowsData]);
+
+  const numArchivedShows = useMemo(() => {
+    return rowsData.reduce((acc, row) => {
+      return acc + row.productions.filter((prod) => prod.IsArchived).length;
+    }, 0);
+  }, [rowsData]);
+
+  const updateShowData = (showData) => {
+    rowsData = rowsData.map((show) => (show.Id === showData.Id ? showData : show));
+  };
 
   const handleCellClick = async (e) => {
     setShowId(e.data.Id);
@@ -177,6 +187,7 @@ const ShowsTable = ({
         gridOptions={gridOptions}
         onCellValueChange={handleCellChanges}
         rowClassRules={rowClassRules}
+        key={numArchivedShows}
       />
       <ConfirmationDialog
         variant="delete"
@@ -190,7 +201,10 @@ const ShowsTable = ({
       {showProductionsModal && (
         <ProductionsView
           visible={showProductionsModal}
-          onClose={() => setShowProductionsModal(false)}
+          onClose={(showData) => {
+            updateShowData(showData);
+            setShowProductionsModal(false);
+          }}
           showData={currentShow}
         />
       )}
