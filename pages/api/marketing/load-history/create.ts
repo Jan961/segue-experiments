@@ -17,15 +17,20 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const { spreadsheetData, selectedProdId, fileID }: RequestBody = req.body;
 
     // Perform Prisma queries in one transaction so that if it fails previous changes are rolled back
-    await prisma.$transaction(async (tx: PrismaClient) => {
-      await updateCreateProductionFile(tx, selectedProdId, fileID);
-      const primaryDateBlock = await getDateBlockForProduction(selectedProdId, true);
-      const primaryDateBlockID = primaryDateBlock[0].Id;
-      await deleteEvents(tx, primaryDateBlockID);
-      await updateSpreadsheetDataWithVenueIDs(tx, spreadsheetData);
-      const bookingsWithSales = await createBookings(tx, spreadsheetData, primaryDateBlockID);
-      await createSalesSetWithSales(tx, bookingsWithSales);
-    });
+    await prisma.$transaction(
+      async (tx: PrismaClient) => {
+        await updateCreateProductionFile(tx, selectedProdId, fileID);
+        const primaryDateBlock = await getDateBlockForProduction(selectedProdId, true);
+        const primaryDateBlockID = primaryDateBlock[0].Id;
+        await deleteEvents(tx, primaryDateBlockID);
+        await updateSpreadsheetDataWithVenueIDs(tx, spreadsheetData);
+        const bookingsWithSales = await createBookings(tx, spreadsheetData, primaryDateBlockID);
+        await createSalesSetWithSales(tx, bookingsWithSales);
+      },
+      {
+        timeout: 90000, // NOTE - if the sales history data is huge, this either needs to be increased, or the creation made more efficient so the transaction doesn't timeout
+      },
+    );
 
     res.status(200).json({ status: 'Success' });
   } catch (error) {
@@ -136,60 +141,82 @@ const createBookings = async (
 };
 
 const createSalesSetWithSales = async (client: PrismaClient, bookingsWithSales) => {
-  // Create the sales set and sales for each booking
-  for (const { booking, sales } of bookingsWithSales) {
-    for (const sale of sales) {
-      const setResult = await client.salesSet.create({
-        data: {
-          SetBookingId: booking.Id,
-          SetPerformanceId: null,
-          SetSalesFiguresDate: sale.salesDate,
-          SetBrochureReleased: false,
-          SetSingleSeats: false,
-          SetNotOnSale: false,
-          SetIsFinalFigures: false,
-          SetIsCopy: false,
-        },
-      });
-      const setID = setResult.SetId;
-      const salesData = [];
+  // THIS FUNCTION IS THE BOTTLENECK IN THE TRANSACTION. THE DATABASE IS STRUGGLING WITH CREATING A SALES SET FOR EACH SALES DATE IN A BOOKING, AND THEN SUBSEQUENTLY ADDING THE SALES TO THOSE SALES SETS.
+  // IF THIS FUNCTION TAKES TOO LONG AND EXCEEDS THE TIMEOUT ON THE PRISMA TRANSACTION, THE OPERATIONS WILL NOT SUCCEED. I CONTEMPLTED REMOVING IT FROM THE TRANSACTION BUT INCASE SOMETHING
+  // GOES WRONG IN HERE, THEN IT WONT UNDO THE PREVIOUS OPERATIONS, SO I DECIDED AGAINST DOING THAT.
+  // NEED TO LOOK INTO WAYS OF MAKING THIS RUN FASTER, AS SPREADSHEETS WITH HUNDREDS OF ROWS ARE TAKING FAR TOO LONG. I IMAGINE SPREADSHEETS WITH 1500+ ROWS WONT EVEN UPLOAD WITHIN THE TRANSACTION TIMEOUT PERIOD.
 
-      if (sale.generalSales) {
-        salesData.push({
-          SaleSaleTypeId: 1,
-          SaleSeats: sale.generalSales.seats,
-          SaleValue: sale.generalSales.value,
-          SaleSetId: setID,
+  const chunkSize = 10;
+
+  for (let i = 0; i < bookingsWithSales.length; i += chunkSize) {
+    const chunk = bookingsWithSales.slice(i, i + chunkSize);
+
+    const bookingPromises = chunk.map(({ booking, sales }) => {
+      const salesSetPromises = sales.map((sale) =>
+        client.salesSet.create({
+          data: {
+            SetBookingId: booking.Id,
+            SetPerformanceId: null,
+            SetSalesFiguresDate: sale.salesDate,
+            SetBrochureReleased: false,
+            SetSingleSeats: false,
+            SetNotOnSale: false,
+            SetIsFinalFigures: false,
+            SetIsCopy: false,
+          },
+        }),
+      );
+
+      const salesChain = Promise.all(salesSetPromises).then((salesSetResults) => {
+        const saleCreatePromises = salesSetResults.map((setResult, index) => {
+          const sale = sales[index];
+          const setID = setResult.SetId;
+          const salesData = [];
+
+          if (sale.generalSales) {
+            salesData.push({
+              SaleSaleTypeId: 1,
+              SaleSeats: sale.generalSales.seats,
+              SaleValue: sale.generalSales.value,
+              SaleSetId: setID,
+            });
+          }
+          if (sale.generalReservations) {
+            salesData.push({
+              SaleSaleTypeId: 2,
+              SaleSeats: sale.generalReservations.seats,
+              SaleValue: sale.generalReservations.value,
+              SaleSetId: setID,
+            });
+          }
+          if (sale.schoolSales) {
+            salesData.push({
+              SaleSaleTypeId: 3,
+              SaleSeats: sale.schoolSales.seats,
+              SaleValue: sale.schoolSales.value,
+              SaleSetId: setID,
+            });
+          }
+          if (sale.schoolReservations) {
+            salesData.push({
+              SaleSaleTypeId: 4,
+              SaleSeats: sale.schoolReservations.seats,
+              SaleValue: sale.schoolReservations.value,
+              SaleSetId: setID,
+            });
+          }
+
+          return client.sale.createMany({
+            data: salesData,
+          });
         });
-      }
-      if (sale.generalReservations) {
-        salesData.push({
-          SaleSaleTypeId: 2,
-          SaleSeats: sale.generalReservations.seats,
-          SaleValue: sale.generalReservations.value,
-          SaleSetId: setID,
-        });
-      }
-      if (sale.schoolSales) {
-        salesData.push({
-          SaleSaleTypeId: 3,
-          SaleSeats: sale.schoolSales.seats,
-          SaleValue: sale.schoolSales.value,
-          SaleSetId: setID,
-        });
-      }
-      if (sale.schoolReservations) {
-        salesData.push({
-          SaleSaleTypeId: 4,
-          SaleSeats: sale.schoolReservations.seats,
-          SaleValue: sale.schoolReservations.value,
-          SaleSetId: setID,
-        });
-      }
-      // Insert sales data
-      await client.sale.createMany({
-        data: salesData,
+
+        return Promise.all(saleCreatePromises);
       });
-    }
+
+      return salesChain;
+    });
+
+    await Promise.all(bookingPromises);
   }
 };

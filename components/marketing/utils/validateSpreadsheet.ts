@@ -21,7 +21,7 @@ let errorRows = new Set();
 let warningRows = new Set();
 let mismatchedRows = new Map<number, MismatchRowData>();
 
-export const validateSpreadsheetFile = async (file, prodCode, venueList, prodDateRange) => {
+export const validateSpreadsheetFile = async (file, prodShowCode, venueList, prodDateRange) => {
   const workbook = new ExcelJS.Workbook();
   await workbook.xlsx.load(file[0].file);
 
@@ -102,7 +102,7 @@ export const validateSpreadsheetFile = async (file, prodCode, venueList, prodDat
 
     const { detailsColumnMessage, rowErrorOccurred, rowWarningOccurred } = validateRow(
       currentRow,
-      prodCode,
+      prodShowCode,
       venueList,
       prodDateRange,
       currentVenue,
@@ -129,7 +129,7 @@ export const validateSpreadsheetFile = async (file, prodCode, venueList, prodDat
 
 const validateRow = (
   currentRow: SpreadsheetRow,
-  prodCode,
+  prodShowCode,
   venueList: Record<number, VenueMinimalDTO>,
   prodDateRange,
   currentVenue,
@@ -152,9 +152,9 @@ const validateRow = (
   if (warningOccurred) rowWarningOccurred = true;
 
   const validations = [
-    validateProductionCode(currentRow, prodCode),
+    validateProductionCode(currentRow, prodShowCode),
     validateVenueCode(currentRow, venueList),
-    validateBookingDate(currentRow, currentBookingDate, prodDateRange, prodCode),
+    validateBookingDate(currentRow, currentBookingDate, prodDateRange, prodShowCode),
     validateSalesDate(currentRow),
     validateSalesType(currentRow),
     validateSeats(currentRow),
@@ -266,7 +266,7 @@ const updateValidateSpreadsheetData = (
   return { detailsColumnMessage, rowWarningOccurred, rowErrorOccurred, currentRowBooking: booking };
 };
 
-const validateProductionCode = (currentRow: SpreadsheetRow, prodCode) => {
+const validateProductionCode = (currentRow: SpreadsheetRow, prodShowCode) => {
   let returnString = '';
   let errorOccurred = false;
   const warningOccurred = false;
@@ -275,8 +275,8 @@ const validateProductionCode = (currentRow: SpreadsheetRow, prodCode) => {
     returnString += '| ERROR - Must include at least 1 ProdCode at start of file';
     errorOccurred = true;
   }
-  if (currentRow.productionCode && currentRow.productionCode !== prodCode) {
-    returnString += '| ERROR - ProdCode does not match selected production (' + prodCode + ')';
+  if (currentRow.productionCode && currentRow.productionCode !== prodShowCode) {
+    returnString += '| ERROR - ProdCode does not match selected production (' + prodShowCode + ')';
     errorOccurred = true;
   }
   return { returnString, warningOccurred, errorOccurred };
@@ -299,7 +299,7 @@ const validateVenueCode = (currentRow: SpreadsheetRow, venueList: Record<number,
   return { returnString, warningOccurred, errorOccurred };
 };
 
-const validateBookingDate = (currentRow: SpreadsheetRow, currentBookingDate, prodDateRange, prodCode) => {
+const validateBookingDate = (currentRow: SpreadsheetRow, currentBookingDate, prodDateRange, prodShowCode) => {
   let returnString = '';
   let errorOccurred = false;
   const warningOccurred = false;
@@ -322,7 +322,7 @@ const validateBookingDate = (currentRow: SpreadsheetRow, currentBookingDate, pro
   }
 
   if ((rowDate < prodStartDate || rowDate > prodEndDate) && currentRow.bookingDate) {
-    returnString += '| ERROR - Booking Date is outside range of ' + prodCode + ' start/end Production Dates';
+    returnString += '| ERROR - Booking Date is outside range of ' + prodShowCode + ' start/end Production Dates';
     errorOccurred = true;
   }
 
