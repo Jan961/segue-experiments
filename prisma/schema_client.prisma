@@ -890,13 +890,13 @@ model ACCContract {
   CancelFee            Decimal?          @map("ACCCCancelFee") @db.Decimal(10, 2)
   ProductionId         Int               @map("ACCCProductionId")
   ACCCDeptId           Int
-  ACCCTemplateId       Int?
+  ACCCTemplateId       Int
   ACCClause            ACCClause[]
   ACCDepartment        ACCDepartment     @relation(fields: [ACCCDeptId], references: [ACCDeptId], map: "ACCDepartment_ACCContract")
   File                 File?             @relation(fields: [ACCContractFileId], references: [Id], onDelete: Cascade, map: "File_ACCContract")
   Person               Person            @relation(fields: [PersonId], references: [PersonId], map: "Person_ACCContract")
   Production           Production        @relation(fields: [ProductionId], references: [Id], onDelete: Cascade, map: "Production_ACCContract")
-  Template             Template?         @relation(fields: [ACCCTemplateId], references: [TemplateId], onDelete: NoAction, map: "Template_ACCContract")
+  Template             Template          @relation(fields: [ACCCTemplateId], references: [TemplateId], onDelete: NoAction, map: "Template_ACCContract")
   Venue                Venue?            @relation(fields: [RehearsalVenueId], references: [Id], onDelete: Cascade, map: "Venue_ACCContract")
   ACCContractData      ACCContractData[]
   ACCPayment           ACCPayment[]
@@ -1323,16 +1323,6 @@ view BookingDateDiffView {
   DaysDifference     Int?
   FromVenueId        Int
   ToVenueId          Int
-
-  @@ignore
-}
-
-/// The underlying view does not contain salesSetTotalsViewa valid unique identifier and can therefore currently not be handled by Prisma Client.
-view VenueVenueView {
-  FromVenueId Int     @default(0)
-  ToVenueId   Int     @default(0)
-  Mileage     Decimal @default(0.0) @db.Decimal(5, 1)
-  TimeMins    Int?
 
   @@ignore
 }
