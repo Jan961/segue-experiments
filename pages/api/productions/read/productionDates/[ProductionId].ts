@@ -1,6 +1,5 @@
 import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getEmailFromReq, checkAccess } from 'services/userService';
 
 /**
  *
@@ -15,9 +14,7 @@ import { getEmailFromReq, checkAccess } from 'services/userService';
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   const ProductionId = parseInt(req.query.ProductionId as string);
 
-  const email = await getEmailFromReq(req);
-  const access = await checkAccess(email, { ProductionId });
-  if (!access) return res.status(401).end();
+  const prisma = await getPrismaClient(req);
 
   // Simole qyerey to get the production Start and End Date
   const productiondates = await prisma.production.findFirst({

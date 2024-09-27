@@ -4,6 +4,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   const VenueId: number = parseInt(req.query.venueID as string);
   try {
+    const prisma = await getPrismaClient(req);
     await prisma.venue.update({
       where: {
         VenueId,

@@ -1,6 +1,8 @@
 import getPrismaClient from 'lib/prisma';
-export default async function getAllPlans() {
+import { NextApiRequest } from 'next';
+export default async function getAllPlans(req: NextApiRequest) {
   try {
+    const prisma = getPrismaClient(req);
     const response = await prisma.subscriptionPlan.findMany();
     return response;
   } catch (err) {

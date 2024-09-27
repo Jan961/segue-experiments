@@ -84,6 +84,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       Email: deliveryEMail,
     };
     try {
+      const prisma = getPrismaClient();
       const venue = await prisma.$transaction(async (tx) => {
         return createVenue(
           tx,

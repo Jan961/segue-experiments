@@ -5,6 +5,7 @@ export default async function handle(req, res) {
   const query = `SELECT DISTINCT WeekName, WeekDate, WeekCode FROM SalesSummaryView WHERE ProductionId = ${productionID}  ORDER BY  WeekDate`;
 
   try {
+    const prisma = await getPrismaClient(req);
     const result = await prisma.$queryRawUnsafe(`${query}`);
     res.json(result);
   } catch (e) {

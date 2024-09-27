@@ -1,7 +1,7 @@
 import { ProductionTaskDTO } from 'interfaces';
 import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getEmailFromReq, checkAccess } from 'services/userService';
+
 import { generateRecurringProductionTasks, getNewTasksNum } from 'services/TaskService';
 import { calculateWeekNumber } from 'services/dateService';
 import { isNullOrEmpty } from 'utils';
@@ -11,9 +11,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     try {
       const task = req.body as ProductionTaskDTO;
       const { Id } = task;
-      const email = await getEmailFromReq(req);
-      const access = await checkAccess(email, { TaskId: Id });
-      if (!access) return res.status(401).end();
+      const prisma = await getPrismaClient(req);
 
       let taskObj = await prisma.ProductionTask.findFirst({
         where: { Id },

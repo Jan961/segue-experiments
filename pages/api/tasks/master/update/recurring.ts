@@ -1,7 +1,7 @@
 import { MasterTaskDTO } from 'interfaces';
 import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getEmailFromReq, checkAccess } from 'services/userService';
+
 import { generateSingleRecurringMasterTask } from 'services/TaskService';
 import { omit } from 'radash';
 import { masterTaskSchema, recurringMasterTaskSchema } from 'validators/tasks';
@@ -10,9 +10,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   if (req.method === 'POST') {
     try {
       const task = req.body as MasterTaskDTO;
-      const email = await getEmailFromReq(req);
-      const access = await checkAccess(email, { TaskId: task.Id });
-      if (!access) return res.status(401).end();
+      const prisma = await getPrismaClient(req);
 
       if (task.MTRId && task.RepeatInterval) {
         await masterTaskSchema.validate(task);

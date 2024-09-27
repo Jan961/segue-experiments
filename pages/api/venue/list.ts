@@ -34,6 +34,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   }
 
   try {
+    const prisma = await getPrismaClient(req);
     const venues = await prisma.venue.findMany({
       where: queryConditions,
       include: {

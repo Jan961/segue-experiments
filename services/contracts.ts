@@ -1,9 +1,11 @@
 import { BankAccount } from 'components/contracts/types';
 import { IContractDepartment, IContractSummary } from 'interfaces/contracts';
 import getPrismaClient from 'lib/prisma';
+import { NextApiRequest } from 'next';
 import { prepareQuery } from 'utils/apiUtils';
 
-export const fetchAllStandardClauses = async () => {
+export const fetchAllStandardClauses = async (req) => {
+  const prisma = getPrismaClient(req);
   const clauses = await prisma.ACCStandardClause.findMany({});
   return clauses.map(({ Id, Text, StdClauseTitle }) => ({
     id: Id,
@@ -12,7 +14,8 @@ export const fetchAllStandardClauses = async () => {
   }));
 };
 
-export const fetchAllContracts = async (productionId?: number): Promise<IContractSummary[]> => {
+export const fetchAllContracts = async (req: NextApiRequest, productionId?: number): Promise<IContractSummary[]> => {
+  const prisma = await getPrismaClient(req);
   const contracts = await prisma.ACCContract.findMany({
     where: {
       ...(productionId && {
@@ -70,7 +73,8 @@ export const fetchAllContracts = async (productionId?: number): Promise<IContrac
   );
 };
 
-export const fetchDepartmentList = async (): Promise<IContractDepartment[]> => {
+export const fetchDepartmentList = async (req: NextApiRequest): Promise<IContractDepartment[]> => {
+  const prisma = await getPrismaClient(req);
   const departments = await prisma.ACCDepartment.findMany({});
   return departments.map(({ ACCDeptId, ACCDeptName }) => ({
     id: ACCDeptId,
@@ -159,7 +163,8 @@ export const prepareAgencyOrganisationUpdateData = (agencyDetails: any) => {
   return prepareQuery(agencyDetails, fieldMappings);
 };
 
-export const getContractDataById = async (contractId: number) => {
+export const getContractDataById = async (contractId: number, req: NextApiRequest) => {
+  const prisma = getPrismaClient(req);
   return prisma.ACCContract.findUnique({
     where: { ContractId: contractId },
     include: {

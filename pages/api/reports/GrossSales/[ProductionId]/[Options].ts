@@ -9,6 +9,7 @@ export default async function handle(req, res) {
   // let totals = "SELECT sum(GBPValue) as Total FROM LocalProductionSalesSummary WHERE NOT (BookingStatus = 'X')"
 
   try {
+    const prisma = await getPrismaClient(req);
     const result = await prisma.$queryRawUnsafe(`${procedure}`);
     res.json(result);
     res.statusCode(200);

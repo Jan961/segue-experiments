@@ -3,6 +3,8 @@ import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getAccountIdFromReq } from 'services/userService';
 
+let prisma = null;
+
 const generateSearchResults = async (options) => {
   return await prisma.production.findMany({
     where: {
@@ -30,6 +32,7 @@ const generateSearchResults = async (options) => {
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
     if (req.method === 'POST') {
+      prisma = await getPrismaClient(req);
       // To be changed back to headers once ssl cert is placed
       const { segue_admin, account_admin, user_id } = await req.body;
 

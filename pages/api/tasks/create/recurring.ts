@@ -1,16 +1,13 @@
 import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getEmailFromReq, checkAccess } from 'services/userService';
+
 import { generateRecurringProductionTasks } from 'services/TaskService';
 import { productionTaskSchema, recurringProductionTaskSchema } from 'validators/tasks';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
     const { RepeatInterval, TaskRepeatFromWeekNum, TaskRepeatToWeekNum, ProductionId } = req.body;
-
-    const email = await getEmailFromReq(req);
-    const access = await checkAccess(email, { ProductionId });
-    if (!access) return res.status(401).end();
+    const prisma = await getPrismaClient(req);
 
     const productionWeeks = await prisma.DateBlock.findMany({
       where: {

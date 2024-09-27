@@ -1,6 +1,5 @@
 import { Booking, GetInFitUp, Other, Prisma, Rehearsal } from 'prisma/generated/prisma-client';
 import { addDays, differenceInDays } from 'date-fns';
-import getPrismaClient from 'lib/prisma';
 import { omit } from 'radash';
 import { isNullOrEmpty } from 'utils';
 import { checkDateValid, getPerformanceTime } from 'utils/getTimeFromDateTime';
@@ -39,7 +38,7 @@ export type BookingsWithPerformances = Prisma.BookingGetPayload<{
   include: typeof bookingInclude;
 }>;
 
-export const updateBooking = async (booking: NewBooking, tx = prisma) => {
+export const updateBooking = async (booking: NewBooking, tx) => {
   let updatedBooking = null;
   let updatedPerformances = null;
   const payload = {
@@ -80,7 +79,7 @@ export const updateBooking = async (booking: NewBooking, tx = prisma) => {
   }
 };
 
-export const updateGetInFitUp = async (booking: GetInFitUp, tx = prisma) => {
+export const updateGetInFitUp = async (booking: GetInFitUp, tx) => {
   const payload = {
     ...omit(booking, ['Id', 'VenueId', 'DateBlockId']),
     ...(booking.VenueId && { Venue: { connect: { Id: booking.VenueId } } }),
@@ -95,7 +94,7 @@ export const updateGetInFitUp = async (booking: GetInFitUp, tx = prisma) => {
   });
 };
 
-export const updateRehearsal = async (booking: Rehearsal, tx = prisma) => {
+export const updateRehearsal = async (booking: Rehearsal, tx) => {
   await tx.rehearsal.update({
     data: {
       ...omit(booking, ['Id', 'DateBlockId']),
@@ -107,7 +106,7 @@ export const updateRehearsal = async (booking: Rehearsal, tx = prisma) => {
   });
 };
 
-export const updateOther = async (booking: Other, tx = prisma) => {
+export const updateOther = async (booking: Other, tx) => {
   await tx.other.update({
     data: {
       ...omit(booking, ['Id', 'DateBlockId', 'DateTypeId']),
@@ -120,7 +119,7 @@ export const updateOther = async (booking: Other, tx = prisma) => {
   });
 };
 
-export const deleteBookingById = async (id: number, tx = prisma) => {
+export const deleteBookingById = async (id: number, tx) => {
   await tx.booking.delete({
     where: {
       Id: id,
@@ -133,7 +132,7 @@ export const deleteBookingById = async (id: number, tx = prisma) => {
   });
 };
 
-export const deleteRehearsalById = async (id: number, tx = prisma) => {
+export const deleteRehearsalById = async (id: number, tx) => {
   await tx.rehearsal.delete({
     where: {
       Id: id,
@@ -141,7 +140,7 @@ export const deleteRehearsalById = async (id: number, tx = prisma) => {
   });
 };
 
-export const deleteGetInFitUpById = async (id: number, tx = prisma) => {
+export const deleteGetInFitUpById = async (id: number, tx) => {
   await tx.getInFitUp.delete({
     where: {
       Id: id,
@@ -149,7 +148,7 @@ export const deleteGetInFitUpById = async (id: number, tx = prisma) => {
   });
 };
 
-export const deleteOtherById = async (id: number, tx = prisma) => {
+export const deleteOtherById = async (id: number, tx) => {
   await tx.other.delete({
     where: {
       Id: id,
@@ -157,7 +156,7 @@ export const deleteOtherById = async (id: number, tx = prisma) => {
   });
 };
 
-export const createBooking = (VenueId: number, FirstDate: Date, DateBlockId: number) => {
+export const createBooking = (VenueId: number, FirstDate: Date, DateBlockId: number, prisma) => {
   return prisma.booking.create({
     data: {
       FirstDate,
@@ -176,7 +175,7 @@ export const createBooking = (VenueId: number, FirstDate: Date, DateBlockId: num
   });
 };
 
-export const getSaleableBookings = async (ProductionId: number) => {
+export const getSaleableBookings = async (ProductionId: number, prisma) => {
   return await prisma.booking.findMany({
     where: {
       DateBlock: {
@@ -212,7 +211,7 @@ export const getSaleableBookings = async (ProductionId: number) => {
   });
 };
 
-export const changeBookingDate = async (Id: number, FirstDate: Date) => {
+export const changeBookingDate = async (Id: number, FirstDate: Date, prisma) => {
   const booking = await prisma.booking.findUnique({
     where: {
       Id,
@@ -259,7 +258,7 @@ export const changeBookingDate = async (Id: number, FirstDate: Date) => {
 
 export const createNewBooking = (
   { Performances, VenueId, DateBlockId, BookingDate, StatusCode, Notes, PencilNum, RunTag }: NewBooking,
-  tx = prisma,
+  tx,
 ) => {
   const performanceData = Performances.map((p: NewPerformance) => {
     return {
@@ -313,7 +312,7 @@ type NewRehearsal = {
 
 export const createNewRehearsal = (
   { DateBlockId, StatusCode, BookingDate, Notes, VenueId, PencilNum, RunTag }: NewRehearsal,
-  tx = prisma,
+  tx,
 ) => {
   return tx.rehearsal.create({
     data: {
@@ -344,7 +343,7 @@ type NewGetInFitUp = {
 
 export const createGetInFitUp = (
   { DateBlockId, StatusCode, BookingDate, Notes, VenueId, PencilNum, RunTag }: NewGetInFitUp,
-  tx = prisma,
+  tx,
 ) => {
   return tx.getInFitUp.create({
     data: {
@@ -375,7 +374,7 @@ type NewOtherBooking = {
 
 export const createOtherBooking = (
   { DateBlockId, BookingDate, StatusCode, Notes, DateTypeId, PencilNum, RunTag }: NewOtherBooking,
-  tx = prisma,
+  tx,
 ) => {
   return tx.other.create({
     data: {

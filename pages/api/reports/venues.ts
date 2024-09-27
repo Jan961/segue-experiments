@@ -5,7 +5,7 @@ import moment from 'moment';
 import { COLOR_HEXCODE } from 'services/salesSummaryService';
 import { addWidthAsPerContent } from 'services/reportsService';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getEmailFromReq, checkAccess } from 'services/userService';
+
 import { ALIGNMENT } from './masterplan';
 import { marketingCostsStatusToLabelMap } from 'config/Reports';
 import { Booking } from 'prisma/generated/prisma-client';
@@ -97,9 +97,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     if (productionId === -1) {
       productionId = null;
     }
-    const email = await getEmailFromReq(req);
-    const access = await checkAccess(email, { ProductionId: productionId });
-    if (!access) return res.status(401).end();
+    const prisma = await getPrismaClient(req);
 
     const data = await prisma.DateBlock.findMany({
       where: {

@@ -7,7 +7,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     if (!req.body.accountId) {
       return res.status(400).json({ error: 'AccountId is required.' });
     }
-
+    const prisma = await getPrismaClient(req);
     const masterVenues = await prisma.masterVenue.findMany({
       where: {
         deleted: 0,

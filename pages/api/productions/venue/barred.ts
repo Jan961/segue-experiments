@@ -1,6 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import getPrismaClient from 'lib/prisma';
-import { getEmailFromReq, checkAccess } from 'services/userService';
 
 export type BarredVenue = {
   Id: number;
@@ -17,10 +16,8 @@ export type BarredVenue = {
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   const { venueId, productionId, excludeLondon, includeExcluded, barDistance, seats, startDate, endDate } = req.body;
 
-  const email = await getEmailFromReq(req);
-  const access = await checkAccess(email, { ProductionId: productionId });
   if (!venueId) return res.status(401).json({ errorMessage: 'Venue is required.', error: true });
-  if (!access) return res.status(401).end();
+  const prisma = await getPrismaClient(req);
 
   try {
     const result = await prisma.venueVenueTravelView.findMany({

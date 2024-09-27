@@ -8,6 +8,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     if (!role.Name) {
       res.status(404).json({ ok: false, message: 'name is required' });
     }
+
+    const prisma = await getPrismaClient(req);
     const updatedRole = await prisma.VenueRole.upsert({
       where: {
         ...(role.Id && { Id: role.Id }),

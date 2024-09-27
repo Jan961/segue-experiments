@@ -1,15 +1,12 @@
 import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { omit } from 'radash';
-import { getEmailFromReq, checkAccess } from 'services/userService';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
     const ProductionId = parseInt(req.query.ProductionId as string);
 
-    const email = await getEmailFromReq(req);
-    const access = await checkAccess(email, { ProductionId });
-    if (!access) return res.status(401).end();
+    const prisma = await getPrismaClient(req);
 
     // TO be implimnented when Prisma supports this
     const result = await prisma.DateBlock.findFirst({

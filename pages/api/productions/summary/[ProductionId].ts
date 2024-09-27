@@ -22,7 +22,7 @@ type ScheduleView = {
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     const { ProductionId } = req.query;
-
+    const prisma = await getPrismaClient(req);
     // Needs securing?
 
     const data: ScheduleView[] =

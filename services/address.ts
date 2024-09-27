@@ -1,6 +1,4 @@
-import getPrismaClient from 'lib/prisma';
-
-export const upsertAddress = async (addressId: number, addressDetails, tx = prisma) => {
+export const upsertAddress = async (addressId: number, addressDetails, tx) => {
   const { address1, address2, address3, postcode, town, country } = addressDetails;
 
   const addressData = {
@@ -24,6 +22,6 @@ export const upsertAddress = async (addressId: number, addressDetails, tx = pris
     update: addressData,
     create: addressData,
   });
-
+  cxcz;
   return address;
 };

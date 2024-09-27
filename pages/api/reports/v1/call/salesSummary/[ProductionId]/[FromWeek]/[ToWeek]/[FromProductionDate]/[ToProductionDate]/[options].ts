@@ -59,46 +59,52 @@ const salesSummarySimple = async (req, res) => {
     productionStartDate: FromProductionDate,
     ShowName,
   } = JSON.parse(req.body);
-  const result = await prisma.$queryRaw`SELECT * FROM SalesView WHERE ProductionId = ${parseInt(ProductionId)}
+  try {
+    const prisma = await getPrismaClient(req);
+    const result = await prisma.$queryRaw`SELECT * FROM SalesView WHERE ProductionId = ${parseInt(ProductionId)}
   AND BookingFirstDate BETWEEN ${FromProductionDate} AND ${ToProductionDate}
   AND SetSalesFiguresDate BETWEEN ${fromWeek} AND ${toWeek}`;
 
-  // console.log(result)
-  const workbook = new ExcelJS.Workbook();
-  // const josnArray = data.map(({ WeekName, WeekDate, Town, VenueName }) => ({ Week: WeekName, Day: 1, Date: WeekDate, Town, Venue: VenueName }))
-  const josnArray = result.map(({ SetProductionWeekNum, SetSalesFiguresDate, VenueTown, VenueName }) => ({
-    Week: SetProductionWeekNum,
-    Day: 1,
-    Date: SetSalesFiguresDate,
-    Town: VenueTown,
-    Venue: VenueName,
-  }));
-  // Write data to the worksheet
-  const worksheet = workbook.addWorksheet('My Sales', {
-    pageSetup: { fitToPage: true, fitToHeight: 5, fitToWidth: 7 },
-  });
+    // console.log(result)
+    const workbook = new ExcelJS.Workbook();
+    // const josnArray = data.map(({ WeekName, WeekDate, Town, VenueName }) => ({ Week: WeekName, Day: 1, Date: WeekDate, Town, Venue: VenueName }))
+    const josnArray = result.map(({ SetProductionWeekNum, SetSalesFiguresDate, VenueTown, VenueName }) => ({
+      Week: SetProductionWeekNum,
+      Day: 1,
+      Date: SetSalesFiguresDate,
+      Town: VenueTown,
+      Venue: VenueName,
+    }));
+    // Write data to the worksheet
+    const worksheet = workbook.addWorksheet('My Sales', {
+      pageSetup: { fitToPage: true, fitToHeight: 5, fitToWidth: 7 },
+    });
 
-  console.log('ShowName', ShowName);
-  worksheet.getCell(1, 1).value = ShowName || 'Reports';
-  worksheet.addRow([]);
-  worksheet.addRow(['Production']);
+    console.log('ShowName', ShowName);
+    worksheet.getCell(1, 1).value = ShowName || 'Reports';
+    worksheet.addRow([]);
+    worksheet.addRow(['Production']);
 
-  worksheet.addRow(['Week', 'Day', 'Date', 'Town', 'Venue']);
-  josnArray.forEach((json) => {
-    worksheet.addRow([...Object.values(json)]);
-  });
-  worksheet.getRow(1).eachCell((cell) => {
-    cell.font = { bold: true };
-  });
+    worksheet.addRow(['Week', 'Day', 'Date', 'Town', 'Venue']);
+    josnArray.forEach((json) => {
+      worksheet.addRow([...Object.values(json)]);
+    });
+    worksheet.getRow(1).eachCell((cell) => {
+      cell.font = { bold: true };
+    });
 
-  const filename = `report_${new Date().getTime()}.xlsx`;
+    const filename = `report_${new Date().getTime()}.xlsx`;
 
-  res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-  res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
 
-  return workbook.xlsx.write(res).then(() => {
-    res.end();
-  });
+    return workbook.xlsx.write(res).then(() => {
+      res.end();
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json('Something went wrong');
+  }
 };
 
 const HANDLERS_MAPPER = {

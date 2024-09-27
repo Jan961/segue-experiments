@@ -89,6 +89,7 @@ export default async function handle(req, res) {
   }
 
   try {
+    const prisma = await getPrismaClient(req);
     const result = await prisma.$queryRawUnsafe(`${query}`);
     res.json(result);
   } catch (e) {

@@ -36,6 +36,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(400).json({ message: 'ProductionId and VenueId are required.' });
   }
   try {
+    const prisma = await getPrismaClient(req);
     const givenStartDate = new Date(startDate);
     const givenEndDate = new Date(endDate);
     // uv stands for user venue, The venue the user selected to do a barring check for

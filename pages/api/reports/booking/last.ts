@@ -3,6 +3,7 @@ import getPrismaClient from 'lib/prisma';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
+    const prisma = await getPrismaClient(req);
     const lastBookingDate = await prisma.booking.findFirst({
       select: {
         FirstDate: true,

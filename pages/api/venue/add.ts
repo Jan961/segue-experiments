@@ -1,8 +1,10 @@
 import getPrismaClient from 'lib/prisma';
+import prismaMaster from 'lib/prisma_master';
 import { NextApiRequest, NextApiResponse } from 'next';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
+    const prisma = await getPrismaClient(req);
     // Input validation
     if (
       !req.body.code ||
@@ -26,7 +28,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     };
 
     // Find user by accountId
-    const user = await prisma.user.findFirst({
+    const user = await prismaMaster.user.findFirst({
       where: { AccountId: req.body.accountId },
     });
 
@@ -34,16 +36,14 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       return res.status(404).json({ error: 'User not found.' });
     }
 
-    let result;
-
     if (user.SegueAdmin === 1) {
       // Create a new master venue
-      result = await prisma.masterVenue.create({
+      await prisma.masterVenue.create({
         data: venueData,
       });
     } else {
       // Create a new venue
-      result = await prisma.venue.create({
+      await prisma.venue.create({
         data: venueData,
       });
     }

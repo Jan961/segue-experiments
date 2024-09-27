@@ -3,6 +3,7 @@ import getPrismaClient from 'lib/prisma';
 export default async function handle(req, res) {
   const date = new Date(req.query.date);
   try {
+    const prisma = await getPrismaClient(req);
     const booking = await prisma.booking.findFirst({
       where: {
         ShowDate: date.toISOString(), // .toISO(req.query.date),

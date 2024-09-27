@@ -14,6 +14,7 @@ export const config = {
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     const { fields, files } = await parseFormData(req);
+    const prisma = await getPrismaClient(req);
     const email = await getEmailFromReq(req);
     const userId = await getUserId(email);
     if (!files.file) {

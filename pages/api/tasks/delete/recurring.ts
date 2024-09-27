@@ -4,6 +4,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   if (req.method === 'POST') {
     try {
       const { taskId, selectOption, PRTId, weekStart } = req.body;
+      const prisma = await getPrismaClient(req);
       if (!taskId) return res.status(401).json({ error: 'missing required params' });
       switch (selectOption) {
         case 'Delete this occurrence only': {

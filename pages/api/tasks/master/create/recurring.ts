@@ -1,17 +1,11 @@
 import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getEmailFromReq, checkAccess, getAccountIdFromReq } from 'services/userService';
 import { generateSingleRecurringMasterTask } from 'services/TaskService';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const { RepeatInterval, TaskRepeatFromWeekNum, TaskRepeatToWeekNum, ProductionId } = req.body;
-
-    const email = await getEmailFromReq(req);
-    const access = await checkAccess(email, { ProductionId });
-    const AccountId = await getAccountIdFromReq(req);
-    if (!access) return res.status(401).end();
-
+    const { RepeatInterval, TaskRepeatFromWeekNum, TaskRepeatToWeekNum } = req.body;
+    const prisma = await getPrismaClient(req);
     const recurringTask = await prisma.MasterTaskRepeat.create({
       data: {
         FromWeekNum: TaskRepeatFromWeekNum,

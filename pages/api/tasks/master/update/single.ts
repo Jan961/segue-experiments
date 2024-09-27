@@ -1,6 +1,5 @@
 import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { checkAccess, getEmailFromReq } from 'services/userService';
 import { MasterTaskDTO } from 'interfaces';
 import { omit } from 'radash';
 import { isNullOrEmpty } from 'utils';
@@ -9,9 +8,7 @@ import { masterTaskSchema } from 'validators/tasks';
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
     let task = req.body as MasterTaskDTO;
-    const email = await getEmailFromReq(req);
-    const access = await checkAccess(email);
-    if (!access) return res.status(401).end();
+    const prisma = await getPrismaClient(req);
     const { Id, TaskAssignedToAccUserId, MTRId } = task;
     await masterTaskSchema.validate(task);
     if (isNullOrEmpty(MTRId)) {

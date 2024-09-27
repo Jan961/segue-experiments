@@ -1,6 +1,5 @@
 import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getEmailFromReq, checkAccess } from 'services/userService';
 import { generateRecurringProductionTasks, getMaxProductionTaskCode } from 'services/TaskService';
 import { isNullOrEmpty } from 'utils';
 import { calculateWeekNumber } from 'services/dateService';
@@ -9,10 +8,7 @@ import { omit } from 'radash';
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
     const { selectedTaskList, ProductionId } = req.body;
-
-    const email = await getEmailFromReq(req);
-    const access = await checkAccess(email, { ProductionId });
-    if (!access) return res.status(401).end();
+    const prisma = await getPrismaClient(req);
     const productionWeeks = await prisma.DateBlock.findFirst({
       where: {
         ProductionId: parseInt(ProductionId),

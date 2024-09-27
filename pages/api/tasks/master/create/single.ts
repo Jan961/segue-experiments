@@ -2,15 +2,11 @@ import { MasterTaskDTO } from 'interfaces';
 import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getMaxMasterTaskCode } from 'services/TaskService';
-import { getEmailFromReq, checkAccess } from 'services/userService';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
     const task = req.body as MasterTaskDTO;
-
-    const email = await getEmailFromReq(req);
-    const access = await checkAccess(email);
-    if (!access) return res.status(401).end();
+    const prisma = await getPrismaClient(req);
 
     const { Code } = await getMaxMasterTaskCode();
 

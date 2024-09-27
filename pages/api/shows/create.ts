@@ -8,6 +8,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   const show: ShowDTO = req.body;
 
   try {
+    const prisma = await getPrismaClient(req);
     const validatedData = await showSchema.validate(show, { abortEarly: true });
     const result = await prisma.show.create({
       data: { ...validatedData },
