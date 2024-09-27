@@ -33,20 +33,22 @@ export default function Users({
 
       if (Array.isArray(users.data)) {
         setUserRowData(
-          users.data.map((user) => {
-            const firstName = user.UserFirstName || '';
-            const lastName = user.UserLastName || '';
+          users.data
+            .map((user) => {
+              const firstName = user.UserFirstName || '';
+              const lastName = user.UserLastName || '';
 
-            return {
-              accountUserId: user.AccUserId,
-              firstName,
-              lastName,
-              name: `${firstName} ${lastName}`,
-              email: user.UserEmail,
-              permissionDesc: user.AllPermissions,
-              licence: 'to be added later',
-            };
-          }),
+              return {
+                accountUserId: user.AccUserId,
+                firstName,
+                lastName,
+                name: `${firstName} ${lastName}`,
+                email: user.UserEmail,
+                permissionDesc: user.AllPermissions,
+                licence: 'to be added later',
+              };
+            })
+            .sort((a, b) => a.lastName.localeCompare(b.lastName)),
         );
       }
     } catch (error) {
