@@ -1,5 +1,8 @@
 image: atlassian/default-image:2
 image: cypress/browsers:latest
+options:
+  docker: true
+  size: 2x
 pipelines:
   custom:
     cypress:
@@ -44,3 +47,6 @@ definitions:
     npm: ~/.npm
     cypress: ~/.cache
     nextcache: ~/.next/cache
+  services:
+    docker:
+      memory: 4096
