@@ -496,3 +496,15 @@ export const areDatesInSameWeek = (
 ) => {
   return isSameWeek(getDateObject(date1), getDateObject(date2), { weekStartsOn });
 };
+
+/**
+ * Converts mins to HH:mm
+ *
+ * @param timeInMins
+ * @returns
+ */
+export const convertMinutesToHoursMins = (timeInMins: number) => {
+  const hours = Math.floor(timeInMins / 60);
+  const minutes = timeInMins % 60;
+  return `${hours}:${minutes < 10 ? '0' : ''}${minutes}`;
+};

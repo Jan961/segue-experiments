@@ -14,7 +14,7 @@ import { convertToPDF } from 'utils/report';
 import { addBorderToAllCells } from 'utils/export';
 import { bookingStatusMap } from 'config/bookings';
 import { add, parseISO, format as dateFormat, differenceInDays } from 'date-fns';
-import { areDatesInSameWeek, formatDate, formatUtcTime } from 'services/dateService';
+import { areDatesInSameWeek, convertMinutesToHoursMins, formatDate, formatUtcTime } from 'services/dateService';
 import { PerformanceInfo } from 'services/reports/schedule-report';
 import { isValidNumber } from 'utils';
 import { sum } from 'radash';
@@ -59,12 +59,6 @@ const styleHeader = ({ worksheet, row, numberOfColumns }: { worksheet: any; row:
     cell.font = { bold: true };
     cell.alignment = { horizontal: 'center' };
   }
-};
-
-const convertMinutesToHoursMins = (timeInMins: number) => {
-  const hours = Math.floor(timeInMins / 60);
-  const minutes = timeInMins % 60;
-  return `${hours}:${minutes < 10 ? '0' : ''}${minutes}`;
 };
 
 const getKey = ({ FullProductionCode, ShowName, EntryDate }) => `${FullProductionCode} - ${ShowName} - ${EntryDate}`;
