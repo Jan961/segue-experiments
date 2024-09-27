@@ -20,7 +20,8 @@ type UserDetails = {
 
 const useUser = () => {
   const { isLoaded: isSignUpLoaded } = useSignUp();
-  const { href: currentUrl } = useUrl();
+  // 👇 useUrl() returns `null` until hydration, so plan for that with `??`;
+  const { origin: currentUrl } = useUrl() ?? {};
   const { session } = useSession();
   const [error, setError] = useState('');
   const [isBusy, setIsBusy] = useState(false);
