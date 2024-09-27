@@ -42,7 +42,7 @@ describe('Select Component', () => {
       />,
     );
     expect(screen.getByText('Label')).toBeInTheDocument();
-    const selectedOption = screen.getAllByText('Multiple');
+    const selectedOption = screen.getAllByText('2 items selected');
     expect(selectedOption).toHaveLength(1);
   });
 

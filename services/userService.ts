@@ -86,10 +86,10 @@ export const getAccountIdFromReq = async (req: any) => {
   return getAccountId(email);
 };
 
-export const getOrganizationIdFromReq = async (req: any) => {
+export const getOrganisationIdFromReq = async (req: any) => {
   const { userId } = getAuth(req);
   const user = await clerkClient.users.getUser(userId);
-  return user?.unsafeMetadata?.organizationId;
+  return user?.unsafeMetadata?.organisationId;
 };
 
 export const checkAccess = async (email: string, items: AccessCheck = null): Promise<boolean> => {

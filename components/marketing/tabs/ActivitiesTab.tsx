@@ -132,7 +132,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
       const venueId = bookings.bookings.find((booking) => booking.Id === bookings.selected)?.Venue?.Id;
 
       // get the currency rate for the global activity cost
-      const currResponse = await axios.get(`/api/marketing/currencyConversion/read`, {
+      const currResponse = await axios.get(`/api/marketing/currency-conversion/read`, {
         params: {
           bookingId,
           productionId,
@@ -141,7 +141,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
 
       const conversionRate = currResponse.data.conversion;
 
-      const response = await axios.get(`/api/marketing/globalActivities/venue/${venueId}`);
+      const response = await axios.get(`/api/marketing/global-activities/venue/${venueId}`);
       const globalActivities = response.data;
 
       if (

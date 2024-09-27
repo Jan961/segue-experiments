@@ -17,11 +17,11 @@ const ShowsTextInputRenderer = ({ value, setValue, eGridCell, placeholder }: Sho
     }
   }, [value]);
 
-  const handleChange = (e: any) => {
-    setInputValue(e);
-    setValue(e);
+  const handleChange = (value: any) => {
+    setInputValue(value);
+    setValue(value);
     setError('');
-    if (e.length === 0) {
+    if (value.length === 0) {
       setError('error');
     }
   };
