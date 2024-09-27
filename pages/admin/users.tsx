@@ -45,7 +45,7 @@ export default function Users({
                 name: `${firstName} ${lastName}`,
                 email: user.UserEmail,
                 permissionDesc: user.AllPermissions,
-                licence: 'to be added later',
+                licence: 'Standard',
               };
             })
             .sort((a, b) => a.lastName.localeCompare(b.lastName)),
