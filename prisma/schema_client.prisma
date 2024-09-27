@@ -496,26 +496,25 @@ model ContractAttachedFile {
 }
 
 model VenueAddress {
-  Id               Int      @id @default(autoincrement()) @map("VenueAddressId")
-  VenueId          Int      @map("VenueAddressVenueId")
-  TypeName         String   @map("VenueAddressTypeName") @db.VarChar(15)
-  Line1            String?  @map("VenueAddress1") @db.VarChar(50)
-  Line2            String?  @map("VenueAddress2") @db.VarChar(50)
-  Line3            String?  @map("VenueAddress3") @db.VarChar(50)
-  Town             String?  @map("VenueAddressTown") @db.VarChar(50)
-  County           String?  @map("VenueAddressCounty") @db.VarChar(50)
-  Postcode         String?  @map("VenueAddressPostcode") @db.VarChar(12)
-  CountryId        Int?     @map("VenueAddressCountryId")
-  Phone            String?  @map("VenueAddressPhone") @db.VarChar(30)
-  Email            String?  @map("VenueAddressEmail") @db.VarChar(80)
-  Latitude         Int?     @map("VenueAddressLat") @db.MediumInt
-  Longitude        Int?     @map("VenueAddressLong") @db.MediumInt
-  Country          Country? @relation(fields: [CountryId], references: [Id], onDelete: Restrict, map: "CountryVenueAddress")
-  Venue            Venue    @relation(fields: [VenueId], references: [Id], onDelete: Cascade, map: "Venue_VenueAddress")
+  Id        Int      @id @default(autoincrement()) @map("VenueAddressId")
+  VenueId   Int      @map("VenueAddressVenueId")
+  TypeName  String   @map("VenueAddressTypeName") @db.VarChar(15)
+  Line1     String?  @map("VenueAddress1") @db.VarChar(50)
+  Line2     String?  @map("VenueAddress2") @db.VarChar(50)
+  Line3     String?  @map("VenueAddress3") @db.VarChar(50)
+  Town      String?  @map("VenueAddressTown") @db.VarChar(50)
+  County    String?  @map("VenueAddressCounty") @db.VarChar(50)
+  Postcode  String?  @map("VenueAddressPostcode") @db.VarChar(12)
+  CountryId Int?     @map("VenueAddressCountryId")
+  Phone     String?  @map("VenueAddressPhone") @db.VarChar(30)
+  Email     String?  @map("VenueAddressEmail") @db.VarChar(80)
+  Latitude  Int?     @map("VenueAddressLat") @db.MediumInt
+  Longitude Int?     @map("VenueAddressLong") @db.MediumInt
+  Country   Country? @relation(fields: [CountryId], references: [Id], onDelete: Restrict, map: "CountryVenueAddress")
+  Venue     Venue    @relation(fields: [VenueId], references: [Id], onDelete: Cascade, map: "Venue_VenueAddress")
 
   @@index([VenueId], map: "Venue_VenueAddress")
   @@index([CountryId], map: "CountryVenueAddress")
-  @@index([VenueId, TypeName], map: "VenueAddress_VenueAddressVenueId_VenueAddressTypeName_index")
 }
 
 model PerformanceReport {

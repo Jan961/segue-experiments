@@ -201,3 +201,6 @@ export const validateWhat3Words = (input: string) => {
     return false;
   }
 };
+
+// Helper function to check if a value is a valid number
+export const isValidNumber = (value: string) => !isNaN(parseInt(value, 10));

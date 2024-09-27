@@ -19,7 +19,7 @@ import { debounce, objectify } from 'radash';
 import { intialState as intialProductionJumpState } from 'state/booking/productionJumpState';
 import { transformToOptions } from 'utils';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
-import { getAllCurrencyList } from 'services/currencyService';
+import { getAllCurrencyList } from 'services/globalService';
 import { UiTransformedVenue, transformVenues } from 'utils/venue';
 import { initialVenueState } from 'config/venue';
 import Spinner from 'components/core-ui-lib/Spinner';

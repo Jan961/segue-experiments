@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { getAccountId, getEmailFromReq } from 'services/userService';
 import prismaMaster from 'lib/prisma_master';
 import prismaClient from 'lib/prisma';
-import { getAllCurrencyList } from 'services/currencyService';
+import { getAllCurrencyList } from 'services/globalService';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {

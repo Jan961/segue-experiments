@@ -2,9 +2,9 @@ import DefaultCellRenderer from 'components/core-ui-lib/Table/renderers/DefaultC
 import MasterTaskNameRenderer from './renderers/MasterTaskNameRenderer';
 
 const getUser = (usersList, id) => {
-  const userData = usersList.filter((user) => user.value === id);
+  const userData = usersList?.filter((user) => user.value === id);
 
-  if (userData.length > 0) return userData[0].text;
+  if (userData?.length > 0) return userData[0].text;
   return null;
 };
 

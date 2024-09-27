@@ -114,3 +114,8 @@ export const sortTasksByDueAndAlpha = (taskList: any[]) => {
     }),
   ];
 };
+
+export const generatePercentageOptions = [0, 25, 50, 75, 100].map((value) => ({
+  text: value.toString(),
+  value: value.toString(),
+}));

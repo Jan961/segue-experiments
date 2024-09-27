@@ -44,7 +44,7 @@ const ContactNotesTab = forwardRef<ContactNoteTabRef, ContactNotesTabProps>((pro
 
   const getContactNotes = async (bookingId: string, users) => {
     try {
-      const contactNoteResponse = await axios.get(`/api/marketing/contactNotes/${bookingId}`);
+      const contactNoteResponse = await axios.get(`/api/marketing/contact-notes/${bookingId}`);
       const contactNotes = contactNoteResponse.data;
 
       if (contactNotes && Array.isArray(contactNotes)) {
@@ -70,7 +70,7 @@ const ContactNotesTab = forwardRef<ContactNoteTabRef, ContactNotesTabProps>((pro
 
   const saveContactNote = async (variant: ContactNoteModalVariant, data) => {
     if (variant === 'add') {
-      const result = await axios.post('/api/marketing/contactNotes/create', data);
+      const result = await axios.post('/api/marketing/contact-notes/create', data);
       const conNoteData = [...contactNoteRows, result.data];
 
       // re sort the rows to ensure the new field is put in the correct place chronologically
@@ -81,7 +81,7 @@ const ContactNotesTab = forwardRef<ContactNoteTabRef, ContactNotesTabProps>((pro
       setContactNoteRows(sortedContactNotes);
       setShowContactNoteModal(false);
     } else if (variant === 'edit') {
-      await axios.post('/api/marketing/contactNotes/update', data);
+      await axios.post('/api/marketing/contact-notes/update', data);
 
       const rowIndex = contactNoteRows.findIndex((conNote) => conNote.Id === data.Id);
       const newRows = [...contactNoteRows];
@@ -94,7 +94,7 @@ const ContactNotesTab = forwardRef<ContactNoteTabRef, ContactNotesTabProps>((pro
       setContactNoteRows(sortedContactNotes);
       setShowContactNoteModal(false);
     } else if (variant === 'delete') {
-      await axios.post('/api/marketing/contactNotes/delete', data);
+      await axios.post('/api/marketing/contact-notes/delete', data);
 
       const rowIndex = contactNoteRows.findIndex((conNote) => conNote.Id === data.Id);
       const newRows = [...contactNoteRows];

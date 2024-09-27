@@ -8,7 +8,6 @@ import Label from 'components/core-ui-lib/Label';
 import Loader from 'components/core-ui-lib/Loader';
 import PopupModal from 'components/core-ui-lib/PopupModal';
 import Select from 'components/core-ui-lib/Select';
-import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import TextArea from 'components/core-ui-lib/TextArea/TextArea';
 import TextInput from 'components/core-ui-lib/TextInput';
 import moment from 'moment';
@@ -19,7 +18,7 @@ import { userState } from 'state/account/userState';
 import { currentProductionSelector } from 'state/booking/selectors/currentProductionSelector';
 import { isNullOrEmpty } from 'utils';
 import { getWeekOptions } from 'utils/taskDate';
-import { priorityOptions } from 'utils/tasks';
+import { priorityOptions, generatePercentageOptions } from 'utils/tasks';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import { addDurationToDate, addOneMonth } from 'services/dateService';
 import { RecurringTasksPopup } from './RecurringTasksPopup';
@@ -172,11 +171,6 @@ const AddTask = ({
       textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
     }
   }, [inputs.Notes]);
-
-  const generatePercentageOptions: SelectOption[] = Array.from({ length: 101 }, (_, index) => ({
-    text: index.toString(),
-    value: index.toString(),
-  }));
 
   const { users } = useRecoilValue(userState);
 
