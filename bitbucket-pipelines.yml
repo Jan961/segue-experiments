@@ -38,6 +38,8 @@ pipelines:
               WEB_APP_URI: $CYPRESS_BASE_URL
             caches:
               - node
+            services:
+              - docker
             script:
               - npm install
               - npm run test:ci
