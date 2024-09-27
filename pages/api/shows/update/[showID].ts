@@ -1,5 +1,5 @@
 import { ShowDTO } from 'interfaces';
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { omit } from 'radash';
 import { getEmailFromReq, checkAccess } from 'services/userService';

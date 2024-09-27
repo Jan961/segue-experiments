@@ -1,5 +1,5 @@
 import { MasterTaskDTO } from 'interfaces';
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getEmailFromReq, checkAccess } from 'services/userService';
 import { generateSingleRecurringMasterTask } from 'services/TaskService';
@@ -76,7 +76,12 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         const MRTId = repeatingTask?.Id;
         let masterTaskData: any = await generateSingleRecurringMasterTask(req.body, repeatingTask.Id);
 
-        await masterTaskSchema.validate({ ...masterTaskData, TaskAssignedToAccUserId, MRTId, AccountId: task.AccountId });
+        await masterTaskSchema.validate({
+          ...masterTaskData,
+          TaskAssignedToAccUserId,
+          MRTId,
+          AccountId: task.AccountId,
+        });
 
         masterTaskData = omit(masterTaskData, ['TaskAssignedToAccUserId', 'MTRId']);
         const createdTask = await prisma.MasterTask.update({

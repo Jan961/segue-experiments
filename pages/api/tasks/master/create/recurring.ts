@@ -1,4 +1,4 @@
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getEmailFromReq, checkAccess, getAccountIdFromReq } from 'services/userService';
 import { generateSingleRecurringMasterTask } from 'services/TaskService';
@@ -25,7 +25,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const task = await generateSingleRecurringMasterTask(req.body, recurringTask.Id);
     const createdTask = await prisma.MasterTask.create({
       data: {
-        ...task
+        ...task,
       },
     });
 

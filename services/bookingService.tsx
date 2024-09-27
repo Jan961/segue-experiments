@@ -1,6 +1,6 @@
 import { Booking, GetInFitUp, Other, Prisma, Rehearsal } from 'prisma/generated/prisma-client';
 import { addDays, differenceInDays } from 'date-fns';
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { omit } from 'radash';
 import { isNullOrEmpty } from 'utils';
 import { checkDateValid, getPerformanceTime } from 'utils/getTimeFromDateTime';

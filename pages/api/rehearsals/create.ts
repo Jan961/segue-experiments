@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { rehearsalMapper } from 'lib/mappers';
 import { getEmailFromReq, checkAccess } from 'services/userService';
 

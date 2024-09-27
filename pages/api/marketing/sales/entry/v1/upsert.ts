@@ -1,5 +1,5 @@
 import { loggingService } from 'services/loggingService';
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 
 type HoldInput = {
@@ -31,6 +31,7 @@ type UpsertSalesParams = {
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
+    const prisma = await getPrismaClient(req);
     const {
       SetBookingId,
       SetPerformanceId,

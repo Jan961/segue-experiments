@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { parseFormData } from 'utils/fileUpload';
 import { getAccountId, getEmailFromReq } from 'services/userService';
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import fs from 'fs';
 
 export const config = {
@@ -12,6 +12,7 @@ export const config = {
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
+    const prisma = await getPrismaClient(req);
     const { fields, files } = await parseFormData(req);
     const email = await getEmailFromReq(req);
     const AccountId = await getAccountId(email);

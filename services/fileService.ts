@@ -1,5 +1,5 @@
 import { getFileUrl } from 'lib/s3';
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 
 export const getFileCardFromFileId = async (Id: number) => {
   try {

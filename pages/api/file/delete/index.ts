@@ -1,5 +1,5 @@
 import { File } from 'prisma/generated/prisma-client';
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { deleteFile } from 'services/uploadService';
 
@@ -7,6 +7,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   if (req.method !== 'DELETE') {
     return res.status(405).json({ message: 'Method not allowed' });
   }
+  const prisma = await getPrismaClient(req);
   const { location: Location } = req.query;
 
   if (!Location || Array.isArray(Location)) {

@@ -1,7 +1,8 @@
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 
 export default async function handle(req, res) {
   try {
+    const prisma = await getPrismaClient(req);
     let { setId, bookingId, salesDate } = req.body;
 
     if (setId === -1) {

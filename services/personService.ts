@@ -1,5 +1,5 @@
 import { PersonMinimalDTO } from 'interfaces';
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { Person } from 'prisma/generated/prisma-client';
 import { isNullOrEmpty, isUndefined } from 'utils';
 import { FieldMapping, prepareQuery } from 'utils/apiUtils';

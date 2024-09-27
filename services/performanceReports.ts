@@ -1,4 +1,4 @@
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { getDuration } from './dateService';
 import { getFileUrlFromLocation } from 'utils/fileUpload';
 

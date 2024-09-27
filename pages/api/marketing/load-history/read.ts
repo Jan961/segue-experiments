@@ -1,8 +1,9 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
+    const prisma = await getPrismaClient(req);
     const selectedId = Array.isArray(req.query.selected)
       ? parseInt(req.query.selected[0])
       : parseInt(req.query.selected);

@@ -1,4 +1,4 @@
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 
 export const getContactNotesByBookingId = async (BookingId: number) => {
   const data = await prisma.bookingContactNotes.findMany({

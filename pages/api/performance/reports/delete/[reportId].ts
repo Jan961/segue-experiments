@@ -1,8 +1,10 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
+    const prisma = await getPrismaClient(req);
+
     const reportId = req.query.reportId as string;
     if (!reportId) {
       res.status(400).json({ ok: false, message: 'reportId is required' });

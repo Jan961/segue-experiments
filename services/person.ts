@@ -1,4 +1,4 @@
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { IOtherWorkType, IPersonDetails } from 'components/contracts/types';
 import { prepareQuery } from 'utils/apiUtils';
 import { Person, Prisma } from 'prisma/generated/prisma-client';

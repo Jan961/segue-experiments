@@ -1,6 +1,5 @@
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { TSalesView } from 'types/MarketingTypes';
-import { getEmailFromReq, checkAccess } from 'services/userService';
 import { getCurrencyFromBookingId } from 'services/venueCurrencyService';
 
 const getMapKey = ({
@@ -29,11 +28,8 @@ const getMapKey = ({
 
 export default async function handle(req, res) {
   try {
+    const prisma = await getPrismaClient(req);
     const BookingId = parseInt(req.query.bookingId);
-
-    const email = await getEmailFromReq(req);
-    const access = await checkAccess(email, { BookingId });
-    if (!access) return res.status(401).end();
     const currencySymbol = (await getCurrencyFromBookingId(BookingId)) || '';
 
     // Fetch data using Prisma Client

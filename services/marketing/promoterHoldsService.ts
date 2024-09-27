@@ -1,5 +1,5 @@
 import { performanceMapper } from 'lib/mappers';
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { dateToSimple, getTimeFromDateAndTime } from 'services/dateService';
 
 export const getPerformanceCompAllocationsByBookingId = async (bookingId: number) => {

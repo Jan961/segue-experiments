@@ -1,4 +1,4 @@
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { checkAccess, getEmailFromReq } from 'services/userService';
 
@@ -28,6 +28,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(405).end(); // Method Not Allowed
   }
   try {
+    const prisma = await getPrismaClient(req);
     const email = await getEmailFromReq(req);
     const access = await checkAccess(email);
     if (!access) return res.status(401).end();

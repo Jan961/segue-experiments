@@ -1,4 +1,4 @@
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import ReactPDF from '@react-pdf/renderer';
 import master from 'lib/prisma_master';
@@ -22,6 +22,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
+    const prisma = await getPrismaClient(req);
     const contractId = Number(id);
     const contractData = await getContractDataById(contractId);
     const contractDetails = transformContractResponse(contractData);

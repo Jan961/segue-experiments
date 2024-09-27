@@ -1,4 +1,4 @@
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { checkAccess, getEmailFromReq } from 'services/userService';
 
@@ -11,6 +11,7 @@ function getBool(toBeParserd: string) {
 }
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
+  const prisma = await getPrismaClient(req);
   const ProductionId = parseInt(req.query.ProductionId as string);
   const VenueId = parseInt(req.query.VenueId as string);
   const London = getBool(req.query.London as string);
@@ -29,12 +30,12 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     let uniqueArray: any[] = [];
     uniqueArray = result.reduce((acc, current) => {
       const stringified = JSON.stringify(current);
-      if (!acc.some(item => JSON.stringify(item) === stringified)) {
+      if (!acc.some((item) => JSON.stringify(item) === stringified)) {
         acc.push(current);
       }
       return acc;
     }, []);
-    
+
     res.json(uniqueArray);
   } catch (e) {
     console.log(e);

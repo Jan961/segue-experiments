@@ -1,6 +1,6 @@
 import { BankAccount } from 'components/contracts/types';
 import { IContractDepartment, IContractSummary } from 'interfaces/contracts';
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { prepareQuery } from 'utils/apiUtils';
 
 export const fetchAllStandardClauses = async () => {

@@ -1,4 +1,4 @@
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 
 export const getSaleTypeOptions = async () => {
   const holdTypeOptions = prisma.HoldType.findMany({});

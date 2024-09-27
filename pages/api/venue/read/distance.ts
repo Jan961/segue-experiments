@@ -1,5 +1,5 @@
 import { VenueVenueTravelView } from 'prisma/generated/prisma-client';
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { unique } from 'radash';
 

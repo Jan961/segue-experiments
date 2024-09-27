@@ -1,4 +1,4 @@
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { omit } from 'radash';
 import ExcelJS from 'exceljs';
 import moment from 'moment';

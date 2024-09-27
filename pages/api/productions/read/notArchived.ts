@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getAccountIdFromReq } from 'services/userService';
 

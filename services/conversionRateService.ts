@@ -1,4 +1,4 @@
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 
 export type ConversionRateUpdate = {
   id?: number;

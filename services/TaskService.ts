@@ -1,4 +1,4 @@
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { addDurationToDate, addOneMonth, calculateWeekNumber } from './dateService';
 import { sortTasksByDueAndAlpha } from 'utils/tasks';
 

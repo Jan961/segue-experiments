@@ -1,5 +1,5 @@
 import ExcelJS from 'exceljs';
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 
 export default async function handle(req, res) {
   const { type } = req.query;

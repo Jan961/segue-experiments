@@ -1,4 +1,4 @@
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 
 export default async function handle(req, res) {
   const ProductionId = req.query.ProductionId;
@@ -46,5 +46,5 @@ export default async function handle(req, res) {
     } catch (e) {
       res.statusCode(400);
     }
-  } 
+  }
 }

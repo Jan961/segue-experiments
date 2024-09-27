@@ -1,4 +1,4 @@
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 
 export const getContractStatus = async (ProductionId: number) => {
   return prisma.booking.findMany({

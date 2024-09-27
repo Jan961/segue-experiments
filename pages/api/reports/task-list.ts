@@ -1,4 +1,4 @@
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import ExcelJS from 'exceljs';
 import moment from 'moment';
 import { addWidthAsPerContent, applyGradientFillToColumn } from 'services/reportsService';

@@ -1,8 +1,9 @@
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { SeatsInfo, TSalesView } from 'types/MarketingTypes';
 import numeral from 'numeral';
-import { checkAccess, getEmailFromReq } from 'services/userService';
 import { getCurrencyFromBookingId } from 'services/venueCurrencyService';
+
+let prisma = null;
 
 const getSeatsRelatedInfo = (param: TSalesView, currencySymbol: string): SeatsInfo => ({
   Seats: param.Seats,
@@ -119,15 +120,10 @@ export const getArchivedSalesList = async (bookingIds: number[]) => {
 
 export default async function handle(req, res) {
   try {
+    prisma = await getPrismaClient(req);
     const bookingIds: number[] = req.body.bookingIds;
     if (!bookingIds) {
       throw new Error('Params are missing');
-    }
-
-    const email = await getEmailFromReq(req);
-    for (const BookingId of bookingIds) {
-      const access = await checkAccess(email, { BookingId });
-      if (!access) return res.status(401).end();
     }
 
     const archivedSalesList = await getArchivedSalesList(bookingIds);

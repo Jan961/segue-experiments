@@ -1,4 +1,4 @@
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import moment from 'moment';
 import { calculateWeekNumber, getWeeksBetweenDates } from 'services/dateService';
 

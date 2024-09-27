@@ -1,7 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import * as yup from 'yup';
-import { getEmailFromReq, checkAccess } from 'services/userService';
 import { isEmpty, omit, pick } from 'radash';
 import { prepareAddressQueryData, prepareOrganisationQueryData, preparePersonQueryData } from 'services/personService';
 import { createPersonSchema } from 'validators/person';
@@ -13,9 +12,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    const email = await getEmailFromReq(req);
-    const access = await checkAccess(email);
-    if (!access) return res.status(401).end();
+    const prisma = await getPrismaClient(req);
 
     const validatedData = await createPersonSchema.validate(req.body, { abortEarly: false });
 

@@ -1,4 +1,4 @@
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { omit } from 'radash';
 import { getEmailFromReq, checkAccess } from 'services/userService';
@@ -28,12 +28,17 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           },
         },
       },
-        orderBy: {
-          StartDate: 'desc'
-        }
-  })
-    const bookings = result.Booking.map(booking => ({ booking: omit(booking, ['Venue']), ...(booking.Venue || {}), ...(booking.Venue?.VenueAddress?.[0] || {}), BookingId: booking.Id }))
-    res.json(bookings)
+      orderBy: {
+        StartDate: 'desc',
+      },
+    });
+    const bookings = result.Booking.map((booking) => ({
+      booking: omit(booking, ['Venue']),
+      ...(booking.Venue || {}),
+      ...(booking.Venue?.VenueAddress?.[0] || {}),
+      BookingId: booking.Id,
+    }));
+    res.json(bookings);
   } catch (error) {
     console.log('==Error fetching Venue bookings==', error);
     res.status(500).end();

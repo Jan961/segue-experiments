@@ -1,5 +1,5 @@
 import { ProductionTaskDTO } from 'interfaces';
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getMaxProductionTaskCode } from 'services/TaskService';
 import { getEmailFromReq, checkAccess } from 'services/userService';

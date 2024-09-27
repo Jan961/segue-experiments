@@ -1,7 +1,6 @@
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { unique } from 'radash';
-import { checkAccess, getAccountId, getEmailFromReq } from 'services/userService';
 import { BookingSelection } from 'types/MarketingTypes';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
@@ -9,15 +8,12 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     if (req.method !== 'POST') {
       return res.status(404).end();
     }
+    const prisma = await getPrismaClient(req);
+
     const { venueCode, salesByType } = req.body || {};
     if (!venueCode || !salesByType) {
       throw new Error('Params are missing');
     }
-
-    const email = await getEmailFromReq(req);
-    const AccountId = await getAccountId(email);
-    const access = await checkAccess(email, { AccountId });
-    if (!access) return res.status(401).end();
 
     let conditions = {};
 

@@ -1,5 +1,5 @@
 import { bookingStatusMap } from 'config/bookings';
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import moment from 'moment';
 import { minutesInHHmmFormat } from 'services/salesSummaryService';
 

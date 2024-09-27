@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { bulkFileUpload, singleFileUpload, transformForPrisma, transformForUi } from 'services/uploadService';
 import { parseFormData } from 'utils/fileUpload';
 import { getEmailFromReq, getUserId } from 'services/userService';
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { FileDTO } from 'interfaces';
 
 export const config = {

@@ -1,8 +1,7 @@
 import { ActivityDTO } from 'interfaces';
 import { activityMapper } from 'lib/mappers';
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getEmailFromReq, checkAccess } from 'services/userService';
 
 export type ActivitiesResponse = {
   info: {
@@ -16,7 +15,9 @@ export type ActivitiesResponse = {
   activityTypes: { Id: number; Name: string }[];
 };
 
-export const getActivitiesByBookingId = async (BookingId) => {
+let prisma = null;
+
+const getActivitiesByBookingId = async (BookingId) => {
   const activityTypes = await prisma.activityType.findMany({
     select: {
       Name: true,
@@ -64,9 +65,7 @@ export const getActivitiesByBookingId = async (BookingId) => {
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
     const BookingId = parseInt(req.query.BookingId as string);
-    const email = await getEmailFromReq(req);
-    const access = await checkAccess(email, { BookingId });
-    if (!access) return res.status(401).end();
+    prisma = await getPrismaClient(req);
 
     const result = await getActivitiesByBookingId(BookingId);
 

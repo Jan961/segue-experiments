@@ -1,4 +1,4 @@
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { checkDateOverlap } from 'services/dateService';
 import { getDateFromWeekNumber } from 'utils/barring';

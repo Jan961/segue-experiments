@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { pick } from 'radash';
 import * as yup from 'yup';
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { getEmailFromReq, checkAccess } from 'services/userService';
 import { isNullOrUndefined } from 'utils';
 import { productionSchema } from 'validators/production';

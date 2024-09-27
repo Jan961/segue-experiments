@@ -1,7 +1,7 @@
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import { GlobalActivityDTO } from 'interfaces';
 import { convertDate } from 'lib/mappers';
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getEmailFromReq, checkAccess } from 'services/userService';
 

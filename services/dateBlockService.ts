@@ -1,4 +1,4 @@
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 export const getDateBlockForProduction = async (productionId: number, isPrimary: boolean) => {
   return prisma.dateBlock.findMany({
     where: {

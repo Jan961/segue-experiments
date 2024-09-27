@@ -1,6 +1,6 @@
 import { Performance } from 'prisma/generated/prisma-client';
 import ExcelJS from 'exceljs';
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import moment from 'moment';
 import {
   COLOR_HEXCODE,

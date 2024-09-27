@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import * as yup from 'yup';
 import { ShowDTO } from 'interfaces';
 import { showSchema } from 'validators/show';

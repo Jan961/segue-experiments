@@ -1,4 +1,4 @@
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { COLOR_HEXCODE } from 'services/salesSummaryService';
 
 export const getProductionAndVenueDetailsFromBookingId = async (bookingId: number) => {

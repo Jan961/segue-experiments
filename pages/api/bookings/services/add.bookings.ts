@@ -1,4 +1,4 @@
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { AddBookingsParams } from '../interface/add.interface'; // Adjust the import path as needed
 import { bookingMapper, performanceMapper, otherMapper, getInFitUpMapper, rehearsalMapper } from 'lib/mappers';
 import { createGetInFitUp, createNewBooking, createNewRehearsal, createOtherBooking } from 'services/bookingService';

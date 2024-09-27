@@ -1,8 +1,9 @@
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
+    const prisma = await getPrismaClient(req);
     const accountId = parseInt(req.query.id as string);
     const account = await prisma.account.findUnique({
       where: {

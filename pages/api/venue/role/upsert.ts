@@ -1,4 +1,4 @@
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 
 const mapToPrismaFields = ({ id: Id, name: Name, isStandard: IsStandard = false }) => ({ Id, Name, IsStandard });

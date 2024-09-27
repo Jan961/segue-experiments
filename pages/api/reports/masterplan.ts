@@ -1,5 +1,5 @@
 import ExcelJS from 'exceljs';
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import moment from 'moment';
 import Decimal from 'decimal.js';
 import { COLOR_HEXCODE, colorCell, colorTextAndBGCell, fillRowBGColorAndTextColor } from 'services/salesSummaryService';

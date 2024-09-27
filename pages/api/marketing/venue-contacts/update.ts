@@ -1,5 +1,5 @@
 import { loggingService } from 'services/loggingService';
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { VenueContactDTO } from 'interfaces';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { isNullOrUndefined } from 'utils';
@@ -7,7 +7,7 @@ import { isNullOrUndefined } from 'utils';
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
     const vc = req.body as VenueContactDTO;
-
+    const prisma = await getPrismaClient(req);
     // if vc.Id is undefined - create the venue contact.
     // the table is populate with standard roles even if the venue doesn't have those roles stored against that venue
     // this api needs to create the role if a VC being edited doesn;t have an id

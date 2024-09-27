@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import * as yup from 'yup';
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { CompanyContractStatus } from 'config/contracts';
 import { contractSchema } from 'validators/contracts';
 
@@ -10,6 +10,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
+    const prisma = await getPrismaClient(req);
     const validatedData = await contractSchema.validate(req.body, { abortEarly: false });
 
     const {

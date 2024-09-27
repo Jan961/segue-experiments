@@ -1,5 +1,5 @@
 import ExcelJS from 'exceljs';
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { Performance } from 'prisma/generated/prisma-client';
 import {
   COLOR_HEXCODE,

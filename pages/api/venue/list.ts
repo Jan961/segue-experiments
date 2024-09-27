@@ -1,4 +1,4 @@
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import fuseFilter from 'utils/fuseFilter';
 import { getFileCardFromFileId } from 'services/fileService';

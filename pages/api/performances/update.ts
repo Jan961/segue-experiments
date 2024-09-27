@@ -1,4 +1,4 @@
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { PerformanceDTO } from 'interfaces';
 import { performanceMapper } from 'lib/mappers';
 import { dateStringToPerformancePair } from 'services/dateService';

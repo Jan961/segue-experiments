@@ -1,7 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { dateStringToPerformancePair } from 'services/dateService';
-import { getEmailFromReq, checkAccess } from 'services/userService';
 import { Report } from 'types/report';
 import moment from 'moment';
 
@@ -15,6 +14,8 @@ const getDateTime = (date: Date, time: string) => {
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
+    const prisma = await getPrismaClient(req);
+
     const report = req.body as Report;
     const {
       actOneDownTime,
@@ -24,7 +25,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       // actTwoDuration,
       // asm,
       audienceNote,
-      bookingId,
       castCrewAbsence,
       castCrewInjury,
       // csm,
@@ -50,9 +50,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
 
     const { Date: date } = dateStringToPerformancePair(performanceDate);
 
-    const email = await getEmailFromReq(req);
-    const access = await checkAccess(email, { BookingId: parseInt(bookingId, 10) });
-    if (!access) return res.status(401).end();
     console.log(getDateTime(date, actOneUpTime), actOneUpTime);
     const result = await prisma.PerformanceReport.create({
       data: {

@@ -1,4 +1,4 @@
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getNextMondayDateString } from 'services/dateService';
 
@@ -46,6 +46,7 @@ type BookingNotes = {
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
+    const prisma = await getPrismaClient(req);
     const { SetBookingId, SetPerformanceId, SetSalesFiguresDate, isFinalFigures } = req.body as UpsertSalesParams;
     const SetSalesFiguresDateInISO = new Date(SetSalesFiguresDate);
 

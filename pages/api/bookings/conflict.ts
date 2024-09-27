@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { Booking } from 'prisma/generated/prisma-client';
 import { bookingMapperWithVenue } from 'lib/mappers';
 import { BookingWithVenueDTO } from 'interfaces';
@@ -7,6 +7,7 @@ import { getDateTypeFromId } from 'services/dayTypeService';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
+    const prisma = await getPrismaClient(req);
     const { productionId, runTag } = req.body;
     const fromDate = new Date(req.body?.fromDate);
     const toDate = new Date(req.body?.toDate);
