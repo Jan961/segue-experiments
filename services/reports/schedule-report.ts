@@ -57,7 +57,7 @@ export const addTime = (timeArr: string[] = []) => {
 const getKey = ({ FullProductionCode, ShowName, EntryDate }) => `${FullProductionCode} - ${ShowName} - ${EntryDate}`;
 
 export const getSheduleReport = async ({ from, to, status, ProductionId }, req: NextApiRequest) => {
-  const prisma = getPrismaClient(req);
+  const prisma = await getPrismaClient(req);
   const formatedFromDate = new Date(from);
   const formatedToDate = new Date(to);
   const data = await prisma.scheduleView.findMany({

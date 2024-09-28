@@ -38,11 +38,11 @@ const getKey = ({ FullProductionCode, ShowName, EntryDate }) => `${FullProductio
 
 const handler = async (req, res) => {
   try {
-    const prisma = getPrismaClient();
+    const prisma = await getPrismaClient(req);
     const { ProductionId, startDate: from, endDate: to, status, format } = req.body;
 
     if (format === 'json') {
-      const data = await getSheduleReport({ from, to, status, ProductionId });
+      const data = await getSheduleReport({ from, to, status, ProductionId }, req);
       res.status(200).json(data);
       return;
     }

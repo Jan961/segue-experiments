@@ -2,7 +2,7 @@ import getPrismaClient from 'lib/prisma';
 import { NextApiRequest } from 'next';
 
 export const getDateBlockForProduction = async (productionId: number, isPrimary: boolean, req: NextApiRequest) => {
-  const prisma = getPrismaClient(req);
+  const prisma = await getPrismaClient(req);
   return prisma.dateBlock.findMany({
     where: {
       ProductionId: productionId,

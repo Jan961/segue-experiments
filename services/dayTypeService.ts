@@ -3,7 +3,7 @@ import { NextApiRequest } from 'next';
 
 export const getDayTypes = async (req: NextApiRequest) => {
   try {
-    const prisma = getPrismaClient(req);
+    const prisma = await getPrismaClient(req);
     return prisma.dateType.findMany({
       orderBy: {
         SeqNo: 'asc',
@@ -17,7 +17,7 @@ export const getDayTypes = async (req: NextApiRequest) => {
 
 export const getDateTypeFromId = async (id: number, req: NextApiRequest) => {
   try {
-    const prisma = getPrismaClient(req);
+    const prisma = await getPrismaClient(req);
 
     return (await prisma.DateType.findFirst({ where: { Id: id }, select: { Name: true } }))?.Name;
   } catch (err) {

@@ -20,7 +20,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     await prisma.$transaction(
       async (tx: PrismaClient) => {
         await updateCreateProductionFile(tx, selectedProdId, fileID);
-        const primaryDateBlock = await getDateBlockForProduction(selectedProdId, true);
+        const primaryDateBlock = await getDateBlockForProduction(selectedProdId, true, req);
         const primaryDateBlockID = primaryDateBlock[0].Id;
         await deleteEvents(tx, primaryDateBlockID);
         await updateSpreadsheetDataWithVenueIDs(tx, spreadsheetData);

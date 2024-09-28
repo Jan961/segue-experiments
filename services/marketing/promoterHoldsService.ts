@@ -4,7 +4,7 @@ import { NextApiRequest } from 'next';
 import { dateToSimple, getTimeFromDateAndTime } from 'services/dateService';
 
 export const getPerformanceCompAllocationsByBookingId = async (bookingId: number, req: NextApiRequest) => {
-  const prisma = getPrismaClient(req);
+  const prisma = await getPrismaClient(req);
   const performanceRaw = await prisma.performance.findMany({
     where: {
       BookingId: bookingId,

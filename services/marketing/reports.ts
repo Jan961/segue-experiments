@@ -3,7 +3,7 @@ import { NextApiRequest } from 'next';
 import { COLOR_HEXCODE } from 'services/salesSummaryService';
 
 export const getProductionAndVenueDetailsFromBookingId = async (bookingId: number, req: NextApiRequest) => {
-  const prisma = getPrismaClient(req);
+  const prisma = await getPrismaClient(req);
   const result = await prisma.scheduleView.findFirst({
     where: {
       EntryType: 'Booking',

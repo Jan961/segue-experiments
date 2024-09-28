@@ -72,7 +72,7 @@ export type PersonWithRoles = Prisma.PersonGetPayload<{
 }>;
 
 export const getPersonById = async (id: number, req: NextApiRequest): Promise<PersonWithRoles> => {
-  const prisma = getPrismaClient(req);
+  const prisma = await getPrismaClient(req);
   return prisma.person.findUnique({
     where: { PersonId: Number(id) },
     include: {

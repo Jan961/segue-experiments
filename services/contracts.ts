@@ -5,7 +5,7 @@ import { NextApiRequest } from 'next';
 import { prepareQuery } from 'utils/apiUtils';
 
 export const fetchAllStandardClauses = async (req) => {
-  const prisma = getPrismaClient(req);
+  const prisma = await getPrismaClient(req);
   const clauses = await prisma.ACCStandardClause.findMany({});
   return clauses.map(({ Id, Text, StdClauseTitle }) => ({
     id: Id,
@@ -164,7 +164,7 @@ export const prepareAgencyOrganisationUpdateData = (agencyDetails: any) => {
 };
 
 export const getContractDataById = async (contractId: number, req: NextApiRequest) => {
-  const prisma = getPrismaClient(req);
+  const prisma = await getPrismaClient(req);
   return prisma.ACCContract.findUnique({
     where: { ContractId: contractId },
     include: {
