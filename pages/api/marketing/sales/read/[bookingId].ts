@@ -30,7 +30,7 @@ export default async function handle(req, res) {
   try {
     const prisma = await getPrismaClient(req);
     const BookingId = parseInt(req.query.bookingId);
-    const currencySymbol = (await getCurrencyFromBookingId(BookingId)) || '';
+    const currencySymbol = (await getCurrencyFromBookingId(req, BookingId)) || '';
 
     // Fetch data using Prisma Client
     const data = await prisma.salesView.findMany({

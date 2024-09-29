@@ -1,6 +1,5 @@
 import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { checkAccess, getEmailFromReq } from 'services/userService';
 
 function getBool(toBeParserd: string) {
   if (parseInt(toBeParserd) === 1) {
@@ -17,10 +16,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   const London = getBool(req.query.London as string);
   const Seats = parseInt(req.query.Seats as string);
   const ProductionOnly = getBool(req.query.ProductionOnly as string);
-
-  const email = await getEmailFromReq(req);
-  const access = await checkAccess(email, { ProductionId });
-  if (!access) return res.status(401).end();
 
   const query = `CALL GetBarringVenues(${VenueId},${ProductionId},${London},${Seats},${ProductionOnly});`;
 

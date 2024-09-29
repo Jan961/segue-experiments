@@ -1,6 +1,5 @@
 import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { checkAccess, getEmailFromReq } from 'services/userService';
 
 const mapToPrisma = (fields) => {
   return {
@@ -29,9 +28,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
   try {
     const prisma = await getPrismaClient(req);
-    const email = await getEmailFromReq(req);
-    const access = await checkAccess(email);
-    if (!access) return res.status(401).end();
     const BookingId = parseInt(req.query.id as string, 10);
     const bookingUpdate = mapToPrisma(req.body);
 

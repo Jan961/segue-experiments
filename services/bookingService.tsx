@@ -3,6 +3,9 @@ import { addDays, differenceInDays } from 'date-fns';
 import { omit } from 'radash';
 import { isNullOrEmpty } from 'utils';
 import { checkDateValid, getPerformanceTime } from 'utils/getTimeFromDateTime';
+import { NextApiRequest } from 'next';
+import getPrismaClient from 'lib/prisma';
+import { activityMapper } from 'lib/mappers';
 
 export type NewPerformance = {
   Date: string;
@@ -175,7 +178,8 @@ export const createBooking = (VenueId: number, FirstDate: Date, DateBlockId: num
   });
 };
 
-export const getSaleableBookings = async (ProductionId: number, prisma) => {
+export const getSaleableBookings = async (ProductionId: number, req: NextApiRequest) => {
+  const prisma = await getPrismaClient(req);
   return await prisma.booking.findMany({
     where: {
       DateBlock: {
@@ -395,4 +399,50 @@ export const createOtherBooking = (
       },
     },
   });
+};
+
+export const getActivitiesByBookingId = async (BookingId, req: NextApiRequest) => {
+  const prisma = await getPrismaClient(req);
+  const activityTypes = await prisma.activityType.findMany({
+    select: {
+      Name: true,
+      Id: true,
+    },
+    orderBy: {
+      Name: 'asc',
+    },
+  });
+
+  const info = await prisma.booking.findUnique({
+    where: {
+      Id: BookingId,
+    },
+    select: {
+      TicketsOnSale: true,
+      TicketsOnSaleFromDate: true,
+      MarketingPlanReceived: true,
+      ContactInfoReceived: true,
+      PrintReqsReceived: true,
+    },
+  });
+
+  const activities = await prisma.bookingActivity.findMany({
+    where: {
+      BookingId,
+    },
+    orderBy: {
+      Date: 'asc',
+    },
+  });
+
+  const result = {
+    activityTypes,
+    activities: activities.map(activityMapper),
+    info: {
+      ...info,
+      OnSaleDate: info.OnSaleDate ? info.OnSaleDate.toISOString() : '',
+    },
+  };
+
+  return result;
 };

@@ -9,7 +9,7 @@ const charCodeToCurrency = (charCode: string) => {
 export const getCurrencyFromBookingId = async (req: NextApiRequest, bookingId: number, returnCurrencyCode = false) => {
   try {
     const prisma = await getPrismaClient(req);
-    const venueIdQuery: any | null = await prisma.Booking.findFirst({
+    const venueIdQuery: any | null = await prisma.booking.findFirst({
       where: {
         Id: bookingId,
       },
@@ -23,7 +23,7 @@ export const getCurrencyFromBookingId = async (req: NextApiRequest, bookingId: n
       return null;
     }
 
-    const venueCountryQuery: any | null = await prisma.VenueAddress.findFirst({
+    const venueCountryQuery: any | null = await prisma.venueAddress.findFirst({
       where: {
         VenueId: { equals: venueId },
         TypeName: { equals: 'Main' },
@@ -40,7 +40,7 @@ export const getCurrencyFromBookingId = async (req: NextApiRequest, bookingId: n
       return null;
     }
 
-    const currencyCodeQuery: any | null = await prisma.Country.findFirst({
+    const currencyCodeQuery: any | null = await prisma.country.findFirst({
       where: {
         Id: { equals: countryId },
       },
@@ -75,9 +75,10 @@ export const getCurrencyFromBookingId = async (req: NextApiRequest, bookingId: n
 
 export const getCurrencyCodeFromCountryId: (countryId: number, req: NextApiRequest) => Promise<any> = async (
   countryId: number,
+  req: NextApiRequest,
 ) => {
-  const prisma = await getPrismaClient();
-  const currencyCodeQuery: any | null = await prisma.Country.findFirst({
+  const prisma = await getPrismaClient(req);
+  const currencyCodeQuery: any | null = await prisma.country.findFirst({
     where: {
       Id: { equals: countryId },
     },
@@ -96,7 +97,7 @@ export const getCurrencyFromProductionId = async (
   try {
     const prisma = await getPrismaClient(req);
     // Query to get the ReportCurrencyCode from Production
-    const currencyCodeQuery: any | null = await prisma.Production.findFirst({
+    const currencyCodeQuery: any | null = await prisma.production.findFirst({
       where: {
         Id: { equals: productionId },
       },

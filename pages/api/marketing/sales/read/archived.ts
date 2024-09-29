@@ -51,7 +51,7 @@ const rearrangeArray = ({
   return arrangedArray;
 };
 
-export const getArchivedSalesList = async (bookingIds: number[]) => {
+const getArchivedSalesList = async (bookingIds: number[], currencySymbol: string) => {
   const data: TSalesView[] = await prisma.salesView.findMany({
     where: {
       BookingId: {
@@ -93,8 +93,6 @@ export const getArchivedSalesList = async (bookingIds: number[]) => {
     return t1 - t2;
   });
 
-  const currencySymbol = (await getCurrencyFromBookingId(bookingIds[0])) || '';
-
   const result: TSalesView[][] = commonData.map(({ SetBookingWeekNum }) =>
     formattedData.reduce((acc, y) => (y.SetBookingWeekNum === SetBookingWeekNum ? [...acc, y] : [...acc]), []),
   );
@@ -125,8 +123,8 @@ export default async function handle(req, res) {
     if (!bookingIds) {
       throw new Error('Params are missing');
     }
-
-    const archivedSalesList = await getArchivedSalesList(bookingIds);
+    const currencySymbol = (await getCurrencyFromBookingId(req, bookingIds[0])) || '';
+    const archivedSalesList = await getArchivedSalesList(bookingIds, currencySymbol);
 
     res.status(200).json(archivedSalesList);
   } catch (error) {

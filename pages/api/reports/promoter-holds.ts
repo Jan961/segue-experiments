@@ -8,7 +8,6 @@ import { toSql } from 'services/dateService';
 import { getProductionWithContent } from 'services/productionService';
 import { addWidthAsPerContent } from 'services/reportsService';
 import { COLOR_HEXCODE } from 'services/salesSummaryService';
-import { getEmailFromReq, checkAccess } from 'services/userService';
 import { getExportedAtTitle } from 'utils/export';
 import { convertToPDF } from 'utils/report';
 
@@ -92,9 +91,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const prisma = await getPrismaClient(req);
     const timezoneOffset = parseInt(req.headers.timezoneoffset as string, 10) || 0;
     let { productionCode = '', fromDate, toDate, venue, productionId, format } = req.body || {};
-    const email = await getEmailFromReq(req);
-    const access = await checkAccess(email, { ProductionId: productionId });
-    if (!access) return res.status(401).end();
 
     const workbook = new ExcelJS.Workbook();
 
@@ -113,7 +109,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const where: Prisma.Sql = conditions.length ? Prisma.sql` where ${Prisma.join(conditions, ' and ')}` : Prisma.empty;
     const [data, productionDetails] = await all([
       prisma.$queryRaw<TPromoter[]>`select * FROM PromoterHoldsView ${where} order by PerformanceDate;`,
-      getProductionWithContent(productionId),
+      getProductionWithContent(productionId, req),
     ]);
     const showName = (productionDetails as ProductionDetails)?.Show?.Name || '';
     const filename = `${productionCode} ${showName} Promoter Holds`;

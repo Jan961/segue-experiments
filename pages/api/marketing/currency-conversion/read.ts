@@ -8,8 +8,8 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     if (!bookingId || !productionId) return res.status(400).end();
     const prisma = await getPrismaClient(req);
 
-    const bookingSymbol = await getCurrencyFromBookingId(parseInt(bookingId.toString()), true);
-    const productionSymbol = await getCurrencyFromProductionId(parseInt(productionId.toString()), true);
+    const bookingSymbol = await getCurrencyFromBookingId(req, parseInt(bookingId.toString()), true);
+    const productionSymbol = await getCurrencyFromProductionId(req, parseInt(productionId.toString()), true);
 
     // if either currency code is blank return 1 so there is no change to as a result of the conversion
     if (!bookingSymbol || !productionSymbol) {
