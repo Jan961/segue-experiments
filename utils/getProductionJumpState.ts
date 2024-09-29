@@ -41,7 +41,7 @@ export const getProductionJumpState = async (ctx, path: string): Promise<Product
           RunningTime: t.RunningTime ? dateTimeToTime(t.RunningTime.toISOString()) : null,
           RunningTimeNote: t.RunningTimeNote,
           SalesFrequency: t.SalesFrequency,
-          ProductionCompany: t.ProductionCompany,
+          ProductionCompany: t.ProductionCompany || '',
           SalesEmail: t.SalesEmail,
         };
       })
