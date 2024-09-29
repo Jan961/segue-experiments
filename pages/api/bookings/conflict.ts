@@ -44,7 +44,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       },
     });
 
-    const result = await prisma.DateBlock.findMany({
+    const result = await prisma.dateBlock.findMany({
       where: {
         ProductionId: productionId,
       },
@@ -71,7 +71,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           const { StatusCode, Date, DateTypeId } = otherBooking;
           if (StatusCode === 'C' || StatusCode === 'U') {
             if (fromDate <= Date && Date <= toDate) {
-              const dateTypeText = await getDateTypeFromId(DateTypeId);
+              const dateTypeText = await getDateTypeFromId(DateTypeId, req);
               conflictList.push({ ...otherBooking, Venue: { Name: dateTypeText } });
             }
           }
