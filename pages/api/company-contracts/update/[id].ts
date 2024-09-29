@@ -23,7 +23,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       accScheduleJson: JSON.stringify(validatedData.accScheduleJson),
     });
     // console.log(updateData.);
-    const updatedContract = await prisma.ACCContract.update({
+    const updatedContract = await prisma.aCCContract.update({
       where: { ContractId: Number(id) },
       data: updateData,
     });

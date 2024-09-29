@@ -161,7 +161,7 @@ export const preparePersonQueryData = (
 
 export const fetchAllMinPersonsList = async (req: NextApiRequest): Promise<PersonMinimalDTO[]> => {
   const prisma = await getPrismaClient(req);
-  const persons: Person[] = await prisma.Person.findMany({
+  const persons: Partial<Person>[] = await prisma.person.findMany({
     select: {
       PersonId: true,
       PersonFirstName: true,
