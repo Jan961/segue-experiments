@@ -15,3 +15,6 @@ const start = () => {
 };
 
 start(); */
+const dummy = null;
+
+export default dummy;
