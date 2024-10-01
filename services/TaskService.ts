@@ -5,7 +5,7 @@ import { NextApiRequest } from 'next';
 
 export const getMasterTasksList = async (req: NextApiRequest) => {
   const prisma = await getPrismaClient(req);
-  const masterTaskList = await prisma.MasterTask.findMany({
+  const masterTaskList = await prisma.masterTask.findMany({
     orderBy: {
       StartByWeekNum: 'asc',
     },
@@ -47,7 +47,7 @@ export const getMaxTaskCode = async (req: NextApiRequest) => {
 
 export const getMaxProductionTaskCode = async (prodId: number, req: NextApiRequest) => {
   const prisma = await getPrismaClient(req);
-  const output = await prisma.ProductionTask.findFirst({
+  const output = await prisma.productionTask.findFirst({
     where: { ProductionId: prodId },
     orderBy: {
       Code: 'desc',
@@ -61,7 +61,7 @@ export const getMaxProductionTaskCode = async (prodId: number, req: NextApiReque
 
 export const getMaxMasterTaskCode = async (req: NextApiRequest) => {
   const prisma = await getPrismaClient(req);
-  return await prisma.MasterTask.findFirst({
+  return await prisma.masterTask.findFirst({
     orderBy: {
       Code: 'desc',
     },
@@ -89,7 +89,7 @@ export const generateRecurringMasterTasks = async (requestBody, MTRId: number, r
   const prisma = await getPrismaClient(req);
   let maxTaskCode =
     (
-      await prisma.MasterTask.findFirst({
+      await prisma.masterTask.findFirst({
         select: {
           Code: true,
         },
@@ -133,7 +133,7 @@ export const generateSingleRecurringMasterTask = async (requestBody, MTRId: numb
   const prisma = await getPrismaClient(req);
   const maxTaskCode =
     (
-      await prisma.MasterTask.findFirst({
+      await prisma.masterTask.findFirst({
         select: {
           Code: true,
         },
@@ -186,7 +186,7 @@ export const generateRecurringProductionTasks = async (
   const prisma = await getPrismaClient(req);
   let maxTaskCode =
     (
-      await prisma.ProductionTask.findFirst({
+      await prisma.productionTask.findFirst({
         select: {
           Code: true,
         },

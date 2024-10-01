@@ -1,9 +1,8 @@
 import getPrismaClient from 'lib/prisma';
 import master from 'lib/prisma_master';
 import { Prisma } from 'prisma/generated/prisma-client';
-import { showProductionMapper, productionEditorMapper } from 'lib/mappers';
-import { getShowWithProductionsById } from './showService';
-import { getAccountId, getEmailFromReq } from './userService';
+import { productionEditorMapper } from 'lib/mappers';
+
 import { ProductionDTO, UICurrency } from 'interfaces';
 import { getProductionsByStartDate } from 'utils/getProductionsByStartDate';
 import { getWeekNumsToDateMap } from 'utils/getDateFromWeekNum';
@@ -47,7 +46,7 @@ export interface AllProductionPageProps {
 
 export const getAllProductionPageProps = async (req: NextApiRequest) => {
   const prisma = await getPrismaClient(req);
-  const productionsRaw = await prisma.Production.findMany({
+  const productionsRaw = await prisma.production.findMany({
     include: {
       Show: true,
       DateBlock: true,
@@ -57,53 +56,6 @@ export const getAllProductionPageProps = async (req: NextApiRequest) => {
   const productions = getProductionsByStartDate(productionsRaw).map(productionEditorMapper);
 
   return { props: { productions } };
-};
-
-export const getProductionPageProps = async (ctx: any) => {
-  const { ShowCode } = ctx.params;
-  const email = await getEmailFromReq(ctx.req);
-  const AccountId = await getAccountId(email);
-
-  const prisma = await getPrismaClient(ctx.req);
-
-  const showRaw = await prisma.show.findFirst({
-    where: {
-      Code: ShowCode,
-      AccountId,
-    },
-    select: {
-      Id: true,
-      Code: true,
-    },
-  });
-
-  if (!showRaw) return { notFound: true, props: { productions: [], code: '', name: '' } };
-
-  const show = await getShowWithProductionsById(showRaw.Id, ctx.req);
-  const productions = showProductionMapper(show);
-
-  return { props: { productions, code: show.Code, name: show.Name } };
-};
-
-export const lookupProductionId = async (
-  ShowCode: string,
-  ProductionCode: string,
-  AccountId: number,
-  req: NextApiRequest,
-) => {
-  const prisma = await getPrismaClient(req);
-  return prisma.production.findFirst({
-    where: {
-      Code: ProductionCode as string,
-      Show: {
-        Code: ShowCode as string,
-        AccountId,
-      },
-    },
-    select: {
-      Id: true,
-    },
-  });
 };
 
 export const getAllProductions = async (req: NextApiRequest) => {
@@ -234,7 +186,7 @@ export const getProductionById = async (Id: number, req: NextApiRequest) => {
 
 export const getProductionsAndTasks = async (req: NextApiRequest, ProductionId?: number) => {
   const prisma = await getPrismaClient(req);
-  let productionsWithTasks = await prisma.Production.findMany({
+  const productionsWithTasks = await prisma.production.findMany({
     where: {
       IsArchived: false,
       ...(ProductionId && { Id: ProductionId }),
@@ -259,7 +211,9 @@ export const getProductionsAndTasks = async (req: NextApiRequest, ProductionId?:
       },
     },
   });
-  productionsWithTasks = productionsWithTasks.map((production) => {
+
+  let results = null;
+  results = productionsWithTasks.map((production) => {
     return {
       ...production,
       ProductionTask: production.ProductionTask.map((task) => {
@@ -275,22 +229,26 @@ export const getProductionsAndTasks = async (req: NextApiRequest, ProductionId?:
     };
   });
 
-  productionsWithTasks = productionsWithTasks.map((production) => {
+  results = productionsWithTasks.map((production) => {
     const { StartDate, EndDate } = production.DateBlock.find((DateBlock) => DateBlock.Name === 'Production') || {};
     const weekNumsList = production.ProductionTask.map((ProductionTask) => [
       ProductionTask.CompleteByWeekNum,
       ProductionTask.StartByWeekNum,
     ]).flat();
-    const WeekNumToDateMap = getWeekNumsToDateMap(StartDate, EndDate, Array.from(new Set(weekNumsList)));
+    const WeekNumToDateMap = getWeekNumsToDateMap(
+      StartDate.toISOString(),
+      EndDate.toISOString(),
+      Array.from(new Set(weekNumsList)),
+    );
     return { ...production, WeekNumToDateMap };
   });
-  return getProductionsByStartDate(productionsWithTasks);
+  return getProductionsByStartDate(results);
 };
 
 export const getAllProductionRegions = async (req: NextApiRequest) => {
   try {
     const prisma = await getPrismaClient(req);
-    return prisma.ProductionRegion.findMany({
+    return prisma.productionRegion.findMany({
       orderBy: {
         PRProductionId: 'asc',
       },

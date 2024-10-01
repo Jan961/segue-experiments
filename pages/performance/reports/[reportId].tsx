@@ -1,5 +1,5 @@
 import ReportForm from 'components/performance/reportForm';
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import { GetServerSideProps, InferGetServerSidePropsType, NextApiRequest } from 'next';
 import { getPerformanceReportById, transformPerformanceReport } from 'services/performanceReports';
 import Layout from 'components/Layout';
 import Link from 'next/link';
@@ -47,7 +47,7 @@ export default function Report({ report }: InferGetServerSidePropsType<typeof ge
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { reportId } = ctx.params;
-  const response = await getPerformanceReportById(parseInt(reportId as string, 10));
+  const response = await getPerformanceReportById(parseInt(reportId as string, 10), ctx.req as NextApiRequest);
   return {
     props: {
       report: transformPerformanceReport(response),

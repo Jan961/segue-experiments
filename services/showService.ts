@@ -6,11 +6,6 @@ import master from 'lib/prisma_master';
 import { getAccountId, getEmailFromReq } from './userService';
 import { NextApiRequest } from 'next';
 
-export const getShows = async (AccountId: number, req: NextApiRequest) => {
-  const prisma = await getPrismaClient(req);
-  return prisma.show.findMany({ where: { AccountId, IsDeleted: false } });
-};
-
 export interface ShowPageProps {
   shows: ShowDTO[];
 }
@@ -18,7 +13,7 @@ export interface ShowPageProps {
 export const getShowPageProps = async (ctx: any) => {
   const email = await getEmailFromReq(ctx.req);
   const accountId = await getAccountId(email);
-  const shows = await getShows(accountId, ctx.req);
+  const shows = await getShowsByAccountId(accountId);
 
   return {
     props: {
@@ -60,23 +55,6 @@ export const getShowById = async (Id: number, req: NextApiRequest) => {
       Id,
     },
   });
-};
-
-export const lookupShowCode = async (Code: string, AccountId: number, req: NextApiRequest) => {
-  const prisma = await getPrismaClient(req);
-  const show = await prisma.show.findUnique({
-    where: {
-      AccountId_Code: {
-        Code,
-        AccountId,
-      },
-    },
-    select: {
-      Id: true,
-    },
-  });
-
-  return show ? show.Id : undefined;
 };
 
 export const getShowsByAccountId = async (req: NextApiRequest) => {
