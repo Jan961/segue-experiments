@@ -1,4 +1,4 @@
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 
 export default async function handle(req, res) {
   const query =
@@ -9,6 +9,7 @@ export default async function handle(req, res) {
     'ORDER BY ProductionWeekNum, VenueCurrency, Symbol, ConversionRate, WeekDate';
 
   try {
+    const prisma = await getPrismaClient(req);
     const result = await prisma.$queryRawUnsafe(`${query}`);
     res.json(result);
   } catch (e) {

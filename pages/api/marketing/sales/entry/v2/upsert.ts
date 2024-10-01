@@ -1,12 +1,13 @@
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { isNullOrEmpty } from 'utils';
 
 export default async function handle(req, res) {
   try {
+    const prisma = await getPrismaClient(req);
     let { bookingId, salesDate, general, schools, setId, action } = req.body;
 
     if (setId === -1) {
-      const setResult = await prisma.SalesSet.create({
+      const setResult = await prisma.salesSet.create({
         data: {
           SetBookingId: parseInt(bookingId),
           SetPerformanceId: null,
@@ -31,7 +32,7 @@ export default async function handle(req, res) {
         },
       });
       if (isNullOrEmpty(saleSetRecord)) {
-        const setResult = await prisma.SalesSet.create({
+        const setResult = await prisma.salesSet.create({
           data: {
             SetBookingId: parseInt(bookingId),
             SetPerformanceId: null,
@@ -90,18 +91,18 @@ export default async function handle(req, res) {
     }
 
     for (const sale of sales) {
-      const recordFound = await prisma.Sale.findFirst({
+      const recordFound = await prisma.sale.findFirst({
         where: {
           SaleSetId: setId,
           SaleSaleTypeId: sale.SaleSaleTypeId,
         },
       });
       if (isNullOrEmpty(recordFound)) {
-        await prisma.Sale.create({
+        await prisma.sale.create({
           data: sale,
         });
       } else {
-        await prisma.Sale.update({ where: { SaleId: recordFound.SaleId }, data: sale });
+        await prisma.sale.update({ where: { SaleId: recordFound.SaleId }, data: sale });
       }
     }
 

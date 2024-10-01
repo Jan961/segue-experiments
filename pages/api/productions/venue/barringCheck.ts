@@ -1,4 +1,4 @@
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { checkDateOverlap } from 'services/dateService';
 import { getDateFromWeekNumber } from 'utils/barring';
@@ -36,6 +36,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(400).json({ message: 'ProductionId and VenueId are required.' });
   }
   try {
+    const prisma = await getPrismaClient(req);
     const givenStartDate = new Date(startDate);
     const givenEndDate = new Date(endDate);
     // uv stands for user venue, The venue the user selected to do a barring check for
@@ -152,8 +153,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         bookingId: Id,
         name: bv.Name + ' ' + bv.Code,
         code: bv.Code,
-        mileage: distance,
-        date: FirstDate,
+        mileage: Number(distance),
+        date: FirstDate.toISOString(),
         hasBarringConflict: isBarred,
         timeMins: venueVenueInfo.TimeMins,
         info,

@@ -1,8 +1,8 @@
-import prisma from 'lib/prisma';
-import dateTypes from './dateTypes.json';
-import venues from './venues.json';
+// import prisma from 'lib/prisma';
+// import dateTypes from './dateTypes.json';
+// import venues from './venues.json';
 
-const populateDateTypes = async () => {
+/* const populateDateTypes = async () => {
   await prisma.dateType.createMany({ data: dateTypes });
 };
 
@@ -14,4 +14,7 @@ const start = () => {
   // populateVenues()
 };
 
-start();
+start(); */
+const dummy = null;
+
+export default dummy;

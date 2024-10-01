@@ -1,7 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import * as yup from 'yup';
-import { getEmailFromReq, checkAccess } from 'services/userService';
 import { isEmpty, omit, pick } from 'radash';
 import { prepareAddressQueryData, prepareOrganisationQueryData, preparePersonQueryData } from 'services/personService';
 import { createPersonSchema } from 'validators/person';
@@ -13,9 +12,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    const email = await getEmailFromReq(req);
-    const access = await checkAccess(email);
-    if (!access) return res.status(401).end();
+    const prisma = await getPrismaClient(req);
 
     const validatedData = await createPersonSchema.validate(req.body, { abortEarly: false });
 
@@ -41,15 +38,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           undefined,
           true,
         );
+        const formattedAgencyPersonData = agencyPersonData.map((p) => ({
+          ...p,
+          Address: { create: agencyPersonAddressData },
+        }));
         if (agencyPersonData) {
           const agencyPerson = await tx.person.create({
             data: {
-              ...agencyPersonData,
-              Address: {
-                create: {
-                  ...agencyPersonAddressData,
-                },
-              },
+              ...formattedAgencyPersonData,
             },
           });
           agencyPersonId = agencyPerson.PersonId;
@@ -59,9 +55,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           agencyPersonId,
           true,
         );
+        const formattedOrganisationData = organisationData.map((o) => ({
+          ...o,
+        }));
         if (organisationData) {
           const organisation = await tx.organisation.create({
-            data: organisationData,
+            data: formattedOrganisationData,
           });
           organisationId = organisation.OrgId;
         }
@@ -78,13 +77,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           undefined,
           true,
         );
+        const formattedEmergencyContactData = emergencyContactData.map((p) => ({
+          ...p,
+          Address: { create: emergencyContactAddressData },
+        }));
         const emergencyContact1Person = await tx.person.create({
-          data: {
-            ...emergencyContactData,
-            Address: {
-              create: emergencyContactAddressData,
-            },
-          },
+          data: formattedEmergencyContactData,
         });
         emergencyContactList.push(emergencyContact1Person.PersonId);
       }
@@ -99,13 +97,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           undefined,
           true,
         );
+        const formattedEmergencyContactData = emergencyContactData.map((p) => ({
+          ...p,
+          Address: { create: emergencyContactAddressData },
+        }));
         const emergencyContact2Person = await tx.person.create({
-          data: {
-            ...emergencyContactData,
-            Address: {
-              create: emergencyContactAddressData,
-            },
-          },
+          data: formattedEmergencyContactData,
         });
         emergencyContactList.push(emergencyContact2Person.PersonId);
       }
@@ -119,15 +116,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         expenseAccountDetails,
         true,
       );
+
+      const formattedPersonData = personData.map((p) => ({
+        ...p,
+        Address: { create: personAddressData },
+      }));
       const mainPerson = await tx.person.create({
-        data: {
-          ...personData,
-          ...(!isEmpty(personAddressData) && {
-            Address: {
-              create: personAddressData,
-            },
-          }),
-        },
+        data: formattedPersonData,
       });
 
       if (emergencyContactList.length) {

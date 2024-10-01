@@ -1,6 +1,6 @@
 import ReportWrapper from 'components/performance/reportWrapper';
 import { productionEditorMapper } from 'lib/mappers';
-import { GetServerSideProps } from 'next';
+import { GetServerSideProps, NextApiRequest } from 'next';
 import { getActiveProductions } from 'services/productionService';
 import { Production } from 'prisma/generated/prisma-client';
 import Layout from 'components/Layout';
@@ -23,8 +23,8 @@ export default function Reports({ productions = [] }: Props) {
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async () => {
-  const activeProductions = await getActiveProductions();
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const activeProductions = await getActiveProductions(ctx.req as NextApiRequest);
   return {
     props: {
       productions: activeProductions.map((production: any & Production) => productionEditorMapper(production)),

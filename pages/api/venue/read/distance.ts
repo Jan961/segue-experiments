@@ -1,5 +1,5 @@
 import { VenueVenueTravelView } from 'prisma/generated/prisma-client';
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { unique } from 'radash';
 
@@ -62,6 +62,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   const SLIDER_MIN = 25;
 
   try {
+    const prisma = await getPrismaClient(req);
     const initial = await prisma.venueVenueTravelView.findMany({
       select: {
         Mileage: true,

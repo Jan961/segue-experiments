@@ -1,5 +1,8 @@
-import prisma from 'lib/prisma';
-export const getDateBlockForProduction = async (productionId: number, isPrimary: boolean) => {
+import getPrismaClient from 'lib/prisma';
+import { NextApiRequest } from 'next';
+
+export const getDateBlockForProduction = async (productionId: number, isPrimary: boolean, req: NextApiRequest) => {
+  const prisma = await getPrismaClient(req);
   return prisma.dateBlock.findMany({
     where: {
       ProductionId: productionId,
@@ -8,7 +11,7 @@ export const getDateBlockForProduction = async (productionId: number, isPrimary:
   });
 };
 
-export const deleteAllDateBlockEvents = async (dateBlockID: number, tx = prisma) => {
+export const deleteAllDateBlockEvents = async (dateBlockID: number, tx) => {
   if (dateBlockID) {
     // important to Check DateBlockID is not null
     await tx.Booking.deleteMany({

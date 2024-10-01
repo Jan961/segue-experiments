@@ -1,4 +1,4 @@
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { transformContractResponse } from 'transformers/contracts';
 
@@ -15,8 +15,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     const contractId = Number(id);
-
-    const contract = await prisma.ACCContract.findUnique({
+    const prisma = await getPrismaClient(req);
+    const contract = await prisma.aCCContract.findUnique({
       where: { ContractId: contractId },
       include: {
         ACCClause: true,

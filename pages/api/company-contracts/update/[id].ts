@@ -1,4 +1,4 @@
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { prepareContractUpdateData } from 'services/contracts';
 import { updateContractSchema } from 'validators/contracts';
@@ -15,6 +15,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
+    const prisma = await getPrismaClient(req);
     const validatedData = await updateContractSchema.validate(req.body, { abortEarly: false });
 
     const updateData = prepareContractUpdateData({
@@ -22,7 +23,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       accScheduleJson: JSON.stringify(validatedData.accScheduleJson),
     });
     // console.log(updateData.);
-    const updatedContract = await prisma.ACCContract.update({
+    const updatedContract = await prisma.aCCContract.update({
       where: { ContractId: Number(id) },
       data: updateData,
     });

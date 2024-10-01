@@ -1,4 +1,4 @@
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import { GetServerSideProps, InferGetServerSidePropsType, NextApiRequest } from 'next';
 import Layout from 'components/Layout';
 import { InitialState } from 'lib/recoil';
 import { getProductionJumpState } from 'utils/getProductionJumpState';
@@ -59,10 +59,14 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
   // Get in parallel
   const [venues, productions, dateTypeRaw, contractStatus, contacts] = await all([
-    getAllVenuesMin(),
-    getProductionsWithContent(ProductionId === -1 ? null : ProductionId, !productionJump.includeArchived),
-    getDayTypes(),
-    getContractStatus(ProductionId === -1 ? null : ProductionId),
+    getAllVenuesMin(ctx.req as NextApiRequest),
+    getProductionsWithContent(
+      ctx.req as NextApiRequest,
+      ProductionId === -1 ? null : ProductionId,
+      !productionJump.includeArchived,
+    ),
+    getDayTypes(ctx.req as NextApiRequest),
+    getContractStatus(ProductionId === -1 ? null : ProductionId, ctx.req as NextApiRequest),
     getAccountContacts(AccountId),
   ]);
   const dateBlock = [];

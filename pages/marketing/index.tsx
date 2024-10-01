@@ -4,7 +4,7 @@ import MarketingHome from 'components/marketing/MarketingHome';
 import { getUserNameFromReq } from 'services/userService';
 import { getProductionJumpState } from 'utils/getProductionJumpState';
 import { InitialState } from 'lib/recoil';
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import { GetServerSideProps, InferGetServerSidePropsType, NextApiRequest } from 'next';
 import { getSaleableBookings } from 'services/bookingService';
 import { getRoles } from 'services/contactService';
 import { BookingJump } from 'state/marketing/bookingJumpState';
@@ -33,8 +33,8 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   let initialState: InitialState;
 
   if (productionId !== null) {
-    const bookings = await getSaleableBookings(productionId);
-    const venueRoles = await getRoles();
+    const bookings = await getSaleableBookings(productionId, ctx.req as NextApiRequest);
+    const venueRoles = await getRoles(ctx.req as NextApiRequest);
     const selected = null;
 
     const bookingJump: BookingJump = {
@@ -42,9 +42,9 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       bookings: bookings.map(bookingMapperWithVenue),
     };
 
-    const townList = await getUniqueVenueTownlist();
+    const townList = await getUniqueVenueTownlist(ctx.req as NextApiRequest);
 
-    const venues = await getAllVenuesMin();
+    const venues = await getAllVenuesMin(ctx.req as NextApiRequest);
 
     const venue = objectify(
       venues,

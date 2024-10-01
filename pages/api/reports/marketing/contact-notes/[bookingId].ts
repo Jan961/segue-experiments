@@ -26,10 +26,11 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const accountId = await getAccountId(email);
   const { prodCode, showName, venueName } = await getProductionAndVenueDetailsFromBookingId(
     parseInt(bookingId as string, 10),
+    req,
   );
   const users = await getUsers(accountId);
   const usersMap = objectify(users, (user) => user.AccUserId);
-  const data = await getContactNotesByBookingId(parseInt(bookingId as string, 10));
+  const data = await getContactNotesByBookingId(parseInt(bookingId as string, 10), req);
   const filename = `${prodCode} ${showName} ${venueName} Contact Notes`;
   const workbook = new ExcelJS.Workbook();
   const worksheet = workbook.addWorksheet('Contact Notes');

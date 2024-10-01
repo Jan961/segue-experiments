@@ -1,4 +1,4 @@
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import moment from 'moment';
 import { calculateWeekNumber, getWeeksBetweenDates } from 'services/dateService';
 
@@ -11,7 +11,8 @@ type ProductionWeek = {
 export default async function handle(req, res) {
   const productionId = parseInt(req.query.productionID);
   try {
-    const productionDateBlock = await prisma.DateBlock.findFirst({
+    const prisma = await getPrismaClient(req);
+    const productionDateBlock = await prisma.dateBlock.findFirst({
       where: {
         ProductionId: productionId,
         Name: 'Production',
