@@ -52,8 +52,8 @@ export const saleFrequencyDay = [
 ];
 
 export const transactionOptions = [
-  { text: 'Per Ticket', value: '1' },
-  { text: 'Per Transaction', value: '2' },
+  { text: 'Per Ticket', value: 'Per Ticket' },
+  { text: 'Per Transaction', value: 'Per Transaction' },
 ];
 
 export const sellerOptions = [

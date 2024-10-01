@@ -295,6 +295,8 @@ export const EditDealMemoContractModal = ({
       DealMemoPrice: dealMemoPriceData,
     };
 
+    console.log(JSON.stringify(dealMemoData));
+
     try {
       await axios.post(`/api/deal-memo/update/${selectedTableCell.contract.Id}`, {
         formData: dealMemoData,
@@ -749,8 +751,8 @@ export const EditDealMemoContractModal = ({
               <TextInput
                 testId="perf-curfew-time-notes"
                 className="w-[55vw]"
-                value={formData.RunningTimeNotes}
-                onChange={(value) => editDemoModalData('RunningTimeNotes', value.target.value, 'dealMemo')}
+                value={formData.PerformanceNotes}
+                onChange={(value) => editDemoModalData('PerformanceNotes', value.target.value, 'dealMemo')}
               />
             </div>
           </div>
@@ -1470,11 +1472,9 @@ export const EditDealMemoContractModal = ({
             );
           })}
           <div className="flex items-center mt-4">
-            <div className="w-1/5 text-primary-input-text font-bold">
-              Restoration Levy<div>{`(per ticket)`}</div>
-            </div>
+            <div className="w-1/5 text-primary-input-text font-bold">Restoration Levy (per ticket)</div>
             <div className="w-4/5 flex items-center">
-              <div className="text-primary-input-text font-bold mr-2">{currency.symbol}</div>
+              <div className="text-primary-input-text font-bold mr-2 -ml-4">{currency.symbol}</div>
 
               <TextInput
                 testId="restoration-levy"
@@ -1484,7 +1484,7 @@ export const EditDealMemoContractModal = ({
                 onChange={(value) => editDemoModalData('RestorationLevy', value.target.value, 'dealMemo')}
                 onBlur={(value) => editDemoModalData('RestorationLevy', formatDecimalOnBlur(value), 'dealMemo')}
               />
-              <div className="text-primary-input-text font-bold ml-16 flex">
+              <div className="text-primary-input-text font-bold ml-[300px] flex">
                 Booking fees <div className="ml-4 mr-2">{currency.symbol}</div>
               </div>
               <TextInput
@@ -1495,7 +1495,7 @@ export const EditDealMemoContractModal = ({
                 onChange={(value) => editDemoModalData('BookingFees', parseFloat(value.target.value), 'dealMemo')}
                 onBlur={(value) => editDemoModalData('BookingFees', formatDecimalOnBlur(value), 'dealMemo')}
               />
-              <div className="text-primary-input-text font-bold ml-14 mr-2">Credit Card Commission</div>
+              <div className="text-primary-input-text font-bold ml-[100px] mr-2">Credit Card Commission</div>
               <TextInput
                 testId="credit-card-commission-percentage"
                 className={classNames('w-auto', errors.CCCommissionPercent ? 'text-primary-red' : '')}
@@ -1528,7 +1528,7 @@ export const EditDealMemoContractModal = ({
                 value={formData.TxnChargeOption}
                 testId="select-transaction-charges-type"
               />
-              <div className="text-primary-input-text font-bold ml-20 mr-2">{currency.symbol}</div>
+              <div className="text-primary-input-text font-bold ml-16 mr-2">{currency.symbol}</div>
               <TextInput
                 testId="transaction-charges-price"
                 className="w-auto"
