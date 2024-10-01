@@ -1,9 +1,10 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import * as yup from 'yup';
-import { getEmailFromReq, checkAccess } from 'services/userService';
 import { isNullOrUndefined, isUndefined } from 'utils';
 import { productionSchema } from 'validators/production';
+
+let prisma = null;
 
 const prepareUpdateData = async ({
   id,
@@ -110,9 +111,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(405).json({ message: 'Method not allowed' });
   }
   try {
-    const email = await getEmailFromReq(req);
-    const access = await checkAccess(email, { ProductionId: req.body.id });
-    if (!access) return res.status(401).end();
+    prisma = await getPrismaClient(req);
     // Validate the incoming payload
     const validatedData = await productionSchema().validate(req.body, { abortEarly: false });
     // Ensure the Production record exists

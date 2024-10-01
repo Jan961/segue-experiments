@@ -3,7 +3,7 @@ import { fetchAllMinPersonsList } from 'services/personService';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const result = await fetchAllMinPersonsList();
+    const result = await fetchAllMinPersonsList(req);
     res.status(200).json(result);
   } catch (err) {
     console.log(err);

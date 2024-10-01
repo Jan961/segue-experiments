@@ -1,4 +1,4 @@
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import moment from 'moment';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { group, objectify, sum } from 'radash';
@@ -22,7 +22,7 @@ type ScheduleView = {
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     const { ProductionId } = req.query;
-
+    const prisma = await getPrismaClient(req);
     // Needs securing?
 
     const data: ScheduleView[] =

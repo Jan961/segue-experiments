@@ -1,7 +1,10 @@
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
+import { NextApiRequest } from 'next';
 
-export const fetchAllTemplates = async () => {
-  const templates = await prisma.Template.findMany({
+
+export const fetchAllTemplates = async (req: NextApiRequest) => {
+  const prisma = await getPrismaClient(req);
+  const templates = await prisma.template.findMany({
     include: {
       File: true,
     },

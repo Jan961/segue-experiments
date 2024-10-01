@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { CompanyContractStatus } from 'config/contracts';
 import { contractSchemaCreate } from 'validators/contracts';
 
@@ -8,13 +8,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(405).json({ message: 'Method not allowed' });
   }
 
+  const prisma = await getPrismaClient(req);
+
   try {
     const validatedData = await contractSchemaCreate.validate(req.body, { abortEarly: false });
 
     const { production, department, role, personId, contractData, accScheduleJson = [], templateId } = validatedData;
 
     const result = await prisma.$transaction(async (tx) => {
-      const result = await tx.ACCContract.create({
+      const result = await tx.aCCContract.create({
         data: {
           RoleName: role,
           ContractStatus: CompanyContractStatus.NotYetIssued,
@@ -38,7 +40,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const contractID = result.ContractId;
 
       const contractDataPromises = contractData.map((contractDatum) =>
-        tx.ACCContractData.create({
+        tx.aCCContractData.create({
           data: {
             ACCContract: {
               connect: {

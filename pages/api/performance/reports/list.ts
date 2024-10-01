@@ -1,12 +1,14 @@
-import { NextApiRequest, NextApiResponse } from 'next'
-import prisma from 'lib/prisma'
+import { NextApiRequest, NextApiResponse } from 'next';
+import getPrismaClient from 'lib/prisma';
 
-export default async function handle (req: NextApiRequest, res: NextApiResponse) {
+export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const result = await prisma.PerformanceReport.findMany({})
-    res.status(200).json(result)
+    const prisma = await getPrismaClient(req);
+
+    const result = await prisma.performanceReport.findMany({});
+    res.status(200).json(result);
   } catch (e) {
-    console.log(e)
-    res.status(500).json({ err: 'Error fetching reports' })
+    console.log(e);
+    res.status(500).json({ err: 'Error fetching reports' });
   }
 }

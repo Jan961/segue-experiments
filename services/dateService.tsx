@@ -6,8 +6,9 @@ import {
   isValid,
   format,
   parseISO,
-  set,
   isSameDay,
+  isSameWeek,
+  set,
 } from 'date-fns';
 import { toZonedTime } from 'date-fns-tz';
 import moment from 'moment';
@@ -478,4 +479,32 @@ export const getDateObject = (date: Date | number | string): Date | null => {
  */
 export const areDatesSame = (date1: Date | number | string, date2: Date | number | string): boolean => {
   return isSameDay(getDateObject(date1), getDateObject(date2));
+};
+
+/**
+ * Checks if two dates belong to the same week.
+ *
+ * @param {Date | number} date1 - The first date to compare.
+ * @param {Date | number} date2 - The second date to compare.
+ * @param {number} [weekStartsOn=0] - The first day of the week (0 = Sunday, 1 = Monday, etc.)
+ * @returns {boolean} Returns true if both dates are in the same week, otherwise false.
+ */
+export const areDatesInSameWeek = (
+  date1: Date | number | string,
+  date2: Date | number | string,
+  weekStartsOn: 0 | 1 | 2 | 3 | 4 | 5 | 6 = 0,
+) => {
+  return isSameWeek(getDateObject(date1), getDateObject(date2), { weekStartsOn });
+};
+
+/**
+ * Converts mins to HH:mm
+ *
+ * @param timeInMins
+ * @returns
+ */
+export const convertMinutesToHoursMins = (timeInMins: number) => {
+  const hours = Math.floor(timeInMins / 60);
+  const minutes = timeInMins % 60;
+  return `${hours}:${minutes < 10 ? '0' : ''}${minutes}`;
 };

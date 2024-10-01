@@ -1,7 +1,6 @@
 import { loggingService } from 'services/loggingService';
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getEmailFromReq, checkAccess } from 'services/userService';
 
 export interface UpdateAvailableSeatsParams {
   Id: number;
@@ -13,12 +12,7 @@ export interface UpdateAvailableSeatsParams {
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
     const x = req.body as UpdateAvailableSeatsParams;
-
-    const { PerformanceId } = x;
-
-    const email = await getEmailFromReq(req);
-    const access = await checkAccess(email, { PerformanceId });
-    if (!access) return res.status(401).end();
+    const prisma = await getPrismaClient(req);
 
     await prisma.$transaction(async (tx) => {
       let existing = await tx.availableComp.findFirst({

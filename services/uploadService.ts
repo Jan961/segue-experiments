@@ -66,7 +66,7 @@ export const deleteFile = async (location: string) => {
   return s3.deleteObject(params).promise();
 };
 
-const transformForPrisma = (data: FileDTO): Partial<File> => {
+const transformForPrisma = (data: FileDTO) => {
   return {
     Id: data.id,
     OriginalFilename: data.originalFilename,

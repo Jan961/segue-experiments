@@ -1,4 +1,4 @@
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import fuseFilter from 'utils/fuseFilter';
 import { getFileCardFromFileId } from 'services/fileService';
@@ -34,6 +34,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   }
 
   try {
+    const prisma = await getPrismaClient(req);
     const venues = await prisma.venue.findMany({
       where: queryConditions,
       include: {
@@ -74,7 +75,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         filteredVenues.slice(0, returnLength).map(async (venue) => {
           const files = await Promise.all(
             venue.VenueFile.map(async (file) => {
-              return await getFileCardFromFileId(file.FileId);
+              return await getFileCardFromFileId(file.FileId, req);
             }),
           );
           venue = omit(venue, ['VenueFile']);

@@ -1,4 +1,4 @@
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import { GetServerSideProps, InferGetServerSidePropsType, NextApiRequest } from 'next';
 import Layout from 'components/Layout';
 import { InitialState } from 'lib/recoil';
 import { getProductionJumpState } from 'utils/getProductionJumpState';
@@ -51,14 +51,13 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     contacts,
   ] = await all([
     getUsers(accountId),
-    getUniqueVenueCountrylist(),
-    getAllVenuesMin(),
-    fetchAllMinPersonsList(),
-    fetchAllTemplates(),
+    getUniqueVenueCountrylist(ctx.req as NextApiRequest),
+    getAllVenuesMin(ctx.req as NextApiRequest),
+    fetchAllMinPersonsList(ctx.req as NextApiRequest),
     getAllCurrencylist(),
-    fetchAllStandardClauses(),
-    fetchDepartmentList(),
-    fetchAllContracts(ProductionId),
+    fetchAllStandardClauses(ctx.req as NextApiRequest),
+    fetchDepartmentList(ctx.req as NextApiRequest),
+    fetchAllContracts(ctx.req as NextApiRequest, ProductionId),
     getAccountContacts(accountId),
   ]);
 

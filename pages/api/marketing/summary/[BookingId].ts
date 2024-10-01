@@ -1,10 +1,9 @@
-import client from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import master from 'lib/prisma_master';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { PerformanceDTO } from 'interfaces';
 import { calculateWeekNumber } from 'services/dateService';
 import { group } from 'radash';
-import { checkAccess, getEmailFromReq } from 'services/userService';
 import { loggingService } from 'services/loggingService';
 import { getCurrencyCodeFromCountryId } from 'services/venueCurrencyService';
 
@@ -42,12 +41,9 @@ export type SummaryResponseDTO = {
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
     const BookingId = parseInt(req.query?.BookingId as string, 10);
+    const prisma = await getPrismaClient(req);
 
-    const email = await getEmailFromReq(req);
-    const access = await checkAccess(email, { BookingId });
-    if (!access) return res.status(401).end();
-
-    const performance: any = await client.performance.findFirst({
+    const performance: any = await prisma.performance.findFirst({
       where: {
         BookingId,
       },
@@ -57,7 +53,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       take: 1,
     });
 
-    const performances: any[] = await client.performance.findMany({
+    const performances: any[] = await prisma.performance.findMany({
       where: {
         BookingId,
       },
@@ -73,7 +69,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
 
     const NumberOfPerformances: number = performances.length;
 
-    const salesSummary = await client.salesSetTotalsView.findFirst({
+    const salesSummary = await prisma.salesSetTotalsView.findFirst({
       where: {
         SaleTypeName: {
           in: ['General Sales', 'School Sales'],
@@ -97,7 +93,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       },
     });
 
-    const booking: any = await client.booking.findFirst({
+    const booking: any = await prisma.booking.findFirst({
       select: {
         FirstDate: true,
         VenueId: true,
@@ -142,7 +138,10 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       CompNotes,
     } = booking || {};
 
-    const currencyCode: string | null = await getCurrencyCodeFromCountryId(booking?.Venue?.VenueAddress[0]?.CountryId);
+    const currencyCode: string | null = await getCurrencyCodeFromCountryId(
+      booking?.Venue?.VenueAddress[0]?.CountryId,
+      req,
+    );
     const { Seats: Capacity } = booking?.Venue || {};
 
     const unicodeQuery = await master.Currency.findFirst({
@@ -153,18 +152,18 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const SymbolUnicode = unicodeQuery?.CurrencySymbolUnicode;
 
     const { ConversionRate } = performance?.DateBlock?.Production?.ConversionRate || {};
-    const AvgTicketPrice = salesSummary === null ? 0 : salesSummary?.Value / salesSummary?.Seats;
+    const AvgTicketPrice = salesSummary === null ? 0 : Number(salesSummary.Value) / Number(salesSummary.Seats);
     const TotalSeats = Capacity * NumberOfPerformances;
     const GrossProfit = AvgTicketPrice === 0 ? 0 : AvgTicketPrice * TotalSeats;
-    const seatsSalePercentage = salesSummary === null ? 0 : (salesSummary?.Seats / TotalSeats) * 100;
+    const seatsSalePercentage = salesSummary === null ? 0 : (Number(salesSummary?.Seats) / TotalSeats) * 100;
     const currentProductionWeekNum = calculateWeekNumber(new Date(), new Date(booking.FirstDate));
 
     const result: SummaryResponseDTO = {
       Performances: performances,
       Info: {
-        SeatsSold: salesSummary?.Seats === undefined ? 0 : salesSummary?.Seats,
+        SeatsSold: salesSummary?.Seats === undefined ? 0 : Number(salesSummary?.Seats),
         Seats: TotalSeats,
-        SalesValue: salesSummary?.Value === undefined ? 0 : salesSummary?.Value,
+        SalesValue: salesSummary?.Value === undefined ? 0 : Number(salesSummary?.Value),
         AvgTicketPrice: AvgTicketPrice && parseFloat(AvgTicketPrice.toFixed(2)),
         GrossPotential: GrossProfit && parseFloat(GrossProfit.toFixed(2)),
         VenueCurrencyCode: currencyCode,
@@ -176,7 +175,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       ProductionInfo: {
         StartDate: booking?.DateBlock.StartDate,
         Date: performances?.[0]?.Date,
-        salesFigureDate: salesSummary?.SaleFiguresDate,
+        salesFigureDate: salesSummary?.SetSalesFiguresDate.toISOString(),
         week: currentProductionWeekNum,
         lastDate: performances?.[performances?.length - 1]?.Date,
         numberOfDays: Object.keys(group(performances, (performance) => performance.Date)).length,

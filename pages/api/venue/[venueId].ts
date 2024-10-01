@@ -1,9 +1,10 @@
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   const Id = parseInt(req.query.venueId as string);
   try {
+    const prisma = await getPrismaClient(req);
     const venue = await prisma.venue.findFirst({
       where: {
         Id,

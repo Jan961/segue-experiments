@@ -1,5 +1,4 @@
-import prisma from 'lib/prisma';
-import { getEmailFromReq, checkAccess } from 'services/userService';
+import getPrismaClient from 'lib/prisma';
 
 // date-fns startOfDay not applicable for this use case
 const removeTime = (inputDate: Date) => {
@@ -9,15 +8,12 @@ const removeTime = (inputDate: Date) => {
 
 export default async function handle(req, res) {
   try {
+    const prisma = await getPrismaClient(req);
     const bookingId = parseInt(req.body.bookingId);
     let salesDate = new Date(req.body.salesDate);
 
     const salesFrequency = req.body.frequency;
     let dateField = salesFrequency === 'W' ? 'SetProductionWeekDate' : 'SetSalesFiguresDate';
-
-    const email = await getEmailFromReq(req);
-    const access = await checkAccess(email);
-    if (!access) return res.status(401).end();
 
     const data = await prisma.salesView.findMany({
       where: {

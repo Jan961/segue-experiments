@@ -1,5 +1,4 @@
-import client from 'lib/prisma';
-import { getEmailFromReq, checkAccess } from 'services/userService';
+import getPrismaClient from 'lib/prisma';
 import { isNullOrEmpty } from 'utils';
 
 interface Hold {
@@ -15,26 +14,28 @@ interface Comp {
   id: number;
 }
 
-type Res = {
+export type Res = {
   holds: Array<Hold>;
   comps: Array<Comp>;
   setId: number;
 };
 
-const getCompHoldData = async (salesDate, bookingId) => {
-  const holdTypes = await client.holdType.findMany({
+let prisma = null;
+
+const getCompHoldData = async (bookingId) => {
+  const holdTypes = await prisma.holdType.findMany({
     orderBy: {
       HoldTypeSeqNo: 'asc',
     },
   });
 
-  const compTypes = await client.compType.findMany({
+  const compTypes = await prisma.compType.findMany({
     orderBy: {
       CompTypeSeqNo: 'asc',
     },
   });
 
-  const holdCompData = await client.salesSet.findMany({
+  const holdCompData = await prisma.salesSet.findMany({
     where: {
       SetBookingId: bookingId,
       // SetHold or SetHold are not null
@@ -136,16 +137,9 @@ const getCompHoldData = async (salesDate, bookingId) => {
 
 export default async function handle(req, res) {
   try {
-    const bookingId = parseInt(req.body.bookingId);
     const salesDate = new Date(req.body.salesDate);
-
-    const email = await getEmailFromReq(req);
-    const access = await checkAccess(email);
-    if (!access) return res.status(401).end();
-
-    let result: Res = null;
-
-    result = await getCompHoldData(salesDate, bookingId);
+    prisma = await getPrismaClient(req);
+    const result = await getCompHoldData(salesDate);
     res.status(200).json(result);
   } catch (err) {
     console.log(err);

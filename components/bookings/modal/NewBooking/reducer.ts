@@ -1,6 +1,5 @@
 import { Actions, INITIAL_STATE } from 'config/AddBooking';
 import { BookingWithVenueDTO } from 'interfaces';
-import { BarredVenue } from 'pages/api/productions/venue/barred';
 import { debug } from 'utils/logging';
 
 export type TAction = {
@@ -16,6 +15,18 @@ export type TForm = {
   dateType?: number;
   shouldFilterVenues?: boolean;
   isRunOfDates?: boolean;
+};
+
+export type BarredVenue = {
+  Id: number;
+  Name: string;
+  Code: string;
+  StatusCode: string;
+  Mileage: number;
+  TimeMins: number;
+  BookingId: number;
+  Date: string;
+  town: string;
 };
 
 export type BookingItem = {
