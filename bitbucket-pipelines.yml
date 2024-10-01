@@ -1,5 +1,8 @@
 image: atlassian/default-image:2
 image: cypress/browsers:latest
+options:
+  docker: true
+  size: 2x
 pipelines:
   custom:
     cypress:
@@ -35,8 +38,12 @@ pipelines:
               WEB_APP_URI: $CYPRESS_BASE_URL
             caches:
               - node
+            services:
+              - docker
             script:
               - npm install
+              - pipe: sonarsource/sonarcloud-scan:2.0.0
+              - pipe: sonarsource/sonarcloud-quality-gate:0.1.6
               - npm run test:ci
               - npm run build
 definitions:
@@ -44,3 +51,6 @@ definitions:
     npm: ~/.npm
     cypress: ~/.cache
     nextcache: ~/.next/cache
+  services:
+    docker:
+      memory: 4096

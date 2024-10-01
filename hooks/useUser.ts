@@ -3,7 +3,7 @@ import { useSignUp, useSession } from '@clerk/nextjs';
 import axios from 'axios';
 import { useState } from 'react';
 import { isNullOrEmpty } from 'utils';
-import { generateRandomHash } from 'utils/crypto';
+import generator from 'generate-password';
 import { useUrl } from 'nextjs-current-url';
 import { NEW_USER_CONFIRMATION_EMAIL_TEMPLATE } from 'config/global';
 
@@ -48,7 +48,14 @@ const useUser = () => {
         return false;
       }
 
-      const password = generateRandomHash(4);
+      const password = generator.generate({
+        length: 8,
+        numbers: true,
+        symbols: true,
+        lowercase: true,
+        uppercase: true,
+      });
+
       // Create the user within clerk
       const { data } = await axios.post('/api/auth/create-clerk-user', {
         ...userDetails,
@@ -64,7 +71,7 @@ const useUser = () => {
       await axios.post('/api/email/send', {
         to: userDetails.email,
         templateName: NEW_USER_CONFIRMATION_EMAIL_TEMPLATE,
-        data: { email: userDetails.email, password, Weblink: `${currentUrl}/auth/sign-in` },
+        data: { username: userDetails.email, password, Weblink: `${currentUrl}/auth/sign-in` },
       });
 
       // Create the user in our database
