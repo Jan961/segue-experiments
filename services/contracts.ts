@@ -6,7 +6,7 @@ import { prepareQuery } from 'utils/apiUtils';
 
 export const fetchAllStandardClauses = async (req) => {
   const prisma = await getPrismaClient(req);
-  const clauses = await prisma.ACCStandardClause.findMany({});
+  const clauses = await prisma.aCCStandardClause.findMany({});
   return clauses.map(({ Id, Text, StdClauseTitle }) => ({
     id: Id,
     text: Text,
@@ -16,7 +16,7 @@ export const fetchAllStandardClauses = async (req) => {
 
 export const fetchAllContracts = async (req: NextApiRequest, productionId?: number): Promise<IContractSummary[]> => {
   const prisma = await getPrismaClient(req);
-  const contracts = await prisma.ACCContract.findMany({
+  const contracts = await prisma.aCCContract.findMany({
     where: {
       ...(productionId && {
         ProductionId: productionId,
@@ -75,7 +75,7 @@ export const fetchAllContracts = async (req: NextApiRequest, productionId?: numb
 
 export const fetchDepartmentList = async (req: NextApiRequest): Promise<IContractDepartment[]> => {
   const prisma = await getPrismaClient(req);
-  const departments = await prisma.ACCDepartment.findMany({});
+  const departments = await prisma.aCCDepartment.findMany({});
   return departments.map(({ ACCDeptId, ACCDeptName }) => ({
     id: ACCDeptId,
     name: ACCDeptName,
@@ -165,7 +165,7 @@ export const prepareAgencyOrganisationUpdateData = (agencyDetails: any) => {
 
 export const getContractDataById = async (contractId: number, req: NextApiRequest) => {
   const prisma = await getPrismaClient(req);
-  return prisma.ACCContract.findUnique({
+  return prisma.aCCContract.findUnique({
     where: { ContractId: contractId },
     include: {
       ACCClause: true,

@@ -9,12 +9,12 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const prisma = await getPrismaClient(req);
 
     const venueFiles = (
-      await prisma.VenueFile.findMany({
+      await prisma.venueFile.findMany({
         where: { VenueId, Type: 'Tech Specs' },
         select: { FileId: true },
       })
     ).map((file) => file.FileId);
-    const fileInfo = await prisma.File.findMany({
+    const fileInfo = await prisma.file.findMany({
       where: { Id: { in: venueFiles } },
       select: { OriginalFilename: true, MediaType: true, Location: true, UploadDateTime: true, Id: true },
     });

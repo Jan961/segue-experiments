@@ -9,7 +9,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const prisma = await getPrismaClient(req);
 
     // TO be implimnented when Prisma supports this
-    const result = await prisma.DateBlock.findFirst({
+    const result = await prisma.dateBlock.findFirst({
       where: {
         ProductionId,
         Name: 'Production',

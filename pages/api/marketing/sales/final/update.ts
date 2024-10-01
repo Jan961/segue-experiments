@@ -10,7 +10,7 @@ export default async function handle(req, res) {
 
     if (!isNullOrEmpty(general)) {
       // get saleId
-      const sale = await prisma.Sale.findFirst({
+      const sale = await prisma.sale.findFirst({
         where: {
           SaleSetId: SetId,
           SaleSaleTypeId: 1,
@@ -22,7 +22,7 @@ export default async function handle(req, res) {
 
       if (!isNullOrEmpty(sale)) {
         salesUpdates.push(
-          prisma.Sale.update({
+          prisma.sale.update({
             where: {
               SaleId: sale.SaleId,
             },
@@ -37,7 +37,7 @@ export default async function handle(req, res) {
 
     if (!isNullOrEmpty(schools)) {
       // get saleId
-      const sale = await prisma.Sale.findFirst({
+      const sale = await prisma.sale.findFirst({
         where: {
           SaleSetId: SetId,
           SaleSaleTypeId: 3,
@@ -49,7 +49,7 @@ export default async function handle(req, res) {
 
       if (!isNullOrEmpty(sale)) {
         salesUpdates.push(
-          prisma.Sale.update({
+          prisma.sale.update({
             where: {
               SaleId: sale.SaleId,
             },
@@ -65,7 +65,7 @@ export default async function handle(req, res) {
     await prisma.$transaction(salesUpdates);
 
     // update the sales set with the user
-    await prisma.SalesSet.update({
+    await prisma.salesSet.update({
       where: {
         SetId,
       },

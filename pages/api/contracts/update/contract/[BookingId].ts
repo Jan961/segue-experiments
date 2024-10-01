@@ -11,7 +11,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         BookingId,
       },
       data: {
-        BarringClauseBreaches: req.body.BarringClauseBreaches,
+        ...req.body,
       },
     });
 

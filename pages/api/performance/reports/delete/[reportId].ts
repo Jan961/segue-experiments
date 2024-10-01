@@ -9,7 +9,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     if (!reportId) {
       res.status(400).json({ ok: false, message: 'reportId is required' });
     }
-    const result = await prisma.PerformanceReport.delete({
+    const result = await prisma.performanceReport.delete({
       where: {
         Id: parseInt(reportId, 10),
       },

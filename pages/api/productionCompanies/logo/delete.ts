@@ -1,15 +1,14 @@
-import getPrismaClient from 'lib/prisma';
+import prisma from 'lib/prisma_master';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getAccountId, getEmailFromReq } from 'services/userService';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const prisma = await getPrismaClient(req);
     const email = await getEmailFromReq(req);
     const AccountId = await getAccountId(email);
     const { Id } = JSON.parse(req.body);
 
-    const edited = await prisma.ProductionCompany.update({
+    const edited = await prisma.productionCompany.update({
       data: {
         Logo: null,
       },

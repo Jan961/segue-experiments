@@ -75,7 +75,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         filteredVenues.slice(0, returnLength).map(async (venue) => {
           const files = await Promise.all(
             venue.VenueFile.map(async (file) => {
-              return await getFileCardFromFileId(file.FileId);
+              return await getFileCardFromFileId(file.FileId, req);
             }),
           );
           venue = omit(venue, ['VenueFile']);

@@ -51,7 +51,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const { Date: date } = dateStringToPerformancePair(performanceDate);
 
     console.log(getDateTime(date, actOneUpTime), actOneUpTime);
-    const result = await prisma.PerformanceReport.create({
+    const result = await prisma.performanceReport.create({
       data: {
         PerformanceId: parseInt(performanceId, 10),
         Act1UpTime: getDateTime(date, actOneUpTime),
@@ -76,7 +76,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         // ASM: asm,
       },
     });
-    console.log(`Created Performance Report: ${result.PRId}`);
     res.status(200).json({ ok: true, report: result });
   } catch (e) {
     console.log(e);

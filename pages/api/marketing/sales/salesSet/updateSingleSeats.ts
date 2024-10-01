@@ -7,7 +7,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     if (!BookingId) return res.status(400).end();
     const prisma = await getPrismaClient(req);
 
-    const result = await prisma.SalesSet.updateMany({
+    const result = await prisma.salesSet.updateMany({
       where: {
         SetBookingId: BookingId,
         SetSalesFiguresDate: {

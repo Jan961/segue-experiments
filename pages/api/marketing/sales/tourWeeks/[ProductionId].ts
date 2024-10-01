@@ -42,7 +42,7 @@ export default async function handle(req, res) {
     const startDate = addDurationToDate(dateBlock[0].StartDate, numWeeks * 7, false);
     const endDate = dateBlock[0].EndDate;
     const dateStartMonday = getMonday(startDate);
-    const weeks = getWeeksBetweenDates(dateStartMonday.toISOString(), endDate);
+    const weeks = getWeeksBetweenDates(dateStartMonday.toISOString(), endDate.toISOString());
 
     const result = [];
     let weekNo = numWeeks * -1;

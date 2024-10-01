@@ -1,9 +1,8 @@
-import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const BookingId = parseInt(req.query.BookingId as string);
+    /* const BookingId = parseInt(req.query.BookingId as string);
     const prisma = await getPrismaClient(req);
 
     const updateResult = await prisma.booking.update({
@@ -27,9 +26,9 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         ContractReceivedBackDate: new Date(req.body.ContractReceivedBackDate),
         ContractCheckedBy: req.body.ContractCheckedBy,
       },
-    });
+    }); */
 
-    return res.json(updateResult);
+    return res.json(null);
   } catch (err) {
     console.log(err);
     res.status(500).json({ err: 'Error occurred while generating search results.' });

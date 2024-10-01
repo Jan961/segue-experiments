@@ -6,6 +6,7 @@ export interface CreateGifuParams {
   DateBlockId: number;
   Date: string;
   VenueId: number;
+  RunTag: string;
 }
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
@@ -16,6 +17,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
 
     const result = await prisma.getInFitUp.create({
       data: {
+        RunTag: gifu.RunTag,
         Date: new Date(gifu.Date),
         DateBlock: {
           connect: {

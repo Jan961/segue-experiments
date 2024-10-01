@@ -1,19 +1,18 @@
 import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { MasterTaskDTO } from 'interfaces';
 import { omit } from 'radash';
 import { isNullOrEmpty } from 'utils';
 import { masterTaskSchema } from 'validators/tasks';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
-    let task = req.body as MasterTaskDTO;
+    let task = req.body;
     const prisma = await getPrismaClient(req);
     const { Id, TaskAssignedToAccUserId, MTRId } = task;
     await masterTaskSchema.validate(task);
     if (isNullOrEmpty(MTRId)) {
       task = omit(task, ['Id', 'AccountId', 'TaskAssignedToAccUserId', 'MTRId', 'MasterTaskRepeat']);
-      const createResult = await prisma.MasterTask.update({
+      const createResult = await prisma.masterTask.update({
         data: {
           ...task,
           ...(task.TaskAssignedToAccUserId && {
@@ -41,7 +40,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         'TaskEndByIsPostProduction',
       ]);
 
-      const updatedTask = await prisma.MasterTask.update({
+      const updatedTask = await prisma.masterTask.update({
         data: {
           ...strippedTask,
           MTRId: null,
@@ -56,7 +55,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         where: { Id },
       });
 
-      await prisma.MasterTaskRepeat.delete({ where: { Id: MTRId } });
+      await prisma.masterTaskRepeat.delete({ where: { Id: MTRId } });
 
       res.status(200).json({ updatedTask });
     }

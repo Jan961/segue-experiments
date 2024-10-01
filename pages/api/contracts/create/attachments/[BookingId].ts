@@ -8,7 +8,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
 
     const data = req.body;
 
-    const result = await prisma.ContractFile.create({
+    const result = await prisma.contractFile.create({
       data: { ...data, ContractBookingId: BookingId },
     });
 

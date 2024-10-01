@@ -89,14 +89,14 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         });
 
         // first delete DealMemoSalesEmailRecipient records with matching deal memo id
-        await prisma.DealMemoSalesEmailRecipient.deleteMany({
+        await prisma.dealMemoSalesEmailRecipient.deleteMany({
           where: {
             DMSRDeMoId: existingDealMemo.Id,
           },
         });
 
         // create records for emails attached to this deal memo now
-        await prisma.DealMemoSalesEmailRecipient.createMany({
+        await prisma.dealMemoSalesEmailRecipient.createMany({
           data: emailSalesRecipients,
         });
       }
@@ -134,7 +134,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           };
         });
         // create sales email link list
-        await prisma.DealMemoSalesEmailRecipient.createMany(emailSalesRecipients);
+        await prisma.dealMemoSalesEmailRecipient.createMany(emailSalesRecipients);
       }
     }
 

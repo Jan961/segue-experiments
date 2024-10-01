@@ -14,7 +14,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     return res.status(400).json({ message: 'Invalid request' });
   }
   try {
-    const files: File[] = await prisma.File.findMany({
+    const files: File[] = await prisma.file.findMany({
       where: { Location },
     });
     if (files.length === 0) {
@@ -22,7 +22,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     }
 
     await deleteFile(files[0].Location);
-    const deletedFile = await prisma.File.delete({
+    const deletedFile = await prisma.file.delete({
       where: { Id: files[0].Id },
     });
     res.status(200).json(deletedFile);

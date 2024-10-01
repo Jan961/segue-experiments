@@ -8,9 +8,9 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const task = req.body as MasterTaskDTO;
     const prisma = await getPrismaClient(req);
 
-    const { Code } = await getMaxMasterTaskCode();
+    const { Code } = await getMaxMasterTaskCode(req);
 
-    const createResult = await prisma.MasterTask.create({
+    const createResult = await prisma.masterTask.create({
       data: {
         Code: Code + 1,
         Name: task.Name,

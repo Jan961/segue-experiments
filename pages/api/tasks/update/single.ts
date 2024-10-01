@@ -26,7 +26,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       };
 
       await productionTaskSchema.validate(prodTaskRecord);
-      const updatedTask = await prisma.ProductionTask.update({
+      const updatedTask = await prisma.productionTask.update({
         where: { Id: task.Id },
         data: {
           Name: task.Name,

@@ -9,7 +9,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   try {
     const { selectedTaskList, ProductionId } = req.body;
     const prisma = await getPrismaClient(req);
-    const productionWeeks = await prisma.DateBlock.findFirst({
+    const productionWeeks = await prisma.dateBlock.findFirst({
       where: {
         ProductionId: parseInt(ProductionId),
         Name: 'Production',
@@ -32,7 +32,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           ToWeekNumIsPostProduction:
             ToWeekNum < 0 ? false : ToWeekNum > calculateWeekNumber(prodStartDate, prodEndDate),
         };
-        const newRepeatingTask = await prisma.ProductionTaskRepeat.create({ data: { ...recurringTaskRecord } });
+        const newRepeatingTask = await prisma.productionTaskRepeat.create({ data: { ...recurringTaskRecord } });
         const recurringTaskInfo = {
           Name: task.Name,
           StartByWeekNum: task.StartByWeekNum,
@@ -54,10 +54,11 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           prodStartDate,
           newRepeatingTask.Id,
           counter,
+          req,
         );
         return await Promise.all(
           newProdTasks.map(async (newTask) => {
-            await prisma.ProductionTask.create({
+            await prisma.productionTask.create({
               data: {
                 ...newTask,
                 CopiedFrom: 'R',
@@ -67,7 +68,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           }),
         );
       } else {
-        const Code = (await getMaxProductionTaskCode(ProductionId)) + index + 1;
+        const Code = (await getMaxProductionTaskCode(ProductionId, req)) + index + 1;
         const taskCompleteBys = {
           StartByIsPostProduction:
             task.StartByWeekNum < 0 ? false : task.StartByWeekNum > calculateWeekNumber(prodStartDate, prodEndDate),
@@ -81,13 +82,14 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           ...filteredTask,
           ...taskCompleteBys,
           Code,
-          ProductionId,
+          Production: { connect: { Id: ProductionId } },
           CopiedFrom: 'P',
           CopiedId: task.Id,
           Progress: 0,
           TaskCompletedDate: null,
+          Name: task.Name,
         };
-        return await prisma.ProductionTask.create({ data: { ...newTaskRecord } });
+        return await prisma.productionTask.create({ data: newTaskRecord });
       }
     });
 

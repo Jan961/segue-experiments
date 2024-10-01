@@ -10,7 +10,12 @@ export interface MarketingActivitiesBookingInfoParams {
   ContactInfoReceived?: boolean;
   PrintReqsReceived?: boolean;
   CastRateTicketsArranged?: boolean;
-  CastRateTicketsNotes?: boolean;
+  CastRateTicketsNotes?: string;
+  SalesNotes?: string;
+  HoldNotes?: string;
+  CompNotes?: string;
+  FinalSalesDiscrepancyNotes?: string;
+  HasSchoolsSales?: boolean;
 }
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {

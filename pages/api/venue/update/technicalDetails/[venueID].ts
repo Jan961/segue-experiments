@@ -7,7 +7,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const prisma = await getPrismaClient(req);
     await prisma.venue.update({
       where: {
-        VenueId,
+        Id: VenueId,
       },
       data: {
         TechSpecsURL: req.body.TechSpecsURL,

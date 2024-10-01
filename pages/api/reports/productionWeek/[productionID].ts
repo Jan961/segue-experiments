@@ -12,7 +12,7 @@ export default async function handle(req, res) {
   const productionId = parseInt(req.query.productionID);
   try {
     const prisma = await getPrismaClient(req);
-    const productionDateBlock = await prisma.DateBlock.findFirst({
+    const productionDateBlock = await prisma.dateBlock.findFirst({
       where: {
         ProductionId: productionId,
         Name: 'Production',

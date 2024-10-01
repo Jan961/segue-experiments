@@ -6,7 +6,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   try {
     const { RepeatInterval, TaskRepeatFromWeekNum, TaskRepeatToWeekNum } = req.body;
     const prisma = await getPrismaClient(req);
-    const recurringTask = await prisma.MasterTaskRepeat.create({
+    const recurringTask = await prisma.masterTaskRepeat.create({
       data: {
         FromWeekNum: TaskRepeatFromWeekNum,
         ToWeekNum: TaskRepeatToWeekNum,
@@ -16,8 +16,8 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       },
     });
 
-    const task = await generateSingleRecurringMasterTask(req.body, recurringTask.Id);
-    const createdTask = await prisma.MasterTask.create({
+    const task = await generateSingleRecurringMasterTask(req.body, recurringTask.Id, req);
+    const createdTask = await prisma.masterTask.create({
       data: {
         ...task,
       },

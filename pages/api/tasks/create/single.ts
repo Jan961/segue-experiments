@@ -9,7 +9,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const { ProductionId } = task;
     const prisma = await getPrismaClient(req);
 
-    const code = await getMaxProductionTaskCode(ProductionId);
+    const code = await getMaxProductionTaskCode(ProductionId, req);
     const createResult = await prisma.productionTask.create({
       data: {
         ProductionId: task.ProductionId,

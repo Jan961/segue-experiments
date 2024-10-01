@@ -150,7 +150,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const barredVenueIds = barredVenues.map(({ barredVenueId }) => barredVenueId).filter((x: number) => x);
     const venueContactIds = venueContacts.map(({ id }) => id).filter((x: number) => x);
     await prisma.$transaction(async (tx) => {
-      const deleteBarredRecordsPromise = tx.VenueBarredVenue.deleteMany({
+      const deleteBarredRecordsPromise = tx.venueBarredVenue.deleteMany({
         where: {
           AND: [
             {
@@ -166,7 +166,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           ],
         },
       });
-      const deleteVenueContactsPromise = tx.VenueContact.deleteMany({
+      const deleteVenueContactsPromise = tx.venueContact.deleteMany({
         where: {
           AND: [
             {

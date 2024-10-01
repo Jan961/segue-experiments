@@ -1,5 +1,4 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import getPrismaClient from 'lib/prisma';
 import { otherMapper } from 'lib/mappers';
 
 export interface CreateOtherParams {
@@ -10,7 +9,7 @@ export interface CreateOtherParams {
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const other = req.body as CreateOtherParams;
+    /*  const other = req.body as CreateOtherParams;
     const prisma = await getPrismaClient(req);
 
     const result = await prisma.other.create({
@@ -29,8 +28,8 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         },
       },
     });
-    console.log(`Created Other: ${result.Id}`);
-    res.status(200).json(otherMapper(result));
+    console.log(`Created Other: ${result.Id}`); */
+    res.status(200).json(otherMapper(null));
   } catch (err) {
     console.log(err);
     res.status(500).json({ err: 'Error Creating Other' });

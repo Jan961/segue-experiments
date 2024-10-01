@@ -6,7 +6,7 @@ export default async function handle(req, res) {
     let { setId, bookingId, salesDate } = req.body;
 
     if (setId === -1) {
-      const setResult = await prisma.SalesSet.create({
+      const setResult = await prisma.salesSet.create({
         data: {
           SetBookingId: parseInt(bookingId),
           SetPerformanceId: null,

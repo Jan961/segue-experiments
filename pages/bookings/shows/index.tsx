@@ -69,7 +69,7 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const productionJump = await getProductionJumpState(ctx, 'bookings');
   const shows = (await getShowsByAccountId(ctx.req as NextApiRequest)) || [];
-  const regionsList = await getRegionlist();
+  const regionsList = await getRegionlist(ctx.req as NextApiRequest);
   const productionCompanyList = await getAllProductionCompanyList();
   const currencyList = await getAllCurrencylist();
 

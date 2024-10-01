@@ -99,7 +99,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     }
     const prisma = await getPrismaClient(req);
 
-    const data = await prisma.DateBlock.findMany({
+    const data = await prisma.dateBlock.findMany({
       where: {
         ...(productionId && { ProductionId: productionId }),
         Name: 'Production',

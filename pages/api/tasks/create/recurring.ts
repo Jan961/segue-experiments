@@ -9,7 +9,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const { RepeatInterval, TaskRepeatFromWeekNum, TaskRepeatToWeekNum, ProductionId } = req.body;
     const prisma = await getPrismaClient(req);
 
-    const productionWeeks = await prisma.DateBlock.findMany({
+    const productionWeeks = await prisma.dateBlock.findMany({
       where: {
         ProductionId: parseInt(ProductionId),
       },
@@ -22,7 +22,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       ToWeekNumIsPostProduction: TaskRepeatToWeekNum < 0,
     };
     await recurringProductionTaskSchema.validate(recurringTaskRecord);
-    const recurringTask = await prisma.ProductionTaskRepeat.create({
+    const recurringTask = await prisma.productionTaskRepeat.create({
       data: {
         ...recurringTaskRecord,
       },
@@ -36,6 +36,8 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       prodBlock,
       prodBlock?.StartDate,
       recurringTask.Id,
+      1,
+      req,
     );
 
     const createdTasks = await Promise.all(

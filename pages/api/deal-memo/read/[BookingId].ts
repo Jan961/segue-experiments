@@ -7,7 +7,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const BookingId: number = parseInt(req.query.BookingId as string);
 
     const prisma = await getPrismaClient(req);
-    let dealMemo = await prisma.dealMemo.findFirst({
+    const dealMemo = await prisma.dealMemo.findFirst({
       where: {
         BookingId,
       },
@@ -26,15 +26,12 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       return;
     }
 
-    const emailSalesRecipients = await prisma.DealMemoSalesEmailRecipient.findMany({
+    const emailSalesRecipients = await prisma.dealMemoSalesEmailRecipient.findMany({
       where: {
         DMSRDeMoId: dealMemo.Id,
       },
     });
-
-    dealMemo = { ...dealMemo, SendTo: emailSalesRecipients.map((recipient) => recipient.DMSRAccUserId) };
-
-    res.status(200).json(dealMemo);
+    res.status(200).json({ ...dealMemo, SendTo: emailSalesRecipients.map((recipient) => recipient.DMSRAccUserId) });
   } catch (err) {
     console.log(err);
     res.status(403).json({ err: 'Error occurred while getting data for Deal Memo' });

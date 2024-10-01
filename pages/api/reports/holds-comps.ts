@@ -226,7 +226,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const where: Prisma.Sql = conditions.length ? Prisma.sql` where ${Prisma.join(conditions, ' and ')}` : Prisma.empty;
     const [data, productionDetails] = await all([
       prisma.$queryRaw`SELECT * FROM BookingHoldCompsView ${where} ORDER BY BookingFirstDate;`,
-      getProductionWithContent(productionId),
+      getProductionWithContent(productionId, req),
     ]);
 
     const showName = (productionDetails as ProductionDetails)?.Show?.Name || '';

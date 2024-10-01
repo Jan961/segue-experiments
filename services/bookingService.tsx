@@ -440,7 +440,7 @@ export const getActivitiesByBookingId = async (BookingId, req: NextApiRequest) =
     activities: activities.map(activityMapper),
     info: {
       ...info,
-      OnSaleDate: info.OnSaleDate ? info.OnSaleDate.toISOString() : '',
+      OnSaleDate: info.TicketsOnSaleFromDate ? info.TicketsOnSaleFromDate.toISOString() : '',
     },
   };
 

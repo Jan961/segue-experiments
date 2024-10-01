@@ -5,7 +5,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   try {
     const prisma = await getPrismaClient(req);
 
-    const holdTypes = await prisma.HoldType.findMany({
+    const holdTypes = await prisma.holdType.findMany({
       orderBy: {
         HoldTypeSeqNo: 'asc',
       },

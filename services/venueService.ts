@@ -1,4 +1,4 @@
-import { Venue, VenueAddress, VenueBarredVenue, VenueContact, VenueVenue } from 'prisma/generated/prisma-client';
+import { Venue, VenueAddress, VenueBarredVenue, VenueContact } from 'prisma/generated/prisma-client';
 import getPrismaClient from 'lib/prisma';
 import { omit } from 'radash';
 import { isNullOrEmpty } from 'utils';
@@ -47,7 +47,7 @@ export const getAllVenues = async (req: NextApiRequest) => {
 
 export const getUniqueVenueTownlist = async (req: NextApiRequest) => {
   const prisma = await getPrismaClient(req);
-  return await prisma.venueAddress.groupBy({
+  const addresses = await prisma.venueAddress.groupBy({
     by: ['Town'],
     where: {
       Town: {
@@ -55,16 +55,18 @@ export const getUniqueVenueTownlist = async (req: NextApiRequest) => {
       },
     },
   });
+
+  return addresses.map((a) => a.Town);
 };
 
 export const getUniqueVenueCountrylist = async (req: NextApiRequest) => {
   const prisma = await getPrismaClient(req);
-  return await prisma.Country.findMany({});
+  return await prisma.country.findMany({});
 };
 
 export const getCountryRegions = async (req: NextApiRequest) => {
   const prisma = await getPrismaClient(req);
-  return await prisma.CountryInRegion.findMany({
+  return await prisma.countryInRegion.findMany({
     orderBy: {
       CountryId: 'asc',
     },
@@ -72,9 +74,10 @@ export const getCountryRegions = async (req: NextApiRequest) => {
 };
 
 export const getVenueCurrencies = async (req: NextApiRequest) => {
-  const prisma = await getPrismaClient(req);
+  console.log(req.query);
+  /* const prisma = await getPrismaClient(req);
   try {
-    const venueCurrency = await prisma.Venue.findMany({
+    const venueCurrency = await prisma.venue.findMany({
       select: {
         Id: true,
         Currency: {
@@ -90,7 +93,8 @@ export const getVenueCurrencies = async (req: NextApiRequest) => {
     return attempt;
   } catch (exception) {
     return '';
-  }
+  } */
+  return [];
 };
 
 export interface DistanceStop {
@@ -114,7 +118,7 @@ export const getDistances = async (stops: DistanceStop[], req: NextApiRequest): 
   const ids = stops.map((x) => x.Ids).flat();
   const prisma = await getPrismaClient(req);
   // Get the distances for all possible combinations (optimisation possible)
-  const distances = await prisma.VenueVenueTravelView.findMany({
+  const distances = await prisma.venueVenueTravelView.findMany({
     where: {
       Venue1Id: {
         in: ids,
@@ -142,7 +146,7 @@ export const getDistances = async (stops: DistanceStop[], req: NextApiRequest): 
       option: stop.Ids.map((id: number) => {
         // Get any distances that match (optimisation possible)
         const match = distances.filter(
-          (x: VenueVenue) =>
+          (x) =>
             (x.Venue2Id === id && x.Venue1Id === prev.Ids[0] && !isNullOrEmpty(x.Mileage)) ||
             (x.Venue1Id === id && x.Venue2Id === prev.Ids[0] && !isNullOrEmpty(x.Mileage)),
         )[0];
@@ -172,7 +176,7 @@ export const getDistance = async (stop: DistanceStop, req: NextApiRequest): Prom
   }
   const prisma = await getPrismaClient(req);
   // Get the distances for all possible combinations (optimisation possible)
-  const distance = await prisma.VenueVenueTravelView.findMany({
+  const distance = await prisma.venueVenueTravelView.findMany({
     where: {
       OR: [
         {
@@ -193,7 +197,7 @@ export const getDistance = async (stop: DistanceStop, req: NextApiRequest): Prom
 
 export const getAllVenueFamilyList = async (req: NextApiRequest) => {
   const prisma = await getPrismaClient(req);
-  return prisma.VenueFamily.findMany({
+  return prisma.venueFamily.findMany({
     orderBy: {
       Name: 'asc',
     },
@@ -336,7 +340,7 @@ export const updateVenue = async (
 
 export const getAllVenueRoles = async (req: NextApiRequest) => {
   const prisma = await getPrismaClient(req);
-  return prisma.VenueRole.findMany({
+  return prisma.venueRole.findMany({
     where: {
       IsStandard: true,
     },

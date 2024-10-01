@@ -5,7 +5,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   try {
     const data = req.body;
     const prisma = await getPrismaClient(req);
-    const result = await prisma.VenueFile.create({
+    const result = await prisma.venueFile.create({
       data: { ...data, Type: 'Tech Specs' },
     });
     res.status(200).json(result);

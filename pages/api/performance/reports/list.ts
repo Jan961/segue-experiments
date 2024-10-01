@@ -5,7 +5,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   try {
     const prisma = await getPrismaClient(req);
 
-    const result = await prisma.PerformanceReport.findMany({});
+    const result = await prisma.performanceReport.findMany({});
     res.status(200).json(result);
   } catch (e) {
     console.log(e);

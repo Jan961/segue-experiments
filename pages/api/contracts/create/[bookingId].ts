@@ -8,7 +8,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const createResult = await prisma.contract.create({
       data: {
         BookingId,
-        BarringClauseBreaches: req.body.BarringClauseBreaches,
       },
     });
 

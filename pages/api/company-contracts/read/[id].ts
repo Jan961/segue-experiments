@@ -16,7 +16,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     const contractId = Number(id);
     const prisma = await getPrismaClient(req);
-    const contract = await prisma.ACCContract.findUnique({
+    const contract = await prisma.aCCContract.findUnique({
       where: { ContractId: contractId },
       include: {
         ACCClause: true,

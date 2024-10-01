@@ -6,7 +6,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const prisma = await getPrismaClient(req);
     const data = req.body;
 
-    const result = await prisma.ContractFile.findFirst({
+    const result = await prisma.contractFile.findFirst({
       where: {
         FileId: data.FileId,
       },
@@ -15,7 +15,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       },
     });
 
-    await prisma.ContractFile.delete({
+    await prisma.contractFile.delete({
       where: {
         Id: result.Id,
       },

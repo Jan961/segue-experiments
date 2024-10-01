@@ -1,4 +1,3 @@
-import { MasterTaskDTO } from 'interfaces';
 import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 
@@ -9,7 +8,7 @@ import { masterTaskSchema, recurringMasterTaskSchema } from 'validators/tasks';
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
     try {
-      const task = req.body as MasterTaskDTO;
+      const task = req.body;
       const prisma = await getPrismaClient(req);
 
       if (task.MTRId && task.RepeatInterval) {
@@ -47,7 +46,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           'TaskRepeatToWeekNum',
           'TaskRepeatFromWeekNum',
         ]);
-        await prisma.MasterTask.update({
+        await prisma.masterTask.update({
           data: {
             ...filteredTaskObject,
           },
@@ -66,13 +65,13 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           ToWeekNumIsPostProduction: false,
         };
         await recurringMasterTaskSchema.validate(masterTaskRepeatInfo);
-        const repeatingTask = await prisma.MasterTaskRepeat.create({
+        const repeatingTask = await prisma.masterTaskRepeat.create({
           data: {
             ...masterTaskRepeatInfo,
           },
         });
         const MRTId = repeatingTask?.Id;
-        let masterTaskData: any = await generateSingleRecurringMasterTask(req.body, repeatingTask.Id);
+        let masterTaskData: any = await generateSingleRecurringMasterTask(req.body, repeatingTask.Id, req);
 
         await masterTaskSchema.validate({
           ...masterTaskData,
@@ -82,7 +81,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         });
 
         masterTaskData = omit(masterTaskData, ['TaskAssignedToAccUserId', 'MTRId']);
-        const createdTask = await prisma.MasterTask.update({
+        const createdTask = await prisma.masterTask.update({
           data: {
             ...masterTaskData,
             ...(task.AccountId && {

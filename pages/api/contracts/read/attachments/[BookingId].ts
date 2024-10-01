@@ -7,7 +7,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const prisma = await getPrismaClient(req);
 
     const contractFiles = (
-      await prisma.ContractFile.findMany({
+      await prisma.contractFile.findMany({
         where: {
           ContractBookingId: BookingId,
         },

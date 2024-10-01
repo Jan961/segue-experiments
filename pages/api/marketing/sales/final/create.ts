@@ -6,7 +6,7 @@ export default async function handle(req, res) {
     const prisma = await getPrismaClient(req);
     const { bookingId, salesDate, user, general, schools } = req.body;
 
-    const setResult = await prisma.SalesSet.create({
+    const setResult = await prisma.salesSet.create({
       data: {
         SetBookingId: parseInt(bookingId),
         SetPerformanceId: null,
@@ -40,7 +40,7 @@ export default async function handle(req, res) {
       });
     }
 
-    await prisma.Sale.createMany({
+    await prisma.sale.createMany({
       data: sales,
     });
 

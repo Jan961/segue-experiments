@@ -22,6 +22,6 @@ export const upsertAddress = async (addressId: number, addressDetails, tx) => {
     update: addressData,
     create: addressData,
   });
-  cxcz;
+
   return address;
 };

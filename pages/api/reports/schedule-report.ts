@@ -55,7 +55,7 @@ const handler = async (req, res) => {
     }
 
     // Construct the Prisma query
-    const data: SCHEDULE_VIEW[] = await prisma.scheduleView.findMany({
+    const data = await prisma.scheduleView.findMany({
       where: {
         AND: [
           from && to

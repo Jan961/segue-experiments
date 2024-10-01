@@ -12,7 +12,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const prisma = await getPrismaClient(req);
 
     const taskList = selectedTaskList.map(async (task) => {
-      const { Code } = await getMaxMasterTaskCode();
+      const { Code } = await getMaxMasterTaskCode(req);
       if (!isNullOrEmpty(task.MTRId)) {
         const {
           Interval,
@@ -26,7 +26,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           Notes,
         } = task;
 
-        const newRepeatingTask = await prisma.MasterTaskRepeat.create({
+        const newRepeatingTask = await prisma.masterTaskRepeat.create({
           data: {
             FromWeekNum,
             ToWeekNum,
@@ -36,7 +36,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           },
         });
 
-        return await prisma.MasterTask.create({
+        return await prisma.masterTask.create({
           data: {
             Name,
             StartByWeekNum,
@@ -63,7 +63,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           'PRTId',
           'MasterTaskRepeat',
         ]);
-        return await prisma.MasterTask.create({
+        return await prisma.masterTask.create({
           data: {
             ...filteredTask,
             TaskStartByIsPostProduction: false,
@@ -71,6 +71,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
             Code: Code + 1,
             CopiedFrom: 'M',
             CopiedId: task.Id,
+            Name: task.Name,
           },
         });
       }

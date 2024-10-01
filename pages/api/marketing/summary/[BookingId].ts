@@ -152,18 +152,18 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const SymbolUnicode = unicodeQuery?.CurrencySymbolUnicode;
 
     const { ConversionRate } = performance?.DateBlock?.Production?.ConversionRate || {};
-    const AvgTicketPrice = salesSummary === null ? 0 : salesSummary?.Value / salesSummary?.Seats;
+    const AvgTicketPrice = salesSummary === null ? 0 : Number(salesSummary.Value) / Number(salesSummary.Seats);
     const TotalSeats = Capacity * NumberOfPerformances;
     const GrossProfit = AvgTicketPrice === 0 ? 0 : AvgTicketPrice * TotalSeats;
-    const seatsSalePercentage = salesSummary === null ? 0 : (salesSummary?.Seats / TotalSeats) * 100;
+    const seatsSalePercentage = salesSummary === null ? 0 : (Number(salesSummary?.Seats) / TotalSeats) * 100;
     const currentProductionWeekNum = calculateWeekNumber(new Date(), new Date(booking.FirstDate));
 
     const result: SummaryResponseDTO = {
       Performances: performances,
       Info: {
-        SeatsSold: salesSummary?.Seats === undefined ? 0 : salesSummary?.Seats,
+        SeatsSold: salesSummary?.Seats === undefined ? 0 : Number(salesSummary?.Seats),
         Seats: TotalSeats,
-        SalesValue: salesSummary?.Value === undefined ? 0 : salesSummary?.Value,
+        SalesValue: salesSummary?.Value === undefined ? 0 : Number(salesSummary?.Value),
         AvgTicketPrice: AvgTicketPrice && parseFloat(AvgTicketPrice.toFixed(2)),
         GrossPotential: GrossProfit && parseFloat(GrossProfit.toFixed(2)),
         VenueCurrencyCode: currencyCode,
@@ -175,7 +175,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       ProductionInfo: {
         StartDate: booking?.DateBlock.StartDate,
         Date: performances?.[0]?.Date,
-        salesFigureDate: salesSummary?.SaleFiguresDate,
+        salesFigureDate: salesSummary?.SetSalesFiguresDate.toISOString(),
         week: currentProductionWeekNum,
         lastDate: performances?.[performances?.length - 1]?.Date,
         numberOfDays: Object.keys(group(performances, (performance) => performance.Date)).length,

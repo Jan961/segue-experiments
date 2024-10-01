@@ -8,7 +8,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       ? parseInt(req.query.selected[0])
       : parseInt(req.query.selected);
 
-    const ProductionFile = await prisma.ProductionFile.findFirst({
+    const ProductionFile = await prisma.productionFile.findFirst({
       where: { ProFiProductionId: { equals: selectedId } },
       select: {
         File: true,

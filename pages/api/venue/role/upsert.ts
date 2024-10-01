@@ -10,7 +10,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     }
 
     const prisma = await getPrismaClient(req);
-    const updatedRole = await prisma.VenueRole.upsert({
+    const updatedRole = await prisma.venueRole.upsert({
       where: {
         ...(role.Id && { Id: role.Id }),
         ...(role.Name && { Name: role.Name }),

@@ -19,7 +19,7 @@ export const getDateTypeFromId = async (id: number, req: NextApiRequest) => {
   try {
     const prisma = await getPrismaClient(req);
 
-    return (await prisma.DateType.findFirst({ where: { Id: id }, select: { Name: true } }))?.Name;
+    return (await prisma.dateType.findFirst({ where: { Id: id }, select: { Name: true } }))?.Name;
   } catch (err) {
     console.log(err);
     return null;

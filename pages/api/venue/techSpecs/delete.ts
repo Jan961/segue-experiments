@@ -9,17 +9,17 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const { fileId } = req.body;
     const prisma = await getPrismaClient(req);
 
-    const fileObj = await prisma.File.delete({
+    const fileObj = await prisma.file.delete({
       where: { Id: fileId },
     });
 
     await deleteFile(fileObj.Location);
-    const venueFileObj = await prisma.VenueFile.findFirst({
+    const venueFileObj = await prisma.venueFile.findFirst({
       where: { FileId: fileId, Type: 'Tech Specs' },
       select: { Id: true },
     });
     if (!isNullOrEmpty(venueFileObj)) {
-      await prisma.VenueFile.delete({
+      await prisma.venueFile.delete({
         where: { FileId: fileId, Id: venueFileObj.Id },
       });
 
