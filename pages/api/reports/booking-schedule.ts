@@ -14,10 +14,16 @@ import { convertToPDF } from 'utils/report';
 import { addBorderToAllCells } from 'utils/export';
 import { bookingStatusMap } from 'config/bookings';
 import { add, parseISO, format as dateFormat, differenceInDays } from 'date-fns';
-import { areDatesInSameWeek, convertMinutesToHoursMins, formatDate, formatUtcTime } from 'services/dateService';
+import {
+  calculateWeekNumber,
+  convertMinutesToHoursMins,
+  formatDate,
+  formatUtcTime,
+  getDateObject,
+} from 'services/dateService';
 import { PerformanceInfo } from 'services/reports/schedule-report';
-import { isValidNumber } from 'utils';
 import { sum } from 'radash';
+import { getProductionWithContent } from 'services/productionService';
 
 type SCHEDULE_VIEW = {
   ProductionId: number;
@@ -42,6 +48,26 @@ type SCHEDULE_VIEW = {
   DateTypeName: string;
   AffectsAvailability: number;
   SeqNo: number;
+};
+
+const addHeaderWithFilters = (worksheet, { title, from, to, status }) => {
+  let headerRowsLength = 4;
+  worksheet.addRow([title]);
+  worksheet.addRow([]);
+  if (from) {
+    worksheet.addRow([`Start Date: ${formatDate(from, 'yyyy-MM-dd')}`]);
+    headerRowsLength++;
+  }
+  if (to) {
+    worksheet.addRow([`End Date: ${formatDate(to, 'yyyy-MM-dd')}`]);
+    headerRowsLength++;
+  }
+  if (status) {
+    worksheet.addRow([`Status: ${status === 'all' ? 'All' : bookingStatusMap[status]}`]);
+    headerRowsLength++;
+  }
+  firstRowFormatting({ worksheet });
+  return headerRowsLength;
 };
 
 const makeRowBold = ({ worksheet, row }: { worksheet: any; row: number }) => {
@@ -142,7 +168,28 @@ const handler = async (req, res) => {
     });
 
     if (!formattedData?.length) {
-      const filename = 'Booking Report.xlsx';
+      const productionDetails = await getProductionWithContent(ProductionId, req);
+      const showName = productionDetails?.Show?.Name || '';
+      const productionCode = productionDetails?.Code || '';
+      const showCode = productionDetails?.Show?.Code || '';
+      const filename = `${productionCode} ${showName} Holds and Comps`;
+      const title = `${showCode}${productionCode} ${showName} Travel Summary - ${formatDate(new Date(), 'dd.MM.yy')}`;
+      const headerRowsLength = addHeaderWithFilters(worksheet, {
+        title,
+        from: from ? formatedFromDate : null,
+        to: to ? formatedToDate : null,
+        status,
+      });
+      worksheet.addRow(['', '', '', '', '', '', '', 'Onward Travel']);
+      worksheet.addRow(['Day', 'Date', 'Week', 'Venue', 'Town', 'Day Type', 'Status', 'Time', 'Miles']);
+      for (let row = 2; row <= headerRowsLength; row++) {
+        styleHeader({ worksheet, row, numberOfColumns: 9 });
+      }
+      for (let row = 1; row <= headerRowsLength; row++) {
+        makeRowTextBoldAndAllignLeft({ worksheet, row, numberOfColumns: 9 });
+      }
+      worksheet.addRow([]);
+      addBorderToAllCells({ worksheet });
       res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
       res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
       await workbook.xlsx.write(res).then(() => {
@@ -151,23 +198,14 @@ const handler = async (req, res) => {
       return;
     }
 
-    const { ShowName, FullProductionCode } = data[0];
+    const { ShowName, FullProductionCode, ProductionStartDate } = data[0];
     const title = `${FullProductionCode} ${ShowName} Travel Summary - ${formatDate(new Date(), 'dd.MM.yy')}`;
-    let headerRowsLength = 4;
-    worksheet.addRow([title]);
-    worksheet.addRow([]);
-    if (from) {
-      worksheet.addRow([`Start Date: ${formatDate(formatedFromDate, 'yyyy-MM-dd')}`]);
-      headerRowsLength++;
-    }
-    if (to) {
-      worksheet.addRow([`End Date: ${formatDate(formatedToDate, 'yyyy-MM-dd')}`]);
-      headerRowsLength++;
-    }
-    if (status) {
-      worksheet.addRow([`Status: ${status === 'all' ? 'All' : bookingStatusMap[status]}`]);
-      headerRowsLength++;
-    }
+    const headerRowsLength = addHeaderWithFilters(worksheet, {
+      title,
+      from: from ? formatedFromDate : null,
+      to: to ? formatedToDate : null,
+      status,
+    });
 
     const performanceTimeCols = new Array(maxNumOfPerformances).fill(0).map((_, i) => `Perf ${i + 1}`);
     const blankPerformances = new Array(maxNumOfPerformances).fill('');
@@ -218,14 +256,8 @@ const handler = async (req, res) => {
       ].includes(value?.EntryName);
       const isCancelled = value?.EntryStatusCode === 'X';
       if (!value) {
-        const dateToCompare = add(parseISO(from), { days: i - 2 });
-        const isSameWeek = areDatesInSameWeek(dateInIncomingFormat, dateToCompare, 1);
-        const validPrevWeekNum = isValidNumber(prevProductionWeekNum) ? parseInt(prevProductionWeekNum, 10) : 0;
-        worksheet.addRow([
-          weekDay.substring(0, 3),
-          formatDate(dateInIncomingFormat, 'dd/MM/yy'),
-          `${isSameWeek ? validPrevWeekNum : validPrevWeekNum + 1}`,
-        ]);
+        const weekNumber = calculateWeekNumber(getDateObject(ProductionStartDate), dateInIncomingFormat);
+        worksheet.addRow([weekDay.substring(0, 3), formatDate(dateInIncomingFormat, 'dd/MM/yy'), `${weekNumber}`]);
         colorTextAndBGCell({
           worksheet,
           row: rowNo + 1,
