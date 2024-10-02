@@ -1414,7 +1414,7 @@ export const EditDealMemoContractModal = ({
                 <div className="w-4/5 flex">
                   <div className="w-1/5">
                     <TextInput
-                      testId={`${inputData.DMPTicketName}-num-of-tickets`}
+                      testId="no-of-custom-tickets"
                       className="w-auto"
                       pattern={/^\d*$/}
                       onChange={(value) =>
@@ -1427,7 +1427,7 @@ export const EditDealMemoContractModal = ({
                   <div className="text-primary-input-text font-bold mr-2 mt-1">{currency.symbol}</div>
 
                   <TextInput
-                    testId={`${inputData.DMPTicketName}-ticketPrice`}
+                    testId="custom-ticket-price"
                     className="w-auto"
                     pattern={/^\d*(\.\d*)?$/}
                     onChange={(value) => editDealMemoPrice('', value.target.value, 'DMPTicketPrice', 'custom', index)}
@@ -1439,7 +1439,7 @@ export const EditDealMemoContractModal = ({
                     }
                   />
                   <TextInput
-                    testId={`${inputData.DMPTicketName}-notes`}
+                    testId="custom-ticket-notes"
                     className={classNames(
                       'ml-8',
                       dealMemoPriceData.custom.length === index + 1 && dealMemoPriceData.custom.length > 1
