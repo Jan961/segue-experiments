@@ -1,4 +1,4 @@
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import { GetServerSideProps, InferGetServerSidePropsType, NextApiRequest } from 'next';
 import Layout from 'components/Layout';
 import {
   DateTypeMapper,
@@ -52,11 +52,11 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
   // Get in parallel
   const [venues, productions, dateTypeRaw, countryRegions, venueCurrencies] = await all([
-    getAllVenuesMin(),
-    getProductionsWithContent(null, false),
-    getDayTypes(),
-    getCountryRegions(),
-    getVenueCurrencies(),
+    getAllVenuesMin(ctx.req as NextApiRequest),
+    getProductionsWithContent(ctx.req as NextApiRequest, null, false),
+    getDayTypes(ctx.req as NextApiRequest),
+    getCountryRegions(ctx.req as NextApiRequest),
+    getVenueCurrencies(ctx.req as NextApiRequest),
   ]);
 
   const dateBlock = [];

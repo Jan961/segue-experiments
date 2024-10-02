@@ -123,7 +123,7 @@ export default function GlobalActivityModal({
     setLoadingVisible(true);
     if (variant === 'edit' || variant === 'view') {
       clearInputs();
-      const response = await axios.get(`/api/marketing/globalActivities/venueIds/${data.Id}`);
+      const response = await axios.get(`/api/marketing/global-activities/venueIds/${data.Id}`);
       const venueIds = response.data.map((rec) => rec.VenueId);
 
       setActName(data.Name);

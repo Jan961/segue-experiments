@@ -6,6 +6,7 @@ import { useWizard } from 'react-use-wizard';
 import Select from 'components/core-ui-lib/Select';
 import schema from './schema/accountDetailsFormSchema';
 import { Checkbox, PopupModal } from 'components/core-ui-lib';
+import { SelectOption } from 'components/core-ui-lib/Select/Select';
 
 export type Account = {
   accountId?: number;
@@ -27,12 +28,14 @@ export type Account = {
 };
 
 interface AccountDetailsFormProps {
+  currencies: SelectOption[];
+  countries: SelectOption[];
   accountDetails: Account;
   onChange: (v: Account) => void;
   onSave: (callBack: () => void) => void;
 }
 
-const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetailsFormProps) => {
+const AccountDetailsForm = ({ currencies, countries, accountDetails, onChange, onSave }: AccountDetailsFormProps) => {
   const { nextStep } = useWizard();
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [showModal, setShowModal] = useState(false);
@@ -50,7 +53,6 @@ const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetails
         errors[error.path] = error.message;
       });
       setValidationErrors(errors);
-      console.log('validation Errors', errors);
       return false;
     }
   }
@@ -196,7 +198,7 @@ const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetails
               name="country"
               placeholder="Select country"
               className="w-full h-[31px]"
-              options={[{ text: 'United Kingdom', value: 'United Kingdom' }]}
+              options={countries}
               value={accountDetails.country}
               onChange={(value) => onChange({ ...accountDetails, country: value.toString() })}
               isClearable={false}
@@ -222,7 +224,7 @@ const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetails
               name="currency"
               placeholder="Select currency"
               className="w-full h-[31px]"
-              options={[{ text: 'GBP', value: 'GBP' }]}
+              options={currencies}
               value={accountDetails.currency}
               onChange={(value) => onChange({ ...accountDetails, currency: value.toString() })}
               isClearable={false}

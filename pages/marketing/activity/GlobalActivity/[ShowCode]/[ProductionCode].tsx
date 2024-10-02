@@ -1,5 +1,5 @@
 import Layout from 'components/Layout';
-import { GetServerSideProps } from 'next';
+import { GetServerSideProps, NextApiRequest } from 'next';
 import { getAccountIdFromReq, getUserNameFromReq, getUsers } from 'services/userService';
 import { getProductionJumpState } from 'utils/getProductionJumpState';
 import { InitialState } from 'lib/recoil';
@@ -33,16 +33,16 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   let initialState: InitialState;
 
   if (productionId !== null) {
-    const bookings = await getSaleableBookings(productionId);
-    const currentUser = await getUserNameFromReq(ctx.req);
-    const venueRoles = await getRoles();
+    const bookings = await getSaleableBookings(productionId, ctx.req as NextApiRequest);
+    const currentUser = await getUserNameFromReq(ctx.req as NextApiRequest);
+    const venueRoles = await getRoles(ctx.req as NextApiRequest);
     const selected = null;
     const bookingJump: BookingJump = {
       selected,
       bookings: bookings.map(bookingMapperWithVenue),
     };
-    const townList = await getUniqueVenueTownlist();
-    const venues = await getAllVenuesMin();
+    const townList = await getUniqueVenueTownlist(ctx.req as NextApiRequest);
+    const venues = await getAllVenuesMin(ctx.req as NextApiRequest);
 
     const venue = objectify(
       venues,

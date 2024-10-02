@@ -1,4 +1,4 @@
-import { GetServerSideProps } from 'next';
+import { GetServerSideProps, NextApiRequest } from 'next';
 import { getActiveProductions } from 'services/productionService';
 import Layout from '../../components/Layout';
 import Switchboard from '../../components/reports/switchboard';
@@ -17,8 +17,8 @@ const Index = ({ activeProductions = [] }: ReportsProps) => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps = async () => {
-  const activeProductions = await getActiveProductions();
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const activeProductions = await getActiveProductions(ctx.req as NextApiRequest);
   return {
     props: {
       activeProductions: activeProductions.map((production: any & Production) => productionEditorMapper(production)),

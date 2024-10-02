@@ -1,15 +1,11 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { PerformanceDTO } from 'interfaces';
-import { getEmailFromReq, checkAccess } from 'services/userService';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
     const perf = req.body as PerformanceDTO;
-
-    const email = await getEmailFromReq(req);
-    const access = await checkAccess(email, { PerformanceId: perf.Id });
-    if (!access) return res.status(401).end();
+    const prisma = await getPrismaClient(req);
 
     await prisma.$transaction([
       prisma.performance.delete({

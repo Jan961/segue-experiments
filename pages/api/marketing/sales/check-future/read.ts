@@ -1,10 +1,11 @@
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
+import { NextApiRequest, NextApiResponse } from 'next';
 
-export default async function handle(req, res) {
+export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
     let data = null;
     let result = null;
-
+    const prisma = await getPrismaClient(req);
     if (req.body.type === 'Hold') {
       // get current values across weeks from the entered week
       data = await prisma.salesSet.findMany({

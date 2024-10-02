@@ -100,7 +100,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
     setLoading(true);
     try {
       const data = await fetchData({
-        url: '/api/marketing/archivedSales/bookingSelection/read',
+        url: '/api/marketing/archived-sales/booking-selection/read',
         method: 'POST',
         data: {
           salesByType: 'venue',

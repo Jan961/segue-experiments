@@ -3,7 +3,7 @@ import { getAllProductions } from 'services/productionService';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const productionsRaw = await getAllProductions();
+    const productionsRaw = await getAllProductions(req);
 
     const values = {
       productions: productionsRaw.map((t: any) => ({

@@ -4,19 +4,21 @@ import { Button, ConfirmationDialog, Table } from 'components/core-ui-lib';
 import AddEditUser from 'components/admin/modals/AddEditUser';
 import AddEditPermissionGroup from 'components/admin/modals/AddEditPermissionGroup';
 import Layout from 'components/Layout';
-import { useEffect, useState } from 'react';
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import { useEffect, useRef, useState } from 'react';
+import { GetServerSideProps, InferGetServerSidePropsType, NextApiRequest } from 'next';
 import { getPermissionGroupsList, getPermissionsList } from 'services/permissionService';
 import { getAllProductions } from 'services/productionService';
 import { useRouter } from 'next/router';
 import { mapRecursive } from 'utils';
 import { TreeItemOption } from 'components/global/TreeSelect/types';
+import { dateBlockMapper } from 'lib/mappers';
 
 export default function Users({
   permissionsList,
   productionsList,
   permisisonGroups,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  const deleteType = useRef<'user' | 'group'>(null);
   const [userRowData, setUserRowData] = useState([]);
   const [showUsersModal, setShowUsersModal] = useState(false);
   const [showPermissionGroupModal, setShowPermissionGroupModal] = useState(false);
@@ -31,20 +33,22 @@ export default function Users({
 
       if (Array.isArray(users.data)) {
         setUserRowData(
-          users.data.map((user) => {
-            const firstName = user.UserFirstName || '';
-            const lastName = user.UserLastName || '';
+          users.data
+            .map((user) => {
+              const firstName = user.UserFirstName || '';
+              const lastName = user.UserLastName || '';
 
-            return {
-              accountUserId: user.AccUserId,
-              firstName,
-              lastName,
-              name: `${firstName} ${lastName}`,
-              email: user.UserEmail,
-              permissionDesc: user.AllPermissions,
-              licence: 'to be added later',
-            };
-          }),
+              return {
+                accountUserId: user.AccUserId,
+                firstName,
+                lastName,
+                name: `${firstName} ${lastName}`,
+                email: user.UserEmail,
+                permissionDesc: user.AllPermissions,
+                licence: 'Standard',
+              };
+            })
+            .sort((a, b) => a.lastName.localeCompare(b.lastName)),
         );
       }
     } catch (error) {
@@ -82,9 +86,15 @@ export default function Users({
     }
   };
 
-  const handleUserEdit = ({ data }) => {
-    setSelectedUser(data);
-    setShowUsersModal(true);
+  const handleUserEdit = async (type, data) => {
+    if (type === 'edit') {
+      setSelectedUser(data);
+      setShowUsersModal(true);
+    } else if (type === 'delete') {
+      deleteType.current = 'user';
+      setSelectedGroup(data);
+      setShowConfirmationDialog(true);
+    }
   };
 
   const handlePermissionGroupEdit = async (type, data) => {
@@ -93,18 +103,29 @@ export default function Users({
       setSelectedGroup({ ...data, permissions: updatedPermissions });
       setShowPermissionGroupModal(true);
     } else if (type === 'delete') {
+      deleteType.current = 'group';
       setSelectedGroup(data);
       setShowConfirmationDialog(true);
     }
   };
-  const handleConfirmClick = async () => {
-    setShowConfirmationDialog(false);
+
+  const deletePermissionGroup = async () => {
     await axios.delete('/api/admin/permissions-group/delete', {
       data: {
         groupId: selectedGroup.groupId,
       },
     });
     setSelectedGroup(null);
+  };
+
+  const deleteUser = async () => {
+    // Add API call to deactivate user
+    setSelectedUser(null);
+  };
+
+  const handleConfirmClick = async () => {
+    setShowConfirmationDialog(false);
+    deleteType.current === 'user' ? deleteUser() : deletePermissionGroup();
     router.replace(router.asPath);
   };
 
@@ -182,14 +203,13 @@ export default function Users({
 
       <Table
         testId="admin-users-table"
-        columnDefs={usersColDef(null)}
+        columnDefs={usersColDef(handleUserEdit)}
         rowData={userRowData}
         styleProps={styleProps}
         tableHeight={300}
-        onRowDoubleClicked={handleUserEdit}
       />
 
-      <div className="flex justify-end mt-5">
+      <div className="flex justify-end mt-5 mb-5">
         <div className="w-[700px]">
           <div className="flex flex-row justify-between items-center my-4">
             <div className="text-primary-navy text-xl font-bold">Your Permission Groups</div>
@@ -210,6 +230,7 @@ export default function Users({
             rowData={permisisonGroups}
             styleProps={styleProps}
             tableHeight={300}
+            gridOptions={{ suppressHorizontalScroll: true }}
           />
         </div>
       </div>
@@ -220,6 +241,7 @@ export default function Users({
           permissions={permissionsList}
           productions={productionsList}
           selectedUser={selectedUser}
+          groups={permisisonGroups}
         />
       )}
       {showPermissionGroupModal && (
@@ -248,16 +270,31 @@ export default function Users({
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const permisisonGroups = await getPermissionGroupsList(ctx.req);
   const permissionsList = await getPermissionsList();
-  const productions = await getAllProductions();
-  const formattedProductions = productions.map((t: any) => ({
-    id: t.Id,
-    code: t.Code,
-    isArchived: t.IsArchived,
-    showCode: t.Show.Code,
-    showName: t.Show.Name,
-    label: `${t.Show.Code}${t.Code} ${t.Show.Name}`,
-    checked: false,
-  }));
+  const productions = await getAllProductions(ctx.req as NextApiRequest);
+
+  const formattedProductions = productions
+    .map((t: any) => {
+      let db = t.DateBlock.find((block) => block.IsPrimary);
+      if (db) {
+        db = dateBlockMapper(db);
+      }
+      return {
+        id: t.Id.toString(),
+        code: t.Code,
+        isArchived: t.IsArchived,
+        showCode: t.Show.Code,
+        showName: t.Show.Name,
+        label: `${t.Show.Code}${t.Code} ${t.Show.Name}`,
+        startDate: db?.StartDate || null,
+        checked: false,
+      };
+    })
+    .sort((a, b) => {
+      if (a.isArchived !== b.isArchived) {
+        return a.isArchived ? 1 : -1;
+      }
+      return new Date(a.startDate).valueOf() > new Date(b.startDate).valueOf();
+    });
 
   return {
     props: {

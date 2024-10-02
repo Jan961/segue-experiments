@@ -48,6 +48,8 @@ export const Switchboard = () => {
       fill: '#FFF',
       iconName: 'production-management',
       color: 'bg-primary-purple',
+      tooltipMessage: 'Coming soon!',
+      disabled: true,
     },
     {
       title: getStrings('global.admin'),

@@ -1,6 +1,7 @@
 import { userMapper } from 'lib/mappers';
 import prisma from 'lib/prisma_master';
 import { NextApiRequest, NextApiResponse } from 'next';
+import { getOrganisationIdFromReq } from 'services/userService';
 
 const getUserPermissions = (permissions) => {
   return permissions.map((id) => ({ UserAuthPermissionId: id }));
@@ -9,6 +10,12 @@ const getUserPermissions = (permissions) => {
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
     const user = req.body;
+
+    const organisationId = await getOrganisationIdFromReq(req);
+    if (!organisationId) {
+      res.status(500).json({ err: 'OrganisationId not found when creating user' });
+      return;
+    }
     // Check if the user already exists
     const existingUser = await prisma.user.findFirst({
       where: {
@@ -32,7 +39,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
             AccUserPIN: user.pin,
             Account: {
               connect: {
-                AccountId: Number(user.accountId),
+                AccountOrganisationId: organisationId,
               },
             },
             AccountUserPermission: {

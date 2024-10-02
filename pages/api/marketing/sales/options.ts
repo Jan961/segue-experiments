@@ -3,7 +3,7 @@ import { getSaleTypeOptions } from 'services/salesService';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const options = await getSaleTypeOptions();
+    const options = await getSaleTypeOptions(req);
     res.status(200).json({ ...options });
   } catch (err) {
     console.log('error', err);

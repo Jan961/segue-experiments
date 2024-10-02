@@ -1,6 +1,6 @@
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getEmailFromReq, checkAccess } from 'services/userService';
+
 import { generateRecurringProductionTasks, getMaxProductionTaskCode } from 'services/TaskService';
 import { isNullOrEmpty } from 'utils';
 import { calculateWeekNumber } from 'services/dateService';
@@ -8,14 +8,11 @@ import { omit } from 'radash';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const { selectedTaskList, ProductionId } = req.body;
-
-    const email = await getEmailFromReq(req);
-    const access = await checkAccess(email, { ProductionId });
-    if (!access) return res.status(401).end();
-    const productionWeeks = await prisma.DateBlock.findFirst({
+    const { selectedTaskList, ProductionId }: { selectedTaskList: any; ProductionId: number } = req.body;
+    const prisma = await getPrismaClient(req);
+    const productionWeeks = await prisma.dateBlock.findFirst({
       where: {
-        ProductionId: parseInt(ProductionId),
+        ProductionId,
         Name: 'Production',
       },
       select: { StartDate: true, EndDate: true },
@@ -35,7 +32,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           FromWeekNumIsPostProduction: false,
           ToWeekNumIsPostProduction: false,
         };
-        const newRepeatingTask = await prisma.ProductionTaskRepeat.create({ data: { ...recurringTaskRecord } });
+        const newRepeatingTask = await prisma.productionTaskRepeat.create({ data: { ...recurringTaskRecord } });
 
         const recurringTaskInfo = {
           Name: task.Name,
@@ -58,10 +55,11 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           prodStartDate,
           newRepeatingTask.Id,
           counter,
+          req,
         );
         return await Promise.all(
           newProdTasks.map(async (newTask) => {
-            await prisma.ProductionTask.create({
+            await prisma.productionTask.create({
               data: {
                 ...newTask,
                 CopiedFrom: 'D',
@@ -71,7 +69,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           }),
         );
       } else {
-        const Code = (await getMaxProductionTaskCode(ProductionId)) + index + 1;
+        const Code = (await getMaxProductionTaskCode(ProductionId, req)) + index + 1;
         const taskCompleteBys = {
           StartByIsPostProduction:
             task.StartByWeekNum < 0 ? false : task.StartByWeekNum > calculateWeekNumber(prodStartDate, prodEndDate),
@@ -98,13 +96,14 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           ...filteredTask,
           ...taskCompleteBys,
           Code,
-          ProductionId,
+          Production: { connect: { Id: ProductionId } },
           CopiedFrom: 'M',
           CopiedId: task.Id,
           Progress: 0,
           TaskCompletedDate: null,
+          Name: task.Name,
         };
-        return await prisma.ProductionTask.create({ data: { ...newTaskRecord } });
+        return await prisma.productionTask.create({ data: newTaskRecord });
       }
     });
 

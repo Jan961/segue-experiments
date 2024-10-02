@@ -93,15 +93,15 @@ export type SalesSnapshot = {
 export type BookingSelection = {
   BookingId: number;
   BookingStatusCode: string;
-  BookingFirstDate: string;
+  BookingFirstDate: Date;
   VenueId: number;
   VenueCode: string;
   VenueMainAddressTown: string;
   ProductionId: number;
   FullProductionCode: string;
   ProductionLengthWeeks: number;
-  PerformanceCount: number;
-  HasSalesData: boolean;
+  PerformanceCount?: number;
+  HasSalesData?: boolean;
 };
 
 export type SalesTabs =

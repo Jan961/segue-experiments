@@ -1,6 +1,7 @@
 import { bookingStatusMap } from 'config/bookings';
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import moment from 'moment';
+import { NextApiRequest } from 'next';
 import { minutesInHHmmFormat } from 'services/salesSummaryService';
 
 export type SCHEDULE_VIEW = {
@@ -55,7 +56,8 @@ export const addTime = (timeArr: string[] = []) => {
 
 const getKey = ({ FullProductionCode, ShowName, EntryDate }) => `${FullProductionCode} - ${ShowName} - ${EntryDate}`;
 
-export const getSheduleReport = async ({ from, to, status, ProductionId }) => {
+export const getSheduleReport = async ({ from, to, status, ProductionId }, req: NextApiRequest) => {
+  const prisma = await getPrismaClient(req);
   const formatedFromDate = new Date(from);
   const formatedToDate = new Date(to);
   const data = await prisma.scheduleView.findMany({

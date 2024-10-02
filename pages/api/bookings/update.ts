@@ -14,7 +14,6 @@ import {
   updateRehearsal,
 } from 'services/bookingService';
 
-import { checkAccess, getEmailFromReq } from 'services/userService';
 import { BookingItem } from 'components/bookings/modal/NewBooking/reducer';
 import {
   mapExistingBookingToPrismaFields,
@@ -22,6 +21,7 @@ import {
   mapNewOtherTypeToPrismaFields,
   mapNewRehearsalOrGIFUToPrismaFields,
 } from './utils';
+import getPrismaClient from 'lib/prisma';
 
 const formatNonPerformanceType = (booking) => ({
   Id: booking.id,
@@ -76,11 +76,8 @@ const getBookngType = (booking: BookingItem) => {
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const email = await getEmailFromReq(req);
-    const access = await checkAccess(email);
-    if (!access) return res.status(401).end();
     const { original, updated } = req.body;
-
+    const prisma = await getPrismaClient(req);
     const rowsMap = {
       booking: { rowsToInsert: [], rowsToUpdate: [], rowsToDelete: [] },
       rehearsal: { rowsToInsert: [], rowsToUpdate: [], rowsToDelete: [] },
@@ -118,47 +115,47 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       rowsToUpdate.forEach((rowToUpdate) => {
         switch (model) {
           case 'booking': {
-            promises.push(updateBooking(rowToUpdate));
+            promises.push(updateBooking(rowToUpdate, prisma));
             break;
           }
           case 'rehearsal':
-            promises.push(updateRehearsal(rowToUpdate));
+            promises.push(updateRehearsal(rowToUpdate, prisma));
             break;
           case 'getInFitUp':
-            promises.push(updateGetInFitUp(rowToUpdate));
+            promises.push(updateGetInFitUp(rowToUpdate, prisma));
             break;
           default:
-            promises.push(updateOther(rowToUpdate));
+            promises.push(updateOther(rowToUpdate, prisma));
         }
       });
       rowsToInsert.forEach((rowToInsert) => {
         switch (model) {
           case 'booking':
-            promises.push(createNewBooking(rowToInsert));
+            promises.push(createNewBooking(rowToInsert, prisma));
             break;
           case 'rehearsal':
-            promises.push(createNewRehearsal(rowToInsert));
+            promises.push(createNewRehearsal(rowToInsert, prisma));
             break;
           case 'getInFitUp':
-            promises.push(createGetInFitUp(rowToInsert));
+            promises.push(createGetInFitUp(rowToInsert, prisma));
             break;
           default:
-            promises.push(createOtherBooking(rowToInsert));
+            promises.push(createOtherBooking(rowToInsert, prisma));
         }
       });
       rowsToDelete.forEach((rowToDelete) => {
         switch (model) {
           case 'booking':
-            promises.push(deleteBookingById(rowToDelete.id));
+            promises.push(deleteBookingById(rowToDelete.id, prisma));
             break;
           case 'rehearsal':
-            promises.push(deleteRehearsalById(rowToDelete.id));
+            promises.push(deleteRehearsalById(rowToDelete.id, prisma));
             break;
           case 'getInFitUp':
-            promises.push(deleteGetInFitUpById(rowToDelete.id));
+            promises.push(deleteGetInFitUpById(rowToDelete.id, prisma));
             break;
           default:
-            promises.push(deleteOtherById(rowToDelete.id));
+            promises.push(deleteOtherById(rowToDelete.id, prisma));
         }
       });
     }

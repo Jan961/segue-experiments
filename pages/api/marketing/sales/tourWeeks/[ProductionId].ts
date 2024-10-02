@@ -1,20 +1,16 @@
 import { startOfDay } from 'date-fns';
-import client from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import master from 'lib/prisma_master';
 import { addDurationToDate, getArrayOfDatesBetween, getMonday, getWeeksBetweenDates } from 'services/dateService';
-import { getEmailFromReq, checkAccess, getAccountIdFromReq } from 'services/userService';
+import { getAccountIdFromReq } from 'services/userService';
 import formatInputDate from 'utils/dateInputFormat';
 
 export default async function handle(req, res) {
   try {
     const ProductionId = parseInt(req.query.ProductionId, 10);
-
-    const email = await getEmailFromReq(req);
     const accountId = await getAccountIdFromReq(req);
-    const access = await checkAccess(email);
-    if (!access) return res.status(401).end();
-
-    const dateBlock = await client.dateBlock.findMany({
+    const prisma = await getPrismaClient(req);
+    const dateBlock = await prisma.dateBlock.findMany({
       where: {
         ProductionId,
         IsPrimary: true,
@@ -30,7 +26,7 @@ export default async function handle(req, res) {
       },
     });
 
-    const production = await client.production.findUnique({
+    const production = await prisma.production.findUnique({
       where: {
         Id: ProductionId,
       },
@@ -46,7 +42,7 @@ export default async function handle(req, res) {
     const startDate = addDurationToDate(dateBlock[0].StartDate, numWeeks * 7, false);
     const endDate = dateBlock[0].EndDate;
     const dateStartMonday = getMonday(startDate);
-    const weeks = getWeeksBetweenDates(dateStartMonday.toISOString(), endDate);
+    const weeks = getWeeksBetweenDates(dateStartMonday.toISOString(), endDate.toISOString());
 
     const result = [];
     let weekNo = numWeeks * -1;

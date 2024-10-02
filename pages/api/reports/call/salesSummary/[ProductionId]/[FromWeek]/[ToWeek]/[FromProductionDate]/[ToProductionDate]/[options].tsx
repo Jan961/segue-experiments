@@ -1,4 +1,4 @@
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 
 export default async function handle(req, res) {
   const ProductionId = req.query.ProductionId;
@@ -12,19 +12,15 @@ export default async function handle(req, res) {
   if (req.query.ToProductionDate !== 'Null' || req.query.ToProductionDate !== 'Null') {
     ToProductionDate = new Date(req.query.ToProductionDate);
   }
-
-  if (req.query.options === 'data') {
-    try {
+  try {
+    const prisma = await getPrismaClient(req);
+    if (req.query.options === 'data') {
       const result =
         await prisma.$queryRaw`SELECT * FROM \`SalesSummaryView\` WHERE \`ProductionId\` = ${ProductionId} AND \`ShowDate\` >= ${FromProductionDate}  AND \`WeekDate\` BETWEEN ${FromWeek} AND ${ToWeek}  AND (IsNull(${FromProductionDate})
                 Or (ShowDate >= ${FromProductionDate})) AND (IsNull(${ToProductionDate}) Or (ShowDate <= ${ToProductionDate}))
                 ;`;
       res.json(result);
-    } catch (e) {
-      res.statusCode(400);
-    }
-  } else if (req.query.options === 'CurrencyWeekTotals') {
-    try {
+    } else if (req.query.options === 'CurrencyWeekTotals') {
       const result = await prisma.$queryRaw`
                     SELECT VenueCurrency, VenueCurrency, ConversionRate, ProductionWeekNum, WeekDate, SUM(Value) AS Total, SUM(RunSeatsSold) AS TotalRunSeatsSold, SUM(TotalSeats) AS TotalTotalSeats
                     FROM SalesSummaryView
@@ -34,17 +30,13 @@ export default async function handle(req, res) {
                     ORDER BY ProductionWeekNum, VenueCurrency, Symbol, ConversionRate, WeekDate
                                `;
       res.json(result);
-    } catch (e) {
-      res.statusCode(400);
-    }
-  } else if (req.query.options === 'weeks') {
-    try {
+    } else if (req.query.options === 'weeks') {
       const result =
         await prisma.$queryRaw`SELECT DISTINCT WeekName, WeekDate, WeekCode FROM \`SalesSummaryView\` WHERE \`ProductionId\` = ${ProductionId} AND \`ShowDate\` >= ${FromProductionDate}  AND \`WeekDate\` BETWEEN ${FromWeek} AND ${ToWeek}  AND (IsNull(${FromProductionDate})
                 Or (ShowDate >= ${FromProductionDate})) AND (IsNull(${ToProductionDate}) Or (ShowDate <= ${ToProductionDate})) ORDER BY  WeekDate`;
       res.json(result);
-    } catch (e) {
-      res.statusCode(400);
     }
-  } 
+  } catch (e) {
+    res.status(500).send('Internal server error');
+  }
 }

@@ -14,7 +14,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    const person = await getPersonById(Number(id));
+    const person = await getPersonById(Number(id), req);
 
     if (!person) {
       return res.status(404).json({ message: 'Person not found' });

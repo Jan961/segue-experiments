@@ -10,7 +10,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   if (req.method === 'POST') {
     try {
       const stops: DistanceParams = req.body;
-      const searchResults = await getDistances(stops);
+      const searchResults = await getDistances(stops, req);
       res.json(searchResults);
     } catch (e) {
       console.log(e);

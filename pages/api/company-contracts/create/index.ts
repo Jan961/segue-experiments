@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import * as yup from 'yup';
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { CompanyContractStatus } from 'config/contracts';
 import { contractSchema } from 'validators/contracts';
 
@@ -10,6 +10,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
+    const prisma = await getPrismaClient(req);
     const validatedData = await contractSchema.validate(req.body, { abortEarly: false });
 
     const {
@@ -24,7 +25,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const result = await prisma.$transaction(async (tx) => {
       // 1. Create the contract
-      const contract = await tx.ACCContract.create({
+      const contract = await tx.aCCContract.create({
         data: {
           RoleName: role,
           FirstDay: new Date(contractDetails.firstDayOfWork),
@@ -85,7 +86,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       });
 
       if (contractDetails.additionalClause && contractDetails.additionalClause.length > 0) {
-        await tx.ACCClause.createMany({
+        await tx.aCCClause.createMany({
           data: contractDetails.additionalClause.map((clauseId: number) => ({
             ACCContractId: contract.ContractId,
             StdClauseId: clauseId,
@@ -94,7 +95,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
 
       if (contractDetails.paymentBreakdownList && contractDetails.paymentBreakdownList.length > 0) {
-        await tx.ACCPayment.createMany({
+        await tx.aCCPayment.createMany({
           data: contractDetails.paymentBreakdownList.map((payment: any) => ({
             ACCContractId: contract.ContractId,
             Date: new Date(payment.date),
@@ -105,7 +106,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
 
       if (contractDetails.publicityEventList && contractDetails.publicityEventList.length > 0) {
-        await tx.ACCPubEvent.createMany({
+        await tx.aCCPubEvent.createMany({
           data: contractDetails.publicityEventList.map((event: any) => ({
             ACCContractId: contract.ContractId,
             Date: new Date(event.date),
@@ -115,7 +116,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
 
       if (contractDetails.customClauseList && contractDetails.customClauseList.length > 0) {
-        await tx.ACCClause.createMany({
+        await tx.aCCClause.createMany({
           data: contractDetails.customClauseList.map((clauseText: string) => ({
             ACCContractId: contract.ContractId,
             Text: clauseText,

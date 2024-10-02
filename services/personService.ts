@@ -1,10 +1,11 @@
 import { PersonMinimalDTO } from 'interfaces';
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { Person } from 'prisma/generated/prisma-client';
 import { isNullOrEmpty, isUndefined } from 'utils';
 import { FieldMapping, prepareQuery } from 'utils/apiUtils';
 import { prepareAccountUpdateData } from './contracts';
 import { BankAccount, IPersonDetails } from 'components/contracts/types';
+import { NextApiRequest } from 'next';
 
 interface AddressDetails {
   address1?: string;
@@ -158,8 +159,9 @@ export const preparePersonQueryData = (
   return personData;
 };
 
-export const fetchAllMinPersonsList = async (): Promise<PersonMinimalDTO[]> => {
-  const persons: Person[] = await prisma.Person.findMany({
+export const fetchAllMinPersonsList = async (req: NextApiRequest): Promise<PersonMinimalDTO[]> => {
+  const prisma = await getPrismaClient(req);
+  const persons: Partial<Person>[] = await prisma.person.findMany({
     select: {
       PersonId: true,
       PersonFirstName: true,

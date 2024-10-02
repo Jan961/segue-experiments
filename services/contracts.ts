@@ -1,10 +1,12 @@
 import { BankAccount } from 'components/contracts/types';
 import { IContractDepartment, IContractSummary } from 'interfaces/contracts';
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
+import { NextApiRequest } from 'next';
 import { prepareQuery } from 'utils/apiUtils';
 
-export const fetchAllStandardClauses = async () => {
-  const clauses = await prisma.ACCStandardClause.findMany({});
+export const fetchAllStandardClauses = async (req) => {
+  const prisma = await getPrismaClient(req);
+  const clauses = await prisma.aCCStandardClause.findMany({});
   return clauses.map(({ Id, Text, StdClauseTitle }) => ({
     id: Id,
     text: Text,
@@ -12,8 +14,9 @@ export const fetchAllStandardClauses = async () => {
   }));
 };
 
-export const fetchAllContracts = async (productionId?: number): Promise<IContractSummary[]> => {
-  const contracts = await prisma.ACCContract.findMany({
+export const fetchAllContracts = async (req: NextApiRequest, productionId?: number): Promise<IContractSummary[]> => {
+  const prisma = await getPrismaClient(req);
+  const contracts = await prisma.aCCContract.findMany({
     where: {
       ...(productionId && {
         ProductionId: productionId,
@@ -70,8 +73,9 @@ export const fetchAllContracts = async (productionId?: number): Promise<IContrac
   );
 };
 
-export const fetchDepartmentList = async (): Promise<IContractDepartment[]> => {
-  const departments = await prisma.ACCDepartment.findMany({});
+export const fetchDepartmentList = async (req: NextApiRequest): Promise<IContractDepartment[]> => {
+  const prisma = await getPrismaClient(req);
+  const departments = await prisma.aCCDepartment.findMany({});
   return departments.map(({ ACCDeptId, ACCDeptName }) => ({
     id: ACCDeptId,
     name: ACCDeptName,
@@ -159,8 +163,9 @@ export const prepareAgencyOrganisationUpdateData = (agencyDetails: any) => {
   return prepareQuery(agencyDetails, fieldMappings);
 };
 
-export const getContractDataById = async (contractId: number) => {
-  return prisma.ACCContract.findUnique({
+export const getContractDataById = async (contractId: number, req: NextApiRequest) => {
+  const prisma = await getPrismaClient(req);
+  return prisma.aCCContract.findUnique({
     where: { ContractId: contractId },
     include: {
       ACCClause: true,

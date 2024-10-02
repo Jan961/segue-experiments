@@ -1,7 +1,6 @@
 import { ProductionTaskDTO } from 'interfaces';
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getEmailFromReq, checkAccess } from 'services/userService';
 import { productionTaskSchema } from 'validators/tasks';
 import { isNullOrEmpty } from 'utils';
 
@@ -9,10 +8,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   if (req.method === 'POST') {
     try {
       const task = req.body as ProductionTaskDTO;
-      const { Id } = task;
-      const email = await getEmailFromReq(req);
-      const access = await checkAccess(email, { TaskId: Id });
-      if (!access) return res.status(401).end();
+      const prisma = await getPrismaClient(req);
 
       const prodTaskRecord = {
         Name: task.Name,
@@ -30,7 +26,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       };
 
       await productionTaskSchema.validate(prodTaskRecord);
-      const updatedTask = await prisma.ProductionTask.update({
+      const updatedTask = await prisma.productionTask.update({
         where: { Id: task.Id },
         data: {
           Name: task.Name,
