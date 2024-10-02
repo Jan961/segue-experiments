@@ -20,7 +20,6 @@ const useMileageCalculator = () => {
     setLoading(true);
     const promises = Object.keys(stops).map(async (prodId) => {
       if (distance[prodId]?.outdated) {
-        console.log(`Calculating mileage for ${prodId}`);
         const { data } = await axios.post('/api/distance', stops[prodId]);
         updatedDistance = { ...updatedDistance, [prodId]: { stops: data, outdated: false } };
       }
