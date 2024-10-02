@@ -54,6 +54,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     getUniqueVenueCountrylist(ctx.req as NextApiRequest),
     getAllVenuesMin(ctx.req as NextApiRequest),
     fetchAllMinPersonsList(ctx.req as NextApiRequest),
+    fetchAllTemplates(ctx.req as NextApiRequest),
     getAllCurrencylist(),
     fetchAllStandardClauses(ctx.req as NextApiRequest),
     fetchDepartmentList(ctx.req as NextApiRequest),

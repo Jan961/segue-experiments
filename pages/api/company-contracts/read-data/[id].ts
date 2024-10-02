@@ -1,4 +1,4 @@
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -12,9 +12,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
+    const prisma = await getPrismaClient(req);
     const contractID = Number(id);
 
-    const data = await prisma.ACCContractData.findMany({
+    const data = await prisma.aCCContractData.findMany({
       where: { DataACCContractId: contractID },
     });
 

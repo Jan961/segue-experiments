@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { contractSchemaUpdate } from 'validators/contracts';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -10,10 +10,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     const validatedData = await contractSchemaUpdate.validate(req.body, { abortEarly: false });
     const { contractId, contractData } = validatedData;
-    console.log(contractData);
+    const prisma = await getPrismaClient(req);
 
     await prisma.$transaction(async (tx) => {
-      await tx.ACCContractData.deleteMany({
+      await tx.aCCContractData.deleteMany({
         where: {
           DataACCContractId: contractId,
         },
@@ -21,24 +21,26 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       await Promise.all(
         contractData.map((row) =>
-          tx.ACCContractData.create({
-            data: {
-              ACCContract: {
-                connect: {
-                  ContractId: contractId,
+          tx.aCCContractData
+            .create({
+              data: {
+                ACCContract: {
+                  connect: {
+                    ContractId: contractId,
+                  },
                 },
-              },
-              TemplateComponent: {
-                connect: {
-                  ComponentId: row.compID,
+                TemplateComponent: {
+                  connect: {
+                    ComponentId: row.compID,
+                  },
                 },
+                DataIndexNum: row.index,
+                DataValue: JSON.stringify(row.value),
               },
-              DataIndexNum: row.index,
-              DataValue: JSON.stringify(row.value),
-            },
-          }).catch((err) => {
-            throw new Error(err);
-          }),
+            })
+            .catch((err) => {
+              throw new Error(err);
+            }),
         ),
       );
     });
