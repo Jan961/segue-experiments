@@ -52,7 +52,6 @@ export default function SalesSummarySimple({ activeProductions }: Props) {
       });
     setProductionWeeks(weeks);
     const currentWeekMonday = getCurrentMondayDate();
-    console.log('weeks', weeks, 'currentWeekMonday', currentWeekMonday);
     setInputs((prev) => ({ ...prev, productionWeek: currentWeekMonday }));
   };
 
@@ -162,7 +161,7 @@ export default function SalesSummarySimple({ activeProductions }: Props) {
           <div className="fixed z-50 inset-0 overflow-y-auto">
             <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
               <div className="fixed inset-0 transition-opacity" aria-hidden="true">
-                <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
+                <div className="absolute inset-0 bg-gray-500 opacity-75" />
               </div>
               <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">
                 &#8203;
@@ -191,7 +190,7 @@ export default function SalesSummarySimple({ activeProductions }: Props) {
                         viewBox="0 0 24 24"
                         stroke="currentColor"
                       >
-                        <path d="M6 18L18 6M6 6l12 12"></path>
+                        <path d="M6 18L18 6M6 6l12 12" />
                       </svg>
                     </button>
                   </div>
@@ -273,9 +272,9 @@ export default function SalesSummarySimple({ activeProductions }: Props) {
                       name="Order"
                       onChange={handleOnChange}
                     >
-                      <option value={'date'}>Show Date</option>
-                      <option value={'sales'}>Show Sales (Low to Highest)</option>
-                      <option value={'change'}>Change (Lowest to highest)</option>
+                      <option value="date">Show Date</option>
+                      <option value="sales">Show Sales (Low to Highest)</option>
+                      <option value="change">Change (Lowest to highest)</option>
                     </select>
                   </div>
                   <div className="flex items-center justify-end p-6 border-t border-solid border-slate-200 rounded-b">
@@ -301,7 +300,7 @@ export default function SalesSummarySimple({ activeProductions }: Props) {
               </div>
             </div>
           </div>
-          <div className="opacity-25 fixed inset-0 z-40 bg-black"></div>
+          <div className="opacity-25 fixed inset-0 z-40 bg-black" />
         </>
       ) : null}
     </>
