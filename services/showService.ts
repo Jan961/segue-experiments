@@ -1,13 +1,10 @@
 import { Prisma } from 'prisma/generated/prisma-client';
 import { ShowDTO } from 'interfaces';
 import { showMapper } from 'lib/mappers';
-import client from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import master from 'lib/prisma_master';
 import { getAccountId, getEmailFromReq } from './userService';
-
-export const getShows = (AccountId: number) => {
-  return client.show.findMany({ where: { AccountId, IsDeleted: false } });
-};
+import { NextApiRequest } from 'next';
 
 export interface ShowPageProps {
   shows: ShowDTO[];
@@ -16,7 +13,7 @@ export interface ShowPageProps {
 export const getShowPageProps = async (ctx: any) => {
   const email = await getEmailFromReq(ctx.req);
   const accountId = await getAccountId(email);
-  const shows = await getShows(accountId);
+  const shows = await getShowsByAccountId(accountId);
 
   return {
     props: {
@@ -41,8 +38,9 @@ export type ShowWithProductions = Prisma.ShowGetPayload<{
   include: typeof showInclude;
 }>;
 
-export const getShowWithProductionsById = async (Id: number) => {
-  return await client.show.findFirst({
+export const getShowWithProductionsById = async (Id: number, req: NextApiRequest) => {
+  const prisma = await getPrismaClient(req);
+  return await prisma.show.findFirst({
     where: {
       Id,
     },
@@ -50,32 +48,18 @@ export const getShowWithProductionsById = async (Id: number) => {
   });
 };
 
-export const getShowById = async (Id: number) => {
-  return await client.show.findFirst({
+export const getShowById = async (Id: number, req: NextApiRequest) => {
+  const prisma = await getPrismaClient(req);
+  return await prisma.show.findFirst({
     where: {
       Id,
     },
   });
 };
 
-export const lookupShowCode = async (Code: string, AccountId: number) => {
-  const show = await client.show.findUnique({
-    where: {
-      AccountId_Code: {
-        Code,
-        AccountId,
-      },
-    },
-    select: {
-      Id: true,
-    },
-  });
-
-  return show ? show.Id : undefined;
-};
-
-export const getShowsByAccountId = async () => {
-  const shows = await client.show.findMany({
+export const getShowsByAccountId = async (req: NextApiRequest) => {
+  const prisma = await getPrismaClient(req);
+  const shows = await prisma.show.findMany({
     where: {
       OR: [
         {

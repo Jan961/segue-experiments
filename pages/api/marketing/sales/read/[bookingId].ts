@@ -1,7 +1,8 @@
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { TSalesView } from 'types/MarketingTypes';
-import { getEmailFromReq, checkAccess } from 'services/userService';
 import { getCurrencyFromBookingId } from 'services/venueCurrencyService';
+import { format } from 'date-fns';
+import { BOOK_STATUS_CODES } from 'types/SalesSummaryTypes';
 
 const getMapKey = ({
   FullProductionCode,
@@ -29,12 +30,9 @@ const getMapKey = ({
 
 export default async function handle(req, res) {
   try {
+    const prisma = await getPrismaClient(req);
     const BookingId = parseInt(req.query.bookingId);
-
-    const email = await getEmailFromReq(req);
-    const access = await checkAccess(email, { BookingId });
-    if (!access) return res.status(401).end();
-    const currencySymbol = (await getCurrencyFromBookingId(BookingId)) || '';
+    const currencySymbol = (await getCurrencyFromBookingId(req, BookingId)) || '';
 
     // Fetch data using Prisma Client
     const data = await prisma.salesView.findMany({
@@ -48,7 +46,15 @@ export default async function handle(req, res) {
     });
 
     const groupedData = data.reduce((acc, sale) => {
-      const key = getMapKey(sale);
+      const formattedSale = {
+        ...sale,
+        ProductionStartDate: format(sale.ProductionStartDate, 'yyyy-MM-dd'),
+        BookingFirstDate: format(sale.BookingFirstDate, 'yyyy-MM-dd'),
+        SetSalesFiguresDate: format(sale.SetSalesFiguresDate, 'yyyy-MM-dd'),
+        SetProductionWeekDate: format(sale.SetProductionWeekDate, 'yyyy-MM-dd'),
+        BookingStatusCode: BOOK_STATUS_CODES[sale.BookingStatusCode],
+      };
+      const key = getMapKey(formattedSale);
       const val = acc[key];
       if (val) {
         return {
@@ -57,7 +63,7 @@ export default async function handle(req, res) {
             ...val,
             ...(sale.SaleTypeName === 'General Sales' && {
               genSeatsSold: sale.Seats,
-              venueCurrencySymbol: sale.VenueCurrencySymbol,
+              venueCurrencySymbol: sale.VenueCurrencySymbolUnicode,
               genTotalValue: currencySymbol + sale.Value,
             }),
             ...(sale.SaleTypeName === 'General Reservations' && {
@@ -66,7 +72,7 @@ export default async function handle(req, res) {
             }),
             ...(sale.SaleTypeName === 'School Sales' && {
               schSeatsSold: sale.Seats,
-              venueCurrencySymbol: sale.VenueCurrencySymbol,
+              venueCurrencySymbol: sale.VenueCurrencySymbolUnicode,
               schTotalValue: currencySymbol + sale.Value,
             }),
             ...(sale.SaleTypeName === 'School Reservations' && {
@@ -89,7 +95,7 @@ export default async function handle(req, res) {
           genReservations: '',
           schReserved: '',
           genReserved: '',
-          venueCurrencySymbol: sale.VenueCurrencySymbol,
+          venueCurrencySymbol: sale.VenueCurrencySymbolUnicode,
           schTotalValue: '',
           genTotalValue: '',
           valueChange: '',
@@ -112,7 +118,7 @@ export default async function handle(req, res) {
           }),
           ...(sale.SaleTypeName === 'School Sales' && {
             schSeatsSold: sale.Seats,
-            venueCurrencySymbol: sale.VenueCurrencySymbol,
+            venueCurrencySymbol: sale.VenueCurrencySymbolUnicode,
             schTotalValue: currencySymbol + sale.Value,
           }),
           ...(sale.SaleTypeName === 'School Reservations' && {

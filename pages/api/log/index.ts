@@ -1,6 +1,6 @@
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
-
+let prisma = null;
 /**
  *
  * This will be a POST from loggingService which will handle the data manipulation
@@ -11,6 +11,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
  */
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
+    prisma = await getPrismaClient(req);
     if (req.body != null) {
       await prisma.log.create({
         data: {

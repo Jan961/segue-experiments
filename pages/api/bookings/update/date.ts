@@ -1,8 +1,8 @@
 import { BookingDTO, PerformanceDTO } from 'interfaces';
 import { bookingMapper, performanceMapper } from 'lib/mappers';
+import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { changeBookingDate } from 'services/bookingService';
-import { checkAccess, getEmailFromReq } from 'services/userService';
 
 export interface UpdateDateParams {
   date: string;
@@ -18,11 +18,8 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   const { bookingId, date } = req.body as UpdateDateParams;
 
   try {
-    const email = await getEmailFromReq(req);
-    const access = await checkAccess(email, { BookingId: bookingId });
-    if (!access) return res.status(401).end();
-
-    const result = await changeBookingDate(bookingId, new Date(date));
+    const prisma = await getPrismaClient(req);
+    const result = await changeBookingDate(bookingId, new Date(date), prisma);
 
     const response: UpdateDateResponse = {
       bookings: [bookingMapper(result)],

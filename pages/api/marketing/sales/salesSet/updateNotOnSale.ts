@@ -1,14 +1,14 @@
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { checkAccess, getEmailFromReq } from 'services/userService';
+
+let prisma = null;
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
     const { BookingId, SalesFigureDate, ...updatedData } = req.body;
     if (!BookingId) return res.status(400).end();
-    const email = await getEmailFromReq(req);
-    const access = await checkAccess(email, { BookingId });
-    if (!access) return res.status(401).end();
+    prisma = await getPrismaClient(req);
+
     const result = updatedData.SetNotOnSale
       ? setNotOnSale(BookingId, SalesFigureDate, updatedData)
       : removeNotOnSale(BookingId, SalesFigureDate, updatedData);

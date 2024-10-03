@@ -1,7 +1,7 @@
 import { barringIssueColumnDefs, styleProps } from 'components/bookings/table/tableConfig';
 import Button from 'components/core-ui-lib/Button';
 import Table from 'components/core-ui-lib/Table';
-import { BarredVenue } from 'pages/api/productions/venue/barred';
+import { BarredVenue } from 'components/bookings/modal/NewBooking/reducer';
 import { useEffect } from 'react';
 import { useWizard } from 'react-use-wizard';
 import { gridOptions } from '../../GapSuggest';

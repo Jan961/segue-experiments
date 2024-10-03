@@ -1,4 +1,4 @@
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -6,6 +6,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(405).end(); // Method Not Allowed
   }
   try {
+    const prisma = await getPrismaClient(req);
     const { VenueId, ...updatedData } = req.body;
     if (!VenueId) {
       return res.status(400).json({ error: 'missing required params' });
@@ -21,7 +22,5 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   } catch (error) {
     console.error('Error updating Venue:', error);
     return res.status(500).json({ error: 'Internal Server Error' });
-  } finally {
-    await prisma.$disconnect();
   }
 }

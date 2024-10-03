@@ -1,13 +1,9 @@
-import prisma from 'lib/prisma';
-import { getEmailFromReq, checkAccess } from 'services/userService';
+import getPrismaClient from 'lib/prisma';
 
 export default async function handle(req, res) {
   try {
     const bookingId = parseInt(req.body.bookingId);
-
-    const email = await getEmailFromReq(req);
-    const access = await checkAccess(email);
-    if (!access) return res.status(401).end();
+    const prisma = await getPrismaClient(req);
 
     // Fetch data using Prisma Client
     const data = await prisma.salesView.findMany({

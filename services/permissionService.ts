@@ -1,7 +1,8 @@
 import prismaMaster from 'lib/prisma_master';
-import prismaClient from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { isNullOrEmpty } from 'utils';
 import { getOrganisationIdFromReq } from './userService';
+import { NextApiRequest } from 'next';
 
 const formatAccountUsers = (data) => {
   if (!data || data.length === 0) {
@@ -39,7 +40,8 @@ function findOptionById(item, id) {
 const formatPermission = (permission) => {
   return {
     id: permission.PermissionId,
-    label: permission.PermissionName,
+    name: permission.PermissionName,
+    label: permission.PermissionDescription,
     value: permission.PermissionId,
     parentId: permission.PermissionParentPermissionId || null,
     groupHeader: !permission.PermissionParentPermissionId,
@@ -113,18 +115,23 @@ export const replaceUserPermissions = async (accountUserId: string, permissionId
   });
 };
 
-export const replaceProudctionPermissions = async (accountUserId: string, productionIds: string[]) => {
+export const replaceProudctionPermissions = async (
+  accountUserId: string,
+  productionIds: string[],
+  req: NextApiRequest,
+) => {
+  const prismaClient = await getPrismaClient(req);
   prismaClient.$transaction(async (tx) => {
-    await tx.AccountUserProduction.deleteMany({
+    await tx.accountUserProduction.deleteMany({
       where: {
-        AUPAccUserId: accountUserId,
+        AUPAccUserId: Number(accountUserId),
       },
     });
 
-    await tx.AccountUserProduction.createMany({
+    await tx.accountUserProduction.createMany({
       data: productionIds.map((productionId) => ({
-        AUPAccUserId: accountUserId,
-        AUPProductionId: productionId,
+        AUPAccUserId: Number(accountUserId),
+        AUPProductionId: Number(productionId),
       })),
     });
   });

@@ -1,6 +1,5 @@
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getEmailFromReq, checkAccess } from 'services/userService';
 import { getDealMemoCall, getPrice, getTechProvision, getContactIdData, getDealMemoHoldUpdQuery } from '../utils';
 import { omit } from 'radash';
 import { isUndefined } from 'utils';
@@ -9,9 +8,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   try {
     const BookingId: number = parseInt(req.query.BookingId as string);
 
-    const email = await getEmailFromReq(req);
-    const access = await checkAccess(email, { BookingId });
-    if (!access) return res.status(401).end();
+    const prisma = await getPrismaClient(req);
     const data = getContactIdData(req.body.formData);
 
     const updatedData = omit(data, [
@@ -92,14 +89,14 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         });
 
         // first delete DealMemoSalesEmailRecipient records with matching deal memo id
-        await prisma.DealMemoSalesEmailRecipient.deleteMany({
+        await prisma.dealMemoSalesEmailRecipient.deleteMany({
           where: {
             DMSRDeMoId: existingDealMemo.Id,
           },
         });
 
         // create records for emails attached to this deal memo now
-        await prisma.DealMemoSalesEmailRecipient.createMany({
+        await prisma.dealMemoSalesEmailRecipient.createMany({
           data: emailSalesRecipients,
         });
       }
@@ -137,7 +134,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           };
         });
         // create sales email link list
-        await prisma.DealMemoSalesEmailRecipient.createMany(emailSalesRecipients);
+        await prisma.dealMemoSalesEmailRecipient.createMany(emailSalesRecipients);
       }
     }
 

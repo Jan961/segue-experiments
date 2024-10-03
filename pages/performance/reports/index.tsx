@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { format } from 'date-fns';
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import { GetServerSideProps, InferGetServerSidePropsType, NextApiRequest } from 'next';
 import { getReportsList } from 'services/performanceReports';
 import Layout from 'components/Layout';
 import { useCallback, useState } from 'react';
@@ -110,9 +110,9 @@ export default function Reports({ reports }: InferGetServerSidePropsType<typeof 
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async () => {
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
   try {
-    const response = await getReportsList();
+    const response = await getReportsList(ctx.req as NextApiRequest);
     return {
       props: {
         reports:

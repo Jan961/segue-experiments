@@ -1,5 +1,5 @@
 import prismaMaster from 'lib/prisma_master';
-import prismaClient from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 
 import { NextApiRequest, NextApiResponse } from 'next';
 
@@ -18,9 +18,9 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       });
 
       const formattedUserPermissions = userPermissions?.AccountUserPermission.map((perm) => perm.UserAuthPermissionId);
-
+      const prismaClient = await getPrismaClient(req);
       // get prodction permissions
-      const productionPermissions = await prismaClient.AccountUserProduction.findMany({
+      const productionPermissions = await prismaClient.accountUserProduction.findMany({
         where: { AUPAccUserId: Id },
         select: { AUPProductionId: true },
       });

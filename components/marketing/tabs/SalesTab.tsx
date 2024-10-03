@@ -68,7 +68,7 @@ const SalesTab = forwardRef<SalesTabRef, SalesTabProps>((props, ref) => {
       return (
         <div>
           {showError ? (
-            <div>No sales figures to show.</div>
+            <div data-testid="no-sales-figures-msg">No sales figures to show.</div>
           ) : (
             <SalesTable
               containerHeight="h-auto"

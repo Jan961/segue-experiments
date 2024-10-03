@@ -13,11 +13,11 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       res.status(400).json({ error: 'Invalid Production ID provided' });
     }
     // Find DateBlock for ProductionID that isPrimary
-    const primaryDateBlock = await getDateBlockForProduction(productionID, true);
+    const primaryDateBlock = await getDateBlockForProduction(productionID, true, req);
     const primaryDateBlockID = primaryDateBlock[0].Id;
 
     // Delete all associated Bookings/Rehearsals/GetInFitUp/Other events for that Primary Date Block - to be replaced.
-    await deleteAllDateBlockEvents(primaryDateBlockID);
+    await deleteAllDateBlockEvents(primaryDateBlockID, req);
 
     res.status(200).json({ status: 'Success' });
   } catch (err) {

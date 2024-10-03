@@ -1,8 +1,10 @@
 import { performanceMapper } from 'lib/mappers';
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
+import { NextApiRequest } from 'next';
 import { dateToSimple, getTimeFromDateAndTime } from 'services/dateService';
 
-export const getPerformanceCompAllocationsByBookingId = async (bookingId: number) => {
+export const getPerformanceCompAllocationsByBookingId = async (bookingId: number, req: NextApiRequest) => {
+  const prisma = await getPrismaClient(req);
   const performanceRaw = await prisma.performance.findMany({
     where: {
       BookingId: bookingId,

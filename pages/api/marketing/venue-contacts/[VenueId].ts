@@ -1,8 +1,9 @@
 import { venueContactMapper } from 'lib/mappers';
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 
 export default async function handle(req, res) {
   try {
+    const prisma = await getPrismaClient(req);
     const VenueId = parseInt(req.query.VenueId);
     const results = await prisma.venueContact.findMany({
       where: {

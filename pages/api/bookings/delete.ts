@@ -1,25 +1,21 @@
 import { deleteBookingById, deleteRehearsalById, deleteGetInFitUpById, deleteOtherById } from 'services/bookingService';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { checkAccess, getEmailFromReq } from 'services/userService';
+import getPrismaClient from 'lib/prisma';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
     const bookings = req.body;
-
-    const email = await getEmailFromReq(req);
-    const access = await checkAccess(email);
-    if (!access) return res.status(401).end();
-
+    const prisma = await getPrismaClient(req);
     await Promise.all(
       bookings.map(async (booking) => {
         if (booking.isRehearsal) {
-          await deleteRehearsalById(booking.id);
+          await deleteRehearsalById(booking.id, prisma);
         } else if (booking.isBooking) {
-          await deleteBookingById(booking.id);
+          await deleteBookingById(booking.id, prisma);
         } else if (booking.isGetInFitUp) {
-          await deleteGetInFitUpById(booking.id);
+          await deleteGetInFitUpById(booking.id, prisma);
         } else {
-          await deleteOtherById(booking.id);
+          await deleteOtherById(booking.id, prisma);
         }
       }),
     );
