@@ -1,4 +1,4 @@
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import { GetServerSideProps, InferGetServerSidePropsType, NextApiRequest } from 'next';
 import Layout from 'components/Layout';
 import { InitialState } from 'lib/recoil';
 import { getProductionJumpState } from 'utils/getProductionJumpState';
@@ -69,10 +69,12 @@ export default TasksPage;
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const AccountId = await getAccountIdFromReq(ctx.req);
   const productionJump = await getProductionJumpState(ctx, 'tasks');
-  const productionsWithTasks = await getProductionsAndTasks(AccountId);
+  const productionsWithTasks = await getProductionsAndTasks(ctx.req as NextApiRequest);
+
   const users = await getUsers(AccountId);
 
   const productions: ProductionsWithTasks[] = mapToProductionTasksDTO(productionsWithTasks);
+  console.log(productions[0].Tasks[4]);
   const initialState: InitialState = {
     global: {
       productionJump,

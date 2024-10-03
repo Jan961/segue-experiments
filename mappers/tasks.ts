@@ -16,6 +16,7 @@ export const mapToProductionTasksDTO = (productionTasks): ProductionsWithTasks[]
         StartDate: t.WeekNumToDateMap[task.StartByWeekNum],
         CompleteDate: t.WeekNumToDateMap[task.CompleteByWeekNum],
         Status: calculateTaskStatus(task.Progress || 0),
+        TaskCompletedDate: task.TaskCompletedDate?.toISOString() || '',
       }))
       .sort((a, b) => a.StartByWeekNum - b.StartByWeekNum),
     weekNumToDateMap: t.WeekNumToDateMap,
