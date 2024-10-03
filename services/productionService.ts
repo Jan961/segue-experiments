@@ -219,7 +219,7 @@ export const getProductionsAndTasks = async (req: NextApiRequest, ProductionId?:
       ProductionTask: production.ProductionTask.map((task) => {
         const tempTask = {
           ...task,
-          TaskCompletedDate: task.TaskCompletedDate != null ? task.TaskCompletedDate.toISOString() : null,
+          TaskCompletedDate: task.TaskCompletedDate ? task.TaskCompletedDate.toISOString() : null,
           TaskRepeatFromWeekNum: task.ProductionTaskRepeat?.FromWeekNum || null,
           TaskRepeatToWeekNum: task.ProductionTaskRepeat?.ToWeekNum || null,
           RepeatInterval: task.ProductionTaskRepeat?.Interval || null,

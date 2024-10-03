@@ -1,13 +1,10 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getMasterTasksList } from 'services/TaskService';
 import { loggingService } from 'services/loggingService';
-import { getAccountId, getEmailFromReq } from 'services/userService';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const email = await getEmailFromReq(req);
-    const AccountId = await getAccountId(email);
-    const result = await getMasterTasksList(AccountId);
+    const result = await getMasterTasksList(req);
 
     res.status(200).json(result);
   } catch (err) {
