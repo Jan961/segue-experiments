@@ -1,22 +1,20 @@
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getEmailFromReq, checkAccess } from 'services/userService';
+
 import { getFileUrl } from 'lib/s3';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
     const { VenueId } = req.body;
-    const email = await getEmailFromReq(req);
-    const access = await checkAccess(email, {});
-    if (!access) return res.status(401).end();
+    const prisma = await getPrismaClient(req);
 
     const venueFiles = (
-      await prisma.VenueFile.findMany({
+      await prisma.venueFile.findMany({
         where: { VenueId, Type: 'Tech Specs' },
         select: { FileId: true },
       })
     ).map((file) => file.FileId);
-    const fileInfo = await prisma.File.findMany({
+    const fileInfo = await prisma.file.findMany({
       where: { Id: { in: venueFiles } },
       select: { OriginalFilename: true, MediaType: true, Location: true, UploadDateTime: true, Id: true },
     });

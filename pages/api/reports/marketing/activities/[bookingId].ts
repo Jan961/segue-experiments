@@ -1,43 +1,12 @@
 import ExcelJS from 'exceljs';
 import moment from 'moment';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getActivitiesByBookingId } from 'pages/api/marketing/activities/[BookingId]';
+import { getActivitiesByBookingId } from 'services/bookingService';
 import { sum } from 'radash';
 import { createHeaderRow } from 'services/marketing/reports';
 import { addWidthAsPerContent } from 'services/reportsService';
 import { COLOR_HEXCODE, applyFormattingToRange } from 'services/salesSummaryService';
 import { convertToPDF } from 'utils/report';
-
-interface ActivityType {
-  Name: string;
-  Id: number;
-}
-
-interface Activity {
-  Id: number;
-  BookingId: number;
-  Date: string;
-  Name: string | null;
-  ActivityTypeId: number;
-  CompanyCost: string;
-  VenueCost: string;
-  FollowUpRequired: boolean;
-  DueByDate: string;
-  Notes: string;
-}
-
-interface ResponseData {
-  activityTypes: ActivityType[];
-  activities: Activity[];
-  info: {
-    TicketsOnSale: boolean;
-    TicketsOnSaleFromDate: string | null;
-    MarketingPlanReceived: boolean;
-    ContactInfoReceived: boolean;
-    PrintReqsReceived: boolean;
-    OnSaleDate: string;
-  };
-}
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { bookingId, format } = req.query || {};
@@ -52,7 +21,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     throw new Error('Required params are missing');
   }
 
-  const data: ResponseData = await getActivitiesByBookingId(parseInt(bookingId as string, 10));
+  const data = await getActivitiesByBookingId(parseInt(bookingId as string, 10), req);
 
   const workbook = new ExcelJS.Workbook();
   const worksheet = workbook.addWorksheet('Marketing Activities');
@@ -92,8 +61,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       activityTypeMap.get(activity.ActivityTypeId) || '',
       activity.Date ? moment(activity.Date).format('DD/MM/YY') : '',
       activity.FollowUpRequired,
-      parseInt(activity.CompanyCost, 10) || 0,
-      parseInt(activity.VenueCost, 10) || 0,
+      activity.CompanyCost,
+      activity.VenueCost,
       activity.Notes,
     ]);
     row.eachCell((cell, colNumber) => {
@@ -109,8 +78,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   });
   worksheet.addRow([]);
   currentRowNum++;
-  const totalCompanyCost = sum(data.activities, (activity) => parseInt(activity.CompanyCost, 10) || 0);
-  const totalVenueCost = sum(data.activities, (activity) => parseInt(activity.VenueCost, 10) || 0);
+  const totalCompanyCost = sum(data.activities, (activity) => activity.CompanyCost);
+  const totalVenueCost = sum(data.activities, (activity) => activity.VenueCost);
   worksheet.addRow(['', '', '', 'Total', totalCompanyCost, totalVenueCost]);
   currentRowNum++;
   worksheet.addRow([]);

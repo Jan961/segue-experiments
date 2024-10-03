@@ -1,10 +1,11 @@
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { AddBookingsParams } from '../interface/add.interface'; // Adjust the import path as needed
 import { bookingMapper, performanceMapper, otherMapper, getInFitUpMapper, rehearsalMapper } from 'lib/mappers';
 import { createGetInFitUp, createNewBooking, createNewRehearsal, createOtherBooking } from 'services/bookingService';
+import { NextApiRequest } from 'next';
 
 export class BookingService {
-  static async createBookings(bookingsData: AddBookingsParams[]) {
+  static async createBookings(bookingsData: AddBookingsParams[], req: NextApiRequest) {
     const promises = [];
     const bookings = [];
     let performances = [];
@@ -14,7 +15,7 @@ export class BookingService {
 
     const orderMap = new Map();
     let counter = 1;
-
+    const prisma = await getPrismaClient(req);
     await prisma.$transaction(async (tx) => {
       for (const bookingData of bookingsData) {
         const {

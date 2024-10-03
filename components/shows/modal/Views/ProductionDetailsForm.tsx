@@ -228,9 +228,7 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
                 />
                 {validationErrors.prodCode && <small className="text-red-400">{validationErrors.prodCode}</small>}
               </div>
-              <Tooltip
-                body="The Production Code should be unique to this particular Production and be recognisable. For example, a Production touring in 2025 could have the Production Code 25."
-              >
+              <Tooltip body="The Production Code should be unique to this particular Production and be recognisable. For example, a Production touring in 2025 could have the Production Code 25.">
                 <Icon
                   className={isNullOrEmpty(validationErrors.prodCode) ? '' : '-mt-4'}
                   iconName="info-circle-solid"

@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { getAccountId, getEmailFromReq } from 'services/userService';
 import { createVenue } from 'services/venueService';
 import { mapVenueContactToPrisma } from 'utils/venue';
@@ -84,6 +84,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       Email: deliveryEMail,
     };
     try {
+      const prisma = await getPrismaClient(req);
       const venue = await prisma.$transaction(async (tx) => {
         return createVenue(
           tx,

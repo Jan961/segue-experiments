@@ -1,16 +1,12 @@
 import { loggingService } from 'services/loggingService';
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { ActivityDTO } from 'interfaces';
-import { getEmailFromReq, checkAccess } from 'services/userService';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
     const data = req.body as ActivityDTO;
-
-    const email = await getEmailFromReq(req);
-    const access = await checkAccess(email, { ActivityId: data.Id });
-    if (!access) return res.status(401).end();
+    const prisma = await getPrismaClient(req);
 
     await prisma.bookingActivity.delete({
       where: {

@@ -1,10 +1,11 @@
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { IOtherWorkType, IPersonDetails } from 'components/contracts/types';
 import { prepareQuery } from 'utils/apiUtils';
 import { Person, Prisma } from 'prisma/generated/prisma-client';
 import { upsertAddress } from './address';
 import { pick } from 'radash';
 import { isNullOrEmpty } from 'utils';
+import { NextApiRequest } from 'next';
 
 export const addressFields = ['address1', 'address2', 'address3', 'postcode', 'town', 'country'];
 export const organisationFields = ['name', 'website'];
@@ -36,7 +37,7 @@ export const preparePersonUpdateData = async (personDetails: Partial<IPersonDeta
   return personQuery;
 };
 
-export const updatePerson = async (id: number, personDetails: any, tx = prisma) => {
+export const updatePerson = async (id: number, personDetails: any, tx) => {
   return tx.person.update({
     where: { PersonId: id },
     data: personDetails,
@@ -70,7 +71,8 @@ export type PersonWithRoles = Prisma.PersonGetPayload<{
   include: typeof personInclude;
 }>;
 
-export const getPersonById = async (id: number): Promise<PersonWithRoles> => {
+export const getPersonById = async (id: number, req: NextApiRequest): Promise<PersonWithRoles> => {
+  const prisma = await getPrismaClient(req);
   return prisma.person.findUnique({
     where: { PersonId: Number(id) },
     include: {
@@ -103,7 +105,7 @@ export const getPersonById = async (id: number): Promise<PersonWithRoles> => {
   });
 };
 
-export const upsertPerson = async (personDetails, salaryAccountDetails, expenseAccountDetails, tx = prisma) => {
+export const upsertPerson = async (personDetails, salaryAccountDetails, expenseAccountDetails, tx) => {
   const { id, addressId, firstName, lastName, email, mobileNumber, landline, otherWorkTypes, workType } = personDetails;
 
   const addressDetails = pick(personDetails, addressFields);
@@ -157,7 +159,7 @@ export const updatePersonRoles = async (
   personId: number,
   workTypes: number[],
   otherWorkTypes: IOtherWorkType[],
-  tx = prisma,
+  tx,
 ) => {
   // Update PersonPersonRole
   if (workTypes) {
@@ -186,7 +188,7 @@ export const updatePersonRoles = async (
   }
 };
 
-export const handleEmergencyContacts = async (personId: number, emergencyContact1, emergencyContact2, tx = prisma) => {
+export const handleEmergencyContacts = async (personId: number, emergencyContact1, emergencyContact2, tx) => {
   if (!isNullOrEmpty(emergencyContact1)) {
     await upsertEmergencyContact(personId, emergencyContact1, 'emergencycontact', tx);
   }
@@ -195,12 +197,7 @@ export const handleEmergencyContacts = async (personId: number, emergencyContact
   }
 };
 
-export const upsertEmergencyContact = async (
-  personId: number,
-  contactDetails,
-  role = 'emergencycontact',
-  tx = prisma,
-) => {
+export const upsertEmergencyContact = async (personId: number, contactDetails, role = 'emergencycontact', tx) => {
   const { id, addressId, firstName, lastName, email, mobileNumber, landline } = contactDetails;
   const address = await upsertAddress(addressId, pick(contactDetails, addressFields), tx);
   const contactData = {
@@ -237,7 +234,7 @@ export const upsertEmergencyContact = async (
   });
 };
 
-export const handleAgencyDetails = async (personId: number, agencyDetails, tx = prisma) => {
+export const handleAgencyDetails = async (personId: number, agencyDetails, tx) => {
   if (!agencyDetails) return;
 
   const agencyPersonId = agencyDetails.agencyPersonId || 0;

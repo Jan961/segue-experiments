@@ -1,7 +1,8 @@
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 
 export default async function handle(req, res) {
   try {
+    const prisma = await getPrismaClient(req);
     const dbField = req.body.field === 'seats' ? `Set${req.body.type}Seats` : `Set${req.body.type}Value`;
 
     let data = null;

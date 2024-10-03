@@ -11,7 +11,7 @@ import {
   getUniqueVenueCountrylist,
   getUniqueVenueTownlist,
 } from 'services/venueService';
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import { GetServerSideProps, InferGetServerSidePropsType, NextApiRequest } from 'next';
 import { getProductionJumpState } from 'utils/getProductionJumpState';
 import axios from 'axios';
 import { defaultVenueFilters } from 'config/bookings';
@@ -136,12 +136,12 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const results = await Promise.allSettled([
     getProductionJumpState(ctx, 'bookings'),
-    getUniqueVenueTownlist(),
-    getUniqueVenueCountrylist(),
+    getUniqueVenueTownlist(ctx.req as NextApiRequest),
+    getUniqueVenueCountrylist(ctx.req as NextApiRequest),
     getAllCurrencyList(),
-    getAllVenueFamilyList(),
-    getAllVenuesMin(),
-    getAllVenueRoles(),
+    getAllVenueFamilyList(ctx.req as NextApiRequest),
+    getAllVenuesMin(ctx.req as NextApiRequest),
+    getAllVenueRoles(ctx.req as NextApiRequest),
   ]);
 
   const productionJump = results[0].status === 'fulfilled' ? results[0].value : intialProductionJumpState;

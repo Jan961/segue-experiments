@@ -1,13 +1,14 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import client from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method not allowed' });
   }
   try {
+    const prisma = await getPrismaClient(req);
     const { currencyCodeList } = req.body;
-    const results = await client.Country.findMany({
+    const results = await prisma.country.findMany({
       where: {
         CurrencyCode: {
           in: currencyCodeList,

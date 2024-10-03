@@ -5,7 +5,7 @@ import AddEditUser from 'components/admin/modals/AddEditUser';
 import AddEditPermissionGroup from 'components/admin/modals/AddEditPermissionGroup';
 import Layout from 'components/Layout';
 import { useEffect, useRef, useState } from 'react';
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import { GetServerSideProps, InferGetServerSidePropsType, NextApiRequest } from 'next';
 import { getPermissionGroupsList, getPermissionsList } from 'services/permissionService';
 import { getAllProductions } from 'services/productionService';
 import { useRouter } from 'next/router';
@@ -270,7 +270,7 @@ export default function Users({
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const permisisonGroups = await getPermissionGroupsList(ctx.req);
   const permissionsList = await getPermissionsList();
-  const productions = await getAllProductions();
+  const productions = await getAllProductions(ctx.req as NextApiRequest);
 
   const formattedProductions = productions
     .map((t: any) => {

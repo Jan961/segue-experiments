@@ -12,10 +12,10 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       let searchResults = [];
       const stops: DistanceParams = req.body;
       if (stops?.length === 1) {
-        const result = await getDistance(stops[0]);
+        const result = await getDistance(stops[0], req);
         searchResults = [result];
       } else {
-        searchResults = await getDistances(stops);
+        searchResults = await getDistances(stops, req);
       }
 
       res.json(searchResults);

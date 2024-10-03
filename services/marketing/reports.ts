@@ -1,7 +1,9 @@
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
+import { NextApiRequest } from 'next';
 import { COLOR_HEXCODE } from 'services/salesSummaryService';
 
-export const getProductionAndVenueDetailsFromBookingId = async (bookingId: number) => {
+export const getProductionAndVenueDetailsFromBookingId = async (bookingId: number, req: NextApiRequest) => {
+  const prisma = await getPrismaClient(req);
   const result = await prisma.scheduleView.findFirst({
     where: {
       EntryType: 'Booking',

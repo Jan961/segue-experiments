@@ -1,4 +1,4 @@
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import ReactPDF from '@react-pdf/renderer';
 import master from 'lib/prisma_master';
@@ -22,11 +22,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
+    const prisma = await getPrismaClient(req);
     const contractId = Number(id);
-    const contractData = await getContractDataById(contractId);
+    const contractData = await getContractDataById(contractId, req);
     const contractDetails = transformContractResponse(contractData);
     const contractSchedule = pick(contractDetails, ['production', 'department', 'personId', 'role']);
-    const productionDetails = await prisma.Production.findUnique({
+    const productionDetails = await prisma.production.findUnique({
       where: {
         Id: contractSchedule.production,
       },
@@ -40,7 +41,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       },
     });
     const showName = `${productionDetails?.Show?.Code}${productionDetails?.Code} ${productionDetails.Show?.Name}`;
-    const person = await getPersonById(Number(contractSchedule.personId));
+    const person = await getPersonById(Number(contractSchedule.personId), req);
     const personDetails = await transformPersonWithRoles(person);
     const schedule = contractDetails?.contractDetails?.accScheduleJson as IScheduleDay[];
     const reportStream = await ReactPDF.renderToStream(

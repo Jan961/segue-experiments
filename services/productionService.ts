@@ -1,13 +1,13 @@
-import client from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import master from 'lib/prisma_master';
 import { Prisma } from 'prisma/generated/prisma-client';
-import { showProductionMapper, productionEditorMapper } from 'lib/mappers';
-import { getShowWithProductionsById } from './showService';
-import { getAccountId, getEmailFromReq } from './userService';
+import { productionEditorMapper } from 'lib/mappers';
+
 import { ProductionDTO, UICurrency } from 'interfaces';
 import { getProductionsByStartDate } from 'utils/getProductionsByStartDate';
 import { getWeekNumsToDateMap } from 'utils/getDateFromWeekNum';
 import { omit } from 'radash';
+import { NextApiRequest } from 'next';
 
 // Edit Production Page
 const productionDateBlockInclude = Prisma.validator<Prisma.ProductionSelect>()({
@@ -23,36 +23,30 @@ const productionDateBlockInclude = Prisma.validator<Prisma.ProductionSelect>()({
   },
 });
 
-export const getActiveProductions = async () => {
-  const productions = await client.production.findMany({
+export const getActiveProductions = async (req: NextApiRequest) => {
+  const prisma = await getPrismaClient(req);
+  const productions = await prisma.production.findMany({
     where: {
       IsArchived: false,
     },
     include: productionDateBlockInclude,
   });
 
-  // const currencyList = productions.flatMap(({ ConversionRate }) => ConversionRate.map(({ ToCurrencyCode, FromCurrencyCode }) => [FromCurrencyCode, ToCurrencyCode]));
-  // const currencyData = await master.Currency({
-  //   where: {
-  //     CurrencyCode: {
-  //       in: currencyList
-  //     }
-  //   }
-  // })
-  // const currencyMap = objectify(currencyData, (c: Currency)=>c.CurrencyCode, c=>c);
   return getProductionsByStartDate(productions);
 };
 
-export const getRegionlist = async () => {
-  return await client.region.findMany({});
+export const getRegionlist = async (req: NextApiRequest) => {
+  const prisma = await getPrismaClient(req);
+  return await prisma.region.findMany({});
 };
 
 export interface AllProductionPageProps {
   productions: ProductionDTO[];
 }
 
-export const getAllProductionPageProps = async () => {
-  const productionsRaw = await client.Production.findMany({
+export const getAllProductionPageProps = async (req: NextApiRequest) => {
+  const prisma = await getPrismaClient(req);
+  const productionsRaw = await prisma.production.findMany({
     include: {
       Show: true,
       DateBlock: true,
@@ -64,46 +58,8 @@ export const getAllProductionPageProps = async () => {
   return { props: { productions } };
 };
 
-export const getProductionPageProps = async (ctx: any) => {
-  const { ShowCode } = ctx.params;
-  const email = await getEmailFromReq(ctx.req);
-  const AccountId = await getAccountId(email);
-
-  const showRaw = await client.show.findFirst({
-    where: {
-      Code: ShowCode,
-      AccountId,
-    },
-    select: {
-      Id: true,
-      Code: true,
-    },
-  });
-
-  if (!showRaw) return { notFound: true, props: { productions: [], code: '', name: '' } };
-
-  const show = await getShowWithProductionsById(showRaw.Id);
-  const productions = showProductionMapper(show);
-
-  return { props: { productions, code: show.Code, name: show.Name } };
-};
-
-export const lookupProductionId = async (ShowCode: string, ProductionCode: string, AccountId: number) => {
-  return client.production.findFirst({
-    where: {
-      Code: ProductionCode as string,
-      Show: {
-        Code: ShowCode as string,
-        AccountId,
-      },
-    },
-    select: {
-      Id: true,
-    },
-  });
-};
-
-export const getAllProductions = async () => {
+export const getAllProductions = async (req: NextApiRequest) => {
+  const prisma = await getPrismaClient(req);
   // TODO: convert this to lookup.
   const productionCompanyList = await master.ProductionCompany.findMany({
     orderBy: {
@@ -111,7 +67,7 @@ export const getAllProductions = async () => {
     },
   });
 
-  const productions = await client.production.findMany({
+  const productions = await prisma.production.findMany({
     select: {
       Id: true,
       Code: true,
@@ -144,8 +100,9 @@ export const getAllProductions = async () => {
   return getProductionsByStartDate(productionList);
 };
 
-export const getProductionsByShowCode = (Code: string) => {
-  return client.production.findMany({
+export const getProductionsByShowCode = async (Code: string, req: NextApiRequest) => {
+  const prisma = await getPrismaClient(req);
+  return prisma.production.findMany({
     where: {
       Show: {
         Code,
@@ -190,8 +147,9 @@ export type ProductionContent = Prisma.ProductionGetPayload<{
   include: typeof productionContentInclude;
 }>;
 
-export const getProductionWithContent = async (Id: number) => {
-  return await client.production.findUnique({
+export const getProductionWithContent = async (Id: number, req: NextApiRequest) => {
+  const prisma = await getPrismaClient(req);
+  return await prisma.production.findUnique({
     where: {
       Id,
     },
@@ -199,8 +157,9 @@ export const getProductionWithContent = async (Id: number) => {
   });
 };
 
-export const getProductionsWithContent = async (Id?: number, excludeArchived = true) => {
-  const productions = await client.production.findMany({
+export const getProductionsWithContent = async (req: NextApiRequest, Id?: number, excludeArchived = true) => {
+  const prisma = await getPrismaClient(req);
+  const productions = await prisma.production.findMany({
     where: {
       ...(Id && { Id }),
       ...(excludeArchived && { IsArchived: false }),
@@ -215,8 +174,9 @@ export type ProductionWithDateblocks = Prisma.ProductionGetPayload<{
   include: typeof productionDateBlockInclude;
 }>;
 
-export const getProductionById = async (Id: number) => {
-  return await client.production.findUnique({
+export const getProductionById = async (Id: number, req: NextApiRequest) => {
+  const prisma = await getPrismaClient(req);
+  return await prisma.production.findUnique({
     where: {
       Id,
     },
@@ -224,8 +184,9 @@ export const getProductionById = async (Id: number) => {
   });
 };
 
-export const getProductionsAndTasks = async (AccountId: number, ProductionId?: number) => {
-  let productionsWithTasks = await client.Production.findMany({
+export const getProductionsAndTasks = async (req: NextApiRequest, ProductionId?: number) => {
+  const prisma = await getPrismaClient(req);
+  const productionsWithTasks = await prisma.production.findMany({
     where: {
       IsArchived: false,
       ...(ProductionId && { Id: ProductionId }),
@@ -250,13 +211,15 @@ export const getProductionsAndTasks = async (AccountId: number, ProductionId?: n
       },
     },
   });
-  productionsWithTasks = productionsWithTasks.map((production) => {
+
+  let results = null;
+  results = productionsWithTasks.map((production) => {
     return {
       ...production,
       ProductionTask: production.ProductionTask.map((task) => {
         const tempTask = {
           ...task,
-          TaskCompletedDate: task.TaskCompletedDate != null ? task.TaskCompletedDate.toISOString() : null,
+          TaskCompletedDate: task.TaskCompletedDate ? task.TaskCompletedDate.toISOString() : null,
           TaskRepeatFromWeekNum: task.ProductionTaskRepeat?.FromWeekNum || null,
           TaskRepeatToWeekNum: task.ProductionTaskRepeat?.ToWeekNum || null,
           RepeatInterval: task.ProductionTaskRepeat?.Interval || null,
@@ -266,21 +229,26 @@ export const getProductionsAndTasks = async (AccountId: number, ProductionId?: n
     };
   });
 
-  productionsWithTasks = productionsWithTasks.map((production) => {
+  results = productionsWithTasks.map((production) => {
     const { StartDate, EndDate } = production.DateBlock.find((DateBlock) => DateBlock.Name === 'Production') || {};
     const weekNumsList = production.ProductionTask.map((ProductionTask) => [
       ProductionTask.CompleteByWeekNum,
       ProductionTask.StartByWeekNum,
     ]).flat();
-    const WeekNumToDateMap = getWeekNumsToDateMap(StartDate, EndDate, Array.from(new Set(weekNumsList)));
+    const WeekNumToDateMap = getWeekNumsToDateMap(
+      StartDate.toISOString(),
+      EndDate.toISOString(),
+      Array.from(new Set(weekNumsList)),
+    );
     return { ...production, WeekNumToDateMap };
   });
-  return getProductionsByStartDate(productionsWithTasks);
+  return getProductionsByStartDate(results);
 };
 
-export const getAllProductionRegions = async () => {
+export const getAllProductionRegions = async (req: NextApiRequest) => {
   try {
-    return client.ProductionRegion.findMany({
+    const prisma = await getPrismaClient(req);
+    return prisma.productionRegion.findMany({
       orderBy: {
         PRProductionId: 'asc',
       },

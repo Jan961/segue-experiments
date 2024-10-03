@@ -1,4 +1,4 @@
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
@@ -11,6 +11,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   const query = `SELECT * FROM \`VenueBarredVenue\` WHERE VenueId = ${venueID} AND BarredVenueId = ${barredVenueId};`;
 
   try {
+    const prisma = await getPrismaClient(req);
     const result = await prisma.$queryRawUnsafe(`${query}`);
     res.status(200).json(result);
   } catch (e) {

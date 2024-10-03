@@ -21,7 +21,7 @@ export const CreateGifuPanel = ({ finish }: CreateGifuPanelProps) => {
   const [gifuDict, setGifuDict] = useRecoilState(getInFitUpState);
 
   const createGifu = async () => {
-    const newDate: CreateGifuParams = { DateBlockId, Date: selectedDate, VenueId: venueId };
+    const newDate: CreateGifuParams = { DateBlockId, Date: selectedDate, VenueId: venueId, RunTag: 'GIFU' };
     const { data } = await axios.post('/api/gifu/create', newDate);
     const newState = { ...gifuDict, [data.Id]: data };
     setGifuDict(newState);

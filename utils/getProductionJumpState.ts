@@ -1,4 +1,5 @@
 import { dateBlockMapper } from 'lib/mappers';
+import { NextApiRequest } from 'next';
 import { ParsedUrlQuery } from 'querystring';
 // import { pick } from 'radash';
 import { dateTimeToTime } from 'services/dateService';
@@ -12,8 +13,8 @@ interface Params extends ParsedUrlQuery {
 
 export const getProductionJumpState = async (ctx, path: string): Promise<ProductionJump> => {
   const { ProductionCode, ShowCode } = (ctx.params || {}) as Params;
-  const productionsRaw = await getAllProductions();
-  const allProductionRegions: any = await getAllProductionRegions();
+  const productionsRaw = await getAllProductions(ctx.req as NextApiRequest);
+  const allProductionRegions: any = await getAllProductionRegions(ctx.req as NextApiRequest);
   const selectedProduction = productionsRaw.find(
     (production: any) => production.Code === ProductionCode && production.Show.Code === ShowCode,
   );
@@ -40,7 +41,7 @@ export const getProductionJumpState = async (ctx, path: string): Promise<Product
           RunningTime: t.RunningTime ? dateTimeToTime(t.RunningTime.toISOString()) : null,
           RunningTimeNote: t.RunningTimeNote,
           SalesFrequency: t.SalesFrequency,
-          ProductionCompany: t.ProductionCompany,
+          ProductionCompany: t.ProductionCompany || '',
           SalesEmail: t.SalesEmail,
         };
       })

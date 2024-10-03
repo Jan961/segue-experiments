@@ -1,5 +1,3 @@
-import prisma from 'lib/prisma';
-
 export type ConversionRateUpdate = {
   id?: number;
   fromCurrencyCode?: string;
@@ -8,7 +6,7 @@ export type ConversionRateUpdate = {
   rate: number;
 };
 
-export const updateConversionRateById = async (tx = prisma, { id, rate }: ConversionRateUpdate) => {
+export const updateConversionRateById = async (tx, { id, rate }: ConversionRateUpdate) => {
   return tx.conversionRate.update({
     where: { Id: id },
     data: { Rate: rate },
@@ -16,7 +14,7 @@ export const updateConversionRateById = async (tx = prisma, { id, rate }: Conver
 };
 
 export const updateConversionRateByDetails = async (
-  tx = prisma,
+  tx,
   { fromCurrencyCode, toCurrencyCode, productionId, rate }: ConversionRateUpdate,
 ) => {
   return tx.conversionRate.updateMany({

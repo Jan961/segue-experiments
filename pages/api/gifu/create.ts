@@ -1,25 +1,23 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { getInFitUpMapper } from 'lib/mappers';
-import { checkAccess, getEmailFromReq } from 'services/userService';
 
 export interface CreateGifuParams {
   DateBlockId: number;
   Date: string;
   VenueId: number;
+  RunTag: string;
 }
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
     const gifu = req.body as CreateGifuParams;
     const { DateBlockId, VenueId } = gifu;
-
-    const email = await getEmailFromReq(req);
-    const access = await checkAccess(email, { DateBlockId });
-    if (!access) return res.status(401).end();
+    const prisma = await getPrismaClient(req);
 
     const result = await prisma.getInFitUp.create({
       data: {
+        RunTag: gifu.RunTag,
         Date: new Date(gifu.Date),
         DateBlock: {
           connect: {

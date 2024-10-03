@@ -3,7 +3,7 @@ import { SalesEntryRef } from 'components/marketing/activity/GlobalActivityView'
 import SalesEntryFilters from 'components/marketing/SalesEntryFilters';
 import { bookingMapperWithVenue, venueRoleMapper } from 'lib/mappers';
 import { InitialState } from 'lib/recoil';
-import { GetServerSideProps } from 'next';
+import { GetServerSideProps, NextApiRequest } from 'next';
 import { objectify } from 'radash';
 import { useRef } from 'react';
 import { getSaleableBookings } from 'services/bookingService';
@@ -46,15 +46,15 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   let initialState: InitialState = null;
 
   if (productionId !== null) {
-    const bookings = await getSaleableBookings(productionId);
-    const venueRoles = await getRoles();
+    const bookings = await getSaleableBookings(productionId, ctx.req as NextApiRequest);
+    const venueRoles = await getRoles(ctx.req as NextApiRequest);
     const selected = null;
     const bookingJump: BookingJump = {
       selected,
       bookings: bookings.map(bookingMapperWithVenue),
     };
-    const townList = await getUniqueVenueTownlist();
-    const venues = await getAllVenuesMin();
+    const townList = await getUniqueVenueTownlist(ctx.req as NextApiRequest);
+    const venues = await getAllVenuesMin(ctx.req as NextApiRequest);
 
     const venue = objectify(
       venues,

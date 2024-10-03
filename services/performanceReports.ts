@@ -1,9 +1,11 @@
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { getDuration } from './dateService';
 import { getFileUrlFromLocation } from 'utils/fileUpload';
+import { NextApiRequest } from 'next';
 
-export const getReportsList = async () => {
-  return prisma.PerformanceReport.findMany({
+export const getReportsList = async (req: NextApiRequest) => {
+  const prisma = await getPrismaClient(req);
+  return prisma.performanceReport.findMany({
     select: {
       Id: true,
       // CreatedAt: true,
@@ -45,8 +47,9 @@ export const getReportsList = async () => {
   });
 };
 
-export const getPerformanceReportById = async (Id: number) => {
-  return prisma.PerformanceReport.findFirst({
+export const getPerformanceReportById = async (Id: number, req: NextApiRequest) => {
+  const prisma = await getPrismaClient(req);
+  return prisma.performanceReport.findFirst({
     where: {
       Id,
     },

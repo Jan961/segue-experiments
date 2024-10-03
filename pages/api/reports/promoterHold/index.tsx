@@ -1,4 +1,4 @@
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 
 /**
 Parameters = ProductionId & ", "
@@ -16,6 +16,7 @@ export default async function handle(req, res) {
   const query = `call GetPromoterHolds(${ProductionId}, ${VenueID},${fromDate},${toDate})`;
 
   try {
+    const prisma = await getPrismaClient(req);
     const result = await prisma.$queryRawUnsafe(`${query}`);
     // console.log(result)
     return res.status(200).json(result);
