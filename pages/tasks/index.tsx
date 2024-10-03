@@ -74,7 +74,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const users = await getUsers(AccountId);
 
   const productions: ProductionsWithTasks[] = mapToProductionTasksDTO(productionsWithTasks);
-  console.log(productions[0].Tasks[4]);
+
   const initialState: InitialState = {
     global: {
       productionJump,
