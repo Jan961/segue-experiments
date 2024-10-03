@@ -40,7 +40,8 @@ function findOptionById(item, id) {
 const formatPermission = (permission) => {
   return {
     id: permission.PermissionId,
-    label: permission.PermissionName,
+    name: permission.PermissionName,
+    label: permission.PermissionDescription,
     value: permission.PermissionId,
     parentId: permission.PermissionParentPermissionId || null,
     groupHeader: !permission.PermissionParentPermissionId,
