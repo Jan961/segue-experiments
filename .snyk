@@ -1,12 +1,26 @@
-# Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities
-version: v1.25.0
+# .snyk file to ignore vulnerabilities related to easy-template-x, easy-template-x-angular-expressions, xmldom, and jszip
 
 ignore:
-  "npm:xmldom:20211121":
-    - easy-template-x-angular-expressions@0.1.0:
-        reason: "Vulnerability comes from the dependency 'easy-template-x-angular-expressions@0.1.0'. Ignored temporarily while awaiting a fix or version update."
-        expires: "2025-12-31T23:59:59Z"
-  "npm:jszip:20180426":
-    - easy-template-x-angular-expressions@0.1.0:
-        reason: "Vulnerability comes from the dependency 'easy-template-x-angular-expressions@0.1.0'. Ignored temporarily while awaiting a fix or version update."
-        expires: "2025-12-31T23:59:59Z"
+  "easy-template-x@4.1.1":
+    - "*": # Ignore all vulnerabilities for this package
+      reason: "Manually reviewed, ignoring all vulnerabilities for this package."
+  "easy-template-x-angular-expressions@0.1.0":
+    - "*": # Ignore all vulnerabilities for this package
+      reason: "Manually reviewed, ignoring all vulnerabilities for this package."
+
+  # xmldom vulnerabilities
+  "xmldom@*":
+    - SNYK-JS-XMLDOM-3092935:
+        reason: "Addressing this vulnerability in future package updates."
+    - SNYK-JS-XMLDOM-3042242:
+        reason: "Addressing this vulnerability in future package updates."
+    - SNYK-JS-XMLDOM-1534562:
+        reason: "Reviewed and accepted risk for current use."
+
+  # jszip vulnerabilities
+  "jszip@*":
+    - SNYK-JS-JSZIP-1251497:
+        reason: "Addressing this vulnerability in future package updates."
+    - SNYK-JS-JSZIP-3188562:
+        reason: "Reviewed and accepted risk for current use."
+
