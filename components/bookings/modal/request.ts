@@ -123,3 +123,26 @@ export const exportProductionTasksReport = async (filters, production) => {
     console.log('Error downloading report', error);
   }
 };
+
+export const exportMasterTasksReport = async (search = '') => {
+  try {
+    const response = await axios.post(
+      '/api/reports/master-tasks',
+      {
+        search,
+      },
+      { responseType: 'blob' },
+    );
+    if (response.status >= 200 && response.status < 300) {
+      const defaultName = `Report`;
+      const suggestedName = getFileNameFromHeaders(response.headers as AxiosResponseHeaders, defaultName, 'xlsx');
+
+      const content = response.data;
+      if (content) {
+        downloadFromContent(content, suggestedName);
+      }
+    }
+  } catch (error) {
+    console.log('Error downloading report', error);
+  }
+};
