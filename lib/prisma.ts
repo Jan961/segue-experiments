@@ -13,7 +13,6 @@ const getPrismaClient = async (req: NextApiRequest): Promise<PrismaClient> => {
       console.log('orgId: ', orgId, clientDBUrl);
       const prismaUrl = `${clientDBUrl}_${process.env.DEPLOYMENT_ENV}_Segue_${orgId}`;
       const client = new PrismaClient({ datasourceUrl: prismaUrl });
-      console.log(client);
       return client;
     } catch (e) {
       console.log('Error getting prisma client', e);
