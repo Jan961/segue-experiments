@@ -42,7 +42,7 @@ export const PreviewTab = ({
       convertFormData.append('token', String(tokenresponse.data.token));
       convertFormData.append('file', populatedDOCX);
 
-      const response = await axios.post(`${process.env.FAST_HOST_DOMAIN}/api/convertDocxToPDF`, convertFormData, {
+      const response = await axios.post(`http://79.99.40.44:3000/api/convertDocxToPDF`, convertFormData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
