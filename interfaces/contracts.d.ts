@@ -17,4 +17,11 @@ export interface IContractSummary {
   lastName: string;
   departmentId: number;
   productionId: number;
+  templateId: number;
+}
+
+export interface IContractTemplate {
+  id: number;
+  name: string;
+  location: string;
 }

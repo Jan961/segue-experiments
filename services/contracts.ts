@@ -40,6 +40,7 @@ export const fetchAllContracts = async (req: NextApiRequest, productionId?: numb
           PersonLastName: true,
         },
       },
+      ACCCTemplateId: true,
     },
   });
   return contracts.map(
@@ -55,6 +56,7 @@ export const fetchAllContracts = async (req: NextApiRequest, productionId?: numb
       Person,
       ACCCDeptId,
       ProductionId,
+      ACCCTemplateId,
     }) => ({
       id: ContractId,
       role: RoleName,
@@ -69,6 +71,7 @@ export const fetchAllContracts = async (req: NextApiRequest, productionId?: numb
       lastName: Person?.PersonLastName,
       departmentId: ACCCDeptId,
       productionId: ProductionId,
+      templateId: ACCCTemplateId,
     }),
   );
 };
