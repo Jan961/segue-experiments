@@ -1,0 +1,11 @@
+# Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities
+version: "v1.26.0"
+ignore:
+  "npm:xmldom:20211121":
+    - easy-template-x-angular-expressions@0.1.0:
+        reason: "Vulnerability comes from the dependency 'easy-template-x-angular-expressions@0.1.0'. Ignored temporarily while awaiting a fix or version update."
+        expires: "2025-12-31T23:59:59Z"
+  "npm:jszip:20180426":
+    - easy-template-x-angular-expressions@0.1.0:
+        reason: "Vulnerability comes from the dependency 'easy-template-x-angular-expressions@0.1.0'. Ignored temporarily while awaiting a fix or version update."
+        expires: "2025-12-31T23:59:59Z"
