@@ -116,7 +116,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
       setDealMemoButtonText('Edit Deal Memo');
     }
 
-    const getHoldType = await axios.get<DealMemoHoldType>(`/api/deal-memo/hold-type/read`);
+    const getHoldType = await axios.get(`/api/deal-memo/hold-type/read`);
     setDealHoldType(getHoldType.data as Array<DealMemoHoldType>);
     if (demoModalData.data && demoModalData.data.BookingId) {
       setDemoModalData(demoModalData.data as DealMemoContractFormData);

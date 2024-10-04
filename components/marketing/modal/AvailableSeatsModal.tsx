@@ -8,6 +8,7 @@ import formatInputDate from 'utils/dateInputFormat';
 import { getTimeFromDateAndTime } from 'services/dateService';
 import { UpdateAvailableSeatsParams } from 'pages/api/marketing/available-seats/update';
 import { ConfDialogVariant } from 'components/core-ui-lib/ConfirmationDialog/ConfirmationDialog';
+import { days } from 'config/global';
 
 interface AvailableSeatsModalProps {
   show: boolean;
@@ -15,8 +16,6 @@ interface AvailableSeatsModalProps {
   onSave: (data) => void;
   data: any;
 }
-
-const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
 export default function AvailableSeatsModal({
   show = false,
