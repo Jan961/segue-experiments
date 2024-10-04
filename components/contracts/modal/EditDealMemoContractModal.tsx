@@ -59,11 +59,17 @@ import {
 } from 'utils';
 import { currencyState } from 'state/global/currencyState';
 import { decimalRegex, stringRegex } from 'utils/regexUtils';
+import { dealMemoExport } from 'pages/api/deal-memo/export';
 
 export interface PriceState {
   default: Array<DealMemoPriceType>;
   custom: Array<DealMemoPriceType>;
 }
+
+export type UserAcc = {
+  email: string;
+  accountUserId: number;
+};
 
 export const EditDealMemoContractModal = ({
   visible,
@@ -96,6 +102,7 @@ export const EditDealMemoContractModal = ({
   const currency = useRecoilValue(currencyState);
   const accountContacts = useRecoilValue(accountContactState);
   const [showSubmitError, setShowSubmitError] = useState<boolean>(false);
+  const [userAccList, setUserAccList] = useState<Array<UserAcc>>([]);
 
   const [errors, setErrors] = useState({
     ROTTPercentage: false,
@@ -224,6 +231,14 @@ export const EditDealMemoContractModal = ({
       })),
     [users],
   );
+
+  useEffect(() => {
+    const userAccList = Object.values(users).map(({ AccUserId, Email = '' }) => ({
+      accountUserId: AccUserId,
+      email: Email || '',
+    }));
+    setUserAccList(userAccList);
+  }, [users]);
 
   useEffect(() => {
     setFormData((prevDealMemo) => ({
@@ -1414,7 +1429,7 @@ export const EditDealMemoContractModal = ({
                 <div className="w-4/5 flex">
                   <div className="w-1/5">
                     <TextInput
-                      testId={`${inputData.DMPTicketName}-num-of-tickets`}
+                      testId="no-of-custom-tickets"
                       className="w-auto"
                       pattern={/^\d*$/}
                       onChange={(value) =>
@@ -1427,7 +1442,7 @@ export const EditDealMemoContractModal = ({
                   <div className="text-primary-input-text font-bold mr-2 mt-1">{currency.symbol}</div>
 
                   <TextInput
-                    testId={`${inputData.DMPTicketName}-ticketPrice`}
+                    testId="custom-ticket-price"
                     className="w-auto"
                     pattern={/^\d*(\.\d*)?$/}
                     onChange={(value) => editDealMemoPrice('', value.target.value, 'DMPTicketPrice', 'custom', index)}
@@ -1439,7 +1454,7 @@ export const EditDealMemoContractModal = ({
                     }
                   />
                   <TextInput
-                    testId={`${inputData.DMPTicketName}-notes`}
+                    testId="custom-ticket-notes"
                     className={classNames(
                       'ml-8',
                       dealMemoPriceData.custom.length === index + 1 && dealMemoPriceData.custom.length > 1
@@ -2265,7 +2280,17 @@ export const EditDealMemoContractModal = ({
           <div className="flex justify-end items-center">
             <Button onClick={() => handleCancelForm(false)} className="w-33" variant="secondary" text="Cancel" />
             <Button
-              onClick={() => null}
+              onClick={() =>
+                dealMemoExport({
+                  bookingId: selectedTableCell.contract.Id.toString(),
+                  dealMemoData: demoModalData,
+                  production: productionJumpState,
+                  contract: selectedTableCell.contract,
+                  venue: venueData,
+                  accContacts: accountContacts,
+                  users: userAccList,
+                })
+              }
               className="ml-4 w-28"
               variant="primary"
               text="Export"

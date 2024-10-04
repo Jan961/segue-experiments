@@ -204,3 +204,10 @@ export const validateWhat3Words = (input: string) => {
 
 // Helper function to check if a value is a valid number
 export const isValidNumber = (value: string) => !isNaN(parseInt(value, 10));
+
+// used to export number with the appriate ending (th, st, nd, rd)
+export const numberToOrdinal = (n) => {
+  const s = ['th', 'st', 'nd', 'rd'];
+  const v = n % 100;
+  return n + (s[(v - 20) % 10] || s[v] || s[0]);
+};
