@@ -7,6 +7,7 @@ import { createResolver } from 'easy-template-x-angular-expressions';
 import { DealMemoHoldType, ProductionDTO } from 'interfaces';
 import { isNullOrUndefined, numberToOrdinal } from 'utils';
 import { formatTemplateObj } from 'utils/templateExport';
+
 type DeMoExportProps = {
   bookingId: string;
   production: Partial<ProductionDTO>;
@@ -16,17 +17,21 @@ type DeMoExportProps = {
   users: Array<UserAcc>;
   dealMemoData: any;
 };
+
 const formatPerfs = (performances) => {
   const perfDays = parseAndSortDates(performances);
-  return perfDays.map((perf) => {
-    const [day, date, ...timesArray] = perf.split(' ');
-    return {
-      day,
-      date,
-      times: timesArray.join(' '),
-    };
-  });
+  return perfDays.length === 0
+    ? [{ day: '', times: '', date: '' }]
+    : perfDays.map((perf) => {
+        const [day, date, ...timesArray] = perf.split(' ');
+        return {
+          day,
+          date,
+          times: timesArray.join(' '),
+        };
+      });
 };
+
 const formatObjKeys = (obj: any) => {
   const result = Object.keys(obj).reduce((acc, key) => {
     acc[`${key}`] = obj[key];
@@ -34,9 +39,11 @@ const formatObjKeys = (obj: any) => {
   }, {});
   return result;
 };
+
 const getContact = (array, key, value) => {
   return array.find((record) => record[key] === value);
 };
+
 const fetchTemplateDocument = async () => {
   try {
     const response = await axios.get(
@@ -45,9 +52,11 @@ const fetchTemplateDocument = async () => {
         responseType: 'arraybuffer',
       },
     );
+
     const file = new File([response.data], 'template.docx', {
       type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
     });
+
     return file;
   } catch (err) {
     console.error(err, 'Error - failed to fetch template document.');
@@ -68,10 +77,15 @@ export const dealMemoExport = async (props: DeMoExportProps) => {
     const techManager = getContact(props.venue.VenueContact, 'Id', deMoRaw.TechVenueContactId);
     const deMoPoc = getContact(props.accContacts, 'AccContId', deMoRaw.AccContId);
     const companyPoc = getContact(props.accContacts, 'AccContId', deMoRaw.CompAccContId);
-    const salesRepEmails = deMoRaw.SendTo.map((sendToId) => {
-      const user = props.users.find((user) => user.accountUserId === sendToId);
-      return { email: user.email };
-    });
+
+    const salesRepEmails =
+      deMoRaw.SendTo.length === 0
+        ? []
+        : deMoRaw.SendTo.map((sendToId) => {
+            const user = props.users.find((user) => user.accountUserId === sendToId);
+            return { email: user.email };
+          });
+
     const generalData = {
       CurrencySymbol: currResponse.currency,
       ShowName: props.production.ShowName,
@@ -120,6 +134,7 @@ export const dealMemoExport = async (props: DeMoExportProps) => {
       },
       SalesReportRecipients: salesRepEmails,
     };
+
     const toBeFormatted = {
       ...formatObjKeys(deMoRaw),
       TM_LONG_RunningTime: deMoRaw.RunningTime,
@@ -131,30 +146,39 @@ export const dealMemoExport = async (props: DeMoExportProps) => {
       DT_FinalProofBy: deMoRaw.FinalProofBy,
       DT_TechArrivalDate: deMoRaw.TechArrivalDate,
       DT_AdvancePaymentDueBy: deMoRaw.AdvancePaymentDueBy,
-      DealMemoCall: deMoRaw.DealMemoCall.map((call) => {
-        return {
-          ...formatObjKeys(call),
-          Label: numberToOrdinal(call.DMCCallNum + 1) + ' Call',
-          DMCPromoterOrVenue: call.DMCPromoterOrVenue === 'p' ? 'Promoter' : 'Venue',
-          DMCValue: call.DMCType === 'p' ? call.DMCValue + '%' : generalData.CurrencySymbol + call.DMCValue,
-        };
-      }),
-      DealMemoHold: deMoRaw.DealMemoHold.map((hold) => {
-        return {
-          ...formatObjKeys(hold),
-          Label: holdTypes.find((type) => type.HoldTypeId === hold.DMHoldHoldTypeId).HoldTypeName,
-          DMHoldValue: generalData.CurrencySymbol + hold.DMHoldValue,
-        };
-      }),
+      DealMemoCall:
+        deMoRaw.DealMemoCall.length === 0
+          ? [{ label: '' }]
+          : deMoRaw.DealMemoCall.map((call) => {
+              return {
+                ...formatObjKeys(call),
+                Label: numberToOrdinal(call.DMCCallNum + 1) + ' Call',
+                DMCPromoterOrVenue: call.DMCPromoterOrVenue === 'p' ? 'Promoter' : 'Venue',
+                DMCValue: call.DMCType === 'p' ? call.DMCValue + '%' : generalData.CurrencySymbol + call.DMCValue,
+              };
+            }),
+      DealMemoHold:
+        deMoRaw.DealMemoHold.length === 0
+          ? [{ label: '' }]
+          : deMoRaw.DealMemoHold.map((hold) => {
+              return {
+                ...formatObjKeys(hold),
+                Label: holdTypes.find((type) => type.HoldTypeId === hold.DMHoldHoldTypeId).HoldTypeName,
+                DMHoldValue: generalData.CurrencySymbol + hold.DMHoldValue,
+              };
+            }),
       SalesDay: days[deMoRaw.SalesDayNum],
       WeeklySales: props.production.SalesFrequency === 'W',
     };
+
     const formattedData = formatTemplateObj(toBeFormatted);
+
     const strKeys = formatObjKeys(formattedData);
     const processedData = {
       ...strKeys,
       ...generalData,
     };
+
     // Need to include this so that Angular Expressions are supported
     const handler = new TemplateHandler({
       scopeDataResolver: createResolver({
@@ -164,17 +188,23 @@ export const dealMemoExport = async (props: DeMoExportProps) => {
         },
       }),
     });
+
     const templateFile = await fetchTemplateDocument();
     const docx = await handler.process(templateFile, processedData);
+
     // get downloadable url from the blob
     const blobUrl = URL.createObjectURL(docx);
+
     // create temp link element
     let link = document.createElement('a');
+
     link.download = 'Deal_Memo.docx';
     link.href = blobUrl;
+
     // use the link to invoke a download
     document.body.appendChild(link);
     link.click();
+
     // remove the link
     setTimeout(() => {
       link.remove();
