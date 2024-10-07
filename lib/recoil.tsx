@@ -51,6 +51,7 @@ import { TStandardClauseState, standardClauseState } from 'state/contracts/stand
 import { TContractListState, contractListState } from 'state/contracts/contractsListState';
 import { TContractDepartmentState, contractDepartmentState } from 'state/contracts/contractDepartmentState';
 import { accountContactState } from 'state/contracts/accountContactState';
+import { contractTemplateState, TContractTemplateState } from 'state/contracts/contractTemplateState';
 
 /*
   Experimental attempt to get Recoil.js working with SSR in React in a DRY manner.
@@ -95,6 +96,7 @@ export type InitialState = Partial<{
     status?: Record<number, ContractStatusType>;
     filters?: TContractsFilterState;
     person?: TPersonState;
+    template?: TContractTemplateState;
     standardClause?: TStandardClauseState;
     contract?: TContractListState;
     department?: TContractDepartmentState;
@@ -165,6 +167,7 @@ const states: {
     status: contractsStatusState,
     filters: contractsFilterState,
     person: personState,
+    template: contractTemplateState,
     standardClause: standardClauseState,
     contract: contractListState,
     department: contractDepartmentState,

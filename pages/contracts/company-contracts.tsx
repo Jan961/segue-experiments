@@ -3,8 +3,8 @@ import Layout from 'components/Layout';
 import { InitialState } from 'lib/recoil';
 import { getProductionJumpState } from 'utils/getProductionJumpState';
 import useContractsFilter from 'hooks/useContractsFilter';
-import CompanyContractFilters from 'components/contracts/CompanyContractsFilters';
-import CompanyContractsTable from 'components/contracts/table/CompanyContractsTable';
+import CompanyContractFilters from 'components/company-contracts/CompanyContractFilters';
+import CompanyContractsTable from 'components/company-contracts/CompanyContractsTable';
 import { getUniqueVenueCountrylist } from 'services/venueService';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
