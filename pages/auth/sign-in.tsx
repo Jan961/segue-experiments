@@ -138,14 +138,14 @@ const SignIn = () => {
         organisationId: loginDetails.company,
       });
 
-      if (data.success) {
-        session.user.update({
-          unsafeMetadata: {
-            organisationId: loginDetails.company,
-          },
-        });
-        router.push('/');
-      } 
+      
+      session.user.update({
+        unsafeMetadata: {
+          organisationId: loginDetails.company,
+        },
+      });
+        
+      
       router.push('/');
     }
 
