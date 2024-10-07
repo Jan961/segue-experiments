@@ -1,7 +1,6 @@
 import { clerkClient } from '@clerk/nextjs';
 import { getAuth } from '@clerk/nextjs/server';
 import prisma from 'lib/prisma_master';
-import { AccessCheck, checkAccess as checkAccessDirect } from './accessService';
 import { userMapper } from 'lib/mappers';
 import { UserDto } from 'interfaces';
 import { isNullOrEmpty } from 'utils';
@@ -92,10 +91,6 @@ export const getOrganisationIdFromReq = async (req: any) => {
   return user?.unsafeMetadata?.organisationId;
 };
 
-export const checkAccess = async (email: string, items: AccessCheck = null): Promise<boolean> => {
-  return checkAccessDirect(email, items);
-};
-
 export const getUserId = async (email: string) => {
   const { UserId } = await prisma.user.findUnique({
     where: {
@@ -179,9 +174,6 @@ export const getUserPermisisons = async (email: string, organisationId: string) 
     },
   });
   const formattedPermissions =
-    accountUser?.AccountUserPermission.map(({ Permission }) => ({
-      permissionId: Permission.PermissionId,
-      permissionName: Permission.PermissionName,
-    })) || [];
+    accountUser?.AccountUserPermission.map(({ Permission }) => Permission.PermissionName) || [];
   return formattedPermissions;
 };

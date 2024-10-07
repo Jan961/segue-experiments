@@ -138,15 +138,17 @@ const SignIn = () => {
         organisationId: loginDetails.company,
       });
       if (data.isValid) {
+        const permissions = data.permissions;
         // Set organisation id on redis
-        const { data } = await axios.post('/api/user/session/create', {
+        const { data: createData } = await axios.post('/api/user/session/create', {
           email: loginDetails.email,
           organisationId: loginDetails.company,
         });
-        if (data.success) {
+        if (createData.success) {
           session.user.update({
             unsafeMetadata: {
               organisationId: loginDetails.company,
+              permissions,
             },
           });
           router.push('/');
