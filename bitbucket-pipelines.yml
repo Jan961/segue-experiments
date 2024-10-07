@@ -47,7 +47,7 @@ pipelines:
               - npm run test:ci
               - npm run build
             only:
-              - hotfix/pipeline
+              - main
 definitions:
   caches:
     npm: ~/.npm
