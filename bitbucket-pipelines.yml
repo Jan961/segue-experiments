@@ -42,7 +42,7 @@ pipelines:
             - npm run test:ci
             - npm run build
   branches:
-      hotfix/pipeline:
+      main:
         - step:
             name: SonarQube Analysis
             image: node:19.8.1
