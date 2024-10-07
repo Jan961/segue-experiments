@@ -75,11 +75,9 @@ pipelines:
               - npm
             script:
               - echo $TEST_APP_ENV | base64 --decode --ignore-garbage > .env
-              - echo $TEST_APP_ENV | base64 --decode --ignore-garbage
+              - cat .env
               - npm ci
               - npm run build
-              - npm run start &
-              - npx wait-on http://localhost:3000
             artifacts:
               - .next/**
         - step:
@@ -89,6 +87,9 @@ pipelines:
               - node
               - cypress
             script:
+              - cat .env
+              - npm run start &
+              - npx wait-on http://localhost:3000
               # Clone Cypress repo in a separate directory
               - mkdir cypress-tests && cd cypress-tests
               - git clone git@bitbucket.org:segue-team/cypress.git .
