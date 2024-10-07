@@ -13,6 +13,18 @@ import { mapRecursive } from 'utils';
 import { TreeItemOption } from 'components/global/TreeSelect/types';
 import { dateBlockMapper } from 'lib/mappers';
 
+const getTableGridOptions = (uniqueKey: string, config = {}) => ({
+  ...config,
+  getRowNodeId: (data) => {
+    return data[uniqueKey];
+  },
+  onRowDataUpdated: (params) => {
+    params.api.forEachNode((rowNode) => {
+      rowNode.id = rowNode.data[uniqueKey];
+    });
+  },
+});
+
 export default function Users({
   permissionsList,
   productionsList,
@@ -207,6 +219,7 @@ export default function Users({
         rowData={userRowData}
         styleProps={styleProps}
         tableHeight={300}
+        gridOptions={getTableGridOptions('email')}
       />
 
       <div className="flex justify-end mt-5 mb-5">
@@ -230,7 +243,7 @@ export default function Users({
             rowData={permisisonGroups}
             styleProps={styleProps}
             tableHeight={300}
-            gridOptions={{ suppressHorizontalScroll: true }}
+            gridOptions={getTableGridOptions('groupName', { suppressHorizontalScroll: true })}
           />
         </div>
       </div>

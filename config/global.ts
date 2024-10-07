@@ -73,5 +73,7 @@ export const pdfStandardColors = {
 */
 export const emailRegex = /^[\w-\\.]+@([\w-]+\.)+[\w-]{2,4}$/;
 
+export const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
 export const NEW_ACCOUNT_CONFIRMATION_EMAIL_TEMPLATE = 'Confirm New Account';
 export const NEW_USER_CONFIRMATION_EMAIL_TEMPLATE = 'Confirm New User';

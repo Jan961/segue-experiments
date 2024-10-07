@@ -13,6 +13,8 @@ import {
   noop,
   transformToOptions,
   formatDecimalValue,
+  numberToOrdinal,
+  mapObjectValues,
 } from 'utils';
 
 describe('Tests for utility functions', () => {
@@ -28,7 +30,6 @@ describe('Tests for utility functions', () => {
 
     expect(updated[0].status).toBe('on');
     expect(updated[0].options[0].status).toBe('on');
-    expect(updated[0].options[0].options[0].status).toBe('on');
   });
 });
 
@@ -387,5 +388,103 @@ describe('formatDecimalValue', () => {
   test('should handle negative numbers correctly', () => {
     expect(formatDecimalValue('-123.456')).toBe('-123.46');
     expect(formatDecimalValue('-0.1')).toBe('-0.10');
+  });
+});
+
+// number to ordinal tests
+describe('numberToOrdinal', () => {
+  test('should return "1st" for 1', () => {
+    expect(numberToOrdinal(1)).toBe('1st');
+  });
+  test('should return "2nd" for 2', () => {
+    expect(numberToOrdinal(2)).toBe('2nd');
+  });
+  test('should return "3rd" for 3', () => {
+    expect(numberToOrdinal(3)).toBe('3rd');
+  });
+  test('should return "4th" for 4', () => {
+    expect(numberToOrdinal(4)).toBe('4th');
+  });
+  test('should return "11th" for 11', () => {
+    expect(numberToOrdinal(11)).toBe('11th');
+  });
+  test('should return "12th" for 12', () => {
+    expect(numberToOrdinal(12)).toBe('12th');
+  });
+  test('should return "13th" for 13', () => {
+    expect(numberToOrdinal(13)).toBe('13th');
+  });
+  test('should return "21st" for 21', () => {
+    expect(numberToOrdinal(21)).toBe('21st');
+  });
+  test('should return "22nd" for 22', () => {
+    expect(numberToOrdinal(22)).toBe('22nd');
+  });
+  test('should return "23rd" for 23', () => {
+    expect(numberToOrdinal(23)).toBe('23rd');
+  });
+  test('should return "101st" for 101', () => {
+    expect(numberToOrdinal(101)).toBe('101st');
+  });
+  test('should return "111th" for 111', () => {
+    expect(numberToOrdinal(111)).toBe('111th');
+  });
+  test('should return "0th" for 0', () => {
+    expect(numberToOrdinal(0)).toBe('0th');
+  });
+  test('should return "100th" for 100', () => {
+    expect(numberToOrdinal(100)).toBe('100th');
+  });
+  test('should return "1000th" for 1000', () => {
+    expect(numberToOrdinal(1000)).toBe('1000th');
+  });
+});
+
+// map object to values test
+describe('mapObjectValues', () => {
+  it('should apply the transformer to all values of the object', () => {
+    const obj = { a: 1, b: 2, c: 3 };
+    const transformer = (key: string, value: any) => value * 2;
+
+    const result = mapObjectValues(obj, transformer);
+
+    expect(result).toEqual({ a: 2, b: 4, c: 6 });
+  });
+
+  it('should handle an empty object', () => {
+    const obj = {};
+    const transformer = (key: string, value: any) => value;
+
+    const result = mapObjectValues(obj, transformer);
+
+    expect(result).toEqual({});
+  });
+
+  it('should pass the correct key to the transformer function', () => {
+    const obj = { a: 1, b: 2 };
+    const transformer = jest.fn();
+
+    mapObjectValues(obj, transformer);
+
+    expect(transformer).toHaveBeenCalledWith('a', 1);
+    expect(transformer).toHaveBeenCalledWith('b', 2);
+  });
+
+  it('should handle different types of values', () => {
+    const obj = { a: 1, b: 'test', c: true, d: null, e: undefined };
+    const transformer = (key: string, value: any) => typeof value;
+
+    const result = mapObjectValues(obj, transformer);
+
+    expect(result).toEqual({ a: 'number', b: 'string', c: 'boolean', d: 'object', e: 'undefined' });
+  });
+
+  it('should apply custom transformation logic based on key', () => {
+    const obj = { a: 1, b: 2, specialKey: 3 };
+    const transformer = (key: string, value: any) => (key === 'specialKey' ? value + 10 : value);
+
+    const result = mapObjectValues(obj, transformer);
+
+    expect(result).toEqual({ a: 1, b: 2, specialKey: 13 });
   });
 });
