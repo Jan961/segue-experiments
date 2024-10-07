@@ -52,7 +52,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       'TASK NAME',
       'START BY (wk)',
       'START BY',
-      'DUE (wk)',
+      'DUE BY (wk)',
       'DUE',
       'PROGRESS',
       'STATUS',
@@ -143,9 +143,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     productionRowList.forEach((row) => {
       makeRowTextBoldAndAllignLeft({ worksheet, row, numberOfColumns, bgColor: COLOR_HEXCODE.TASK_YELLOW });
     });
-    worksheet.mergeCells('C4:D4');
-    worksheet.mergeCells('E4:F4');
-    worksheet.mergeCells('H3:K3');
+    // worksheet.mergeCells('C4:D4');
+    // worksheet.mergeCells('E4:F4');
+    // worksheet.mergeCells('H3:K3');
     addWidthAsPerContent({
       worksheet,
       fromColNumber: 1,
@@ -157,8 +157,15 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       maxColWidth: Infinity,
     });
     worksheet.getColumn('A').width = 12;
-    worksheet.getColumn('C').width = 5;
-    worksheet.getColumn('E').width = 5;
+    worksheet.getColumn('C').width = 14;
+    worksheet.getColumn('D').width = 10;
+    worksheet.getColumn('E').width = 12;
+    worksheet.getColumn('F').width = 12;
+    worksheet.getColumn('G').width = 10;
+    worksheet.getColumn('J').width = 10;
+    if (worksheet.getColumn('K').width < 35) {
+      worksheet.getColumn('K').width = 35;
+    }
     worksheet.getColumn('G').alignment = { horizontal: 'center' };
     addBorderToAllCells({ worksheet });
     worksheet.getCell(1, 1).font = { size: 16, bold: true, color: { argb: COLOR_HEXCODE.WHITE } };
