@@ -287,6 +287,7 @@ const AdEditUser = ({ visible, onClose, permissions, productions = [], selectedU
                 renderOption={(option) => <CustomOption option={option} isMulti />}
                 options={permissionGroups}
                 onChange={(values: string[]) => setSelectedGroups(values.map((v) => Number(v)))}
+                testId="select-add-to-permission-groups"
               />
             </div>
           </div>

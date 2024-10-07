@@ -1,3 +1,5 @@
+import { exportMasterTasksReport } from 'components/bookings/modal/request';
+import { notify } from 'components/core-ui-lib';
 import Button from 'components/core-ui-lib/Button';
 import TextInput from 'components/core-ui-lib/TextInput';
 import { useRouter } from 'next/router';
@@ -22,6 +24,14 @@ const Filters = ({ handleShowTask }: FiltersProps) => {
     });
   };
 
+  const exportMasterTasks = async () => {
+    notify.promise(exportMasterTasksReport(filter.taskText), {
+      loading: 'Generating Production Tasks Report',
+      success: 'Production Tasks Report successfully downloaded',
+      error: 'Error generating Production Tasks Report',
+    });
+  };
+
   const router = useRouter();
 
   return (
@@ -42,7 +52,7 @@ const Filters = ({ handleShowTask }: FiltersProps) => {
       </div>
       <div className="pl-20 flex items-center gap-4 flex-wrap  py-1">
         <Button text="Production Task Lists" className="w-[158px]" onClick={() => router.push('/tasks')} />
-        <Button text="Export" className="w-[132px]" sufixIconName="excel" onClick={null} />
+        <Button text="Export" className="w-[132px]" sufixIconName="excel" onClick={exportMasterTasks} />
         <Button onClick={handleShowTask} text="Add Task" className="w-[132px]" />
       </div>
     </div>
