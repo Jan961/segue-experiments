@@ -32,9 +32,9 @@ type Task = {
 export const getExportedDate = () => format(new Date(), "dd/MM/yy 'at' HH:mm");
 export const getTaskStatusFromProgress = (progress: number) => {
   if (progress === 0) {
-    return 'ToDo';
+    return 'To Do';
   } else if (progress > 0 && progress < 100) {
-    return 'InProgress';
+    return 'In Progress';
   } else if (progress === 100) {
     return 'Complete';
   }

@@ -151,11 +151,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       fromColNumber: 1,
       toColNumber: numberOfColumns,
       startingColAsCharWIthCapsOn: 'A',
-      minColWidth: 10,
+      minColWidth: 7,
       bufferWidth: 0,
       rowsToIgnore: 4,
       maxColWidth: Infinity,
     });
+    worksheet.getColumn('A').width = 12;
     worksheet.getColumn('C').width = 5;
     worksheet.getColumn('E').width = 5;
     worksheet.getColumn('G').alignment = { horizontal: 'center' };
