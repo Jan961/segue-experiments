@@ -48,7 +48,8 @@ pipelines:
             name: SonarQube Scan (only on main)
             image: node:19.8.1
             script:
-              - if [[ "$BITBUCKET_BRANCH" == "main" ]]; then
+              - > 
+                if [[ "$BITBUCKET_BRANCH" == "main" ]]; then
                   npm install;
                   pipe: sonarsource/sonarcloud-scan:2.0.0;
                   pipe: sonarsource/sonarcloud-quality-gate:0.1.6;
