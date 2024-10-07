@@ -61,7 +61,7 @@ pipelines:
             script:
               - pipe: sonarsource/sonarcloud-scan:2.0.0
               - pipe: sonarsource/sonarcloud-quality-gate:0.1.6
-      feature/sk-489-testing-pipeline:
+      feature/sk-489-testing-pipelines:
         - step:
             name: "Build and Start Website"
             image: node:19.8.1
