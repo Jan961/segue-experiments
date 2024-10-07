@@ -137,26 +137,7 @@ const SignIn = () => {
         email: loginDetails.email,
         organisationId: loginDetails.company,
       });
-      if (data.isValid) {
-        // Set organisation id on redis
-        const { data } = await axios.post('/api/user/session/create', {
-          email: loginDetails.email,
-          organisationId: loginDetails.company,
-        });
-        if (data.success) {
-          session.user.update({
-            unsafeMetadata: {
-              organisationId: loginDetails.company,
-            },
-          });
-          router.push('/');
-        } else {
-          console.error('Error setting redis');
-          router.reload();
-        }
-      } else {
-        setError('Invalid Pin');
-      }
+
     } catch (error) {
       if (error instanceof yup.ValidationError) {
         const formattedErrors = error.inner.reduce((acc, err) => {
@@ -176,13 +157,7 @@ const SignIn = () => {
   const handleLogout = async () => {
     try {
       clearErrors();
-      // Remove organisation id on redis
-      const { data } = await axios.post('/api/user/session/delete', {
-        email: user.primaryEmailAddress.emailAddress,
-      });
-      if (!data.success) {
-        console.error('Error deleting user session');
-      }
+      
       // Sign out from Clerk
       await signOut();
       setShowLogout(false);
