@@ -30,7 +30,7 @@ pipelines:
   default:
     - parallel:
         - step:
-            name: Build and Test
+            name: Build
             image: node:19.8.1
             variables:
               NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: $NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
@@ -42,12 +42,18 @@ pipelines:
               - docker
             script:
               - npm install
-              - pipe: sonarsource/sonarcloud-scan:2.0.0
-              - pipe: sonarsource/sonarcloud-quality-gate:0.1.6
               - npm run test:ci
               - npm run build
-            only:
-              - main
+        - step:
+            name: SonarQube Analysis
+            image: node:19.8.1
+            condition:
+              changesets:
+                includeBranches:
+                  - hotfix/pipeline
+            script:
+              - pipe: sonarsource/sonarcloud-scan:2.0.0
+              - pipe: sonarsource/sonarcloud-quality-gate:0.1.6
 definitions:
   caches:
     npm: ~/.npm
