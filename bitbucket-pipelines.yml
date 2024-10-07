@@ -4,6 +4,14 @@ options:
   docker: true
   size: 2x
 pipelines:
+  branches:
+    main:
+      - step:
+          name: SonarQube Analysis
+          image: node:19.8.1
+          script:
+            - pipe: sonarsource/sonarcloud-scan:2.0.0
+            - pipe: sonarsource/sonarcloud-quality-gate:0.1.6
   custom:
     cypress:
       - variables:
@@ -44,16 +52,12 @@ pipelines:
               - npm install
               - npm run test:ci
               - npm run build
-        - step:
-            name: SonarQube Analysis
-            image: node:19.8.1
-            condition:
-              changesets:
-                includeBranches:
-                  - hotfix/pipeline
-            script:
-              - pipe: sonarsource/sonarcloud-scan:2.0.0
-              - pipe: sonarsource/sonarcloud-quality-gate:0.1.6
+        # - step:
+        #     name: SonarQube Analysis
+        #     image: node:19.8.1
+        #     script:
+        #       - pipe: sonarsource/sonarcloud-scan:2.0.0
+        #       - pipe: sonarsource/sonarcloud-quality-gate:0.1.6
 definitions:
   caches:
     npm: ~/.npm
