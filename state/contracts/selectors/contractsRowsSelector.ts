@@ -12,7 +12,7 @@ import { contractsPerformanceState } from '../contractsPerformanceState';
 import ContractsHelper from 'utils/contracts';
 import { contractsDateBlockState } from '../contractsDateBlockState';
 import { DAY_TYPE_FILTERS } from 'components/bookings/utils';
-import { contractsBookingStatusState, contractsStatusState } from '../contractsStatusState';
+import { contractsBookingStatusState, contractsStatusState, dealMemoStatusState } from '../contractsStatusState';
 import { contractRehearsalState } from '../contractRehearsalState';
 import { contractGetInFitUpState } from '../contractGetInFitUpState';
 
@@ -26,6 +26,7 @@ export const contractsRowsSelector = selector({
     const bookings = get(contractsState);
     const getInFitUp = get(contractGetInFitUpState);
     const contractData = get(contractsStatusState);
+    const dealMemoStatus = get(dealMemoStatusState);
     const contractBookingData = get(contractsBookingStatusState);
     const performanceDict = get(contractsPerformanceState);
     const other = get(contractsOtherState);
@@ -53,6 +54,7 @@ export const contractsRowsSelector = selector({
         }
         return value;
       };
+
       const row = {
         ...rowData,
         week,
@@ -66,6 +68,7 @@ export const contractsRowsSelector = selector({
         status: data?.StatusCode,
         venue: getValueForDayType(rowData.venue, type),
         contractStatus: contractData[rowData.Id] ? contractsStatusMap[contractData[rowData.Id].StatusCode] : '',
+        dealMemoStatus: dealMemoStatus[rowData.Id] ? dealMemoStatus[rowData.Id.toString()].Status : '',
         SignedDate: contractData[rowData.Id] ? contractData[rowData.Id].SignedDate : '',
         SignedBy: contractData[rowData.Id] ? contractData[rowData.Id].SignedBy : '',
         ReturnDate: contractData[rowData.Id] ? contractData[rowData.Id].ReturnDate : '',

@@ -9,6 +9,7 @@ import {
   ContractStatusType,
   ContractBookingStatusType,
   AccountContactDTO,
+  DealMemoContractFormData,
 } from 'interfaces';
 import { RecoilState, useRecoilCallback } from 'recoil';
 import { bookingState } from 'state/booking/bookingState';
@@ -37,7 +38,11 @@ import { contractsDateBlockState } from 'state/contracts/contractsDateBlockState
 import { contractsDateTypeState } from 'state/contracts/contractsDateTypeState';
 import { contractsPerformanceState } from 'state/contracts/contractsPerformanceState';
 import { contractsVenueState } from 'state/contracts/contractsVenueState';
-import { contractsBookingStatusState, contractsStatusState } from 'state/contracts/contractsStatusState';
+import {
+  contractsBookingStatusState,
+  contractsStatusState,
+  dealMemoStatusState,
+} from 'state/contracts/contractsStatusState';
 import { contractRehearsalState } from 'state/contracts/contractRehearsalState';
 import { contractGetInFitUpState } from 'state/contracts/contractGetInFitUpState';
 import { currencyState, TCurrencySymbol } from 'state/global/currencyState';
@@ -92,6 +97,7 @@ export type InitialState = Partial<{
     performance?: Record<number, PerformanceDTO>;
     venue?: Record<number, VenueMinimalDTO>;
     contractStatus?: Record<number, ContractStatusType>;
+    dealMemoStatus?: Record<number, DealMemoContractFormData>;
     contractBookingStatus?: Record<number, ContractBookingStatusType>;
     status?: Record<number, ContractStatusType>;
     filters?: TContractsFilterState;
@@ -163,6 +169,7 @@ const states: {
     performance: contractsPerformanceState,
     venue: contractsVenueState,
     contractStatus: contractsStatusState,
+    dealMemoStatus: dealMemoStatusState,
     contractBookingStatus: contractsBookingStatusState,
     status: contractsStatusState,
     filters: contractsFilterState,

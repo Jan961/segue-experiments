@@ -14,6 +14,7 @@ import {
   transformToOptions,
   formatDecimalValue,
   numberToOrdinal,
+  mapObjectValues,
 } from 'utils';
 
 describe('Tests for utility functions', () => {
@@ -436,5 +437,54 @@ describe('numberToOrdinal', () => {
   });
   test('should return "1000th" for 1000', () => {
     expect(numberToOrdinal(1000)).toBe('1000th');
+  });
+});
+
+// map object to values test
+describe('mapObjectValues', () => {
+  it('should apply the transformer to all values of the object', () => {
+    const obj = { a: 1, b: 2, c: 3 };
+    const transformer = (key: string, value: any) => value * 2;
+
+    const result = mapObjectValues(obj, transformer);
+
+    expect(result).toEqual({ a: 2, b: 4, c: 6 });
+  });
+
+  it('should handle an empty object', () => {
+    const obj = {};
+    const transformer = (key: string, value: any) => value;
+
+    const result = mapObjectValues(obj, transformer);
+
+    expect(result).toEqual({});
+  });
+
+  it('should pass the correct key to the transformer function', () => {
+    const obj = { a: 1, b: 2 };
+    const transformer = jest.fn();
+
+    mapObjectValues(obj, transformer);
+
+    expect(transformer).toHaveBeenCalledWith('a', 1);
+    expect(transformer).toHaveBeenCalledWith('b', 2);
+  });
+
+  it('should handle different types of values', () => {
+    const obj = { a: 1, b: 'test', c: true, d: null, e: undefined };
+    const transformer = (key: string, value: any) => typeof value;
+
+    const result = mapObjectValues(obj, transformer);
+
+    expect(result).toEqual({ a: 'number', b: 'string', c: 'boolean', d: 'object', e: 'undefined' });
+  });
+
+  it('should apply custom transformation logic based on key', () => {
+    const obj = { a: 1, b: 2, specialKey: 3 };
+    const transformer = (key: string, value: any) => (key === 'specialKey' ? value + 10 : value);
+
+    const result = mapObjectValues(obj, transformer);
+
+    expect(result).toEqual({ a: 1, b: 2, specialKey: 13 });
   });
 });
