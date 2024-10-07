@@ -143,9 +143,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     productionRowList.forEach((row) => {
       makeRowTextBoldAndAllignLeft({ worksheet, row, numberOfColumns, bgColor: COLOR_HEXCODE.TASK_YELLOW });
     });
-    // worksheet.mergeCells('C4:D4');
-    // worksheet.mergeCells('E4:F4');
-    // worksheet.mergeCells('H3:K3');
     addWidthAsPerContent({
       worksheet,
       fromColNumber: 1,
