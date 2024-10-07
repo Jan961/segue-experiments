@@ -145,10 +145,7 @@ const SignIn = () => {
           },
         });
         router.push('/');
-      } else {
-        console.error('Error setting redis');
-        router.reload();
-      }
+      } 
       router.push('/');
     }
 
