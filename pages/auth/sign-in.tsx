@@ -138,7 +138,21 @@ const SignIn = () => {
         organisationId: loginDetails.company,
       });
 
-    } catch (error) {
+      if (data.success) {
+        session.user.update({
+          unsafeMetadata: {
+            organisationId: loginDetails.company,
+          },
+        });
+        router.push('/');
+      } else {
+        console.error('Error setting redis');
+        router.reload();
+      }
+      router.push('/');
+    }
+
+     catch (error) {
       if (error instanceof yup.ValidationError) {
         const formattedErrors = error.inner.reduce((acc, err) => {
           return {
