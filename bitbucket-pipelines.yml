@@ -1,5 +1,8 @@
 image: atlassian/default-image:2
 image: cypress/browsers:latest
+options:
+  docker: true
+  size: 2x
 pipelines:
   custom:
     cypress:
@@ -39,7 +42,7 @@ pipelines:
             - npm run test:ci
             - npm run build
   branches:
-      main:
+      hotfix/pipeline:
         - step:
             name: Build and Test
             image: node:19.8.1
@@ -66,3 +69,6 @@ definitions:
     npm: ~/.npm
     cypress: ~/.cache
     nextcache: ~/.next/cache
+  services:
+    docker:
+      memory: 8192
