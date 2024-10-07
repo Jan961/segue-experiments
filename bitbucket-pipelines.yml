@@ -71,4 +71,4 @@ definitions:
     nextcache: ~/.next/cache
   services:
     docker:
-      memory: 7168
+      memory: 4096
