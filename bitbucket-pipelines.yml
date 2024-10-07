@@ -1,17 +1,6 @@
 image: atlassian/default-image:2
 image: cypress/browsers:latest
-options:
-  docker: true
-  size: 2x
 pipelines:
-  branches:
-    main:
-      - step:
-          name: SonarQube Analysis
-          image: node:19.8.1
-          script:
-            - pipe: sonarsource/sonarcloud-scan:2.0.0
-            - pipe: sonarsource/sonarcloud-quality-gate:0.1.6
   custom:
     cypress:
       - variables:
@@ -36,9 +25,23 @@ pipelines:
           artifacts: # defining the artifacts to be passed to each future step.
             - cypress/reports/**
   default:
-    - parallel:
+      - step:
+          name: Build and Test
+          image: node:19.8.1
+          variables:
+            NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: $NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+            CLERK_SECRET_KEY: $CLERK_SECRET_KEY
+            WEB_APP_URI: $CYPRESS_BASE_URL
+          caches:
+            - node
+          script:
+            - npm install
+            - npm run test:ci
+            - npm run build
+  branches:
+      main:
         - step:
-            name: Build
+            name: Build and Test
             image: node:19.8.1
             variables:
               NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: $NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
@@ -52,11 +55,14 @@ pipelines:
               - npm install
               - npm run test:ci
               - npm run build
+        - step:
+            name: SonarQube Analysis
+            image: node:19.8.1
+            script:
+              - pipe: sonarsource/sonarcloud-scan:2.0.0
+              - pipe: sonarsource/sonarcloud-quality-gate:0.1.6
 definitions:
   caches:
     npm: ~/.npm
     cypress: ~/.cache
     nextcache: ~/.next/cache
-  services:
-    docker:
-      memory: 4096
