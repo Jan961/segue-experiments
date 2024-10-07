@@ -5,7 +5,7 @@ options:
   size: 2x
 pipelines:
   branches:
-    hotfix/pipeline:
+    main:
       - step:
           name: SonarQube Analysis
           image: node:19.8.1
