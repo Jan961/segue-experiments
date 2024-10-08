@@ -378,7 +378,7 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
 
   useEffect(() => {
     isMenuPinned.current = state.menuPinned;
-    if (permissions.length > 0 && isNullOrEmpty(state.menuItems)) {
+    if (permissions?.length > 0 && isNullOrEmpty(state.menuItems)) {
       const disabledRoutes = ['/touring'];
       const filteredMenuItems = menuItems.filter(
         (item) => permissions.includes(item.permission) && !disabledRoutes.includes(item.value),

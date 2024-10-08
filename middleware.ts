@@ -6,6 +6,7 @@ import { isNullOrEmpty } from 'utils';
 const publicPaths = [
   '/api/user*',
   '/api/account*',
+  '/api/account-user*',
   '/api/email*',
   '/api/subscription-plans*',
   '/api/subscription*',

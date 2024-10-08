@@ -13,7 +13,7 @@ const HOME_PERMISSIONS = [
 export const accessHome = selector({
   key: 'accessDepartmentsSelector',
   get: ({ get }) => {
-    const { permissions } = get(userPermissionsState);
+    const { permissions = [] } = get(userPermissionsState);
     return permissions.filter((x) => HOME_PERMISSIONS.includes(x));
   },
 });
