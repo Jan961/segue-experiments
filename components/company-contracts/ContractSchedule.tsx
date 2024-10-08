@@ -43,12 +43,10 @@ export const ContractScheduleModal = ({ openContract, onClose }: { openContract:
     [personMap],
   );
   const productionOptions = useMemo(() => {
-    const nonArchivedProductions = productions.filter((production) => !production.IsArchived);
-    if (!nonArchivedProductions.length) {
-      return [];
-    }
+    const filteredProductions = productions.filter((production) => !production.IsArchived);
+
     return transformToOptions(
-      productions,
+      filteredProductions,
       null,
       'Id',
       ({ ShowCode, Code, ShowName }) => `${ShowCode}${Code} ${ShowName}`,
@@ -108,7 +106,7 @@ export const ContractScheduleModal = ({ openContract, onClose }: { openContract:
           testId="cs-production-selector"
           value={production}
           options={productionOptions}
-          placeholder="Please select a production"
+          placeholder="Please select a Production"
           onChange={(productionId) => handleChange('production', productionId as number)}
         />
         <div className="flex mt-4 mb-4 items-center">
