@@ -13,7 +13,7 @@ import {
 import { getWeekNumsToDateMap } from 'utils/getDateFromWeekNum';
 import { group } from 'radash';
 import { makeRowTextBoldAndAllignLeft } from './promoter-holds';
-import { formattedDateWithDay } from 'services/dateService';
+import { calculateWeekNumber, formattedDateWithDay } from 'services/dateService';
 import { COLOR_HEXCODE, colorTextAndBGCell } from 'services/salesSummaryService';
 import { addWidthAsPerContent, applyGradientFillToColumn } from 'services/reportsService';
 import { addBorderToAllCells } from 'utils/export';
@@ -82,13 +82,14 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           taskList.flatMap((ProductionTask) => [ProductionTask.CompleteByWeekNum, ProductionTask.StartByWeekNum]),
         ),
       ].filter((x) => x);
+      console.log(weekNumsList);
       const weekNumToDateMap = getWeekNumsToDateMap(
         StartDate.toISOString?.(),
         EndDate?.toISOString?.(),
         Array.from(new Set(weekNumsList)),
       );
       taskList = taskList.filter((task) => {
-        const taskDueDate = weekNumToDateMap?.[task.CompleteByWeekNum];
+        const taskDueDate = weekNumToDateMap?.[task.CompleteByWeekNum] || '';
         return !(
           (startDueDate && new Date(taskDueDate) < new Date(startDueDate)) ||
           (endDueDate && new Date(taskDueDate) > new Date(endDueDate))
@@ -100,6 +101,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       worksheet.addRow([]);
       rows += 3;
       productionRowList.push(rows - 1);
+      const currentWeekNum = calculateWeekNumber(StartDate, new Date());
       taskList
         .sort((a, b) => a.StartByWeekNum - b.StartByWeekNum)
         .map(
@@ -108,12 +110,14 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             const { UserFirstName: FirstName, UserLastName: LastName } = User || {};
             progressData.push(Progress);
             const status = getTaskStatusFromProgress(Progress);
+            const startWeek = weekNumToDateMap[StartByWeekNum] ? StartByWeekNum : null;
+            const dueWeek = weekNumToDateMap[CompleteByWeekNum] ? CompleteByWeekNum : null;
             const row = worksheet.addRow([
               `${fullProductionCode}-${Code}`,
               Name,
-              StartByWeekNum,
+              startWeek || '',
               formattedDateWithDay(weekNumToDateMap[StartByWeekNum]),
-              CompleteByWeekNum,
+              dueWeek || '',
               formattedDateWithDay(weekNumToDateMap[CompleteByWeekNum]),
               Progress,
               status,
@@ -122,7 +126,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
               Notes,
             ]);
             rows++;
-            const cellFormat = getColorFormatFromStatus(status);
+            const cellFormat = getColorFormatFromStatus(status, dueWeek, currentWeekNum);
             colorTextAndBGCell({ worksheet, row: rows, col: 1, ...cellFormat });
             colorTextAndBGCell({ worksheet, row: rows, col: 2, ...cellFormat });
             return row;

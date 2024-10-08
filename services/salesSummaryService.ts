@@ -33,6 +33,7 @@ export enum COLOR_HEXCODE {
   TASK_GREEN = 'ff10841c',
   TASK_RED = 'ffd41818',
   TASK_YELLOW = 'ffffbe43',
+  TASK_AMBER = 'ffea8439',
 }
 
 export const formatWeek = (num: number): string => `Week ${num}`;
