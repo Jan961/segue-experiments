@@ -13,7 +13,7 @@ import {
 import { getWeekNumsToDateMap } from 'utils/getDateFromWeekNum';
 import { group } from 'radash';
 import { makeRowTextBoldAndAllignLeft } from './promoter-holds';
-import { formattedDateWithDay } from 'services/dateService';
+import { calculateWeekNumber, formattedDateWithDay } from 'services/dateService';
 import { COLOR_HEXCODE, colorTextAndBGCell } from 'services/salesSummaryService';
 import { addWidthAsPerContent, applyGradientFillToColumn } from 'services/reportsService';
 import { addBorderToAllCells } from 'utils/export';
@@ -52,7 +52,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       'TASK NAME',
       'START BY (wk)',
       'START BY',
-      'DUE (wk)',
+      'DUE BY (wk)',
       'DUE',
       'PROGRESS',
       'STATUS',
@@ -82,13 +82,14 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           taskList.flatMap((ProductionTask) => [ProductionTask.CompleteByWeekNum, ProductionTask.StartByWeekNum]),
         ),
       ].filter((x) => x);
+      console.log(weekNumsList);
       const weekNumToDateMap = getWeekNumsToDateMap(
         StartDate.toISOString?.(),
         EndDate?.toISOString?.(),
         Array.from(new Set(weekNumsList)),
       );
       taskList = taskList.filter((task) => {
-        const taskDueDate = weekNumToDateMap?.[task.CompleteByWeekNum];
+        const taskDueDate = weekNumToDateMap?.[task.CompleteByWeekNum] || '';
         return !(
           (startDueDate && new Date(taskDueDate) < new Date(startDueDate)) ||
           (endDueDate && new Date(taskDueDate) > new Date(endDueDate))
@@ -100,6 +101,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       worksheet.addRow([]);
       rows += 3;
       productionRowList.push(rows - 1);
+      const currentWeekNum = calculateWeekNumber(StartDate, new Date());
       taskList
         .sort((a, b) => a.StartByWeekNum - b.StartByWeekNum)
         .map(
@@ -108,12 +110,14 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             const { UserFirstName: FirstName, UserLastName: LastName } = User || {};
             progressData.push(Progress);
             const status = getTaskStatusFromProgress(Progress);
+            const startWeek = weekNumToDateMap[StartByWeekNum] ? StartByWeekNum : null;
+            const dueWeek = weekNumToDateMap[CompleteByWeekNum] ? CompleteByWeekNum : null;
             const row = worksheet.addRow([
               `${fullProductionCode}-${Code}`,
               Name,
-              StartByWeekNum,
+              startWeek || '',
               formattedDateWithDay(weekNumToDateMap[StartByWeekNum]),
-              CompleteByWeekNum,
+              dueWeek || '',
               formattedDateWithDay(weekNumToDateMap[CompleteByWeekNum]),
               Progress,
               status,
@@ -122,7 +126,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
               Notes,
             ]);
             rows++;
-            const cellFormat = getColorFormatFromStatus(status);
+            const cellFormat = getColorFormatFromStatus(status, dueWeek, currentWeekNum);
             colorTextAndBGCell({ worksheet, row: rows, col: 1, ...cellFormat });
             colorTextAndBGCell({ worksheet, row: rows, col: 2, ...cellFormat });
             return row;
@@ -143,21 +147,26 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     productionRowList.forEach((row) => {
       makeRowTextBoldAndAllignLeft({ worksheet, row, numberOfColumns, bgColor: COLOR_HEXCODE.TASK_YELLOW });
     });
-    worksheet.mergeCells('C4:D4');
-    worksheet.mergeCells('E4:F4');
-    worksheet.mergeCells('H3:K3');
     addWidthAsPerContent({
       worksheet,
       fromColNumber: 1,
       toColNumber: numberOfColumns,
       startingColAsCharWIthCapsOn: 'A',
-      minColWidth: 10,
+      minColWidth: 7,
       bufferWidth: 0,
       rowsToIgnore: 4,
       maxColWidth: Infinity,
     });
-    worksheet.getColumn('C').width = 5;
-    worksheet.getColumn('E').width = 5;
+    worksheet.getColumn('A').width = 12;
+    worksheet.getColumn('C').width = 14;
+    worksheet.getColumn('D').width = 10;
+    worksheet.getColumn('E').width = 12;
+    worksheet.getColumn('F').width = 12;
+    worksheet.getColumn('G').width = 10;
+    worksheet.getColumn('J').width = 10;
+    if (worksheet.getColumn('K').width < 35) {
+      worksheet.getColumn('K').width = 35;
+    }
     worksheet.getColumn('G').alignment = { horizontal: 'center' };
     addBorderToAllCells({ worksheet });
     worksheet.getCell(1, 1).font = { size: 16, bold: true, color: { argb: COLOR_HEXCODE.WHITE } };
