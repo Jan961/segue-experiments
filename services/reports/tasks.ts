@@ -32,9 +32,9 @@ type Task = {
 export const getExportedDate = () => format(new Date(), "dd/MM/yy 'at' HH:mm");
 export const getTaskStatusFromProgress = (progress: number) => {
   if (progress === 0) {
-    return 'ToDo';
+    return 'To Do';
   } else if (progress > 0 && progress < 100) {
-    return 'InProgress';
+    return 'In Progress';
   } else if (progress === 100) {
     return 'Complete';
   }
@@ -46,22 +46,42 @@ export type CELL_FORMAT = {
   cellColor: COLOR_HEXCODE;
 };
 
-export const getColorFormatFromStatus = (status: string): CELL_FORMAT => {
+export const getColorFormatFromStatus = (
+  status: string,
+  dueWeekNum: number,
+  currentWeekNum: number,
+): CELL_FORMAT | undefined => {
+  if (!status || !dueWeekNum) {
+    return;
+  }
+
+  const isTaskPending = status === 'To Do' || status === 'In Progress';
+
   if (status === 'Complete') {
     return {
       textColor: COLOR_HEXCODE.WHITE,
       cellColor: COLOR_HEXCODE.TASK_GREEN,
     };
-  } else if (status === 'ToDo') {
+  }
+
+  if (isTaskPending) {
+    if (currentWeekNum > dueWeekNum) {
+      return {
+        textColor: COLOR_HEXCODE.WHITE,
+        cellColor: COLOR_HEXCODE.TASK_RED,
+      };
+    }
+    if (currentWeekNum === dueWeekNum) {
+      return {
+        textColor: COLOR_HEXCODE.WHITE,
+        cellColor: COLOR_HEXCODE.TASK_AMBER,
+      };
+    }
     return {
-      textColor: COLOR_HEXCODE.WHITE,
-      cellColor: COLOR_HEXCODE.TASK_RED,
+      textColor: COLOR_HEXCODE.BLACK,
+      cellColor: COLOR_HEXCODE.WHITE,
     };
   }
-  return {
-    textColor: COLOR_HEXCODE.BLACK,
-    cellColor: COLOR_HEXCODE.WHITE,
-  };
 };
 
 export const fetchTasksForProduction = async (prisma, { production, assignee, taskText }): Promise<Task[]> => {
