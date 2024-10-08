@@ -219,7 +219,7 @@ const AdEditUser = ({ visible, onClose, permissions, productions = [], selectedU
         panelClass="relative"
         hasOverlay={false}
       >
-        <div className="w-[640px] h-full max-h-[95vh]">
+        <div className="w-[1000px] h-full max-h-[95vh]">
           <div className="flex flex-col w-full gap-1 mb-4">
             <div className="w-full">
               <Label text="First Name" required />
