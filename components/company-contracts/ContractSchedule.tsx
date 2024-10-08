@@ -42,11 +42,18 @@ export const ContractScheduleModal = ({ openContract, onClose }: { openContract:
       ).sort((a, b) => a.text.localeCompare(b.text)),
     [personMap],
   );
-  const productionOptions = useMemo(
-    () =>
-      transformToOptions(productions, null, 'Id', ({ ShowCode, Code, ShowName }) => `${ShowCode}${Code} ${ShowName}`),
-    [productions],
-  );
+  const productionOptions = useMemo(() => {
+    const nonArchivedProductions = productions.filter((production) => !production.IsArchived);
+    if (!nonArchivedProductions.length) {
+      return [];
+    }
+    return transformToOptions(
+      productions,
+      null,
+      'Id',
+      ({ ShowCode, Code, ShowName }) => `${ShowCode}${Code} ${ShowName}`,
+    );
+  }, [productions]);
 
   const templateOptions = useMemo(() => transformToOptions(Object.values(templateMap), 'name', 'id'), [templateMap]);
 
@@ -101,6 +108,7 @@ export const ContractScheduleModal = ({ openContract, onClose }: { openContract:
           testId="cs-production-selector"
           value={production}
           options={productionOptions}
+          placeholder="Please select a production"
           onChange={(productionId) => handleChange('production', productionId as number)}
         />
         <div className="flex mt-4 mb-4 items-center">
