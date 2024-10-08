@@ -211,3 +211,8 @@ export const numberToOrdinal = (n) => {
   const v = n % 100;
   return n + (s[(v - 20) % 10] || s[v] || s[0]);
 };
+
+// used to map through an object and apply a transformer to all values - e.g. isUndefined
+export const mapObjectValues = (obj: any, transformer: (key: string, value: any) => any) => {
+  return Object.fromEntries(Object.entries(obj).map(([key, value]) => [key, transformer(key, value)]));
+};

@@ -1,4 +1,4 @@
-import { ContractStatusType, ContractBookingStatusType } from 'interfaces';
+import { ContractStatusType, ContractBookingStatusType, DealMemoContractFormData } from 'interfaces';
 import { atom } from 'recoil';
 
 export type ContractsStatusState = Record<number, ContractStatusType>;
@@ -13,4 +13,11 @@ export type ContractsBookingStatusState = Record<number, ContractBookingStatusTy
 export const contractsBookingStatusState = atom({
   key: 'contractsBookingStatusState',
   default: {} as ContractsBookingStatusState,
+});
+
+export type DealMemoStatusState = Record<number, DealMemoContractFormData>;
+
+export const dealMemoStatusState = atom({
+  key: 'dealMemoStatusState',
+  default: {} as DealMemoStatusState,
 });
