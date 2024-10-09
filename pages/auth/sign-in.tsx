@@ -7,13 +7,14 @@ import { useRouter } from 'next/router';
 import Link from 'next/link';
 import axios from 'axios';
 import { accountLoginSchema, loginSchema } from 'validators/auth';
-import { useSession } from '@clerk/clerk-react';
 import * as yup from 'yup';
 import AuthError from 'components/auth/AuthError';
 import Spinner from 'components/core-ui-lib/Spinner';
 import Head from 'next/head';
 import { isNullOrEmpty } from 'utils';
 import { SESSION_ALREADY_EXISTS } from 'utils/authUtils';
+import usePermissions from 'hooks/usePermissions';
+import useAuth from 'hooks/useAuth';
 
 export const LoadingOverlay = () => (
   <div className="inset-0 absolute bg-white bg-opacity-50 z-50 flex justify-center items-center top-20 left-20 right-20 bottom-20">
@@ -22,11 +23,12 @@ export const LoadingOverlay = () => (
 );
 
 const SignIn = () => {
+  const { setUserPermissions } = usePermissions();
   const { isLoaded, signIn, setActive } = useSignIn();
+  const { navigateToHome } = useAuth();
   const { user } = useUser();
   const [isBusy, setIsBusy] = useState(false);
   const { signOut } = useClerk();
-  const { session } = useSession();
   const [error, setError] = useState('');
   const [validationError, setValidationError] = useState(null);
   const [showLogout, setShowLogout] = useState(false);
@@ -137,19 +139,15 @@ const SignIn = () => {
         email: loginDetails.email,
         organisationId: loginDetails.company,
       });
+      if (data.isValid) {
+        const permissions = data.permissions;
 
-      
-      session.user.update({
-        unsafeMetadata: {
-          organisationId: loginDetails.company,
-        },
-      });
-        
-      
-      router.push('/');
-    }
-
-     catch (error) {
+        setUserPermissions(loginDetails.company, permissions);
+        navigateToHome();
+      } else {
+        setError('Invalid Pin');
+      }
+    } catch (error) {
       if (error instanceof yup.ValidationError) {
         const formattedErrors = error.inner.reduce((acc, err) => {
           return {
@@ -168,7 +166,7 @@ const SignIn = () => {
   const handleLogout = async () => {
     try {
       clearErrors();
-      
+
       // Sign out from Clerk
       await signOut();
       setShowLogout(false);
