@@ -14,6 +14,7 @@ import Head from 'next/head';
 import { isNullOrEmpty } from 'utils';
 import { SESSION_ALREADY_EXISTS } from 'utils/authUtils';
 import usePermissions from 'hooks/usePermissions';
+import useAuth from 'hooks/useAuth';
 
 export const LoadingOverlay = () => (
   <div className="inset-0 absolute bg-white bg-opacity-50 z-50 flex justify-center items-center top-20 left-20 right-20 bottom-20">
@@ -24,6 +25,7 @@ export const LoadingOverlay = () => (
 const SignIn = () => {
   const { setUserPermissions } = usePermissions();
   const { isLoaded, signIn, setActive } = useSignIn();
+  const { navigateToHome } = useAuth();
   const { user } = useUser();
   const [isBusy, setIsBusy] = useState(false);
   const { signOut } = useClerk();
@@ -139,18 +141,9 @@ const SignIn = () => {
       });
       if (data.isValid) {
         const permissions = data.permissions;
-        // Set organisation id on redis
-        const { data: createData } = await axios.post('/api/user/session/create', {
-          email: loginDetails.email,
-          organisationId: loginDetails.company,
-        });
-        if (createData.success) {
-          setUserPermissions(loginDetails.company, permissions);
-          router.push('/');
-        } else {
-          console.error('Error setting redis');
-          router.reload();
-        }
+
+        setUserPermissions(loginDetails.company, permissions);
+        navigateToHome();
       } else {
         setError('Invalid Pin');
       }

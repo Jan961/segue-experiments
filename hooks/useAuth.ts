@@ -15,7 +15,11 @@ const useAuth = () => {
     }
   };
 
-  return { signOut };
+  const navigateToHome = () => {
+    router.push('/');
+  };
+
+  return { signOut, navigateToHome };
 };
 
 export default useAuth;
