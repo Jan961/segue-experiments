@@ -25,9 +25,10 @@ const NoPerfRenderer = ({ eGridCell, value, setValue, data, api, node }: ICellRe
     setIsDisabled(!data.perf);
   }, [data.perf, value]);
 
-  const handleChange = (event: any) => {
-    let newValue = event?.replace(/\D/g, ''); // Remove non-numeric characters
-    if (newValue === '') {
+  const handleChange = (event) => {
+    let newValue = event || null;
+
+    if (newValue === null) {
       setNoOfPerfs('');
       setValue(0);
       updateRowHeight(ROW_HEIGHT + MARGIN);
@@ -50,6 +51,7 @@ const NoPerfRenderer = ({ eGridCell, value, setValue, data, api, node }: ICellRe
         value={noOfPerfs}
         onChange={handleChange}
         disabled={isDisabled}
+        pattern={/^\d{0,1}$/}
         className="w-[1.2rem] !h-[1.2rem] !text-center border-2 border-primary-input-text focus:border-primary-input-text rounded-sm line text-sm !p-0 focus:!ring-0"
       />
     </div>
