@@ -77,7 +77,7 @@ pipelines:
         - step:
             name: "Generate Test Report"
             script:
-              - cd cypress-tests/cypress
+              - ls -al
               - npm install -g mochawesome-merge mochawesome-report-generator
               - mochawesome-merge reports/mocha/*.json > reports/mochawesome.json
               - marge reports/mochawesome.json -f report -o reports
