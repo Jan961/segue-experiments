@@ -1,8 +1,12 @@
 import { SwitchBoardItem } from 'components/global/SwitchBoardItem';
 import useStrings from 'hooks/useStrings';
+import { useRecoilValue } from 'recoil';
+import { accessHome } from 'state/account/selectors/permissionSelector';
 
 export const Switchboard = () => {
+  const permissions = useRecoilValue(accessHome);
   const getStrings = useStrings();
+
   const links = [
     {
       title: getStrings('global.bookings'),
@@ -12,6 +16,7 @@ export const Switchboard = () => {
       stroke: '',
       fill: '',
       color: 'bg-primary-orange',
+      permission: 'BOOKINGS',
     },
     {
       title: getStrings('global.marketing'),
@@ -21,6 +26,7 @@ export const Switchboard = () => {
       fill: '#41A29A',
       iconName: 'marketing',
       color: 'bg-primary-green',
+      permission: 'MARKETING',
     },
     {
       title: getStrings('global.projectManagement'),
@@ -30,6 +36,7 @@ export const Switchboard = () => {
       fill: '#FFF',
       iconName: 'tasks',
       color: 'bg-primary-yellow',
+      permission: 'PROJECT_MANAGEMENT',
     },
     {
       title: getStrings('global.contracts'),
@@ -39,6 +46,7 @@ export const Switchboard = () => {
       fill: '',
       iconName: 'contracts',
       color: 'bg-primary-blue',
+      permission: 'CONTRACTS',
     },
     {
       title: getStrings('global.touringManagement'),
@@ -50,6 +58,7 @@ export const Switchboard = () => {
       color: 'bg-primary-purple',
       tooltipMessage: 'Coming soon!',
       disabled: true,
+      permission: 'TOURING_MANAGEMENT',
     },
     {
       title: getStrings('global.admin'),
@@ -59,6 +68,7 @@ export const Switchboard = () => {
       fill: '#E94580',
       iconName: 'system-admin',
       color: 'bg-primary-pink',
+      permission: 'SYSTEM_ADMIN',
     },
   ];
 
@@ -68,9 +78,11 @@ export const Switchboard = () => {
       role="list"
       className="grid grid-cols-1 gap-4 w-fit sm:grid-cols-2 md:grid-cols-3 mt-4 mx-auto"
     >
-      {links.map((link) => (
-        <SwitchBoardItem key={link.route} link={link} />
-      ))}
+      {links
+        .filter(({ permission }) => permissions.includes(permission))
+        .map((link) => (
+          <SwitchBoardItem key={link.route} link={link} />
+        ))}
     </ul>
   );
 };
