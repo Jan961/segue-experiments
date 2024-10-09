@@ -219,6 +219,14 @@ model Country {
   @@index([CountryCurrencyCode], map: "Master_Currency_Country")
 }
 
+model PermissionTest {
+  PermissionId                 Int    @id @default(autoincrement())
+  PermissionParentPermissionId Int?
+  PermissionName               String @db.VarChar(50)
+  PermissionDescription        String @db.LongText
+  PermissionSeqNo              Int?   @db.TinyInt
+}
+
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view AccountUserView {
   AccountId             Int     @default(0)

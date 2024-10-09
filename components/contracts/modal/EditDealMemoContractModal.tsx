@@ -33,7 +33,6 @@ import {
   filterPrice,
   filterTechProvision,
   parseAndSortDates,
-  filterCurrencyNum,
   formatDecimalOnBlur,
   timeToDateTime,
   dtToTime,
@@ -309,8 +308,6 @@ export const EditDealMemoContractModal = ({
       ...formatDecimalFields(formData, 'float'),
       DealMemoPrice: dealMemoPriceData,
     };
-
-    console.log(JSON.stringify(dealMemoData));
 
     try {
       await axios.post(`/api/deal-memo/update/${selectedTableCell.contract.Id}`, {
@@ -630,10 +627,10 @@ export const EditDealMemoContractModal = ({
           </div>
           <div className="text-primary-input-text mt-4">
             If we have requested anything that incurs a cost, it must be agreed with
-            {`${productionJumpState.ProductionCompany ? productionJumpState.ProductionCompany.ProdCoName : ''}`}
+            {` ${productionJumpState.ProductionCompany ? productionJumpState.ProductionCompany.ProdCoName : ''} `}
             prior to our arrival. No extras will be paid without a pre-authorisation
-            {`(this includes internet access).`} Unless otherwise agreed, all staff calls will be scheduled within the
-            contractual allowance- if you foresee any overtime, please advise immediately.
+            {` (this includes internet access).`} Unless otherwise agreed, all staff calls will be scheduled within the
+            contractual allowance - if you foresee any overtime, please advise immediately.
           </div>
           <hr className="bg-primary h-[3px] mt-4 mb-4" />
           <div className="text-xl text-primary-navy font-bold -mt-2.5">Contacts</div>
@@ -750,7 +747,6 @@ export const EditDealMemoContractModal = ({
           </div>
           <div className="flex items-center mt-4">
             <div className="w-1/5 text-primary-input-text font-bold">Off-Stage Venue Curfew Time </div>
-            {/* - <br/>{'Logging:\n'}<br/>{timeFinal} */}
             <div className="w-4/5 flex items-center" data-testid="perf-curfew-time">
               <TimeInput
                 className="w-fit h-[31px] [&>input]:!h-[25px] [&>input]:!w-11 !justify-center shadow-input-shadow"
@@ -1114,13 +1110,13 @@ export const EditDealMemoContractModal = ({
 
                   <TextInput
                     testId={`${inputData[1]}-amount`}
-                    type="number"
                     className="w-[100px] mr-6"
                     value={formData[inputData[1]]}
                     onBlur={(value) => {
                       editDemoModalData(inputData[1], formatDecimalOnBlur(value), 'dealMemo');
                     }}
                     onChange={(value) => editDemoModalData(inputData[1], value.target.value, 'dealMemo')}
+                    pattern={/^\d*(\.\d*)?$/}
                   />
                   <TextInput
                     testId={`${inputData[2]}-text`}
@@ -1323,10 +1319,11 @@ export const EditDealMemoContractModal = ({
               <div className="ml-16 w-[394px]">
                 <div className="text-primary-input-text font-bold">Hold Notes</div>
                 <TextArea
-                  testId="box-oofice-hold-notes"
+                  testId="box-office-hold-notes"
                   className="mt-2 mb-2 w-full h-[583px]"
                   value={formData.OtherHolds}
                   placeholder="Notes Field"
+                  // PL - TO BE CHANGED
                   onChange={(value) => editDemoModalData('OtherHolds', value.target.value, 'dealMemo')}
                 />
               </div>
@@ -1489,38 +1486,43 @@ export const EditDealMemoContractModal = ({
           <div className="flex items-center mt-4">
             <div className="w-1/5 text-primary-input-text font-bold">Restoration Levy (per ticket)</div>
             <div className="w-4/5 flex items-center">
-              <div className="text-primary-input-text font-bold mr-2 -ml-4">{currency.symbol}</div>
-
-              <TextInput
-                testId="restoration-levy"
-                className="w-auto"
-                type="number"
-                value={formData.RestorationLevy}
-                onChange={(value) => editDemoModalData('RestorationLevy', value.target.value, 'dealMemo')}
-                onBlur={(value) => editDemoModalData('RestorationLevy', formatDecimalOnBlur(value), 'dealMemo')}
-              />
-              <div className="text-primary-input-text font-bold ml-[300px] flex">
-                Booking fees <div className="ml-4 mr-2">{currency.symbol}</div>
+              <div className="w-3/6 flex">
+                <div className="text-primary-input-text font-bold mr-2 -ml-4">{currency.symbol}</div>
+                <TextInput
+                  testId="restoration-levy"
+                  className="w-auto"
+                  pattern={/^\d*(\.\d*)?$/}
+                  value={formData.RestorationLevy}
+                  onChange={(value) => editDemoModalData('RestorationLevy', value.target.value, 'dealMemo')}
+                  onBlur={(value) => editDemoModalData('RestorationLevy', formatDecimalOnBlur(value), 'dealMemo')}
+                />
               </div>
-              <TextInput
-                testId="booking-fees"
-                className="w-auto"
-                type="number"
-                value={formData.BookingFees}
-                onChange={(value) => editDemoModalData('BookingFees', parseFloat(value.target.value), 'dealMemo')}
-                onBlur={(value) => editDemoModalData('BookingFees', formatDecimalOnBlur(value), 'dealMemo')}
-              />
-              <div className="text-primary-input-text font-bold ml-[100px] mr-2">Credit Card Commission</div>
-              <TextInput
-                testId="credit-card-commission-percentage"
-                className={classNames('w-auto', errors.CCCommissionPercent ? 'text-primary-red' : '')}
-                value={formData.CCCommissionPercent === 0 ? '0' : formData.CCCommissionPercent}
-                onChange={(value) => handlePercentChange('CCCommissionPercent', value.target.value)}
-                onBlur={(value) =>
-                  editDemoModalData('CCCommissionPercent', formatPercentageValue(value.target.value), 'dealMemo')
-                }
-              />
-              <div className="text-primary-input-text font-bold ml-2">%</div>
+
+              <div className="w-5/6 flex">
+                <div className="text-primary-input-text font-bold flex -ml-2">
+                  Booking fees
+                  <div className="ml-4 mr-2">{currency.symbol}</div>
+                </div>
+                <TextInput
+                  testId="booking-fees"
+                  className="w-auto"
+                  pattern={/^\d*(\.\d*)?$/}
+                  value={formData.BookingFees}
+                  onChange={(value) => editDemoModalData('BookingFees', parseFloat(value.target.value), 'dealMemo')}
+                  onBlur={(value) => editDemoModalData('BookingFees', formatDecimalOnBlur(value), 'dealMemo')}
+                />
+                <div className="text-primary-input-text font-bold ml-[100px] mr-2">Credit Card Commission</div>
+                <TextInput
+                  testId="credit-card-commission-percentage"
+                  className={classNames('w-auto', errors.CCCommissionPercent ? 'text-primary-red' : '')}
+                  value={formData.CCCommissionPercent === 0 ? '0' : formData.CCCommissionPercent}
+                  onChange={(value) => handlePercentChange('CCCommissionPercent', value.target.value)}
+                  onBlur={(value) =>
+                    editDemoModalData('CCCommissionPercent', formatPercentageValue(value.target.value), 'dealMemo')
+                  }
+                />
+                <div className="text-primary-input-text font-bold ml-2">%</div>
+              </div>
             </div>
           </div>
           {errors.CCCommissionPercent && (
@@ -1547,7 +1549,7 @@ export const EditDealMemoContractModal = ({
               <TextInput
                 testId="transaction-charges-price"
                 className="w-auto"
-                type="number"
+                pattern={/^\d*(\.\d*)?$/}
                 value={formData.TxnChargeAmount}
                 onChange={(value) => editDemoModalData('TxnChargeAmount', value.target.value, 'dealMemo')}
                 onBlur={(value) => editDemoModalData('TxnChargeAmount', formatDecimalOnBlur(value), 'dealMemo')}
@@ -1645,6 +1647,7 @@ export const EditDealMemoContractModal = ({
                 options={saleFrequencyDay}
                 isClearable
                 isSearchable
+                value={formData.SalesDayNum}
                 disabled={productionJumpState.SalesFrequency !== 'W'}
                 testId="select-day-for-sales-frequency"
               />
@@ -1797,7 +1800,7 @@ export const EditDealMemoContractModal = ({
               <TextInput
                 testId="local-marketing-budget"
                 className="w-auto"
-                type="number"
+                pattern={/^\d*(\.\d*)?$/}
                 value={formData.LocalMarketingBudget}
                 onChange={(value) => editDemoModalData('LocalMarketingBudget', value.target.value, 'dealMemo')}
                 onBlur={(value) => editDemoModalData('LocalMarketingBudget', formatDecimalOnBlur(value), 'dealMemo')}
@@ -1808,15 +1811,9 @@ export const EditDealMemoContractModal = ({
               <TextInput
                 testId="local-marketing-contract-price"
                 className="w-auto"
-                type="number"
+                pattern={/^\d*(\.\d*)?$/}
                 value={formData.LocalMarketingContra}
-                onChange={(value) =>
-                  editDemoModalData(
-                    'LocalMarketingContra',
-                    filterCurrencyNum(parseFloat(value.target.value)),
-                    'dealMemo',
-                  )
-                }
+                onChange={(value) => editDemoModalData('LocalMarketingContra', value.target.value, 'dealMemo')}
                 onBlur={(value) => editDemoModalData('LocalMarketingContra', formatDecimalOnBlur(value), 'dealMemo')}
               />
             </div>
@@ -1880,9 +1877,10 @@ export const EditDealMemoContractModal = ({
                 testId="merchandise-checkbox"
               />
 
-              <TextArea
+              <TextInput
                 className="w-[48vw] ml-2"
                 value={formData.SellNotes}
+                disabled={!formData.SellMerch}
                 onChange={(value) => editDemoModalData('SellNotes', value.target.value, 'dealMemo')}
                 testId="items-to-be-sold-notes"
               />
@@ -1921,11 +1919,9 @@ export const EditDealMemoContractModal = ({
               <TextInput
                 testId="fixed-pitch-fee"
                 className="w-[150px]"
-                type="number"
+                pattern={/^\d*(\.\d*)?$/}
                 value={formData.SellPitchFee}
-                onChange={(value) =>
-                  editDemoModalData('SellPitchFee', filterCurrencyNum(parseFloat(value.target.value)), 'dealMemo')
-                }
+                onChange={(value) => editDemoModalData('SellPitchFee', value.target.value, 'dealMemo')}
                 onBlur={(value) => editDemoModalData('SellPitchFee', formatDecimalOnBlur(value), 'dealMemo')}
               />
             </div>
@@ -2192,6 +2188,7 @@ export const EditDealMemoContractModal = ({
                 testId="advance-payment-yes-amount"
                 className="w-full"
                 value={formData.AdvancePaymentAmount}
+                pattern={/^\d*(\.\d*)?$/}
                 onChange={(value) => editDemoModalData('AdvancePaymentAmount', value.target.value, 'dealMemo')}
                 onBlur={(value) => editDemoModalData('AdvancePaymentAmount', formatDecimalOnBlur(value), 'dealMemo')}
                 disabled={!formData.AdvancePaymentRequired}
@@ -2218,7 +2215,12 @@ export const EditDealMemoContractModal = ({
                 className="flex flex-row-reverse"
                 labelClassName="!text-base"
                 id="includeExcludedVenues"
-                onChange={(value) => setContractCheckBox(value.target.checked)}
+                onChange={(value) => {
+                  if (value) {
+                    setFormData({ ...formData, SettlementDays: null });
+                  }
+                  setContractCheckBox(value.target.checked);
+                }}
                 checked={contractCheckBox}
                 testId="payment-same-day-checkbox"
               />
