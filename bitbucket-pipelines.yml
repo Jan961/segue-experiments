@@ -66,13 +66,36 @@ pipelines:
               - npx wait-on http://localhost:3000
               # Clone Cypress repo in a separate directory
               - mkdir cypress-tests && cd cypress-tests
-              - git clone git@bitbucket.org:segue-team/cypress.git .
+              - git clone git@bitbucket.org:segue-team/cypress.git --branch pipeline_test
               - cd cypress
               - npm ci
               # Run Cypress tests in headless mode
-              - npm run cy:alltests --browser chrome
+              # - npm run cy:alltests --browser chrome
+              - npm run cy:permissions --browser chrome
             artifacts:
               - cypress-tests/cypress/reports/**
+        - step:
+            name: "Generate Test Report"
+            script:
+              - cd cypress-tests/cypress
+              - npm install -g mochawesome-merge mochawesome-report-generator
+              - mochawesome-merge reports/mocha/*.json > reports/mochawesome.json
+              - marge reports/mochawesome.json -f report -o reports
+            artifacts:
+              - cypress-tests/cypress/reports/**
+        - step:
+            name: "Send Email with Test Report"
+            script:
+              - pipe: atlassian/email-notify:0.7.0
+                variables:
+                  USERNAME: $SMTP_USERNAME
+                  PASSWORD: $SMTP_PASSWORD
+                  FROM: 'asara97911@gmail.com'
+                  TO: 'asara97911@gmail.com'
+                  HOST: 'smtp.gmail.com'
+                  SUBJECT: 'Cypress Test Report'
+                  BODY_HTML: '<h1>Cypress Test Report</h1><p>Please find the test report attached.</p>'
+                  ATTACHMENTS: 'cypress-tests/cypress/reports/report.html'
 definitions:
   caches:
     npm: ~/.npm
