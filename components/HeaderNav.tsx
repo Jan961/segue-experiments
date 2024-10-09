@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
-import { useRouter } from 'next/router';
-import { useClerk } from '@clerk/nextjs';
-import { userService } from 'services/user.service';
+import useAuth from 'hooks/useAuth';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import classNames from 'classnames';
 import { SegueLogo } from './global/SegueLogo';
@@ -55,18 +53,15 @@ const HeaderNavButton = ({
 const HeaderNavDivider = () => <span className="mx-2">{' | '}</span>;
 
 export const HeaderNav = ({ menuIsOpen, setMenuIsOpen }: any) => {
+  const { signOut } = useAuth();
   const [confirmVisible, setConfirmVisible] = useState<boolean>(false);
   const getString = useStrings();
-  const router = useRouter();
   const { isHome, navigateToHome } = useUrlPath();
   const isCurrentPathHome = isHome();
-  const { signOut } = useClerk();
 
   const onLogout = async () => {
     setConfirmVisible(false);
-    userService.logout();
     await signOut();
-    router.push('/');
   };
 
   return (
@@ -105,7 +100,7 @@ export const HeaderNav = ({ menuIsOpen, setMenuIsOpen }: any) => {
       </div>
 
       <ConfirmationDialog
-        variant={'logout'}
+        variant="logout"
         show={confirmVisible}
         onYesClick={onLogout}
         onNoClick={() => setConfirmVisible(false)}
