@@ -4,7 +4,6 @@ import prisma from 'lib/prisma_master';
 import { userMapper } from 'lib/mappers';
 import { UserDto } from 'interfaces';
 import { isNullOrEmpty } from 'utils';
-import redis from 'lib/redis';
 
 export const getUsers = async (AccountId: number): Promise<UserDto[]> => {
   const result = await prisma.user.findMany({
@@ -102,37 +101,6 @@ export const getUserId = async (email: string) => {
   });
 
   return UserId;
-};
-
-const THREE_HOURS_IN_SECONDS = 60 * 60 * 3;
-export const createUserSession = async (email: string, orgId: string) => {
-  try {
-    // Set TTL for 3 hours (in seconds)
-    const redisResonse = await redis.set(email, orgId, {
-      ex: THREE_HOURS_IN_SECONDS,
-    });
-    return redisResonse;
-  } catch (err) {
-    console.error(err);
-  }
-};
-
-export const deleteUserSession = async (email: string) => {
-  try {
-    const redisResonse = await redis.del(email);
-    return redisResonse;
-  } catch (err) {
-    console.error(err);
-  }
-};
-
-export const isSessionActive = async (email: string) => {
-  try {
-    const isActive = await redis.get(email);
-    return !!isActive;
-  } catch (err) {
-    console.error(err);
-  }
 };
 
 export const createClerkUserWithoutSession = async (

@@ -173,13 +173,7 @@ const SignIn = () => {
   const handleLogout = async () => {
     try {
       clearErrors();
-      // Remove organisation id on redis
-      const { data } = await axios.post('/api/user/session/delete', {
-        email: user.primaryEmailAddress.emailAddress,
-      });
-      if (!data.success) {
-        console.error('Error deleting user session');
-      }
+
       // Sign out from Clerk
       await signOut();
       setShowLogout(false);
