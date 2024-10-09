@@ -1,4 +1,5 @@
-import prisma from 'lib/prisma';
+import prisma from 'lib/prisma_master';
+
 export default async function getAllPlans() {
   try {
     const response = await prisma.subscriptionPlan.findMany();

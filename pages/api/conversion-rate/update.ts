@@ -1,4 +1,4 @@
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { updateConversionRateByDetails, updateConversionRateById } from 'services/conversionRateService';
 
@@ -7,7 +7,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     res.status(405).json({ message: 'Method Not Allowed' });
     return;
   }
-
+  const prisma = await getPrismaClient(req);
   const { updates } = req.body;
 
   if (!Array.isArray(updates) || updates.length === 0) {

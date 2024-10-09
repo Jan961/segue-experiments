@@ -1,9 +1,11 @@
 import { getFileUrl } from 'lib/s3';
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
+import { NextApiRequest } from 'next';
 
-export const getFileCardFromFileId = async (Id: number) => {
+export const getFileCardFromFileId = async (Id: number, req: NextApiRequest) => {
   try {
-    const result = await prisma.File.findFirst({
+    const prisma = await getPrismaClient(req);
+    const result = await prisma.file.findFirst({
       where: { Id },
       select: { Location: true, MediaType: true, OriginalFilename: true },
     });

@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import * as yup from 'yup';
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { handleAgencyDetails, handleEmergencyContacts, upsertPerson } from 'services/person';
 import { updatePersonSchema } from 'validators/person';
 import { ERROR_CODES } from 'config/apiConfig';
@@ -12,6 +12,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
+    const prisma = await getPrismaClient(req);
     const validatedData = await updatePersonSchema.validate(req.body, { abortEarly: false });
 
     await prisma.$transaction(async (tx) => {

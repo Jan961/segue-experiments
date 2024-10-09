@@ -1,11 +1,11 @@
 import ExcelJS from 'exceljs';
-import { getArchivedSalesList } from 'pages/api/marketing/sales/read/archived';
 import { isArray } from 'radash';
 import { COLOR_HEXCODE } from 'services/salesSummaryService';
 import { convertToPDF } from 'utils/report';
 import formatInputDate from 'utils/dateInputFormat';
 import { ALIGNMENT } from '../masterplan';
 import { addWidthAsPerContent } from 'services/reportsService';
+import getPrismaClient from 'lib/prisma';
 
 const createExcelFromData = (data, bookingInfo, productionName, venueAndDate) => {
   const workbook = new ExcelJS.Workbook();
@@ -169,9 +169,19 @@ const handler = async (req, res) => {
     throw new Error('Required params are missing');
   }
 
+  const prisma = await getPrismaClient(req);
   const bookingIds = bookingsSelection.map((booking) => booking.bookingId);
 
-  const data = await getArchivedSalesList(bookingIds);
+  const data = await prisma.salesView.findMany({
+    where: {
+      BookingId: {
+        in: bookingIds,
+      },
+      SaleTypeName: 'General Sales',
+    },
+    orderBy: [{ BookingFirstDate: 'asc' }, { SetSalesFiguresDate: 'asc' }],
+    take: 300,
+  });
 
   const workbook = createExcelFromData(data, bookingsSelection, productionName, venueAndDate);
   const worksheet = workbook.getWorksheet('Archived Sales');

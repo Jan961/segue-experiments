@@ -1,4 +1,4 @@
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getAccountId, getEmailFromReq } from 'services/userService';
 import { updateVenue } from 'services/venueService';
@@ -12,6 +12,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(405).end(); // Method Not Allowed
   }
   try {
+    const prisma = await getPrismaClient(req);
     const VenueId = parseInt(req.query.id as string, 10);
     if (!VenueId) {
       return res.status(400).json({ error: 'missing required params' });
@@ -149,7 +150,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const barredVenueIds = barredVenues.map(({ barredVenueId }) => barredVenueId).filter((x: number) => x);
     const venueContactIds = venueContacts.map(({ id }) => id).filter((x: number) => x);
     await prisma.$transaction(async (tx) => {
-      const deleteBarredRecordsPromise = tx.VenueBarredVenue.deleteMany({
+      const deleteBarredRecordsPromise = tx.venueBarredVenue.deleteMany({
         where: {
           AND: [
             {
@@ -165,7 +166,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           ],
         },
       });
-      const deleteVenueContactsPromise = tx.VenueContact.deleteMany({
+      const deleteVenueContactsPromise = tx.venueContact.deleteMany({
         where: {
           AND: [
             {

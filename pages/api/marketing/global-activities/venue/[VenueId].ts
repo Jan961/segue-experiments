@@ -1,16 +1,17 @@
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import { GlobalActivityDTO } from 'interfaces';
 import { convertDate } from 'lib/mappers';
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getEmailFromReq, checkAccess } from 'services/userService';
 
 export type GlobalActivitiesResponse = {
   activities: GlobalActivityDTO[];
   activityTypes: Array<SelectOption>;
 };
 
-export const getActivitiesByVenueId = async (VenueId: number) => {
+let prisma = null;
+
+const getActivitiesByVenueId = async (VenueId: number) => {
   // activity types
   const activityTypes = await prisma.activityType.findMany({
     select: {
@@ -81,9 +82,7 @@ const fieldsMapper = (original) => ({
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
     const VenueId = parseInt(req.query.VenueId as string);
-    const email = await getEmailFromReq(req);
-    const access = await checkAccess(email);
-    if (!access) return res.status(401).end();
+    prisma = await getPrismaClient(req);
 
     const result = await getActivitiesByVenueId(VenueId);
 

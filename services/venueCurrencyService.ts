@@ -1,13 +1,15 @@
-import client from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import master from 'lib/prisma_master';
+import { NextApiRequest } from 'next';
 
 const charCodeToCurrency = (charCode: string) => {
   return String.fromCharCode(Number('0x' + charCode));
 };
 
-export const getCurrencyFromBookingId = async (bookingId: number, returnCurrencyCode = false) => {
+export const getCurrencyFromBookingId = async (req: NextApiRequest, bookingId: number, returnCurrencyCode = false) => {
   try {
-    const venueIdQuery: any | null = await client.Booking.findFirst({
+    const prisma = await getPrismaClient(req);
+    const venueIdQuery: any | null = await prisma.booking.findFirst({
       where: {
         Id: bookingId,
       },
@@ -21,7 +23,7 @@ export const getCurrencyFromBookingId = async (bookingId: number, returnCurrency
       return null;
     }
 
-    const venueCountryQuery: any | null = await client.VenueAddress.findFirst({
+    const venueCountryQuery: any | null = await prisma.venueAddress.findFirst({
       where: {
         VenueId: { equals: venueId },
         TypeName: { equals: 'Main' },
@@ -38,7 +40,7 @@ export const getCurrencyFromBookingId = async (bookingId: number, returnCurrency
       return null;
     }
 
-    const currencyCodeQuery: any | null = await client.Country.findFirst({
+    const currencyCodeQuery: any | null = await prisma.country.findFirst({
       where: {
         Id: { equals: countryId },
       },
@@ -71,8 +73,12 @@ export const getCurrencyFromBookingId = async (bookingId: number, returnCurrency
   }
 };
 
-export const getCurrencyCodeFromCountryId: (countryId: number) => Promise<any> = async (countryId: number) => {
-  const currencyCodeQuery: any | null = await client.Country.findFirst({
+export const getCurrencyCodeFromCountryId: (countryId: number, req: NextApiRequest) => Promise<any> = async (
+  countryId: number,
+  req: NextApiRequest,
+) => {
+  const prisma = await getPrismaClient(req);
+  const currencyCodeQuery: any | null = await prisma.country.findFirst({
     where: {
       Id: { equals: countryId },
     },
@@ -83,10 +89,15 @@ export const getCurrencyCodeFromCountryId: (countryId: number) => Promise<any> =
   return currencyCodeQuery?.CurrencyCode;
 };
 
-export const getCurrencyFromProductionId = async (productionId: number, returnCurrencyCode = false) => {
+export const getCurrencyFromProductionId = async (
+  req: NextApiRequest,
+  productionId: number,
+  returnCurrencyCode = false,
+) => {
   try {
+    const prisma = await getPrismaClient(req);
     // Query to get the ReportCurrencyCode from Production
-    const currencyCodeQuery: any | null = await client.Production.findFirst({
+    const currencyCodeQuery: any | null = await prisma.production.findFirst({
       where: {
         Id: { equals: productionId },
       },

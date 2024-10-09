@@ -2,17 +2,14 @@ import { mapToProductionTasksDTO } from 'mappers/tasks';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { loggingService } from 'services/loggingService';
 import { getProductionsAndTasks } from 'services/productionService';
-import { getAccountId, getEmailFromReq } from 'services/userService';
 import { ProductionsWithTasks } from 'state/tasks/productionState';
 import { isNullOrEmpty } from 'utils';
 import { sortProductionTasksByDueAndAlpha } from 'utils/tasks';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const email = await getEmailFromReq(req);
-    const AccountId = await getAccountId(email);
     const ProductionId = req.query.productionId.toString();
-    const productionsWithTasks = await getProductionsAndTasks(AccountId, parseInt(ProductionId));
+    const productionsWithTasks = await getProductionsAndTasks(req, parseInt(ProductionId));
     const productions: ProductionsWithTasks[] = mapToProductionTasksDTO(productionsWithTasks);
     const compressedTasks = productions.map((production) => {
       const taskList = [];

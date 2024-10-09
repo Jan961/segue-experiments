@@ -1,27 +1,25 @@
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getEmailFromReq, checkAccess } from 'services/userService';
+
 import { isNullOrEmpty } from 'utils';
 import { deleteFile } from 'services/uploadService';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
     const { fileId } = req.body;
-    const email = await getEmailFromReq(req);
-    const access = await checkAccess(email);
-    if (!access) return res.status(401).end();
+    const prisma = await getPrismaClient(req);
 
-    const fileObj = await prisma.File.delete({
+    const fileObj = await prisma.file.delete({
       where: { Id: fileId },
     });
 
     await deleteFile(fileObj.Location);
-    const venueFileObj = await prisma.VenueFile.findFirst({
+    const venueFileObj = await prisma.venueFile.findFirst({
       where: { FileId: fileId, Type: 'Tech Specs' },
       select: { Id: true },
     });
     if (!isNullOrEmpty(venueFileObj)) {
-      await prisma.VenueFile.delete({
+      await prisma.venueFile.delete({
         where: { FileId: fileId, Id: venueFileObj.Id },
       });
 

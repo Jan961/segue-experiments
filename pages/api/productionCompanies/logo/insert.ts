@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { parseFormData } from 'utils/fileUpload';
 import { getAccountId, getEmailFromReq } from 'services/userService';
-import prisma from 'lib/prisma';
+import prisma from 'lib/prisma_master';
 import fs from 'fs';
 
 export const config = {

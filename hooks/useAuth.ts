@@ -1,26 +1,25 @@
 import { useClerk } from '@clerk/nextjs';
-import axios from 'axios';
-const useAuth = () => {
-  const { signOut } = useClerk();
+import { useRouter } from 'next/router';
 
-  const logout = async (email: string) => {
+const useAuth = () => {
+  const { signOut: clerkSignOut } = useClerk();
+  const router = useRouter();
+  const signOut = async () => {
     try {
       // Sign out from Clerk
-      await signOut();
-      // Remove organisation id on redis
-      const { data } = await axios.post('/api/user/session/delete', {
-        email,
-      });
-
-      if (!data.success) {
-        console.error('Error deleting user session');
-      }
+      await clerkSignOut();
+      // navigate to sign-in page
+      router.push('/auth/sign-in');
     } catch (err) {
       console.error(err);
     }
   };
 
-  return { logout };
+  const navigateToHome = () => {
+    router.push('/');
+  };
+
+  return { signOut, navigateToHome };
 };
 
 export default useAuth;

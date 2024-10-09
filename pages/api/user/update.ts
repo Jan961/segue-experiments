@@ -31,7 +31,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     });
 
     await replaceUserPermissions(userDetails.accountUserId, userDetails.permissions);
-    await replaceProudctionPermissions(userDetails.accountUserId, userDetails.productions);
+    await replaceProudctionPermissions(userDetails.accountUserId, userDetails.productions, req);
 
     return res.json(updatedUSer);
   } catch (err) {

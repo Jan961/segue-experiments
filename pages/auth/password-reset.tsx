@@ -20,7 +20,7 @@ export const LoadingOverlay = () => (
 );
 
 const PasswordReset = () => {
-  const { logout } = useAuth();
+  const { signOut } = useAuth();
   const [isBusy, setIsBusy] = useState(false);
   const { isLoaded, signIn, setActive } = useSignIn();
   const [showLogout, setShowLogout] = useState(false);
@@ -109,7 +109,7 @@ const PasswordReset = () => {
     setIsBusy(true);
     try {
       // Sign out from Clerk
-      await logout(loginDetails.email);
+      await signOut();
       setIsAuthenticated(false);
       setError('');
       setShowLogout(false);

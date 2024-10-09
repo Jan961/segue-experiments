@@ -1,4 +1,4 @@
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import { GetServerSideProps, InferGetServerSidePropsType, NextApiRequest } from 'next';
 import Layout from 'components/Layout';
 import { getAccountIdFromReq, getUsers } from 'services/userService';
 import { getMasterTasksList } from 'services/TaskService';
@@ -201,7 +201,7 @@ const MasterTasks = (props: InferGetServerSidePropsType<typeof getServerSideProp
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const AccountId = await getAccountIdFromReq(ctx.req);
 
-  const masterTasks: MasterTask[] = await getMasterTasksList(AccountId);
+  const masterTasks: MasterTask[] = await getMasterTasksList(ctx.req as NextApiRequest);
   const users = await getUsers(AccountId);
 
   return {

@@ -1,4 +1,4 @@
-import prisma from 'lib/prisma';
+import prisma from 'lib/prisma_master';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getAccountId, getEmailFromReq } from 'services/userService';
 

@@ -1,6 +1,29 @@
 import axios from 'axios';
+import s3 from 'lib/s3';
+import MariaDB from 'mariadb';
 
 const DB_USER_PRIVILEGES = 'SELECT,INSERT,UPDATE,DELETE,EXECUTE,SHOW VIEW';
+
+const executeSQLFromFile = async (host, user, password, database, file) => {
+  // Create a MySQL connection pool
+  const pool = MariaDB.createPool({
+    host,
+    user,
+    password,
+    database,
+    multipleStatements: true,
+  });
+  // Get a connection from the pool
+  const conn = await pool.getConnection();
+
+  // Execute the SQL script
+  const result = await conn.query(file);
+
+  // Close the connection
+  conn.release();
+
+  return result;
+};
 
 export const createClientDB = async (organisationId: string) => {
   if (!organisationId) {
@@ -16,7 +39,8 @@ export const createClientDB = async (organisationId: string) => {
     'Content-Type': 'application/json',
     Authorization: `cpanel ${process.env.DB_USER}:${process.env.DB_API_KEY}`,
   };
-  const url = `https://${process.env.DB_SERVER}:${process.env.DB_PORT}/execute/Mysql`;
+  const host = process.env.DB_SERVER;
+  const url = `https://${host}:${process.env.DB_PORT}/execute/Mysql`;
   const dbName = `${process.env.DB_USER}_${deploymentEnv}_Segue_${organisationId}`;
   const dbUser = `${process.env.DB_USER}_${deploymentEnv}User`;
   const dboUser = `${process.env.DB_USER}_${deploymentEnv}DBO`;
@@ -46,5 +70,20 @@ export const createClientDB = async (organisationId: string) => {
         headers,
       },
     );
+
+    // Seed data
+    const params = {
+      Bucket: process.env.S3_BUCKET_NAME,
+      Key: process.env.CLIENT_DB_SEED_SCRIPT,
+    };
+    const response = await s3.getObject(params).promise();
+
+    if (!response.Body || response.ContentLength === 0) {
+      throw new Error('Unable to create new DB. Unable to get DB seed script');
+    }
+
+    await executeSQLFromFile(host, dboUser, process.env.DBO_PASSWORD, dbName, response.Body.toString('utf-8'));
+  } else {
+    throw new Error('Unable to create new DB');
   }
 };

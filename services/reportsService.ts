@@ -96,8 +96,8 @@ export const applyGradientFillToColumn = ({
       degree: 0,
       stops: [
         ...((progress === 0 && [{ position: 0, color: { argb: COLOR_HEXCODE.WHITE } }]) || []),
-        { position: 0, color: { argb: 'ff84ecd7' } },
-        { position: progress, color: { argb: 'ff84ecd7' } },
+        { position: 0, color: { argb: COLOR_HEXCODE.TASK_GREEN } },
+        { position: progress, color: { argb: COLOR_HEXCODE.TASK_GREEN } },
         ...(((progress < 1 || progress === 0) && [{ position: 1, color: { argb: COLOR_HEXCODE.WHITE } }]) || []),
       ],
     };

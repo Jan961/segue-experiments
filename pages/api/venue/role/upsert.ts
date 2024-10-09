@@ -1,4 +1,4 @@
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 
 const mapToPrismaFields = ({ id: Id, name: Name, isStandard: IsStandard = false }) => ({ Id, Name, IsStandard });
@@ -8,7 +8,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     if (!role.Name) {
       res.status(404).json({ ok: false, message: 'name is required' });
     }
-    const updatedRole = await prisma.VenueRole.upsert({
+
+    const prisma = await getPrismaClient(req);
+    const updatedRole = await prisma.venueRole.upsert({
       where: {
         ...(role.Id && { Id: role.Id }),
         ...(role.Name && { Name: role.Name }),

@@ -1,7 +1,7 @@
 import { ProductionTaskDTO } from 'interfaces';
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getEmailFromReq, checkAccess } from 'services/userService';
+
 import { generateRecurringProductionTasks, getNewTasksNum } from 'services/TaskService';
 import { calculateWeekNumber } from 'services/dateService';
 import { isNullOrEmpty } from 'utils';
@@ -11,17 +11,15 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     try {
       const task = req.body as ProductionTaskDTO;
       const { Id } = task;
-      const email = await getEmailFromReq(req);
-      const access = await checkAccess(email, { TaskId: Id });
-      if (!access) return res.status(401).end();
-
-      let taskObj = await prisma.ProductionTask.findFirst({
+      const prisma = await getPrismaClient(req);
+      let result = null;
+      let taskObj = await prisma.productionTask.findFirst({
         where: { Id },
         include: { Production: { include: { DateBlock: true } }, ProductionTaskRepeat: true },
       });
       taskObj = { ...taskObj, ...taskObj?.ProductionTaskRepeat };
       if (!isNullOrEmpty(taskObj?.ProductionTaskRepeat)) {
-        taskObj = {
+        result = {
           ...taskObj,
           TaskRepeatFromWeekNum: taskObj?.ProductionTaskRepeat.FromWeekNum,
           TaskRepeatToWeekNum: taskObj?.ProductionTaskRepeat.ToWeekNum,
@@ -35,13 +33,13 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
 
       let fieldDifference = false;
       fieldList.forEach((field) => {
-        if (taskObj[field] !== req.body[field]) {
+        if (result[field] !== req.body[field]) {
           fieldDifference = true;
         }
       });
 
       if (fieldDifference) {
-        const productionDateBlock = taskObj.Production.DateBlock;
+        const productionDateBlock = result.Production.DateBlock;
 
         const prodStartDate = new Date(
           productionDateBlock.find((dateBlock) => dateBlock.Name === 'Production')?.StartDate,
@@ -58,18 +56,20 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         if (!isNullOrEmpty(PRTId)) {
           const numTasksExist =
             (
-              await prisma.ProductionTaskRepeat.findFirst({
+              await prisma.productionTaskRepeat.findFirst({
                 where: { Id: PRTId },
                 include: { ProductionTask: true },
               })
             )?.ProductionTask || [];
-
-          if (numTasksExist !== numTasksByCalc) {
+          //  if (numTasksExist !== numTasksByCalc) does not make sense aswe compare an object to number. Setting to numTasksExist.length to get build working
+          if (numTasksExist.length !== numTasksByCalc) {
             const newTasks = await generateRecurringProductionTasks(
               req.body,
               productionDateBlock,
               prodStartDate,
               PRTId,
+              1,
+              req,
             );
             const tasksToKeep = [];
             const tasksToDelete = [];
@@ -103,7 +103,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
             });
 
             await prisma.$transaction(async (prisma) => {
-              await prisma.ProductionTask.deleteMany({
+              await prisma.productionTask.deleteMany({
                 where: {
                   Id: { in: tasksToDelete.map((task) => task.Id) },
                 },
@@ -131,7 +131,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
                 }
               }),
             );
-            await prisma.ProductionTaskRepeat.update({
+            await prisma.productionTaskRepeat.update({
               where: { Id: PRTId },
               data: {
                 Interval: RepeatInterval,
@@ -145,7 +145,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
             return res.status(201).json(createdTasks);
           }
         } else {
-          const newRepeatingTask = await prisma.ProductionTaskRepeat.create({
+          const newRepeatingTask = await prisma.productionTaskRepeat.create({
             data: {
               Interval: RepeatInterval,
               FromWeekNum: TaskRepeatFromWeekNum,
@@ -156,18 +156,25 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           });
 
           const newTasks = (
-            await generateRecurringProductionTasks(req.body, productionDateBlock, prodStartDate, newRepeatingTask.Id)
+            await generateRecurringProductionTasks(
+              req.body,
+              productionDateBlock,
+              prodStartDate,
+              newRepeatingTask.Id,
+              1,
+              req,
+            )
           ).splice(0);
 
           const taskObjects = await Promise.all(
             newTasks.map(async (task) => {
-              return await prisma.ProductionTask.create({ data: { ...task } });
+              return await prisma.productionTask.create({ data: { ...task } });
             }),
           );
           return res.status(201).json(taskObjects);
         }
       } else {
-        const updatedTask = await prisma.ProductionTask.update({
+        const updatedTask = await prisma.productionTask.update({
           where: { Id: task.Id },
           data: {
             Name: task.Name,

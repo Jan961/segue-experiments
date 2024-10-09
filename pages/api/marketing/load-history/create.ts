@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
 import { SpreadsheetDataCleaned } from 'types/SpreadsheetValidationTypes';
 import { getDateBlockForProduction, deleteAllDateBlockEvents } from 'services/dateBlockService';
 import { nanoid } from 'nanoid';
@@ -15,12 +15,12 @@ interface RequestBody {
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
     const { spreadsheetData, selectedProdId, fileID }: RequestBody = req.body;
-
+    const prisma = await getPrismaClient(req);
     // Perform Prisma queries in one transaction so that if it fails previous changes are rolled back
     await prisma.$transaction(
       async (tx: PrismaClient) => {
         await updateCreateProductionFile(tx, selectedProdId, fileID);
-        const primaryDateBlock = await getDateBlockForProduction(selectedProdId, true);
+        const primaryDateBlock = await getDateBlockForProduction(selectedProdId, true, req);
         const primaryDateBlockID = primaryDateBlock[0].Id;
         await deleteEvents(tx, primaryDateBlockID);
         await updateSpreadsheetDataWithVenueIDs(tx, spreadsheetData);

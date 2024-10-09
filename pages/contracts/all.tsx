@@ -1,4 +1,4 @@
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import { GetServerSideProps, InferGetServerSidePropsType, NextApiRequest } from 'next';
 import Layout from 'components/Layout';
 import { InitialState } from 'lib/recoil';
 import { getProductionJumpState } from 'utils/getProductionJumpState';
@@ -13,6 +13,7 @@ import {
   performanceMapper,
   rehearsalMapper,
   contractStatusmapper,
+  dealMemoMapper,
 } from 'lib/mappers';
 import useContractsFilter from 'hooks/useContractsFilter';
 import { getAllVenuesMin } from 'services/venueService';
@@ -20,10 +21,11 @@ import { BookingsWithPerformances } from 'services/bookingService';
 import { objectify, all } from 'radash';
 import { getDayTypes } from 'services/dayTypeService';
 import { getAllCurrencylist, getProductionsWithContent } from 'services/productionService';
-import { getAllContractStatus } from 'services/contractStatus';
+import { getAllContractStatus, getContractDealMemo } from 'services/contractStatus';
 import { DateType } from 'prisma/generated/prisma-client';
 import { getAccountContacts } from 'services/contactService';
 import { getAccountIdFromReq } from 'services/userService';
+import { isNullOrUndefined, mapObjectValues } from 'utils';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const ContractsPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
@@ -55,13 +57,14 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
   const accountId = await getAccountIdFromReq(ctx.req);
 
-  const [venues, productions, dateTypeRaw, contractStatus, currencyList, contacts] = await all([
-    getAllVenuesMin(),
-    getProductionsWithContent(null, false),
-    getDayTypes(),
-    getAllContractStatus(),
+  const [venues, productions, dateTypeRaw, contractStatus, currencyList, contacts, dealMemoStatus] = await all([
+    getAllVenuesMin(ctx.req as NextApiRequest),
+    getProductionsWithContent(ctx.req as NextApiRequest, null, false),
+    getDayTypes(ctx.req as NextApiRequest),
+    getAllContractStatus(ctx.req as NextApiRequest),
     getAllCurrencylist(),
     getAccountContacts(accountId),
+    getContractDealMemo(ProductionId === -1 ? null : ProductionId, ctx.req as NextApiRequest),
   ]);
   const dateBlock = [];
   const rehearsal = {};
@@ -135,6 +138,17 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       contractStatusData[contractData.Id] = contractStatusmapper(contractData.Contract);
     }
   });
+
+  // set the deal memo status
+  const valTransform = (key: string, value: any) => (isNullOrUndefined(value) ? null : value.toString());
+  const dealMemoStatusData = {};
+  dealMemoStatus.forEach((deMoStatus) => {
+    if (!isNullOrUndefined(deMoStatus.DealMemo)) {
+      const dealMemoMapped = dealMemoMapper(deMoStatus.DealMemo);
+      dealMemoStatusData[deMoStatus.Id] = mapObjectValues(dealMemoMapped, valTransform);
+    }
+  });
+
   // See _app.tsx for how this is picked up
   const initialState: InitialState = {
     global: {
@@ -155,6 +169,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       }),
       venue,
       contractStatus: contractStatusData,
+      dealMemoStatus: dealMemoStatusData,
       accountContacts: contacts,
     },
   };

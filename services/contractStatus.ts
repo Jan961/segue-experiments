@@ -1,6 +1,8 @@
-import prisma from 'lib/prisma';
+import getPrismaClient from 'lib/prisma';
+import { NextApiRequest } from 'next';
 
-export const getContractStatus = async (ProductionId: number) => {
+export const getContractStatus = async (ProductionId: number, req: NextApiRequest) => {
+  const prisma = await getPrismaClient(req);
   return prisma.booking.findMany({
     where: {
       DateBlock: {
@@ -13,7 +15,8 @@ export const getContractStatus = async (ProductionId: number) => {
   });
 };
 
-export const getContractDealMemo = async (ProductionId: number) => {
+export const getContractDealMemo = async (ProductionId: number, req: NextApiRequest) => {
+  const prisma = await getPrismaClient(req);
   return prisma.booking.findMany({
     where: {
       DateBlock: {
@@ -26,7 +29,8 @@ export const getContractDealMemo = async (ProductionId: number) => {
   });
 };
 
-export const getAllContractStatus = async () => {
+export const getAllContractStatus = async (req: NextApiRequest) => {
+  const prisma = await getPrismaClient(req);
   return prisma.booking.findMany({
     include: {
       Contract: true,

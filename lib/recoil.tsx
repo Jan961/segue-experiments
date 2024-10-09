@@ -9,6 +9,7 @@ import {
   ContractStatusType,
   ContractBookingStatusType,
   AccountContactDTO,
+  DealMemoContractFormData,
 } from 'interfaces';
 import { RecoilState, useRecoilCallback } from 'recoil';
 import { bookingState } from 'state/booking/bookingState';
@@ -37,7 +38,11 @@ import { contractsDateBlockState } from 'state/contracts/contractsDateBlockState
 import { contractsDateTypeState } from 'state/contracts/contractsDateTypeState';
 import { contractsPerformanceState } from 'state/contracts/contractsPerformanceState';
 import { contractsVenueState } from 'state/contracts/contractsVenueState';
-import { contractsBookingStatusState, contractsStatusState } from 'state/contracts/contractsStatusState';
+import {
+  contractsBookingStatusState,
+  contractsStatusState,
+  dealMemoStatusState,
+} from 'state/contracts/contractsStatusState';
 import { contractRehearsalState } from 'state/contracts/contractRehearsalState';
 import { contractGetInFitUpState } from 'state/contracts/contractGetInFitUpState';
 import { currencyState, TCurrencySymbol } from 'state/global/currencyState';
@@ -51,6 +56,7 @@ import { TStandardClauseState, standardClauseState } from 'state/contracts/stand
 import { TContractListState, contractListState } from 'state/contracts/contractsListState';
 import { TContractDepartmentState, contractDepartmentState } from 'state/contracts/contractDepartmentState';
 import { accountContactState } from 'state/contracts/accountContactState';
+import { contractTemplateState, TContractTemplateState } from 'state/contracts/contractTemplateState';
 
 /*
   Experimental attempt to get Recoil.js working with SSR in React in a DRY manner.
@@ -91,10 +97,12 @@ export type InitialState = Partial<{
     performance?: Record<number, PerformanceDTO>;
     venue?: Record<number, VenueMinimalDTO>;
     contractStatus?: Record<number, ContractStatusType>;
+    dealMemoStatus?: Record<number, DealMemoContractFormData>;
     contractBookingStatus?: Record<number, ContractBookingStatusType>;
     status?: Record<number, ContractStatusType>;
     filters?: TContractsFilterState;
     person?: TPersonState;
+    template?: TContractTemplateState;
     standardClause?: TStandardClauseState;
     contract?: TContractListState;
     department?: TContractDepartmentState;
@@ -161,10 +169,12 @@ const states: {
     performance: contractsPerformanceState,
     venue: contractsVenueState,
     contractStatus: contractsStatusState,
+    dealMemoStatus: dealMemoStatusState,
     contractBookingStatus: contractsBookingStatusState,
     status: contractsStatusState,
     filters: contractsFilterState,
     person: personState,
+    template: contractTemplateState,
     standardClause: standardClauseState,
     contract: contractListState,
     department: contractDepartmentState,

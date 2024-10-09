@@ -5,13 +5,25 @@ import AddEditUser from 'components/admin/modals/AddEditUser';
 import AddEditPermissionGroup from 'components/admin/modals/AddEditPermissionGroup';
 import Layout from 'components/Layout';
 import { useEffect, useRef, useState } from 'react';
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import { GetServerSideProps, InferGetServerSidePropsType, NextApiRequest } from 'next';
 import { getPermissionGroupsList, getPermissionsList } from 'services/permissionService';
 import { getAllProductions } from 'services/productionService';
 import { useRouter } from 'next/router';
 import { mapRecursive } from 'utils';
 import { TreeItemOption } from 'components/global/TreeSelect/types';
 import { dateBlockMapper } from 'lib/mappers';
+
+const getTableGridOptions = (uniqueKey: string, config = {}) => ({
+  ...config,
+  getRowNodeId: (data) => {
+    return data[uniqueKey];
+  },
+  onRowDataUpdated: (params) => {
+    params.api.forEachNode((rowNode) => {
+      rowNode.id = rowNode.data[uniqueKey];
+    });
+  },
+});
 
 export default function Users({
   permissionsList,
@@ -207,6 +219,7 @@ export default function Users({
         rowData={userRowData}
         styleProps={styleProps}
         tableHeight={300}
+        gridOptions={getTableGridOptions('email')}
       />
 
       <div className="flex justify-end mt-5 mb-5">
@@ -230,7 +243,7 @@ export default function Users({
             rowData={permisisonGroups}
             styleProps={styleProps}
             tableHeight={300}
-            gridOptions={{ suppressHorizontalScroll: true }}
+            gridOptions={getTableGridOptions('groupName', { suppressHorizontalScroll: true })}
           />
         </div>
       </div>
@@ -270,7 +283,7 @@ export default function Users({
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const permisisonGroups = await getPermissionGroupsList(ctx.req);
   const permissionsList = await getPermissionsList();
-  const productions = await getAllProductions();
+  const productions = await getAllProductions(ctx.req as NextApiRequest);
 
   const formattedProductions = productions
     .map((t: any) => {

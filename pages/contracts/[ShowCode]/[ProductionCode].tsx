@@ -1,4 +1,4 @@
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import { GetServerSideProps, InferGetServerSidePropsType, NextApiRequest } from 'next';
 import Layout from 'components/Layout';
 import { InitialState } from 'lib/recoil';
 import { getProductionJumpState } from 'utils/getProductionJumpState';
@@ -15,6 +15,7 @@ import {
   rehearsalMapper,
   contractStatusmapper,
   contractBookingStatusmapper,
+  dealMemoMapper,
 } from 'lib/mappers';
 import useContractsFilter from 'hooks/useContractsFilter';
 import { getAllVenuesMin } from 'services/venueService';
@@ -22,9 +23,10 @@ import { BookingsWithPerformances } from 'services/bookingService';
 import { objectify, all } from 'radash';
 import { getDayTypes } from 'services/dayTypeService';
 import { getProductionsWithContent } from 'services/productionService';
-import { getContractStatus } from 'services/contractStatus';
+import { getContractDealMemo, getContractStatus } from 'services/contractStatus';
 import { DateType } from 'prisma/generated/prisma-client';
 import { getAccountContacts } from 'services/contactService';
+import { isNullOrUndefined, mapObjectValues } from 'utils';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const ContractsPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const rows = useContractsFilter();
@@ -58,12 +60,17 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   if (!ProductionId) return { notFound: true };
 
   // Get in parallel
-  const [venues, productions, dateTypeRaw, contractStatus, contacts] = await all([
-    getAllVenuesMin(),
-    getProductionsWithContent(ProductionId === -1 ? null : ProductionId, !productionJump.includeArchived),
-    getDayTypes(),
-    getContractStatus(ProductionId === -1 ? null : ProductionId),
+  const [venues, productions, dateTypeRaw, contractStatus, contacts, dealMemoStatus] = await all([
+    getAllVenuesMin(ctx.req as NextApiRequest),
+    getProductionsWithContent(
+      ctx.req as NextApiRequest,
+      ProductionId === -1 ? null : ProductionId,
+      !productionJump.includeArchived,
+    ),
+    getDayTypes(ctx.req as NextApiRequest),
+    getContractStatus(ProductionId === -1 ? null : ProductionId, ctx.req as NextApiRequest),
     getAccountContacts(AccountId),
+    getContractDealMemo(ProductionId === -1 ? null : ProductionId, ctx.req as NextApiRequest),
   ]);
   const dateBlock = [];
   const rehearsal = {};
@@ -139,6 +146,17 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     contractStatusData[contractData.Id] = contractStatusmapper(contractData.Contract);
     contractBookingStatusData[contractData.Id] = contractBookingStatusmapper(contractData);
   });
+
+  // set the deal memo status
+  const valTransform = (key: string, value: any) => (isNullOrUndefined(value) ? null : value.toString());
+  const dealMemoStatusData = {};
+  dealMemoStatus.forEach((deMoStatus) => {
+    if (!isNullOrUndefined(deMoStatus.DealMemo)) {
+      const dealMemoMapped = dealMemoMapper(deMoStatus.DealMemo);
+      dealMemoStatusData[deMoStatus.Id] = mapObjectValues(dealMemoMapped, valTransform);
+    }
+  });
+
   // See _app.tsx for how this is picked up
   const initialState: InitialState = {
     global: {
@@ -158,6 +176,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       venue,
       contractStatus: contractStatusData,
       contractBookingStatus: contractBookingStatusData,
+      dealMemoStatus: dealMemoStatusData,
       accountContacts: contacts,
     },
     account: {

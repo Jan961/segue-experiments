@@ -9,6 +9,7 @@ export interface BankAccount {
 }
 
 export interface IAgencyDetails {
+  hasAgent: boolean;
   firstName: string;
   lastName: string;
   email: string;
@@ -75,7 +76,7 @@ export interface IPerson {
   personDetails?: IPersonDetails;
   emergencyContact1?: EmergencyContact;
   emergencyContact2?: EmergencyContact;
-  agencyDetails?: AgencyDetails;
+  agencyDetails?: IAgencyDetails;
   salaryAccountDetails?: BankAccount;
   expenseAccountDetails?: BankAccount;
 }
