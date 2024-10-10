@@ -76,6 +76,9 @@ pipelines:
               - cd cypress
               - ls -al
               - zip -r reports.zip reports
+              - ls -al
+            artifacts:
+              - reports.zip
             after-script:
               - ALERT_TYPE="success"
               - if [[ $BITBUCKET_EXIT_CODE -ne 0 ]]; then ALERT_TYPE="error" ; fi
@@ -90,6 +93,7 @@ pipelines:
                   ATTACHMENTS: 'reports.zip'
             artifacts:
               - cypress-tests/cypress/reports/**
+              - cypress-tests/cypress/**
         # - step:
         #     name: "Generate Test Report"
         #     script:
