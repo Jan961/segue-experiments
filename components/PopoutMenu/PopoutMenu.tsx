@@ -24,7 +24,7 @@ const leve2 = 'text-[1.0625rem]';
 const level3 = 'text-[0.9375rem]';
 
 export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: any) {
-  const [state, setGlobalState] = useRecoilState(globalState);
+  const [sideMenuState, setSideMenuState] = useRecoilState(globalState);
   const { permissions } = useRecoilValue(userPermissionsState);
   const isMenuPinned = useRef(false);
   const menuRef = useRef(null);
@@ -343,18 +343,21 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
   );
 
   const close = () => {
-    setGlobalState({ ...state, menuPinned: false });
+    setSideMenuState({ ...sideMenuState, menuPinned: false });
     setMenuIsOpen(false);
   };
 
   const handleMenuClick = (option) => {
+    if (!isMenuPinned.current) {
+      close();
+    }
     if (option?.value) {
       router.push(option.value);
     }
   };
 
   const handleMenuToggle = (menuState) => {
-    setGlobalState({ ...state, menuItems: menuState });
+    setSideMenuState({ ...sideMenuState, menuItems: menuState });
   };
 
   const handleOutsideClick = (e) => {
@@ -368,7 +371,7 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
 
   const handlePinToggle = () => {
     isMenuPinned.current = !isMenuPinned.current;
-    setGlobalState({ ...state, menuPinned: isMenuPinned.current });
+    setSideMenuState({ ...sideMenuState, menuPinned: isMenuPinned.current });
     if (!isMenuPinned.current) {
       close();
     } else {
@@ -377,16 +380,16 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
   };
 
   useEffect(() => {
-    isMenuPinned.current = state.menuPinned;
-    if (permissions?.length > 0 && isNullOrEmpty(state.menuItems)) {
+    isMenuPinned.current = sideMenuState.menuPinned;
+    if (permissions?.length > 0 && isNullOrEmpty(sideMenuState.menuItems)) {
       const disabledRoutes = ['/touring'];
       const filteredMenuItems = menuItems.filter(
         (item) => permissions.includes(item.permission) && !disabledRoutes.includes(item.value),
       );
 
-      setGlobalState({ ...state, menuItems: filteredMenuItems });
+      setSideMenuState({ ...sideMenuState, menuItems: filteredMenuItems });
     }
-  }, [menuItems, state, setGlobalState, permissions]);
+  }, [menuItems, sideMenuState, setSideMenuState, permissions]);
 
   useEffect(() => {
     if (menuIsOpen) {
@@ -416,7 +419,7 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
       >
         <HierarchicalMenu
           ref={menuRef}
-          options={state?.menuItems || []}
+          options={sideMenuState?.menuItems || []}
           onClick={handleMenuClick}
           onToggle={handleMenuToggle}
           className="w-64"
@@ -426,7 +429,7 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
         <Icon
           fill="#FFF"
           stroke="#FFF"
-          className={state.menuPinned ? '' : 'rotate-90 transform'}
+          className={sideMenuState.menuPinned ? '' : 'rotate-90 transform'}
           iconName="pin-close"
           onClick={handlePinToggle}
         />
