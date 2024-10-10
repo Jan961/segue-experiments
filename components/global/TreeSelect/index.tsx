@@ -10,6 +10,7 @@ interface TreeSelectProps {
   options: TreeItemOption[];
   onChange: (v: TreeItemOption[]) => void;
   selectAllLabel?: string;
+  disabled?: boolean;
 }
 
 const baseClass = 'border bg-white px-3 py-2';
@@ -20,6 +21,7 @@ export default function TreeSelect({
   defaultOpen = false,
   className = '',
   selectAllLabel = 'Select All',
+  disabled = false,
 }: TreeSelectProps) {
   const [itemOptions, setItemOptions] = useState(options || []);
   const [selectAll, setSelecteAll] = useState<boolean>(false);
@@ -27,7 +29,8 @@ export default function TreeSelect({
   useEffect(() => {
     if (!options || options.length === 0) setItemOptions([]);
 
-    const updatedOptions = options.map((o) => ({ ...o, groupHeader: true }));
+    let updatedOptions: TreeItemOption[] = options.map((o) => ({ ...o, groupHeader: true }));
+    updatedOptions = mapRecursive(updatedOptions, (o) => ({ ...o, disabled }));
     setItemOptions(updatedOptions);
     const areAllOptionsSelected = updatedOptions.every((o) => o.checked);
     setSelecteAll(areAllOptionsSelected);
@@ -61,6 +64,7 @@ export default function TreeSelect({
           value="selectAll"
           onChange={handleSelectAllToggle}
           showIntermediate={false}
+          disabled={disabled}
         />
       )}
       {itemOptions.map((o) => (
