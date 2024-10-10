@@ -73,6 +73,7 @@ pipelines:
               # - npm run cy:alltests --browser chrome
               - npm run cy:permissions --browser chrome
               - apt-get update && apt-get install -y zip
+              - cd cypress
               - ls -al
               - zip -r reports.zip reports
             after-script:
