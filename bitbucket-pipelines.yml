@@ -77,8 +77,10 @@ pipelines:
               - ls -al
               - zip -r reports.zip reports
               - ls -al
+              - pwd
             artifacts:
               - reports.zip
+              - cypress-tests/cypress/**
             after-script:
               - ALERT_TYPE="success"
               - if [[ $BITBUCKET_EXIT_CODE -ne 0 ]]; then ALERT_TYPE="error" ; fi
