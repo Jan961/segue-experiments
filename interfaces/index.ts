@@ -821,6 +821,8 @@ export interface DealMemoContractFormData {
   Notes?: string;
   CompAccContId?: number;
   SendTo?: Array<number>;
+  SettlementSameDay?: boolean;
+  SeatKillNotes?: string;
 }
 
 export interface DealMemoHoldType {

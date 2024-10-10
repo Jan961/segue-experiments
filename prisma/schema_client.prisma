@@ -684,7 +684,7 @@ model DealMemo {
   PRSPercentage                                              Decimal?                      @map("DeMoPRSPercentage") @db.Decimal(5, 2)
   Guarantee                                                  Boolean                       @default(dbgenerated("(b'0')")) @map("DeMoGuarantee") @db.Bit(1)
   GuaranteeAmount                                            Decimal?                      @map("DeMoGuaranteeAmount") @db.Decimal(10, 2)
-  HasCalls                                                   Boolean                       @default(false) @map("DeMoHasCalls")
+  HasCalls                                                   Boolean                       @default(dbgenerated("(b'0')")) @map("DeMoHasCalls") @db.Bit(1)
   PromoterSplitPercentage                                    Decimal?                      @map("DeMoPromoterSplitPercentage") @db.Decimal(5, 2)
   VenueSplitPercentage                                       Decimal?                      @map("DeMoVenueSplitPercentage") @db.Decimal(5, 2)
   VenueRental                                                Decimal?                      @map("DeMoVenueRental") @db.Decimal(10, 2)
@@ -740,11 +740,11 @@ model DealMemo {
   AdvancePaymentDueBy                                        DateTime?                     @map("DeMoAdvancePaymentDueBy") @db.Date
   SettlementDays                                             Int?                          @map("DeMoSettlementDays") @db.TinyInt
   ContractClause                                             String?                       @map("DeMoContractClause") @db.LongText
-  PrintDelVenueAddressLine                                   String?                       @db.LongText @map("DeMoPrintDelVenueAddressLine")
+  PrintDelVenueAddressLine                                   String?                       @map("DeMoPrintDelVenueAddressLine") @db.LongText
   PrintDelUseVenueAddress                                    Boolean                       @default(dbgenerated("(b'0')")) @map("DeMoPrintDelUseVenueAddress") @db.Bit(1)
   CompAccContId                                              Int?                          @map("DeMoCompAccContId")
   SeatKillNotes                                              String?                       @map("DeMoSeatKillNotes") @db.LongText
-  SettlementSameDay                                          Boolean                       @default(false) @map("DeMoSettlementSameDay")
+  SettlementSameDay                                          Boolean                       @default(dbgenerated("(b'0')")) @map("DeMoSettlementSameDay") @db.Bit(1)
   Booking                                                    Booking                       @relation(fields: [BookingId], references: [Id], onDelete: Cascade, map: "BookingDealMemo")
   VenueContact_DealMemo_DeMoBOMVenueContactIdToVenueContact  VenueContact?                 @relation("DealMemo_DeMoBOMVenueContactIdToVenueContact", fields: [BOMVenueContactId], references: [Id], onDelete: Cascade, map: "VenueContactDealMemoBOM")
   VenueContact_DealMemo_DeMoTechVenueContactIdToVenueContact VenueContact?                 @relation("DealMemo_DeMoTechVenueContactIdToVenueContact", fields: [TechVenueContactId], references: [Id], onDelete: Cascade, map: "VenueContactDealMemoTech")
@@ -1206,7 +1206,6 @@ model BookingFile {
   @@index([BookingFileBookingId], map: "Booking_BookingFile")
 }
 
-
 model VenueVenue {
   Venue1Id Int     @map("VVVenue1Id")
   Venue2Id Int     @map("VVVenue2Id")
@@ -1219,7 +1218,6 @@ model VenueVenue {
   @@index([Venue1Id], map: "Venue_VenueVenue1_idx")
   @@index([Venue2Id], map: "Venue_VenueVenue2_idx")
 }
-
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view SalesFiguresView {

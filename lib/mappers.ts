@@ -424,6 +424,8 @@ export const dealMemoMapper = (dealMemo: DealMemoContractFormData) => {
     Notes: dealMemo.Notes,
     CompAccContId: dealMemo.CompAccContId,
     SendTo: dealMemo.SendTo,
+    SettlementSameDay: dealMemo.SettlementSameDay,
+    SeatKillNotes: dealMemo.SeatKillNotes,
   };
 };
 

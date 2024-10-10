@@ -88,7 +88,6 @@ export const EditDealMemoContractModal = ({
   dealHoldType: Array<DealMemoHoldType>;
 }) => {
   const [formData, setFormData] = useRecoilState(dealMemoInitialState);
-  const [contractCheckBox, setContractCheckBox] = useState<boolean>(false);
   const [dealMemoPriceData, setDealMemoPriceData] = useState<PriceState>({ default: [], custom: [] });
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [dealCall, setDealCall] = useState([]);
@@ -1322,10 +1321,9 @@ export const EditDealMemoContractModal = ({
                 <TextArea
                   testId="box-office-hold-notes"
                   className="mt-2 mb-2 w-full h-[583px]"
-                  value={formData.OtherHolds}
+                  value={formData.SeatKillNotes}
                   placeholder="Notes Field"
-                  // PL - TO BE CHANGED
-                  onChange={(value) => editDemoModalData('OtherHolds', value.target.value, 'dealMemo')}
+                  onChange={(value) => editDemoModalData('SeatKillNotes', value.target.value, 'dealMemo')}
                 />
               </div>
             </div>
@@ -2217,12 +2215,13 @@ export const EditDealMemoContractModal = ({
                 labelClassName="!text-base"
                 id="includeExcludedVenues"
                 onChange={(value) => {
-                  if (value) {
-                    setFormData({ ...formData, SettlementDays: null });
+                  if (value.target.checked) {
+                    setFormData({ ...formData, SettlementSameDay: value.target.checked, SettlementDays: null });
+                  } else {
+                    editDemoModalData('SettlementSameDay', value.target.checked, 'dealMemo');
                   }
-                  setContractCheckBox(value.target.checked);
                 }}
-                checked={contractCheckBox}
+                checked={formData.SettlementSameDay}
                 testId="payment-same-day-checkbox"
               />
               <div className=" text-primary-input-text font-bold ml-4 mr-2">or within</div>
@@ -2232,7 +2231,7 @@ export const EditDealMemoContractModal = ({
                 className="w-full"
                 value={formData.SettlementDays}
                 onChange={(value) => editDemoModalData('SettlementDays', parseFloat(value.target.value), 'dealMemo')}
-                disabled={contractCheckBox}
+                disabled={formData.SettlementSameDay}
               />
 
               <div className=" text-primary-input-text font-bold ml-2">days</div>

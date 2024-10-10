@@ -110,6 +110,8 @@ export const initialDealMemoDataState: DealMemoContractFormData = {
   DealMemoTechProvision: [],
   DealMemoCall: [],
   DealMemoHold: [],
+  SettlementSameDay: false,
+  SeatKillNotes: '',
 };
 
 export const dealMemoInitialState = atom({

@@ -199,6 +199,8 @@ export const initialEditDemoFormData = {
   AdvancePaymentDueBy: null,
   SettlementDays: null,
   ContractClause: '',
+  SettlementSameDay: null,
+  SeatKillNotes: '',
 };
 
 export const salaryPaidToOptions = [
