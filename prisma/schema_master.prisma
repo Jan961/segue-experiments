@@ -240,6 +240,7 @@ view AccountUserPermissionsView {
   AccountId      Int
   UserId         Int     @default(0)
   AccUserId      Int     @default(0)
+  AccUserIsAdmin Boolean @default(dbgenerated("(b'0')")) @db.Bit(1)
   UserFirstName  String  @db.VarChar(50)
   UserLastName   String? @db.VarChar(50)
   UserEmail      String  @db.VarChar(120)
