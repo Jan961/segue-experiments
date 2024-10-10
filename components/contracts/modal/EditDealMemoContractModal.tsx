@@ -188,12 +188,13 @@ export const EditDealMemoContractModal = ({
 
     setHoldTypeData(dealHoldType);
 
-    // format seat kill data if undefined
-    if (!isUndefined(demoModalData.DealMemoHold)) {
-      setSeatKillsData(formatSeatKillValues(demoModalData.DealMemoHold));
-    } else {
-      setSeatKillsData([]);
-    }
+    // format the seat kill data
+    // supply the hold types so an empty array of objects can be formed
+    const processedHoldData = formatSeatKillValues(demoModalData.DealMemoHold, dealHoldType);
+    setSeatKillsData(processedHoldData);
+
+    // setting data on the form so when initialised, the formData object receives the initialised object to update the db
+    setFormData({ ...formData, DealMemoHold: processedHoldData });
 
     const techProvisionData = demoModalData.DealMemoTechProvision ? demoModalData.DealMemoTechProvision : [];
     const techProvision = filterTechProvision(techProvisionData);
