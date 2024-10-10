@@ -1787,8 +1787,8 @@ export const EditDealMemoContractModal = ({
                   testId="marketing-delivery-address"
                   className="w-3/4"
                   disabled={formData.PrintDelUseVenueAddress}
-                  value={formData.PrintDelUseVenueAddress ? '' : formData.PrintDelUseVenueAddressline}
-                  onChange={(value) => editDemoModalData('PrintDelUseVenueAddressline', value.target.value, 'dealMemo')}
+                  value={formData.PrintDelUseVenueAddress ? '' : formData.PrintDelVenueAddressLine}
+                  onChange={(value) => editDemoModalData('PrintDelVenueAddressLine', value.target.value, 'dealMemo')}
                 />
               </div>
             </div>
@@ -1880,9 +1880,9 @@ export const EditDealMemoContractModal = ({
 
               <TextInput
                 className="w-[48vw] ml-2"
-                value={formData.SellNotes}
+                value={formData.MerchNotes}
                 disabled={!formData.SellMerch}
-                onChange={(value) => editDemoModalData('SellNotes', value.target.value, 'dealMemo')}
+                onChange={(value) => editDemoModalData('MerchNotes', value.target.value, 'dealMemo')}
                 testId="items-to-be-sold-notes"
               />
             </div>

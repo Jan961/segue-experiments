@@ -2,7 +2,7 @@ import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getDealMemoCall, getPrice, getTechProvision, getContactIdData, getDealMemoHoldUpdQuery } from '../utils';
 import { omit } from 'radash';
-import { isUndefined } from 'utils';
+import { isNullOrUndefined } from 'utils';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -77,7 +77,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         await prisma.dealMemoHold.update(updObj);
       });
 
-      if (!isUndefined(data.SendTo)) {
+      if (!isNullOrUndefined(data.SendTo)) {
         // create sales email list
         const emailSalesRecipients = data.SendTo.filter(
           (accId) => accId !== 'select_all' && typeof accId !== 'string',
@@ -124,7 +124,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         },
       });
 
-      if (!isUndefined(data.SendTo)) {
+      if (!isNullOrUndefined(data.SendTo)) {
         const emailSalesRecipients = data.SendTo.filter(
           (accId) => accId !== 'select_all' && typeof accId !== 'string',
         ).map((accId) => {

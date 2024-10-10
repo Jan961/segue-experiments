@@ -740,14 +740,12 @@ export interface DealMemoCall {
 export interface DealMemoContractFormData {
   Id?: number;
   BookingId?: number;
-  AgreementDate?: Date;
   AccContId?: number;
   RunningTime?: Date;
   DateIssued?: Date;
   VatCode?: string;
   RunningTimeNotes?: string;
   PrePostShowEvents?: string;
-  DressingRooms?: string;
   VenueCurfewTime?: Date;
   PerformanceNotes?: string;
   ProgrammerVenueContactId?: number;
@@ -791,16 +789,16 @@ export interface DealMemoContractFormData {
   SellWho?: string;
   SellProgrammes?: boolean;
   PrintDelUseVenueAddress?: boolean;
-  PrintDelUseVenueAddressline?: string;
+  PrintDelVenueAddressLine?: string;
   SellMerch?: boolean;
-  SellNotes?: string;
+  MerchNotes?: string;
   SellProgCommPercent?: number;
   SellMerchCommPercent?: number;
   SellPitchFee?: string;
   TechVenueContactId?: number;
   TechArrivalDate?: Date;
   TechArrivalTime?: Date;
-  NumDressingRooms?: number;
+  DressingRooms?: string;
   NumFacilitiesLaundry?: boolean;
   NumFacilitiesDrier?: boolean;
   NumFacilitiesLaundryRoom?: boolean;

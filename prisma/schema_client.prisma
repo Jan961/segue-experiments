@@ -740,7 +740,7 @@ model DealMemo {
   AdvancePaymentDueBy                                        DateTime?                     @map("DeMoAdvancePaymentDueBy") @db.Date
   SettlementDays                                             Int?                          @map("DeMoSettlementDays") @db.TinyInt
   ContractClause                                             String?                       @map("DeMoContractClause") @db.LongText
-  DeMoPrintDelVenueAddressLine                               String?                       @db.LongText
+  PrintDelVenueAddressLine                                   String?                       @db.LongText @map("DeMoPrintDelVenueAddressLine")
   PrintDelUseVenueAddress                                    Boolean                       @default(dbgenerated("(b'0')")) @map("DeMoPrintDelUseVenueAddress") @db.Bit(1)
   CompAccContId                                              Int?                          @map("DeMoCompAccContId")
   SeatKillNotes                                              String?                       @map("DeMoSeatKillNotes") @db.LongText
