@@ -83,6 +83,8 @@ pipelines:
             after-script:
               - ALERT_TYPE="success"
               - if [[ $BITBUCKET_EXIT_CODE -ne 0 ]]; then ALERT_TYPE="error" ; fi
+              - ls -al cypress-tests/cypress/reports/reports.zip
+              - ls -al
               - pipe: atlassian/email-notify:0.3.11
                 variables:
                   USERNAME: $SMTP_USERNAME
