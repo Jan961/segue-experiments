@@ -70,9 +70,8 @@ const AttachmentsTab = forwardRef<AttachmentsTabRef, AttachmentsTabProps>((props
       clearInterval(slowProgressInterval);
 
       const fileRec = {
-        FileBookingBookingId: parseInt(bookingIdVal),
-        FileDateTime: new Date(),
-        FileDescription: attachType,
+        BookingFileBookingId: parseInt(bookingIdVal),
+        BookingFileDescription: attachType,
         FileOriginalFilename: response.data.originalFilename,
         FileURL: getFileUrl(response.data.location),
         FileUploadedDateTime: new Date(),

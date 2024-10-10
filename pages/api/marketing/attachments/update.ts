@@ -1,16 +1,16 @@
 import { loggingService } from 'services/loggingService';
 import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { BookingAttachedFile } from 'prisma/generated/prisma-client';
+import { BookingFile } from 'prisma/generated/prisma-client';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const data = req.body as BookingAttachedFile;
+    const data = req.body as BookingFile;
     const prisma = await getPrismaClient(req);
 
-    await prisma.bookingAttachedFile.update({
+    await prisma.bookingFile.update({
       where: {
-        FileId: data.FileId,
+        BookingFileId: data.BookingFileId,
       },
       data: {
         FileOriginalFilename: data.FileOriginalFilename,

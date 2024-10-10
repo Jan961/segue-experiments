@@ -6,9 +6,9 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const BookingId = parseInt(req.query.BookingId as string);
     const prisma = await getPrismaClient(req);
 
-    const attachments = await prisma.bookingAttachedFile.findMany({
+    const attachments = await prisma.bookingFile.findMany({
       where: {
-        FileBookingBookingId: BookingId,
+        BookingFileBookingId: BookingId,
       },
     });
 
