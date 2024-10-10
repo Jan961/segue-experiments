@@ -60,6 +60,7 @@ model Booking {
   DealMemo                   DealMemo?
   Performance                Performance[]
   SalesSet                   SalesSet[]
+  BookingAttachedFile        BookingAttachedFile[]
 
   @@unique([DateBlockId, VenueId, FirstDate, StatusCode], map: "SECONDARY")
   @@index([DateBlockId], map: "DateBlock_Booking_idx")
@@ -452,6 +453,20 @@ model SetHold {
   @@index([SetHoldSetId], map: "SalesSet_SetHold_idx")
 }
 
+model BookingAttachedFile {
+  FileId               Int      @id @default(autoincrement())
+  FileBookingBookingId Int
+  FileDescription      String   @db.VarChar(100)
+  FileOriginalFilename String   @db.VarChar(100)
+  FileDateTime         DateTime @db.DateTime(0)
+  FileUploadedDateTime DateTime @db.DateTime(0)
+  FileContent          Bytes?
+  FileURL              String?  @db.VarChar(255)
+  Booking              Booking  @relation(fields: [FileBookingBookingId], references: [Id], onDelete: Cascade, map: "Booking_BookingAttachedFile")
+
+  @@index([FileBookingBookingId], map: "Booking_BookingAttachedFile")
+}
+
 model VenueAddress {
   Id        Int      @id @default(autoincrement()) @map("VenueAddressId")
   VenueId   Int      @map("VenueAddressVenueId")
@@ -704,7 +719,7 @@ model DealMemo {
   SellWho                                                    String?                       @map("DeMoSellWho") @db.VarChar(10)
   SellProgrammes                                             Boolean                       @default(dbgenerated("(b'0')")) @map("DeMoSellProgrammes") @db.Bit(1)
   SellMerch                                                  Boolean                       @default(dbgenerated("(b'0')")) @map("DeMoSellMerch") @db.Bit(1)
-  SellNotes                                                  String?                       @map("DeMoSellNotes") @db.LongText
+  MerchNotes                                                 String?                       @map("DeMoMerchNotes") @db.LongText
   SellProgCommPercent                                        Decimal?                      @map("DeMoSellProgCommPercent") @db.Decimal(5, 2)
   SellMerchCommPercent                                       Decimal?                      @map("DeMoSellMerchCommPercent") @db.Decimal(5, 2)
   SellPitchFee                                               Decimal?                      @map("DeMoSellPitchFee") @db.Decimal(10, 2)
@@ -723,10 +738,11 @@ model DealMemo {
   AdvancePaymentDueBy                                        DateTime?                     @map("DeMoAdvancePaymentDueBy") @db.Date
   SettlementDays                                             Int?                          @map("DeMoSettlementDays") @db.TinyInt
   ContractClause                                             String?                       @map("DeMoContractClause") @db.LongText
-  PrintDelVenueAddressId                                     Int?                          @map("DeMoPrintDelVenueAddressId")
+  DeMoPrintDelVenueAddressLine                               String?                       @db.LongText
   PrintDelUseVenueAddress                                    Boolean                       @default(dbgenerated("(b'0')")) @map("DeMoPrintDelUseVenueAddress") @db.Bit(1)
   CompAccContId                                              Int?                          @map("DeMoCompAccContId")
-  DeMoSeatKillNotes                                          String?                       @db.LongText
+  SeatKillNotes                                              String?                       @map("DeMoSeatKillNotes") @db.LongText
+  SettlementSameDay                                          Boolean                       @default(false) @map("DeMoSettlementSameDay")
   Booking                                                    Booking                       @relation(fields: [BookingId], references: [Id], onDelete: Cascade, map: "BookingDealMemo")
   VenueContact_DealMemo_DeMoBOMVenueContactIdToVenueContact  VenueContact?                 @relation("DealMemo_DeMoBOMVenueContactIdToVenueContact", fields: [BOMVenueContactId], references: [Id], onDelete: Cascade, map: "VenueContactDealMemoBOM")
   VenueContact_DealMemo_DeMoTechVenueContactIdToVenueContact VenueContact?                 @relation("DealMemo_DeMoTechVenueContactIdToVenueContact", fields: [TechVenueContactId], references: [Id], onDelete: Cascade, map: "VenueContactDealMemoTech")
