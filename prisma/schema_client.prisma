@@ -54,13 +54,13 @@ model Booking {
   DateBlock                  DateBlock             @relation(fields: [DateBlockId], references: [Id], onDelete: Cascade, map: "DateBlock_Booking")
   Venue                      Venue                 @relation(fields: [VenueId], references: [Id], map: "Venue_Booking")
   BookingActivity            BookingActivity[]
+  BookingAttachedFile        BookingAttachedFile[]
   BookingContactNotes        BookingContactNotes[]
   BookingFile                BookingFile[]
   Contract                   Contract?
   DealMemo                   DealMemo?
   Performance                Performance[]
   SalesSet                   SalesSet[]
-  BookingAttachedFile        BookingAttachedFile[]
 
   @@unique([DateBlockId, VenueId, FirstDate, StatusCode], map: "SECONDARY")
   @@index([DateBlockId], map: "DateBlock_Booking_idx")
@@ -179,6 +179,8 @@ model Venue {
   VenueBarredVenue_VenueBarredVenue_VBVVenueIdToVenue       VenueBarredVenue[]           @relation("VenueBarredVenue_VBVVenueIdToVenue")
   VenueContact                                              VenueContact[]
   VenueFile                                                 VenueFile[]
+  VenueVenue1                                               VenueVenue[]                 @relation("VenueVenue_VVVenue1IdToVenue")
+  VenueVenue2                                               VenueVenue[]                 @relation("VenueVenue_VVVenue2IdToVenue")
 
   @@index([FamilyId], map: "Venue_VenueFamily")
 }
@@ -1203,6 +1205,21 @@ model BookingFile {
 
   @@index([BookingFileBookingId], map: "Booking_BookingFile")
 }
+
+
+model VenueVenue {
+  Venue1Id Int     @map("VVVenue1Id")
+  Venue2Id Int     @map("VVVenue2Id")
+  Mileage  Decimal @map("VVMileage") @db.Decimal(5, 1)
+  TimeMins Int?    @map("VVTimeMins")
+  Venue1   Venue   @relation("VenueVenue_VVVenue1IdToVenue", fields: [Venue1Id], references: [Id], onDelete: Cascade, map: "Venue_VenueVenue1")
+  Venue2   Venue   @relation("VenueVenue_VVVenue2IdToVenue", fields: [Venue2Id], references: [Id], onDelete: Cascade, map: "Venue_VenueVenue2")
+
+  @@id([Venue1Id, Venue2Id])
+  @@index([Venue1Id], map: "Venue_VenueVenue1_idx")
+  @@index([Venue2Id], map: "Venue_VenueVenue2_idx")
+}
+
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view SalesFiguresView {
