@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import getPrismaClient from 'lib/prisma';
 import { convertToPDF } from 'utils/report';
 import { createUserMap, fetchAccountUsers, fetchTasks, generateExcelSheet } from 'services/reports/tasks';
+import { formatDate } from 'services/dateService';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
@@ -15,7 +16,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const usersMap = createUserMap(accountUsers);
 
     const workbook = generateExcelSheet(taskList, usersMap, 'Master Tasks');
-    const filename = `Master Tasks.xlsx`;
+    const filename = `Master Tasks ${formatDate(new Date(), 'dd.MM.yy')}.xlsx`;
     if (format === 'pdf') {
       const pdf = await convertToPDF(workbook);
       res.setHeader('Content-Type', 'application/pdf');

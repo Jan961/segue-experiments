@@ -13,7 +13,7 @@ import {
 import { getWeekNumsToDateMap } from 'utils/getDateFromWeekNum';
 import { group } from 'radash';
 import { makeRowTextBoldAndAllignLeft } from './promoter-holds';
-import { calculateWeekNumber, formattedDateWithDay } from 'services/dateService';
+import { calculateWeekNumber, formatDate, formattedDateWithDay } from 'services/dateService';
 import { COLOR_HEXCODE, colorTextAndBGCell } from 'services/salesSummaryService';
 import { addWidthAsPerContent, applyGradientFillToColumn } from 'services/reportsService';
 import { addBorderToAllCells } from 'utils/export';
@@ -36,7 +36,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       views: [{ state: 'frozen', xSplit: 0, ySplit: 5 }],
     });
     if (!taskList?.length) {
-      const filename = `Tasks.xlsx`;
+      const filename = `Production Tasks ${formatDate(new Date(), 'dd.MM.yy')}.xlsx`;
       res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
       res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
       await workbook.xlsx.write(res).then(() => {
@@ -170,7 +170,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     worksheet.getColumn('G').alignment = { horizontal: 'center' };
     addBorderToAllCells({ worksheet });
     worksheet.getCell(1, 1).font = { size: 16, bold: true, color: { argb: COLOR_HEXCODE.WHITE } };
-    const filename = `Production Tasks.xlsx`;
+    const filename = `Production Tasks ${formatDate(new Date(), 'dd.MM.yy')}.xlsx`;
     if (format === 'pdf') {
       const pdf = await convertToPDF(workbook);
       res.setHeader('Content-Type', 'application/pdf');
