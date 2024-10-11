@@ -124,7 +124,7 @@ export default forwardRef(function Select(
         fontSize: '1rem',
         lineHeight: '1.5rem',
         backgroundColor: isDisabled
-          ? undefined
+          ? '#E9EBF0CC'
           : isSelected
           ? '#21345BCC'
           : isFocused
