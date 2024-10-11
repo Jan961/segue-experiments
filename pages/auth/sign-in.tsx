@@ -266,9 +266,9 @@ const SignIn = () => {
             <div className="flex items-center mt-4 mb-2 w-full">
               <Label text="PIN" required />
               <Tooltip
-                body="Please enter the 4 digit pin for this account."
+                body="Please enter the 5 digit Company PIN. Contact your system administrator if you have forgotten the PIN."
                 position="right"
-                width="w-[140px]"
+                width="w-[200px]"
                 bgColorClass="primary-input-text"
               >
                 <Icon iconName="info-circle-solid" variant="xs" className="text-primary-blue ml-2" />
