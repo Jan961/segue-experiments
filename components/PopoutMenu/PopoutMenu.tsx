@@ -64,12 +64,14 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
             value: '/bookings/shows',
             labelClass: leve2,
             testId: 'sidepanel-bookings-manage-shows-or-productions',
+            permission: 'ACCESS_MANAGE_SHOWS_PRODUCTIONS',
           },
           {
             label: 'Manage Venue Database',
             value: '/bookings/venues',
             labelClass: leve2,
             testId: 'sidepanel-bookings-manage-venue-db',
+            permission: 'ACCESS_MANAGE_VENUE_DATABASE',
           },
         ],
       },
@@ -172,12 +174,14 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
             value: '/tasks',
             labelClass: leve2,
             testId: 'sidepanel-project-management-production-tasks-list',
+            permission: 'ACCESS_PRODUCTION_TASK_LISTS',
           },
           {
             label: 'Master Task List',
             value: '/tasks/master',
             labelClass: leve2,
             testId: 'sidepanel-project-management-master-tasks-list',
+            permission: 'ACCESS_MASTER_TASK_LIST',
           },
         ],
       },
@@ -291,6 +295,7 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
             value: '/admin/company-information',
             labelClass: leve2,
             testId: 'sidepanel-system-admin-company-info',
+            permission: 'ACCESS_COMPANY_DETAILS',
             options: [
               {
                 label: 'Account Details',
