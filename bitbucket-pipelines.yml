@@ -29,12 +29,12 @@ pipelines:
             - npx wait-on http://localhost:3000
             # Clone Cypress repo in a separate directory
             - mkdir cypress-tests && cd cypress-tests
-            - git clone git@bitbucket.org:segue-team/cypress.git --branch pipeline_test
+            - git clone git@bitbucket.org:segue-team/cypress.git
             - cd cypress
             - npm ci
             # Run Cypress tests in headless mode
-            # - npm run cy:alltests --browser chrome
-            - npm run cy:permissions --browser chrome
+            - npm run cy:alltests --browser chrome
+            # - npm run cy:permissions --browser chrome
             - ls -al
             - zip -r reports.zip reports
           artifacts: # defining the artifacts to be passed to each future step.
@@ -61,7 +61,6 @@ pipelines:
             script:
               - pipe: sonarsource/sonarcloud-scan:2.0.0
               - pipe: sonarsource/sonarcloud-quality-gate:0.1.6
-
 definitions:
   caches:
     npm: ~/.npm
