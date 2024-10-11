@@ -1,8 +1,7 @@
-import { UserPermission } from 'interfaces';
 import { atom } from 'recoil';
 
 export interface UserPermissionsState {
-  permissions: UserPermission[];
+  permissions: string[];
   accountId: string;
 }
 

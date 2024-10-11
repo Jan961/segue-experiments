@@ -76,7 +76,9 @@ const formatPermissions = (permissions) => {
 
 export const getPermissionsList = async () => {
   try {
-    const results = await prismaMaster.permission.findMany();
+    const results = await prismaMaster.permission.findMany({
+      orderBy: { PermissionParentPermissionId: 'asc' },
+    });
     return formatPermissions(results);
   } catch (err) {
     console.log('Error fetching permissions ', err);
@@ -162,7 +164,11 @@ export const getPermissionGroupsList = async (req) => {
       },
       include: {
         PermissionGroupPermission: {
-          include: { Permission: { select: { PermissionId: true, PermissionName: true } } },
+          include: {
+            Permission: {
+              select: { PermissionId: true, PermissionName: true },
+            },
+          },
         },
       },
     });
