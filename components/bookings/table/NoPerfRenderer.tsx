@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ICellRendererParams } from 'ag-grid-community';
 import TextInputRenderer from 'components/core-ui-lib/Table/renderers/TextInputRenderer';
+import { isNullOrUndefined } from 'utils';
 
 const ROW_HEIGHT = 35;
 const MARGIN = 9;
@@ -28,7 +29,7 @@ const NoPerfRenderer = ({ eGridCell, value, setValue, data, api, node }: ICellRe
   const handleChange = (newValue) => {
     // changed the param name from event to newValue as this function in fact handles event.target.value
 
-    if (!newValue) {
+    if (isNullOrUndefined(newValue)) {
       setNoOfPerfs('');
       setValue(0);
       updateRowHeight(ROW_HEIGHT + MARGIN);
