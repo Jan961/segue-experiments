@@ -7,6 +7,7 @@ import axios from 'axios';
 import { useRecoilValue } from 'recoil';
 import { userPermissionsState } from 'state/account/userPermissionsState';
 import { PermissionGroup } from './config';
+import { flattenHierarchicalOptions } from 'utils';
 
 type GroupDetails = {
   groupName: string;
@@ -74,8 +75,7 @@ const AdEditPermissionGroup = ({
     }
 
     try {
-      const permissions = groupDetails.permissions
-        .flatMap((perm) => [perm, ...perm.options])
+      const permissions = flattenHierarchicalOptions(groupDetails.permissions)
         .filter(({ checked }) => checked)
         .map(({ id }) => id);
 

@@ -43,3 +43,17 @@ export const LeavePageModal: Story = {
     show: true,
   },
 };
+
+export const ReturnPageModal: Story = {
+  args: {
+    variant: 'return',
+    show: true,
+  },
+};
+
+export const ContinuePageModal: Story = {
+  args: {
+    variant: 'continue',
+    show: true,
+  },
+};
