@@ -7,21 +7,25 @@ export default function index() {
       title: 'Company Information',
       route: '/admin/company-information',
       color: 'bg-primary-pink',
+      permission: 'ACCESS_COMPANY_DETAILS',
     },
     {
       title: 'Users',
       route: '/admin/users',
       color: 'bg-primary-pink',
+      permission: 'ACCESS_USERS',
     },
     {
       title: 'Payment Details',
       route: '/payment-details',
       color: 'bg-primary-pink',
+      permission: 'ACCESS_PAYMENT_DETAILS',
     },
     {
       title: 'Account Preferences',
       route: '/account-preferences',
       color: 'bg-primary-pink',
+      permission: 'ACCESS_ACCOUNT_PREFERENCES',
     },
   ];
   return (

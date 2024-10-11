@@ -14,7 +14,10 @@ const routePermissions = new Map<RegExp, string[]>([
   [/^\/tasks\/master$/, ['ACCESS_MASTER_TASK_LIST']],
   [/^\/contracts$/, ['CONTRACTS']],
   [/^\/system-admin$/, ['SYSTEM_ADMIN']],
+  [/^\/admin\/users$/, ['ACCESS_USERS']],
   [/^\/admin\/company-information$/, ['ACCESS_COMPANY_DETAILS']],
+  [/^\/admin\/account-preferences\/[a-zA-Z0-9]+$/, ['ACCESS_ACCOUNT_PREFERENCES']],
+  [/^\/admin\/payment-details\/[a-zA-Z0-9]+$/, ['ACCESS_PAYMENT_DETAILS']],
   [/^\/touring-management$/, ['TOURING_MANAGEMENT']],
   [bookingsSlug, ['ACCESS_BOOKING_HOME']],
 ]);
