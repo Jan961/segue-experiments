@@ -25,10 +25,10 @@ const NoPerfRenderer = ({ eGridCell, value, setValue, data, api, node }: ICellRe
     setIsDisabled(!data.perf);
   }, [data.perf, value]);
 
-  const handleChange = (event) => {
-    let newValue = event || null;
+  const handleChange = (newValue) => {
+    // changed the param name from event to newValue as this function in fact handles event.target.value
 
-    if (newValue === null) {
+    if (!newValue) {
       setNoOfPerfs('');
       setValue(0);
       updateRowHeight(ROW_HEIGHT + MARGIN);
