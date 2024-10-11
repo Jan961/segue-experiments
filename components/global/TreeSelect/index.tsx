@@ -3,6 +3,7 @@ import TreeItem from './TreeItem';
 import { TreeItemOption } from './types';
 import { Checkbox } from 'components/core-ui-lib';
 import { isNullOrEmpty, mapRecursive } from 'utils';
+import classNames from 'classnames';
 
 interface TreeSelectProps {
   className?: string;
@@ -13,7 +14,7 @@ interface TreeSelectProps {
   disabled?: boolean;
 }
 
-const baseClass = 'border bg-white px-3 py-2';
+const baseClass = 'border bg-primary-white px-3 py-2';
 
 export default function TreeSelect({
   options = [],
@@ -52,7 +53,7 @@ export default function TreeSelect({
   };
 
   return (
-    <div className={`${baseClass} ${className}`}>
+    <div className={classNames(baseClass, disabled ? '!bg-disabled-input' : '', className)}>
       {!isNullOrEmpty(itemOptions) && (
         <Checkbox
           label={selectAllLabel}
