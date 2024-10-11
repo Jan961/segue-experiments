@@ -13,7 +13,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       const countAdminUsers = await prismaMaster.AccountUser.count({
         where: { AccUserIsAdmin: true, Account: { AccountOrganisationId: accountId } },
       });
-      console.log('countAdminUsers', countAdminUsers);
+
       if (countAdminUsers === 1) {
         res.status(200).json({ error: 'At least one System Administrator is required for this account' });
         return;
