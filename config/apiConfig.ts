@@ -3,6 +3,7 @@ export enum ERROR_CODES {
 }
 
 const bookingsSlug = /\/bookings\/[a-zA-Z0-9]+/;
+const marketingSlug = /\/marketing\/[a-zA-Z0-9]+/;
 
 // It is important that all slug routes are listed after the spefic routes
 const routePermissions = new Map<RegExp, string[]>([
@@ -20,6 +21,7 @@ const routePermissions = new Map<RegExp, string[]>([
   [/^\/admin\/payment-details\/[a-zA-Z0-9]+$/, ['ACCESS_PAYMENT_DETAILS']],
   [/^\/touring-management$/, ['TOURING_MANAGEMENT']],
   [bookingsSlug, ['ACCESS_BOOKING_HOME']],
+  [marketingSlug, ['MARKETING']],
 ]);
 
 export const allowRoute = (path: string, permissions: string[]) => {

@@ -1,7 +1,10 @@
 import Layout from 'components/Layout';
 import { SwitchBoardItem } from 'components/global/SwitchBoardItem';
+import { useRecoilValue } from 'recoil';
+import { accessAdmin } from 'state/account/selectors/permissionSelector';
 
-export default function index() {
+export default function Index() {
+  const permissions = useRecoilValue(accessAdmin);
   const links = [
     {
       title: 'Company Information',
@@ -37,9 +40,11 @@ export default function index() {
           role="list"
           className="grid grid-cols-1 gap-4 w-fit sm:grid-cols-2 md:grid-cols-4 mt-20 mx-auto "
         >
-          {links.map((link) => (
-            <SwitchBoardItem key={link.route} link={link} />
-          ))}
+          {links
+            .filter(({ permission }) => permissions.includes(permission))
+            .map((link) => (
+              <SwitchBoardItem key={link.route} link={link} />
+            ))}
         </ul>
       </div>
     </Layout>

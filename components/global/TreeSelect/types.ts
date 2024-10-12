@@ -1,8 +1,15 @@
+export type HierarchicalItem = {
+  id: string;
+  value: string;
+  label: string;
+  options?: HierarchicalItem[];
+};
+
 export type TreeItemOption = {
   id: string;
   value: string;
   label: string;
-  checked: boolean;
+  checked?: boolean;
   options?: TreeItemOption[];
   groupHeader?: boolean;
   isPartiallySelected?: boolean;
