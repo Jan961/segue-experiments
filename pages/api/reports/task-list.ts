@@ -35,8 +35,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       pageSetup: { fitToPage: true, fitToHeight: 5, fitToWidth: 7 },
       views: [{ state: 'frozen', xSplit: 0, ySplit: 5 }],
     });
+    const title = `Production Tasks ${formatDate(new Date(), 'dd.MM.yy')}`;
     if (!taskList?.length) {
-      const filename = `Production Tasks ${formatDate(new Date(), 'dd.MM.yy')}.xlsx`;
+      const filename = `${title}.xlsx`;
       res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
       res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
       await workbook.xlsx.write(res).then(() => {
@@ -44,7 +45,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       });
       return;
     }
-    worksheet.addRow([`PRODUCTION TASK LIST`]);
+    worksheet.addRow([title]);
     worksheet.addRow([`Exported: ${getExportedDate()} - Layout: Standard`]);
     worksheet.addRow(['', '', '', '', '', '', '', '', '', '', '']);
     worksheet.addRow([
@@ -170,7 +171,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     worksheet.getColumn('G').alignment = { horizontal: 'center' };
     addBorderToAllCells({ worksheet });
     worksheet.getCell(1, 1).font = { size: 16, bold: true, color: { argb: COLOR_HEXCODE.WHITE } };
-    const filename = `Production Tasks ${formatDate(new Date(), 'dd.MM.yy')}.xlsx`;
+    const filename = `${title}.xlsx`;
     if (format === 'pdf') {
       const pdf = await convertToPDF(workbook);
       res.setHeader('Content-Type', 'application/pdf');

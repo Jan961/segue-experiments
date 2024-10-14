@@ -14,9 +14,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
     const accountUsers = await fetchAccountUsers(userIdList);
     const usersMap = createUserMap(accountUsers);
-
-    const workbook = generateExcelSheet(taskList, usersMap, 'Master Tasks');
-    const filename = `Master Tasks ${formatDate(new Date(), 'dd.MM.yy')}.xlsx`;
+    const title = `Master Tasks ${formatDate(new Date(), 'dd.MM.yy')}`;
+    const workbook = generateExcelSheet(taskList, usersMap, title);
+    const filename = `${title}.xlsx`;
     if (format === 'pdf') {
       const pdf = await convertToPDF(workbook);
       res.setHeader('Content-Type', 'application/pdf');
