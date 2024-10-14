@@ -50,7 +50,6 @@ pipelines:
                 FROM: 'asara97911@gmail.com'
                 TO: 'asara97911@gmail.com'
                 HOST: 'smtp.gmail.com'
-                PORT: 465
                 SUBJECT: '${ALERT_TYPE}:Bitbucket Pipe Notification for ${BITBUCKET_BRANCH}'
                 ATTACHMENTS: 'cypress-tests/cypress/reports.zip'
           artifacts:
