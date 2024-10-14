@@ -42,7 +42,7 @@ pipelines:
             - ALERT_TYPE="success"
             - if [[ $BITBUCKET_EXIT_CODE -ne 0 ]]; then ALERT_TYPE="error" ; fi
             - echo "SMTP_USERNAME: $SMTP_USERNAME"
-            - echo "SMTP_PASSWORD is set: $([[ ! -z "$SMTP_PASSWORD" ]] && echo 'true' || echo 'false')"
+            - echo "SMTP_PASSWORD is set: $SMTP_PASSWORD"
             - pipe: atlassian/email-notify:0.13.1
               variables:
                 USERNAME: $SMTP_USERNAME
