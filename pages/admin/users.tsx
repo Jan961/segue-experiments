@@ -56,6 +56,7 @@ export default function Users({
                 lastName,
                 name: `${firstName} ${lastName}`,
                 email: user.UserEmail,
+                isSystemAdmin: user.AccUserIsAdmin,
                 permissionDesc: user.AllPermissions,
                 licence: 'Standard',
               };
@@ -306,7 +307,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       if (a.isArchived !== b.isArchived) {
         return a.isArchived ? 1 : -1;
       }
-      return new Date(a.startDate).valueOf() > new Date(b.startDate).valueOf();
+      return new Date(b.startDate).getTime() - new Date(a.startDate).getTime();
     });
 
   return {
