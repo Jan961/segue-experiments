@@ -106,13 +106,17 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
   };
 
   useEffect(() => {
+    console.log('Booking', booking);
+    console.log('Use Effect running');
     if (booking) {
       // Check for run of dates
       const runOfDates = bookings
         .filter(({ runTag }) => runTag === booking.runTag)
         .sort((a, b) => new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime());
       if (runOfDates.length > 1) {
+        console.log('Run of dates', runOfDates);
         onFormDataChange({ isRunOfDates: true });
+        console.log('Run of dates after update', runOfDates);
       }
       const bookingsToEdit = isNullOrEmpty(runOfDates) ? [booking] : runOfDates;
       // format booking and set on state

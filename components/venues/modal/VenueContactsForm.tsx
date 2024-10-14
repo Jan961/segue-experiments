@@ -130,10 +130,13 @@ const VenueContactForm = ({
       ...venue,
       venueContacts: updatedContactVenueTableRows,
     };
-    onChange(updatedFormData, 'delete', rowToDel);
     if (createMode && deleteIndex === 0) {
+      setShowDeleteModal(!showDeleteModal);
       setCreateMode(false);
+      return;
     }
+
+    onChange(updatedFormData, 'delete', rowToDel);
   };
 
   return (
