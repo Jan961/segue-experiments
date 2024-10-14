@@ -37,3 +37,12 @@ export const getAllContractStatus = async (req: NextApiRequest) => {
     },
   });
 };
+
+export const getAllContractDealMemo = async (req: NextApiRequest) => {
+  const prisma = await getPrismaClient(req);
+  return prisma.booking.findMany({
+    include: {
+      DealMemo: true,
+    },
+  });
+};

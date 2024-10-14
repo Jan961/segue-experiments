@@ -21,7 +21,7 @@ import { BookingsWithPerformances } from 'services/bookingService';
 import { objectify, all } from 'radash';
 import { getDayTypes } from 'services/dayTypeService';
 import { getAllCurrencylist, getProductionsWithContent } from 'services/productionService';
-import { getAllContractStatus, getContractDealMemo } from 'services/contractStatus';
+import { getAllContractDealMemo, getAllContractStatus } from 'services/contractStatus';
 import { DateType } from 'prisma/generated/prisma-client';
 import { getAccountContacts } from 'services/contactService';
 import { getAccountIdFromReq } from 'services/userService';
@@ -64,7 +64,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     getAllContractStatus(ctx.req as NextApiRequest),
     getAllCurrencylist(),
     getAccountContacts(accountId),
-    getContractDealMemo(ProductionId === -1 ? null : ProductionId, ctx.req as NextApiRequest),
+    getAllContractDealMemo(ctx.req as NextApiRequest),
   ]);
   const dateBlock = [];
   const rehearsal = {};
