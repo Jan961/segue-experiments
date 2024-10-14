@@ -35,6 +35,7 @@ pipelines:
             # Run Cypress tests in headless mode
             # - npm run cy:alltests --browser chrome
             - npm run cy:permissions --browser chrome
+            - apt-get update && apt-get install -y zip
             - ls -al
             - zip -r reports.zip reports
           after-script:
