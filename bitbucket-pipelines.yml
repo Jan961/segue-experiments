@@ -41,8 +41,8 @@ pipelines:
           after-script:
             - ALERT_TYPE="success"
             - if [[ $BITBUCKET_EXIT_CODE -ne 0 ]]; then ALERT_TYPE="error" ; fi
-            - echo "SMTP_USERNAME: $SMTP_USERNAME"
-            - echo "SMTP_PASSWORD is set: $SMTP_PASSWORD"
+            - echo $SMTP_USERNAME
+            - echo $SMTP_PASSWORD
             - pipe: atlassian/email-notify:0.13.2
               variables:
                 USERNAME: $SMTP_USERNAME
