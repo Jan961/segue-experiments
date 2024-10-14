@@ -35,9 +35,10 @@ pipelines:
             # Run Cypress tests in headless mode
             # - npm run cy:alltests --browser chrome
             - npm run cy:permissions --browser chrome
-            - apt-get update && apt-get install -y zip jq
+            - apt-get update && apt-get install -y zip jq tree
             - ls -al cypress/
             - zip -r reports.zip cypress/reports/
+            - tree -I "node_modules"
           after-script:
             - ALERT_TYPE="success"
             - if [[ $BITBUCKET_EXIT_CODE -ne 0 ]]; then ALERT_TYPE="error" ; fi
@@ -68,10 +69,8 @@ pipelines:
                   echo "<p>No test results found.</p>"
                 fi
               }
-            - generate_summary > test_summary.html
-            - ls -al
-            - ls -l test_summary.html
-            - cat test_summary.html
+            - EMAIL_BODY=$(generate_summary)
+            - echo "$EMAIL_BODY"
             - pipe: atlassian/email-notify:0.13.2
               variables:
                 USERNAME: $SMTP_USERNAME
@@ -80,12 +79,11 @@ pipelines:
                 TO: 'asara97911@gmail.com'
                 HOST: 'smtp.gmail.com'
                 SUBJECT: '${ALERT_TYPE}:Bitbucket Pipe Notification for ${BITBUCKET_BRANCH}'
-                BODY_HTML: file://${BITBUCKET_CLONE_DIR}/test_summary.html"
+                BODY_HTML: $EMAIL_BODY
                 ATTACHMENTS: 'cypress-tests/cypress/reports.zip'
           artifacts:
             - cypress-tests/cypress/reports/**
             - cypress-tests/cypress/reports.zip
-            - test_summary.html
   default:
       - step:
           name: Build and Test
