@@ -3,12 +3,17 @@ import { NextApiRequest } from 'next';
 
 export const getContractStatus = async (ProductionId: number, req: NextApiRequest) => {
   const prisma = await getPrismaClient(req);
-  return prisma.booking.findMany({
-    where: {
+  let where = {};
+  if (ProductionId) {
+    where = {
       DateBlock: {
         ProductionId,
       },
-    },
+    };
+  }
+
+  return prisma.booking.findMany({
+    where,
     include: {
       Contract: true,
     },
@@ -17,30 +22,18 @@ export const getContractStatus = async (ProductionId: number, req: NextApiReques
 
 export const getContractDealMemo = async (ProductionId: number, req: NextApiRequest) => {
   const prisma = await getPrismaClient(req);
-  return prisma.booking.findMany({
-    where: {
+
+  let where = {};
+  if (ProductionId) {
+    where = {
       DateBlock: {
         ProductionId,
       },
-    },
-    include: {
-      DealMemo: true,
-    },
-  });
-};
+    };
+  }
 
-export const getAllContractStatus = async (req: NextApiRequest) => {
-  const prisma = await getPrismaClient(req);
   return prisma.booking.findMany({
-    include: {
-      Contract: true,
-    },
-  });
-};
-
-export const getAllContractDealMemo = async (req: NextApiRequest) => {
-  const prisma = await getPrismaClient(req);
-  return prisma.booking.findMany({
+    where,
     include: {
       DealMemo: true,
     },
