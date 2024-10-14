@@ -69,6 +69,9 @@ pipelines:
                 fi
               }
             - generate_summary > test_summary.html
+            - ls -al
+            - ls -l test_summary.html
+            - cat test_summary.html
             - pipe: atlassian/email-notify:0.13.2
               variables:
                 USERNAME: $SMTP_USERNAME
@@ -77,7 +80,7 @@ pipelines:
                 TO: 'asara97911@gmail.com'
                 HOST: 'smtp.gmail.com'
                 SUBJECT: '${ALERT_TYPE}:Bitbucket Pipe Notification for ${BITBUCKET_BRANCH}'
-                BODY_HTML: "file://test_summary.html"
+                BODY_HTML: file://${BITBUCKET_CLONE_DIR}/test_summary.html"
                 ATTACHMENTS: 'cypress-tests/cypress/reports.zip'
           artifacts:
             - cypress-tests/cypress/reports/**
