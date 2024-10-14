@@ -170,6 +170,7 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
           tabIndex={tabIndexShow ? 0 : 1}
           onInput={handleInputChange}
           onKeyDown={(e) => handleKeyPress(e)}
+          autoComplete="off"
         />
         <span className="">:</span>
         <input

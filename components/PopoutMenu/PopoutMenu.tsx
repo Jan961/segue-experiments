@@ -293,26 +293,14 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
             testId: 'sidepanel-system-admin-company-info',
             options: [
               {
-                label: 'Company Details',
-                value: '',
+                label: 'Account Details',
+                value: '/admin/company-information/?tabIndex=0',
                 labelClass: level3,
-                testId: 'sidepanel-system-admin-company-info-company-details',
-              },
-              {
-                label: 'Staff Details',
-                value: '',
-                labelClass: level3,
-                testId: 'sidepanel-system-admin-company-info-staff-details',
-              },
-              {
-                label: 'System Administrator(s)',
-                value: '',
-                labelClass: level3,
-                testId: 'sidepanel-system-admin-company-info-system-administrator',
+                testId: 'sidepanel-system-admin-company-info-account-details ',
               },
               {
                 label: 'Production Companies',
-                value: '',
+                value: '/admin/company-information/?tabIndex=1',
                 labelClass: level3,
                 testId: 'sidepanel-system-admin-company-info-production-companies',
               },
@@ -321,21 +309,18 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
 
           {
             label: 'Users',
-            value: '',
+            value: '/admin/users',
             labelClass: leve2,
             testId: 'sidepanel-system-admin-users',
-            options: [
-              {
-                label: 'Manage User Permissions',
-                value: '',
-                labelClass: level3,
-                testId: 'sidepanel-system-admin-users-manage-user-permissions',
-              },
-            ],
           },
-          { label: 'Account', value: '', labelClass: leve2, testId: 'sidepanel-system-admin-account' },
           { label: 'Payment Details', value: '', labelClass: leve2, testId: 'sidepanel-system-admin-payment-details' },
-          { label: 'Venue Information', value: '', labelClass: leve2, testId: 'sidepanel-system-admin-venuw-info' },
+
+          {
+            label: 'Account Preferences',
+            value: '',
+            labelClass: leve2,
+            testId: 'sidepanel-system-admin-account-preferences',
+          },
         ],
       },
     ],
