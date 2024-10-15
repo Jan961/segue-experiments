@@ -80,8 +80,10 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
   );
 
   const onFormDataChange = (change: Partial<TForm>) => {
-    if (new Date(change.toDate).getTime() - new Date(change.fromDate).getTime() >1) {
+    if (change.toDate !== change.fromDate) {
       change.isRunOfDates = true;
+    } else {
+      change.isRunOfDates = false;
     }
     dispatch(actionSpreader(Actions.UPDATE_FORM_DATA, change));
     setBookingOnStore(null);
