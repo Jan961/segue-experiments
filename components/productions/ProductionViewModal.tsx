@@ -10,7 +10,6 @@ import DateRange from 'components/core-ui-lib/DateRange';
 import { Icon, TextInput, UploadModal } from 'components/core-ui-lib';
 import { REGIONS_LIST, SALES_FIG_OPTIONS } from 'config/shows';
 
-// This is an interface btw
 interface FormDataType {
   production: number | null;
   currency: string | null;
