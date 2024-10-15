@@ -35,8 +35,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         UserEmail: user.email,
         AccountUser: {
           create: {
-            AccUserIsAdmin: true,
-            AccUserPIN: user.pin,
+            AccUserIsAdmin: user.isSystemAdmin,
             Account: {
               connect: {
                 AccountOrganisationId: organisationId,
