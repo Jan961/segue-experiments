@@ -55,6 +55,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
 
   const handleModalCancel = () => onCancel?.();
   const [venueDesc, setVenueDesc] = useState<string>('');
+  const [excelFilename, setExcelFilename] = useState<string>('');
 
   const venueOptions = useRecoilValue(venueHistoryOptionsSelector([]));
 
@@ -63,8 +64,9 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
   }, [visible]);
 
   const exportTable = (key: string) => {
+    const extraContent = { fileName: `Venue History ${excelFilename}` };
     if (key === 'Excel') {
-      exportToExcel(salesTableRef);
+      exportToExcel(salesTableRef, extraContent);
     } else if (key === 'PDF') {
       exportToPDF(salesTableRef);
     }
@@ -95,6 +97,10 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
       return;
     }
     setVenueDesc(venue.Code + ' ' + venue.Name + ' | ' + venue.Town);
+    // Split venue name by spacing
+    // Check is town name is at the end of the spacing
+    const strs: string[] = venue.Name.split('');
+    setExcelFilename(venue.Code + ' ' + venue.Name + (strs[strs.length - 1].toLowerCase() === venue.Town.toLower() ? ' ' + venue.Town : ''));
     setVenueID(venueID);
 
     setLoading(true);
