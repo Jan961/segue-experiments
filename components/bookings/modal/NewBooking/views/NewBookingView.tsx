@@ -129,6 +129,23 @@ const NewBookingView = ({
       });
   };
 
+  const handleChange = ({ from, to }) => {
+    const change = {
+      fromDate: from?.toISOString() || '',
+      toDate: !toDate && !to ? from?.toISOString() : to?.toISOString() || '',
+      isRunOfDates: true,
+    };
+    console.log('from date ', change.fromDate);
+    console.log('to date ', change.toDate);
+    const check = new Date(change.fromDate).toDateString() === new Date(change.toDate).toDateString();
+    console.log('check :', check);
+
+    if (check) {
+      change.isRunOfDates = false;
+    }
+    onChange(change);
+  };
+
   const handleOnSubmit = async (e) => {
     e.preventDefault();
   };
@@ -166,12 +183,7 @@ const NewBookingView = ({
           testId="cnb-date-range"
           label="Date"
           className=" bg-white my-2 w-fit"
-          onChange={({ from, to }) => {
-            onChange({
-              fromDate: from?.toISOString() || '',
-              toDate: !toDate && !to ? from?.toISOString() : to?.toISOString() || '',
-            });
-          }}
+          onChange={({ from, to }) => handleChange({ from, to })}
           value={{ from: fromDate ? new Date(fromDate) : null, to: toDate ? new Date(toDate) : null }}
           minDate={minDate ? new Date(minDate) : null}
           maxDate={maxDate ? new Date(maxDate) : null}
@@ -183,7 +195,10 @@ const NewBookingView = ({
               className="!w-fit"
               id="shouldFilterVenues"
               labelClassName="text-white w-fit"
-              onChange={(e: any) => onChange({ isRunOfDates: e.target.checked })}
+              onChange={(e: any) => {
+                console.log('click on checkbox');
+                onChange({ isRunOfDates: e.target.checked });
+              }}
               checked={isRunOfDates}
               label="This is a run of dates. Y/N"
             />

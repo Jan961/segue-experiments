@@ -82,7 +82,7 @@ export default function NewBookingDetailsView({
 
   useEffect(() => {
     if (bookingData && tableRef.current) {
-      // This is required afyer saving the note so the value gets updated on the grid
+      // This is required after saving the note so the value gets updated on the grid
       tableRef.current.getApi()?.refreshCells({
         force: true,
       });
