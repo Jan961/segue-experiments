@@ -100,7 +100,12 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
     // Split venue name by spacing
     // Check is town name is at the end of the spacing
     const strs: string[] = venue.Name.split('');
-    setExcelFilename(venue.Code + ' ' + venue.Name + (strs[strs.length - 1].toLowerCase() === venue.Town.toLower() ? ' ' + venue.Town : ''));
+    setExcelFilename(
+      venue.Code +
+        ' ' +
+        venue.Name +
+        (strs[strs.length - 1].toLowerCase() === venue.Town.toLowerCase() ? ' ' + venue.Town : ''),
+    );
     setVenueID(venueID);
 
     setLoading(true);
