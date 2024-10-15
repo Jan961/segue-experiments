@@ -3,16 +3,19 @@ import Tabs from 'components/core-ui-lib/Tabs';
 import { Tab } from '@headlessui/react';
 import ProductionCompaniesTab from 'components/admin/tabs/ProductionCompaniesTab';
 import CompanyDetailsTab from 'components/admin/tabs/AccountDetailsTab';
-import { router } from 'next/client';
+import { useRouter } from 'next/router';
 import { isNullOrUndefined } from 'is-what';
-import { useState } from 'react';
-export default function CompanyInformation() {
-  const [tabIndex, setTabIndex] = useState(0);
 
-  const defaultIndex = isNullOrUndefined(router.query.tabIndex)
-    ? setTabIndex(0)
-    : setTabIndex(parseInt(router.query.tabIndex[0]));
-  console.log(defaultIndex);
+
+
+
+export default function CompanyInformation() {
+
+
+  const router = useRouter();
+  const tabIndex = isNullOrUndefined(router.query.tabIndex)
+    ? 0
+    : parseInt(router.query.tabIndex[0]);
 
   const tabs = ['Account Details', 'Production Companies'];
   return (
