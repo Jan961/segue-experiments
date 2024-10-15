@@ -76,10 +76,9 @@ pipelines:
                 USERNAME: $SMTP_USERNAME
                 PASSWORD: $SMTP_PASSWORD
                 FROM: 'asara97911@gmail.com'
-                TO: 'asara97911@gmail.com'
+                TO: 'testing@segue360.co.uk'
                 HOST: 'smtp.gmail.com'
                 SUBJECT: '${ALERT_TYPE}:Bitbucket Pipe Notification for ${BITBUCKET_BRANCH}'
-                BODY_HTML: $EMAIL_BODY
                 ATTACHMENTS: 'cypress-tests/cypress/reports.zip'
           artifacts:
             - cypress-tests/cypress/reports/**
