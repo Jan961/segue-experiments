@@ -29,30 +29,29 @@ export const defaultCustomPrice = {
   DMPNotes: '',
 };
 
-const techProv = ['Lighting', 'Sound', 'Other', 'Technical Staff'];
-
-export const defaultTechProvision = {
-  Lighting: {
+export const defaultTechProvision = [
+  {
     DMTechName: 'Lighting',
     DMTechVenue: '',
     DMTechCompany: '',
   },
-  Sound: {
+  {
     DMTechName: 'Sound',
     DMTechVenue: '',
     DMTechCompany: '',
   },
-  Other: {
+  {
     DMTechName: 'Other',
     DMTechVenue: '',
     DMTechCompany: '',
   },
-  'Technical Staff': {
+  {
     DMTechName: 'Technical Staff',
     DMTechVenue: '',
     DMTechCompany: '',
   },
-};
+];
+
 export const defaultDemoCall = {
   DMCDeMoId: null,
   DMCCallNum: 0,
@@ -85,18 +84,6 @@ export const filterPrice = (dealMemoPrice: any): PriceState => {
 
     return { custom: customPriceList.length === 0 ? [defaultCustomPrice] : customPriceList, default: defaultPriceList };
   }
-};
-
-export const filterTechProvision = (techProvision) => {
-  const techData = [];
-  techProv.forEach((tech, index) => {
-    if (techProvision.length > 0 && techProvision[index].DMTechName === tech) {
-      techData.push(techProvision[index]);
-    } else {
-      techData.push(defaultTechProvision[tech]);
-    }
-  });
-  return techData;
 };
 
 export const filterPercentage = (num: number) => {
@@ -332,4 +319,8 @@ export const formatSeatKillValues = (dmHoldData: any, dmTypes: any) => {
       DMHoldValue: formatValue(hold.DMHoldValue) === '' ? '' : formatDecimalValue(hold.DMHoldValue),
     }));
   }
+};
+
+export const formatAddress = (...fields: (string | null)[]): string => {
+  return fields.filter((field) => !isNullOrEmpty(field)).join(', ');
 };

@@ -11,6 +11,7 @@ import {
   DealMemoContractFormData,
   DealMemoHoldType,
   DealMemoPriceType,
+  DealMemoTechProvision,
   ProductionDTO,
 } from 'interfaces';
 import { AddEditContractsState } from 'state/contracts/contractsState';
@@ -31,7 +32,6 @@ import axios from 'axios';
 import {
   defaultDemoCall,
   filterPrice,
-  filterTechProvision,
   parseAndSortDates,
   formatDecimalOnBlur,
   timeToDateTime,
@@ -39,8 +39,9 @@ import {
   formatDecimalFields,
   formatSeatKillValues,
   defaultCustomPrice,
+  formatAddress,
+  defaultTechProvision,
 } from '../utils';
-import { DealMemoTechProvision } from 'prisma/generated/prisma-client';
 import { dealMemoInitialState } from 'state/contracts/contractsFilterState';
 import { convertTimeToTodayDateFormat, dateToTimeString } from 'services/dateService';
 import StandardSeatKillsTable, { SeatKillRow } from '../table/StandardSeatKillsTable';
@@ -166,38 +167,10 @@ export const EditDealMemoContractModal = ({
   }, [venueData]);
 
   useEffect(() => {
-    setFormData({
-      ...demoModalData,
-      DateIssued: isUndefined(demoModalData.DateIssued) ? new Date() : demoModalData.DateIssued,
-      TechArrivalTime: isUndefined(demoModalData.TechArrivalTime)
-        ? convertTimeToTodayDateFormat('09:00')
-        : demoModalData.TechArrivalTime,
-      TechArrivalDate: isUndefined(demoModalData.TechArrivalDate)
-        ? new Date(selectedTableCell.contract.dateTime)
-        : demoModalData.TechArrivalDate,
-      RunningTime: timeToDateTime(productionJumpState.RunningTime),
-      PrintDelUseVenueAddress: isUndefined(demoModalData.PrintDelUseVenueAddress)
-        ? true
-        : demoModalData.PrintDelUseVenueAddress,
-      ...formatDecimalFields(demoModalData, 'string'),
-    });
-
     const priceData = filterPrice(demoModalData.DealMemoPrice);
     setDealMemoPriceData(priceData);
 
     setHoldTypeData(dealHoldType);
-
-    // format the seat kill data
-    // supply the hold types so an empty array of objects can be formed
-    const processedHoldData = formatSeatKillValues(demoModalData.DealMemoHold, dealHoldType);
-    setSeatKillsData(processedHoldData);
-
-    // setting data on the form so when initialised, the formData object receives the initialised object to update the db
-    setFormData({ ...formData, DealMemoHold: processedHoldData });
-
-    const techProvisionData = demoModalData.DealMemoTechProvision ? demoModalData.DealMemoTechProvision : [];
-    const techProvision = filterTechProvision(techProvisionData);
-    setDealMemoTechProvision([...techProvision]);
 
     const demoCall =
       demoModalData.DealMemoCall && demoModalData.DealMemoCall.length > 0
@@ -214,8 +187,42 @@ export const EditDealMemoContractModal = ({
         return { ...dmc };
       }
     });
-
     setDealCall([...dmcProcessed]);
+
+    // format the seat kill data
+    // supply the hold types so an empty array of objects can be formed
+    const processedHoldData = formatSeatKillValues(demoModalData.DealMemoHold, dealHoldType);
+    setSeatKillsData(processedHoldData);
+
+    const customOrder = defaultTechProvision.map((item) => item.DMTechName);
+    const processedTechProvision = isNullOrEmpty(demoModalData.DealMemoTechProvision)
+      ? defaultTechProvision
+      : [...demoModalData.DealMemoTechProvision].sort((a, b) => {
+          return customOrder.indexOf(a.DMTechName) - customOrder.indexOf(b.DMTechName);
+        });
+
+    setDealMemoTechProvision(processedTechProvision);
+
+    setFormData({
+      ...demoModalData,
+      DateIssued: isUndefined(demoModalData.DateIssued) ? new Date() : demoModalData.DateIssued,
+      TechArrivalTime: isUndefined(demoModalData.TechArrivalTime)
+        ? convertTimeToTodayDateFormat('09:00')
+        : demoModalData.TechArrivalTime,
+      TechArrivalDate: isUndefined(demoModalData.TechArrivalDate)
+        ? new Date(selectedTableCell.contract.dateTime)
+        : demoModalData.TechArrivalDate,
+      RunningTime: timeToDateTime(productionJumpState.RunningTime),
+      PrintDelUseVenueAddress: isUndefined(demoModalData.PrintDelUseVenueAddress)
+        ? true
+        : demoModalData.PrintDelUseVenueAddress,
+      PrintDelVenueAddressLine: isNullOrEmpty(demoModalData.PrintDelVenueAddressLine)
+        ? getDefaultPrintDelAddress()
+        : demoModalData.PrintDelVenueAddressLine,
+      DealMemoHold: processedHoldData,
+      DealMemoTechProvision: processedTechProvision,
+      ...formatDecimalFields(demoModalData, 'string'),
+    });
 
     setDisableDate(false);
   }, []);
@@ -240,9 +247,10 @@ export const EditDealMemoContractModal = ({
   }, [users]);
 
   useEffect(() => {
+    const data = [...dealMemoTechProvision];
     setFormData((prevDealMemo) => ({
       ...prevDealMemo,
-      DealMemoTechProvision: [],
+      DealMemoTechProvision: data,
     }));
   }, [dealMemoTechProvision]);
 
@@ -280,13 +288,14 @@ export const EditDealMemoContractModal = ({
   const editTechProvisionModalData = (key, value, name) => {
     const techProvisionData = dealMemoTechProvision.map((data) => {
       if (data.DMTechName === name) {
-        data[key] = value;
-        return data;
-      } else {
-        return data;
+        return {
+          ...data,
+          [key]: value,
+        };
       }
+      return data;
     });
-    setDealMemoTechProvision([...techProvisionData]);
+    setDealMemoTechProvision(techProvisionData);
   };
 
   const saveDemoModalData = async () => {
@@ -540,6 +549,19 @@ export const EditDealMemoContractModal = ({
         editDemoModalData(key, value, 'dealMemo');
       }
     }
+  };
+
+  // this will change when the delivery address is split out into Address 1, Address 2 and so on in the deal memo
+  // for now, the print address, on the deal memo will be the a comma separated value line
+  const getDefaultPrintDelAddress = () => {
+    const mainAddress = venueData.VenueAddress.find((address) => address.TypeName === 'Main');
+    return formatAddress(
+      mainAddress.Line1,
+      mainAddress.Line2,
+      mainAddress.Line3,
+      mainAddress.Town,
+      mainAddress.Postcode,
+    );
   };
 
   return (
@@ -1785,7 +1807,7 @@ export const EditDealMemoContractModal = ({
                   testId="marketing-delivery-address"
                   className="w-3/4"
                   disabled={formData.PrintDelUseVenueAddress}
-                  value={formData.PrintDelUseVenueAddress ? '' : formData.PrintDelVenueAddressLine}
+                  value={formData.PrintDelVenueAddressLine}
                   onChange={(value) => editDemoModalData('PrintDelVenueAddressLine', value.target.value, 'dealMemo')}
                 />
               </div>
