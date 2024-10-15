@@ -21,7 +21,7 @@
     "db-dev": "prisma studio --schema prisma/schema_client.prisma",
     "install-libreoffice": "sh ./install-libreoffice.sh",
     "prisma-generate": "prisma generate --schema prisma/schema_master.prisma & prisma generate --schema prisma/schema_client.prisma",
-    "lint-staged" : "lint-staged"
+    "lint-staged": "lint-staged"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
@@ -36,7 +36,6 @@
       "pre-push": "npm run test"
     }
   },
-
   "dependencies": {
     "@clerk/nextjs": "^4.23.3",
     "@devexpress/dx-react-grid": "^4.0.3",
@@ -93,6 +92,7 @@
     "jsonwebtoken": "^8.5.1",
     "jspdf": "^2.5.1",
     "libreoffice-convert": "^1.5.1",
+    "lint-staged": "^15.2.10",
     "mariadb": "^3.3.2",
     "match-sorter": "^6.3.4",
     "moment": "^2.29.4",
