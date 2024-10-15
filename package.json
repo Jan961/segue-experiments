@@ -20,8 +20,7 @@
     "build-storybook": "storybook build",
     "db-dev": "prisma studio --schema prisma/schema_client.prisma",
     "install-libreoffice": "sh ./install-libreoffice.sh",
-    "prisma-generate": "prisma generate --schema prisma/schema_master.prisma & prisma generate --schema prisma/schema_client.prisma",
-    "lint-staged": "lint-staged"
+    "prisma-generate": "prisma generate --schema prisma/schema_master.prisma & prisma generate --schema prisma/schema_client.prisma"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
