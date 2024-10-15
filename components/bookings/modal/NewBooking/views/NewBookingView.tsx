@@ -102,6 +102,9 @@ const NewBookingView = ({
   };
 
   const goToNext = () => {
+    if (formData.isDateTypeOnly && formData.isRunOfDates) {
+      onChange({ isRunOfDates: false });
+    }
     fetchData({
       url: '/api/bookings/conflict',
       method: 'POST',
