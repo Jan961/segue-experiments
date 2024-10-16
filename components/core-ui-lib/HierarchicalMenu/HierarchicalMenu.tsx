@@ -49,8 +49,13 @@ const HierarchicalMenu = forwardRef(
       setItemOptions(updatedOptions);
     }, [options]);
 
-    const handleMenuToggle = (selectedOption) => {
+    const handleMenuToggle = (selectedOption, ref: React.RefObject<HTMLDivElement>) => {
       const updated = mapRecursive(itemOptions, (o) => (o.id === selectedOption.id ? selectedOption : o));
+      if (selectedOption.expanded) {
+        setTimeout(() => {
+          ref.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+      }
       setItemOptions(updated);
       onToggle(updated);
     };
