@@ -191,7 +191,6 @@ const NewBookingView = ({
               id="shouldFilterVenues"
               labelClassName="text-white w-fit"
               onChange={(e: any) => {
-                console.log('click on checkbox');
                 onChange({ isRunOfDates: e.target.checked });
               }}
               checked={isRunOfDates}

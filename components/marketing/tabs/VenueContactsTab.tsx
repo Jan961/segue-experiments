@@ -41,11 +41,8 @@ const VenueContactsTab = forwardRef<VenueContactTabRef, VenueContactsProps>((pro
       const booking = bookings.bookings.find((booking) => booking.Id === props.bookingId);
       const variant = data.mode;
 
-      console.log('booking id: ', booking.Id);
-
       // create venue contact
       if (variant === 'create') {
-        console.log('creating a new contact');
         const newContact = data.venueContacts.find((contact) => contact.venueRoleId === null);
         const roleIndex = venueStandardRoleList.findIndex((role) => role.text === newContact.roleName);
         let venueRole = null;
@@ -90,7 +87,6 @@ const VenueContactsTab = forwardRef<VenueContactTabRef, VenueContactsProps>((pro
 
         // update fields
       } else if (variant === 'update') {
-        console.log('updating a new contact');
         const role = venueRoles.find((role) => role.Name === data.updatedFormData.roleName);
 
         if (!role || role.Id === undefined) {
