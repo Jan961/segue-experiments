@@ -16,7 +16,7 @@ import { contractsBookingStatusState, contractsStatusState, dealMemoStatusState 
 import { contractRehearsalState } from '../contractRehearsalState';
 import { contractGetInFitUpState } from '../contractGetInFitUpState';
 
-const getProductionName = ({ Id, ShowCode, ShowName }: any) => `${ShowCode}${Id} - ${ShowName}`;
+const getProductionName = ({ Code, ShowCode, ShowName }: any) => `${ShowCode}${Code} - ${ShowName}`;
 const getProductionCode = ({ ShowCode, Code }: any) => `${ShowCode}${Code}`;
 
 export const contractsRowsSelector = selector({

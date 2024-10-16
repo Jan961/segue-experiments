@@ -1,13 +1,13 @@
 import { Disclosure } from '@headlessui/react';
 import Icon from '../Icon';
 import { MenuOption } from './types';
-import { useEffect, useState, memo } from 'react';
+import React, { useEffect, useState, memo, useRef } from 'react';
 import classNames from 'classnames';
 
 export interface MenuItemProps {
   option: MenuOption;
   onClick?: (o: MenuOption) => void;
-  onToggle?: (o: MenuOption) => void;
+  onToggle?: (o: MenuOption, ref: React.RefObject<HTMLDivElement>) => void;
 }
 
 export default memo(function MenuItem({ option, onClick, onToggle }: MenuItemProps) {
@@ -17,6 +17,7 @@ export default memo(function MenuItem({ option, onClick, onToggle }: MenuItemPro
   const baseClass = 'cursor-pointer';
 
   const [itemOptions, setItemOptions] = useState(options || []);
+  const menuItemRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setItemOptions(options);
@@ -31,7 +32,7 @@ export default memo(function MenuItem({ option, onClick, onToggle }: MenuItemPro
   };
 
   const handleMenuToggle = () => {
-    onToggle({ ...option, expanded: !expanded });
+    onToggle({ ...option, expanded: !expanded }, menuItemRef);
     setIsExpanded(!expanded);
   };
 
@@ -47,7 +48,7 @@ export default memo(function MenuItem({ option, onClick, onToggle }: MenuItemPro
       </span>
     </div>
   ) : (
-    <div className={groupHeader ? 'mt-4' : ''}>
+    <div ref={menuItemRef} className={groupHeader ? 'mt-4' : ''}>
       <Disclosure as="div" key={value} className="" defaultOpen={isExpanded}>
         {({ open }) => (
           <>
