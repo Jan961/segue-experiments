@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { Select, TextInput } from 'components/core-ui-lib';
+import { Select, TextInput, Tooltip, Icon } from 'components/core-ui-lib';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import { EmergencyContact } from '../types';
 
@@ -35,6 +35,9 @@ const EmergencyContactForm = ({ emergencyContact = {}, countryOptionList = [], o
     },
     [onChange, setContact, contact],
   );
+  const countryTooltipText =
+    'For addresses in the United Kingdom, please select Scotland, England, Wales or Northern Ireland';
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-start">
@@ -123,8 +126,13 @@ const EmergencyContactForm = ({ emergencyContact = {}, countryOptionList = [], o
           />
         </div>
       </div>
-      <div className="flex items-start">
-        <div className="text-primary-input-text font-bold w-44">Country</div>
+      <div className="flex items-center ">
+        <div className="flex items-center gap-2 text-primary-input-text font-bold w-44">
+          <span>Country</span>
+          <Tooltip body={countryTooltipText} position="left" width="w-[140px]" bgColorClass="primary-input-text">
+            <Icon iconName="info-circle-solid" variant="xs" />
+          </Tooltip>
+        </div>
         <div className="grow">
           <Select
             testId="emergency-contact-country"

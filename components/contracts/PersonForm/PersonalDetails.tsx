@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { DateInput, Icon, Select, TextInput } from 'components/core-ui-lib';
+import { DateInput, Icon, Select, TextInput, Tooltip } from 'components/core-ui-lib';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import { workTypeOptions } from 'config/contracts';
 import { insertAtPos, removeAtPos, replaceAtPos } from 'utils';
@@ -80,6 +80,10 @@ const PersonalDetails = ({
     },
     [onChange, setFormData, formData, details],
   );
+
+  const countryTooltipText =
+    'For addresses in the United Kingdom, please select Scotland, England, Wales or Northern Ireland';
+
   return (
     <>
       <div className="grid grid-cols-2 gap-x-4">
@@ -158,8 +162,14 @@ const PersonalDetails = ({
               />
             </div>
           </div>
-          <div className="flex items-center">
-            <div className="text-primary-input-text font-bold w-40">Country</div>
+          <div className="flex justify-between items-center">
+            <div className="flex items-center text-primary-input-text font-bold w-40 gap-2">
+              <span>Country</span>
+              <Tooltip body={countryTooltipText} position="left" width="w-[140px]" bgColorClass="primary-input-text">
+                <Icon iconName="info-circle-solid" variant="xs" />
+              </Tooltip>
+            </div>
+
             <div className="grow">
               <Select
                 testId="person-country"
