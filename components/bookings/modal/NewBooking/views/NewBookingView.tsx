@@ -130,14 +130,14 @@ const NewBookingView = ({
   };
 
   const handleChange = ({ from, to }) => {
+    const fromDate = from?.toISOString() || null;
+    const toDate = !to && !to ? from?.toISOString() : to?.toISOString() || null;
     const change = {
-      fromDate: from?.toISOString() || '',
-      toDate: !toDate && !to ? from?.toISOString() : to?.toISOString() || '',
-      isRunOfDates: true,
+      fromDate,
+      toDate,
+      isRunOfDates: new Date(fromDate).toDateString() !== new Date(toDate).toDateString(),
     };
-    if (new Date(change.fromDate).toDateString() === new Date(change.toDate).toDateString()) {
-      change.isRunOfDates = false;
-    }
+
     onChange(change);
   };
 
