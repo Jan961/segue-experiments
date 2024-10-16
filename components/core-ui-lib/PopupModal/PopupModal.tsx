@@ -5,6 +5,7 @@ import Icon from '../Icon';
 import classNames from 'classnames';
 
 interface PopupModalProps {
+  autoXOverflow?: boolean;
   title?: string;
   children?: React.ReactNode;
   show: boolean;
@@ -18,6 +19,7 @@ interface PopupModalProps {
 }
 
 export default function PopupModal({
+  autoXOverflow = true,
   title = '',
   children,
   show = false,
@@ -43,7 +45,7 @@ export default function PopupModal({
 
   return (
     <Transition appear show={show} as={Fragment}>
-      <Dialog as="div" className="relative z-150" onClick={handleOverlayClick} onClose={() => null}>
+      <Dialog as="div" className="relative z-150 no-scrollbar" onClick={handleOverlayClick} onClose={() => null}>
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-300"
@@ -65,7 +67,7 @@ export default function PopupModal({
           )}
           data-testid="overlay"
         >
-          <div className="flex min-h-full items-center justify-center p-4 text-center ">
+          <div className="flex min-h-full items-center justify-center p-4 text-center">
             <Transition.Child
               as={Fragment}
               enter="ease-out duration-300"
@@ -77,7 +79,8 @@ export default function PopupModal({
             >
               <Dialog.Panel
                 className={classNames(
-                  'px-7 pt-7 pb-5 transform bg-primary-white text-left align-middle shadow-xl transition-all max-w-full overflow-x-auto',
+                  'px-7 pt-7 pb-5 transform bg-primary-white text-left align-middle shadow-xl transition-all max-w-full',
+                  autoXOverflow ? 'overflow-x-auto' : '',
                   panelClass,
                 )}
               >
