@@ -111,8 +111,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           },
         });
 
-        console.log({ data: techProvisionData, type: 'update' });
-
         // create record for tech provision data
         await prisma.dealMemoTechProvision.createMany({
           data: techProvisionData,
