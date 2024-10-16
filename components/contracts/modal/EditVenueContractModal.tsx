@@ -11,7 +11,6 @@ import { useRecoilState, useRecoilValue } from 'recoil';
 import { useRouter } from 'next/router';
 import { currentProductionSelector } from 'state/booking/selectors/currentProductionSelector';
 import { addEditContractsState } from 'state/contracts/contractsState';
-import useAxios from 'hooks/useAxios';
 import axios from 'axios';
 import { bookingStatusMap } from 'config/bookings';
 import { userState } from 'state/account/userState';
@@ -57,11 +56,8 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
   const [dealMemoFormData, setDealMemoFormData] = useState<Partial<DealMemoContractFormData>>({});
   const [demoModalData, setDemoModalData] = useState<Partial<DealMemoContractFormData>>({});
   const [modalTitle, setModalTitle] = useState<string>(
-    `${productionJumpState.ShowCode + productionJumpState.Code} ${productionJumpState.ShowName} | ${
-      selectedTableCell.contract.venue
-    } | `,
+    `${selectedTableCell.contract.productionName.replace('- ', '')} | ${selectedTableCell.contract.venue} | `,
   );
-  const { fetchData } = useAxios();
   const router = useRouter();
   const { users } = useRecoilValue(userState);
   const userList = useMemo(
@@ -163,7 +159,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
   };
 
   const fetchLastDates = async () => {
-    const productionId = productionJumpState.Id;
+    const productionId = selectedTableCell.contract.productionId;
     if (!productionId) return;
     try {
       const { data } = await axios(`/api/performances/lastDate/${productionId}`);
@@ -192,9 +188,8 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
     const formattedLastDate = formattedDateWithDay(lastDate);
     const lastPerformanceDate =
       formattedLastDate === formattedDateWithDay(formData.FirstDate) ? '' : `to ${formattedLastDate}`;
-    const title = `${productionJumpState.ShowCode + productionJumpState.Code}  ${productionJumpState.ShowName} | ${
-      selectedTableCell.contract.venue
-    } | ${formattedDateWithDay(formData.FirstDate)} ${lastPerformanceDate}`;
+    const title = `${selectedTableCell.contract.productionName.replace('- ', '')} | 
+    ${selectedTableCell.contract.venue} | ${formattedDateWithDay(formData.FirstDate)} ${lastPerformanceDate}`;
     setModalTitle(title);
   }, [lastDates]);
 
@@ -244,28 +239,20 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
       const contractData = Object.keys(saveContractFormData).length > 0;
       const dealMemoData = Object.keys(saveDealMemoFormData).length > 0;
       if (contractData) {
-        await fetchData({
-          url: `/api/contracts/upsert/venueContract/${selectedTableCell.contract.Id}`,
-          method: 'PATCH',
-          data: saveContractFormData,
-        });
+        await axios.patch(`/api/contracts/upsert/venueContract/${selectedTableCell.contract.Id}`, saveContractFormData);
       }
 
       if (bookingData) {
-        await fetchData({
-          url: `/api/contracts/update/venueContractBooking/${selectedTableCell.contract.Id}`,
-          method: 'PATCH',
-          data: saveBookingFormData,
-        });
+        await axios.patch(
+          `/api/contracts/update/venueContractBooking/${selectedTableCell.contract.Id}`,
+          saveBookingFormData,
+        );
       }
 
       if (dealMemoData) {
-        await fetchData({
-          url: `/api/contracts/update/dealMemo/${selectedTableCell.contract.Id}`,
-          method: 'PATCH',
-          data: saveDealMemoFormData,
-        });
+        await axios.patch(`/api/contracts/update/dealMemo/${selectedTableCell.contract.Id}`, saveDealMemoFormData);
       }
+
       setSaveBookingFormData({});
       setSaveContractFormData({});
       setSaveDealMemoFormData({});
