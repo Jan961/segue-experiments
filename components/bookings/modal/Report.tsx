@@ -71,7 +71,7 @@ export default function Report({
         autoXOverflow={false}
       >
         {loading && (
-          <div className="w-full h-full absolute left-0 top-0 flex items-center opacity-95">
+          <div className="w-full h-full absolute left-0 top-0 bg-white flex items-center opacity-95">
             <Spinner className="w-full" size="lg" />
           </div>
         )}
