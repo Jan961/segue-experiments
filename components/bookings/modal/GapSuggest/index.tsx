@@ -60,7 +60,6 @@ const GapSuggest = ({ startDate, endDate, productionId, onOkClick = () => null, 
         });
       }
     }
-    // getExcelFilename();
     return filteredRows.sort((a, b) => a.MinsFromStart - b.MinsFromStart);
   }, [selectedVenueIds, rows]);
 
@@ -104,7 +103,6 @@ const GapSuggest = ({ startDate, endDate, productionId, onOkClick = () => null, 
   };
 
   const exportTableData = () => {
-    // tableRef.current?.getApi?.()?.exportDataAsExcel?.();
     exportToExcel(tableRef, { fileName: excelFilename });
   };
 
