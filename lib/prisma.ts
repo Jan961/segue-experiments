@@ -17,7 +17,7 @@ const getPrismaClient = async (req: NextApiRequest): Promise<PrismaClient> => {
       const prismaUrl = `${clientDBUrl}_${process.env.DEPLOYMENT_ENV}_Segue_${orgId}`;
       let client: PrismaClient;
       // if cache exists, (it won't on Vercel) get prisma client from cache
-      if (cache) {
+      if (cache && ['prod', 'preprod'].includes(process.env.DEPLOYMENT_ENV)) {
         const cachedClient = cache.get(orgId);
 
         if (cachedClient) {
