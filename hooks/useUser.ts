@@ -54,6 +54,7 @@ const useUser = () => {
         symbols: true,
         lowercase: true,
         uppercase: true,
+        strict: true,
       });
 
       // Create the user within clerk
