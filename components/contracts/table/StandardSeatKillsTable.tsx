@@ -26,7 +26,7 @@ export default function StandardSeatKillsTable({ rowData, holdTypeList, handleFo
 
   const handleChange = (row: SeatKillRow, value: string, field: string) => {
     // get row thats being updated
-    const rowToUpdate = rows.find((seatKill) => seatKill.id === row.id);
+    const rowToUpdate = rows.find((seatKill) => seatKill.typeId === row.typeId);
 
     // update the field in the row object
     rowToUpdate[field] = parseInt(value);
