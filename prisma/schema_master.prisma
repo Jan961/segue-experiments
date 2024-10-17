@@ -36,6 +36,7 @@ model Account {
   AccountPaymentCurrencyCode String?               @db.VarChar(3)
   AccountW3WCount            Int?                  @db.UnsignedSmallInt
   AccountW3WAllowance        Int?                  @db.UnsignedSmallInt
+  AccountPIN                 String                @db.VarChar(5)
   Currency                   Currency?             @relation(fields: [AccountPaymentCurrencyCode], references: [CurrencyCode], onDelete: Restrict, map: "Currency_Account_Payment")
   File                       File?                 @relation(fields: [AccountLogoFileId], references: [FileId], map: "File_Account")
   AccountContact             AccountContact[]
@@ -240,6 +241,7 @@ view AccountUserPermissionsView {
   AccountId      Int
   UserId         Int     @default(0)
   AccUserId      Int     @default(0)
+  AccountPIN     String  @db.VarChar(5)
   AccUserIsAdmin Boolean @default(dbgenerated("(b'0')")) @db.Bit(1)
   UserFirstName  String  @db.VarChar(50)
   UserLastName   String? @db.VarChar(50)

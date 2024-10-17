@@ -2,11 +2,11 @@ import { useSignUp, useSession } from '@clerk/nextjs';
 import axios from 'axios';
 import { useState } from 'react';
 import { isNullOrEmpty, mapRecursive } from 'utils';
-import generator from 'generate-password';
 import { useUrl } from 'nextjs-current-url';
 import { NEW_USER_CONFIRMATION_EMAIL_TEMPLATE } from 'config/global';
 import { Production } from 'components/admin/modals/config';
 import { TreeItemOption } from 'components/global/TreeSelect/types';
+import { generateUserPassword } from 'utils/authUtils';
 
 type UserDetails = {
   email: string;
@@ -48,14 +48,7 @@ const useUser = () => {
         return false;
       }
 
-      const password = generator.generate({
-        length: 8,
-        numbers: true,
-        symbols: true,
-        lowercase: true,
-        uppercase: true,
-        strict: true,
-      });
+      const password = generateUserPassword();
 
       // Create the user within clerk
       const { data } = await axios.post('/api/auth/create-clerk-user', {
