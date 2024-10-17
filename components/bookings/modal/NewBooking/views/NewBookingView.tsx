@@ -131,7 +131,9 @@ const NewBookingView = ({
 
   const handleChange = ({ from, to }) => {
     const fromDate = from?.toISOString() || null;
-    const toDate = !to && !to ? from?.toISOString() : to?.toISOString() || null;
+    // const toDate = !to && !to ? from?.toISOString() : to?.toISOString() || null;
+    const toDate = to?.toISOString() || null;
+
     const change = {
       fromDate,
       toDate,
@@ -178,7 +180,7 @@ const NewBookingView = ({
           testId="cnb-date-range"
           label="Date"
           className=" bg-white my-2 w-fit"
-          onChange={({ from, to }) => handleChange({ from, to })}
+          onChange={handleChange}
           value={{ from: fromDate ? new Date(fromDate) : null, to: toDate ? new Date(toDate) : null }}
           minDate={minDate ? new Date(minDate) : null}
           maxDate={maxDate ? new Date(maxDate) : null}
