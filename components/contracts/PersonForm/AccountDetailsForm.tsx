@@ -36,7 +36,7 @@ const SalaryDetailsForm = ({ details, countryOptionList, onChange, accountType =
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-start">
-        <div className="text-primary-input-text font-bold w-44">{`${accountType} to be Paid to`}</div>
+        <div className="text-primary-input-text font-bold w-40">{`${accountType} to be Paid to`}</div>
         <div className="grow">
           <RadioGroup
             testId={`${accountType}-paid-to`}
@@ -49,7 +49,7 @@ const SalaryDetailsForm = ({ details, countryOptionList, onChange, accountType =
         </div>
       </div>
       <div className="flex items-start">
-        <div className="text-primary-input-text font-bold w-44">Bank Account Name</div>
+        <div className="text-primary-input-text font-bold w-40">Bank Account Name</div>
         <div className="grow">
           <TextInput
             testId={`${accountType}-bank-account-name`}
@@ -61,7 +61,7 @@ const SalaryDetailsForm = ({ details, countryOptionList, onChange, accountType =
         </div>
       </div>
       <div className="flex items-start">
-        <div className="text-primary-input-text font-bold w-44">Sort Code</div>
+        <div className="text-primary-input-text font-bold w-40">Sort Code</div>
         <div className="grow">
           <TextInput
             testId={`${accountType}-sort-code`}
@@ -73,7 +73,7 @@ const SalaryDetailsForm = ({ details, countryOptionList, onChange, accountType =
         </div>
       </div>
       <div className="flex items-start">
-        <div className="text-primary-input-text font-bold w-44">Account Number</div>
+        <div className="text-primary-input-text font-bold w-40">Account Number</div>
         <div className="grow">
           <TextInput
             testId={`${accountType}-account-number`}
@@ -86,7 +86,7 @@ const SalaryDetailsForm = ({ details, countryOptionList, onChange, accountType =
         </div>
       </div>
       <div className="flex items-start">
-        <div className="text-primary-input-text font-bold w-44">SWIFT(if applicable)</div>
+        <div className="text-primary-input-text font-bold w-40">SWIFT(if applicable)</div>
         <div className="grow">
           <TextInput
             testId={`${accountType}-account-swift`}
@@ -99,7 +99,7 @@ const SalaryDetailsForm = ({ details, countryOptionList, onChange, accountType =
         </div>
       </div>
       <div className="flex items-start">
-        <div className="text-primary-input-text font-bold w-44">IBAN(if applicable)</div>
+        <div className="text-primary-input-text font-bold w-40">IBAN(if applicable)</div>
         <div className="grow">
           <TextInput
             testId={`${accountType}-account-iban`}
@@ -112,7 +112,7 @@ const SalaryDetailsForm = ({ details, countryOptionList, onChange, accountType =
         </div>
       </div>
       <div className="flex items-start">
-        <div className="flex items-center gap-2 text-primary-input-text font-bold w-44">
+        <div className="flex items-center gap-2 text-primary-input-text font-bold w-40">
           <span>Country</span>
           <Tooltip
             body="For addresses in the United Kingdom, please select Scotland, England, Wales or Northern Ireland"
