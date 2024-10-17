@@ -29,12 +29,12 @@ pipelines:
             - npx wait-on http://localhost:3000
             # Clone Cypress repo in a separate directory
             - mkdir cypress-tests && cd cypress-tests
-            - git clone git@bitbucket.org:segue-team/cypress.git --branch=pipeline_test
+            - git clone git@bitbucket.org:segue-team/cypress.git
             - cd cypress
             - npm ci
             # Run Cypress tests in headless mode
-            # - npm run cy:alltests --browser chrome
-            - npm run cy:permissions --browser chrome
+            - npm run cy:alltests --browser chrome
+            # - npm run cy:permissions --browser chrome
             - apt-get update && apt-get install -y zip jq tree
             - ls -al cypress/
             - zip -r reports.zip cypress/reports/
@@ -44,40 +44,14 @@ pipelines:
             - if [[ $BITBUCKET_EXIT_CODE -ne 0 ]]; then ALERT_TYPE="error" ; fi
             - echo "$SMTP_USERNAME"
             - echo "$SMTP_PASSWORD"
-            - |
-              generate_summary() {
-                echo "<h2>Cypress Test Results Summary</h2>"
-                echo "<p>Branch: ${BITBUCKET_BRANCH}</p>"
-                echo "<p>Commit: ${BITBUCKET_COMMIT}</p>"
-                echo "<h3>Test Results:</h3>"
-                if [ -f cypress-tests/cypress/results.json ]; then
-                  total=$(jq '.stats.tests' cypress-tests/cypress/reports/mocha/mochawesome.json)
-                  passed=$(jq '.stats.passes' cypress-tests/cypress/reports/mocha/mochawesome.json)
-                  failed=$(jq '.stats.failures' cypress-tests/cypress/reports/mocha/mochawesome.json)
-                  echo "<ul>"
-                  echo "<li>Total Tests: $total</li>"
-                  echo "<li>Passed: $passed</li>"
-                  echo "<li>Failed: $failed</li>"
-                  echo "</ul>"
-                  echo "<h3>Failed Tests:</h3>"
-                  echo "<ul>"
-                  jq -r '.results[] | select(.fail) | .fullTitle' cypress-tests/cypress/reports/mocha/mochawesome.json | while read -r test; do
-                    echo "<li>$test</li>"
-                  done
-                  echo "</ul>"
-                else
-                  echo "<p>No test results found.</p>"
-                fi
-              }
-            - EMAIL_BODY=$(generate_summary)
-            - echo "$EMAIL_BODY"
             - pipe: atlassian/email-notify:0.13.2
               variables:
                 USERNAME: $SMTP_USERNAME
                 PASSWORD: $SMTP_PASSWORD
                 FROM: 'asara97911@gmail.com'
-                TO: 'testing@segue360.co.uk'
+                TO: 'asara97911@gmail.com'
                 HOST: 'smtp.gmail.com'
+                PORT: 465
                 SUBJECT: '${ALERT_TYPE}:Bitbucket Pipe Notification for ${BITBUCKET_BRANCH}'
                 ATTACHMENTS: 'cypress-tests/cypress/reports.zip'
           artifacts:
