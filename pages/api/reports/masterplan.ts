@@ -163,7 +163,9 @@ const handler = async (req, res) => {
       pageSetup: { fitToPage: true, fitToHeight: 5, fitToWidth: 7 },
       views: [{ state: 'frozen', xSplit: 2, ySplit: 6 }],
     });
-    const title = `All Productions Masterplan ${formatedFromDateString} to ${formatedToDateString}`;
+    const title = `All Productions Masterplan ${moment(formatedFromDateString).format('DD-MM-YY')} to ${moment(
+      formatedToDateString,
+    ).format('DD-MM-YY')}`;
     worksheet.addRow([title]);
     const date = new Date();
     worksheet.addRow([
@@ -346,7 +348,7 @@ const handler = async (req, res) => {
 
     worksheet.getCell(1, 1).font = { size: 16, color: { argb: COLOR_HEXCODE.WHITE }, bold: true };
 
-    const filename = `${title}.xlsx`;
+    const filename = `${title}`;
     if (format === 'pdf') {
       worksheet.pageSetup.printArea = `A1:${worksheet.getColumn(11).letter}${rowNo}`;
       worksheet.pageSetup.fitToWidth = 1;
