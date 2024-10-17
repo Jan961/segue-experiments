@@ -1,11 +1,9 @@
 import { clerkClient } from '@clerk/nextjs';
 import { getAuth } from '@clerk/nextjs/server';
 import prisma from 'lib/prisma_master';
-import { AccessCheck, checkAccess as checkAccessDirect } from './accessService';
 import { userMapper } from 'lib/mappers';
 import { UserDto } from 'interfaces';
 import { isNullOrEmpty } from 'utils';
-import redis from 'lib/redis';
 
 export const getUsers = async (AccountId: number): Promise<UserDto[]> => {
   const result = await prisma.user.findMany({
@@ -92,10 +90,6 @@ export const getOrganisationIdFromReq = async (req: any) => {
   return user?.unsafeMetadata?.organisationId;
 };
 
-export const checkAccess = async (email: string, items: AccessCheck = null): Promise<boolean> => {
-  return checkAccessDirect(email, items);
-};
-
 export const getUserId = async (email: string) => {
   const { UserId } = await prisma.user.findUnique({
     where: {
@@ -107,37 +101,6 @@ export const getUserId = async (email: string) => {
   });
 
   return UserId;
-};
-
-const THREE_HOURS_IN_SECONDS = 60 * 60 * 3;
-export const createUserSession = async (email: string, orgId: string) => {
-  try {
-    // Set TTL for 3 hours (in seconds)
-    const redisResonse = await redis.set(email, orgId, {
-      ex: THREE_HOURS_IN_SECONDS,
-    });
-    return redisResonse;
-  } catch (err) {
-    console.error(err);
-  }
-};
-
-export const deleteUserSession = async (email: string) => {
-  try {
-    const redisResonse = await redis.del(email);
-    return redisResonse;
-  } catch (err) {
-    console.error(err);
-  }
-};
-
-export const isSessionActive = async (email: string) => {
-  try {
-    const isActive = await redis.get(email);
-    return !!isActive;
-  } catch (err) {
-    console.error(err);
-  }
 };
 
 export const createClerkUserWithoutSession = async (
@@ -179,9 +142,6 @@ export const getUserPermisisons = async (email: string, organisationId: string) 
     },
   });
   const formattedPermissions =
-    accountUser?.AccountUserPermission.map(({ Permission }) => ({
-      permissionId: Permission.PermissionId,
-      permissionName: Permission.PermissionName,
-    })) || [];
+    accountUser?.AccountUserPermission.map(({ Permission }) => Permission.PermissionName) || [];
   return formattedPermissions;
 };

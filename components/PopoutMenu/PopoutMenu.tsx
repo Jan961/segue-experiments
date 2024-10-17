@@ -16,6 +16,8 @@ import {
 import { useEffect, useMemo, useRef } from 'react';
 import Icon from 'components/core-ui-lib/Icon';
 import { globalState } from 'state/global/globalState';
+import { userPermissionsState } from 'state/account/userPermissionsState';
+import { isNullOrEmpty } from 'utils';
 
 const groupHeader = 'text-[1.0625rem] font-bold';
 const leve2 = 'text-[1.0625rem]';
@@ -23,6 +25,7 @@ const level3 = 'text-[0.9375rem]';
 
 export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: any) {
   const [state, setGlobalState] = useRecoilState(globalState);
+  const { permissions } = useRecoilValue(userPermissionsState);
   const isMenuPinned = useRef(false);
   const menuRef = useRef(null);
   // If no path, you need to add a tourJump to the page. This is a global state
@@ -53,6 +56,7 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
         icon: bookingsIcon,
         labelClass: groupHeader,
         testId: 'sidepanel-bookings',
+        permission: 'BOOKINGS',
         options: [
           { label: 'Bookings Home', value: '/bookings', labelClass: leve2, testId: 'sidepanel-bookings-home' },
           {
@@ -76,6 +80,7 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
         icon: marketingIcon,
         labelClass: groupHeader,
         testId: 'sidepanel-marketing',
+        permission: 'MARKETING',
         options: [
           {
             label: 'Marketing Home',
@@ -160,6 +165,7 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
         icon: tasksIcon,
         labelClass: groupHeader,
         testId: 'sidepanel-project-management',
+        permission: 'PROJECT_MANAGEMENT',
         options: [
           {
             label: 'Production Task Lists',
@@ -182,6 +188,7 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
         icon: contractsIcon,
         labelClass: groupHeader,
         testId: 'sidepanel-contracts',
+        permission: 'CONTRACTS',
         options: [
           {
             label: 'Venue Contracts',
@@ -216,6 +223,7 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
         icon: tourManagementIcon,
         labelClass: groupHeader,
         testId: 'sidepanel-touring-management',
+        permission: 'TOURING_MANAGEMENT',
         options: [
           {
             label: 'Performance Reports',
@@ -276,6 +284,7 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
         icon: systemAdminIcon,
         labelClass: groupHeader,
         testId: 'sidepanel-system-admin',
+        permission: 'SYSTEM_ADMIN',
         options: [
           {
             label: 'Company Information',
@@ -284,26 +293,14 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
             testId: 'sidepanel-system-admin-company-info',
             options: [
               {
-                label: 'Company Details',
-                value: '',
+                label: 'Account Details',
+                value: '/admin/company-information/?tabIndex=0',
                 labelClass: level3,
-                testId: 'sidepanel-system-admin-company-info-company-details',
-              },
-              {
-                label: 'Staff Details',
-                value: '',
-                labelClass: level3,
-                testId: 'sidepanel-system-admin-company-info-staff-details',
-              },
-              {
-                label: 'System Administrator(s)',
-                value: '',
-                labelClass: level3,
-                testId: 'sidepanel-system-admin-company-info-system-administrator',
+                testId: 'sidepanel-system-admin-company-info-account-details ',
               },
               {
                 label: 'Production Companies',
-                value: '',
+                value: '/admin/company-information/?tabIndex=1',
                 labelClass: level3,
                 testId: 'sidepanel-system-admin-company-info-production-companies',
               },
@@ -312,21 +309,18 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
 
           {
             label: 'Users',
-            value: '',
+            value: '/admin/users',
             labelClass: leve2,
             testId: 'sidepanel-system-admin-users',
-            options: [
-              {
-                label: 'Manage User Permissions',
-                value: '',
-                labelClass: level3,
-                testId: 'sidepanel-system-admin-users-manage-user-permissions',
-              },
-            ],
           },
-          { label: 'Account', value: '', labelClass: leve2, testId: 'sidepanel-system-admin-account' },
           { label: 'Payment Details', value: '', labelClass: leve2, testId: 'sidepanel-system-admin-payment-details' },
-          { label: 'Venue Information', value: '', labelClass: leve2, testId: 'sidepanel-system-admin-venuw-info' },
+
+          {
+            label: 'Account Preferences',
+            value: '',
+            labelClass: leve2,
+            testId: 'sidepanel-system-admin-account-preferences',
+          },
         ],
       },
     ],
@@ -339,6 +333,9 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
   };
 
   const handleMenuClick = (option) => {
+    if (!isMenuPinned.current) {
+      close();
+    }
     if (option?.value) {
       router.push(option.value);
     }
@@ -369,13 +366,15 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
 
   useEffect(() => {
     isMenuPinned.current = state.menuPinned;
-    if (!state.menuItems || state.menuItems.length === 0) {
+    if (permissions?.length > 0 && isNullOrEmpty(state.menuItems)) {
       const disabledRoutes = ['/touring'];
-      const filteredMenuItems = menuItems.filter((item) => !disabledRoutes.includes(item.value));
+      const filteredMenuItems = menuItems.filter(
+        (item) => permissions.includes(item.permission) && !disabledRoutes.includes(item.value),
+      );
 
       setGlobalState({ ...state, menuItems: filteredMenuItems });
     }
-  }, [menuItems, state, setGlobalState]);
+  }, [menuItems, state, setGlobalState, permissions]);
 
   useEffect(() => {
     if (menuIsOpen) {

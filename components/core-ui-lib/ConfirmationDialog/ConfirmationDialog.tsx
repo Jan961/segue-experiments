@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Button from '../Button';
 import PopupModal from '../PopupModal';
 
-export type ConfDialogVariant = 'close' | 'cancel' | 'delete' | 'logout' | 'leave' | 'return';
+export type ConfDialogVariant = 'close' | 'cancel' | 'delete' | 'logout' | 'leave' | 'return' | 'continue';
 
 export type ConfirmationDialogContent = {
   question: string;
@@ -16,6 +16,7 @@ export enum ConfVariant {
   Logout = 'logout',
   Leave = 'leave',
   Return = 'return',
+  Continue = 'continue',
 }
 
 export interface ConfirmationDialogProps {
@@ -56,6 +57,10 @@ export const confOptions = {
   },
   return: {
     question: 'Are you sure you want to return to home?',
+    warning: '',
+  },
+  continue: {
+    question: 'Are you sure you want to continue?',
     warning: '',
   },
 };
