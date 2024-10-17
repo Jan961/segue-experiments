@@ -2307,7 +2307,7 @@ export const EditDealMemoContractModal = ({
               onClick={() =>
                 dealMemoExport({
                   bookingId: selectedTableCell.contract.Id.toString(),
-                  dealMemoData: demoModalData,
+                  dealMemoData: formData,
                   production: productionJumpState,
                   contract: selectedTableCell.contract,
                   venue: venueData,
