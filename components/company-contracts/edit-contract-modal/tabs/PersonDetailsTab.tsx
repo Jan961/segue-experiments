@@ -104,22 +104,19 @@ export const PersonDetailsTab = ({ person = {}, height, updateFormData }: Contra
           onChange={(data) => onChange('personDetails', data)}
         />
         <div className="grid grid-cols-2 mt-10 gap-x-4">
-          <div>
-            <h3 className="text-xl text-primary-navy font-bold mb-3">Emergency Contact 1</h3>
-            <EmergencyContact
-              emergencyContact={emergencyContact1}
-              countryOptionList={countryOptionList}
-              onChange={(data) => onChange('emergencyContact1', data)}
-            />
-          </div>
-          <div>
-            <h3 className="text-xl text-primary-navy font-bold mb-3">Emergency Contact 2</h3>
-            <EmergencyContact
-              emergencyContact={emergencyContact2}
-              countryOptionList={countryOptionList}
-              onChange={(data) => onChange('emergencyContact2', data)}
-            />
-          </div>
+          <h3 className="text-xl text-primary-navy font-bold mb-3">Emergency Contact 1</h3>
+          <EmergencyContact
+            emergencyContact={emergencyContact1}
+            countryOptionList={countryOptionList}
+            onChange={(data) => onChange('emergencyContact1', data)}
+          />
+
+          <h3 className="text-xl text-primary-navy font-bold mb-3">Emergency Contact 2</h3>
+          <EmergencyContact
+            emergencyContact={emergencyContact2}
+            countryOptionList={countryOptionList}
+            onChange={(data) => onChange('emergencyContact2', data)}
+          />
         </div>
         <div className="flex gap-4 mt-8 mb-3">
           <h3 className="text-xl text-primary-navy font-bold">Agency Details</h3>

@@ -40,8 +40,8 @@ const EmergencyContactForm = ({ emergencyContact = {}, countryOptionList = [], o
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-start">
-        <div className="text-primary-input-text font-bold w-44">First Name</div>
+      <div className="flex items-center">
+        <div className="text-primary-input-text font-bold w-40">First Name</div>
         <div className="grow">
           <TextInput
             testId="emergency-contact-first-name"
@@ -52,8 +52,8 @@ const EmergencyContactForm = ({ emergencyContact = {}, countryOptionList = [], o
           />
         </div>
       </div>
-      <div className="flex items-start">
-        <div className="text-primary-input-text font-bold w-44">Last Name</div>
+      <div className="flex items-center">
+        <div className="text-primary-input-text font-bold w-40">Last Name</div>
         <div className="grow">
           <TextInput
             testId="emergency-contact-last-name"
@@ -64,8 +64,8 @@ const EmergencyContactForm = ({ emergencyContact = {}, countryOptionList = [], o
           />
         </div>
       </div>
-      <div className="flex items-start">
-        <div className="text-primary-input-text font-bold w-44">Address</div>
+      <div className="flex items-center">
+        <div className="text-primary-input-text font-bold w-40">Address</div>
         <div className="grow flex flex-col gap-2">
           <TextInput
             testId="emergency-contact-address-1"
@@ -90,8 +90,8 @@ const EmergencyContactForm = ({ emergencyContact = {}, countryOptionList = [], o
           />
         </div>
       </div>
-      <div className="flex items-start">
-        <div className="text-primary-input-text font-bold w-44">Town</div>
+      <div className="flex items-center">
+        <div className="text-primary-input-text font-bold w-40">Town</div>
         <div className="grow">
           <TextInput
             testId="emergency-contact-town"
@@ -102,8 +102,8 @@ const EmergencyContactForm = ({ emergencyContact = {}, countryOptionList = [], o
           />
         </div>
       </div>
-      <div className="flex items-start">
-        <div className="text-primary-input-text font-bold w-44">Postcode</div>
+      <div className="flex items-center">
+        <div className="text-primary-input-text font-bold w-40">Postcode</div>
         <div className="grow">
           <TextInput
             testId="emergency-contact-postcode"
@@ -114,8 +114,8 @@ const EmergencyContactForm = ({ emergencyContact = {}, countryOptionList = [], o
           />
         </div>
       </div>
-      <div className="flex items-start">
-        <div className="text-primary-input-text font-bold w-44">Email Address</div>
+      <div className="flex items-center">
+        <div className="text-primary-input-text font-bold w-40">Email Address</div>
         <div className="grow">
           <TextInput
             testId="emergency-contact-email"
@@ -127,7 +127,7 @@ const EmergencyContactForm = ({ emergencyContact = {}, countryOptionList = [], o
         </div>
       </div>
       <div className="flex items-center ">
-        <div className="flex items-center gap-2 text-primary-input-text font-bold w-44">
+        <div className="flex items-center gap-2 text-primary-input-text font-bold w-40">
           <span>Country</span>
           <Tooltip body={countryTooltipText} position="left" width="w-[140px]" bgColorClass="primary-input-text">
             <Icon iconName="info-circle-solid" variant="xs" />
@@ -146,8 +146,8 @@ const EmergencyContactForm = ({ emergencyContact = {}, countryOptionList = [], o
           />
         </div>
       </div>
-      <div className="flex items-start">
-        <div className="text-primary-input-text font-bold w-44">Landline Number</div>
+      <div className="flex items-center">
+        <div className="text-primary-input-text font-bold w-40">Landline Number</div>
         <div className="grow">
           <TextInput
             testId="emergency-contact-landline"
@@ -158,8 +158,8 @@ const EmergencyContactForm = ({ emergencyContact = {}, countryOptionList = [], o
           />
         </div>
       </div>
-      <div className="flex items-start">
-        <div className="text-primary-input-text font-bold w-44">Mobile Number</div>
+      <div className="flex items-center">
+        <div className="text-primary-input-text font-bold w-40">Mobile Number</div>
         <div className="grow">
           <TextInput
             testId="emergency-contact-mobile-number"

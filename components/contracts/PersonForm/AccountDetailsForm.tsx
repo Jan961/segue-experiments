@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { RadioGroup, Select, TextInput } from 'components/core-ui-lib';
+import { RadioGroup, Select, TextInput, Tooltip, Icon } from 'components/core-ui-lib';
 import { Direction } from 'components/core-ui-lib/RadioGroup/RadioGroup';
 import { salaryPaidToOptions } from 'config/contracts';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
@@ -112,7 +112,17 @@ const SalaryDetailsForm = ({ details, countryOptionList, onChange, accountType =
         </div>
       </div>
       <div className="flex items-start">
-        <div className="text-primary-input-text font-bold w-44">Country</div>
+        <div className="flex items-center gap-2 text-primary-input-text font-bold w-44">
+          <span>Country</span>
+          <Tooltip
+            body="For addresses in the United Kingdom, please select Scotland, England, Wales or Northern Ireland"
+            position="left"
+            width="w-[140px]"
+            bgColorClass="primary-input-text"
+          >
+            <Icon iconName="info-circle-solid" variant="xs" />
+          </Tooltip>
+        </div>
         <div className="grow">
           <Select
             testId={`${accountType}-account-country`}

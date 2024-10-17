@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import { noop } from 'utils';
-import { Select, TextInput } from 'components/core-ui-lib';
+import { Select, TextInput, Tooltip, Icon } from 'components/core-ui-lib';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import { IAgencyDetails } from '../types';
 
@@ -58,7 +58,7 @@ const AgencyDetails = ({ details, countryOptionList, onChange = noop, disabled =
       <div className="grid grid-cols-2">
         <div className="flex flex-col gap-2">
           <div className="flex items-start">
-            <div className="text-primary-input-text font-bold w-44">Agent First Name</div>
+            <div className="text-primary-input-text font-bold w-40">Agent First Name</div>
             <div className="grow">
               <TextInput
                 placeholder="Enter Agents First Name"
@@ -71,7 +71,7 @@ const AgencyDetails = ({ details, countryOptionList, onChange = noop, disabled =
             </div>
           </div>
           <div className="flex items-start">
-            <div className="text-primary-input-text font-bold w-44">Agent Last Name</div>
+            <div className="text-primary-input-text font-bold w-40">Agent Last Name</div>
             <div className="grow">
               <TextInput
                 placeholder="Enter Agents Last Name"
@@ -84,7 +84,7 @@ const AgencyDetails = ({ details, countryOptionList, onChange = noop, disabled =
             </div>
           </div>
           <div className="flex items-start">
-            <div className="text-primary-input-text font-bold w-44">Address Line 1</div>
+            <div className="text-primary-input-text font-bold w-40">Address Line 1</div>
             <div className="grow flex-col gap-4">
               <TextInput
                 placeholder="Enter Address 1"
@@ -113,7 +113,7 @@ const AgencyDetails = ({ details, countryOptionList, onChange = noop, disabled =
             </div>
           </div>
           <div className="flex items-start">
-            <div className="text-primary-input-text font-bold w-44">Agency Name</div>
+            <div className="text-primary-input-text font-bold w-40">Agency Name</div>
             <div className="grow">
               <TextInput
                 placeholder="Enter Agency Name"
@@ -126,7 +126,7 @@ const AgencyDetails = ({ details, countryOptionList, onChange = noop, disabled =
             </div>
           </div>
           <div className="flex items-start">
-            <div className="text-primary-input-text font-bold w-44">Town</div>
+            <div className="text-primary-input-text font-bold w-40">Town</div>
             <div className="grow">
               <TextInput
                 placeholder="Enter Town"
@@ -139,7 +139,7 @@ const AgencyDetails = ({ details, countryOptionList, onChange = noop, disabled =
             </div>
           </div>
           <div className="flex items-start">
-            <div className="text-primary-input-text font-bold w-44">Postcode</div>
+            <div className="text-primary-input-text font-bold w-40">Postcode</div>
             <div className="grow">
               <TextInput
                 placeholder="Enter Postcode"
@@ -152,7 +152,18 @@ const AgencyDetails = ({ details, countryOptionList, onChange = noop, disabled =
             </div>
           </div>
           <div className="flex items-start">
-            <div className="text-primary-input-text font-bold w-44">Country</div>
+            <div className="flex items-center gap-2 text-primary-input-text font-bold w-40">
+              <span>Country</span>
+              <Tooltip
+                body="For addresses in the United Kingdom, please select Scotland, England, Wales or Northern Ireland"
+                position="left"
+                width="w-[140px]"
+                bgColorClass="primary-input-text"
+              >
+                <Icon iconName="info-circle-solid" variant="xs" />
+              </Tooltip>
+            </div>
+
             <div className="grow">
               <Select
                 testId="agency-contact-country"
@@ -170,7 +181,7 @@ const AgencyDetails = ({ details, countryOptionList, onChange = noop, disabled =
         </div>
         <div className="flex flex-col gap-2">
           <div className="flex items-start">
-            <div className="text-primary-input-text font-bold w-44">Email Address</div>
+            <div className="text-primary-input-text font-bold w-40">Email Address</div>
             <div className="grow">
               <TextInput
                 placeholder="Enter Email Address"
@@ -183,7 +194,7 @@ const AgencyDetails = ({ details, countryOptionList, onChange = noop, disabled =
             </div>
           </div>
           <div className="flex items-start">
-            <div className="text-primary-input-text font-bold w-44">Landline Number</div>
+            <div className="text-primary-input-text font-bold w-40">Landline Number</div>
             <div className="grow">
               <TextInput
                 placeholder="Enter Landline Number"
@@ -196,7 +207,7 @@ const AgencyDetails = ({ details, countryOptionList, onChange = noop, disabled =
             </div>
           </div>
           <div className="flex items-start">
-            <div className="text-primary-input-text font-bold w-44">Mobile Number</div>
+            <div className="text-primary-input-text font-bold w-40">Mobile Number</div>
             <div className="grow">
               <TextInput
                 placeholder="Enter Mobile Number"
@@ -209,7 +220,7 @@ const AgencyDetails = ({ details, countryOptionList, onChange = noop, disabled =
             </div>
           </div>
           <div className="flex items-start">
-            <div className="text-primary-input-text font-bold w-44">Agency Website</div>
+            <div className="text-primary-input-text font-bold w-40">Agency Website</div>
             <div className="grow">
               <TextInput
                 placeholder="Enter Agency Website"
