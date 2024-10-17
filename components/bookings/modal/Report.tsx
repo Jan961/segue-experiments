@@ -63,13 +63,7 @@ export default function Report({
   };
   return (
     <>
-      <PopupModal
-        show={visible}
-        onClose={onClose}
-        title="Tour Summary"
-        titleClass="text-primary-navy"
-        autoXOverflow={false}
-      >
+      <PopupModal show={visible} onClose={onClose} title="Tour Summary" titleClass="text-primary-navy">
         {loading && (
           <div className="w-full h-full absolute left-0 top-0 bg-white flex items-center opacity-95">
             <Spinner className="w-full" size="lg" />
