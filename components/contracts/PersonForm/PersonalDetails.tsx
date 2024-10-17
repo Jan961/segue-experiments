@@ -17,12 +17,12 @@ export const defaultPersonDetails = {
   mobileNumber: '',
   passportName: '',
   passportNumber: '',
-  hasUKWorkPermit: false,
+  hasUKWorkPermit: null,
   passportExpiryDate: null,
   postcode: '',
   checkedBy: null,
   country: null,
-  isFEURequired: false,
+  isFEURequired: null,
   workType: [],
   advisoryNotes: '',
   generalNotes: '',
@@ -118,7 +118,7 @@ const PersonalDetails = ({
               <TextInput
                 testId="person-address-1"
                 placeholder="Enter Address 1"
-                className="text-primary-input-text font-bold w-full max-w-96"
+                className="text-primary-input-text font-bold w-full  max-w-96"
                 onChange={(event) => handleChange('address1', event.target.value)}
                 value={address1}
               />
@@ -222,87 +222,94 @@ const PersonalDetails = ({
               />
             </div>
           </div>
-          <div className="flex items-center">
-            <div className="text-primary-input-text font-bold w-44">Full Name as it appears on Passport</div>
-            <div className="max-w-96">
-              <TextInput
-                testId="person-passport-name"
-                placeholder="Enter Name on Passport"
-                className="text-primary-input-text font-bold w-full max-w-96"
-                onChange={(event) => handleChange('passportName', event.target.value)}
-                value={passportName}
-              />
-            </div>
-          </div>
-          <div className="flex items-center">
-            <div className="text-primary-input-text font-bold w-44">Passport Number</div>
-            <div className="max-w-96">
-              <TextInput
-                testId="person-passport-number"
-                placeholder="Enter Passport Number"
-                className="text-primary-input-text font-bold w-full max-w-96"
-                onChange={(event) => handleChange('passportNumber', event.target.value)}
-                value={passportNumber}
-              />
-            </div>
-          </div>
-          <div className="flex items-center">
-            <div className="text-primary-input-text font-bold w-44">Passport Expiry Date</div>
-            <div className="max-w-96 flex items-center">
-              <DateInput
-                testId="person-passport-expiry-date"
-                onChange={(value) => handleChange('passportExpiryDate', value?.toISOString?.() || '')}
-                value={passportExpiryDate}
-              />
-              <div className="text-xs text-primary-input-text font-bold ml-4">
-                (<span className="underline">NOTE:</span> Expiry date is 10 years from{' '}
-                <span className="text-red-500 underline">PASSPORT ISSUE DATE</span>)
+
+          <div className="pt-20">
+            <div className="flex items-center h-12">
+              <div className="text-primary-input-text font-bold w-44 mr-2">
+                <p className="pr-5">Full Name as it appears on Passport</p>
+              </div>
+              <div className="max-w-96">
+                <TextInput
+                  testId="person-passport-name"
+                  placeholder="Enter Name on Passport"
+                  className="text-primary-input-text font-bold w-full max-w-96"
+                  onChange={(event) => handleChange('passportName', event.target.value)}
+                  value={passportName}
+                />
               </div>
             </div>
-          </div>
-          <div className="flex items-center">
-            <div className="text-primary-input-text font-bold w-44">Eligible to Work in the UK</div>
-            <div className="max-w-96  flex items-center">
-              <Select
-                testId="person-uk-work-eligibility"
-                onChange={(value) => handleChange('hasUKWorkPermit', value as string)}
-                value={hasUKWorkPermit}
-                className="bg-primary-white w-40"
-                placeholder="YES/NO."
-                options={booleanOptions}
-                isClearable
-                isSearchable
-              />
-              <div className="text-primary-input-text font-bold ml-2 mr-2 w-20">Checked</div>
-              <div className="grow">
+            <div className="flex items-center h-12">
+              <div className="text-primary-input-text font-bold w-44">Passport Number</div>
+              <div className="max-w-96">
+                <TextInput
+                  testId="person-passport-number"
+                  placeholder="Enter Passport Number"
+                  className="text-primary-input-text font-bold w-full max-w-96"
+                  onChange={(event) => handleChange('passportNumber', event.target.value)}
+                  value={passportNumber}
+                />
+              </div>
+            </div>
+            <div className="flex items-center h-12">
+              <div className="text-primary-input-text font-bold w-44">Passport Expiry Date</div>
+              <div className="max-w-96 flex items-center">
+                <DateInput
+                  testId="person-passport-expiry-date"
+                  onChange={(value) => handleChange('passportExpiryDate', value?.toISOString?.() || '')}
+                  value={passportExpiryDate}
+                />
+                <div className="text-xs text-primary-input-text font-bold ml-4">
+                  (<span className="underline">NOTE:</span> Expiry date is 10 years from{' '}
+                  <span className="text-red-500 underline">PASSPORT ISSUE DATE</span>)
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center h-12">
+              <div className="text-primary-input-text font-bold w-44">
+                <p className="pr-5">Eligible to Work in the UK</p>
+              </div>
+              <div className="max-w-96  flex items-center">
                 <Select
-                  testId="person-checked-by"
-                  onChange={(value) => handleChange('checkedBy', value as number)}
-                  value={checkedBy}
-                  className="bg-primary-white w-full"
-                  placeholder="Please select..."
-                  options={userOptionList}
+                  testId="person-uk-work-eligibility"
+                  onChange={(value) => handleChange('hasUKWorkPermit', value as string)}
+                  value={hasUKWorkPermit}
+                  className="bg-primary-white w-30"
+                  placeholder="YES/NO"
+                  options={booleanOptions}
+                  isClearable
+                  isSearchable
+                />
+                <div className="text-primary-input-text font-bold ml-2 mr-2 w-20">Checked by</div>
+                <div className="grow">
+                  <Select
+                    testId="person-checked-by"
+                    onChange={(value) => handleChange('checkedBy', value as number)}
+                    value={checkedBy}
+                    className="bg-primary-white w-full"
+                    placeholder="Please select..."
+                    options={userOptionList}
+                    isClearable
+                    isSearchable
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center h-12">
+              <div className="text-primary-input-text font-bold w-44">
+                <p className="pr-5">Is FEU (Foreign Entertainer Union) permission required</p>
+              </div>
+              <div>
+                <Select
+                  testId="person-is-feu-required"
+                  onChange={(value) => handleChange('isFEURequired', value as string)}
+                  value={isFEURequired}
+                  className="bg-primary-white w-30 mr-3"
+                  placeholder="YES/NO"
+                  options={booleanOptions}
                   isClearable
                   isSearchable
                 />
               </div>
-            </div>
-          </div>
-          <div className="flex items-center">
-            <div className="text-primary-input-text font-bold w-44">
-              Is FEU (Foreign Entertainer Union) permission required
-            </div>
-            <div className="grow ">
-              <Select
-                testId="person-is-feu-required"
-                onChange={(value) => handleChange('isFEURequired', value as string)}
-                value={isFEURequired}
-                className="bg-primary-white w-40 mr-3 max-w-96"
-                placeholder="Please select.."
-                options={booleanOptions}
-                isClearable
-                isSearchable
-              />
             </div>
           </div>
         </div>
