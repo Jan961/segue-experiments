@@ -244,7 +244,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       'Date',
       'Town',
       'Venue',
-      ...headerWeekDates.map((week) => convertDateFormat(week)),
+      ...headerWeekDates.map((week) => convertDateFormat(new Date(week))),
       'Last Week',
       ...(isSeatsDataRequired ? ['Sold', 'Capacity', 'vs Capacity'] : []),
     ]);

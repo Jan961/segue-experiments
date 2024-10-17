@@ -56,9 +56,9 @@ export const getMapKeyForValue = (
   }: Pick<TRequiredFieldsFinalFormat, 'FormattedSetProductionWeekNum' | 'SetProductionWeekDate'>,
 ): string => `${Week} | ${Town} | ${Venue} | ${setProductionWeekNumVar} | ${setProductionWeekDateVar}`;
 
-export const convertDateFormat = (date) => {
-  const parsedDate = moment(date, 'DD-MM-YYYY');
-  return parsedDate.format('DD/MM/YY');
+export const convertDateFormat = (date: Date) => {
+  const parsedDate = moment(date, 'DD-MM-YYYY').format('DD/MM/YY');
+  return parsedDate;
 };
 
 export const getAggregateKey = ({
