@@ -19,7 +19,7 @@ import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import { BarredVenue } from 'pages/api/productions/venue/barringCheck';
 import Toggle from 'components/core-ui-lib/Toggle/Toggle';
 import Label from 'components/core-ui-lib/Label';
-import { dateToSimple, formattedDateWithWeekDay, getArrayOfDatesBetween } from 'services/dateService';
+import { areDatesSame, dateToSimple, formattedDateWithWeekDay, getArrayOfDatesBetween } from 'services/dateService';
 import { debug } from 'utils/logging';
 import { isNullOrEmpty } from 'utils';
 
@@ -131,13 +131,12 @@ const NewBookingView = ({
 
   const handleChange = ({ from, to }) => {
     const fromDate = from?.toISOString() || null;
-    // const toDate = !to && !to ? from?.toISOString() : to?.toISOString() || null;
     const toDate = to?.toISOString() || null;
 
     const change = {
       fromDate,
       toDate,
-      isRunOfDates: new Date(fromDate).toDateString() !== new Date(toDate).toDateString(),
+      isRunOfDates: !areDatesSame(fromDate, toDate),
     };
 
     onChange(change);
