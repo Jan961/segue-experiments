@@ -13,7 +13,7 @@ import {
 import { calibri } from 'lib/fonts';
 import Image from 'next/image';
 import axios from 'axios';
-import { useSignIn, useSignUp } from '@clerk/nextjs';
+import { useClerk, useSignIn, useSignUp } from '@clerk/nextjs';
 import Link from 'next/link';
 import classNames from 'classnames';
 
@@ -35,10 +35,13 @@ const DEFAULT_ACCOUNT_DETAILS = {
 const SignUp = () => {
   const router = useRouter();
   const [error, setError] = useState('');
+  const [showLogout, setShowLogout] = useState(false);
+  const { signOut } = useClerk();
   const { isLoaded: signUpLoaded, signUp } = useSignUp();
   const [authMode, setAuthMode] = useState<'default' | 'signUp' | 'signIn'>('default');
   const { signIn } = useSignIn();
   const [accountDetails, setAccountDetails] = useState(DEFAULT_ACCOUNT_DETAILS);
+
   const isValidEmail = useMemo(() => validateEmail(accountDetails.email), [accountDetails.email]);
 
   const isFormValid = useMemo(() => {
@@ -100,6 +103,7 @@ const SignUp = () => {
         // 'User already registeredwith clerk. Verify if they have a pin registered'
         verifyUserExits();
       } else if (errorCode === SESSION_ALREADY_EXISTS) {
+        setShowLogout(true);
         setError('Please log out of the current session and try again');
       } else {
         setError(err.errors[0].messsage);
@@ -127,6 +131,7 @@ const SignUp = () => {
   };
 
   const handleSaveUser = async () => {
+    setShowLogout(false);
     try {
       // Create the user within clerk
       await createNewUserWithClerk();
@@ -157,6 +162,20 @@ const SignUp = () => {
       handleSaveUser();
     } else if (authMode === 'signIn') {
       handleUpdateUser();
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      setError('');
+
+      // Sign out from Clerk
+      await signOut();
+      setShowLogout(false);
+      setAccountDetails(DEFAULT_ACCOUNT_DETAILS);
+      router.replace(router.asPath);
+    } catch (err) {
+      console.error(err);
     }
   };
 
@@ -320,7 +339,12 @@ const SignUp = () => {
             </div>
           </div>
         )}
-
+        {error.includes('current session') && (
+          <div className="flex gap-3 items-center mt-5">
+            <AuthError error={error} className="items-end" />
+            {showLogout && <Button variant="secondary" text="Logout" onClick={handleLogout} />}
+          </div>
+        )}
         <div
           className={classNames('w-full flex items-center gap-2 mt-5 justify-end', {
             'justify-between': authMode !== 'default',
@@ -336,7 +360,6 @@ const SignUp = () => {
             disabled={!isFormValid || !signUpLoaded}
           />
         </div>
-        {error.includes('current session') && <AuthError error={error} />}
       </div>
     </div>
   );
