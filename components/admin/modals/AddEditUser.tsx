@@ -13,6 +13,7 @@ import { CustomOption } from 'components/core-ui-lib/Table/renderers/SelectCellR
 import classNames from 'classnames';
 import axios from 'axios';
 import { SEND_ACCOUNT_PIN_TEMPLATE } from 'config/global';
+import { notify } from 'components/core-ui-lib/Notifications';
 
 type UserDetails = {
   accountUserId?: number;
@@ -248,12 +249,17 @@ const AdEditUser = ({
   };
 
   const sendPinToUser = async () => {
-    // Send out an email with the newly generated password
-    await axios.post('/api/email/send', {
-      to: selectedUser.email,
-      templateName: SEND_ACCOUNT_PIN_TEMPLATE,
-      data: { pin: accountPIN },
-    });
+    // Send out an email with rhw account pin
+    try {
+      await axios.post('/api/email/send', {
+        to: selectedUser.email,
+        templateName: SEND_ACCOUNT_PIN_TEMPLATE,
+        data: { pin: accountPIN },
+      });
+    } catch (err) {
+      console.error(err);
+      notify.error('Error sending email with account pin');
+    }
   };
 
   return (
