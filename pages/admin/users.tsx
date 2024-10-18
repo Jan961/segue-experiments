@@ -252,7 +252,6 @@ export default function Users({
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const accountId = await getAccountIdFromReq(ctx.req);
   const accountPIN = await getAccountPIN(accountId);
-  console.log(accountPIN);
   const users = await getUsersWithPermissions(accountId);
   const permisisonGroups = await getPermissionGroupsList(ctx.req);
   const permissionsList = await getPermissionsList();
