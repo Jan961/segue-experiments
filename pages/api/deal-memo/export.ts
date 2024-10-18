@@ -1,11 +1,11 @@
 import axios from 'axios';
 import { UserAcc } from 'components/contracts/modal/EditDealMemoContractModal';
-import { parseAndSortDates } from 'components/contracts/utils';
+import { defaultPrice, parseAndSortDates } from 'components/contracts/utils';
 import { days } from 'config/global';
 import { TemplateHandler } from 'easy-template-x';
 import { createResolver } from 'easy-template-x-angular-expressions';
 import { DealMemoHoldType, ProductionDTO } from 'interfaces';
-import { isNullOrUndefined, numberToOrdinal } from 'utils';
+import { formatDecimalValue, isNullOrUndefined, isUndefined, numberToOrdinal, tidyString } from 'utils';
 import { formatTemplateObj } from 'utils/templateExport';
 
 type DeMoExportProps = {
@@ -17,6 +17,15 @@ type DeMoExportProps = {
   users: Array<UserAcc>;
   dealMemoData: any;
 };
+
+// Notes for SK-494 - comment will be removed when actioned
+/*  
+   1. SellNotes has been changed to MerchNotes
+   2. SettlementSameDay has been added to store the boolean field
+   3. NumDressingRooms removed from object but was not used and not in DB
+   4. PrintUseDelVenueAddressId changed to PrintDelVenueAddressLine and made a long text field
+   5. SeatKillNotes field added - this will remain disconnected from BookingHoldNotes - for the time being the value from the deal memo will need to be copied over manually (from RCK)
+*/
 
 const formatPerfs = (performances) => {
   const perfDays = parseAndSortDates(performances);
@@ -65,7 +74,6 @@ const fetchTemplateDocument = async () => {
 
 export const dealMemoExport = async (props: DeMoExportProps) => {
   if (!isNullOrUndefined(props.bookingId)) {
-    // const { data: deMoRaw } = await axios.get<DealMemoContractFormData>(`/api/deal-memo/read/${props.bookingId}`);
     const deMoRaw = props.dealMemoData;
     const { data: currResponse } = await axios.get(`/api/marketing/currency/booking/${props.bookingId}`);
     const { data: holdTypes } = await axios.get<Array<DealMemoHoldType>>(`/api/deal-memo/hold-type/read`);
@@ -78,74 +86,75 @@ export const dealMemoExport = async (props: DeMoExportProps) => {
     const deMoPoc = getContact(props.accContacts, 'AccContId', deMoRaw.AccContId);
     const companyPoc = getContact(props.accContacts, 'AccContId', deMoRaw.CompAccContId);
 
-    const salesRepEmails =
-      deMoRaw.SendTo.length === 0
-        ? []
-        : deMoRaw.SendTo.map((sendToId) => {
-            const user = props.users.find((user) => user.accountUserId === sendToId);
-            return { email: user.email };
-          });
+    const salesRepEmails = isUndefined(deMoRaw.SendTo)
+      ? []
+      : deMoRaw.SendTo.length === 0
+      ? []
+      : deMoRaw.SendTo.map((sendToId) => {
+          const user = props.users.find((user) => user.accountUserId === sendToId);
+          return { email: user.email };
+        });
 
     const generalData = {
-      CurrencySymbol: currResponse.currency,
-      ShowName: props.production.ShowName,
-      ProductionCompanyName: props.production.ProductionCompany.ProdCoName,
-      ProductionCompanyVatNo: props.production.ProductionCompany.ProdCoVATCode,
+      CurrencySymbol: tidyString(currResponse?.currency),
+      ShowName: tidyString(props?.production?.ShowName),
+      ProductionCompanyName: tidyString(props?.production?.ProductionCompany?.ProdCoName),
+      ProductionCompanyVatNo: tidyString(props?.production?.ProductionCompany?.ProdCoVATCode),
       PDates: formatPerfs(props.contract.PerformanceTimes),
-      HoldNotes: deMoRaw.OtherHolds, // needs changed to own field when fixed
-      What3Words_Stage: props.venue.AddressStageDoorW3W,
-      What3Words_Loading: props.venue.AddressLoadingW3W,
+      HoldNotes: tidyString(deMoRaw?.OtherHolds), // needs changed to own field when fixed
+      What3Words_Stage: tidyString(props?.venue?.AddressStageDoorW3W),
+      What3Words_Loading: tidyString(props?.venue?.AddressLoadingW3W),
       Venue: {
-        Name: props.venue.Name,
-        Phone: primaryAddress.Phone,
-        Email: primaryAddress.Email,
+        Name: tidyString(props?.venue?.Name),
+        Phone: tidyString(primaryAddress?.Phone),
+        Email: tidyString(primaryAddress?.Email),
         Programmer: {
-          Name: `${programmer.FirstName} ${programmer.LastName}`,
-          Email: programmer.Email,
+          Name: `${tidyString(programmer?.FirstName)} ${tidyString(programmer?.LastName)}`,
+          Email: tidyString(programmer?.Email),
         },
         BO_Manager: {
-          Name: `${boManager.FirstName} ${boManager.LastName}`,
-          Email: boManager.Email,
+          Name: `${tidyString(boManager?.FirstName)} ${tidyString(boManager?.LastName)}`,
+          Email: boManager?.Email,
         },
         Acc_Settlement: {
-          Name: `${accSettlment.FirstName} ${accSettlment.LastName}`,
-          Email: accSettlment.Email,
+          Name: `${tidyString(accSettlment?.FirstName)} ${tidyString(accSettlment?.LastName)}`,
+          Email: tidyString(accSettlment?.Email),
         },
         M_Manager: {
-          Name: `${marketManager.FirstName} ${marketManager.LastName}`,
-          Email: marketManager.Email,
-          Phone: marketManager.Phone,
+          Name: `${tidyString(marketManager?.FirstName)} ${tidyString(marketManager?.LastName)}`,
+          Email: tidyString(marketManager?.Email),
+          Phone: tidyString(marketManager?.Phone),
         },
         Tech_Manager: {
-          Name: `${techManager.FirstName} ${techManager.LastName}`,
-          Email: techManager.Email,
-          Phone: techManager.Phone,
+          Name: `${tidyString(techManager?.FirstName)} ${tidyString(techManager?.LastName)}`,
+          Email: tidyString(techManager?.Email),
+          Phone: tidyString(techManager?.Phone),
         },
-        Capacity: props.venue.Seats,
+        Capacity: tidyString(props?.venue?.Seats),
       },
       DeMo_PointOfContact: {
-        Name: `${deMoPoc.AccContFirstName} ${deMoPoc.AccContLastName}`,
-        Email: deMoPoc.AccContMainEmail,
+        Name: `${tidyString(deMoPoc?.AccContFirstName)} ${tidyString(deMoPoc?.AccContLastName)}`,
+        Email: deMoPoc?.AccContMainEmail,
       },
       DM_CompanyContact: {
-        Name: `${companyPoc.AccContFirstName} ${companyPoc.AccContLastName}`,
-        Email: companyPoc.AccContMainEmail,
-        Phone: companyPoc.AccContPhone,
+        Name: `${tidyString(companyPoc?.AccContFirstName)} ${tidyString(companyPoc?.AccContLastName)}`,
+        Email: tidyString(companyPoc?.AccContMainEmail),
+        Phone: tidyString(companyPoc?.AccContPhone),
       },
       SalesReportRecipients: salesRepEmails,
     };
 
     const toBeFormatted = {
       ...formatObjKeys(deMoRaw),
-      TM_LONG_RunningTime: deMoRaw.RunningTime,
-      TM_TechArrivalTime: deMoRaw.TechArrivalTime,
-      TM_VenueCurfewTime: deMoRaw.VenueCurfewTime,
-      DT_DateIssued: deMoRaw.DateIssued,
-      DT_OnSaleDate: deMoRaw.OnSaleDate,
-      DT_BrochureDeadline: deMoRaw.BrochureDeadline,
-      DT_FinalProofBy: deMoRaw.FinalProofBy,
-      DT_TechArrivalDate: deMoRaw.TechArrivalDate,
-      DT_AdvancePaymentDueBy: deMoRaw.AdvancePaymentDueBy,
+      TM_LONG_RunningTime: deMoRaw?.RunningTime,
+      TM_TechArrivalTime: deMoRaw?.TechArrivalTime,
+      TM_VenueCurfewTime: deMoRaw?.VenueCurfewTime,
+      DT_DateIssued: deMoRaw?.DateIssued,
+      DT_OnSaleDate: deMoRaw?.OnSaleDate,
+      DT_BrochureDeadline: deMoRaw?.BrochureDeadline,
+      DT_FinalProofBy: deMoRaw?.FinalProofBy,
+      DT_TechArrivalDate: deMoRaw?.TechArrivalDate,
+      DT_AdvancePaymentDueBy: deMoRaw?.AdvancePaymentDueBy,
       DealMemoCall:
         deMoRaw.DealMemoCall.length === 0
           ? [{ label: '' }]
@@ -154,7 +163,7 @@ export const dealMemoExport = async (props: DeMoExportProps) => {
                 ...formatObjKeys(call),
                 Label: numberToOrdinal(call.DMCCallNum + 1) + ' Call',
                 DMCPromoterOrVenue: call.DMCPromoterOrVenue === 'p' ? 'Promoter' : 'Venue',
-                DMCValue: call.DMCType === 'p' ? call.DMCValue + '%' : generalData.CurrencySymbol + call.DMCValue,
+                DMCValue: call.DMCType === 'p' ? call.DMCValue + '%' : generalData?.CurrencySymbol + call?.DMCValue,
               };
             }),
       DealMemoHold:
@@ -164,10 +173,26 @@ export const dealMemoExport = async (props: DeMoExportProps) => {
               return {
                 ...formatObjKeys(hold),
                 Label: holdTypes.find((type) => type.HoldTypeId === hold.DMHoldHoldTypeId).HoldTypeName,
-                DMHoldValue: generalData.CurrencySymbol + hold.DMHoldValue,
+                DMHoldValue:
+                  generalData.CurrencySymbol + (hold.DMHoldValue === 0 ? '' : formatDecimalValue(hold.DMHoldValue)),
+                DMHoldSeats: hold.DMHoldSeats === 0 ? '' : hold.DMHoldSeats,
               };
             }),
-      SalesDay: days[deMoRaw.SalesDayNum],
+      DealMemoPrice: isUndefined(deMoRaw.DealMemoPrice)
+        ? defaultPrice.map((price) => {
+            return {
+              ...price,
+              DMPNumTickets: '',
+              DMPTicketPrice: '',
+            };
+          })
+        : deMoRaw.DealMemoPrice.map((price) => {
+            return {
+              ...price,
+              DMPTicketPrice: formatDecimalValue(price.DMPTicketPrice),
+            };
+          }),
+      SalesDay: deMoRaw.SalesDayNum ? days[deMoRaw.SalesDayNum] : '',
       WeeklySales: props.production.SalesFrequency === 'W',
     };
 
@@ -198,7 +223,9 @@ export const dealMemoExport = async (props: DeMoExportProps) => {
     // create temp link element
     let link = document.createElement('a');
 
-    link.download = 'Deal_Memo.docx';
+    link.download = `Deal Memo ${props.production.ShowCode + props.production.Code} ${props.production.ShowName} ${
+      props.venue.Name
+    }.docx`;
     link.href = blobUrl;
 
     // use the link to invoke a download
