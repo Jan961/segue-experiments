@@ -21,25 +21,6 @@ export const getPrice = (dealMemoPrice) => {
   return processedPrice;
 };
 
-export const getTechProvision = (techProvision) => {
-  const updateTechProvision = [];
-  const createTechProvision = [];
-
-  techProvision.forEach((tech) => {
-    if (tech.DMTechDeMoId) {
-      const provision = {
-        where: { DMTechDeMoId: tech.DMTechDeMoId },
-        data: tech,
-      };
-      delete provision.data.DMTechDeMoId;
-      updateTechProvision.push(provision);
-    } else {
-      createTechProvision.push(tech);
-    }
-  });
-  return [updateTechProvision, createTechProvision];
-};
-
 export const getDealMemoCall = (dealMemoCall) => {
   const processedCalls = [];
 

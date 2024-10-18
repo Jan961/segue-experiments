@@ -11,6 +11,9 @@ import { flattenHierarchicalOptions, isNullOrEmpty, mapRecursive } from 'utils';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import { CustomOption } from 'components/core-ui-lib/Table/renderers/SelectCellRenderer';
 import classNames from 'classnames';
+import axios from 'axios';
+import { SEND_ACCOUNT_PIN_TEMPLATE } from 'config/global';
+import { notify } from 'components/core-ui-lib/Notifications';
 
 type UserDetails = {
   accountUserId?: number;
@@ -31,6 +34,7 @@ interface AdEditUserProps {
   visible: boolean;
   selectedUser?: Partial<UserDetails>;
   groups: PermissionGroup[];
+  accountPIN: number;
 }
 
 const DEFAULT_USER_DETAILS: UserDetails = {
@@ -44,7 +48,15 @@ const DEFAULT_USER_DETAILS: UserDetails = {
   isSystemAdmin: false,
 };
 
-const AdEditUser = ({ visible, onClose, permissions, productions = [], selectedUser, groups }: AdEditUserProps) => {
+const AdEditUser = ({
+  visible,
+  onClose,
+  permissions,
+  productions = [],
+  selectedUser,
+  groups,
+  accountPIN,
+}: AdEditUserProps) => {
   const [userDetails, setUserDetails] = useState<UserDetails>(DEFAULT_USER_DETAILS);
   const [isFormDirty, setIsFormDirty] = useState(false);
   const [showConfirmationDialog, setShowConfirmationDialog] = useState(false);
@@ -106,11 +118,11 @@ const AdEditUser = ({ visible, onClose, permissions, productions = [], selectedU
   }, [groups]);
 
   const setPermissionsForSelectedUser = async () => {
-    const { prodPermissions, userPermissions, isSingleAdminUser } = await fetchPermissionsForSelectedUser(
-      selectedUser.accountUserId,
-      productions,
-      permissions,
-    );
+    const {
+      prodPermissions = [],
+      userPermissions = [],
+      isSingleAdminUser,
+    } = await fetchPermissionsForSelectedUser(selectedUser.accountUserId, productions, permissions);
 
     setUserDetails({
       accountId: selectedUser.accountId,
@@ -236,6 +248,20 @@ const AdEditUser = ({ visible, onClose, permissions, productions = [], selectedU
     isFormDirty ? setShowConfirmationDialog(true) : onClose();
   };
 
+  const sendPinToUser = async () => {
+    // Send out an email with rhw account pin
+    try {
+      await axios.post('/api/email/send', {
+        to: selectedUser.email,
+        templateName: SEND_ACCOUNT_PIN_TEMPLATE,
+        data: { pin: accountPIN },
+      });
+    } catch (err) {
+      console.error(err);
+      notify.error('Error sending email with account pin');
+    }
+  };
+
   return (
     <div>
       <PopupModal
@@ -285,6 +311,24 @@ const AdEditUser = ({ visible, onClose, permissions, productions = [], selectedU
                   disabled={!!selectedUser}
                 />
                 <FormError error={validationErrors.email} className="mt-2 ml-2" />
+              </div>
+              <div className="mt-2 w-full flex items-center gap-3">
+                <Label text="PIN" required />
+                <div className="flex items-center gap-3">
+                  <TextInput
+                    testId="account-pin"
+                    className="tracking-widest text-center w-24"
+                    name="pin"
+                    value={accountPIN}
+                    disabled
+                  />
+                  {selectedUser && (
+                    <Button onClick={sendPinToUser} testId="send-pin-button">
+                      Send PIN to User
+                    </Button>
+                  )}
+                </div>
+                <FormError error={validationErrors.pin} className="ml-2" />
               </div>
               <div className="mt-5">
                 <div>

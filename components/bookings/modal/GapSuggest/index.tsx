@@ -4,7 +4,7 @@ import { gapSuggestColumnDefs, styleProps } from 'components/bookings/table/tabl
 import Button from 'components/core-ui-lib/Button';
 import Table from 'components/core-ui-lib/Table';
 import { GapSuggestionReponse, GapSuggestionUnbalancedProps } from 'pages/api/venue/read/distance';
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import { bookingState } from 'state/booking/bookingState';
 import { rowsSelector } from 'state/booking/selectors/rowsSelector';
@@ -12,8 +12,12 @@ import Form from './Form';
 import { formatMinutes } from 'utils/booking';
 import BarringCheck from './BarringCheck';
 import { isNull } from 'utils';
+import { exportToExcel } from 'utils/export';
+import { BookingRow } from 'types/BookingTypes';
+import { formattedDateWithWeekDay } from 'services/dateService';
 
 type GapSuggestProps = {
+  booking: BookingRow;
   startDate: string;
   endDate: string;
   productionId: number;
@@ -29,13 +33,20 @@ export const gridOptions = {
   suppressRowClickSelection: true,
 };
 
-const GapSuggest = ({ startDate, endDate, productionId, onOkClick = () => null }: GapSuggestProps) => {
+const GapSuggest = ({ startDate, endDate, productionId, onOkClick = () => null, booking }: GapSuggestProps) => {
   const bookingDict = useRecoilValue(bookingState);
   const { rows: bookings } = useRecoilValue(rowsSelector);
   const [rows, setRows] = useState(null);
   const [selectedVenueIds, setSelectedVenueIds] = useState<number[]>([]);
   const [barringCheckContext, setBarringCheckContext] = useState<number | null>(null);
+  const [excelFilename, setExcelFilename] = useState<string>('');
   const tableRef = useRef(null);
+
+  useEffect(() => {
+    const newDate = `${formattedDateWithWeekDay(booking.dateTime, 'Short').replaceAll('/', '.')}`;
+    setExcelFilename(`Venue Gap Suggestion ${booking.production} ${newDate}.xlsx`);
+  }, [booking]);
+
   const filteredRows = useMemo(() => {
     const filteredRows = [];
     for (const row of rows || []) {
@@ -92,7 +103,7 @@ const GapSuggest = ({ startDate, endDate, productionId, onOkClick = () => null }
   };
 
   const exportTableData = () => {
-    tableRef.current?.getApi?.()?.exportDataAsExcel?.();
+    exportToExcel(tableRef, { fileName: excelFilename });
   };
 
   const onRowSelected = (e: any) => {
