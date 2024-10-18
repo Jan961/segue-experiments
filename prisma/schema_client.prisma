@@ -743,8 +743,8 @@ model DealMemo {
   PrintDelVenueAddressLine                                   String?                       @map("DeMoPrintDelVenueAddressLine") @db.LongText
   PrintDelUseVenueAddress                                    Boolean                       @default(dbgenerated("(b'0')")) @map("DeMoPrintDelUseVenueAddress") @db.Bit(1)
   CompAccContId                                              Int?                          @map("DeMoCompAccContId")
-  DeMoSeatKillNotes                                          String?                       @db.LongText
-  DeMoSettlementSameDay                                      Boolean                       @default(dbgenerated("(b'0')")) @db.Bit(1)
+  SeatKillNotes                                              String?                       @map("DeMoSeatKillNotes") @db.LongText
+  SettlementSameDay                                          Boolean                       @default(dbgenerated("(b'0')")) @map("DeMoSettlementSameDay") @db.Bit(1)
   Booking                                                    Booking                       @relation(fields: [BookingId], references: [Id], onDelete: Cascade, map: "BookingDealMemo")
   VenueContact_DealMemo_DeMoBOMVenueContactIdToVenueContact  VenueContact?                 @relation("DealMemo_DeMoBOMVenueContactIdToVenueContact", fields: [BOMVenueContactId], references: [Id], onDelete: Cascade, map: "VenueContactDealMemoBOM")
   VenueContact_DealMemo_DeMoTechVenueContactIdToVenueContact VenueContact?                 @relation("DealMemo_DeMoTechVenueContactIdToVenueContact", fields: [TechVenueContactId], references: [Id], onDelete: Cascade, map: "VenueContactDealMemoTech")
