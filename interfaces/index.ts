@@ -1,4 +1,4 @@
-import { DealMemoHold, DealMemoPrice, DealMemoTechProvision, Region } from 'prisma/generated/prisma-client';
+import { DealMemoHold, DealMemoPrice, Region } from 'prisma/generated/prisma-client';
 
 export type StatusCode = 'C' | 'U' | 'X';
 
@@ -281,7 +281,7 @@ export interface ProductionCompanyDTO {
   ProdCoLogoFileId?: number;
   ProdCoName?: string;
   ProdCoSaleStartWeek?: number;
-  ProdCoVATCode?: number;
+  ProdCoVATCode?: string;
   ProdCoWebSite?: string;
 }
 export type ConversionRateDTO = {
@@ -737,17 +737,21 @@ export interface DealMemoCall {
   DMCValue?: number;
 }
 
+export interface DealMemoTechProvision {
+  DMTechName: string;
+  DMTechVenue: string | null;
+  DMTechCompany: string | null;
+}
+
 export interface DealMemoContractFormData {
   Id?: number;
   BookingId?: number;
-  AgreementDate?: Date;
   AccContId?: number;
   RunningTime?: Date;
   DateIssued?: Date;
   VatCode?: string;
   RunningTimeNotes?: string;
   PrePostShowEvents?: string;
-  DressingRooms?: string;
   VenueCurfewTime?: Date;
   PerformanceNotes?: string;
   ProgrammerVenueContactId?: number;
@@ -791,16 +795,16 @@ export interface DealMemoContractFormData {
   SellWho?: string;
   SellProgrammes?: boolean;
   PrintDelUseVenueAddress?: boolean;
-  PrintDelUseVenueAddressline?: string;
+  PrintDelVenueAddressLine?: string;
   SellMerch?: boolean;
-  SellNotes?: string;
+  MerchNotes?: string;
   SellProgCommPercent?: number;
   SellMerchCommPercent?: number;
   SellPitchFee?: string;
   TechVenueContactId?: number;
   TechArrivalDate?: Date;
   TechArrivalTime?: Date;
-  NumDressingRooms?: number;
+  DressingRooms?: string;
   NumFacilitiesLaundry?: boolean;
   NumFacilitiesDrier?: boolean;
   NumFacilitiesLaundryRoom?: boolean;
@@ -823,6 +827,8 @@ export interface DealMemoContractFormData {
   Notes?: string;
   CompAccContId?: number;
   SendTo?: Array<number>;
+  SettlementSameDay?: boolean;
+  SeatKillNotes?: string;
 }
 
 export interface DealMemoHoldType {

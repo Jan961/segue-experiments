@@ -35,6 +35,7 @@ export default function BookingsTable({ rowData, tableRef }: BookingsTableProps)
   const [showModal, setShowModal] = useState<boolean>(false);
   const [productionItem, setProductionItem] = useState(null);
   const [showConfirmationModal, setShowConfirmationModal] = useState<boolean>(false);
+  const [bookingInfo, setBookingInfo] = useState(null);
   const isMounted = useComponentMountStatus();
   const bookingColumDefs = useMemo(() => (isMounted ? columnDefs : []), [isMounted]);
 
@@ -66,6 +67,7 @@ export default function BookingsTable({ rowData, tableRef }: BookingsTableProps)
       return;
     }
     const { data } = e;
+    setBookingInfo(data);
     if (!data.Id) {
       setShowAddEditBookingModal({
         visible: true,
@@ -157,7 +159,9 @@ export default function BookingsTable({ rowData, tableRef }: BookingsTableProps)
         onSave={handleSaveNote}
         onCancel={() => setShowModal(false)}
       />
-      {showAddEditBookingModal.visible && <AddBooking {...showAddEditBookingModal} onClose={handleClose} />}
+      {showAddEditBookingModal.visible && (
+        <AddBooking {...showAddEditBookingModal} onClose={handleClose} bookingInfo={bookingInfo} />
+      )}
       <ConfirmationDialog
         labelYes="OK"
         labelNo=""

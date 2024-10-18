@@ -46,6 +46,7 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
       testId,
       autoComplete = 'off',
       pattern,
+      type,
       ...rest
     },
     ref,
@@ -63,6 +64,14 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
       }
     };
 
+    const handleWheel = (e) => {
+      if (type === 'number') {
+        e.preventDefault();
+        e.target.blur();
+        setTimeout(() => e.target.focus(), 0);
+      }
+    };
+
     return (
       <div
         className={classNames(
@@ -76,7 +85,7 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
           data-testid={testId || 'core-ui-lib-text-input'}
           ref={ref}
           id={id}
-          type={rest.type ? rest.type : 'text'}
+          type={type || 'text'}
           className={classNames(baseClass, inputClass, disabledClass, `${iconName ? 'pr-6' : ''}`, className, {
             'focus:ring-2 focus:ring-primary-input-text ring-inset': !disabled,
             'cursor-not-allowed': disabled,
@@ -87,6 +96,7 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
           value={value || ''}
           onKeyDown={onKeyDown}
           autoComplete={autoComplete}
+          onWheel={handleWheel}
           {...rest}
         />
         {iconName && (
