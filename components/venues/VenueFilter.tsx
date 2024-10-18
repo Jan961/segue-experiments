@@ -19,6 +19,9 @@ export default function VenueFilter({
   onFilterChange: (change: Partial<VenueFilters>) => void;
   showVenueModal: () => void;
 }) {
+  //   console.log("counties in index", countryOptions)
+  //   console.log("towns in index", townOptions)
+
   const productionOptions = useRecoilValue(productionOptionsSelector(true));
   const onChange = (e: any) => {
     onFilterChange({ ...filters, [e.target.id]: e.target.value });

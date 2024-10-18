@@ -45,7 +45,10 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const filterVenues = useMemo(() => debounce({ delay: 1000 }, (payload) => fetchVenues(payload)), []);
-  const townOptions = useMemo(() => venueTownList.map(({ Town }) => ({ text: Town, value: Town })), [venueTownList]);
+  // const townOptions = useMemo(() => venueTownList.map(({ Town }) => ({ text: Town, value: Town })), [venueTownList]);
+  const townOptions = venueTownList;
+  // console.log("countries ", venueCountryOptionList)
+  // console.log("towns", venueTownList)
 
   const fetchVenues = useCallback(async (payload) => {
     const { productionId, town, country, searchQuery } = payload || {};
@@ -145,9 +148,15 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   ]);
 
   const productionJump = results[0].status === 'fulfilled' ? results[0].value : intialProductionJumpState;
-  const venueTownList = results[1].status === 'fulfilled' ? results[1].value : [];
+  const venueTownList: SelectOption[] =
+    results[1].status === 'fulfilled'
+      ? (results[1] as PromiseFulfilledResult<any>).value.map((item, index) => ({ text: item, value: index + 1 }))
+      : [];
+
+  console.log('towns at the start', venueTownList);
   const venueCountryOptionList: SelectOption[] =
     results[2].status === 'fulfilled' ? transformToOptions(results[2].value, 'Name', 'Id') : [];
+  // console.log("countries at the start", venueCountryOptionList)
 
   const venueCurrencyOptionList: SelectOption[] =
     results[3].status === 'fulfilled'
@@ -174,6 +183,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   );
   const venueRoleOptionList: SelectOption[] =
     results[6].status === 'fulfilled' ? transformToOptions(results[6].value, 'Name', 'Id') : [];
+
   const initialState = {
     global: {
       productionJump,
@@ -182,6 +192,8 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       venue,
     },
   };
+
+  console.log('towns at the end', venueTownList);
 
   return {
     props: {
