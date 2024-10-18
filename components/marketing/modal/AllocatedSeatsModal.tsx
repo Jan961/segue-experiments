@@ -138,7 +138,7 @@ export default function AllocatedSeatsModal({
       Comments: form.comments,
       RequestedBy: form.requestBy,
       Seats: parseInt(form.numSeatsReq.toString()),
-      SeatsAllocated: parseInt(form.seatNumList.toString()),
+      SeatsAllocated: form.seatNumList.toString(),
       TicketHolderEmail: form.email,
       TicketHolderName: form.custName,
       VenueConfirmationNotes: form.venueConfNotes,
@@ -151,7 +151,6 @@ export default function AllocatedSeatsModal({
       data = { ...data, Id: allocId };
     }
 
-    console.log(data);
     onSave(data, form.perfSelected, type);
   };
 
@@ -469,6 +468,7 @@ export default function AllocatedSeatsModal({
                 value={form.venueConfNotes}
                 placeholder="Notes Field"
                 onChange={handleChange}
+                name="venueConfNotes"
               />
             </div>
           </div>
