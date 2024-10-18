@@ -33,7 +33,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
 
       const results = {
         pin: userPermissions?.AccUserPIN,
-        isAdmin: userPermissions?.AccUserIsAdmin,
+        isSystemAdmin: userPermissions?.AccUserIsAdmin,
         permissions: formattedUserPermissions || [],
         productions: formattedProductionPermissions || [],
         isSingleAdminUser: countAdminUsers === 1 && userPermissions?.AccUserIsAdmin,

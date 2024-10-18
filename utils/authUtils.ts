@@ -1,3 +1,4 @@
+import generator from 'generate-password';
 export const EMAIL_NOT_FOUND = 'form_identifier_not_found';
 export const EMAIL_ALREADY_EXISTS = 'form_identifier_exists';
 export const PASSWORD_INCORRECT = 'form_password_incorrect';
@@ -23,4 +24,27 @@ export const errorsMap = {
 */
 export const validateEmail = (value: string) => {
   return value ? /^[\w-\\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(value) : false;
+};
+
+export const generateUserPin = (): number => {
+  const pin = generator.generate({
+    length: 5,
+    numbers: true,
+    symbols: false,
+    lowercase: false,
+    uppercase: false,
+    strict: true,
+  });
+  return parseInt(pin, 10);
+};
+
+export const generateUserPassword = (): string => {
+  return generator.generate({
+    length: 8,
+    numbers: true,
+    symbols: true,
+    lowercase: true,
+    uppercase: true,
+    strict: true,
+  });
 };
