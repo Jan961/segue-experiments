@@ -23,6 +23,7 @@ const RadioGroup: FC<RadioGroupProps> = ({
   direction,
   onChange,
   value,
+  className,
   testId = 'core-ui-lib-radio-group',
 }) => {
   const [selection, setSelection] = useState(value);
@@ -43,7 +44,14 @@ const RadioGroup: FC<RadioGroupProps> = ({
       })}
     >
       {options.map((option, i) => (
-        <Radio name={name} key={i} value={selection} handleChange={handleChange} option={option} />
+        <Radio
+          name={name}
+          key={i}
+          value={selection}
+          handleChange={handleChange}
+          option={option}
+          className={className}
+        />
       ))}
     </div>
   );

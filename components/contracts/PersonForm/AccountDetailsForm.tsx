@@ -40,7 +40,7 @@ const SalaryDetailsForm = ({ details, countryOptionList, onChange, accountType =
         <div className="grow">
           <RadioGroup
             testId={`${accountType}-paid-to`}
-            className=" text-primary-input-text font-bold w-full max-w-96"
+            className=" text-primary-input-text font-bold w-full max-w-96 "
             onChange={(value) => handleChange('paidTo', value)}
             value={paidTo}
             options={salaryPaidToOptions}
@@ -127,7 +127,7 @@ const SalaryDetailsForm = ({ details, countryOptionList, onChange, accountType =
           <Select
             testId={`${accountType}-account-country`}
             placeholder="Select Country"
-            className=" text-primary-input-text font-bold w-full max-w-96"
+            className=" text-primary-input-text font-bold w-full max-w-96 placeholder:f-normal"
             onChange={(value) => handleChange('country', value as number)}
             options={countryOptionList}
             value={country}

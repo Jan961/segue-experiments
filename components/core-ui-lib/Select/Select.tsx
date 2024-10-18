@@ -154,7 +154,11 @@ export default forwardRef(function Select(
         padding: '0 6px',
       }),
       input: (styles) => ({ ...styles, color: '#617293', margin: '0px' }),
-      placeholder: (styles) => ({ ...styles, color: '#617293' }),
+      placeholder: (styles) => ({
+        ...styles,
+        color: '#617293',
+        fontWeight: className?.includes('placeholder:f-normal') ? 'normal' : 'bold',
+      }),
       singleValue: (styles) => ({
         ...styles,
         color: '#617293',
@@ -302,7 +306,7 @@ export default forwardRef(function Select(
         <WindowedSelect
           ref={ref}
           instanceId={useId()} // eslint-disable-line react-hooks/exhaustive-deps
-          className="w-full"
+          className={classNames('w-full', className)}
           onInputChange={(inputValue) => {
             if (inputValue) {
               setFilteredOptions(fuseFilter(options, inputValue, ['text']).reverse());
