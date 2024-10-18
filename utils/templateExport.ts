@@ -1,5 +1,6 @@
 import { dateTimeToTime } from 'services/dateService';
 import formatInputDate from './dateInputFormat';
+import { isNullOrUndefined } from 'utils';
 /**
  *
  * @param templateData
@@ -29,19 +30,23 @@ export const formatTemplateObj = (templateData: any) => {
   return {
     ...Object.fromEntries(
       Object.entries(templateData).map(([key, value]) => {
-        // Skip keys with values that are arrays
-        if (Array.isArray(value)) {
+        // Skip keys with values that are arrays or if value is null or undefined
+        if (Array.isArray(value) || isNullOrUndefined(value)) {
           return [key, value];
         }
+
         // Apply transformations for specific keys
         if (key.startsWith('DT_')) {
           return [key, formatInputDate(value)];
         } else if (key.startsWith('TM_LONG_')) {
-          const hrMinArray = dateTimeToTime(value.toString()).split(':');
+          const tmLongDt = new Date(value.toString()).toISOString();
+          const hrMinArray = dateTimeToTime(tmLongDt.toString()).split(':');
           return [key, `${hrMinArray[0]} hour(s) ${hrMinArray[1]} minutes`];
         } else if (key.startsWith('TM_')) {
-          return [key, dateTimeToTime(value.toString())];
+          const tmDt = new Date(value.toString()).toISOString();
+          return [key, dateTimeToTime(tmDt.toString())];
         }
+
         // Return the unchanged key-value pair for other cases
         return [key, value];
       }),

@@ -6,7 +6,7 @@ import { formatDecimalValue, isNullOrEmpty, isNullOrUndefined, isUndefined } fro
 import formatInputDate from 'utils/dateInputFormat';
 import { PriceState } from './modal/EditDealMemoContractModal';
 
-const defaultPrice = [
+export const defaultPrice = [
   { DMPTicketName: 'Premium', DMPTicketPrice: 0, DMPNumTickets: 0, DMPDeMoId: 0, DMPNotes: '' },
   { DMPTicketName: 'Concession', DMPTicketPrice: 0, DMPNumTickets: 0, DMPDeMoId: 0, DMPNotes: '' },
   {
