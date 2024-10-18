@@ -26,7 +26,7 @@ export const validateEmail = (value: string) => {
   return value ? /^[\w-\\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(value) : false;
 };
 
-export const generateUserPin = (): number => {
+export const generateUserPin = (): string => {
   const pin = generator.generate({
     length: 5,
     numbers: true,
@@ -35,7 +35,7 @@ export const generateUserPin = (): number => {
     uppercase: false,
     strict: true,
   });
-  return parseInt(pin, 10);
+  return pin;
 };
 
 export const generateUserPassword = (): string => {
