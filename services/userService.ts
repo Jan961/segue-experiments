@@ -35,7 +35,12 @@ export const getUsers = async (AccountId: number): Promise<UserDto[]> => {
 };
 
 export const getUsersWithPermissions = async (AccountId: number) => {
-  const users = await prisma.$queryRaw`SELECT * FROM AccountUserPermissionsView where AccountId = ${AccountId}`;
+  const users = await prisma.AccountUserPermissionsView.findMany({
+    where: {
+      AccountId,
+    },
+  });
+
   const formattedUsers = users
     .map((user) => {
       const firstName = user.UserFirstName || '';

@@ -236,7 +236,6 @@ view AccountUserView {
   @@ignore
 }
 
-/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view AccountUserPermissionsView {
   AccountId      Int
   UserId         Int     @default(0)
@@ -248,5 +247,5 @@ view AccountUserPermissionsView {
   UserEmail      String  @db.VarChar(120)
   AllPermissions String? @db.MediumText
 
-  @@ignore
+  @@id([AccountId, UserId, AccUserId])
 }
