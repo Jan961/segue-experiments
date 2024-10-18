@@ -43,3 +43,15 @@ export const updateAccountContact = async (accountContact: Partial<AccountContac
   });
   return updatedAccount;
 };
+
+export const getAccountPIN = async (accountId: number) => {
+  const account = await prisma.account.findUnique({
+    where: {
+      AccountId: accountId,
+    },
+    select: {
+      AccountPIN: true,
+    },
+  });
+  return account.AccountPIN;
+};

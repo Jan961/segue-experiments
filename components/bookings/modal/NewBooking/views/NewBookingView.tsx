@@ -19,7 +19,7 @@ import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import { BarredVenue } from 'pages/api/productions/venue/barringCheck';
 import Toggle from 'components/core-ui-lib/Toggle/Toggle';
 import Label from 'components/core-ui-lib/Label';
-import { dateToSimple, formattedDateWithWeekDay, getArrayOfDatesBetween } from 'services/dateService';
+import { areDatesSame, dateToSimple, formattedDateWithWeekDay, getArrayOfDatesBetween } from 'services/dateService';
 import { debug } from 'utils/logging';
 import { isNullOrEmpty } from 'utils';
 
@@ -130,14 +130,15 @@ const NewBookingView = ({
   };
 
   const handleChange = ({ from, to }) => {
+    const fromDate = from?.toISOString() || null;
+    const toDate = to?.toISOString() || null;
+
     const change = {
-      fromDate: from?.toISOString() || '',
-      toDate: !toDate && !to ? from?.toISOString() : to?.toISOString() || '',
-      isRunOfDates: true,
+      fromDate,
+      toDate,
+      isRunOfDates: !areDatesSame(fromDate, toDate),
     };
-    if (new Date(change.fromDate).toDateString() === new Date(change.toDate).toDateString()) {
-      change.isRunOfDates = false;
-    }
+
     onChange(change);
   };
 
@@ -178,7 +179,7 @@ const NewBookingView = ({
           testId="cnb-date-range"
           label="Date"
           className=" bg-white my-2 w-fit"
-          onChange={({ from, to }) => handleChange({ from, to })}
+          onChange={handleChange}
           value={{ from: fromDate ? new Date(fromDate) : null, to: toDate ? new Date(toDate) : null }}
           minDate={minDate ? new Date(minDate) : null}
           maxDate={maxDate ? new Date(maxDate) : null}
