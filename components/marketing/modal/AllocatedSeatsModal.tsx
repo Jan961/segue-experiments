@@ -137,8 +137,8 @@ export default function AllocatedSeatsModal({
       ArrangedByAccUserId: form.arrangedBy,
       Comments: form.comments,
       RequestedBy: form.requestBy,
-      Seats: form.numSeatsReq,
-      SeatsAllocated: form.seatNumList,
+      Seats: parseInt(form.numSeatsReq.toString()),
+      SeatsAllocated: parseInt(form.seatNumList.toString()),
       TicketHolderEmail: form.email,
       TicketHolderName: form.custName,
       VenueConfirmationNotes: form.venueConfNotes,
@@ -151,6 +151,7 @@ export default function AllocatedSeatsModal({
       data = { ...data, Id: allocId };
     }
 
+    console.log(data);
     onSave(data, form.perfSelected, type);
   };
 
