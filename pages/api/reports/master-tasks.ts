@@ -1,8 +1,8 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import getPrismaClient from 'lib/prisma';
-import { convertToPDF } from 'utils/report';
 import { createUserMap, fetchAccountUsers, fetchTasks, generateExcelSheet } from 'services/reports/tasks';
 import { formatDate } from 'services/dateService';
+import { exportWorkbook } from 'utils/report';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
@@ -16,19 +16,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const usersMap = createUserMap(accountUsers);
     const title = `Master Tasks ${formatDate(new Date(), 'dd.MM.yy')}`;
     const workbook = generateExcelSheet(taskList, usersMap, title);
-    const filename = `${title}.xlsx`;
-    if (format === 'pdf') {
-      const pdf = await convertToPDF(workbook);
-      res.setHeader('Content-Type', 'application/pdf');
-      res.setHeader('Content-Disposition', `attachment; filename="${filename}.pdf"`);
-      res.end(pdf);
-    } else {
-      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-      res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
-      workbook.xlsx.write(res).then(() => {
-        res.end();
-      });
-    }
+
+    await exportWorkbook(res, workbook, title, format);
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: 'Something went wrong', error });
