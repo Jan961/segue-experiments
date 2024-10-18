@@ -3,8 +3,8 @@ import 'react-datepicker/dist/react-datepicker.css';
 import TextInput from '../TextInput';
 import React, { createRef, forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import moment from 'moment';
-import { convertLocalDateToUTC } from 'services/dateService';
 import Label from '../Label';
+import { Portal } from 'react-overlays';
 
 interface DateInputProps {
   value?: string | Date;
@@ -129,6 +129,11 @@ export default forwardRef<Ref, DateInputProps>(function DateInput(
     }
   };
 
+  const CalendarContainer = (props: { children }) => {
+    const el = document.getElementById('calendar-portal');
+    return <Portal container={el}>{props.children}</Portal>;
+  };
+
   return (
     <div
       className={`relative h-[1.9375rem] flex flex-row rounded-md ${
@@ -144,18 +149,20 @@ export default forwardRef<Ref, DateInputProps>(function DateInput(
       </div>
       <div data-testid={`${testId}-picker`} className="absolute right-3 top-3 z-10 flex flex-col">
         <DatePicker
+          popperContainer={CalendarContainer}
           ref={dpRef}
           minDate={minDate}
           maxDate={maxDate}
           placeholderText={placeholder}
           dateFormat="dd/MM/yy"
           popperClassName={`!z-50 ${position}`}
-          onSelect={(e) => onChange(convertLocalDateToUTC(e))}
+          onSelect={(e) => onChange(e)}
           onChange={() => null}
           selected={selectedDate}
           openToDate={selectedDate}
           customInput={<div className="cursor-pointer w-4 h-4 " />}
           disabled={disabled}
+          locale="UTC"
           {...props}
         />
       </div>

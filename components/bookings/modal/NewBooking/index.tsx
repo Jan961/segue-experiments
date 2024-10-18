@@ -33,9 +33,10 @@ interface AddBookingProps {
   startDate?: string;
   endDate?: string;
   booking?: BookingRow;
+  bookingInfo: BookingRow;
 }
 
-const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookingProps) => {
+const AddBooking = ({ visible, onClose, startDate, endDate, bookingInfo, booking }: AddBookingProps) => {
   const bookingDict = useRecoilValue(bookingState);
   const { rows: bookings } = useRecoilValue(rowsSelector);
   const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
@@ -46,6 +47,7 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
       ...INITIAL_STATE.form,
       fromDate: startDate,
       toDate: endDate,
+      isRunOfDates: false,
     },
   }));
 
@@ -274,6 +276,7 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
         />
         {!editBooking && (
           <GapSuggestionView
+            booking={bookingInfo}
             productionId={currentProduction?.Id}
             startDate={state.form.fromDate}
             endDate={state.form.toDate}

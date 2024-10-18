@@ -56,6 +56,7 @@ model Booking {
   BookingActivity            BookingActivity[]
   BookingAttachedFile        BookingAttachedFile[]
   BookingContactNotes        BookingContactNotes[]
+  BookingFile                BookingFile[]
   Contract                   Contract?
   DealMemo                   DealMemo?
   Performance                Performance[]
@@ -99,25 +100,24 @@ model BookingContactNotes {
 }
 
 model Contract {
-  BookingId            Int                    @id @map("ContractBookingId")
-  StatusCode           String?                @map("ContractStatusCode") @db.VarChar(4)
-  SignedDate           DateTime?              @map("ContractSignedDate") @db.Date
-  SignedBy             String?                @map("ContractSignedBy") @db.VarChar(100)
-  ReturnDate           DateTime?              @map("ContractReturnDate") @db.Date
-  CheckedBy            String?                @map("ContractCheckedBy") @db.VarChar(100)
-  RoyaltyPercentage    Decimal?               @map("ContractRoyaltyPercentage") @db.Decimal(5, 2)
-  DealType             String?                @map("ContractDealType") @db.VarChar(4)
-  Notes                String?                @map("ContractNotes") @db.LongText
-  ReceivedBackDate     DateTime?              @map("ContractReceivedBackDate") @db.Date
-  Exceptions           String?                @map("ContractExceptions") @db.LongText
-  BankDetailsSent      Boolean                @default(dbgenerated("(b'0')")) @map("ContractBankDetailsSent") @db.Bit(1)
-  TechSpecSent         Boolean                @default(dbgenerated("(b'0')")) @map("ContractTechSpecSent") @db.Bit(1)
-  PRSCertSent          Boolean                @default(dbgenerated("(b'0')")) @map("ContractPRSCertSent") @db.Bit(1)
-  GP                   Decimal?               @map("ContractGP") @db.Decimal(10, 2)
-  PromoterPercent      Decimal?               @map("ContractPromoterPercent") @db.Decimal(6, 3)
-  Booking              Booking                @relation(fields: [BookingId], references: [Id], onDelete: Cascade, map: "Booking_Contract")
-  ContractAttachedFile ContractAttachedFile[]
-  ContractFile         ContractFile[]
+  BookingId         Int            @id @map("ContractBookingId")
+  StatusCode        String?        @map("ContractStatusCode") @db.VarChar(4)
+  SignedDate        DateTime?      @map("ContractSignedDate") @db.Date
+  SignedBy          String?        @map("ContractSignedBy") @db.VarChar(100)
+  ReturnDate        DateTime?      @map("ContractReturnDate") @db.Date
+  CheckedBy         String?        @map("ContractCheckedBy") @db.VarChar(100)
+  RoyaltyPercentage Decimal?       @map("ContractRoyaltyPercentage") @db.Decimal(5, 2)
+  DealType          String?        @map("ContractDealType") @db.VarChar(4)
+  Notes             String?        @map("ContractNotes") @db.LongText
+  ReceivedBackDate  DateTime?      @map("ContractReceivedBackDate") @db.Date
+  Exceptions        String?        @map("ContractExceptions") @db.LongText
+  BankDetailsSent   Boolean        @default(dbgenerated("(b'0')")) @map("ContractBankDetailsSent") @db.Bit(1)
+  TechSpecSent      Boolean        @default(dbgenerated("(b'0')")) @map("ContractTechSpecSent") @db.Bit(1)
+  PRSCertSent       Boolean        @default(dbgenerated("(b'0')")) @map("ContractPRSCertSent") @db.Bit(1)
+  GP                Decimal?       @map("ContractGP") @db.Decimal(10, 2)
+  PromoterPercent   Decimal?       @map("ContractPromoterPercent") @db.Decimal(6, 3)
+  Booking           Booking        @relation(fields: [BookingId], references: [Id], onDelete: Cascade, map: "Booking_Contract")
+  ContractFile      ContractFile[]
 }
 
 model DateType {
@@ -221,19 +221,6 @@ model VenueRole {
   Name         String         @unique(map: "VenueRole_RoleName_uq") @map("VenueRoleName") @db.VarChar(30)
   IsStandard   Boolean        @map("VenueRoleIsStandard") @db.Bit(1)
   VenueContact VenueContact[]
-}
-
-model VenueVenue {
-  Venue1Id Int     @map("VVVenue1Id")
-  Venue2Id Int     @map("VVVenue2Id")
-  Mileage  Decimal @map("VVMileage") @db.Decimal(5, 1)
-  TimeMins Int?    @map("VVTimeMins")
-  Venue1   Venue   @relation("VenueVenue_VVVenue1IdToVenue", fields: [Venue1Id], references: [Id], onDelete: Cascade, map: "Venue_VenueVenue1")
-  Venue2   Venue   @relation("VenueVenue_VVVenue2IdToVenue", fields: [Venue2Id], references: [Id], onDelete: Cascade, map: "Venue_VenueVenue2")
-
-  @@id([Venue1Id, Venue2Id])
-  @@index([Venue1Id], map: "Venue_VenueVenue1_idx")
-  @@index([Venue2Id], map: "Venue_VenueVenue2_idx")
 }
 
 model DateBlock {
@@ -482,19 +469,6 @@ model BookingAttachedFile {
   @@index([FileBookingBookingId], map: "Booking_BookingAttachedFile")
 }
 
-model ContractAttachedFile {
-  FileId                Int      @id @default(autoincrement())
-  FileContractBookingId Int
-  FileDescription       String   @db.VarChar(100)
-  FileOriginalFilename  String   @db.VarChar(100)
-  FileDateTime          DateTime @db.DateTime(0)
-  FileUploadedDateTime  DateTime @db.DateTime(0)
-  FileContent           Bytes
-  Contract              Contract @relation(fields: [FileContractBookingId], references: [BookingId], onDelete: Cascade, map: "Contract_ContractAttachedFile")
-
-  @@index([FileContractBookingId], map: "Contract_ContractAttachedFile")
-}
-
 model VenueAddress {
   Id        Int      @id @default(autoincrement()) @map("VenueAddressId")
   VenueId   Int      @map("VenueAddressVenueId")
@@ -710,7 +684,7 @@ model DealMemo {
   PRSPercentage                                              Decimal?                      @map("DeMoPRSPercentage") @db.Decimal(5, 2)
   Guarantee                                                  Boolean                       @default(dbgenerated("(b'0')")) @map("DeMoGuarantee") @db.Bit(1)
   GuaranteeAmount                                            Decimal?                      @map("DeMoGuaranteeAmount") @db.Decimal(10, 2)
-  HasCalls                                                   Boolean                       @default(false) @map("DeMoHasCalls")
+  HasCalls                                                   Boolean                       @default(dbgenerated("(b'0')")) @map("DeMoHasCalls") @db.Bit(1)
   PromoterSplitPercentage                                    Decimal?                      @map("DeMoPromoterSplitPercentage") @db.Decimal(5, 2)
   VenueSplitPercentage                                       Decimal?                      @map("DeMoVenueSplitPercentage") @db.Decimal(5, 2)
   VenueRental                                                Decimal?                      @map("DeMoVenueRental") @db.Decimal(10, 2)
@@ -744,10 +718,10 @@ model DealMemo {
   PrintReqs                                                  String?                       @map("DeMoPrintReqs") @db.LongText
   LocalMarketingBudget                                       Decimal?                      @map("DeMoLocalMarketingBudget") @db.Decimal(10, 2)
   LocalMarketingContra                                       Decimal?                      @map("DeMoLocalMarketingContra") @db.Decimal(10, 2)
-  SellWho                                                    String?                       @map("DeMoSellWho") @db.Char(1)
+  SellWho                                                    String?                       @map("DeMoSellWho") @db.VarChar(10)
   SellProgrammes                                             Boolean                       @default(dbgenerated("(b'0')")) @map("DeMoSellProgrammes") @db.Bit(1)
   SellMerch                                                  Boolean                       @default(dbgenerated("(b'0')")) @map("DeMoSellMerch") @db.Bit(1)
-  SellNotes                                                  String?                       @map("DeMoSellNotes") @db.LongText
+  MerchNotes                                                 String?                       @map("DeMoMerchNotes") @db.LongText
   SellProgCommPercent                                        Decimal?                      @map("DeMoSellProgCommPercent") @db.Decimal(5, 2)
   SellMerchCommPercent                                       Decimal?                      @map("DeMoSellMerchCommPercent") @db.Decimal(5, 2)
   SellPitchFee                                               Decimal?                      @map("DeMoSellPitchFee") @db.Decimal(10, 2)
@@ -766,9 +740,11 @@ model DealMemo {
   AdvancePaymentDueBy                                        DateTime?                     @map("DeMoAdvancePaymentDueBy") @db.Date
   SettlementDays                                             Int?                          @map("DeMoSettlementDays") @db.TinyInt
   ContractClause                                             String?                       @map("DeMoContractClause") @db.LongText
-  PrintDelVenueAddressId                                     Int?                          @map("DeMoPrintDelVenueAddressId")
+  PrintDelVenueAddressLine                                   String?                       @map("DeMoPrintDelVenueAddressLine") @db.LongText
   PrintDelUseVenueAddress                                    Boolean                       @default(dbgenerated("(b'0')")) @map("DeMoPrintDelUseVenueAddress") @db.Bit(1)
   CompAccContId                                              Int?                          @map("DeMoCompAccContId")
+  SeatKillNotes                                              String?                       @map("DeMoSeatKillNotes") @db.LongText
+  SettlementSameDay                                          Boolean                       @default(dbgenerated("(b'0')")) @map("DeMoSettlementSameDay") @db.Bit(1)
   Booking                                                    Booking                       @relation(fields: [BookingId], references: [Id], onDelete: Cascade, map: "BookingDealMemo")
   VenueContact_DealMemo_DeMoBOMVenueContactIdToVenueContact  VenueContact?                 @relation("DealMemo_DeMoBOMVenueContactIdToVenueContact", fields: [BOMVenueContactId], references: [Id], onDelete: Cascade, map: "VenueContactDealMemoBOM")
   VenueContact_DealMemo_DeMoTechVenueContactIdToVenueContact VenueContact?                 @relation("DealMemo_DeMoTechVenueContactIdToVenueContact", fields: [TechVenueContactId], references: [Id], onDelete: Cascade, map: "VenueContactDealMemoTech")
@@ -890,13 +866,13 @@ model ACCContract {
   CancelFee            Decimal?          @map("ACCCCancelFee") @db.Decimal(10, 2)
   ProductionId         Int               @map("ACCCProductionId")
   ACCCDeptId           Int
-  ACCCTemplateId       Int?
+  ACCCTemplateId       Int
   ACCClause            ACCClause[]
   ACCDepartment        ACCDepartment     @relation(fields: [ACCCDeptId], references: [ACCDeptId], map: "ACCDepartment_ACCContract")
   File                 File?             @relation(fields: [ACCContractFileId], references: [Id], onDelete: Cascade, map: "File_ACCContract")
   Person               Person            @relation(fields: [PersonId], references: [PersonId], map: "Person_ACCContract")
   Production           Production        @relation(fields: [ProductionId], references: [Id], onDelete: Cascade, map: "Production_ACCContract")
-  Template             Template?         @relation(fields: [ACCCTemplateId], references: [TemplateId], onDelete: NoAction, map: "Template_ACCContract")
+  Template             Template          @relation(fields: [ACCCTemplateId], references: [TemplateId], onDelete: NoAction, map: "Template_ACCContract")
   Venue                Venue?            @relation(fields: [RehearsalVenueId], references: [Id], onDelete: Cascade, map: "Venue_ACCContract")
   ACCContractData      ACCContractData[]
   ACCPayment           ACCPayment[]
@@ -1219,6 +1195,30 @@ model TemplateRow {
   @@index([TemplateRowTemplateId], map: "Template_TemplateRow")
 }
 
+model BookingFile {
+  BookingFileId          Int     @id @default(autoincrement())
+  BookingFileBookingId   Int
+  BookingFileFileId      Int
+  BookingFileType        String? @db.VarChar(20)
+  BookingFileDescription String? @db.VarChar(80)
+  Booking                Booking @relation(fields: [BookingFileBookingId], references: [Id], onDelete: Cascade, map: "Booking_BookingFile")
+
+  @@index([BookingFileBookingId], map: "Booking_BookingFile")
+}
+
+model VenueVenue {
+  Venue1Id Int     @map("VVVenue1Id")
+  Venue2Id Int     @map("VVVenue2Id")
+  Mileage  Decimal @map("VVMileage") @db.Decimal(5, 1)
+  TimeMins Int?    @map("VVTimeMins")
+  Venue1   Venue   @relation("VenueVenue_VVVenue1IdToVenue", fields: [Venue1Id], references: [Id], onDelete: Cascade, map: "Venue_VenueVenue1")
+  Venue2   Venue   @relation("VenueVenue_VVVenue2IdToVenue", fields: [Venue2Id], references: [Id], onDelete: Cascade, map: "Venue_VenueVenue2")
+
+  @@id([Venue1Id, Venue2Id])
+  @@index([Venue1Id], map: "Venue_VenueVenue1_idx")
+  @@index([Venue2Id], map: "Venue_VenueVenue2_idx")
+}
+
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view SalesFiguresView {
   SetId               Int      @default(0)
@@ -1237,9 +1237,9 @@ view SalesFiguresView {
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view BookingTravelView {
   BookingDateBlockId Int
-  FromBookingId      Int      @default(0)
-  Mileage            Decimal? @db.Decimal(5, 1)
-  TimeMins           Int?
+  FromBookingId      Int  @default(0)
+  Mileage            Int? @db.UnsignedSmallInt
+  TimeMins           Int? @db.UnsignedSmallInt
 
   @@ignore
 }
@@ -1274,8 +1274,8 @@ view ScheduleView {
   PencilNum           Int?
   VenueId             Int?
   VenueSeats          Float?
-  Mileage             Decimal?  @db.Decimal(5, 1)
-  TimeMins            Int?
+  Mileage             Decimal?  @db.Decimal(5, 0)
+  TimeMins            Decimal?  @db.Decimal(5, 0)
   DateTypeId          Int?
   DateTypeName        String?   @db.VarChar(30)
   AffectsAvailability Bytes?    @db.VarBinary(1)
@@ -1296,8 +1296,8 @@ view DateBlockDatesView {
   PencilNum           Int?
   VenueId             Int?
   VenueSeats          Float?
-  Mileage             Decimal? @db.Decimal(5, 1)
-  TimeMins            Int?
+  Mileage             Decimal? @db.Decimal(5, 0)
+  TimeMins            Decimal? @db.Decimal(5, 0)
   DateTypeId          Int?
   DateTypeName        String?  @db.VarChar(30)
   AffectsAvailability Bytes?   @db.VarBinary(1)
@@ -1323,16 +1323,6 @@ view BookingDateDiffView {
   DaysDifference     Int?
   FromVenueId        Int
   ToVenueId          Int
-
-  @@ignore
-}
-
-/// The underlying view does not contain salesSetTotalsViewa valid unique identifier and can therefore currently not be handled by Prisma Client.
-view VenueVenueView {
-  FromVenueId Int     @default(0)
-  ToVenueId   Int     @default(0)
-  Mileage     Decimal @default(0.0) @db.Decimal(5, 1)
-  TimeMins    Int?
 
   @@ignore
 }
@@ -1390,8 +1380,8 @@ view ScheduledDatesView {
   StatusCode  String   @default("") @db.Char(1)
   PencilNum   Int?
   VenueSeats  Float?
-  Mileage     Decimal? @db.Decimal(5, 1)
-  TimeMins    Int?
+  Mileage     Decimal? @db.Decimal(5, 0)
+  TimeMins    Decimal? @db.Decimal(5, 0)
 
   @@ignore
 }
