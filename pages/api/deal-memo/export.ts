@@ -18,6 +18,15 @@ type DeMoExportProps = {
   dealMemoData: any;
 };
 
+// Notes for SK-494 - comment will be removed when actioned
+/*  
+   1. SellNotes has been changed to MerchNotes
+   2. SettlementSameDay has been added to store the boolean field
+   3. NumDressingRooms removed from object but was not used and not in DB
+   4. PrintUseDelVenueAddressId changed to PrintDelVenueAddressLine and made a long text field
+   5. SeatKillNotes field added - this will remain disconnected from BookingHoldNotes - for the time being the value from the deal memo will need to be copied over manually (from RCK)
+*/
+
 const formatPerfs = (performances) => {
   const perfDays = parseAndSortDates(performances);
   return perfDays.length === 0

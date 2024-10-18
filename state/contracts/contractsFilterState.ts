@@ -36,7 +36,6 @@ export const contractsFilterState = atom({
 export const initialDealMemoDataState: DealMemoContractFormData = {
   Id: null,
   BookingId: null,
-  AgreementDate: null,
   AccContId: null,
   RunningTime: null,
   RunningTimeNotes: '',
@@ -86,7 +85,7 @@ export const initialDealMemoDataState: DealMemoContractFormData = {
   SellWho: '',
   SellProgrammes: false,
   SellMerch: false,
-  SellNotes: '',
+  MerchNotes: '',
   SellProgCommPercent: null,
   SellMerchCommPercent: null,
   SellPitchFee: null,
@@ -94,7 +93,6 @@ export const initialDealMemoDataState: DealMemoContractFormData = {
   TechVenueContactId: null,
   TechArrivalDate: null,
   TechArrivalTime: null,
-  NumDressingRooms: null,
   NumFacilitiesLaundry: false,
   NumFacilitiesDrier: false,
   NumFacilitiesLaundryRoom: false,
@@ -107,11 +105,13 @@ export const initialDealMemoDataState: DealMemoContractFormData = {
   SettlementDays: null,
   ContractClause: '',
   PrintDelUseVenueAddress: true,
-  PrintDelUseVenueAddressline: '',
+  PrintDelVenueAddressLine: '',
   DealMemoPrice: [],
   DealMemoTechProvision: [],
   DealMemoCall: [],
   DealMemoHold: [],
+  SettlementSameDay: false,
+  SeatKillNotes: '',
 };
 
 export const dealMemoInitialState = atom({
