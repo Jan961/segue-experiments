@@ -76,10 +76,7 @@ export default function PopupModal({
             >
               <Dialog.Panel
                 className={classNames(
-                  // transform also a cause for problem
-                  'px-7 pt-7 pb-5 transform bg-primary-white text-left align-middle shadow-xl transition-all max-w-full',
-                  'overflow-x-auto',
-                  'overflow-y-hidden',
+                  'flex flex-col max-h-[90vh] px-7 pt-7 pb-5 transform bg-primary-white text-left align-middle shadow-xl transition-all max-w-full overflow-x-auto',
                   panelClass,
                 )}
               >
@@ -95,7 +92,7 @@ export default function PopupModal({
                 <Dialog.Title as="h3" className={`-mt-6 text-lg font-bold leading-6 ${titleClass}`}>
                   {title}
                 </Dialog.Title>
-                <div className="mt-4">{children}</div>
+                <div className="overflow-y-auto mt-4">{children}</div>
               </Dialog.Panel>
             </Transition.Child>
           </div>
