@@ -101,7 +101,7 @@ export const getAccountUsersList = async () => {
 };
 
 export const replaceUserPermissions = async (accountUserId: string, permissionIds: string[]) => {
-  prismaMaster.$transaction(async (tx) => {
+  await prismaMaster.$transaction(async (tx) => {
     await tx.AccountUserPermission.deleteMany({
       where: {
         UserAuthAccUserId: accountUserId,
@@ -123,7 +123,7 @@ export const replaceProudctionPermissions = async (
   req: NextApiRequest,
 ) => {
   const prismaClient = await getPrismaClient(req);
-  prismaClient.$transaction(async (tx) => {
+  await prismaClient.$transaction(async (tx) => {
     await tx.accountUserProduction.deleteMany({
       where: {
         AUPAccUserId: Number(accountUserId),
