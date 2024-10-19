@@ -6,17 +6,11 @@ declare const globalThis: {
   prismaGlobal: PrismaClient;
 } & typeof global;
 
-const prismaClientSingleton = async (req: NextApiRequest) => {
+const prismaClientSingleton = async (orgId: string) => {
   try {
-    console.log('Creating new prisma client');
     const clientDBUrl = process.env.CLIENT_DATABASE_URL;
-    const orgId = (await getOrganisationIdFromReq(req)) as string;
-    if (!orgId) {
-      throw new Error('Unable to get orgId');
-    }
-
     const prismaUrl = `${clientDBUrl}_${process.env.DEPLOYMENT_ENV}_Segue_${orgId}`;
-    const client = new PrismaClient({ log: ['info'], datasourceUrl: prismaUrl });
+    const client = new PrismaClient({ datasourceUrl: prismaUrl });
     if (process.env.NODE_ENV !== 'production') globalThis.prismaGlobal = client;
     return client;
   } catch (e) {
@@ -25,9 +19,12 @@ const prismaClientSingleton = async (req: NextApiRequest) => {
 };
 
 const getPrismaClient = async (req: NextApiRequest): Promise<PrismaClient> => {
-  console.log('In getPrismaClient', !!globalThis.prismaGlobal);
   if (req) {
-    return globalThis.prismaGlobal ?? prismaClientSingleton(req);
+    const orgId = (await getOrganisationIdFromReq(req)) as string;
+    if (!orgId) {
+      throw new Error('Unable to get orgId');
+    }
+    return globalThis.prismaGlobal ?? prismaClientSingleton(orgId);
   } else {
     throw new Error('In getPrismaClient, req is null');
   }
