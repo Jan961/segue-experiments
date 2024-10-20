@@ -54,7 +54,7 @@ model Booking {
   DateBlock                  DateBlock             @relation(fields: [DateBlockId], references: [Id], onDelete: Cascade, map: "DateBlock_Booking")
   Venue                      Venue                 @relation(fields: [VenueId], references: [Id], map: "Venue_Booking")
   BookingActivity            BookingActivity[]
-  BookingAttachedFile        BookingAttachedFile[]
+  BookingFile                BookingFile[]
   BookingContactNotes        BookingContactNotes[]
   Contract                   Contract?
   DealMemo                   DealMemo?
@@ -468,19 +468,30 @@ model SetHold {
   @@index([SetHoldSetId], map: "SalesSet_SetHold_idx")
 }
 
-model BookingAttachedFile {
-  FileId               Int      @id @default(autoincrement())
-  FileBookingBookingId Int
-  FileDescription      String   @db.VarChar(100)
-  FileOriginalFilename String   @db.VarChar(100)
-  FileDateTime         DateTime @db.DateTime(0)
-  FileUploadedDateTime DateTime @db.DateTime(0)
-  FileContent          Bytes?
-  FileURL              String?  @db.VarChar(255)
-  Booking              Booking  @relation(fields: [FileBookingBookingId], references: [Id], onDelete: Cascade, map: "Booking_BookingAttachedFile")
+model BookingFile {
+  BookingFileId          Int     @id @default(autoincrement())
+  BookingFileBookingId   Int
+  BookingFileFileId      Int
+  BookingFileType        String? @db.VarChar(20)
+  BookingFileDescription String? @db.VarChar(80)
+  Booking                Booking @relation(fields: [BookingFileBookingId], references: [Id], onDelete: Cascade, map: "Booking_BookingFile")
 
-  @@index([FileBookingBookingId], map: "Booking_BookingAttachedFile")
+  @@index([BookingFileBookingId], map: "Booking_BookingFile")
 }
+
+// model BookingAttachedFile {
+//   FileId               Int      @id @default(autoincrement())
+//   FileBookingBookingId Int
+//   FileDescription      String   @db.VarChar(100)
+//   FileOriginalFilename String   @db.VarChar(100)
+//   FileDateTime         DateTime @db.DateTime(0)
+//   FileUploadedDateTime DateTime @db.DateTime(0)
+//   FileContent          Bytes?
+//   FileURL              String?  @db.VarChar(255)
+//   Booking              Booking  @relation(fields: [FileBookingBookingId], references: [Id], onDelete: Cascade, map: "Booking_BookingAttachedFile")
+//
+//   @@index([FileBookingBookingId], map: "Booking_BookingAttachedFile")
+// }
 
 model ContractAttachedFile {
   FileId                Int      @id @default(autoincrement())

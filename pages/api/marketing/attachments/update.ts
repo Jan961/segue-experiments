@@ -1,25 +1,29 @@
 import { loggingService } from 'services/loggingService';
 import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { BookingFile } from 'prisma/generated/prisma-client';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const data = req.body as BookingFile;
+    const { BookingFileId, BookingFileBookingId, BookingFileFileId, BookingFileType, BookingFileDescription } =
+      req.body;
+
     const prisma = await getPrismaClient(req);
 
     await prisma.bookingFile.update({
       where: {
-        BookingFileId: data.BookingFileId,
+        BookingFileId,
       },
       data: {
-        FileOriginalFilename: data.FileOriginalFilename,
+        BookingFileBookingId,
+        BookingFileFileId,
+        BookingFileType,
+        BookingFileDescription,
       },
     });
     res.status(200).json({});
   } catch (err) {
     await loggingService.logError(err);
     console.log(err);
-    res.status(500).json({ err: 'Error updating BookingAttachedFile' });
+    res.status(500).json({ err: 'Error updating BookingFile' });
   }
 }
