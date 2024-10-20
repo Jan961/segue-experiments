@@ -99,24 +99,24 @@ model BookingContactNotes {
 }
 
 model Contract {
-  BookingId            Int                    @id @map("ContractBookingId")
-  StatusCode           String?                @map("ContractStatusCode") @db.VarChar(4)
-  SignedDate           DateTime?              @map("ContractSignedDate") @db.Date
-  SignedBy             String?                @map("ContractSignedBy") @db.VarChar(100)
-  ReturnDate           DateTime?              @map("ContractReturnDate") @db.Date
-  CheckedBy            String?                @map("ContractCheckedBy") @db.VarChar(100)
-  RoyaltyPercentage    Decimal?               @map("ContractRoyaltyPercentage") @db.Decimal(5, 2)
-  DealType             String?                @map("ContractDealType") @db.VarChar(4)
-  Notes                String?                @map("ContractNotes") @db.LongText
-  ReceivedBackDate     DateTime?              @map("ContractReceivedBackDate") @db.Date
-  Exceptions           String?                @map("ContractExceptions") @db.LongText
-  BankDetailsSent      Boolean                @default(dbgenerated("(b'0')")) @map("ContractBankDetailsSent") @db.Bit(1)
-  TechSpecSent         Boolean                @default(dbgenerated("(b'0')")) @map("ContractTechSpecSent") @db.Bit(1)
-  PRSCertSent          Boolean                @default(dbgenerated("(b'0')")) @map("ContractPRSCertSent") @db.Bit(1)
-  GP                   Decimal?               @map("ContractGP") @db.Decimal(10, 2)
-  PromoterPercent      Decimal?               @map("ContractPromoterPercent") @db.Decimal(6, 3)
-  Booking              Booking                @relation(fields: [BookingId], references: [Id], onDelete: Cascade, map: "Booking_Contract")
-  ContractFile         ContractFile[]
+  BookingId         Int            @id @map("ContractBookingId")
+  StatusCode        String?        @map("ContractStatusCode") @db.VarChar(4)
+  SignedDate        DateTime?      @map("ContractSignedDate") @db.Date
+  SignedBy          String?        @map("ContractSignedBy") @db.VarChar(100)
+  ReturnDate        DateTime?      @map("ContractReturnDate") @db.Date
+  CheckedBy         String?        @map("ContractCheckedBy") @db.VarChar(100)
+  RoyaltyPercentage Decimal?       @map("ContractRoyaltyPercentage") @db.Decimal(5, 2)
+  DealType          String?        @map("ContractDealType") @db.VarChar(4)
+  Notes             String?        @map("ContractNotes") @db.LongText
+  ReceivedBackDate  DateTime?      @map("ContractReceivedBackDate") @db.Date
+  Exceptions        String?        @map("ContractExceptions") @db.LongText
+  BankDetailsSent   Boolean        @default(dbgenerated("(b'0')")) @map("ContractBankDetailsSent") @db.Bit(1)
+  TechSpecSent      Boolean        @default(dbgenerated("(b'0')")) @map("ContractTechSpecSent") @db.Bit(1)
+  PRSCertSent       Boolean        @default(dbgenerated("(b'0')")) @map("ContractPRSCertSent") @db.Bit(1)
+  GP                Decimal?       @map("ContractGP") @db.Decimal(10, 2)
+  PromoterPercent   Decimal?       @map("ContractPromoterPercent") @db.Decimal(6, 3)
+  Booking           Booking        @relation(fields: [BookingId], references: [Id], onDelete: Cascade, map: "Booking_Contract")
+  ContractFile      ContractFile[]
 }
 
 model DateType {
@@ -491,7 +491,6 @@ model BookingFile {
 //
 //   @@index([FileBookingBookingId], map: "Booking_BookingAttachedFile")
 // }
-
 
 model VenueAddress {
   Id        Int      @id @default(autoincrement()) @map("VenueAddressId")
