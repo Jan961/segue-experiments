@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import useDebounce from 'hooks/useDebounce';
 import Layout from 'components/Layout';
 import VenueFilter from 'components/venues/VenueFilter';
 import VenueTable from 'components/venues/VenueTable';
@@ -15,7 +16,7 @@ import { GetServerSideProps, InferGetServerSidePropsType, NextApiRequest } from 
 import { getProductionJumpState } from 'utils/getProductionJumpState';
 import axios from 'axios';
 import { defaultVenueFilters } from 'config/bookings';
-import { debounce, objectify } from 'radash';
+import { objectify } from 'radash';
 import { intialState as intialProductionJumpState } from 'state/booking/productionJumpState';
 import { transformToOptions } from 'utils';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
@@ -33,30 +34,21 @@ export type VenueFilters = {
 };
 export default function Index(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const {
-    venueTownList = [],
+    venueTownOptionsList = [],
     venueCountryOptionList = [],
     venueFamilyOptionList = [],
     venueRoleOptionList = [],
   } = props;
   const [filters, setFilters] = useState<VenueFilters>(defaultVenueFilters);
+  const debouncedFilters = useDebounce(filters, 1000);
+  const { productionId, town, country, search } = debouncedFilters;
   const [venues, setVenues] = useState([]);
   const [editVenueContext, setEditVenueContext] = useState<UiTransformedVenue>(null);
-  const { productionId, town, country, search } = filters;
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  console.log('town list ', venueTownList);
-  const filterVenues = useMemo(() => debounce({ delay: 1000 }, (payload) => fetchVenues(payload)), []);
-  const townOptions: SelectOption[] = useMemo(
-    () => venueTownList.map(({ Town }) => ({ text: Town, value: Town })),
-    [venueTownList],
-  );
-
-  // console.log("countries ", venueCountryOptionList)
-  console.log('town options ', townOptions);
-
   const fetchVenues = useCallback(async (payload) => {
+    console.log('fetching venues', payload);
     const { productionId, town, country, searchQuery } = payload || {};
-
     if (!(productionId || town || country || searchQuery)) {
       setVenues([]);
       return;
@@ -72,12 +64,10 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
   }, []);
 
   useEffect(() => {
-    filterVenues({ productionId, town, country, searchQuery: search, limit: productionId ? null : 50 });
-  }, [productionId, town, country, search]);
-
-  const refreshTable = useCallback(() => {
-    filterVenues({ productionId, town, country, searchQuery: search, limit: productionId ? null : 50 });
-  }, [productionId, town, country, search, filterVenues]);
+    (async () => {
+      await fetchVenues({ productionId, town, country, searchQuery: search, limit: productionId ? null : 50 });
+    })();
+  }, [country, productionId, search, town, fetchVenues]);
 
   const updateFilters = useCallback(
     (change) => {
@@ -93,13 +83,9 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
     [setEditVenueContext],
   );
 
-  const onModalClose = useCallback(
-    (isSuccess?: boolean) => {
-      if (isSuccess) refreshTable();
-      setEditVenueContext(null);
-    },
-    [refreshTable, setEditVenueContext],
-  );
+  const onModalClose = useCallback(() => {
+    setEditVenueContext(null);
+  }, [setEditVenueContext]);
 
   return (
     <>
@@ -115,7 +101,7 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
         <div className="max-w-5xl mx-auto">
           <div className="mb-4">
             <VenueFilter
-              townOptions={townOptions}
+              townOptions={venueTownOptionsList}
               countryOptions={venueCountryOptionList}
               onFilterChange={updateFilters}
               filters={filters}
@@ -153,10 +139,11 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   ]);
 
   const productionJump = results[0].status === 'fulfilled' ? results[0].value : intialProductionJumpState;
-  const venueTownList: SelectOption[] =
-    results[1].status === 'fulfilled' ? (results[1] as PromiseFulfilledResult<any>).value : [];
+  const venueTownOptionsList: SelectOption[] =
+    results[1].status === 'fulfilled'
+      ? (results[1] as PromiseFulfilledResult<any>).value.map((t) => ({ value: t, text: t }))
+      : [];
 
-  // console.log('towns at the start', venueTownList);
   const venueCountryOptionList: SelectOption[] =
     results[2].status === 'fulfilled' ? transformToOptions(results[2].value, 'Name', 'Id') : [];
   // console.log("countries at the start", venueCountryOptionList)
@@ -198,7 +185,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
   return {
     props: {
-      venueTownList,
+      venueTownOptionsList,
       venueCountryOptionList,
       venueCurrencyOptionList,
       venueFamilyOptionList,
