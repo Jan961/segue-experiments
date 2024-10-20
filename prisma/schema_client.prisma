@@ -116,7 +116,6 @@ model Contract {
   GP                   Decimal?               @map("ContractGP") @db.Decimal(10, 2)
   PromoterPercent      Decimal?               @map("ContractPromoterPercent") @db.Decimal(6, 3)
   Booking              Booking                @relation(fields: [BookingId], references: [Id], onDelete: Cascade, map: "Booking_Contract")
-  ContractAttachedFile ContractAttachedFile[]
   ContractFile         ContractFile[]
 }
 
@@ -493,18 +492,6 @@ model BookingFile {
 //   @@index([FileBookingBookingId], map: "Booking_BookingAttachedFile")
 // }
 
-model ContractAttachedFile {
-  FileId                Int      @id @default(autoincrement())
-  FileContractBookingId Int
-  FileDescription       String   @db.VarChar(100)
-  FileOriginalFilename  String   @db.VarChar(100)
-  FileDateTime          DateTime @db.DateTime(0)
-  FileUploadedDateTime  DateTime @db.DateTime(0)
-  FileContent           Bytes
-  Contract              Contract @relation(fields: [FileContractBookingId], references: [BookingId], onDelete: Cascade, map: "Contract_ContractAttachedFile")
-
-  @@index([FileContractBookingId], map: "Contract_ContractAttachedFile")
-}
 
 model VenueAddress {
   Id        Int      @id @default(autoincrement()) @map("VenueAddressId")
