@@ -26,7 +26,7 @@
     "*.{js,jsx,ts,tsx}": [
       "prettier --config .prettierrc --write",
       "eslint --config .eslintrc.js --fix",
-      "git add"
+        "git add"
     ]
   },
   "husky": {
