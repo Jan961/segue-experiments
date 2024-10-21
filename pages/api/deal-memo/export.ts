@@ -47,7 +47,7 @@ const getContact = (array, key, value) => {
 const fetchTemplateDocument = async () => {
   try {
     const response = await axios.get(
-      `/api/file/download?location=${'https://d1e9vbizioozy0.cloudfront.net/contracts/templates/DealMemo.docx'}`,
+      `/api/file/download?location=${'https://d1e9vbizioozy0.cloudfront.net/contracts/templates/DealMemo_v1.1.docx'}`,
       {
         responseType: 'arraybuffer',
       },
