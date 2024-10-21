@@ -232,3 +232,6 @@ export const numberToOrdinal = (n) => {
 export const mapObjectValues = (obj: any, transformer: (key: string, value: any) => any) => {
   return Object.fromEntries(Object.entries(obj).map(([key, value]) => [key, transformer(key, value)]));
 };
+
+// used to return the value if not null or undefined - otherwise the function will return an empty string
+export const tidyString = (value: string) => (isNullOrUndefined(value) ? '' : value);

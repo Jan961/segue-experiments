@@ -369,7 +369,7 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
     if (permissions?.length > 0 && isNullOrEmpty(state.menuItems)) {
       const disabledRoutes = ['/touring'];
       const filteredMenuItems = menuItems.filter(
-        (item) => permissions.includes(item.permission) && !disabledRoutes.includes(item.value),
+        (item) => item.value === '/' || (permissions.includes(item.permission) && !disabledRoutes.includes(item.value)),
       );
 
       setGlobalState({ ...state, menuItems: filteredMenuItems });
