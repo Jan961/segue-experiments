@@ -229,14 +229,14 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
 
               return (
                 <div key={index}>
-                  <Icon
-                    color="#fff"
-                    className="float-right mt-3"
-                    iconName="edit"
-                    onClick={() => editAvailSeats(holdRec)}
-                    testId="iconEditAvailSeats"
-                  />
-                  <div className="w-[1045px] bg-white mb-1 rounded-md border border-primary-border">
+                  <div className="w-auto bg-white mb-1 rounded-md border border-primary-border">
+                    <Icon
+                      color="#fff"
+                      className="float-right mt-1"
+                      iconName="edit"
+                      onClick={() => editAvailSeats(holdRec)}
+                      testId="iconEditAvailSeats"
+                    />
                     <div className="text-base text-primary-navy font-bold ml-2">
                       {date} | {time} | Seats Allocated:{' '}
                       {holdRec.totalAllocated > holdRec.totalAvailable ? (
