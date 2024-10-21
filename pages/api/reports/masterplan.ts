@@ -29,7 +29,7 @@ type UniqueHeadersObject = {
 };
 
 export enum ALIGNMENT {
-  MIddLE = 'middle',
+  MIDDLE = 'middle',
   TOP = 'top',
   BOTTOM = 'bottom',
   CENTER = 'center',
