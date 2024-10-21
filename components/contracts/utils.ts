@@ -2,11 +2,11 @@ import { Time } from 'components/core-ui-lib/TimeInput/TimeInput';
 import { startOfDay } from 'date-fns';
 import { pick } from 'radash';
 import { getShortWeekFormat } from 'services/dateService';
-import { formatDecimalValue, isNullOrEmpty, isUndefined } from 'utils';
+import { formatDecimalValue, isNullOrEmpty, isNullOrUndefined, isUndefined } from 'utils';
 import formatInputDate from 'utils/dateInputFormat';
 import { PriceState } from './modal/EditDealMemoContractModal';
 
-const defaultPrice = [
+export const defaultPrice = [
   { DMPTicketName: 'Premium', DMPTicketPrice: 0, DMPNumTickets: 0, DMPDeMoId: 0, DMPNotes: '' },
   { DMPTicketName: 'Concession', DMPTicketPrice: 0, DMPNumTickets: 0, DMPDeMoId: 0, DMPNotes: '' },
   {
@@ -29,30 +29,29 @@ export const defaultCustomPrice = {
   DMPNotes: '',
 };
 
-const techProv = ['Lighting', 'Sound', 'Other', 'Technical Staff'];
-
-export const defaultTechProvision = {
-  Lighting: {
+export const defaultTechProvision = [
+  {
     DMTechName: 'Lighting',
     DMTechVenue: '',
     DMTechCompany: '',
   },
-  Sound: {
+  {
     DMTechName: 'Sound',
     DMTechVenue: '',
     DMTechCompany: '',
   },
-  Other: {
+  {
     DMTechName: 'Other',
     DMTechVenue: '',
     DMTechCompany: '',
   },
-  'Technical Staff': {
+  {
     DMTechName: 'Technical Staff',
     DMTechVenue: '',
     DMTechCompany: '',
   },
-};
+];
+
 export const defaultDemoCall = {
   DMCDeMoId: null,
   DMCCallNum: 0,
@@ -85,18 +84,6 @@ export const filterPrice = (dealMemoPrice: any): PriceState => {
 
     return { custom: customPriceList.length === 0 ? [defaultCustomPrice] : customPriceList, default: defaultPriceList };
   }
-};
-
-export const filterTechProvision = (techProvision) => {
-  const techData = [];
-  techProv.forEach((tech, index) => {
-    if (techProvision.length > 0 && techProvision[index].DMTechName === tech) {
-      techData.push(techProvision[index]);
-    } else {
-      techData.push(defaultTechProvision[tech]);
-    }
-  });
-  return techData;
 };
 
 export const filterPercentage = (num: number) => {
@@ -314,8 +301,26 @@ export const formatValue = (value: any) => {
   }
 };
 
-export const formatSeatKillValues = (dmHoldData: any) =>
-  dmHoldData.map((hold) => ({
-    ...hold,
-    DMHoldValue: formatValue(hold.DMHoldValue) === '' ? '' : formatDecimalValue(hold.DMHoldValue),
-  }));
+export const formatSeatKillValues = (dmHoldData: any, dmTypes: any) => {
+  // if dmHoldData is undefined - initialise object with zeros and the hold type ids
+  if (isNullOrUndefined(dmHoldData)) {
+    const emptyDmHolds = [];
+    dmTypes.forEach((dmType) => {
+      emptyDmHolds.push({
+        DMHoldHoldTypeId: dmType.HoldTypeId,
+        DMHoldSeats: 0,
+        DMHoldValue: 0,
+      });
+    });
+    return emptyDmHolds;
+  } else {
+    return dmHoldData.map((hold) => ({
+      ...hold,
+      DMHoldValue: formatValue(hold.DMHoldValue) === '' ? '' : formatDecimalValue(hold.DMHoldValue),
+    }));
+  }
+};
+
+export const formatAddress = (...fields: (string | null)[]): string => {
+  return fields.filter((field) => !isNullOrEmpty(field)).join(', ');
+};

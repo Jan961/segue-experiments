@@ -207,7 +207,7 @@ export const generateExcelSheet = (taskList, usersMap, worksheetTitle = 'Tasks')
   worksheet.addRow([`Exported: ${getExportedDate()} - Layout: Standard`]);
   worksheet.addRow(['', '', '', '', '', '', '']);
   worksheet.addRow(['CODE', 'TASK NAME', 'START BY (wk)', 'DUE (wk)', 'ASSIGNEE', 'PRIORITY', 'NOTES']);
-
+  worksheet.mergeCells(`A1:C1`);
   taskList
     .sort((a, b) => a.StartByWeekNum - b.StartByWeekNum)
     .forEach(({ Name, Code, StartByWeekNum, CompleteByWeekNum, Priority, Notes, TaskAssignedToAccUserId }) => {
@@ -243,7 +243,7 @@ export const generateExcelSheet = (taskList, usersMap, worksheetTitle = 'Tasks')
     rowsToIgnore: 3,
     maxColWidth: Infinity,
   });
+  worksheet.getCell(1, 1).font = { size: 16, bold: true, color: { argb: COLOR_HEXCODE.WHITE } };
   addBorderToAllCells({ worksheet });
-  worksheet.getCell(1, 1).font = { size: 16, bold: true };
   return workbook;
 };
