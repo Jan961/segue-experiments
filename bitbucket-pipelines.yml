@@ -48,7 +48,7 @@ pipelines:
               variables:
                 USERNAME: $SMTP_USERNAME
                 PASSWORD: $SMTP_PASSWORD
-                FROM: 'asara97911@gmail.com'
+                FROM: 'seguetesting@gmail.com'
                 TO: 'testing@segue360.co.uk'
                 HOST: 'smtp.gmail.com'
                 PORT: 465
