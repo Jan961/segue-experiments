@@ -107,15 +107,9 @@ const handler = async (req, res) => {
       dateFormat: 'yyyy-MM-DD',
     });
 
-    console.log(formatedFromDateString);
-    console.log(formatedToDateString);
-
     // Convert the formatted date strings back to Date objects
     const formatedFromDate = new Date(formatedFromDateString);
     const formatedToDate = new Date(formatedToDateString);
-
-    console.log(formatedFromDate);
-    console.log(formatedToDate);
 
     if (!fromDate || !toDate || isNaN(formatedFromDate.getTime()) || isNaN(formatedToDate.getTime())) {
       throw new Error('Params are missing or invalid dates provided');
