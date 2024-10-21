@@ -17,6 +17,7 @@ import {
   numberToOrdinal,
   mapObjectValues,
   flattenHierarchicalOptions,
+  tidyString,
 } from 'utils';
 
 describe('Tests for utility functions', () => {
@@ -638,5 +639,27 @@ describe('Tests for flattenHierarchicalOptions', () => {
   it('test for flattening hierarchical options', () => {
     const flattened = flattenHierarchicalOptions(options);
     expect(flattened).toEqual(mockResults);
+  });
+});
+
+describe('tidyString', () => {
+  it('should return an empty string if the value is null', () => {
+    expect(tidyString(null)).toBe('');
+  });
+
+  it('should return an empty string if the value is undefined', () => {
+    expect(tidyString(undefined)).toBe('');
+  });
+
+  it('should return the original string if the value is a non-null, non-undefined string', () => {
+    expect(tidyString('test')).toBe('test');
+  });
+
+  it('should return an empty string for an empty string input', () => {
+    expect(tidyString('')).toBe('');
+  });
+
+  it('should return the original string if the value contains spaces', () => {
+    expect(tidyString('   spaces   ')).toBe('   spaces   ');
   });
 });

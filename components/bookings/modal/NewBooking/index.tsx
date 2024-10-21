@@ -47,6 +47,7 @@ const AddBooking = ({ visible, onClose, startDate, endDate, bookingInfo, booking
       ...INITIAL_STATE.form,
       fromDate: startDate,
       toDate: endDate,
+      isRunOfDates: false,
     },
   }));
 

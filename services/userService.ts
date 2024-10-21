@@ -34,6 +34,35 @@ export const getUsers = async (AccountId: number): Promise<UserDto[]> => {
   return result.map(userMapper);
 };
 
+export const getUsersWithPermissions = async (AccountId: number) => {
+  const users = await prisma.AccountUserPermissionsView.findMany({
+    where: {
+      AccountId,
+    },
+  });
+
+  const formattedUsers = users
+    .map((user) => {
+      const firstName = user.UserFirstName || '';
+      const lastName = user.UserLastName || '';
+
+      return {
+        accountUserId: user.AccUserId,
+        firstName,
+        lastName,
+        name: `${firstName} ${lastName}`,
+        email: user.UserEmail,
+        isSystemAdmin: user.AccUserIsAdmin,
+        pin: user.AccountPIN,
+        permissions: user.AllPermissions,
+        permissionDesc: user.AllPermissions,
+        licence: 'Standard',
+      };
+    })
+    .sort((a, b) => a.lastName.localeCompare(b.lastName));
+  return formattedUsers;
+};
+
 export const getEmailAddressForClerkId = async (userId: string): Promise<string> => {
   const user = await clerkClient.users.getUser(userId);
   const matching = user.emailAddresses.filter((x) => x.id === user.primaryEmailAddressId)[0];
