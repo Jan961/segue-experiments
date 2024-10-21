@@ -46,7 +46,7 @@ export default function NotesPopup({ show, onSave, onCancel, productionItem, tes
         onClose={() => showConfModal('close')}
         hasOverlay={confirm}
       >
-        <div>
+        <div className="p-2">
           <h3 className="text-responsive-lg font-bold text-primary-navy">{`${productionItem?.production} | ${productionItem?.date} | ${
             productionItem?.venue !== undefined ? productionItem?.venue : ''
           }`}</h3>
