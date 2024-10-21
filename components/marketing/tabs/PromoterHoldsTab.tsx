@@ -101,7 +101,7 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
     }
   };
 
-  const saveAllocatedSeats = async (data, perfId, type) => {
+  const saveAllocatedSeats = async (data, perfId, type: string) => {
     const holdRec = holdList.find((hold) => hold.info.Id === perfId);
     const recData = { AvailableCompId: holdRec.availableCompId, ...data };
 
@@ -298,7 +298,7 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
             show={showAllocSeatsModal}
             bookingId={bookingIdVal}
             onCancel={() => setShowAllocSeatsModal(false)}
-            onSave={(data, perfId, type) => saveAllocatedSeats(data, perfId, type)}
+            onSave={(data, perfId, type: string) => saveAllocatedSeats(data, perfId, type)}
             data={allocatedRow}
             type={allocType}
           />
