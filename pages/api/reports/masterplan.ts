@@ -29,7 +29,7 @@ type UniqueHeadersObject = {
 };
 
 export enum ALIGNMENT {
-  MIDDLE = 'middle',
+  MIddLE = 'middle',
   TOP = 'top',
   BOTTOM = 'bottom',
   CENTER = 'center',
@@ -99,17 +99,23 @@ const handler = async (req, res) => {
     const formatedFromDateString = formatDateWithTimezoneOffset({
       date: fromDate,
       timezoneOffset,
-      dateFormat: 'YYYY-MM-DD',
+      dateFormat: 'yyyy-MM-DD',
     });
     const formatedToDateString = formatDateWithTimezoneOffset({
       date: toDate,
       timezoneOffset,
-      dateFormat: 'YYYY-MM-DD',
+      dateFormat: 'yyyy-MM-DD',
     });
+
+    console.log(formatedFromDateString);
+    console.log(formatedToDateString);
 
     // Convert the formatted date strings back to Date objects
     const formatedFromDate = new Date(formatedFromDateString);
     const formatedToDate = new Date(formatedToDateString);
+
+    console.log(formatedFromDate);
+    console.log(formatedToDate);
 
     if (!fromDate || !toDate || isNaN(formatedFromDate.getTime()) || isNaN(formatedToDate.getTime())) {
       throw new Error('Params are missing or invalid dates provided');
@@ -131,9 +137,9 @@ const handler = async (req, res) => {
     const workbook = new ExcelJS.Workbook();
     const formattedData = data.map((x) => ({
       ...x,
-      EntryDate: format(x.EntryDate, 'YYYY-MM-DD'),
-      ProductionStartDate: format(x.ProductionStartDate, 'YYYY-MM-DD'),
-      ProductionEndDate: format(x.ProductionEndDate, 'YYYY-MM-DD'),
+      EntryDate: format(x.EntryDate, 'yyyy-MM-dd'),
+      ProductionStartDate: format(x.ProductionStartDate, 'yyyy-MM-dd'),
+      ProductionEndDate: format(x.ProductionEndDate, 'yyyy-MM-dd'),
     }));
 
     const showNameAndProductionCode: { [key: string]: string[] } = formattedData.reduce((acc, x) => {
@@ -163,16 +169,16 @@ const handler = async (req, res) => {
       pageSetup: { fitToPage: true, fitToHeight: 5, fitToWidth: 7 },
       views: [{ state: 'frozen', xSplit: 2, ySplit: 6 }],
     });
-    const title = `All Productions Masterplan ${format(new Date(formatedFromDateString), 'DD-MM-YY')} to ${format(
+    const title = `All Productions Masterplan ${format(new Date(formatedFromDateString), 'dd-MM-yy')} to ${format(
       new Date(formatedToDateString),
-      'DD-MM-YY',
+      'dd-MM-yy',
     )}`;
     worksheet.addRow([title]);
     const date = new Date();
     worksheet.addRow([
       `Exported: ${formatDateWithTimezoneOffset({
         date,
-        dateFormat: 'DD/MM/YY',
+        dateFormat: 'dd/MM/yy',
         timezoneOffset,
       })} at ${formatDateWithTimezoneOffset({ date, dateFormat: 'HH:mm', timezoneOffset })}`,
     ]);
