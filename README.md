@@ -28,7 +28,7 @@ DATABASE_URL="mysql://root:LOCAL_PASSWORD@127.0.0.1:3306/segue"
 ### Bing Distance Matrix
 
 Getting the Distance between Venues Is done Using a mapping service provided by morose that takes the location of
-each venue as A Latitude logdtidutre.
+each venue as A Latitude logdtidutre..
 
 - This requires a key to access the API
 - BING_MAPS_API_KEY: mapped to "key" in API
@@ -81,6 +81,6 @@ Logging an error can be done by sending a string to the logging service with the
 
 ### Action Logging
 
-This service will log the action with the logged in user attached in the Logging Sevice to do this add..
+This service will log the action with the logged in user attached in the Logging Sevice to do this add.
 
 `loggingService.logAction("{Action or component }","{Details of the action to be logged}")`

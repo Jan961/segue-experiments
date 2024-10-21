@@ -69,7 +69,7 @@ export default function Report({
             <Spinner className="w-full" size="lg" />
           </div>
         )}
-        <div className="py-4 overflow-y-auto overflow-x-hidden max-h-[85vh] w-[500px]">
+        <div className="py-4 overflow-y-scroll overflow-x-hidden max-h-[85vh] w-[500px] no-scrollbar">
           {productionSummary.length ? (
             <>
               {productionSummary.map((item, index) => (

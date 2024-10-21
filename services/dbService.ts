@@ -42,8 +42,8 @@ export const createClientDB = async (organisationId: string) => {
   const host = process.env.DB_SERVER;
   const url = `https://${host}:${process.env.DB_PORT}/execute/Mysql`;
   const dbName = `${process.env.DB_USER}_${deploymentEnv}_Segue_${organisationId}`;
-  const dbUser = `${process.env.DB_USER}_${deploymentEnv}User`;
-  const dboUser = `${process.env.DB_USER}_${deploymentEnv}DBO`;
+  const dbUser = `${process.env.DB_USER}_${deploymentEnv}_AppUser`;
+  const dboUser = `${process.env.DB_USER}_${deploymentEnv}_DBOUser`;
   // Create the DB
   const createDBUrl = `${url}/create_database`;
   const { data: dbData } = await axios.post(

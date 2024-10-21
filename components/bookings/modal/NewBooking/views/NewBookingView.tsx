@@ -19,7 +19,7 @@ import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import { BarredVenue } from 'pages/api/productions/venue/barringCheck';
 import Toggle from 'components/core-ui-lib/Toggle/Toggle';
 import Label from 'components/core-ui-lib/Label';
-import { dateToSimple, formattedDateWithWeekDay, getArrayOfDatesBetween } from 'services/dateService';
+import { areDatesSame, dateToSimple, formattedDateWithWeekDay, getArrayOfDatesBetween } from 'services/dateService';
 import { debug } from 'utils/logging';
 import { isNullOrEmpty } from 'utils';
 
@@ -132,6 +132,19 @@ const NewBookingView = ({
       });
   };
 
+  const handleChange = ({ from, to }) => {
+    const fromDate = from?.toISOString() || null;
+    const toDate = to?.toISOString() || null;
+
+    const change = {
+      fromDate,
+      toDate,
+      isRunOfDates: !areDatesSame(fromDate, toDate),
+    };
+
+    onChange(change);
+  };
+
   const handleOnSubmit = async (e) => {
     e.preventDefault();
   };
@@ -169,12 +182,7 @@ const NewBookingView = ({
           testId="cnb-date-range"
           label="Date"
           className=" bg-white my-2 w-fit"
-          onChange={({ from, to }) => {
-            onChange({
-              fromDate: from?.toISOString() || '',
-              toDate: !toDate && !to ? from?.toISOString() : to?.toISOString() || '',
-            });
-          }}
+          onChange={handleChange}
           value={{ from: fromDate ? new Date(fromDate) : null, to: toDate ? new Date(toDate) : null }}
           minDate={minDate ? new Date(minDate) : null}
           maxDate={maxDate ? new Date(maxDate) : null}
@@ -186,7 +194,9 @@ const NewBookingView = ({
               className="!w-fit"
               id="shouldFilterVenues"
               labelClassName="text-white w-fit"
-              onChange={(e: any) => onChange({ isRunOfDates: e.target.checked })}
+              onChange={(e: any) => {
+                onChange({ isRunOfDates: e.target.checked });
+              }}
               checked={isRunOfDates}
               label="This is a run of dates. Y/N"
             />
