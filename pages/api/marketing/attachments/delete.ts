@@ -10,7 +10,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
 
     await prisma.bookingFile.delete({
       where: {
-        BookingFileId: data.BookingFileFileId,
+        BookingFileId: data.BookingFileId,
       },
     });
     res.status(200).json({});
