@@ -2,7 +2,6 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import TextInput from '../TextInput';
 import React, { createRef, forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
-// import moment from 'moment';
 import Label from '../Label';
 import { Portal } from 'react-overlays';
 import { format, isValid } from 'date-fns';
@@ -101,7 +100,6 @@ export default forwardRef<Ref, DateInputProps>(function DateInput(
         let dateText = value.replace(/\D/g, '');
         dateText = dateText.replace(/(\d{2})(?=\d)/g, '$1/');
         setInputValue(dateText);
-        // const formattedDate = format(new Date(inputValue), 'dd/MM/yy');
         if (regex.test(inputValue) && !isValid(inputValue)) {
           setErrorMsg('Invalid Date');
         }
@@ -168,13 +166,11 @@ export default forwardRef<Ref, DateInputProps>(function DateInput(
           placeholderText={placeholder}
           dateFormat="dd/MM/yy"
           popperClassName={`!z-50 ${position}`}
-          // onSelect={(e) => onChange(e)}
           onChange={(e) => onChange(e)}
           selected={selectedDate}
           openToDate={selectedDate}
           customInput={<div className="cursor-pointer w-4 h-4 " />}
           disabled={disabled}
-          // locale="UTC"
           {...props}
         />
       </div>
