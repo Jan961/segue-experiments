@@ -18,15 +18,6 @@ type DeMoExportProps = {
   dealMemoData: any;
 };
 
-// Notes for SK-494 - comment will be removed when actioned
-/*  
-   1. SellNotes has been changed to MerchNotes
-   2. SettlementSameDay has been added to store the boolean field
-   3. NumDressingRooms removed from object but was not used and not in DB
-   4. PrintUseDelVenueAddressId changed to PrintDelVenueAddressLine and made a long text field
-   5. SeatKillNotes field added - this will remain disconnected from BookingHoldNotes - for the time being the value from the deal memo will need to be copied over manually (from RCK)
-*/
-
 const formatPerfs = (performances) => {
   const perfDays = parseAndSortDates(performances);
   return perfDays.length === 0
@@ -72,9 +63,33 @@ const fetchTemplateDocument = async () => {
   }
 };
 
+const processPriceData = (priceData) => {
+  let result = [];
+  if (isUndefined(priceData)) {
+    result = defaultPrice.map((price) => {
+      return {
+        ...price,
+        DMPNumTickets: '',
+        DMPTicketPrice: '',
+      };
+    });
+  } else {
+    const pricesJoined = [...priceData.default, ...priceData.custom];
+    result = pricesJoined.map((price) => {
+      return {
+        ...price,
+        DMPTicketPrice: formatDecimalValue(price.DMPTicketPrice),
+      };
+    });
+  }
+
+  return result;
+};
+
 export const dealMemoExport = async (props: DeMoExportProps) => {
   if (!isNullOrUndefined(props.bookingId)) {
     const deMoRaw = props.dealMemoData;
+    console.log(deMoRaw);
     const { data: currResponse } = await axios.get(`/api/marketing/currency/booking/${props.bookingId}`);
     const { data: holdTypes } = await axios.get<Array<DealMemoHoldType>>(`/api/deal-memo/hold-type/read`);
     const primaryAddress = props.venue.VenueAddress.find((address) => address.TypeName === 'Main');
@@ -178,22 +193,19 @@ export const dealMemoExport = async (props: DeMoExportProps) => {
                 DMHoldSeats: hold.DMHoldSeats === 0 ? '' : hold.DMHoldSeats,
               };
             }),
-      DealMemoPrice: isUndefined(deMoRaw.DealMemoPrice)
-        ? defaultPrice.map((price) => {
-            return {
-              ...price,
-              DMPNumTickets: '',
-              DMPTicketPrice: '',
-            };
-          })
-        : deMoRaw.DealMemoPrice.map((price) => {
-            return {
-              ...price,
-              DMPTicketPrice: formatDecimalValue(price.DMPTicketPrice),
-            };
-          }),
+      DealMemoPrice: processPriceData(deMoRaw.DealMemoPrice),
       SalesDay: deMoRaw.SalesDayNum ? days[deMoRaw.SalesDayNum] : '',
       WeeklySales: props.production.SalesFrequency === 'W',
+      DEC_ROTTPercentage: deMoRaw.ROTTPercentage,
+      DEC_VenueRental: deMoRaw.VenueRental,
+      DEC_StaffingContra: deMoRaw.StaffingContra,
+      DEC_AgreedContraItems: deMoRaw.AgreedContraItems,
+      DEC_RestorationLevy: deMoRaw.RestorationLevy,
+      DEC_BookingFees: deMoRaw.BookingFees,
+      DEC_TxnChargeAmount: deMoRaw.TxnChargeAmount,
+      DEC_LocalMarketingBudget: deMoRaw.LocalMarketingBudget,
+      DEC_LocalMarketingContra: deMoRaw.LocalMarketingContra,
+      DEC_SellPitchFee: deMoRaw.SellPitchFee,
     };
 
     const formattedData = formatTemplateObj(toBeFormatted);

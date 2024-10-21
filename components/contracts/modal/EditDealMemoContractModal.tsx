@@ -41,9 +41,10 @@ import {
   defaultCustomPrice,
   formatAddress,
   defaultTechProvision,
+  getDateWithOffset,
 } from '../utils';
 import { dealMemoInitialState } from 'state/contracts/contractsFilterState';
-import { convertTimeToTodayDateFormat, dateToTimeString } from 'services/dateService';
+import { dateToTimeString } from 'services/dateService';
 import StandardSeatKillsTable, { SeatKillRow } from '../table/StandardSeatKillsTable';
 import LoadingOverlay from 'components/shows/LoadingOverlay';
 import { CustomOption } from 'components/core-ui-lib/Table/renderers/SelectCellRenderer';
@@ -203,12 +204,20 @@ export const EditDealMemoContractModal = ({
 
     setDealMemoTechProvision(processedTechProvision);
 
+    // get techArrivalTime with time offset
+    const techArrivalTime = getDateWithOffset(new Date());
+    if (isNullOrUndefined(demoModalData.TechArrivalTime)) {
+      techArrivalTime.setHours(9);
+    } else {
+      const timeArrive = new Date(demoModalData.TechArrivalTime);
+      techArrivalTime.setHours(timeArrive.getHours());
+      techArrivalTime.setMinutes(timeArrive.getMinutes());
+    }
+
     setFormData({
       ...demoModalData,
       DateIssued: isUndefined(demoModalData.DateIssued) ? new Date() : demoModalData.DateIssued,
-      TechArrivalTime: isUndefined(demoModalData.TechArrivalTime)
-        ? convertTimeToTodayDateFormat('09:00')
-        : demoModalData.TechArrivalTime,
+      TechArrivalTime: techArrivalTime,
       TechArrivalDate: isUndefined(demoModalData.TechArrivalDate)
         ? new Date(selectedTableCell.contract.dateTime)
         : demoModalData.TechArrivalDate,
@@ -298,7 +307,7 @@ export const EditDealMemoContractModal = ({
     setDealMemoTechProvision(techProvisionData);
   };
 
-  const saveDemoModalData = async () => {
+  const submitForm = async (exportForm: boolean) => {
     // if errors array has any error set to true - show submission error and return
     // create a single array if error statuses
     const { callData, ...errorList } = errors;
@@ -317,6 +326,18 @@ export const EditDealMemoContractModal = ({
       ...formatDecimalFields(formData, 'float'),
       DealMemoPrice: dealMemoPriceData,
     };
+
+    // run the export process if the exportForm is true
+    exportForm &&
+      dealMemoExport({
+        bookingId: selectedTableCell.contract.Id.toString(),
+        dealMemoData,
+        production: productionJumpState,
+        contract: selectedTableCell.contract,
+        venue: venueData,
+        accContacts: accountContacts,
+        users: userAccList,
+      });
 
     try {
       await axios.post(`/api/deal-memo/update/${selectedTableCell.contract.Id}`, {
@@ -521,8 +542,12 @@ export const EditDealMemoContractModal = ({
     const { hrs, min } = times[key];
 
     if (hrs && min) {
-      const timeStr = `${hrs}:${min}`;
-      const datetime = convertTimeToTodayDateFormat(timeStr);
+      const datetime = getDateWithOffset(new Date());
+      datetime.setHours(hrs);
+      datetime.setMinutes(min);
+
+      console.log(datetime, key);
+
       editDemoModalData(key, datetime, 'dealMemo');
     }
   };
@@ -1529,7 +1554,7 @@ export const EditDealMemoContractModal = ({
                   className="w-auto"
                   pattern={/^\d*(\.\d*)?$/}
                   value={formData.BookingFees}
-                  onChange={(value) => editDemoModalData('BookingFees', parseFloat(value.target.value), 'dealMemo')}
+                  onChange={(value) => editDemoModalData('BookingFees', value.target.value, 'dealMemo')}
                   onBlur={(value) => editDemoModalData('BookingFees', formatDecimalOnBlur(value), 'dealMemo')}
                 />
                 <div className="text-primary-input-text font-bold ml-[100px] mr-2">Credit Card Commission</div>
@@ -2304,17 +2329,7 @@ export const EditDealMemoContractModal = ({
           <div className="flex justify-end items-center">
             <Button onClick={() => handleCancelForm(false)} className="w-33" variant="secondary" text="Cancel" />
             <Button
-              onClick={() =>
-                dealMemoExport({
-                  bookingId: selectedTableCell.contract.Id.toString(),
-                  dealMemoData: formData,
-                  production: productionJumpState,
-                  contract: selectedTableCell.contract,
-                  venue: venueData,
-                  accContacts: accountContacts,
-                  users: userAccList,
-                })
-              }
+              onClick={() => submitForm(true)}
               className="ml-4 w-28"
               variant="primary"
               text="Export"
@@ -2323,7 +2338,7 @@ export const EditDealMemoContractModal = ({
               testId="deal-memo-export"
             />
             <Button
-              onClick={() => saveDemoModalData()}
+              onClick={() => submitForm(false)}
               className="ml-4 w-33"
               variant="primary"
               text="Save and Close"
