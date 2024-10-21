@@ -76,7 +76,9 @@ const formatPermissions = (permissions) => {
 
 export const getPermissionsList = async () => {
   try {
-    const results = await prismaMaster.permission.findMany();
+    const results = await prismaMaster.permission.findMany({
+      orderBy: { PermissionParentPermissionId: 'asc' },
+    });
     return formatPermissions(results);
   } catch (err) {
     console.log('Error fetching permissions ', err);
@@ -99,7 +101,7 @@ export const getAccountUsersList = async () => {
 };
 
 export const replaceUserPermissions = async (accountUserId: string, permissionIds: string[]) => {
-  prismaMaster.$transaction(async (tx) => {
+  await prismaMaster.$transaction(async (tx) => {
     await tx.AccountUserPermission.deleteMany({
       where: {
         UserAuthAccUserId: accountUserId,
@@ -121,7 +123,7 @@ export const replaceProudctionPermissions = async (
   req: NextApiRequest,
 ) => {
   const prismaClient = await getPrismaClient(req);
-  prismaClient.$transaction(async (tx) => {
+  await prismaClient.$transaction(async (tx) => {
     await tx.accountUserProduction.deleteMany({
       where: {
         AUPAccUserId: Number(accountUserId),
@@ -162,7 +164,11 @@ export const getPermissionGroupsList = async (req) => {
       },
       include: {
         PermissionGroupPermission: {
-          include: { Permission: { select: { PermissionId: true, PermissionName: true } } },
+          include: {
+            Permission: {
+              select: { PermissionId: true, PermissionName: true },
+            },
+          },
         },
       },
     });

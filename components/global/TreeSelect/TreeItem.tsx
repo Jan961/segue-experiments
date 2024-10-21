@@ -5,6 +5,7 @@ import React, { useEffect, useState, memo } from 'react';
 
 import { mapRecursive } from 'utils';
 import { Checkbox, Label } from 'components/core-ui-lib';
+import classNames from 'classnames';
 
 export interface TreeItemProps {
   defaultOpen: boolean;
@@ -13,7 +14,7 @@ export interface TreeItemProps {
 }
 
 export default memo(function TreeItem({ value, onChange, defaultOpen }: TreeItemProps) {
-  const { id, label, options, checked, groupHeader, isPartiallySelected } = value;
+  const { id, label, options, checked, groupHeader, isPartiallySelected, disabled } = value;
   const isLeafNode = !options || options.length === 0;
   const labelClass = groupHeader ? 'text-responsive-sm font-semibold' : 'text-responsive-sm';
   const [itemOptions, setItemOptions] = useState(options || []);
@@ -103,10 +104,11 @@ export default memo(function TreeItem({ value, onChange, defaultOpen }: TreeItem
         name={`${id}`}
         checked={selected}
         value={id}
+        disabled={disabled}
         onChange={groupHeader ? handleGroupToggle : handleLeafToggle}
       />
 
-      <Label text={label} className={labelClass} />
+      <Label text={label} className={classNames(labelClass, disabled && 'bg-disabled-input')} />
     </div>
   ) : (
     <div>
@@ -119,13 +121,14 @@ export default memo(function TreeItem({ value, onChange, defaultOpen }: TreeItem
                 testId={label}
                 name={`${id}`}
                 checked={selected}
+                disabled={disabled}
                 value={id}
                 onChange={handleGroupToggle}
                 showIntermediate={showIntermediateState}
               />
 
-              <Disclosure.Button className="flex w-full items-center bg-white">
-                <Label text={label} className={labelClass} />
+              <Disclosure.Button className="flex w-full items-center">
+                <Label text={label} className={classNames(labelClass, disabled && 'bg-disabled-input')} />
                 <span className="flex items-center ml-2">
                   {open ? (
                     <ChevronUpIcon data-testid="tree-item-open" className="h-5 w-5" aria-hidden="true" />

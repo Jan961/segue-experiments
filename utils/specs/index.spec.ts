@@ -1,3 +1,4 @@
+import { TreeItemOption } from 'components/global/TreeSelect/types';
 import {
   insertAtPos,
   removeAtPos,
@@ -15,6 +16,8 @@ import {
   formatDecimalValue,
   numberToOrdinal,
   mapObjectValues,
+  flattenHierarchicalOptions,
+  tidyString,
 } from 'utils';
 
 describe('Tests for utility functions', () => {
@@ -486,5 +489,177 @@ describe('mapObjectValues', () => {
     const result = mapObjectValues(obj, transformer);
 
     expect(result).toEqual({ a: 1, b: 2, specialKey: 13 });
+  });
+});
+
+describe('Tests for flattenHierarchicalOptions', () => {
+  const mockResults = [
+    {
+      id: '1',
+      value: 'A',
+      label: 'A',
+      checked: false,
+      options: [
+        {
+          id: '2',
+          value: 'A1',
+          label: 'A1',
+          checked: false,
+          options: [
+            {
+              id: '3',
+              value: 'A11',
+              label: 'A11',
+              checked: false,
+              options: [],
+            },
+          ],
+        },
+      ],
+    },
+    {
+      id: '2',
+      value: 'A1',
+      label: 'A1',
+      checked: false,
+      options: [
+        {
+          id: '3',
+          value: 'A11',
+          label: 'A11',
+          checked: false,
+          options: [],
+        },
+      ],
+    },
+    {
+      id: '3',
+      value: 'A11',
+      label: 'A11',
+      checked: false,
+      options: [],
+    },
+    {
+      id: '4',
+      value: 'B',
+      label: 'B',
+      checked: false,
+      options: [
+        {
+          id: '5',
+          value: 'B1',
+          label: 'B1',
+          checked: false,
+          options: [],
+        },
+        {
+          id: '6',
+          value: 'B2',
+          label: 'B2',
+          checked: false,
+          options: [],
+        },
+      ],
+    },
+    {
+      id: '5',
+      value: 'B1',
+      label: 'B1',
+      checked: false,
+      options: [],
+    },
+    {
+      id: '6',
+      value: 'B2',
+      label: 'B2',
+      checked: false,
+      options: [],
+    },
+  ];
+
+  const options: TreeItemOption[] = [
+    {
+      id: '1',
+      value: 'A',
+      label: 'A',
+      checked: false,
+      options: [
+        {
+          id: '2',
+          value: 'A1',
+          label: 'A1',
+          checked: false,
+          options: [
+            {
+              id: '3',
+              value: 'A11',
+              label: 'A11',
+              checked: false,
+              options: [],
+            },
+          ],
+        },
+      ],
+    },
+    {
+      id: '4',
+      value: 'B',
+      label: 'B',
+      checked: false,
+      options: [
+        {
+          id: '5',
+          value: 'B1',
+          label: 'B1',
+          checked: false,
+          options: [],
+        },
+        {
+          id: '6',
+          value: 'B2',
+          label: 'B2',
+          checked: false,
+          options: [],
+        },
+      ],
+    },
+  ];
+
+  it('tests for null, undefined and empty options', () => {
+    let flattened = flattenHierarchicalOptions(null);
+    expect(flattened).toEqual([]);
+
+    flattened = flattenHierarchicalOptions(undefined);
+    expect(flattened).toEqual([]);
+
+    flattened = flattenHierarchicalOptions([]);
+    expect(flattened).toEqual([]);
+  });
+
+  it('test for flattening hierarchical options', () => {
+    const flattened = flattenHierarchicalOptions(options);
+    expect(flattened).toEqual(mockResults);
+  });
+});
+
+describe('tidyString', () => {
+  it('should return an empty string if the value is null', () => {
+    expect(tidyString(null)).toBe('');
+  });
+
+  it('should return an empty string if the value is undefined', () => {
+    expect(tidyString(undefined)).toBe('');
+  });
+
+  it('should return the original string if the value is a non-null, non-undefined string', () => {
+    expect(tidyString('test')).toBe('test');
+  });
+
+  it('should return an empty string for an empty string input', () => {
+    expect(tidyString('')).toBe('');
+  });
+
+  it('should return the original string if the value contains spaces', () => {
+    expect(tidyString('   spaces   ')).toBe('   spaces   ');
   });
 });

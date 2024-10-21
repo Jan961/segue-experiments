@@ -1,17 +1,17 @@
 import { useSignUp, useSession } from '@clerk/nextjs';
-
 import axios from 'axios';
 import { useState } from 'react';
-import { isNullOrEmpty } from 'utils';
-import generator from 'generate-password';
+import { isNullOrEmpty, mapRecursive } from 'utils';
 import { useUrl } from 'nextjs-current-url';
 import { NEW_USER_CONFIRMATION_EMAIL_TEMPLATE } from 'config/global';
+import { Production } from 'components/admin/modals/config';
+import { TreeItemOption } from 'components/global/TreeSelect/types';
+import { generateUserPassword } from 'utils/authUtils';
 
 type UserDetails = {
   email: string;
   firstName: string;
   lastName: string;
-  pin: string;
   password?: string;
   permissions: string[];
   productions: string[];
@@ -48,13 +48,7 @@ const useUser = () => {
         return false;
       }
 
-      const password = generator.generate({
-        length: 8,
-        numbers: true,
-        symbols: true,
-        lowercase: true,
-        uppercase: true,
-      });
+      const password = generateUserPassword();
 
       // Create the user within clerk
       const { data } = await axios.post('/api/auth/create-clerk-user', {
@@ -101,6 +95,7 @@ const useUser = () => {
   const updateUser = async (userDetails: UserDetails): Promise<boolean> => {
     try {
       setError('');
+      setIsBusy(true);
       const { data } = await axios.post('/api/user/update', userDetails);
       if (data.error) {
         setError(data.error);
@@ -111,10 +106,32 @@ const useUser = () => {
       console.log(error);
       setError('Something went wrong, please try again');
       return false;
+    } finally {
+      setIsBusy(false);
     }
   };
 
-  return { isSignUpLoaded, isBusy, createUser, updateUser, error };
+  const fetchPermissionsForSelectedUser = async (
+    accountUserId: number,
+    productions: Production[],
+    permissions: TreeItemOption[],
+  ) => {
+    try {
+      setIsBusy(true);
+      setError('');
+      const { data } = await axios.get(`/api/admin/user-permissions/${accountUserId}`);
+      const prodPermissions = productions.map((p) => (data.productions.includes(p.id) ? { ...p, checked: true } : p));
+      const userPermissions = mapRecursive(permissions, (p) =>
+        data.permissions.includes(p.id) ? { ...p, checked: true } : p,
+      );
+      return { prodPermissions, userPermissions, isSingleAdminUser: data.isSingleAdminUser };
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsBusy(false);
+    }
+  };
+  return { isSignUpLoaded, isBusy, createUser, updateUser, fetchPermissionsForSelectedUser, error };
 };
 
 export default useUser;

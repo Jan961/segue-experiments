@@ -4,7 +4,7 @@ import { Button, ConfirmationDialog, Table } from 'components/core-ui-lib';
 import AddEditUser from 'components/admin/modals/AddEditUser';
 import AddEditPermissionGroup from 'components/admin/modals/AddEditPermissionGroup';
 import Layout from 'components/Layout';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { GetServerSideProps, InferGetServerSidePropsType, NextApiRequest } from 'next';
 import { getPermissionGroupsList, getPermissionsList } from 'services/permissionService';
 import { getAllProductions } from 'services/productionService';
@@ -12,6 +12,8 @@ import { useRouter } from 'next/router';
 import { mapRecursive } from 'utils';
 import { TreeItemOption } from 'components/global/TreeSelect/types';
 import { dateBlockMapper } from 'lib/mappers';
+import { getAccountIdFromReq, getUsersWithPermissions } from 'services/userService';
+import { getAccountPIN } from 'services/accountService';
 
 const getTableGridOptions = (uniqueKey: string, config = {}) => ({
   ...config,
@@ -29,44 +31,16 @@ export default function Users({
   permissionsList,
   productionsList,
   permisisonGroups,
+  users,
+  accountPIN,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const deleteType = useRef<'user' | 'group'>(null);
-  const [userRowData, setUserRowData] = useState([]);
   const [showUsersModal, setShowUsersModal] = useState(false);
   const [showPermissionGroupModal, setShowPermissionGroupModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [selectedGroup, setSelectedGroup] = useState(null);
   const [showConfirmationDialog, setShowConfirmationDialog] = useState(false);
   const router = useRouter();
-
-  const populateUserTable = async () => {
-    try {
-      const users = await axios.get('/api/admin/users/read');
-
-      if (Array.isArray(users.data)) {
-        setUserRowData(
-          users.data
-            .map((user) => {
-              const firstName = user.UserFirstName || '';
-              const lastName = user.UserLastName || '';
-
-              return {
-                accountUserId: user.AccUserId,
-                firstName,
-                lastName,
-                name: `${firstName} ${lastName}`,
-                email: user.UserEmail,
-                permissionDesc: user.AllPermissions,
-                licence: 'Standard',
-              };
-            })
-            .sort((a, b) => a.lastName.localeCompare(b.lastName)),
-        );
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
 
   const updatePermissions = (options: TreeItemOption[], values: TreeItemOption[]) => {
     const updatedOptions = mapRecursive(options, (o) => {
@@ -76,17 +50,11 @@ export default function Users({
     return updatedOptions;
   };
 
-  useEffect(() => {
-    if (userRowData.length === 0) {
-      populateUserTable();
-    }
-  }, [userRowData]);
-
   const handleUsersModalClose = (refresh = false) => {
     setSelectedUser(null);
     setShowUsersModal(false);
     if (refresh) {
-      populateUserTable();
+      router.replace(router.asPath);
     }
   };
 
@@ -216,7 +184,7 @@ export default function Users({
       <Table
         testId="admin-users-table"
         columnDefs={usersColDef(handleUserEdit)}
-        rowData={userRowData}
+        rowData={users}
         styleProps={styleProps}
         tableHeight={300}
         gridOptions={getTableGridOptions('email')}
@@ -255,6 +223,7 @@ export default function Users({
           productions={productionsList}
           selectedUser={selectedUser}
           groups={permisisonGroups}
+          accountPIN={accountPIN}
         />
       )}
       {showPermissionGroupModal && (
@@ -281,6 +250,9 @@ export default function Users({
 }
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const accountId = await getAccountIdFromReq(ctx.req);
+  const accountPIN = await getAccountPIN(accountId);
+  const users = await getUsersWithPermissions(accountId);
   const permisisonGroups = await getPermissionGroupsList(ctx.req);
   const permissionsList = await getPermissionsList();
   const productions = await getAllProductions(ctx.req as NextApiRequest);
@@ -306,7 +278,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       if (a.isArchived !== b.isArchived) {
         return a.isArchived ? 1 : -1;
       }
-      return new Date(a.startDate).valueOf() > new Date(b.startDate).valueOf();
+      return new Date(b.startDate).getTime() - new Date(a.startDate).getTime();
     });
 
   return {
@@ -314,6 +286,8 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       productionsList: formattedProductions || [],
       permissionsList: permissionsList || [],
       permisisonGroups: permisisonGroups || [],
+      users,
+      accountPIN,
     },
   };
 };

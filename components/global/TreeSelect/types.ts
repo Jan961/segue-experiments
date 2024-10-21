@@ -6,6 +6,7 @@ export type TreeItemOption = {
   options?: TreeItemOption[];
   groupHeader?: boolean;
   isPartiallySelected?: boolean;
+  disabled?: boolean;
 };
 
 export type TreeItemSelectedOption = TreeItemOption & {

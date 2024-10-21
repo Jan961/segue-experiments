@@ -66,6 +66,13 @@ describe('ConfirmationDialog Component', () => {
     expect(within(dialog).getByTestId('confirmation-dialog-warning')).toHaveTextContent('');
   });
 
+  test('renders component : variant==continue', async () => {
+    render(<ConfirmationDialog show={true} variant="continue" />);
+    const dialog = await screen.findByTestId('confirmation-dialog');
+    expect(within(dialog).getByText(confOptions.continue.question)).toBeInTheDocument();
+    expect(within(dialog).getByTestId('confirmation-dialog-warning')).toHaveTextContent('');
+  });
+
   test('renders component with custom content', async () => {
     render(
       <ConfirmationDialog
