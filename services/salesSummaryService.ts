@@ -13,9 +13,8 @@ import {
   WeekAggregateSeatsDetailCurrencyWise,
   WeekAggregates,
 } from 'types/SalesSummaryTypes';
-import { format, isBefore } from 'date-fns';
+import { format, formatDuration, intervalToDuration, isBefore } from 'date-fns';
 import { simpleToDate } from './dateService';
-import moment from 'moment';
 
 export enum COLOR_HEXCODE {
   PURPLE = 'ff7030a0',
@@ -453,7 +452,7 @@ export const makeTextBoldOfNRows = ({
 };
 
 export const getFileName = (worksheet): string =>
-  `${worksheet.getCell(1, 1).value} ${moment().format('DD MM YYYY hh:mm:ss')}.xlsx`;
+  `${worksheet.getCell(1, 1).value} ${format(new Date(), 'DD MM YYYY hh:mm:ss')}.xlsx`;
 
 export const getCurrencyWiseTotal = ({
   totalForWeeks,
@@ -645,7 +644,9 @@ export const topAndBottomBorder = ({
 };
 
 export const minutesInHHmmFormat = (min: number) => {
-  return moment.utc(moment.duration(min, 'minutes').asMilliseconds()).format('HH:mm');
+  const duration = intervalToDuration({ start: 0, end: min * 1000 * 60 });
+  return formatDuration(duration, { format: ['hours', 'minutes'] });
+  // return moment.utc(moment.duration(min, 'minutes').asMilliseconds()).format('HH:mm');
 };
 export const makeColumnTextBold = ({ worksheet, colAsChar }: { worksheet: any; colAsChar: string }) => {
   worksheet.getColumn(colAsChar).eachCell((cell) => {
