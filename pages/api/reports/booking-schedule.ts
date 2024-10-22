@@ -335,7 +335,7 @@ const handler = async (req, res) => {
           textColor: COLOR_HEXCODE.WHITE,
           cellColor: COLOR_HEXCODE.BLACK,
         });
-        if (isCancelled) {
+        if (isSuspended) {
           colorTextAndBGCell({
             worksheet,
             row: rowNo,
