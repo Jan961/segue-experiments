@@ -16,7 +16,6 @@ export default function Report({
 }) {
   const [productionSummary, setProductionSummary] = useState<any[]>([]);
   const [loading, setIsLoading] = useState<boolean>(false);
-  const [error] = useState<string>('Oops! Something went wrong. Please try again after some time');
   const fetchProductionSummary = useCallback((productionCode) => {
     setIsLoading(true);
     axios
@@ -73,9 +72,9 @@ export default function Report({
           {productionSummary.length ? (
             <>
               {productionSummary.map((item, index) => (
-                <div key={index} className={`w-full ${item.bold ? 'font-bold' : 'font-normal'}`}>
+                <>
                   {item.length > 0 && (
-                    <div className="w-full mb-2 overflow-x-hidden">
+                    <div key={index} className={`w-full ${item.bold ? 'font-bold' : 'font-normal'}`}>
                       <Table
                         testId="tour-report"
                         key={index}
@@ -87,11 +86,11 @@ export default function Report({
                       />
                     </div>
                   )}
-                </div>
+                </>
               ))}
             </>
           ) : (
-            <div className="text-primary-orange w-100 h-[100px] text-center">{error}</div>
+            <div className="text-primary-orange w-100 h-[100px] text-center">No records to show</div>
           )}
         </div>
       </PopupModal>

@@ -20,7 +20,7 @@ export interface ButtonProps {
 }
 
 const baseClass =
-  'h-[1.9375rem] min-w-fit px-2 py-1 rounded-md text-center flex justify-center items-center !shadow-sm-shadow font-bold text-sm tracking-[-0.00263re] transition-all hover:scale-105';
+  'h-[1.9375rem] min-w-fit px-2 py-1 rounded-md text-center flex justify-center items-center !shadow-sm-shadow font-bold text-sm tracking-[-0.00263re] transition-all';
 const primaryClass = 'bg-primary-navy text-primary-white hover:bg-primary-button-hover active:bg-primary-button-active';
 const secondaryClass =
   'bg-primary-white border border-primary-button-active text-primary-button-active hover:bg-secondary-button-hover active:bg-secondary-button-active';

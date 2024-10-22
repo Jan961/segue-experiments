@@ -90,8 +90,8 @@ const CompanyContractFilters = () => {
           />
         </div>
       </div>
-      <div className="flex justify-between gap-2">
-        <div className="px-4 flex items-center gap-4 flex-wrap  mt-2">
+      <div className="flex justify-between items-center gap-2 mt-2 ">
+        <div className="px-4 flex items-center gap-4 flex-wrap  ">
           <Label className="!text-base text-primary-input-text !font-bold" text="Contract Status" />
           <Select
             onChange={(value) => onChange({ target: { id: 'status', value } })}
