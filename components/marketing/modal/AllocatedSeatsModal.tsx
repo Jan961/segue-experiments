@@ -75,7 +75,7 @@ export default function AllocatedSeatsModal({
   const [confVariant, setConfVariant] = useState<ConfDialogVariant>('cancel');
   const [allocId, setAllocId] = useState<number>(null);
 
-  const labelClass = 'text-md text-primary-input-text flex-col text-left w-1/2 whitespace-pre-wrap: 1';
+  const labelClass = 'text-md text-primary-input-text flex-col text-left w-1/2 whitespace-pre-wrap: 0';
 
   const [errors, setErrors] = useState({
     performance: false,
@@ -379,7 +379,7 @@ export default function AllocatedSeatsModal({
 
           <div className="flex flex-row">
             <Label text="Number of Seats Required" required className={labelClass} />
-            <div className={classNames('flex flex-col w-2/3 mb-2')}>
+            <div className={classNames('flex flex-col w-2/3')}>
               <TextInput
                 className={classNames('w-full', errors.numberOfSeats ? '' : 'mb-4')}
                 testId="no-of-seats"
@@ -459,10 +459,10 @@ export default function AllocatedSeatsModal({
           </div>
 
           <div className="flex flex-row">
-            <Label text={'Venue' + '\n' + 'Confirmation' + '\n' + 'notes'} className={labelClass} />
-            <div className="flex flex-col">
+            <Label text={'Venue \n Confirmation \n Notes'} className={labelClass} />
+            <div className="flex flex-col w-2/3">
               <TextArea
-                className="w-[300px] h-[80px] mb-4"
+                className="w-full h-[80px] mb-4"
                 testId="venue-confirmation-notes"
                 value={form.venueConfNotes}
                 placeholder="Notes Field"
