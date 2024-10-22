@@ -255,6 +255,7 @@ const handler = async (req, res) => {
         'Declared Holiday',
       ].includes(value?.EntryName);
       const isCancelled = value?.EntryStatusCode === 'X';
+      const isSuspended = value?.EntryStatusCode === 'S';
       if (!value) {
         const weekNumber = calculateWeekNumber(getDateObject(ProductionStartDate), dateInIncomingFormat);
         worksheet.addRow([weekDay.substring(0, 3), formatDate(dateInIncomingFormat, 'dd/MM/yy'), `${weekNumber}`]);
@@ -279,12 +280,12 @@ const handler = async (req, res) => {
         } = value || {};
         const { Location: nextDayLocation } = nextDayValue || {};
         const formattedTime = TimeMins ? convertMinutesToHoursMins(Number(TimeMins)) : '';
-        if (nextDayLocation !== Location && !isCancelled) {
+        if (nextDayLocation !== Location && (!isCancelled || !isSuspended)) {
           time.push(Number(TimeMins));
           mileage.push(Number(Mileage) || 0);
         }
         prevProductionWeekNum = ProductionWeekNum ? String(ProductionWeekNum) : prevProductionWeekNum;
-        const dayType = isOtherDay ? EntryType : !isCancelled ? 'Performance' : '';
+        const dayType = isOtherDay ? EntryType : !isCancelled || !isSuspended ? 'Performance' : '';
         let row: (string | number)[] = [
           weekDay.substring(0, 3),
           formatDate(dateInIncomingFormat, 'dd/MM/yy'),
@@ -299,7 +300,7 @@ const handler = async (req, res) => {
           .fill(0)
           .map((_, i) => bookingIdPerformanceMap?.[performanceKey]?.[i]?.performanceTime ?? '');
         row = [...row, ...performanceTimes];
-        if (nextDayLocation !== Location && !isCancelled) {
+        if (nextDayLocation !== Location && (!isCancelled || !isSuspended)) {
           row.push(formattedTime);
           row.push(Number(Mileage));
         }
@@ -334,6 +335,15 @@ const handler = async (req, res) => {
           textColor: COLOR_HEXCODE.WHITE,
           cellColor: COLOR_HEXCODE.BLACK,
         });
+        if (isCancelled) {
+          colorTextAndBGCell({
+            worksheet,
+            row: rowNo,
+            col: 4,
+            textColor: COLOR_HEXCODE.WHITE,
+            cellColor: COLOR_HEXCODE.PURPLE,
+          });
+        }
       }
       if (weekDay === 'Sunday') {
         worksheet.addRow([
