@@ -313,14 +313,6 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
             labelClass: leve2,
             testId: 'sidepanel-system-admin-users',
           },
-          { label: 'Payment Details', value: '', labelClass: leve2, testId: 'sidepanel-system-admin-payment-details' },
-
-          {
-            label: 'Account Preferences',
-            value: '',
-            labelClass: leve2,
-            testId: 'sidepanel-system-admin-account-preferences',
-          },
         ],
       },
     ],
