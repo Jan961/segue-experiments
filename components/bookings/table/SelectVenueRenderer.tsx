@@ -31,7 +31,9 @@ export default function SelectVenueRenderer({
 
   useEffect(() => {
     if (data) {
-      setIsDisabled(node.rowIndex > 0);
+      if (data.isRunOfDates) {
+        setIsDisabled(node.rowIndex > 0);
+      }
       setValue(venueAsDayType && !data.isRunOfDates ? null : value);
     }
   }, [data, node, setIsDisabled]);
@@ -39,7 +41,7 @@ export default function SelectVenueRenderer({
   return (
     <div className="pl-1 pr-2 mt-1">
       {venueAsDayType && !data.isRunOfDates ? (
-        <div className="mt-1 p-2 border border-primary-border rounded-md w-full h-[1.9375rem] bg-primary-white flex items-center">
+        <div className="mt-1 p-2 border border-primary-border rounded-md w-full h-[1.9375rem]  flex justify-center items-center">
           <span className="text-primary-input-text text-base font-bold leading-6 truncate">{venueAsDayType}</span>
         </div>
       ) : (
