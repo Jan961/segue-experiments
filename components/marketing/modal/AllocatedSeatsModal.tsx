@@ -39,7 +39,7 @@ interface FormInterface {
   custName: string;
   email: string;
   numSeatsReq: number;
-  seatNumList: number;
+  seatNumList: string;
   requestBy: string;
   comments: string;
   arrangedBy: number;
@@ -65,7 +65,7 @@ export default function AllocatedSeatsModal({
     custName: '',
     email: '',
     numSeatsReq: null,
-    seatNumList: 0,
+    seatNumList: '',
     requestBy: '',
     comments: '',
     arrangedBy: null,
@@ -211,7 +211,7 @@ export default function AllocatedSeatsModal({
       custName: '',
       email: '',
       numSeatsReq: null,
-      seatNumList: 0,
+      seatNumList: '',
       requestBy: '',
       comments: '',
       arrangedBy: null,
@@ -328,7 +328,7 @@ export default function AllocatedSeatsModal({
     <div>
       <PopupModal show={visible} onClose={() => handleClose('close')} showCloseIcon={true} hasOverlay={showConfirm}>
         <div className="h-[552px] w-[448px]">
-          <div className="text-xl text-primary-navy font-bold mb-4 -mt-3">Allocated Seats</div>
+          <div className="text-xl text-primary-navy font-bold mb-4 mt-3">Allocated Seats</div>
           <div className="flex flex-row">
             <Label text="Performance" required className={labelClass} />
             <div className="flex flex-col w-2/3 mb-2">
