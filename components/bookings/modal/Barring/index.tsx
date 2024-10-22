@@ -14,8 +14,8 @@ import { useRecoilValue } from 'recoil';
 import { venueState } from 'state/booking/venueState';
 import { dateToSimple } from 'services/dateService';
 import { exportToExcel } from 'utils/export';
-import { VenueMinimalDTO } from 'interfaces';
-import { productionState, ProductionsWithTasks } from 'state/tasks/productionState';
+import { ProductionDTO, VenueMinimalDTO } from 'interfaces';
+import { productionJumpState } from 'state/booking/productionJumpState';
 
 type BarringProps = {
   visible: boolean;
@@ -47,9 +47,9 @@ export default function Barring({ visible, onClose }: BarringProps) {
   const [selectedVenueIds, setSelectedVenueIds] = useState([]);
   const [selectedVenueName, setSelectedVenueName] = useState<string>('');
   const [venueInfo, setVenuInfo] = useState<VenueMinimalDTO>();
-  const [productionInfo, setProductionInfo] = useState<ProductionsWithTasks>();
+  const [productionInfo, setProductionInfo] = useState<Partial<ProductionDTO>>();
   const venueDict = useRecoilValue(venueState);
-  const productionDict = useRecoilValue(productionState);
+  const productionDict = useRecoilValue(productionJumpState);
   const tableRef = useRef(null);
   const filteredRows = useMemo(() => {
     const filteredRows = [];
@@ -90,17 +90,17 @@ export default function Barring({ visible, onClose }: BarringProps) {
       });
   };
   const exportTableData = () => {
-    // Barring Check-Production code-Venue Code-Venue Name-Town
-    const fileName = `Barring Check ${productionInfo.Code} ${venueInfo.Code} ${venueInfo.Name} ${venueInfo.Town}`;
+    const fileName = `Barring Check ${productionInfo?.ShowCode} ${venueInfo.Code} ${venueInfo.Name} ${venueInfo.Town}`;
     exportToExcel(tableRef, { fileName });
-    // tableRef.current?.getApi?.()?.exportDataAsExcel?.();
   };
 
   const onSubmit = (formData) => {
     fetchBarredVenues(formData);
-    const { productionId, venueId } = formData;
+    const { venueId } = formData;
     setVenuInfo(venueDict?.[venueId]);
-    setProductionInfo(productionDict?.[productionId]);
+    console.log(productionDict.selected);
+    const production = productionDict.productions.find((prod) => prod.Id === productionDict.selected);
+    setProductionInfo(production);
   };
 
   const onRowSelected = (e: any) => {
