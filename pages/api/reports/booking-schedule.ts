@@ -335,15 +335,15 @@ const handler = async (req, res) => {
           textColor: COLOR_HEXCODE.WHITE,
           cellColor: COLOR_HEXCODE.BLACK,
         });
-        if (isSuspended) {
-          colorTextAndBGCell({
-            worksheet,
-            row: rowNo,
-            col: 4,
-            textColor: COLOR_HEXCODE.WHITE,
-            cellColor: COLOR_HEXCODE.PURPLE,
-          });
-        }
+      }
+      if (isSuspended) {
+        colorTextAndBGCell({
+          worksheet,
+          row: rowNo,
+          col: 4,
+          textColor: COLOR_HEXCODE.WHITE,
+          cellColor: COLOR_HEXCODE.PURPLE,
+        });
       }
       if (weekDay === 'Sunday') {
         worksheet.addRow([
