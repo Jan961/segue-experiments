@@ -104,6 +104,8 @@ export default function NewBookingDetailsView({
     tableRef.current.getApi().redrawRows();
   };
 
+  // test
+
   useEffect(() => {
     if (isNewBooking) {
       let dayTypeOption = null;
