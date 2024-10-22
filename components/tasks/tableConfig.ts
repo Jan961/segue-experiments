@@ -14,7 +14,9 @@ import { isNullOrEmpty } from 'utils';
 export const styleProps = { headerColor: tileColors.tasks };
 
 export const getColumnDefs = (usersList = [], production) => {
-  const weekOptions = getWeekOptions(production, false, false);
+  const weekOptions = getWeekOptions(production, false, false).sort(
+    (a, b) => parseInt(b.value.toString()) - parseInt(a.value.toString()),
+  );
   return [
     {
       headerName: 'Code',

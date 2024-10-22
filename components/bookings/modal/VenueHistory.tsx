@@ -238,16 +238,16 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
       <PopupModal
         show={showVenueSelectModal}
         title="Venue History"
-        titleClass="text-xl text-primary-navy font-bold -mt-2"
+        titleClass="text-xl text-primary-navy font-bold"
         onClose={handleModalCancel}
       >
-        <div className="w-[417px]">
+        <div className="w-[417px] p-2">
           {venueSelectView === 'select' ? (
-            <div>
-              <div className="text text-primary-navy">Please select a venue for comparison</div>
+            <div className="flex flex-col">
+              <div className="text text-primary-navy mb-4">Please select a venue for comparison</div>
 
               <Select
-                className={classNames('my-2 w-full !border-0 text-primary-navy')}
+                className={classNames('w-full !border-0 text-primary-navy')}
                 options={venueOptions}
                 isClearable
                 isSearchable
@@ -258,9 +258,9 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
                 testId="venue-filter"
               />
 
-              <div className="float-right flex flex-row">
-                {loading && <Spinner size="sm" className="mt-2 mr-3 -mb-1" />}
-                <Button className="px-8 mt-2 -mb-1" onClick={handleModalCancel} variant="secondary" text="Cancel" />
+              <div className="flex justify-end w-full mt-2">
+                {loading && <Spinner size="sm" className="mt-2 mr-3" />}
+                <Button className="px-8 mt-2" onClick={handleModalCancel} variant="secondary" text="Cancel" />
               </div>
             </div>
           ) : (
