@@ -702,7 +702,7 @@ model DealMemo {
   RestorationLevy                                            Decimal?                      @map("DeMoRestorationLevy") @db.Decimal(10, 2)
   BookingFees                                                Decimal?                      @map("DeMoBookingFees") @db.Decimal(10, 2)
   CCCommissionPercent                                        Decimal?                      @map("DeMoCCCommissionPercent") @db.Decimal(5, 2)
-  TxnChargeOption                                            String?                       @map("DeMoTxnChargeOption") @db.Char(3)
+  TxnChargeOption                                            String?                       @map("DeMoTxnChargeOption") @db.VarChar(15)
   TxnChargeAmount                                            Decimal?                      @map("DeMoTxnChargeAmount") @db.Decimal(10, 2)
   AgreedDiscounts                                            String?                       @map("DeMoAgreedDiscounts") @db.VarChar(80)
   MaxTAAlloc                                                 String?                       @map("DeMoMaxTAAlloc") @db.VarChar(80)
