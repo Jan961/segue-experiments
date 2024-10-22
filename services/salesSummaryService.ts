@@ -1,5 +1,4 @@
 import Decimal from 'decimal.js';
-import moment from 'moment';
 import * as ExcelJS from 'exceljs';
 import {
   BOOK_STATUS_CODES,
@@ -14,6 +13,9 @@ import {
   WeekAggregateSeatsDetailCurrencyWise,
   WeekAggregates,
 } from 'types/SalesSummaryTypes';
+import { format, isBefore } from 'date-fns';
+import { simpleToDate } from './dateService';
+import moment from 'moment';
 
 export enum COLOR_HEXCODE {
   PURPLE = 'ff7030a0',
@@ -57,7 +59,7 @@ export const getMapKeyForValue = (
 ): string => `${Week} | ${Town} | ${Venue} | ${setProductionWeekNumVar} | ${setProductionWeekDateVar}`;
 
 export const convertDateFormat = (date: Date) => {
-  const parsedDate = moment(date, 'DD-MM-YYYY').format('DD/MM/YY');
+  const parsedDate = format(date, 'dd/MM/yy');
   return parsedDate;
 };
 
@@ -116,11 +118,13 @@ export const assignBackgroundColor = ({
     colorCell({ worksheet, row, col, argbColor: COLOR_HEXCODE.YELLOW });
   }
 
-  if (moment(Date).valueOf() < moment(SetProductionWeekDate).valueOf()) {
+  // if (moment(Date).valueOf() < (SetProductionWeekDate).valueOf()) {
+  if (isBefore(simpleToDate(Date), simpleToDate(SetProductionWeekDate))) {
     colorCell({ worksheet, row, col, argbColor: COLOR_HEXCODE.BLUE });
   }
 
-  if (NotOnSalesDate && moment(SetProductionWeekDate).valueOf() < moment(NotOnSalesDate).valueOf()) {
+  // if (NotOnSalesDate && moment(SetProductionWeekDate).valueOf() < moment(NotOnSalesDate).valueOf()) {
+  if (NotOnSalesDate && isBefore(simpleToDate(SetProductionWeekDate), simpleToDate(NotOnSalesDate))) {
     colorCell({ worksheet, row, col, argbColor: COLOR_HEXCODE.RED });
   }
   if (BookingStatusCode === BOOK_STATUS_CODES.X) {
