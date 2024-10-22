@@ -9,8 +9,8 @@ input[type='text']:focus {
 
 /* Autofill styling */
 .autofill-white-bg:-webkit-autofill {
-  background-color: #FFF !important;
-  box-shadow: 0 0 0 1000px #FFF inset !important;
+  background-color: #fff !important;
+  box-shadow: 0 0 0 1000px #fff inset !important;
   -webkit-text-fill-color: #000 !important;
 }
 
@@ -99,8 +99,8 @@ input[type='text']:focus {
   display: none;
 }
 
-input[type="number"]::-webkit-inner-spin-button,
-input[type="number"]::-webkit-outer-spin-button {
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }

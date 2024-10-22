@@ -1,7 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import getPrismaClient from 'lib/prisma';
 import ExcelJS from 'exceljs';
-import { convertToPDF } from 'utils/report';
 import {
   createUserMap,
   fetchAccountUsers,
@@ -13,10 +12,11 @@ import {
 import { getWeekNumsToDateMap } from 'utils/getDateFromWeekNum';
 import { group } from 'radash';
 import { makeRowTextBoldAndAllignLeft } from './promoter-holds';
-import { calculateWeekNumber, formattedDateWithDay } from 'services/dateService';
+import { calculateWeekNumber, formatDate, formattedDateWithDay } from 'services/dateService';
 import { COLOR_HEXCODE, colorTextAndBGCell } from 'services/salesSummaryService';
 import { addWidthAsPerContent, applyGradientFillToColumn } from 'services/reportsService';
 import { addBorderToAllCells } from 'utils/export';
+import { exportWorkbook } from 'utils/report';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
@@ -35,16 +35,14 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       pageSetup: { fitToPage: true, fitToHeight: 5, fitToWidth: 7 },
       views: [{ state: 'frozen', xSplit: 0, ySplit: 5 }],
     });
+
+    const title = `Production Tasks ${formatDate(new Date(), 'dd.MM.yy')}`;
     if (!taskList?.length) {
-      const filename = `Tasks.xlsx`;
-      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-      res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
-      await workbook.xlsx.write(res).then(() => {
-        res.end();
-      });
+      await exportWorkbook(res, workbook, title, format);
       return;
     }
-    worksheet.addRow([`PRODUCTION TASK LIST`]);
+
+    worksheet.addRow([title]);
     worksheet.addRow([`Exported: ${getExportedDate()} - Layout: Standard`]);
     worksheet.addRow(['', '', '', '', '', '', '', '', '', '', '']);
     worksheet.addRow([
@@ -60,6 +58,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       'PRIORITY',
       'NOTES',
     ]);
+
     let rows = 4;
     let startingRow = 8;
     const compareProductions = (a, b): number => {
@@ -68,8 +67,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         '';
       return getStartDate(b) < getStartDate(a) ? 1 : -1;
     };
+
     const ProductionTasks = Object.values(ProductionTaskMap).sort(compareProductions);
     const productionRowList = [];
+
     for (let taskList of ProductionTasks) {
       const progressData = [];
       const task = taskList?.[0];
@@ -82,12 +83,13 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           taskList.flatMap((ProductionTask) => [ProductionTask.CompleteByWeekNum, ProductionTask.StartByWeekNum]),
         ),
       ].filter((x) => x);
-      console.log(weekNumsList);
+
       const weekNumToDateMap = getWeekNumsToDateMap(
         StartDate.toISOString?.(),
         EndDate?.toISOString?.(),
         Array.from(new Set(weekNumsList)),
       );
+
       taskList = taskList.filter((task) => {
         const taskDueDate = weekNumToDateMap?.[task.CompleteByWeekNum] || '';
         return !(
@@ -96,12 +98,14 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         );
       });
       if (!taskList.length) continue;
+
       worksheet.addRow([]);
       worksheet.addRow([ShowName]);
       worksheet.addRow([]);
       rows += 3;
       productionRowList.push(rows - 1);
       const currentWeekNum = calculateWeekNumber(StartDate, new Date());
+
       taskList
         .sort((a, b) => a.StartByWeekNum - b.StartByWeekNum)
         .map(
@@ -138,15 +142,19 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       applyGradientFillToColumn({ worksheet, columnIndex: 6, progressData, startingRow });
       startingRow = startingRow + 3 + taskList.length;
     }
+
     worksheet.getRow(1).font = { bold: true, size: 16 };
     worksheet.getRow(1).alignment = { horizontal: 'left' };
     const numberOfColumns = worksheet.columnCount;
+
     for (let row = 1; row <= 4; row++) {
       makeRowTextBoldAndAllignLeft({ worksheet, row, numberOfColumns, bgColor: COLOR_HEXCODE.TASK_YELLOW });
     }
+
     productionRowList.forEach((row) => {
       makeRowTextBoldAndAllignLeft({ worksheet, row, numberOfColumns, bgColor: COLOR_HEXCODE.TASK_YELLOW });
     });
+
     addWidthAsPerContent({
       worksheet,
       fromColNumber: 1,
@@ -157,6 +165,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       rowsToIgnore: 4,
       maxColWidth: Infinity,
     });
+
     worksheet.getColumn('A').width = 12;
     worksheet.getColumn('C').width = 14;
     worksheet.getColumn('D').width = 10;
@@ -168,21 +177,11 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       worksheet.getColumn('K').width = 35;
     }
     worksheet.getColumn('G').alignment = { horizontal: 'center' };
+
     addBorderToAllCells({ worksheet });
     worksheet.getCell(1, 1).font = { size: 16, bold: true, color: { argb: COLOR_HEXCODE.WHITE } };
-    const filename = `Production Tasks.xlsx`;
-    if (format === 'pdf') {
-      const pdf = await convertToPDF(workbook);
-      res.setHeader('Content-Type', 'application/pdf');
-      res.setHeader('Content-Disposition', `attachment; filename="${filename}.pdf"`);
-      res.end(pdf);
-    } else {
-      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-      res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
-      workbook.xlsx.write(res).then(() => {
-        res.end();
-      });
-    }
+
+    await exportWorkbook(res, workbook, title, format);
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: 'Something went wrong', error });

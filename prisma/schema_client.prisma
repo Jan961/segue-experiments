@@ -223,19 +223,6 @@ model VenueRole {
   VenueContact VenueContact[]
 }
 
-model VenueVenue {
-  Venue1Id Int     @map("VVVenue1Id")
-  Venue2Id Int     @map("VVVenue2Id")
-  Mileage  Decimal @map("VVMileage") @db.Decimal(5, 1)
-  TimeMins Int?    @map("VVTimeMins")
-  Venue1   Venue   @relation("VenueVenue_VVVenue1IdToVenue", fields: [Venue1Id], references: [Id], onDelete: Cascade, map: "Venue_VenueVenue1")
-  Venue2   Venue   @relation("VenueVenue_VVVenue2IdToVenue", fields: [Venue2Id], references: [Id], onDelete: Cascade, map: "Venue_VenueVenue2")
-
-  @@id([Venue1Id, Venue2Id])
-  @@index([Venue1Id], map: "Venue_VenueVenue1_idx")
-  @@index([Venue2Id], map: "Venue_VenueVenue2_idx")
-}
-
 model DateBlock {
   Id           Int          @id @default(autoincrement()) @map("DateBlockId")
   ProductionId Int          @map("DateBlockProductionId")
@@ -697,7 +684,7 @@ model DealMemo {
   PRSPercentage                                              Decimal?                      @map("DeMoPRSPercentage") @db.Decimal(5, 2)
   Guarantee                                                  Boolean                       @default(dbgenerated("(b'0')")) @map("DeMoGuarantee") @db.Bit(1)
   GuaranteeAmount                                            Decimal?                      @map("DeMoGuaranteeAmount") @db.Decimal(10, 2)
-  HasCalls                                                   Boolean                       @default(false) @map("DeMoHasCalls")
+  HasCalls                                                   Boolean                       @default(dbgenerated("(b'0')")) @map("DeMoHasCalls") @db.Bit(1)
   PromoterSplitPercentage                                    Decimal?                      @map("DeMoPromoterSplitPercentage") @db.Decimal(5, 2)
   VenueSplitPercentage                                       Decimal?                      @map("DeMoVenueSplitPercentage") @db.Decimal(5, 2)
   VenueRental                                                Decimal?                      @map("DeMoVenueRental") @db.Decimal(10, 2)
@@ -715,7 +702,7 @@ model DealMemo {
   RestorationLevy                                            Decimal?                      @map("DeMoRestorationLevy") @db.Decimal(10, 2)
   BookingFees                                                Decimal?                      @map("DeMoBookingFees") @db.Decimal(10, 2)
   CCCommissionPercent                                        Decimal?                      @map("DeMoCCCommissionPercent") @db.Decimal(5, 2)
-  TxnChargeOption                                            String?                       @map("DeMoTxnChargeOption") @db.Char(3)
+  TxnChargeOption                                            String?                       @map("DeMoTxnChargeOption") @db.VarChar(15)
   TxnChargeAmount                                            Decimal?                      @map("DeMoTxnChargeAmount") @db.Decimal(10, 2)
   AgreedDiscounts                                            String?                       @map("DeMoAgreedDiscounts") @db.VarChar(80)
   MaxTAAlloc                                                 String?                       @map("DeMoMaxTAAlloc") @db.VarChar(80)
@@ -734,7 +721,7 @@ model DealMemo {
   SellWho                                                    String?                       @map("DeMoSellWho") @db.VarChar(10)
   SellProgrammes                                             Boolean                       @default(dbgenerated("(b'0')")) @map("DeMoSellProgrammes") @db.Bit(1)
   SellMerch                                                  Boolean                       @default(dbgenerated("(b'0')")) @map("DeMoSellMerch") @db.Bit(1)
-  DeMoMerchNotes                                             String?                       @db.LongText
+  MerchNotes                                                 String?                       @map("DeMoMerchNotes") @db.LongText
   SellProgCommPercent                                        Decimal?                      @map("DeMoSellProgCommPercent") @db.Decimal(5, 2)
   SellMerchCommPercent                                       Decimal?                      @map("DeMoSellMerchCommPercent") @db.Decimal(5, 2)
   SellPitchFee                                               Decimal?                      @map("DeMoSellPitchFee") @db.Decimal(10, 2)
@@ -753,11 +740,11 @@ model DealMemo {
   AdvancePaymentDueBy                                        DateTime?                     @map("DeMoAdvancePaymentDueBy") @db.Date
   SettlementDays                                             Int?                          @map("DeMoSettlementDays") @db.TinyInt
   ContractClause                                             String?                       @map("DeMoContractClause") @db.LongText
-  DeMoPrintDelVenueAddressLine                               String?                       @db.LongText
+  PrintDelVenueAddressLine                                   String?                       @map("DeMoPrintDelVenueAddressLine") @db.LongText
   PrintDelUseVenueAddress                                    Boolean                       @default(dbgenerated("(b'0')")) @map("DeMoPrintDelUseVenueAddress") @db.Bit(1)
   CompAccContId                                              Int?                          @map("DeMoCompAccContId")
-  DeMoSeatKillNotes                                          String?                       @db.LongText
-  DeMoSettlementSameDay                                      Boolean                       @default(false)
+  SeatKillNotes                                              String?                       @map("DeMoSeatKillNotes") @db.LongText
+  SettlementSameDay                                          Boolean                       @default(dbgenerated("(b'0')")) @map("DeMoSettlementSameDay") @db.Bit(1)
   Booking                                                    Booking                       @relation(fields: [BookingId], references: [Id], onDelete: Cascade, map: "BookingDealMemo")
   VenueContact_DealMemo_DeMoBOMVenueContactIdToVenueContact  VenueContact?                 @relation("DealMemo_DeMoBOMVenueContactIdToVenueContact", fields: [BOMVenueContactId], references: [Id], onDelete: Cascade, map: "VenueContactDealMemoBOM")
   VenueContact_DealMemo_DeMoTechVenueContactIdToVenueContact VenueContact?                 @relation("DealMemo_DeMoTechVenueContactIdToVenueContact", fields: [TechVenueContactId], references: [Id], onDelete: Cascade, map: "VenueContactDealMemoTech")
@@ -1217,6 +1204,19 @@ model BookingFile {
   Booking                Booking @relation(fields: [BookingFileBookingId], references: [Id], onDelete: Cascade, map: "Booking_BookingFile")
 
   @@index([BookingFileBookingId], map: "Booking_BookingFile")
+}
+
+model VenueVenue {
+  Venue1Id Int     @map("VVVenue1Id")
+  Venue2Id Int     @map("VVVenue2Id")
+  Mileage  Decimal @map("VVMileage") @db.Decimal(5, 1)
+  TimeMins Int?    @map("VVTimeMins")
+  Venue1   Venue   @relation("VenueVenue_VVVenue1IdToVenue", fields: [Venue1Id], references: [Id], onDelete: Cascade, map: "Venue_VenueVenue1")
+  Venue2   Venue   @relation("VenueVenue_VVVenue2IdToVenue", fields: [Venue2Id], references: [Id], onDelete: Cascade, map: "Venue_VenueVenue2")
+
+  @@id([Venue1Id, Venue2Id])
+  @@index([Venue1Id], map: "Venue_VenueVenue1_idx")
+  @@index([Venue2Id], map: "Venue_VenueVenue2_idx")
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.

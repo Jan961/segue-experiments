@@ -42,23 +42,23 @@ export const saleFrequency = [
 ];
 
 export const saleFrequencyDay = [
+  { text: 'Sunday', value: 0 },
   { text: 'Monday', value: 1 },
   { text: 'Tuesday', value: 2 },
   { text: 'Wednesday', value: 3 },
   { text: 'Thursday', value: 4 },
   { text: 'Friday', value: 5 },
   { text: 'Saturday', value: 6 },
-  { text: 'Sunday', value: 7 },
 ];
 
 export const transactionOptions = [
-  { text: 'Per Ticket', value: '1' },
-  { text: 'Per Transaction', value: '2' },
+  { text: 'Per Ticket', value: 'Per Ticket' },
+  { text: 'Per Transaction', value: 'Per Transaction' },
 ];
 
 export const sellerOptions = [
-  { text: 'PRODUCTION', value: '1' },
-  { text: 'VENUE', value: '2' },
+  { text: 'PRODUCTION', value: 'Production' },
+  { text: 'VENUE', value: 'Venue' },
 ];
 
 export const contractsStatusMap = {
@@ -132,7 +132,6 @@ export const initialEditContractFormData = {
 export const initialEditDemoFormData = {
   Id: null,
   BookingId: null,
-  AgreementDate: null,
   AccContId: null,
   RunningTime: null,
   RunningTimeNotes: '',
@@ -181,14 +180,14 @@ export const initialEditDemoFormData = {
   SellWho: '',
   SellProgrammes: null,
   SellMerch: null,
-  SellNotes: '',
+  MerchNotes: '',
   SellProgCommPercent: null,
   SellMerchCommPercent: null,
   SellPitchFee: null,
   TechVenueContactId: null,
   TechArrivalDate: null,
   TechArrivalTime: null,
-  NumDressingRooms: null,
+  DressingRooms: '',
   NumFacilitiesLaundry: null,
   NumFacilitiesDrier: null,
   NumFacilitiesLaundryRoom: null,
@@ -200,6 +199,8 @@ export const initialEditDemoFormData = {
   AdvancePaymentDueBy: null,
   SettlementDays: null,
   ContractClause: '',
+  SettlementSameDay: null,
+  SeatKillNotes: '',
 };
 
 export const salaryPaidToOptions = [
@@ -345,6 +346,14 @@ export const statusToBgColorMap = {
   },
   [CompanyContractStatus.Overdue]: {
     backgroundColor: '#ED1111',
+    color: 'white',
+  },
+  [CompanyContractStatus.Voided]: {
+    backgroundColor: '#000000',
+    color: 'white',
+  },
+  [CompanyContractStatus.Cancelled]: {
+    backgroundColor: '#000000',
     color: 'white',
   },
 };

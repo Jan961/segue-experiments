@@ -89,7 +89,7 @@ export default function ConfirmationDialog({
 
   return (
     <PopupModal data-testid={testId} show={visible} showCloseIcon={false} hasOverlay={hasOverlay}>
-      <div data-testid="confirmation-dialog" className="-mt-5">
+      <div data-testid="confirmation-dialog" className="p-2 flex flex-col gap-4">
         <div className="text-center">
           <div data-testid="confirmation-dialog-question" className="text text-primary-navy font-bold text-xl">
             {content ? content.question : confOptions[variant].question}
@@ -98,7 +98,7 @@ export default function ConfirmationDialog({
             {content ? content.warning : confOptions[variant].warning}
           </div>
         </div>
-        <div className="w-full mt-4 flex justify-center items-center">
+        <div className="w-full flex justify-center items-center">
           {labelNo && (
             <Button
               testId="confirmation-dialog-no-btn"

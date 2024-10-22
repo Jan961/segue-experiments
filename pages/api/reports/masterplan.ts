@@ -1,10 +1,10 @@
 import ExcelJS from 'exceljs';
 import getPrismaClient from 'lib/prisma';
-import moment from 'moment';
 import Decimal from 'decimal.js';
 import { COLOR_HEXCODE, colorCell, colorTextAndBGCell, fillRowBGColorAndTextColor } from 'services/salesSummaryService';
 import { formatDateWithTimezoneOffset } from 'services/dateService';
 import { convertToPDF } from 'utils/report';
+import { format, add, differenceInDays } from 'date-fns';
 
 type SCHEDULE_VIEW = {
   ProductionId: number;
@@ -89,22 +89,22 @@ type ReqBody = {
   fromDate: string;
   toDate: string;
   timezoneOffset: number;
-  format?: string;
+  fileFormat?: string;
 };
 
 const handler = async (req, res) => {
-  const { fromDate, toDate, timezoneOffset, format }: ReqBody = req.body || {};
+  const { fromDate, toDate, timezoneOffset, fileFormat }: ReqBody = req.body || {};
   try {
     const prisma = await getPrismaClient(req);
     const formatedFromDateString = formatDateWithTimezoneOffset({
       date: fromDate,
       timezoneOffset,
-      dateFormat: 'YYYY-MM-DD',
+      dateFormat: 'yyyy-MM-DD',
     });
     const formatedToDateString = formatDateWithTimezoneOffset({
       date: toDate,
       timezoneOffset,
-      dateFormat: 'YYYY-MM-DD',
+      dateFormat: 'yyyy-MM-DD',
     });
 
     // Convert the formatted date strings back to Date objects
@@ -131,9 +131,9 @@ const handler = async (req, res) => {
     const workbook = new ExcelJS.Workbook();
     const formattedData = data.map((x) => ({
       ...x,
-      EntryDate: moment(x.EntryDate).format('YYYY-MM-DD'),
-      ProductionStartDate: moment(x.ProductionStartDate).format('YYYY-MM-DD'),
-      ProductionEndDate: moment(x.ProductionEndDate).format('YYYY-MM-DD'),
+      EntryDate: format(x.EntryDate, 'yyyy-MM-dd'),
+      ProductionStartDate: format(x.ProductionStartDate, 'yyyy-MM-dd'),
+      ProductionEndDate: format(x.ProductionEndDate, 'yyyy-MM-dd'),
     }));
 
     const showNameAndProductionCode: { [key: string]: string[] } = formattedData.reduce((acc, x) => {
@@ -163,13 +163,16 @@ const handler = async (req, res) => {
       pageSetup: { fitToPage: true, fitToHeight: 5, fitToWidth: 7 },
       views: [{ state: 'frozen', xSplit: 2, ySplit: 6 }],
     });
-    const title = `All Productions Masterplan ${formatedFromDateString} to ${formatedToDateString}`;
+    const title = `All Productions Masterplan ${format(new Date(formatedFromDateString), 'dd-MM-yy')} to ${format(
+      new Date(formatedToDateString),
+      'dd-MM-yy',
+    )}`;
     worksheet.addRow([title]);
     const date = new Date();
     worksheet.addRow([
       `Exported: ${formatDateWithTimezoneOffset({
         date,
-        dateFormat: 'DD/MM/YY',
+        dateFormat: 'dd/MM/yy',
         timezoneOffset,
       })} at ${formatDateWithTimezoneOffset({ date, dateFormat: 'HH:mm', timezoneOffset })}`,
     ]);
@@ -192,7 +195,7 @@ const handler = async (req, res) => {
           throw new Error('Missing Data');
         }
 
-        const daysDiff = moment(fromDate).diff(moment(value.ProductionStartDate), 'days');
+        const daysDiff = differenceInDays(new Date(fromDate), new Date(value.ProductionStartDate));
         let week;
         if (daysDiff >= 0 && daysDiff <= 6) {
           week = 1;
@@ -231,7 +234,7 @@ const handler = async (req, res) => {
       isBold: true,
     });
 
-    const daysDiff = moment(toDate).diff(moment(fromDate), 'days');
+    const daysDiff = differenceInDays(new Date(toDate), new Date(fromDate));
 
     const minRehearsalStartTimeInEpoch = data.reduce((acc, x) => {
       if (x.RehearsalStartDate && new Date(x.RehearsalStartDate).getTime() < acc) {
@@ -242,8 +245,8 @@ const handler = async (req, res) => {
 
     let rowNo = 6;
     for (let i = 1; i <= daysDiff; i++) {
-      const weekDay = moment(moment(fromDate).add(i - 1, 'day')).format('dddd');
-      const dateInIncomingFormat = moment(moment(fromDate).add(i - 1, 'day')).format('YYYY-MM-DD');
+      const weekDay = format(add(new Date(fromDate), { days: i - 1 }), 'dddd');
+      const dateInIncomingFormat = format(add(new Date(fromDate), { days: i - 1 }), 'yyyy-mm-dd');
       const date = formatDateWithTimezoneOffset({ date: dateInIncomingFormat, timezoneOffset });
 
       const values: string[] = distinctShowNames.map(({ FullProductionCode, ShowName }) => {
@@ -346,8 +349,8 @@ const handler = async (req, res) => {
 
     worksheet.getCell(1, 1).font = { size: 16, color: { argb: COLOR_HEXCODE.WHITE }, bold: true };
 
-    const filename = `${title}.xlsx`;
-    if (format === 'pdf') {
+    const filename = `${title}`;
+    if (fileFormat === 'pdf') {
       worksheet.pageSetup.printArea = `A1:${worksheet.getColumn(11).letter}${rowNo}`;
       worksheet.pageSetup.fitToWidth = 1;
       worksheet.pageSetup.fitToHeight = 1;
