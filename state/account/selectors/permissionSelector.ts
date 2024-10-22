@@ -30,6 +30,14 @@ const MARKETING_HOME_PERMISSIONS = [
   'EDIT_LANDING_PAGE',
 ];
 
+const CONTRACTS_HOME_PERMISSIONS = [
+  'CONTRACTS',
+  'ACCESS_ARTISTE_CONTRACTS',
+  'ACCESS_CREATIVE_CONTRACTS',
+  'ACCESS_VENUE_CONTRACTS',
+  'ACCESS_SM_/_CREW_/_TECH_CONTRACTS',
+];
+
 export const accessHome = selector({
   key: 'accessHomeSelector',
   get: ({ get }) => {
@@ -51,5 +59,14 @@ export const accessMarketingHome = selector({
   get: ({ get }) => {
     const { permissions = [] } = get(userPermissionsState);
     return permissions.filter((x) => MARKETING_HOME_PERMISSIONS.includes(x));
+  },
+});
+
+export const accesContractsHome = selector({
+  key: 'accesContractsHomeSelector',
+  get: ({ get }) => {
+    const { permissions = [] } = get(userPermissionsState);
+    console.log('permissions', permissions);
+    return permissions.filter((x) => CONTRACTS_HOME_PERMISSIONS.includes(x));
   },
 });
