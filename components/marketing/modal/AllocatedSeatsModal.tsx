@@ -75,7 +75,7 @@ export default function AllocatedSeatsModal({
   const [confVariant, setConfVariant] = useState<ConfDialogVariant>('cancel');
   const [allocId, setAllocId] = useState<number>(null);
 
-  const labelClass = 'text-md text-primary-input-text flex-col text-left w-1/2 whitespace-pre-wrap: 0';
+  const labelClass = 'text-md text-primary-input-text flex-col text-left w-1/2 whitespace-pre-wrap: 1';
 
   const [errors, setErrors] = useState({
     performance: false,
