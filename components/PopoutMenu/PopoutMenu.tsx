@@ -245,6 +245,7 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
             value: '/contracts/venue-contracts',
             labelClass: leve2,
             testId: 'sidepanel-contracts-venue-contracts',
+            permission: 'ACCESS_VENUE_CONTRACTS',
           },
           {
             id: '52',
@@ -252,6 +253,7 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
             value: '/contracts/company-contracts/all?d=1',
             labelClass: leve2,
             testId: 'sidepanel-contracts-artiste-contracts',
+            permission: 'ACCESS_ARTISTE_CONTRACTS',
           },
           {
             id: '53',
@@ -259,6 +261,7 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
             value: '/contracts/company-contracts/all?d=2',
             labelClass: leve2,
             testId: 'sidepanel-contracts-creative-contracts',
+            permission: 'ACCESS_CREATIVE_CONTRACTS',
           },
           {
             id: '54',
@@ -266,6 +269,7 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
             value: '/contracts/company-contracts/all?d=3',
             labelClass: leve2,
             testId: 'sidepanel-contracts-sm-or-tech-or-crew-contracts',
+            permission: 'ACCESS_SM_/_CREW_/_TECH_CONTRACTS',
           },
         ],
       },
