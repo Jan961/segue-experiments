@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useState } from 'react';
 import { isNullOrEmpty, mapRecursive } from 'utils';
 import { useUrl } from 'nextjs-current-url';
-import { NEW_USER_CONFIRMATION_EMAIL_TEMPLATE } from 'config/global';
+import { NEW_USER_CONFIRMATION_EMAIL_TEMPLATE, SEND_ACCOUNT_PIN_TEMPLATE } from 'config/global';
 import { Production } from 'components/admin/modals/config';
 import { TreeItemOption } from 'components/global/TreeSelect/types';
 import { generateUserPassword } from 'utils/authUtils';
@@ -16,6 +16,7 @@ type UserDetails = {
   permissions: string[];
   productions: string[];
   accountId: number;
+  accpuntPIN?: number;
 };
 
 const useUser = () => {
@@ -66,6 +67,13 @@ const useUser = () => {
         to: userDetails.email,
         templateName: NEW_USER_CONFIRMATION_EMAIL_TEMPLATE,
         data: { username: userDetails.email, password, Weblink: `${currentUrl}/auth/sign-in` },
+      });
+
+      // Send out an email with the account PIN
+      await axios.post('/api/email/send', {
+        to: userDetails.email,
+        templateName: SEND_ACCOUNT_PIN_TEMPLATE,
+        data: { AccountPin: userDetails.accpuntPIN },
       });
 
       // Create the user in our database

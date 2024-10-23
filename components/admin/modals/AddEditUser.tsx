@@ -210,7 +210,7 @@ const AdEditUser = ({
       .map(({ id }) => id);
 
     const selectedProductions = userDetails.productions.filter(({ checked }) => checked).map(({ id }) => id);
-    const payload = { ...userDetails, permissions, productions: selectedProductions };
+    const payload = { ...userDetails, permissions, productions: selectedProductions, accountPIN };
     const success = selectedUser ? await updateUser(payload) : await createUser(payload);
     if (!success) {
       return;
@@ -254,7 +254,7 @@ const AdEditUser = ({
       await axios.post('/api/email/send', {
         to: selectedUser.email,
         templateName: SEND_ACCOUNT_PIN_TEMPLATE,
-        data: { pin: accountPIN },
+        data: { accountPIN },
       });
     } catch (err) {
       console.error(err);
