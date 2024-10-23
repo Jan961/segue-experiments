@@ -327,22 +327,13 @@ const handler = async (req, res) => {
           cellColor: COLOR_HEXCODE.RED,
         });
       }
-      if (isCancelled) {
-        colorTextAndBGCell({
-          worksheet,
-          row: rowNo,
-          col: 5,
-          textColor: COLOR_HEXCODE.WHITE,
-          cellColor: COLOR_HEXCODE.BLACK,
-        });
-      }
-      if (isSuspended) {
+      if (isCancelled || isSuspended) {
         colorTextAndBGCell({
           worksheet,
           row: rowNo,
           col: 4,
           textColor: COLOR_HEXCODE.WHITE,
-          cellColor: COLOR_HEXCODE.PURPLE,
+          cellColor: isSuspended ? COLOR_HEXCODE.PURPLE : COLOR_HEXCODE.BLACK,
         });
       }
       if (weekDay === 'Sunday') {
