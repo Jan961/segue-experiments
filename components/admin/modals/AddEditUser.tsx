@@ -206,7 +206,7 @@ const AdEditUser = ({
 
   const saveUser = async () => {
     const permissions = flattenHierarchicalOptions(userDetails.permissions)
-      .filter(({ checked }) => checked)
+      .filter(({ checked, isPartiallySelected }) => checked || isPartiallySelected)
       .map(({ id }) => id);
 
     const selectedProductions = userDetails.productions.filter(({ checked }) => checked).map(({ id }) => id);
