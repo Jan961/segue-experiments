@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import Summary, { SummaryRef } from './Summary';
@@ -15,6 +15,7 @@ import ContactNotesTab, { ContactNoteTabRef } from './tabs/ContactNotesTab';
 import VenueContactsTab, { VenueContactTabRef } from './tabs/VenueContactsTab';
 import PromotorHoldsTab, { PromoterHoldTabRef } from './tabs/PromoterHoldsTab';
 import AttachmentsTab, { AttachmentsTabRef } from './tabs/AttachmentsTab';
+import { accessMarketingHome } from 'state/account/selectors/permissionSelector';
 
 export type SelectOption = {
   text: string;
@@ -34,6 +35,7 @@ export type VenueDetail = {
 };
 
 const MarketingHome = () => {
+  const permissions = useRecoilValue(accessMarketingHome);
   const { selected: productionId } = useRecoilValue(productionJumpState);
   const bookings = useRecoilState(bookingJumpState);
   const [bookingId, setBookingId] = useState(null);
@@ -52,14 +54,18 @@ const MarketingHome = () => {
   const router = useRouter();
 
   const tabs = [
-    'Sales',
-    'Archived Sales',
-    'Activities',
-    'Contact Notes',
-    'Venue Contacts',
-    'Promoter Holds',
-    'Attachments',
+    { name: 'Sales', permission: 'ACCESS_MARKETING_HOME_-_SALES' },
+    { name: 'Archived Sales', permission: 'ACCESS_MARKETING_HOME_-_ARCHIVED_SALES' },
+    { name: 'Activities', permission: 'ACCESS_MARKETING_HOME_-_ACTIVITIES' },
+    { name: 'Contact Notes', permission: 'ACCESS_MARKETING_HOME_-_CONTACT_NOTES' },
+    { name: 'Venue Contacts', permission: 'ACCESS_MARKETING_HOME_-_VENUE_CONTACTS' },
+    { name: 'Promoter Holds', permission: 'ACCESS_MARKETING_HOME_-_PROMOTER_HOLDS' },
+    { name: 'Attachments', permission: 'ACCESS_MARKETING_HOME_-_ATTACHMENTS' },
   ];
+
+  const permissionedTabs = useMemo(() => {
+    return tabs.filter((tab) => permissions.includes(tab.permission));
+  }, [permissions]);
 
   useEffect(() => {
     resetData();
@@ -97,7 +103,6 @@ const MarketingHome = () => {
 
   return (
     <div className="flex w-full h-full">
-      {/* Green Box */}
       <div className="bg-primary-green/[0.15] w-[291px] h-[690PX] rounded-xl p-4 mr-5 flex flex-col justify-between mb-5 -mt-5">
         <div className="flex-grow overflow-y-auto">
           <Summary bookingId={bookingId} ref={summaryRef} />
@@ -121,37 +126,51 @@ const MarketingHome = () => {
       <div className="flex-grow flex flex-col">
         <Tabs
           selectedTabClass="!bg-primary-green/[0.30] !text-primary-navy"
-          tabs={tabs}
+          tabs={permissionedTabs.map(({ name }) => name)}
           disabled={!productionId || !bookingId}
           defaultIndex={tabIndex}
         >
-          <Tab.Panel className="h-[650px] overflow-y-hidden">
-            <SalesTab bookingId={bookingId} ref={salesTabRef} />
-          </Tab.Panel>
+          {permissions.includes(tabs[0].permission) && (
+            <Tab.Panel className="h-[650px] overflow-y-hidden">
+              <SalesTab bookingId={bookingId} ref={salesTabRef} />
+            </Tab.Panel>
+          )}
 
-          <Tab.Panel className="w-[1085px]">
-            <ArchivedSalesTab ref={archSalesRef} selectedBooking={bookings[0].selected} />
-          </Tab.Panel>
+          {permissions.includes(tabs[1].permission) && (
+            <Tab.Panel className="w-[1085px]">
+              <ArchivedSalesTab ref={archSalesRef} selectedBooking={bookings[0].selected} />
+            </Tab.Panel>
+          )}
 
-          <Tab.Panel className="h-[650px] w-[1085px]">
-            <ActivitiesTab bookingId={bookingId} ref={activityTabRef} />
-          </Tab.Panel>
+          {permissions.includes(tabs[2].permission) && (
+            <Tab.Panel className="h-[650px] w-[1085px]">
+              <ActivitiesTab bookingId={bookingId} ref={activityTabRef} />
+            </Tab.Panel>
+          )}
 
-          <Tab.Panel className="w-[1085px]">
-            <ContactNotesTab bookingId={bookingId} ref={contactNoteTabRef} />
-          </Tab.Panel>
+          {permissions.includes(tabs[3].permission) && (
+            <Tab.Panel className="w-[1085px]">
+              <ContactNotesTab bookingId={bookingId} ref={contactNoteTabRef} />
+            </Tab.Panel>
+          )}
 
-          <Tab.Panel className="w-[1085px]">
-            <VenueContactsTab bookingId={bookingId} ref={venueContactTabRef} />
-          </Tab.Panel>
+          {permissions.includes(tabs[4].permission) && (
+            <Tab.Panel className="w-[1085px]">
+              <VenueContactsTab bookingId={bookingId} ref={venueContactTabRef} />
+            </Tab.Panel>
+          )}
 
-          <Tab.Panel className="w-[1085px]">
-            <PromotorHoldsTab bookingId={bookingId} ref={promoterHoldTabRef} />
-          </Tab.Panel>
+          {permissions.includes(tabs[5].permission) && (
+            <Tab.Panel className="w-[1085px]">
+              <PromotorHoldsTab bookingId={bookingId} ref={promoterHoldTabRef} />
+            </Tab.Panel>
+          )}
 
-          <Tab.Panel className="w-[1085px]">
-            <AttachmentsTab bookingId={bookingId} ref={attachmentsTabRef} />
-          </Tab.Panel>
+          {permissions.includes(tabs[6].permission) && (
+            <Tab.Panel className="w-[1085px]">
+              <AttachmentsTab bookingId={bookingId} ref={attachmentsTabRef} />
+            </Tab.Panel>
+          )}
         </Tabs>
       </div>
     </div>
