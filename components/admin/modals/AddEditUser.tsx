@@ -254,8 +254,9 @@ const AdEditUser = ({
       await axios.post('/api/email/send', {
         to: selectedUser.email,
         templateName: SEND_ACCOUNT_PIN_TEMPLATE,
-        data: { accountPIN },
+        data: { AccountPin: accountPIN },
       });
+      notify.success("PIN Sent to user's Email");
     } catch (err) {
       console.error(err);
       notify.error('Error sending email with account pin');
