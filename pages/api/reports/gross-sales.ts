@@ -8,6 +8,8 @@ import { addBorderToAllCells, getExportedAtTitle } from 'utils/export';
 import { currencyCodeToSymbolMap } from 'config/Reports';
 import { convertToPDF } from 'utils/report';
 import { BOOK_STATUS_CODES, SALES_TYPE_NAME } from 'types/MarketingTypes';
+import { formatDate, getDifferenceInDays } from 'services/dateService';
+import { SCHEDULE_VIEW } from 'services/reports/schedule-report';
 
 type SALES_SUMMARY = {
   ProductionId: number;
@@ -93,7 +95,6 @@ const firstRowFormatting = ({ worksheet }: { worksheet: any }) => {
 };
 
 const getKey = ({ FullProductionCode, ShowName, EntryDate }) => `${FullProductionCode} - ${ShowName} - ${EntryDate}`;
-const formatDate = (date) => moment(date).format('DD/MM/YY');
 
 const getTotalInPound = ({ totalOfCurrency, conversionRate }) => {
   const euroVal = totalOfCurrency['€'];
@@ -115,14 +116,29 @@ const handler = async (req, res) => {
         SaleTypeName: SALES_TYPE_NAME.GENERAL_SALES,
       },
     });
+    const schedule = await prisma.scheduleView.findMany({
+      where: {
+        ProductionId: productionId,
+      },
+      orderBy: {
+        EntryDate: 'asc',
+      },
+    });
     let filename = 'Gross Sales';
     const workbook = new ExcelJS.Workbook();
     const formattedData = data.map((x) => ({
       ...x,
       Value: x.Value?.toNumber?.() || 0,
-      EntryDate: moment(x.EntryDate).format('YYYY-MM-DD'),
-      ProductionStartDate: moment(x.ProductionStartDate).format('YYYY-MM-DD'),
-      ProductionEndDate: moment(x.ProductionEndDate).format('YYYY-MM-DD'),
+      EntryDate: formatDate(x.EntryDate, 'yyyy-MM-dd'),
+      ProductionStartDate: formatDate(x.ProductionStartDate, 'yyyy-MM-dd'),
+      ProductionEndDate: formatDate(x.ProductionEndDate, 'yyyy-MM-dd'),
+    }));
+
+    const formattedScheduleData = schedule.map((x) => ({
+      ...x,
+      EntryDate: formatDate(x.EntryDate, 'yyyy-MM-dd'),
+      ProductionStartDate: formatDate(x.ProductionStartDate, 'yyyy-MM-dd'),
+      ProductionEndDate: formatDate(x.ProductionEndDate, 'yyyy-MM-dd'),
     }));
 
     const worksheet = workbook.addWorksheet('Gross Sales', {
@@ -148,10 +164,13 @@ const handler = async (req, res) => {
     worksheet.addRow([]);
 
     const map: { [key: string]: SALES_SUMMARY } = formattedData.reduce((acc, x) => ({ ...acc, [getKey(x)]: x }), {});
-
+    const scheduleMap: { [key: string]: SCHEDULE_VIEW } = formattedScheduleData.reduce(
+      (acc, x) => ({ ...acc, [getKey(x)]: x }),
+      {},
+    );
     const { ProductionStartDate: fromDate, ProductionEndDate: toDate } = data[0];
 
-    const daysDiff = moment(toDate).diff(moment(fromDate), 'days');
+    const daysDiff = getDifferenceInDays(fromDate?.toISOString(), toDate?.toISOString());
 
     let colNo = 1;
     let weekPending = false;
@@ -175,12 +194,10 @@ const handler = async (req, res) => {
     let prevValue: SALES_SUMMARY;
     for (let i = 1; i <= daysDiff || weekPending; i++) {
       weekPending = true;
-
-      const j = i + 1;
       const weekDay = moment(moment(fromDate).add(i - 1, 'day')).format('dddd');
       const dateInIncomingFormat = moment(moment(fromDate).add(i - 1, 'day')).format('YYYY-MM-DD');
-      const nextDateInIncomingFormat = moment(moment(fromDate).add(j - 1, 'day')).format('YYYY-MM-DD');
-      const date = formatDate(dateInIncomingFormat);
+      const nextDateInIncomingFormat = moment(moment(fromDate).add(i, 'day')).format('YYYY-MM-DD');
+      const date = formatDate(dateInIncomingFormat, 'dd/MM/yy');
 
       if (i % 7 === 1) {
         r4.push(`Week ${Math.floor(i / 7) + 1}`);
@@ -201,26 +218,31 @@ const handler = async (req, res) => {
       r6.push(weekDay);
 
       if (weekDay === 'Monday') {
-        cellColor.push({ cell: { rowNo: 5, colNo }, cellColor: COLOR_HEXCODE.ORANGE });
-        cellColor.push({ cell: { rowNo: 6, colNo }, cellColor: COLOR_HEXCODE.ORANGE });
+        cellColor.push({ cell: { rowNo: 5, colNo }, cellColor: COLOR_HEXCODE.LIGHT_BROWN });
+        cellColor.push({ cell: { rowNo: 6, colNo }, cellColor: COLOR_HEXCODE.LIGHT_BROWN });
       }
 
       const key = getKey({ FullProductionCode, ShowName, EntryDate: dateInIncomingFormat });
       const nextKey = getKey({ FullProductionCode, ShowName, EntryDate: nextDateInIncomingFormat });
       const value: SALES_SUMMARY = map[key];
       const nextValue: SALES_SUMMARY = map[nextKey];
+      const scheduleValue: SCHEDULE_VIEW = scheduleMap[key];
       if (!value) {
-        r7.push('');
-        r8.push('');
-        r9.push('');
-      } else if (
-        ['Get In/Fit Up Day', 'Tech/Dress Day', 'Day Off', 'Travel Day'].includes(value.EntryName) ||
-        value.EntryName.toLowerCase().includes('holiday')
-      ) {
-        r9.push(value.EntryName);
-        cellColor.push({ cell: { rowNo: 7, colNo }, cellColor: COLOR_HEXCODE.RED, textColor: COLOR_HEXCODE.WHITE });
-        cellColor.push({ cell: { rowNo: 8, colNo }, cellColor: COLOR_HEXCODE.RED, textColor: COLOR_HEXCODE.WHITE });
-        mergeRowCol.push({ row: [7, 8], col: [colNo, colNo] });
+        if (
+          scheduleValue &&
+          (['Get In/Fit Up Day', 'Tech/Dress Day', 'Day Off', 'Travel Day'].includes(scheduleValue?.EntryName) ||
+            scheduleValue?.EntryName?.toLowerCase?.().includes?.('holiday'))
+        ) {
+          r7.push(scheduleValue.EntryName);
+          cellColor.push({ cell: { rowNo: 7, colNo }, cellColor: COLOR_HEXCODE.RED, textColor: COLOR_HEXCODE.WHITE });
+          cellColor.push({ cell: { rowNo: 8, colNo }, cellColor: COLOR_HEXCODE.RED, textColor: COLOR_HEXCODE.WHITE });
+          mergeRowCol.push({ row: [7, 8], col: [colNo, colNo] });
+          r9.push(``);
+        } else {
+          r7.push('');
+          r8.push('');
+          r9.push('');
+        }
       } else {
         value.VenueCurrencySymbol = currencyCodeToSymbolMap[value.VenueCurrencyCode];
         if (!conversionRate && value.ConversionRate && Number(value.ConversionRate) !== 1) {
