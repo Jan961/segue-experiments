@@ -7,7 +7,6 @@ import UploadModal from 'components/core-ui-lib/UploadModal';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import { Spinner } from 'components/global/Spinner';
 import { attachmentMimeTypes } from 'components/core-ui-lib/UploadModal/interface';
-import { getFileUrl } from 'lib/s3';
 
 interface AttachmentsTabProps {
   bookingId: string;
@@ -72,9 +71,8 @@ const AttachmentsTab = forwardRef<AttachmentsTabRef, AttachmentsTabProps>((props
       const fileRec = {
         BookingFileBookingId: parseInt(bookingIdVal),
         BookingFileDescription: attachType,
-        FileOriginalFilename: response.data.originalFilename,
-        FileURL: getFileUrl(response.data.location),
-        FileUploadedDateTime: new Date(),
+        BookingFileFileId: response.data.id,
+        BookingFileType: response.data.mediaType,
       };
 
       // update in the database

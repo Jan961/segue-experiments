@@ -56,7 +56,6 @@ model Booking {
   BookingActivity            BookingActivity[]
   BookingFile                BookingFile[]
   BookingContactNotes        BookingContactNotes[]
-  BookingFile                BookingFile[]
   Contract                   Contract?
   DealMemo                   DealMemo?
   Performance                Performance[]
@@ -809,11 +808,11 @@ model DealMemoTechProvision {
 model File {
   Id               Int              @id @default(autoincrement()) @map("FileId")
   OriginalFilename String           @map("FileOriginalFilename") @db.VarChar(200)
-  MediaType        String?          @map("FileMediaType") @db.VarChar(200)
+  MediaType        String           @map("FileMediaType") @db.VarChar(200) @default("file")
   Location         String           @map("FileLocation") @db.VarChar(512)
   UploadDateTime   DateTime         @map("FileUploadDateTime") @db.DateTime(0)
   UploadUserId     Int              @map("FileUploadUserId")
-  SizeBytes        BigInt?          @map("FileSizeBytes")
+  SizeBytes        BigInt           @map("FileSizeBytes") @default(0)
   ACCContract      ACCContract[]
   Production       Production[]
   ProductionFile   ProductionFile[]
@@ -1204,17 +1203,6 @@ model TemplateRow {
   Template              Template            @relation(fields: [TemplateRowTemplateId], references: [TemplateId], onDelete: Cascade, map: "Template_TemplateRow")
 
   @@index([TemplateRowTemplateId], map: "Template_TemplateRow")
-}
-
-model BookingFile {
-  BookingFileId          Int     @id @default(autoincrement())
-  BookingFileBookingId   Int
-  BookingFileFileId      Int
-  BookingFileType        String? @db.VarChar(20)
-  BookingFileDescription String? @db.VarChar(80)
-  Booking                Booking @relation(fields: [BookingFileBookingId], references: [Id], onDelete: Cascade, map: "Booking_BookingFile")
-
-  @@index([BookingFileBookingId], map: "Booking_BookingFile")
 }
 
 model VenueVenue {
