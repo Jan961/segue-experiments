@@ -69,7 +69,7 @@ const colorTextAndBGCell = ({
   }
   const cell = worksheet.getCell(row, col);
   if (textColor) {
-    cell.font = { color: { argb: 'ffffffff' }, bold: true };
+    cell.font = { color: { argb: textColor || 'ffffff' }, bold: true };
   }
   if (numFmt) {
     cell.numFmt = numFmt;
@@ -97,8 +97,8 @@ const formatDate = (date) => moment(date).format('DD/MM/YY');
 
 const getTotalInPound = ({ totalOfCurrency, conversionRate }) => {
   const euroVal = totalOfCurrency['€'];
-  const finalValOfEuro = euroVal ? new Decimal(euroVal).mul(conversionRate).toFixed(2) : 0;
-  return totalOfCurrency['£'] ? new Decimal(totalOfCurrency['£']).plus(finalValOfEuro).toFixed(2) : finalValOfEuro;
+  const finalValOfEuro = euroVal ? new Decimal(euroVal).mul(conversionRate).toNumber() : 0;
+  return totalOfCurrency['£'] ? new Decimal(totalOfCurrency['£']).plus(finalValOfEuro).toNumber() : finalValOfEuro;
 };
 
 const handler = async (req, res) => {
@@ -213,6 +213,14 @@ const handler = async (req, res) => {
         r7.push('');
         r8.push('');
         r9.push('');
+      } else if (
+        ['Get In/Fit Up Day', 'Tech/Dress Day', 'Day Off', 'Travel Day'].includes(value.EntryName) ||
+        value.EntryName.toLowerCase().includes('holiday')
+      ) {
+        r9.push(value.EntryName);
+        cellColor.push({ cell: { rowNo: 7, colNo }, cellColor: COLOR_HEXCODE.RED, textColor: COLOR_HEXCODE.WHITE });
+        cellColor.push({ cell: { rowNo: 8, colNo }, cellColor: COLOR_HEXCODE.RED, textColor: COLOR_HEXCODE.WHITE });
+        mergeRowCol.push({ row: [7, 8], col: [colNo, colNo] });
       } else {
         value.VenueCurrencySymbol = currencyCodeToSymbolMap[value.VenueCurrencyCode];
         if (!conversionRate && value.ConversionRate && Number(value.ConversionRate) !== 1) {
@@ -235,7 +243,7 @@ const handler = async (req, res) => {
           } else {
             cellColor.push({
               cell: { rowNo: 9, colNo },
-              ...(value.EntryStatusCode === 'X' && { cellColor: COLOR_HEXCODE.GREY }),
+              ...(value.EntryStatusCode === 'X' && { textColor: COLOR_HEXCODE.GREY, cellColor: COLOR_HEXCODE.WHITE }),
               numFmt: (value.VenueCurrencySymbol || '') + '#,##0.00',
             });
           }
@@ -244,16 +252,9 @@ const handler = async (req, res) => {
             if (val || val === 0) {
               totalOfCurrency[value.VenueCurrencySymbol] = new Decimal(val)
                 .plus(new Decimal(value.Value).toFixed(2))
-                .toFixed(2) as any as number;
+                .toNumber();
             }
           }
-        }
-        if (
-          ['Get In/Fit Up Day', 'Tech/Dress Day', 'Day Off', 'Travel Day'].includes(value.EntryName) ||
-          value.EntryName.toLowerCase().includes('holiday')
-        ) {
-          cellColor.push({ cell: { rowNo: 7, colNo }, cellColor: COLOR_HEXCODE.RED, textColor: COLOR_HEXCODE.WHITE });
-          cellColor.push({ cell: { rowNo: 8, colNo }, cellColor: COLOR_HEXCODE.RED, textColor: COLOR_HEXCODE.WHITE });
         }
         if (value.EntryStatusCode === 'X') {
           cellColor.push({ cell: { rowNo: 7, colNo }, cellColor: COLOR_HEXCODE.BLACK, textColor: COLOR_HEXCODE.WHITE });
@@ -279,17 +280,29 @@ const handler = async (req, res) => {
 
       if (i === 0) {
         r7.push('Total EUR');
-        r9.push(totalOfCurrency['€'] ? `€${String(totalOfCurrency['€'])}` : '');
+        r9.push(totalOfCurrency['€'] ?? 0);
+        cellColor.push({
+          cell: { rowNo: 9, colNo },
+          numFmt: '€#,##0.00',
+        });
       } else if (i === 1) {
         r7.push('Total GBP');
-        r9.push(totalOfCurrency['£'] ? `£${String(totalOfCurrency['£'])}` : '');
+        r9.push(totalOfCurrency['£'] ?? 0);
+        cellColor.push({
+          cell: { rowNo: 9, colNo },
+          numFmt: '£#,##0.00',
+        });
       } else {
         r7.push('Grand Total');
-        r9.push(`£${getTotalInPound({ totalOfCurrency, conversionRate })}`);
+        r9.push(getTotalInPound({ totalOfCurrency, conversionRate }) ?? 0);
+        cellColor.push({
+          cell: { rowNo: 9, colNo },
+          numFmt: '£#,##0.00',
+        });
       }
       r8.push('');
-
-      mergeRowCol.push({ row: [7, 8], col: [colNo + i, colNo + i] });
+      mergeRowCol.push({ row: [7, 8], col: [colNo, colNo] });
+      colNo++;
     }
 
     mergeRowCol.push({ row: [4, 4], col: [colNo, colNo + 2] });
