@@ -362,6 +362,7 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
             value: '/admin/company-information',
             labelClass: leve2,
             testId: 'sidepanel-system-admin-company-info',
+            permission: 'ACCESS_COMPANY_DETAILS',
             options: [
               {
                 id: '711',
@@ -369,6 +370,7 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
                 value: '/admin/company-information/?tabIndex=0',
                 labelClass: level3,
                 testId: 'sidepanel-system-admin-company-info-account-details ',
+                permission: 'ACCESS_ACCOUNT_DETAILS',
               },
               {
                 id: '712',
@@ -376,6 +378,7 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
                 value: '/admin/company-information/?tabIndex=1',
                 labelClass: level3,
                 testId: 'sidepanel-system-admin-company-info-production-companies',
+                permission: 'ACCESS_PRODUCTION_COMPANIES',
               },
             ],
           },
@@ -385,6 +388,7 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
             value: '/admin/users',
             labelClass: leve2,
             testId: 'sidepanel-system-admin-users',
+            permission: 'ACCESS_USERS',
           },
         ],
       },
