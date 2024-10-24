@@ -482,10 +482,8 @@ export default function AllocatedSeatsModal({
               text="Cancel"
               onClick={() => handleConfirm('cancel')}
             />
-            {type !== 'new' ? (
+            {type !== 'new' && (
               <Button className="ml-4 w-32" onClick={() => handleConfirm('delete')} variant="tertiary" text="Delete" />
-            ) : (
-              <></>
             )}
             <Button
               className="ml-4 w-32 flex float-right"
