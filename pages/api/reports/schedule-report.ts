@@ -191,8 +191,11 @@ const handler = async (req, res) => {
       lastWeekMetaInfo = { ...lastWeekMetaInfo, weekTotalPrinted: false };
       const weekDay = moment(moment(from).add(i - 1, 'day')).format('dddd');
       const dateInIncomingFormat = moment(moment(from).add(i - 1, 'day'));
+      const nextDateIncomingFormat = moment(moment(from).add(i, 'day'));
       const key = getKey({ FullProductionCode, ShowName, EntryDate: dateInIncomingFormat.format('YYYY-MM-DD') });
+      const nextKey = getKey({ FullProductionCode, ShowName, EntryDate: nextDateIncomingFormat.format('YYYY-MM-DD') });
       const value: SCHEDULE_VIEW = map[key];
+      const nextValue: SCHEDULE_VIEW = map[nextKey];
       const isOtherDay = [
         'Day Off',
         'Travel Day',
@@ -202,7 +205,7 @@ const handler = async (req, res) => {
         'Declared Holiday',
       ].includes(value?.EntryName);
       const isCancelled = value?.EntryStatusCode === 'X';
-
+      const isSuspended = value?.EntryStatusCode === 'S';
       if (!value) {
         worksheet.addRow([
           FullProductionCode,
@@ -240,27 +243,40 @@ const handler = async (req, res) => {
         seats.push(Number(VenueSeats) || 0);
         performancesPerDay.push(performances?.length || 0);
         prevProductionWeekNum = ProductionWeekNum ? String(ProductionWeekNum) : prevProductionWeekNum;
-        worksheet.addRow([
+        let row = [
           FullProductionCode,
           weekDay.substring(0, 3),
           dateInIncomingFormat.format('DD/MM/YY'),
           ProductionWeekNum,
           EntryName || '',
-          ...((isOtherDay && [Location || '', EntryType || '']) || []),
-          ...((!isOtherDay &&
-            !isCancelled && [
-              Location || '',
-              'Performance',
-              `${bookingStatusMap?.[EntryStatusCode] || ''} ${PencilNum ? `(${PencilNum})` : ''}`,
-              VenueSeats,
-              performancesOnThisDay?.length,
-              performancesOnThisDay?.[0]?.performanceTime || '',
-              performancesOnThisDay?.[1]?.performanceTime || '',
-              Number(Mileage) || '',
-              formattedTime,
-            ]) ||
-            []),
-        ]);
+        ];
+        if (isOtherDay) {
+          row = row.concat([Location || '', EntryType || '']);
+        } else if (!isCancelled && !isSuspended) {
+          row = row.concat([
+            Location || '',
+            'Performance',
+            `${bookingStatusMap?.[EntryStatusCode] || ''} ${PencilNum ? `(${PencilNum})` : ''}`,
+            VenueSeats,
+            performancesOnThisDay?.length,
+            performancesOnThisDay?.[0]?.performanceTime || '',
+            performancesOnThisDay?.[1]?.performanceTime || '',
+          ]);
+          if (!nextValue || nextValue?.Location !== value?.Location) {
+            row = row.concat([Number(Mileage) || '', formattedTime]);
+          }
+        } else {
+          row = row.concat([
+            Location || '',
+            'Performance',
+            `${bookingStatusMap?.[EntryStatusCode] || ''} ${PencilNum ? `(${PencilNum})` : ''}`,
+            VenueSeats,
+            performancesOnThisDay?.length,
+            performancesOnThisDay?.[0]?.performanceTime || '',
+            performancesOnThisDay?.[1]?.performanceTime || '',
+          ]);
+        }
+        worksheet.addRow([...row]);
       }
       rowNo++;
 
@@ -273,13 +289,13 @@ const handler = async (req, res) => {
           cellColor: COLOR_HEXCODE.RED,
         });
       }
-      if (isCancelled) {
+      if (isCancelled || isSuspended) {
         colorTextAndBGCell({
           worksheet,
           row: rowNo,
           col: 5,
           textColor: COLOR_HEXCODE.WHITE,
-          cellColor: COLOR_HEXCODE.BLACK,
+          cellColor: isSuspended ? COLOR_HEXCODE.PURPLE : COLOR_HEXCODE.BLACK,
         });
       }
       if (weekDay === 'Monday') {
