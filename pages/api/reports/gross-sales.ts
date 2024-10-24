@@ -1,4 +1,3 @@
-import { Prisma } from 'prisma/generated/prisma-client';
 import ExcelJS from 'exceljs';
 import getPrismaClient from 'lib/prisma';
 import moment from 'moment';
@@ -107,19 +106,15 @@ const handler = async (req, res) => {
     const prisma = await getPrismaClient(req);
     const timezoneOffset = parseInt(req.headers.timezoneoffset as string, 10) || 0;
     const { productionId, format } = req.body || {};
-
     if (!productionId) {
       throw new Error('Params are missing');
     }
-    const conditions: Prisma.Sql[] = [];
-    if (productionId) {
-      conditions.push(Prisma.sql` ProductionId=${productionId}`);
-    }
-    conditions.push(Prisma.sql` SaleTypeName=${SALES_TYPE_NAME.GENERAL_SALES}`);
-    const where: Prisma.Sql = conditions.length ? Prisma.sql` where ${Prisma.join(conditions, ' and ')}` : Prisma.empty;
-
-    const data: SALES_SUMMARY[] = await prisma.$queryRaw`select * FROM SalesSummaryView ${where} order by EntryDate;`;
-
+    const data = await prisma.salesSummaryView.findMany({
+      where: {
+        ProductionId: productionId,
+        SaleTypeName: SALES_TYPE_NAME.GENERAL_SALES,
+      },
+    });
     let filename = 'Gross Sales';
     const workbook = new ExcelJS.Workbook();
     const formattedData = data.map((x) => ({
@@ -177,6 +172,7 @@ const handler = async (req, res) => {
       numFmt?: string;
     }[] = [];
     const totalOfCurrency: { [key: string]: number } = { '£': 0, '€': 0 };
+    let prevValue: SALES_SUMMARY;
     for (let i = 1; i <= daysDiff || weekPending; i++) {
       weekPending = true;
 
@@ -225,15 +221,24 @@ const handler = async (req, res) => {
         r7.push(value.Location || '');
         r8.push(value.EntryName || '');
         if (nextValue && nextValue.EntryId === value.EntryId) {
-          r9.push('');
-          cellColor.push({
-            cell: { rowNo: 9, colNo },
-            cellColor: COLOR_HEXCODE.BLUE,
-            numFmt: (value.VenueCurrencySymbol || '') + '#,##0.00',
-          });
+          // This skips adding value for cell if it is repeating value
+          r9.push(``);
         } else {
           r9.push(value.Value ? value.Value : '');
-          cellColor.push({ cell: { rowNo: 9, colNo }, numFmt: (value.VenueCurrencySymbol || '') + '#,##0.00' });
+          // This adds blue background for Final Sales
+          if (prevValue && nextValue && prevValue.EntryId === value.EntryId && value.EntryId !== nextValue.EntryId) {
+            cellColor.push({
+              cell: { rowNo: 9, colNo },
+              cellColor: COLOR_HEXCODE.BLUE,
+              numFmt: (value.VenueCurrencySymbol || '') + '#,##0.00',
+            });
+          } else {
+            cellColor.push({
+              cell: { rowNo: 9, colNo },
+              ...(value.EntryStatusCode === 'X' && { cellColor: COLOR_HEXCODE.GREY }),
+              numFmt: (value.VenueCurrencySymbol || '') + '#,##0.00',
+            });
+          }
           if (value.VenueCurrencySymbol && value.Value && value.EntryStatusCode !== 'X') {
             const val = totalOfCurrency[value.VenueCurrencySymbol];
             if (val || val === 0) {
@@ -260,6 +265,7 @@ const handler = async (req, res) => {
         weekPending = false;
       }
       colNo++;
+      prevValue = value;
     }
 
     for (let i = 0; i <= 2; i++) {
@@ -354,7 +360,6 @@ const handler = async (req, res) => {
         textColor,
         numFmt,
       } = ele;
-      console.log(rowNo, colNo, numFmt);
       colorTextAndBGCell({
         worksheet,
         row: rowNo,
