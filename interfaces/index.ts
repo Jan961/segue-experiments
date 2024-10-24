@@ -266,12 +266,13 @@ export type DateBlockDTO = {
 };
 
 export interface FileDTO {
-  id?: number;
+  id: string;
   originalFilename: string;
   mediaType: string;
   location: string;
+  fileCreatedDateTime: string;
+  fileLastModifiedDateTime: string;
   uploadUserId: number;
-  uploadDateTime: string;
   imageUrl?: string;
 }
 

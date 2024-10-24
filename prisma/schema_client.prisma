@@ -806,17 +806,17 @@ model DealMemoTechProvision {
 }
 
 model File {
-  Id               Int              @id @default(autoincrement()) @map("FileId")
-  OriginalFilename String           @map("FileOriginalFilename") @db.VarChar(200)
-  MediaType        String           @map("FileMediaType") @db.VarChar(200) @default("file")
-  Location         String           @map("FileLocation") @db.VarChar(512)
-  UploadDateTime   DateTime         @map("FileUploadDateTime") @db.DateTime(0)
-  UploadUserId     Int              @map("FileUploadUserId")
-  SizeBytes        BigInt           @map("FileSizeBytes") @default(0)
-  ACCContract      ACCContract[]
-  Production       Production[]
-  ProductionFile   ProductionFile[]
-  Template         Template[]
+  Id               Int    @id @default(autoincrement()) @map("FileId")
+  OriginalFilename String @map("FileOriginalFilename") @db.VarChar(200)
+  MediaType        String @default("file") @map("FileMediaType") @db.VarChar(200)
+  Location         String @map("FileLocation") @db.VarChar(512)
+
+  UploadUserId   Int              @map("FileUploadUserId")
+  SizeBytes      BigInt           @default(0) @map("FileSizeBytes")
+  ACCContract    ACCContract[]
+  Production     Production[]
+  ProductionFile ProductionFile[]
+  Template       Template[]
 
   @@index([UploadUserId], map: "UserAttachedFile")
 }

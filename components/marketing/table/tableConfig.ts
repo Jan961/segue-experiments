@@ -288,8 +288,8 @@ export const attachmentsColDefs = [
     width: 600,
   },
   {
-    headerName: 'Date Uploaded',
-    field: 'FileUploadedDateTime',
+    headerName: 'Date Last Modified',
+    field: 'FileLastModifiedDateTime',
     cellRenderer: DefaultTextRenderer,
     cellRendererParams: function (params) {
       const updDate = new Date(params.data.FileUploadedDateTime);
@@ -301,7 +301,7 @@ export const attachmentsColDefs = [
   },
   {
     headerName: 'Date File Created',
-    field: 'FileDateTime',
+    field: 'FileCreatedDateTime',
     cellRenderer: DefaultTextRenderer,
     cellRendererParams: function (params) {
       const fileDt = new Date(params.data.FileDateTime);

@@ -6,11 +6,28 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const BookingId = parseInt(req.query.BookingId as string);
     const prisma = await getPrismaClient(req);
 
-    const attachments = await prisma.bookingFile.findMany({
+    const fileIds = await prisma.bookingFile.findMany({
       where: {
         BookingFileBookingId: BookingId,
       },
-      select: {},
+      select: { BookingFileFileId: true },
+    });
+    console.log('file ids', fileIds);
+
+    const fileIdArray = fileIds.map((bookingFile) => bookingFile.BookingFileFileId);
+    console.log('file id array', fileIdArray);
+    const attachments = await prisma.file.findMany({
+      where: {
+        Id: { in: fileIdArray },
+      },
+      select: {
+        OriginalFilename: true,
+        FileCreatedDateTime: true,
+        FileLastModifiedDateTime: true,
+      },
+      orderBy: {
+        FileLastModifiedDateTime: 'desc',
+      },
     });
 
     res.json(attachments);
