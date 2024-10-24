@@ -16,7 +16,7 @@ type UserDetails = {
   permissions: string[];
   productions: string[];
   accountId: number;
-  accpuntPIN?: number;
+  accountPIN?: number;
 };
 
 const useUser = () => {
@@ -73,7 +73,7 @@ const useUser = () => {
       await axios.post('/api/email/send', {
         to: userDetails.email,
         templateName: SEND_ACCOUNT_PIN_TEMPLATE,
-        data: { AccountPin: userDetails.accpuntPIN },
+        data: { AccountPin: userDetails.accountPIN },
       });
 
       // Create the user in our database
