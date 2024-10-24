@@ -702,7 +702,7 @@ model DealMemo {
   RestorationLevy                                            Decimal?                      @map("DeMoRestorationLevy") @db.Decimal(10, 2)
   BookingFees                                                Decimal?                      @map("DeMoBookingFees") @db.Decimal(10, 2)
   CCCommissionPercent                                        Decimal?                      @map("DeMoCCCommissionPercent") @db.Decimal(5, 2)
-  TxnChargeOption                                            String?                       @map("DeMoTxnChargeOption") @db.Char(3)
+  TxnChargeOption                                            String?                       @map("DeMoTxnChargeOption") @db.VarChar(15)
   TxnChargeAmount                                            Decimal?                      @map("DeMoTxnChargeAmount") @db.Decimal(10, 2)
   AgreedDiscounts                                            String?                       @map("DeMoAgreedDiscounts") @db.VarChar(80)
   MaxTAAlloc                                                 String?                       @map("DeMoMaxTAAlloc") @db.VarChar(80)
@@ -1575,12 +1575,12 @@ view SalesSummaryView {
   VenueCurrencySymbolUnicode String?   @db.VarChar(30)
   ConversionRate             Decimal?  @db.Decimal(8, 4)
   ConversionToCurrencyCode   String?   @db.VarChar(3)
-  SaleTypeName               String?   @db.VarChar(45)
+  SaleTypeName               String    @db.VarChar(45)
   SetSalesFiguresDate        DateTime? @db.Date
   FinalSetSalesFiguresDate   DateTime? @db.Date
   NotOnSaleDate              DateTime? @db.Date
 
-  @@ignore
+  @@id([ProductionId, EntryDate, SaleTypeName])
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
