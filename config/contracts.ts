@@ -348,4 +348,12 @@ export const statusToBgColorMap = {
     backgroundColor: '#ED1111',
     color: 'white',
   },
+  [CompanyContractStatus.Voided]: {
+    backgroundColor: '#000000',
+    color: 'white',
+  },
+  [CompanyContractStatus.Cancelled]: {
+    backgroundColor: '#000000',
+    color: 'white',
+  },
 };

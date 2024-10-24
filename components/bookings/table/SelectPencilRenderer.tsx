@@ -26,7 +26,9 @@ const SelectPencilRenderer = ({ eGridCell, value, setValue, data, api, node }: S
       const { dayType, bookingStatus } = data;
       const pencilled = statusOptions.find(({ text }) => text === 'Pencilled').value;
 
-      setIsDisabled(node.rowIndex > 0 || dayType === null || dayType === '' || bookingStatus !== pencilled);
+      setIsDisabled(
+        (node.rowIndex > 0 && data.isRunOfDates) || dayType === null || dayType === '' || bookingStatus !== pencilled,
+      );
       if (!data.isRunOfDates) {
         setValue(dayType === null || dayType === '' || bookingStatus !== pencilled ? null : value);
       } else if (node.rowIndex === 0 && value !== null && (dayType === null || dayType === '')) {
