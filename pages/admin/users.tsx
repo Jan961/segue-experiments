@@ -75,7 +75,7 @@ export default function Users({
       setShowUsersModal(true);
     } else if (type === 'delete') {
       deleteType.current = 'user';
-      setSelectedGroup(data);
+      setSelectedUser(data);
       setShowConfirmationDialog(true);
     }
   };
@@ -102,8 +102,20 @@ export default function Users({
   };
 
   const deleteUser = async () => {
-    // Add API call to deactivate user
-    setSelectedUser(null);
+    try {
+      if (selectedUser) {
+        await axios.delete('/api/user/delete', {
+          data: {
+            accountUserId: selectedUser.accountUserId,
+            email: selectedUser.email,
+          },
+        });
+        setSelectedUser(null);
+        router.replace(router.asPath);
+      }
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   const handleConfirmClick = async () => {
