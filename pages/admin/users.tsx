@@ -20,6 +20,9 @@ const getTableGridOptions = (uniqueKey: string, config = {}) => ({
   getRowNodeId: (data) => {
     return data[uniqueKey];
   },
+  getRowId: ({ data }) => {
+    return data[uniqueKey];
+  },
   onRowDataUpdated: (params) => {
     params.api.forEachNode((rowNode) => {
       rowNode.id = rowNode.data[uniqueKey];
