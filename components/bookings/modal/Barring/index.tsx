@@ -98,7 +98,6 @@ export default function Barring({ visible, onClose }: BarringProps) {
     fetchBarredVenues(formData);
     const { venueId } = formData;
     setVenuInfo(venueDict?.[venueId]);
-    console.log(productionDict.selected);
     const production = productionDict.productions.find((prod) => prod.Id === productionDict.selected);
     setProductionInfo(production);
   };
@@ -125,7 +124,7 @@ export default function Barring({ visible, onClose }: BarringProps) {
             <Form onSubmit={onSubmit} />
           </div>
           {Array.isArray(rows) && rows.length === 0 && (
-            <Label className="text-md my-2" text="A Barring Check has found no issuess." />
+            <Label className="text-md my-2" text="A Barring Check has found no issues." />
           )}
           {(rows !== null && rows?.length > 0 && (
             <div className="block">
