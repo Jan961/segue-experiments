@@ -281,7 +281,7 @@ export interface ProductionCompanyDTO {
   ProdCoLogoFileId?: number;
   ProdCoName?: string;
   ProdCoSaleStartWeek?: number;
-  ProdCoVATCode?: number;
+  ProdCoVATCode?: string;
   ProdCoWebSite?: string;
 }
 export type ConversionRateDTO = {

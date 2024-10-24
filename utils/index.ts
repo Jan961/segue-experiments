@@ -1,5 +1,4 @@
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
-import { TreeItemOption } from 'components/global/TreeSelect/types';
 export const safeJsonParse = (jsonString: string): any => {
   try {
     return JSON.parse(jsonString);
@@ -31,7 +30,15 @@ export const mapRecursive = <T>(
   }
 };
 
-export const flattenHierarchicalOptions = (values: TreeItemOption[]): TreeItemOption[] => {
+type RecursiveObject<T> = T & {
+  options?: RecursiveObject<T>[];
+};
+/**
+ * Flattens an array of hierarchical objects into a flat array of objects.
+ * @param values - The array of hierarchical objects.
+ * @returns The flattened array of objects.
+ */
+export const flattenHierarchicalOptions = <T>(values: RecursiveObject<T>[]): RecursiveObject<T>[] => {
   if (isNullOrEmpty(values)) {
     return [];
   }
@@ -232,3 +239,6 @@ export const numberToOrdinal = (n) => {
 export const mapObjectValues = (obj: any, transformer: (key: string, value: any) => any) => {
   return Object.fromEntries(Object.entries(obj).map(([key, value]) => [key, transformer(key, value)]));
 };
+
+// used to return the value if not null or undefined - otherwise the function will return an empty string
+export const tidyString = (value: string) => (isNullOrUndefined(value) ? '' : value);

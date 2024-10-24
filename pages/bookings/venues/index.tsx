@@ -33,7 +33,7 @@ export type VenueFilters = {
 };
 export default function Index(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const {
-    venueTownList = [],
+    venueTownOptionList = [],
     venueCountryOptionList = [],
     venueFamilyOptionList = [],
     venueRoleOptionList = [],
@@ -45,7 +45,6 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const filterVenues = useMemo(() => debounce({ delay: 1000 }, (payload) => fetchVenues(payload)), []);
-  const townOptions = useMemo(() => venueTownList.map(({ Town }) => ({ text: Town, value: Town })), [venueTownList]);
 
   const fetchVenues = useCallback(async (payload) => {
     const { productionId, town, country, searchQuery } = payload || {};
@@ -107,7 +106,7 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
         <div className="max-w-5xl mx-auto">
           <div className="mb-4">
             <VenueFilter
-              townOptions={townOptions}
+              townOptions={venueTownOptionList}
               countryOptions={venueCountryOptionList}
               onFilterChange={updateFilters}
               filters={filters}
@@ -145,7 +144,10 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   ]);
 
   const productionJump = results[0].status === 'fulfilled' ? results[0].value : intialProductionJumpState;
-  const venueTownList = results[1].status === 'fulfilled' ? results[1].value : [];
+  const venueTownOptionList: SelectOption[] =
+    results[1].status === 'fulfilled'
+      ? (results[1] as PromiseFulfilledResult<any>).value.map((town) => ({ value: town, text: town }))
+      : [];
   const venueCountryOptionList: SelectOption[] =
     results[2].status === 'fulfilled' ? transformToOptions(results[2].value, 'Name', 'Id') : [];
 
@@ -185,7 +187,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
   return {
     props: {
-      venueTownList,
+      venueTownOptionList,
       venueCountryOptionList,
       venueCurrencyOptionList,
       venueFamilyOptionList,
