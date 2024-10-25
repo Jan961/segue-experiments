@@ -77,4 +77,4 @@ export const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Fr
 
 export const NEW_ACCOUNT_CONFIRMATION_EMAIL_TEMPLATE = 'Confirm New Account';
 export const NEW_USER_CONFIRMATION_EMAIL_TEMPLATE = 'Confirm New User';
-export const SEND_ACCOUNT_PIN_TEMPLATE = 'Send Account Pin';
+export const SEND_ACCOUNT_PIN_TEMPLATE = 'Send Account PIN';
