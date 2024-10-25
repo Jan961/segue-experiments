@@ -38,6 +38,20 @@ const CONTRACTS_HOME_PERMISSIONS = [
   'ACCESS_SM_/_CREW_/_TECH_CONTRACTS',
 ];
 
+const ADMIN_HOME_PERMISSIONS = [
+  'SYSTEM_ADMIN',
+  'ACCESS_USERS',
+  'ACCESS_COMPANY_DETAILS',
+  'ACCESS_ACCOUNT_PREFERENCES',
+  'ACCESS_PRODUCTION_COMPANIES',
+  'EDIT_USER',
+  'ADD_NEW_USER',
+  'CREATE_USER_PERMSSION_GROUP',
+  'EDIT_USER_PERMISSION_GROUP',
+  'DELETE_USER_PERMISSION_GROUP',
+  'DELETE_USER',
+];
+
 export const accessHome = selector({
   key: 'accessHomeSelector',
   get: ({ get }) => {
@@ -66,7 +80,14 @@ export const accesContractsHome = selector({
   key: 'accesContractsHomeSelector',
   get: ({ get }) => {
     const { permissions = [] } = get(userPermissionsState);
-    console.log('permissions', permissions);
     return permissions.filter((x) => CONTRACTS_HOME_PERMISSIONS.includes(x));
+  },
+});
+
+export const accessAdminHome = selector({
+  key: 'accesAdminHomeSelector',
+  get: ({ get }) => {
+    const { permissions = [] } = get(userPermissionsState);
+    return permissions.filter((x) => ADMIN_HOME_PERMISSIONS.includes(x));
   },
 });

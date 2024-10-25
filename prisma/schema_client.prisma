@@ -1556,7 +1556,6 @@ view BookingSelectionView {
   @@id([BookingId, VenueId, ProductionId])
 }
 
-/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view SalesSummaryView {
   ProductionId               Int       @default(0)
   FullProductionCode         String?   @db.VarChar(20)

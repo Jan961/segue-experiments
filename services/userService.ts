@@ -38,6 +38,8 @@ export const getUsersWithPermissions = async (AccountId: number) => {
   const users = await prisma.AccountUserPermissionsView.findMany({
     where: {
       AccountId,
+      UserIsActive: true,
+      AccUserIsActive: true,
     },
   });
 
@@ -132,6 +134,12 @@ export const getUserId = async (email: string) => {
   return UserId;
 };
 
+export const getClerkUserByEmailAddress = async (emailAddress: string) => {
+  const clerkUsers = await clerkClient.users.getUserList();
+  const user = clerkUsers.find((user) => user.emailAddresses[0].emailAddress === emailAddress);
+  return user;
+};
+
 export const createClerkUserWithoutSession = async (
   emailAddress: string,
   password: string,
@@ -145,6 +153,15 @@ export const createClerkUserWithoutSession = async (
     lastName,
   });
   return response;
+};
+
+export const removeUserFromClerk = async (emailAddress: string) => {
+  const user = await getClerkUserByEmailAddress(emailAddress);
+  if (user) {
+    const response = await clerkClient.users.deleteUser(user.id);
+    return response;
+  }
+  return true;
 };
 
 export const getUserPermisisons = async (email: string, organisationId: string) => {
