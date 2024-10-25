@@ -369,7 +369,7 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
                 label: 'Account Details',
                 value: '/admin/company-information/?tabIndex=0',
                 labelClass: level3,
-                testId: 'sidepanel-system-admin-company-info-account-details',
+                testId: 'sidepanel-system-admin-company-info-account-details ',
                 permission: 'ACCESS_ACCOUNT_DETAILS',
               },
               {
