@@ -17,14 +17,13 @@ import { otherState } from 'state/booking/otherState';
 import { currentProductionSelector } from 'state/booking/selectors/currentProductionSelector';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import useComponentMountStatus from 'hooks/useComponentMountStatus';
-import { accessBookingsHome } from 'state/account/selectors/permissionSelector';
+
 interface BookingsTableProps {
   rowData?: any;
   tableRef?: any;
 }
 
 export default function BookingsTable({ rowData, tableRef }: BookingsTableProps) {
-  const permissions = useRecoilValue(accessBookingsHome);
   const router = useRouter();
   const [filter, setFilter] = useRecoilState(filterState);
   const [bookings, setBookings] = useRecoilState(bookingState);
