@@ -38,6 +38,18 @@ const CONTRACTS_HOME_PERMISSIONS = [
   'ACCESS_SM_/_CREW_/_TECH_CONTRACTS',
 ];
 
+const BOOKINGS_HOME_PERMISSIONS = [
+  'BOOKINGS',
+  'ACCESS_BOOKINGS',
+  'ACCESS_TOUR_SUMMARY',
+  'ACCESS_VENUE_HISTORY',
+  'ACCESS_BARRING_CHECK',
+  'ACCESS_BOOKING_NOTES',
+  'CREATE_NEW_BOOKING',
+  'ACCESS_BOOKING_DETAILS',
+  'ACCESS_BOOKING_REPORTS',
+];
+
 export const accessHome = selector({
   key: 'accessHomeSelector',
   get: ({ get }) => {
@@ -68,5 +80,13 @@ export const accesContractsHome = selector({
     const { permissions = [] } = get(userPermissionsState);
     console.log('permissions', permissions);
     return permissions.filter((x) => CONTRACTS_HOME_PERMISSIONS.includes(x));
+  },
+});
+
+export const accessBookingsHome = selector({
+  key: 'accessBookingsHomeSelector',
+  get: ({ get }) => {
+    const { permissions = [] } = get(userPermissionsState);
+    return permissions.filter((x) => BOOKINGS_HOME_PERMISSIONS.includes(x));
   },
 });
