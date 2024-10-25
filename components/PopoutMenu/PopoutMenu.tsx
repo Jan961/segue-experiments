@@ -364,7 +364,7 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
                 label: 'Account Details',
                 value: '/admin/company-information/?tabIndex=0',
                 labelClass: level3,
-                testId: 'sidepanel-system-admin-company-info-account-details ',
+                testId: 'sidepanel-system-admin-company-info-account-details',
               },
               {
                 id: '712',
@@ -492,6 +492,7 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
           className={state.menuPinned ? '' : 'rotate-90 transform'}
           iconName="pin-close"
           onClick={handlePinToggle}
+          testId="pin-side-panel"
         />
       </div>
     </div>
