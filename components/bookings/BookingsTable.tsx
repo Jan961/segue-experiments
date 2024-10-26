@@ -17,6 +17,7 @@ import { otherState } from 'state/booking/otherState';
 import { currentProductionSelector } from 'state/booking/selectors/currentProductionSelector';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import useComponentMountStatus from 'hooks/useComponentMountStatus';
+import { accessBookingsHome } from 'state/account/selectors/permissionSelector';
 
 interface BookingsTableProps {
   rowData?: any;
@@ -24,6 +25,7 @@ interface BookingsTableProps {
 }
 
 export default function BookingsTable({ rowData, tableRef }: BookingsTableProps) {
+  const permissions = useRecoilValue(accessBookingsHome);
   const router = useRouter();
   const [filter, setFilter] = useRecoilState(filterState);
   const [bookings, setBookings] = useRecoilState(bookingState);
@@ -38,7 +40,8 @@ export default function BookingsTable({ rowData, tableRef }: BookingsTableProps)
   const [showConfirmationModal, setShowConfirmationModal] = useState<boolean>(false);
   const [bookingInfo, setBookingInfo] = useState(null);
   const isMounted = useComponentMountStatus();
-  const bookingColumDefs = useMemo(() => (isMounted ? columnDefs : []), [isMounted]);
+  const canAccessNotes = useMemo(() => permissions && permissions.includes('ACCESS_BOOKING_NOTES'), [permissions]);
+  const bookingColumDefs = useMemo(() => (isMounted ? columnDefs(canAccessNotes) : []), [isMounted, canAccessNotes]);
 
   const gridOptions = {
     suppressColumnVirtualisation: false,
