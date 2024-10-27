@@ -245,6 +245,7 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
             value: '/contracts/venue-contracts',
             labelClass: leve2,
             testId: 'sidepanel-contracts-venue-contracts',
+            permission: 'ACCESS_VENUE_CONTRACTS',
           },
           {
             id: '52',
@@ -252,6 +253,7 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
             value: '/contracts/company-contracts/all?d=1',
             labelClass: leve2,
             testId: 'sidepanel-contracts-artiste-contracts',
+            permission: 'ACCESS_ARTISTE_CONTRACTS',
           },
           {
             id: '53',
@@ -259,6 +261,7 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
             value: '/contracts/company-contracts/all?d=2',
             labelClass: leve2,
             testId: 'sidepanel-contracts-creative-contracts',
+            permission: 'ACCESS_CREATIVE_CONTRACTS',
           },
           {
             id: '54',
@@ -266,6 +269,7 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
             value: '/contracts/company-contracts/all?d=3',
             labelClass: leve2,
             testId: 'sidepanel-contracts-sm-or-tech-or-crew-contracts',
+            permission: 'ACCESS_SM_/_CREW_/_TECH_CONTRACTS',
           },
         ],
       },
@@ -358,13 +362,15 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
             value: '/admin/company-information',
             labelClass: leve2,
             testId: 'sidepanel-system-admin-company-info',
+            permission: 'ACCESS_COMPANY_DETAILS',
             options: [
               {
                 id: '711',
                 label: 'Account Details',
                 value: '/admin/company-information/?tabIndex=0',
                 labelClass: level3,
-                testId: 'sidepanel-system-admin-company-info-account-details',
+                testId: 'sidepanel-system-admin-company-info-account-details ',
+                permission: 'ACCESS_ACCOUNT_DETAILS',
               },
               {
                 id: '712',
@@ -372,6 +378,7 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
                 value: '/admin/company-information/?tabIndex=1',
                 labelClass: level3,
                 testId: 'sidepanel-system-admin-company-info-production-companies',
+                permission: 'ACCESS_PRODUCTION_COMPANIES',
               },
             ],
           },
@@ -381,6 +388,7 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
             value: '/admin/users',
             labelClass: leve2,
             testId: 'sidepanel-system-admin-users',
+            permission: 'ACCESS_USERS',
           },
         ],
       },
