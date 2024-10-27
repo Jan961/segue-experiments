@@ -59,32 +59,39 @@ export default function BookingsTable({ rowData, tableRef }: BookingsTableProps)
   };
 
   const handleCellClick = (e) => {
-    if (e.column.colId === 'note' && e.data.venue && !isNullOrEmpty(e.data.dayType)) {
+    if (
+      e.column.colId === 'note' &&
+      permissions.includes('EDIT_BOOKING_NOTES') &&
+      e.data.venue &&
+      !isNullOrEmpty(e.data.dayType)
+    ) {
       setProductionItem(e.data);
       setShowModal(true);
     }
   };
 
   const handleRowDoubleClicked = (e: RowDoubleClickedEvent) => {
-    if (!currentProduction) {
-      setShowConfirmationModal(true);
-      return;
-    }
-    const { data } = e;
-    setBookingInfo(data);
-    if (!data.Id) {
-      setShowAddEditBookingModal({
-        visible: true,
-        startDate: e.data.dateTime,
-        endDate: e.data.dateTime,
-      });
-    } else {
-      setShowAddEditBookingModal({
-        visible: true,
-        startDate: data.dateTime,
-        endDate: data.dateTime,
-        booking: data,
-      });
+    if (permissions.includes('EDIT_BOOKING_DETAILS')) {
+      if (!currentProduction) {
+        setShowConfirmationModal(true);
+        return;
+      }
+      const { data } = e;
+      setBookingInfo(data);
+      if (!data.Id) {
+        setShowAddEditBookingModal({
+          visible: true,
+          startDate: e.data.dateTime,
+          endDate: e.data.dateTime,
+        });
+      } else {
+        setShowAddEditBookingModal({
+          visible: true,
+          startDate: data.dateTime,
+          endDate: data.dateTime,
+          booking: data,
+        });
+      }
     }
   };
 

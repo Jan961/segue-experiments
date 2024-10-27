@@ -48,6 +48,22 @@ const BOOKINGS_HOME_PERMISSIONS = [
   'CREATE_NEW_BOOKING',
   'ACCESS_BOOKING_DETAILS',
   'ACCESS_BOOKING_REPORTS',
+  'EDIT_BOOKING_DETAILS',
+  'EXPORT_ALL_PRODUCTIONS_MASTERPLAN',
+  'EXPORT_MULTIPLE_PENCIL_REPORT',
+  'EXPORT_TO_MYTRBK',
+  'EXPORT_TRAVEL_SUMMARY',
+  'EXPORT_TOUR_SCHEDULE',
+  'EXPORT_VENUE_HISTORY',
+  'ACCESS_MILEAGE_CHECK',
+];
+
+const SHOWS_PERMISSIONS = [
+  'ADD_NEW_SHOW',
+  'EDIT_SHOW_NAME_AND_CODE',
+  'ARCHIVE_SHOW',
+  'DELETE_SHOW',
+  'ACCESS_VIEW_EDIT_PRODUCTIONS',
 ];
 
 export const accessHome = selector({
@@ -88,5 +104,13 @@ export const accessBookingsHome = selector({
   get: ({ get }) => {
     const { permissions = [] } = get(userPermissionsState);
     return permissions.filter((x) => BOOKINGS_HOME_PERMISSIONS.includes(x));
+  },
+});
+
+export const accessShows = selector({
+  key: 'accessShowsSelector',
+  get: ({ get }) => {
+    const { permissions = [] } = get(userPermissionsState);
+    return permissions.filter((x) => SHOWS_PERMISSIONS.includes(x));
   },
 });

@@ -44,7 +44,7 @@ export default function Users({
   const [selectedGroup, setSelectedGroup] = useState(null);
   const [showConfirmationDialog, setShowConfirmationDialog] = useState(false);
   const router = useRouter();
-  console.log(permissionsList);
+
   const updatePermissions = (options: TreeItemOption[], values: TreeItemOption[]) => {
     const updatedOptions = mapRecursive(options, (o) => {
       const value = values.find((v) => v.id === o.id);
