@@ -158,7 +158,14 @@ export default function PreviewBookingDetails({
 
   const GetPerformancetiems = (item) => {
     const times = item.times.split(';');
-    return times.slice(0, item.noPerf);
+    const accTimes = times.slice(0, item.noPerf);
+    let str = '';
+    for (let i = 0; i < accTimes.length - 1; i++) {
+      str += `${accTimes[i]}; `;
+    }
+    str += accTimes[accTimes.length - 1];
+    item.times = str;
+    return str;
   };
 
   const formatRowData = (data) => {
