@@ -13,6 +13,8 @@ import { showsTableConfig } from './table/tableConfig';
 import ProductionsView from './modal/Views/ProductionsView';
 import { notify } from 'components/core-ui-lib';
 import { isNullOrEmpty } from 'utils';
+import { useRecoilValue } from 'recoil';
+import { accessShows } from 'state/account/selectors/permissionSelector';
 
 const rowClassRules = {
   'custom-red-row': (params) => {
@@ -49,6 +51,7 @@ const ShowsTable = ({
   handleEdit: () => void;
   setIsAddRow: (value: boolean) => void;
 }) => {
+  const permissions = useRecoilValue(accessShows);
   const tableRef = useRef(null);
   const router = useRouter();
   const [confirm, setConfirm] = useState<boolean>(false);
@@ -101,8 +104,10 @@ const ShowsTable = ({
         setConfirm(true);
       }
     } else if (e.column.colId === 'productions' && e.data.Id) {
-      setShowProductionsModal(true);
-      setCurrentShow(e.data);
+      if (permissions.includes('ACCESS_VIEW_EDIT_PRODUCTIONS')) {
+        setShowProductionsModal(true);
+        setCurrentShow(e.data);
+      }
     } else if (e.column.colId === 'EditId' && currentShow?.Id) {
       if (!(currentShow?.Code?.length > 0)) {
         notify.error('Error Creating Show. Please enter a show code');
@@ -179,7 +184,7 @@ const ShowsTable = ({
   return (
     <div className="relative">
       <Table
-        columnDefs={showsTableConfig}
+        columnDefs={showsTableConfig(permissions)}
         ref={tableRef}
         rowData={rowsData}
         styleProps={styleProps}

@@ -7,6 +7,8 @@ import { ConversionRateDTO, ICurrency, ICurrencyCountry } from 'interfaces';
 import { useRouter } from 'next/router';
 import { unique } from 'radash';
 import { useCallback, useMemo, useRef, useState } from 'react';
+import { useRecoilValue } from 'recoil';
+import { accessShows } from 'state/account/selectors/permissionSelector';
 import { debug } from 'utils/logging';
 
 interface CurrencyConversionModalProps {
@@ -25,6 +27,7 @@ const CurrencyConversionModal = ({
   currencyLookup = {},
   visible,
 }: CurrencyConversionModalProps) => {
+  const permissions = useRecoilValue(accessShows);
   const router = useRouter();
   const tableRef = useRef(null);
   const [editMap, setEditMap] = useState<Record<string, number>>({});
@@ -91,7 +94,7 @@ const CurrencyConversionModal = ({
       <div className=" w-[750px] lg:w-[1047px] h-full flex flex-col ">
         <Table
           ref={tableRef}
-          columnDefs={currencyConversionTableConfig}
+          columnDefs={currencyConversionTableConfig(permissions)}
           rowData={rowsData}
           styleProps={styleProps}
           gridOptions={gridOptions}
@@ -107,6 +110,7 @@ const CurrencyConversionModal = ({
           iconProps={{ className: 'h-4 w-3' }}
           text="Save and Close"
           onClick={onSubmit}
+          disabled={!permissions.includes('EDIT_CURRENCY_CONVERSION')}
         />
       </div>
     </PopupModal>

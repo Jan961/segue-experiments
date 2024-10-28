@@ -8,6 +8,8 @@ import Label from 'components/core-ui-lib/Label';
 import { dateToSimple } from 'services/dateService';
 import { useQuery } from '@tanstack/react-query';
 import { fetchBarredVenues } from './request';
+import { useRecoilValue } from 'recoil';
+import { accessBookingsHome } from 'state/account/selectors/permissionSelector';
 
 type BarringCheckProps = {
   visible: boolean;
@@ -19,6 +21,7 @@ type BarringCheckProps = {
 };
 
 const BarringCheck = ({ visible, startDate, endDate, venueId, productionId, onClose }: BarringCheckProps) => {
+  const permissions = useRecoilValue(accessBookingsHome);
   const {
     data: barredVenues = [],
     isLoading: loading,
@@ -108,6 +111,7 @@ const BarringCheck = ({ visible, startDate, endDate, venueId, productionId, onCl
             text="Export"
             iconProps={{ className: 'h-4 w-3' }}
             sufixIconName="excel"
+            disabled={!permissions.includes('EXPORT_BARRING_CHECK')}
           />
         )) ||
           ''}
