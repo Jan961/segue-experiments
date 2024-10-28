@@ -87,7 +87,7 @@ const fetchProductionBookings = async (productionId: number): Promise<Production
     conditions.push(Prisma.sql`ProductionId = ${productionId} `);
   }
   conditions.push(Prisma.sql` SaleTypeName=${SALES_TYPE_NAME.GENERAL_SALES}`);
-  const where: Prisma.Sql = conditions.length ? Prisma.sql` where ${Prisma.join(conditions, ' and ')}` : Prisma.empty;
+  const where: Prisma.Sql = conditions.length ? Prisma.sql` ${Prisma.join(conditions, ' and ')}` : Prisma.empty;
   const data: any[] = await prisma.$queryRaw`select 
                                                 FullProductionCode, 
                                                 ProductionStartDate as StartDate, 
@@ -104,7 +104,7 @@ const fetchProductionBookings = async (productionId: number): Promise<Production
                                                 FinalSetSalesFiguresDate,
                                                 NotOnSaleDate
                                               FROM SalesSummaryView  
-                                              ${where} 
+                                              WHERE ${where} 
                                               order by BookingFirstDate;`;
   const summary = unique(data, (entry) => entry.BookingId)
     .map((entry) => ({
@@ -141,9 +141,9 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       conditions.push(Prisma.sql`setProductionWeekDate BETWEEN ${fromWeek} AND ${toWeek}`);
     }
     conditions.push(Prisma.sql` SaleTypeName=${SALES_TYPE_NAME.GENERAL_SALES}`);
-    const where: Prisma.Sql = conditions.length ? Prisma.sql` where ${Prisma.join(conditions, ' and ')}` : Prisma.empty;
+    const where: Prisma.Sql = conditions.length ? Prisma.sql`${Prisma.join(conditions, ' and ')}` : Prisma.empty;
     const data: TSalesView[] =
-      await prisma.$queryRaw`select * FROM SalesView ${where} order by BookingFirstDate, SetSalesFiguresDate;`;
+      await prisma.$queryRaw`select * FROM SalesView WHERE ${where} order by BookingFirstDate, SetSalesFiguresDate;`;
 
     const jsonArray: TRequiredFields[] = data
       .filter((x) => x.SaleTypeName === SALES_TYPE_NAME.GENERAL_SALES)
@@ -244,7 +244,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       'Date',
       'Town',
       'Venue',
-      ...headerWeekDates.map((week) => convertDateFormat(week)),
+      ...headerWeekDates.map((week) => convertDateFormat(new Date(week))),
       'Last Week',
       ...(isSeatsDataRequired ? ['Sold', 'Capacity', 'vs Capacity'] : []),
     ]);
