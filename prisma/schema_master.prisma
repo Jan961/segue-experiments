@@ -81,6 +81,7 @@ model AccountUser {
   AccUserAccountId      Int
   AccUserIsAdmin        Boolean                 @default(dbgenerated("(b'0')")) @db.Bit(1)
   AccUserPIN            String?                 @db.VarChar(4)
+  AccUserIsActive       Boolean                 @default(dbgenerated("(b'0')")) @db.Bit(1)
   Account               Account                 @relation(fields: [AccUserAccountId], references: [AccountId], onDelete: Cascade, map: "Account_AccountUser")
   User                  User                    @relation(fields: [AccUserUserId], references: [UserId], onDelete: Cascade, map: "User_AccountUser")
   AccountUserPermission AccountUserPermission[]
@@ -178,6 +179,7 @@ model User {
   UserEmail     String        @unique(map: "UserEmail_uk") @db.VarChar(120)
   UserFirstName String        @db.VarChar(50)
   UserLastName  String?       @db.VarChar(50)
+  UserIsActive  Boolean       @default(dbgenerated("(b'0')")) @db.Bit(1)
   AccountUser   AccountUser[]
 }
 
@@ -237,15 +239,17 @@ view AccountUserView {
 }
 
 view AccountUserPermissionsView {
-  AccountId      Int
-  UserId         Int     @default(0)
-  AccUserId      Int     @default(0)
-  AccountPIN     String  @db.VarChar(5)
-  AccUserIsAdmin Boolean @default(dbgenerated("(b'0')")) @db.Bit(1)
-  UserFirstName  String  @db.VarChar(50)
-  UserLastName   String? @db.VarChar(50)
-  UserEmail      String  @db.VarChar(120)
-  AllPermissions String? @db.MediumText
+  AccountId       Int
+  UserId          Int     @default(0)
+  AccUserId       Int     @default(0)
+  AccountPIN      String  @db.VarChar(5)
+  AccUserIsAdmin  Boolean @default(dbgenerated("(b'0')")) @db.Bit(1)
+  AccUserIsActive Boolean @default(dbgenerated("(b'0')")) @db.Bit(1)
+  UserFirstName   String  @db.VarChar(50)
+  UserLastName    String? @db.VarChar(50)
+  UserEmail       String  @db.VarChar(120)
+  UserIsActive    Boolean @default(dbgenerated("(b'0')")) @db.Bit(1)
+  AllPermissions  String? @db.MediumText
 
   @@id([AccountId, UserId, AccUserId])
 }

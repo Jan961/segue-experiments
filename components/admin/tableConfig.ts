@@ -58,7 +58,7 @@ export const productionCompaniesColDefs = (fetchProductionCompanies, onUploadSuc
   ];
 };
 
-export const usersColDef = (updateUser) => {
+export const usersColDef = (updateUser, permissions) => {
   return [
     {
       headerName: 'Name',
@@ -93,12 +93,14 @@ export const usersColDef = (updateUser) => {
           {
             name: 'edit',
             onClick: () => updateUser('edit', params.data),
+            permission: 'EDIT_USER',
           },
           {
             name: 'delete',
             onClick: () => updateUser('delete', params.data),
+            permission: 'DELETE_USER',
           },
-        ],
+        ].filter((x) => permissions.includes(x.permission)),
       }),
       width: 90,
       resizable: false,
@@ -106,7 +108,7 @@ export const usersColDef = (updateUser) => {
   ];
 };
 
-export const permissionGroupColDef = (updateGroup) => {
+export const permissionGroupColDef = (updateGroup, permissions = []) => {
   return [
     {
       headerName: 'Name of Permission Group',
@@ -123,12 +125,14 @@ export const permissionGroupColDef = (updateGroup) => {
           {
             name: 'edit',
             onClick: () => updateGroup('edit', params.data),
+            permission: 'EDIT_USER_PERMISSION_GROUP',
           },
           {
             name: 'delete',
             onClick: () => updateGroup('delete', params.data),
+            permission: 'DELETE_USER_PERMISSION_GROUP',
           },
-        ],
+        ].filter((x) => permissions.includes(x.permission)),
       }),
       width: 90,
       resizable: false,
