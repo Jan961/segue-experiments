@@ -14,7 +14,7 @@ import {
   WeekAggregates,
 } from 'types/SalesSummaryTypes';
 import { format, formatDuration, intervalToDuration, isBefore } from 'date-fns';
-import { simpleToDate } from './dateService';
+import { formatDate, simpleToDate } from './dateService';
 
 export enum COLOR_HEXCODE {
   PURPLE = 'ff7030a0',
@@ -58,7 +58,7 @@ export const getMapKeyForValue = (
 ): string => `${Week} | ${Town} | ${Venue} | ${setProductionWeekNumVar} | ${setProductionWeekDateVar}`;
 
 export const convertDateFormat = (date: Date) => {
-  const parsedDate = format(date, 'dd/MM/yy');
+  const parsedDate = formatDate(date, 'dd/MM/yy');
   return parsedDate;
 };
 
