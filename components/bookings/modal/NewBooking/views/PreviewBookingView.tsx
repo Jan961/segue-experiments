@@ -24,11 +24,11 @@ export default function PreviewBookingView(props: PreviewBookingViewProps) {
   };
 
   const areInputFieldsValid = useMemo(() => {
-    if (rows && formData.isRunOfDates) {
-      const rowsWithNoDayType = rows.filter(({ dayType }) => isNullOrEmpty(dayType));
-      return isNullOrEmpty(rowsWithNoDayType);
-    } else {
-      return true;
+    if (rows) {
+      const noDayType = !isNullOrEmpty(rows.filter(({ dayType }) => isNullOrEmpty(dayType)));
+      const noVenue = !isNullOrEmpty(rows.filter(({ venue, perf }) => isNullOrEmpty(venue) && perf)); // If not a performance venu not required
+      const noBookingStatus = !isNullOrEmpty(rows.filter(({ bookingStatus }) => isNullOrEmpty(bookingStatus)));
+      return noDayType || noVenue || noBookingStatus;
     }
   }, [rows, formData]);
 
@@ -38,7 +38,7 @@ export default function PreviewBookingView(props: PreviewBookingViewProps) {
       <div className="pt-8 w-full flex justify-end  gap-3 float-right">
         <div className="flex gap-4">
           <Button className="w-33" variant="secondary" text="Back" onClick={previousStepFunc} />
-          <Button className="w-33" text="Accept" onClick={props.onSaveBooking} disabled={!areInputFieldsValid} />
+          <Button className="w-33" text="Accept" onClick={props.onSaveBooking} disabled={areInputFieldsValid} />
         </div>
       </div>
     </>

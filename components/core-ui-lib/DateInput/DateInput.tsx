@@ -162,7 +162,6 @@ export default forwardRef<Ref, DateInputProps>(function DateInput(
           openToDate={selectedDate}
           customInput={<div className="cursor-pointer w-4 h-4 " />}
           disabled={disabled}
-          locale="UTC"
           {...props}
         />
       </div>

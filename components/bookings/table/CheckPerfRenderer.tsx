@@ -8,18 +8,40 @@ interface CheckPerfRendererProps extends ICellRendererParams {
   dayTypeOptions: SelectOption[];
 }
 
-const CheckPerfRenderer = ({ eGridCell, data, dayTypeOptions, node, setValue }: CheckPerfRendererProps) => {
+const CheckPerfRenderer = ({ eGridCell, data, dayTypeOptions, node, setValue, api }: CheckPerfRendererProps) => {
   const [perfChecked, setPerfChecked] = useState(false);
-  const performanceOption = dayTypeOptions?.find(({ text }) => text === 'Performance');
   const pencilledStatus = statusOptions.find(({ text }) => text === 'Pencilled').value;
 
   useEffect(() => {
-    const isChecked = data.perf || (performanceOption && data.dayType === performanceOption.value);
+    const isChecked = data.perf || data.dayType === -2;
     setValue(isChecked);
     setPerfChecked(isChecked);
   }, [data, dayTypeOptions]);
 
-  const handleCheckboxChange = (checked) => {
+  const GetDayType = (checked: boolean) => {
+    if (checked) {
+      return -2; // Performance Code
+    } else {
+      if (node.rowIndex === 0) {
+        return 15; // TBA code
+      }
+      return 6; // Day off Code
+    }
+  };
+
+  const GetBookingStatus = (checked: boolean) => {
+    if (checked) {
+      if (data.rowIndex === 0) {
+        return pencilledStatus;
+      } else {
+        return api.getRenderedNodes()[0].data.bookingStatus;
+      }
+    } else {
+      return api.getRenderedNodes()[0].data.bookingStatus;
+    }
+  };
+
+  const handleCheckboxChange = (checked: boolean) => {
     setPerfChecked(checked);
     setValue(checked);
     const isBooking = checked;
@@ -28,9 +50,10 @@ const CheckPerfRenderer = ({ eGridCell, data, dayTypeOptions, node, setValue }: 
     node.setData({
       ...data,
       perf: checked,
-      dayType: checked ? performanceOption.value : '',
-      bookingStatus: checked ? pencilledStatus : '',
+      dayType: GetDayType(checked),
+      bookingStatus: GetBookingStatus(checked),
       pencilNo: null,
+      // noPerf: GetNoPerf(checked),
       isBooking,
       isRehearsal,
       isGetInFitUp,
