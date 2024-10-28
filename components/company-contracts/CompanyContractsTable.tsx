@@ -12,6 +12,8 @@ import useAxiosCancelToken from 'hooks/useCancelToken';
 import axios from 'axios';
 import { BuildNewContract, BuildNewContractProps } from './edit-contract-modal/BuildNewContract';
 import { defaultContractSchedule } from './ContractSchedule';
+import { productionJumpState } from 'state/booking/productionJumpState';
+import { objectify } from 'radash';
 
 interface ContractsTableProps {
   rowData?: IContractSummary[];
@@ -27,6 +29,8 @@ const defaultEditContractState = {
 export default function CompanyContractsTable({ rowData = [] }: ContractsTableProps) {
   const tableRef = useRef(null);
   const { users } = useRecoilValue(userState);
+  const { productions } = useRecoilValue(productionJumpState);
+  const productionMap = useMemo(() => objectify(productions, (production) => production.Id), [productions]);
   const [contracts, setContracts] = useRecoilState(contractListState);
   const [notesPopupContext, setNotesPopupContext] = useState(defaultNotesPopupContext);
   const [editContract, setEditContract] = useState<Partial<BuildNewContractProps>>(defaultEditContractState);
@@ -55,6 +59,17 @@ export default function CompanyContractsTable({ rowData = [] }: ContractsTablePr
   const columnDefs = useMemo(() => getCompanyContractsColumnDefs(userOptionList), [userOptionList]);
   const cancelToken = useAxiosCancelToken();
 
+  const getProductionCode = (id: number) => {
+    const production = productionMap[id];
+    return `${production.ShowCode}${production.Code}`;
+  };
+  const getNotesPopupTitle = (contract: IContractSummary): string => {
+    const { productionId, role, firstName, lastName } = contract || {};
+    const code = productionId ? `${getProductionCode(productionId)} |` : '';
+    const name = firstName || lastName ? `${firstName} ${lastName} |` : '';
+    const roleName = role ? `${role}` : '';
+    return `${code} ${name} ${roleName}`;
+  };
   const handleCellClick = (e) => {
     if (e.column.colId === 'notes') {
       setNotesPopupContext({ visible: true, contract: e.data });
@@ -122,9 +137,7 @@ export default function CompanyContractsTable({ rowData = [] }: ContractsTablePr
           <NotesPopup
             show={notesPopupContext.visible}
             notes={notesPopupContext.contract?.notes || ''}
-            title={`${notesPopupContext.contract?.firstName || ''} | ${notesPopupContext.contract?.lastName || ''} | ${
-              notesPopupContext?.contract.role || ''
-            }`}
+            title={getNotesPopupTitle(notesPopupContext.contract) || ''}
             onSave={handleSaveNote}
             onCancel={() => setNotesPopupContext(defaultNotesPopupContext)}
           />
