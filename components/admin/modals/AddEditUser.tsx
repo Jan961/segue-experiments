@@ -68,7 +68,7 @@ const AdEditUser = ({
   const [permissionGroups, setPermissionGroups] = useState<SelectOption[]>([]);
   const [selectedGroups, setSelectedGroups] = useState<number[]>([]);
   const { isSignUpLoaded, isBusy, createUser, updateUser, fetchPermissionsForSelectedUser, error } = useUser();
-  console.log('errors', validationErrors);
+
   const handleInputChange = (e) => {
     setIsFormDirty(true);
     setUserDetails({ ...userDetails, [e.target.name]: e.target.value });

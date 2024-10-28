@@ -1,26 +1,32 @@
 import { useUser } from '@clerk/nextjs';
-import { useRecoilState, useSetRecoilState } from 'recoil';
+import { useSetRecoilState } from 'recoil';
 import { userPermissionsState } from 'state/account/userPermissionsState';
 import { globalState } from 'state/global/globalState';
 import { isNullOrEmpty } from 'utils';
+import { getMenuItems } from 'components/PopoutMenu/config';
+import useStrings from './useStrings';
+import { useMemo } from 'react';
 
 const usePermissions = () => {
   const { isSignedIn, user } = useUser();
+  const getStrings = useStrings();
   const setPermissionsState = useSetRecoilState(userPermissionsState);
-  const [state, setGlobalState] = useRecoilState(globalState);
+  const setGlobalState = useSetRecoilState(globalState);
 
-  const applyPermissionsToMenuItems = (permissions = []) => {
-    const filteredItems = state.menuItems.reduce((acc, item) => {
+  const menuItems = useMemo(() => getMenuItems(getStrings), [getStrings]);
+
+  const applyPermissionsToMenuItems = (items, permissions = []) => {
+    const filteredItems = items.reduce((acc, item) => {
       if (!item.permission || permissions.includes(item.permission)) {
         let options = [];
         if (!isNullOrEmpty(item.options)) {
-          options = applyPermissionsToMenuItems(item.options);
+          options = applyPermissionsToMenuItems(item.options, permissions);
         }
         acc.push({ ...item, options });
       }
-
       return acc;
     }, []);
+
     return filteredItems;
   };
 
@@ -37,7 +43,7 @@ const usePermissions = () => {
           permissions,
           accountId: organisationId,
         });
-        const updatedmenuItems = applyPermissionsToMenuItems(permissions);
+        const updatedmenuItems = applyPermissionsToMenuItems(menuItems, permissions);
         setGlobalState((prev) => ({ ...prev, menuItems: updatedmenuItems }));
       }
     } catch (err) {
