@@ -18,7 +18,7 @@ const CheckPerfRenderer = ({ eGridCell, data, dayTypeOptions, node, setValue, ap
     setPerfChecked(isChecked);
   }, [data, dayTypeOptions]);
 
-  const GetDayType = (checked: boolean) => {
+  const getDayType = (checked: boolean) => {
     if (checked) {
       return -2; // Performance Code
     } else {
@@ -29,7 +29,7 @@ const CheckPerfRenderer = ({ eGridCell, data, dayTypeOptions, node, setValue, ap
     }
   };
 
-  const GetBookingStatus = (checked: boolean) => {
+  const getBookingStatus = (checked: boolean) => {
     if (checked) {
       if (data.rowIndex === 0) {
         return pencilledStatus;
@@ -50,10 +50,9 @@ const CheckPerfRenderer = ({ eGridCell, data, dayTypeOptions, node, setValue, ap
     node.setData({
       ...data,
       perf: checked,
-      dayType: GetDayType(checked),
-      bookingStatus: GetBookingStatus(checked),
+      dayType: getDayType(checked),
+      bookingStatus: getBookingStatus(checked),
       pencilNo: null,
-      // noPerf: GetNoPerf(checked),
       isBooking,
       isRehearsal,
       isGetInFitUp,

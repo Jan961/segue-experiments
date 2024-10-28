@@ -26,7 +26,7 @@ export default function PreviewBookingView(props: PreviewBookingViewProps) {
   const areInputFieldsValid = useMemo(() => {
     if (rows) {
       const noDayType = !isNullOrEmpty(rows.filter(({ dayType }) => isNullOrEmpty(dayType)));
-      const noVenue = !isNullOrEmpty(rows.filter(({ venue, perf }) => isNullOrEmpty(venue) && perf)); // If not a performance venu not required
+      const noVenue = !isNullOrEmpty(rows.filter(({ venue, perf }) => isNullOrEmpty(venue) && perf));
       const noBookingStatus = !isNullOrEmpty(rows.filter(({ bookingStatus }) => isNullOrEmpty(bookingStatus)));
       return noDayType || noVenue || noBookingStatus;
     }

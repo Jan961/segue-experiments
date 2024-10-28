@@ -147,7 +147,7 @@ export default function PreviewBookingDetails({
     return sortedFilteredBookings;
   };
 
-  const GetVenue = (item) => {
+  const getVenue = (item) => {
     if (!item.perf) {
       return dayTypeOptions.find((option) => option.value === item.dayType)?.text;
     }
@@ -156,7 +156,7 @@ export default function PreviewBookingDetails({
       : dayTypeOptions.find((option) => option.value === item.dayType)?.text;
   };
 
-  const GetPerformancetiems = (item) => {
+  const getPerformanceTimes = (item) => {
     const times = item.times.split(';');
     const accTimes = times.slice(0, item.noPerf);
     let str = '';
@@ -176,7 +176,7 @@ export default function PreviewBookingDetails({
       return {
         ...item,
         highlightRow: true,
-        venue: GetVenue(item),
+        venue: getVenue(item),
         town: item.venue && item.dayType !== null ? venueDict[item.venue].Town : '',
         capacity: item.venue && item.dayType !== null ? venueDict[item.venue].Seats : null,
         dayType: dayTypeOptions.find((option) => option.value === item.dayType)?.text,
@@ -184,7 +184,7 @@ export default function PreviewBookingDetails({
         bookingStatus: bookingStatusMap[item.bookingStatus],
         status: item.bookingStatus,
         performanceCount: item.perf ? item.noPerf?.toString() || '' : '',
-        performanceTimes: GetPerformancetiems(item),
+        performanceTimes: getPerformanceTimes(item),
         week: calculateWeek(),
         miles: '',
         travelTime: '',
