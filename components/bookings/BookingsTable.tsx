@@ -18,6 +18,7 @@ import { currentProductionSelector } from 'state/booking/selectors/currentProduc
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import useComponentMountStatus from 'hooks/useComponentMountStatus';
 import { accessBookingsHome } from 'state/account/selectors/permissionSelector';
+import { ColDef } from 'ag-grid-enterprise';
 
 interface BookingsTableProps {
   rowData?: any;
@@ -147,7 +148,7 @@ export default function BookingsTable({ rowData, tableRef }: BookingsTableProps)
   };
 
   if (bookingColumDefs.length > 0) {
-    bookingColumDefs[0].sortable = currentProduction === undefined;
+    (bookingColumDefs[0] as ColDef).sortable = currentProduction === undefined;
   }
   return (
     <>
