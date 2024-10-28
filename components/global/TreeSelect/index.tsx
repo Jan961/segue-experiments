@@ -32,6 +32,7 @@ export default function TreeSelect({
 
     let updatedOptions: TreeItemOption[] = options.map((o) => ({ ...o, groupHeader: true }));
     updatedOptions = mapRecursive(updatedOptions, (o) => ({ ...o, disabled }));
+
     setItemOptions(updatedOptions);
     const areAllOptionsSelected = updatedOptions.every((o) => o.checked);
     setSelecteAll(areAllOptionsSelected);

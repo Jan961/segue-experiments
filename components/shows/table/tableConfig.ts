@@ -43,6 +43,7 @@ export const showsTableConfig = (permissions = []) => [
     cellRenderer: ShowsTextInputRenderer,
     cellRendererParams: {
       placeholder: 'Please enter Show Name',
+      disabled: !permissions.includes('EDIT_SHOW_NAME_AND_CODE'),
     },
     headerClass: 'text-center',
     width: 396,
@@ -55,6 +56,7 @@ export const showsTableConfig = (permissions = []) => [
     field: 'Code',
     cellRendererParams: {
       placeholder: 'Please enter Show Code',
+      disabled: !permissions.includes('EDIT_SHOW_NAME_AND_CODE'),
     },
     cellRenderer: ShowsTextInputRenderer,
     width: 130,
@@ -130,18 +132,20 @@ export const showsTableConfig = (permissions = []) => [
     width: 70,
     cellRenderer: ButtonRenderer,
     cellRendererParams: (params) => {
-      return {
-        buttonText: 'Delete',
-        variant: 'tertiary',
-        ...(!isUndefined(params.data.productions) &&
-          params.data.productions.length > 0 && {
-            disabled: true,
-            tpActive: true,
-            body: 'Please delete all Productions before deleting a Show',
-            position: 'right',
-            width: 'w-36',
-          }),
-      };
+      return !permissions.includes('DELETE_SHOW')
+        ? { disabled: true, buttonText: 'Delete', variant: 'tertiary', position: 'right', width: 'w-36' }
+        : {
+            buttonText: 'Delete',
+            variant: 'tertiary',
+            ...(!isUndefined(params.data.productions) &&
+              params.data.productions.length > 0 && {
+                disabled: true,
+                tpActive: true,
+                body: 'Please delete all Productions before deleting a Show',
+                position: 'right',
+                width: 'w-36',
+              }),
+          };
     },
     cellStyle: {
       paddingRight: '0.5em',
@@ -207,7 +211,7 @@ export const currencyConversionTableConfig = [
   },
 ];
 
-export const productionsTableConfig = [
+export const productionsTableConfig = (permissions) => [
   {
     headerName: 'Production',
     headerClass: 'justify-center font-bold text-base ',
@@ -265,17 +269,20 @@ export const productionsTableConfig = [
     field: 'delete',
     width: 70,
     cellRenderer: ButtonRenderer,
-    cellRendererParams: (params) => ({
-      buttonText: 'Delete',
-      variant: 'tertiary',
-      ...(!params.data.IsArchived && {
-        disabled: true,
-        tpActive: true,
-        body: 'Please archive the production prior to deleting',
-        position: 'right',
-        width: 'w-36',
-      }),
-    }),
+    cellRendererParams: (params) =>
+      !permissions.includes('DELETE_PRODUCTION')
+        ? { disabled: true, buttonText: 'Delete', variant: 'tertiary', position: 'right', width: 'w-36' }
+        : {
+            buttonText: 'Delete',
+            variant: 'tertiary',
+            ...(!params.data.IsArchived && {
+              disabled: true,
+              tpActive: true,
+              body: 'Please archive the production prior to deleting',
+              position: 'right',
+              width: 'w-36',
+            }),
+          },
     cellStyle: {
       paddingRight: '0.5em',
     },

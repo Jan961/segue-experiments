@@ -1,10 +1,10 @@
 import Layout from 'components/Layout';
 import { SwitchBoardItem } from 'components/global/SwitchBoardItem';
 import { useRecoilValue } from 'recoil';
-import { accessAdmin } from 'state/account/selectors/permissionSelector';
+import { accessAdminHome } from 'state/account/selectors/permissionSelector';
 
 export default function Index() {
-  const permissions = useRecoilValue(accessAdmin);
+  const permissions = useRecoilValue(accessAdminHome);
   const links = [
     {
       title: 'Company Information',

@@ -111,6 +111,7 @@ const sortPermissionsHierarchy = (items, topLevelIds) => {
 export const getPermissionsList = async () => {
   try {
     const results = await prismaMaster.permission.findMany({ orderBy: { PermissionParentPermissionId: 'asc' } });
+    // Build the hierarchy
     const topLevelItems = results.filter((item) => item.PermissionParentPermissionId === null);
     const sortedResults = sortPermissionsHierarchy(results, topLevelItems);
     return formatPermissions(sortedResults);

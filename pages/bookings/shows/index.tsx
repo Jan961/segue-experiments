@@ -54,7 +54,7 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
               onChange={() => setIsArchived(!isArchived)}
             />
             <Button
-              disabled={isAddRow || !permissions.includes('CREATE_NEW_SHOW')}
+              disabled={isAddRow || !permissions.includes('ADD_NEW_SHOW')}
               onClick={addNewRow}
               text="Add New Show"
             />
