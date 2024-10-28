@@ -7,7 +7,13 @@ interface ShowsTextInputRendererProps extends ICellRendererParams {
   disabled?: boolean;
 }
 
-const ShowsTextInputRenderer = ({ value, setValue, eGridCell, placeholder, disabled }: ShowsTextInputRendererProps) => {
+const ShowsTextInputRenderer = ({
+  value,
+  setValue,
+  eGridCell,
+  placeholder,
+  disabled = true,
+}: ShowsTextInputRendererProps) => {
   const [inputValue, setInputValue] = useState(value || '');
 
   const [error, setError] = useState<string>('');

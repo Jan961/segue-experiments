@@ -15,7 +15,7 @@ const CurrencyExchangeRenderer = ({
   node,
   colDef,
   data,
-  disabled,
+  disabled = true,
 }: ShowsTextInputRendererProps) => {
   const [inputValue, setInputValue] = useState(value);
   const { toSymbol, fromCurrencyCode } = data.exchange || {};
