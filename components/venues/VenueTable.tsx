@@ -2,6 +2,8 @@ import Table from 'components/core-ui-lib/Table';
 import { styleProps, venueColumnDefs } from 'components/bookings/table/tableConfig';
 import { Venue } from 'interfaces';
 import { UiTransformedVenue } from 'utils/venue';
+import { useRecoilValue } from 'recoil';
+import { accessBookingsHome } from 'state/account/selectors/permissionSelector';
 type Props = {
   items?: Venue[];
   onSelectVenue: (venue: UiTransformedVenue) => void;
@@ -19,8 +21,12 @@ const gridOptions = {
 };
 
 const VenueTable = ({ items, onSelectVenue }: Props) => {
+  const permissions = useRecoilValue(accessBookingsHome);
+
   const handleCellClick = (e: { data: UiTransformedVenue }) => {
-    onSelectVenue(e.data);
+    if (permissions.includes('ACCESS_EDIT_VENUE')) {
+      onSelectVenue(e.data);
+    }
   };
 
   return (

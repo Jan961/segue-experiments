@@ -155,7 +155,7 @@ export const showsTableConfig = (permissions = []) => [
   },
 ];
 
-export const currencyConversionTableConfig = [
+export const currencyConversionTableConfig = (permissions) => [
   {
     headerName: 'Currency',
     headerClass: 'justify-center font-bold text-base ',
@@ -202,6 +202,9 @@ export const currencyConversionTableConfig = [
     width: 300,
     autoHeaderHeight: true,
     resizable: false,
+    cellRendererParams: {
+      disabled: !permissions.includes('EDIT_CURRENCY_CONVERSION'),
+    },
     cellStyle: {
       paddingRight: '0.75em',
       paddingLeft: '0.75em',
@@ -245,6 +248,7 @@ export const productionsTableConfig = (permissions) => [
     field: 'editId',
     cellRenderer: ButtonRenderer,
     cellRendererParams: {
+      disabled: !permissions.includes('ACCESS_EDIT_PRODUCTION DETAILS'),
       buttonText: 'View/Edit',
     },
     resizable: false,
@@ -257,6 +261,7 @@ export const productionsTableConfig = (permissions) => [
     width: 270,
     cellRenderer: ButtonRenderer,
     cellRendererParams: {
+      disabled: !permissions.includes('ACCESS_CURRENCY_CONVERSION'),
       buttonText: 'SET CURRENCY CONVERSION RATES',
       variant: 'secondary',
       width: 270,

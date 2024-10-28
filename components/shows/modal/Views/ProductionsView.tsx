@@ -244,10 +244,10 @@ const ProductionsView = ({ showData, visible, onClose }: ProductionsViewProps) =
 
   const handleCellClick = async (e) => {
     updateCurrentProductionState(e.data);
-    if (e.column.colId === 'editId') {
+    if (e.column.colId === 'editId' && permissions.includes('ACCESS_EDIT_PRODUCTION DETAILS')) {
       setOpenEditModal(true);
     }
-    if (e.column.colId === 'updateCurrencyConversion') {
+    if (e.column.colId === 'updateCurrencyConversion' && permissions.includes('ACCESS_CURRENCY_CONVERSION')) {
       setOpenCurrencyConversionModal(true);
     }
     if (e.column.colId === 'delete' && permissions.includes('DELETE_PRODUCTION') && e.data?.IsArchived) {

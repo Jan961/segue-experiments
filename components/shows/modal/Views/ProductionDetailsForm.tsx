@@ -20,6 +20,7 @@ import { debug } from 'utils/logging';
 import { uploadStrings } from 'config/upload';
 import axios from 'axios';
 import classNames from 'classnames';
+import { accessShows } from 'state/account/selectors/permissionSelector';
 
 export interface ProductionFormData {
   id?: number;
@@ -65,6 +66,7 @@ export const defaultProductionFormData: ProductionFormData = {
 };
 
 const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: ProductionsViewModalProps) => {
+  const permissions = useRecoilValue(accessShows);
   const currencyList = useRecoilValue(currencyListState);
   const productionCompanyList = useRecoilValue(productionCompanyState);
   const [formData, setFormData] = useState(production || defaultProductionFormData);
@@ -409,6 +411,7 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
             iconProps={{ className: 'h-4 w-3' }}
             text="Save and Close"
             onClick={onSubmit}
+            disabled={!permissions.includes('EDIT_PRODUCTION_DETAILS')}
           />
         </div>
       </form>

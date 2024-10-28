@@ -48,7 +48,11 @@ export default function TreeSelect({
 
   const handleSelectAllToggle = () => {
     setSelecteAll(!selectAll);
-    const updatedOptions = mapRecursive(itemOptions, (o) => ({ ...o, checked: !selectAll }));
+    const updatedOptions = mapRecursive(itemOptions, (o) => ({
+      ...o,
+      checked: !selectAll,
+      isPartiallySelected: false,
+    }));
     setItemOptions(updatedOptions);
     onChange(updatedOptions);
   };
