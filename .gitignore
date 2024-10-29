@@ -61,5 +61,5 @@ coverage
 prisma/views/
 prisma/generated/
 
-#folder for developers to store notes and/or personalised helpers
+#dev tools directory for custom dev tools
 devTools/
