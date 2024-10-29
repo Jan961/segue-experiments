@@ -19,6 +19,8 @@ import { ConfirmationDialog, PopupModal } from 'components/core-ui-lib';
 import { all, group, objectify } from 'radash';
 import { ICurrency, ICurrencyCountry } from 'interfaces';
 import { isNullOrEmpty } from 'utils';
+import { useRecoilValue } from 'recoil';
+import { accessShows } from 'state/account/selectors/permissionSelector';
 
 interface ProductionsViewProps {
   showData: any;
@@ -38,6 +40,7 @@ const rowClassRules = {
 };
 
 const ProductionsView = ({ showData, visible, onClose }: ProductionsViewProps) => {
+  const permissions = useRecoilValue(accessShows);
   const tableRef = useRef(null);
   const router = useRouter();
   const [openEditModal, setOpenEditModal] = useState<boolean>(false);
@@ -49,7 +52,10 @@ const ProductionsView = ({ showData, visible, onClose }: ProductionsViewProps) =
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isArchived, setIsArchived] = useState<boolean>(true);
   const isMounted = useComponentMountStatus();
-  const productionColumDefs = useMemo(() => (isMounted ? productionsTableConfig : []), [isMounted]);
+  const productionColumDefs = useMemo(
+    () => (isMounted ? productionsTableConfig(permissions) : []),
+    [isMounted, permissions],
+  );
   const [showParentLoading, setParentLoadingOverlay] = useState<boolean>(false);
   const showName = useMemo(() => showData.Name, [showData]);
   const showCode = useMemo(() => showData.Code, [showData]);
@@ -238,13 +244,13 @@ const ProductionsView = ({ showData, visible, onClose }: ProductionsViewProps) =
 
   const handleCellClick = async (e) => {
     updateCurrentProductionState(e.data);
-    if (e.column.colId === 'editId') {
+    if (e.column.colId === 'editId' && permissions.includes('ACCESS_EDIT_PRODUCTION DETAILS')) {
       setOpenEditModal(true);
     }
-    if (e.column.colId === 'updateCurrencyConversion') {
+    if (e.column.colId === 'updateCurrencyConversion' && permissions.includes('ACCESS_CURRENCY_CONVERSION')) {
       setOpenCurrencyConversionModal(true);
     }
-    if (e.column.colId === 'delete' && e.data?.IsArchived) {
+    if (e.column.colId === 'delete' && permissions.includes('DELETE_PRODUCTION') && e.data?.IsArchived) {
       setConfirm(true);
     }
   };
@@ -297,7 +303,11 @@ const ProductionsView = ({ showData, visible, onClose }: ProductionsViewProps) =
                 id=""
                 onChange={handleArchive}
               />
-              <Button onClick={addNewRow} text="Add New Production" />
+              <Button
+                onClick={addNewRow}
+                text="Add New Production"
+                disabled={!permissions.includes('ADD_NEW_PRODUCTION')}
+              />
             </div>
           </div>
         </div>

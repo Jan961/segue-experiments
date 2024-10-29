@@ -57,7 +57,6 @@ const formatPermissions = (permissions) => {
 
   const formattedResults = permissions.reduce((acc, permission) => {
     const formattedItem = formatPermission(permission);
-
     if (!formattedItem.parentId) {
       acc.push(formattedItem);
     } else {
@@ -74,12 +73,48 @@ const formatPermissions = (permissions) => {
   return formattedResults;
 };
 
+const sortPermissionsHierarchy = (items, topLevelIds) => {
+  // Create a map to store items by their id for quick lookup
+  const itemMap = new Map();
+  items.forEach((item) => itemMap.set(item.PermissionId, { ...item, children: [] }));
+
+  // Build the hierarchy by assigning each item to its parent's children array
+  items.forEach((item) => {
+    if (item.PermissionParentPermissionId) {
+      const parent = itemMap.get(item.PermissionParentPermissionId);
+      if (parent) {
+        parent.children.push(itemMap.get(item.PermissionId));
+      }
+    }
+  });
+
+  // Function to recursively add parent-children items in order
+  const addInOrder = (item, result) => {
+    result.push({
+      ...item,
+      PermissionId: item.PermissionId,
+      PermissionParentPermissionId: item.PermissionParentPermissionId,
+    });
+    item.children.forEach((child) => addInOrder(child, result));
+  };
+
+  // Collect sorted items
+  const sortedItems = [];
+  topLevelIds.forEach(({ PermissionId }) => {
+    const topLevelItem = itemMap.get(PermissionId);
+    if (topLevelItem) addInOrder(topLevelItem, sortedItems);
+  });
+
+  return sortedItems;
+};
+
 export const getPermissionsList = async () => {
   try {
-    const results = await prismaMaster.permission.findMany({
-      orderBy: { PermissionParentPermissionId: 'asc' },
-    });
-    return formatPermissions(results);
+    const results = await prismaMaster.permission.findMany({ orderBy: { PermissionParentPermissionId: 'asc' } });
+    // Build the hierarchy
+    const topLevelItems = results.filter((item) => item.PermissionParentPermissionId === null);
+    const sortedResults = sortPermissionsHierarchy(results, topLevelItems);
+    return formatPermissions(sortedResults);
   } catch (err) {
     console.log('Error fetching permissions ', err);
   }
