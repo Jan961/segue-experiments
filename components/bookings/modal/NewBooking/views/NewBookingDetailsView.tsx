@@ -92,19 +92,31 @@ export default function NewBookingDetailsView({
   }, [bookingData]);
 
   const addRowToTable = (index: number, data: any, direction: Direction) => {
+    const api = tableRef.current.getApi();
+    const initRows = api.getRenderedNodes();
+    if (initRows.length === 1) {
+      initRows[0].data.isRunOfDates = true;
+    }
     const rowDate =
       direction === 'before' ? subDays(parseISO(data.dateAsISOString), 1) : addDays(parseISO(data.dateAsISOString), 1);
     const date = formattedDateWithWeekDay(rowDate, 'Short');
     const dateAsISOString = rowDate.toISOString();
     const rowToAdd = { ...data, noPerf: null, times: '', date, dateAsISOString, id: null, isRunOfDates: true };
     applyTransactionToGrid(tableRef, { add: [rowToAdd], addIndex: direction === 'before' ? 0 : index + 1 });
-    tableRef.current.getApi().redrawRows();
+    api.redrawRows();
   };
 
   const removeRowFromTable = (data: any) => {
+    const api = tableRef.current.getApi();
     applyTransactionToGrid(tableRef, { remove: [data] });
-    tableRef.current.getApi().redrawRows();
+    const rows = api.getRenderedNodes();
+    if (rows.length === 1) {
+      rows[0].data.isRunOfDates = false;
+    }
+    api.redrawRows();
   };
+
+  // test
 
   useEffect(() => {
     if (isNewBooking) {

@@ -414,6 +414,13 @@ const AdEditUser = ({
               </div>
             </div>
             <FormError error={error} className="my-2 flex justify-end" variant="md" />
+            {!error && Object.values(validationErrors).length > 0 && (
+              <FormError
+                error="Please ensure you complete all highlighted fields"
+                className="my-2 flex justify-end"
+                variant="md"
+              />
+            )}
             <div className="flex justify-end gap-4 mt-2">
               <Button onClick={handleModalClose} variant="secondary" testId="cancel-edited-user-info">
                 Cancel
