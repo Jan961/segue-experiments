@@ -19,13 +19,14 @@ const CheckPerfRenderer = ({ eGridCell, data, dayTypeOptions, node, setValue, ap
   }, [data, dayTypeOptions]);
 
   const getDayType = (checked: boolean) => {
+    console.log(dayTypeOptions);
     if (checked) {
-      return -2; // Performance Code
+      return dayTypeOptions.find(({ text }) => text === 'Performance').value; // Performance Code
     } else {
       if (node.rowIndex === 0) {
-        return 15; // TBA code
+        return dayTypeOptions.find(({ text }) => text === 'TBA').value; // TBA code
       }
-      return 6; // Day off Code
+      return dayTypeOptions.find(({ text }) => text === 'Day Off').value; // Day off Code
     }
   };
 
