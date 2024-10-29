@@ -13,12 +13,14 @@ import { productionJumpState } from 'state/booking/productionJumpState';
 import moment from 'moment';
 import useMileageCalculator from 'hooks/useBookingMileageCalculator';
 import BookingsButtons from './BookingsButton';
+import { accessBookingsHome } from 'state/account/selectors/permissionSelector';
 
 interface FiltersProps {
   onExportClick?: (key: string) => void;
 }
 
 const Filters = ({ onExportClick }: FiltersProps) => {
+  const permissions = useRecoilValue(accessBookingsHome);
   const [filter, setFilter] = useRecoilState(filterState);
   const { selected: ProductionId } = useRecoilValue(productionJumpState);
   const schedule = useRecoilValue(filteredScheduleSelector);
@@ -75,7 +77,7 @@ const Filters = ({ onExportClick }: FiltersProps) => {
               <Button
                 testId="booking-filters-tour-summary"
                 text="Tour Summary"
-                disabled={ProductionId === -1 || !ProductionId}
+                disabled={ProductionId === -1 || !ProductionId || !permissions.includes('ACCESS_TOUR_SUMMARY')}
                 className="text-sm leading-8 w-[120px]"
                 onClick={() => setShowProductionSummary(true)}
               />
