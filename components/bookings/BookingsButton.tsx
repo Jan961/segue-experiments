@@ -8,12 +8,14 @@ import { productionJumpState } from 'state/booking/productionJumpState';
 import { BookingReports } from './modal/BookingReports';
 import { VenueHistory } from './modal/VenueHistory';
 import { addEditBookingState } from 'state/booking/bookingState';
+import { accessBookingsHome } from 'state/account/selectors/permissionSelector';
 
 interface BookingsButtonProps {
   onExportClick: (key: string) => void;
 }
 
 export default function BookingsButtons({ onExportClick }: BookingsButtonProps) {
+  const permissions = useRecoilValue(accessBookingsHome);
   const [showBarringModal, setShowBarringModal] = useState<boolean>(false);
   const [bookingsDisabled, setBookingsDisabled] = useState<boolean>(false);
   const [showBookingReportsModal, setShowBookingReportsModal] = useState<boolean>();
@@ -38,7 +40,7 @@ export default function BookingsButtons({ onExportClick }: BookingsButtonProps) 
       >
         <Button
           testId="booking-filters-create-new-booking"
-          disabled={bookingsDisabled}
+          disabled={bookingsDisabled || disabled || !permissions.includes('CREATE_NEW_BOOKING')}
           text="Create New Booking"
           className="w-[155px]"
           onClick={() => setAddNewBookingModalVisible({ visible: true, startDate: null, endDate: null })}
@@ -47,7 +49,7 @@ export default function BookingsButtons({ onExportClick }: BookingsButtonProps) 
 
       <Button
         testId="booking-filters-booking-reports"
-        disabled={disabled}
+        disabled={disabled || !permissions.includes('ACCESS_BOOKING_REPORTS')}
         text="Booking Reports"
         className="w-[155px]"
         iconProps={{ className: 'h-4 w-3' }}
@@ -59,12 +61,13 @@ export default function BookingsButtons({ onExportClick }: BookingsButtonProps) 
         testId="booking-filters-venue-history"
         onClick={() => setShowVenueHistory(true)}
         text="Venue History"
+        disabled={!permissions.includes('ACCESS_VENUE_HISTORY')}
         className="w-[155px] mt-0.5"
       />
 
       <Button
         testId="booking-filters-barring-check"
-        disabled={disabled}
+        disabled={disabled || !permissions.includes('ACCESS_BARRING_CHECK')}
         text="Barring Check"
         className="w-[155px] mt-0.5"
         onClick={() => setShowBarringModal(true)}

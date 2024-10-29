@@ -43,7 +43,7 @@ const SignIn = () => {
   });
 
   const handleLoginDetailsChange = (e) => {
-    setLoginDetails((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    setLoginDetails((prev) => ({ ...prev, [e.target.name]: e.target.value.trim() }));
   };
 
   const handleAllowAccountSelect = async () => {

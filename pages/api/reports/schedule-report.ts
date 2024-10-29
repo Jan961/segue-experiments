@@ -7,7 +7,6 @@ import {
   alignColumnTextHorizontally,
   colorCell,
   colorTextAndBGCell,
-  minutesInHHmmFormat,
   topAndBottomBorder,
 } from 'services/salesSummaryService';
 import { addWidthAsPerContent } from 'services/reportsService';
@@ -15,7 +14,9 @@ import { makeRowTextBoldAndAllignLeft } from './promoter-holds';
 import { convertToPDF } from 'utils/report';
 import { bookingStatusMap } from 'config/bookings';
 import { addBorderToAllCells } from 'utils/export';
-import { PerformanceInfo, SCHEDULE_VIEW, addTime, getSheduleReport } from 'services/reports/schedule-report';
+import { PerformanceInfo, SCHEDULE_VIEW, getSheduleReport } from 'services/reports/schedule-report';
+import { convertMinutesToHoursMins } from 'services/dateService';
+import { sum } from 'radash';
 
 const makeRowBold = ({ worksheet, row }: { worksheet: any; row: number }) => {
   worksheet.getRow(row).font = { bold: true };
@@ -180,9 +181,9 @@ const handler = async (req, res) => {
       weekTotalPrinted: false,
       prevProductionWeekNum: '',
     };
-    const time: string[] = [];
+    const time: number[] = [];
     const mileage: number[] = [];
-    let totalTime: string[] = [];
+    let totalTime: number[] = [];
     let totalMileage: number[] = [];
     const seats: number[] = [];
     const performancesPerDay: number[] = [];
@@ -191,8 +192,11 @@ const handler = async (req, res) => {
       lastWeekMetaInfo = { ...lastWeekMetaInfo, weekTotalPrinted: false };
       const weekDay = moment(moment(from).add(i - 1, 'day')).format('dddd');
       const dateInIncomingFormat = moment(moment(from).add(i - 1, 'day'));
+      const nextDateIncomingFormat = moment(moment(from).add(i, 'day'));
       const key = getKey({ FullProductionCode, ShowName, EntryDate: dateInIncomingFormat.format('YYYY-MM-DD') });
+      const nextKey = getKey({ FullProductionCode, ShowName, EntryDate: nextDateIncomingFormat.format('YYYY-MM-DD') });
       const value: SCHEDULE_VIEW = map[key];
+      const nextValue: SCHEDULE_VIEW = map[nextKey];
       const isOtherDay = [
         'Day Off',
         'Travel Day',
@@ -202,7 +206,7 @@ const handler = async (req, res) => {
         'Declared Holiday',
       ].includes(value?.EntryName);
       const isCancelled = value?.EntryStatusCode === 'X';
-
+      const isSuspended = value?.EntryStatusCode === 'S';
       if (!value) {
         worksheet.addRow([
           FullProductionCode,
@@ -230,37 +234,51 @@ const handler = async (req, res) => {
           EntryStatusCode,
           EntryType = '',
         } = value;
-        const formattedTime = TimeMins ? minutesInHHmmFormat(Number(TimeMins)) : '';
+        const formattedTime = TimeMins ? convertMinutesToHoursMins(Number(TimeMins)) : '';
         const performances = bookingIdPerformanceMap[EntryId];
         const performancesOnThisDay = performances?.filter?.((performance) =>
           moment(performance.performanceDate).isSame(dateInIncomingFormat, 'day'),
         );
-        time.push(formattedTime || '00:00');
-        mileage.push(Number(Mileage) || 0);
-        seats.push(Number(VenueSeats) || 0);
-        performancesPerDay.push(performances?.length || 0);
         prevProductionWeekNum = ProductionWeekNum ? String(ProductionWeekNum) : prevProductionWeekNum;
-        worksheet.addRow([
+        let row = [
           FullProductionCode,
           weekDay.substring(0, 3),
           dateInIncomingFormat.format('DD/MM/YY'),
           ProductionWeekNum,
           EntryName || '',
-          ...((isOtherDay && [Location || '', EntryType || '']) || []),
-          ...((!isOtherDay &&
-            !isCancelled && [
-              Location || '',
-              'Performance',
-              `${bookingStatusMap?.[EntryStatusCode] || ''} ${PencilNum ? `(${PencilNum})` : ''}`,
-              VenueSeats,
-              performancesOnThisDay?.length,
-              performancesOnThisDay?.[0]?.performanceTime || '',
-              performancesOnThisDay?.[1]?.performanceTime || '',
-              Number(Mileage) || '',
-              formattedTime,
-            ]) ||
-            []),
-        ]);
+        ];
+        if (isOtherDay) {
+          row = row.concat([Location || '', EntryType || '']);
+        } else if (!isCancelled && !isSuspended) {
+          const isFinalDay = nextValue?.Location !== value?.Location;
+          row = row.concat([
+            Location || '',
+            'Performance',
+            `${bookingStatusMap?.[EntryStatusCode] || ''} ${PencilNum ? `(${PencilNum})` : ''}`,
+            VenueSeats,
+            performancesOnThisDay?.length,
+            performancesOnThisDay?.[0]?.performanceTime || '',
+            performancesOnThisDay?.[1]?.performanceTime || '',
+          ]);
+          seats.push(Number(VenueSeats) || 0);
+          if (isFinalDay) {
+            row = row.concat([Number(Mileage) || '', formattedTime]);
+            performancesPerDay.push(performances?.length || 0);
+            time.push(Number(TimeMins) || 0);
+            mileage.push(Number(Mileage) || 0);
+          }
+        } else {
+          row = row.concat([
+            Location || '',
+            'Performance',
+            `${bookingStatusMap?.[EntryStatusCode] || ''} ${PencilNum ? `(${PencilNum})` : ''}`,
+            // VenueSeats,
+            // performancesOnThisDay?.length,
+            // performancesOnThisDay?.[0]?.performanceTime || '',
+            // performancesOnThisDay?.[1]?.performanceTime || '',
+          ]);
+        }
+        worksheet.addRow([...row]);
       }
       rowNo++;
 
@@ -273,13 +291,13 @@ const handler = async (req, res) => {
           cellColor: COLOR_HEXCODE.RED,
         });
       }
-      if (isCancelled) {
+      if (isCancelled || isSuspended) {
         colorTextAndBGCell({
           worksheet,
           row: rowNo,
           col: 5,
           textColor: COLOR_HEXCODE.WHITE,
-          cellColor: COLOR_HEXCODE.BLACK,
+          cellColor: isSuspended ? COLOR_HEXCODE.PURPLE : COLOR_HEXCODE.BLACK,
         });
       }
       if (weekDay === 'Monday') {
@@ -310,7 +328,7 @@ const handler = async (req, res) => {
       '',
       '',
       totalMileage.reduce((acc, m) => acc + Number(m || 0), 0),
-      addTime(totalTime),
+      convertMinutesToHoursMins(sum(totalTime)),
     ]);
 
     rowNo++;
@@ -362,7 +380,7 @@ const handler = async (req, res) => {
     worksheet.getColumn('L').width = 7;
     worksheet.getColumn('M').width = 7;
     addBorderToAllCells({ worksheet });
-
+    worksheet.getCell(1, 1).font = { size: 16, color: { argb: COLOR_HEXCODE.WHITE }, bold: true };
     const filename = `${title}.xlsx`;
 
     if (format === 'pdf') {

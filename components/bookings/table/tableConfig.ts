@@ -37,150 +37,159 @@ const milesCellStyle = ({ value, data, node }) => ({
   fontStyle: value === -1 ? 'italic' : 'normal',
 });
 
-export const columnDefs = [
-  {
-    headerName: 'Production',
-    field: 'production',
-    cellRenderer: DefaultCellRenderer,
-    headerClass: ['bgOrangeTextWhite'],
-    width: 106,
-    sortable: true,
-  },
-  {
-    headerName: 'Date',
-    field: 'date',
-    cellRenderer: DateColumnRenderer,
-    headerClass: ['bgOrangeTextWhite'],
-    width: 120,
-    minWidth: 120,
-    cellClassRules: {
-      isMonday: (params) => params.value.includes('Mon'),
+export const columnDefs = (canAccessNotes: boolean) => {
+  const columns = [
+    {
+      headerName: 'Production',
+      field: 'production',
+      cellRenderer: DefaultCellRenderer,
+      headerClass: ['bgOrangeTextWhite'],
+      width: 106,
+      sortable: true,
     },
-    comparator: (valueA, valueB, _nodeA, _nodeB, _isDescending) => {
-      const aTrimmed = valueA.slice(4);
-      const bTrimmed = valueB.slice(4);
-      const aDateParts = aTrimmed
-        .split('/')
-        .map((item: string) => {
-          return parseInt(item);
-        })
-        .reverse();
-      const bDateParts = bTrimmed
-        .split('/')
-        .map((item: string) => {
-          return parseInt(item);
-        })
-        .reverse();
-      const compareDates = (date1: number[], date2: number[]) => {
-        if (date1.length === 0 || date2.length === 0) return 0;
+    {
+      headerName: 'Date',
+      field: 'date',
+      cellRenderer: DateColumnRenderer,
+      headerClass: ['bgOrangeTextWhite'],
+      width: 120,
+      minWidth: 120,
+      cellClassRules: {
+        isMonday: (params) => params.value.includes('Mon'),
+      },
+      comparator: (valueA, valueB, _nodeA, _nodeB, _isDescending) => {
+        const aTrimmed = valueA.slice(4);
+        const bTrimmed = valueB.slice(4);
+        const aDateParts = aTrimmed
+          .split('/')
+          .map((item: string) => {
+            return parseInt(item);
+          })
+          .reverse();
+        const bDateParts = bTrimmed
+          .split('/')
+          .map((item: string) => {
+            return parseInt(item);
+          })
+          .reverse();
+        const compareDates = (date1: number[], date2: number[]) => {
+          if (date1.length === 0 || date2.length === 0) return 0;
 
-        if (date1[0] === date2[0]) {
-          return compareDates(date1.slice(1), date2.slice(1));
-        } else {
-          return date1[0] > date2[0] ? 1 : -1;
-        }
-      };
-      return compareDates(aDateParts, bDateParts);
+          if (date1[0] === date2[0]) {
+            return compareDates(date1.slice(1), date2.slice(1));
+          } else {
+            return date1[0] > date2[0] ? 1 : -1;
+          }
+        };
+        return compareDates(aDateParts, bDateParts);
+      },
     },
-  },
-  { headerName: 'Wk', field: 'week', headerClass: ['bgOrangeTextWhite'], cellRenderer: DefaultCellRenderer, width: 55 },
-  {
-    headerName: 'Venue Details',
-    field: 'venue',
-    cellRenderer: VenueColumnRenderer,
-    headerClass: ['bgOrangeTextWhite'],
-    minWidth: 6,
-    flex: 2,
+    {
+      headerName: 'Wk',
+      field: 'week',
+      headerClass: ['bgOrangeTextWhite'],
+      cellRenderer: DefaultCellRenderer,
+      width: 55,
+    },
+    {
+      headerName: 'Venue Details',
+      field: 'venue',
+      cellRenderer: VenueColumnRenderer,
+      headerClass: ['bgOrangeTextWhite'],
+      minWidth: 6,
+      flex: 2,
 
-    cellClassRules: {
-      dayTypeNotPerformance: (params) => {
-        const { dayType } = params.data;
-        return dayType !== 'Performance' && params.value !== '';
-      },
-      cancelledBooking: (params) => {
-        const { bookingStatus } = params.data;
-        return bookingStatus === 'Cancelled' && params.value !== '';
-      },
-      suspendedBooking: (params) => {
-        const { bookingStatus } = params.data;
-        return bookingStatus === 'Suspended' && params.value !== '';
-      },
-      pencilledBooking: (params) => {
-        const { bookingStatus, multipleVenuesOnSameDate } = params.data;
-        return bookingStatus === 'Pencilled' && multipleVenuesOnSameDate && params.value !== '';
-      },
-      multipleBookings: (params) => {
-        const { dayType, venueHasMultipleBookings } = params.data;
-        return dayType === 'Performance' && venueHasMultipleBookings && params.value !== '';
+      cellClassRules: {
+        dayTypeNotPerformance: (params) => {
+          const { dayType } = params.data;
+          return dayType !== 'Performance' && params.value !== '';
+        },
+        cancelledBooking: (params) => {
+          const { bookingStatus } = params.data;
+          return bookingStatus === 'Cancelled' && params.value !== '';
+        },
+        suspendedBooking: (params) => {
+          const { bookingStatus } = params.data;
+          return bookingStatus === 'Suspended' && params.value !== '';
+        },
+        pencilledBooking: (params) => {
+          const { bookingStatus, multipleVenuesOnSameDate } = params.data;
+          return bookingStatus === 'Pencilled' && multipleVenuesOnSameDate && params.value !== '';
+        },
+        multipleBookings: (params) => {
+          const { dayType, venueHasMultipleBookings } = params.data;
+          return dayType === 'Performance' && venueHasMultipleBookings && params.value !== '';
+        },
       },
     },
-  },
-  {
-    headerName: 'Town',
-    field: 'town',
-    cellRenderer: DefaultCellRenderer,
-    headerClass: ['bgOrangeTextWhite'],
-    minWidth: 100,
-    flex: 1,
-  },
-  {
-    headerName: 'Day Type',
-    field: 'dayType',
-    cellRenderer: DefaultCellRenderer,
-    headerClass: ['bgOrangeTextWhite'],
-    width: 95,
-  },
-  {
-    headerName: 'Booking Status',
-    field: 'bookingStatus',
-    valueFormatter: ({ value, data }) =>
-      value === 'Pencilled' && data.pencilNo ? `${value} (${data.pencilNo})` : value,
-    headerClass: ['bgOrangeTextWhite'],
-    cellStyle: {
-      paddingLeft: '0.5rem',
+    {
+      headerName: 'Town',
+      field: 'town',
+      cellRenderer: DefaultCellRenderer,
+      headerClass: ['bgOrangeTextWhite'],
+      minWidth: 100,
+      flex: 1,
     },
-    resizable: true,
-    width: 105,
-  },
-  {
-    headerName: 'Capacity',
-    field: 'capacity',
-    cellRenderer: DefaultCellRenderer,
-    headerClass: ['bgOrangeTextWhite'],
-    width: 90,
-  },
-  {
-    headerName: 'No. Perfs',
-    field: 'performanceCount',
-    cellRenderer: DefaultCellRenderer,
-    headerClass: ['bgOrangeTextWhite'],
-    width: 70,
-  },
-  {
-    headerName: 'Perf Times',
-    field: 'performanceTimes',
-    cellRenderer: DefaultCellRenderer,
-    headerClass: ['bgOrangeTextWhite'],
-    width: 90,
-    minWidth: 90,
-  },
-  {
-    headerName: 'Miles',
-    field: 'miles',
-    valueFormatter: milesFormatter,
-    headerClass: ['bgOrangeTextWhite'],
-    cellStyle: milesCellStyle,
-    width: 80,
-  },
-  {
-    headerName: 'Travel Time',
-    field: 'travelTime',
-    width: 90,
-    valueFormatter: travelTimeFormatter,
-    headerClass: ['bgOrangeTextWhite'],
-    cellStyle: milesCellStyle,
-  },
-  {
+    {
+      headerName: 'Day Type',
+      field: 'dayType',
+      cellRenderer: DefaultCellRenderer,
+      headerClass: ['bgOrangeTextWhite'],
+      width: 95,
+    },
+    {
+      headerName: 'Booking Status',
+      field: 'bookingStatus',
+      valueFormatter: ({ value, data }) =>
+        value === 'Pencilled' && data.pencilNo ? `${value} (${data.pencilNo})` : value,
+      headerClass: ['bgOrangeTextWhite'],
+      cellStyle: {
+        paddingLeft: '0.5rem',
+      },
+      resizable: true,
+      width: 105,
+    },
+    {
+      headerName: 'Capacity',
+      field: 'capacity',
+      cellRenderer: DefaultCellRenderer,
+      headerClass: ['bgOrangeTextWhite'],
+      width: 90,
+    },
+    {
+      headerName: 'No. Perfs',
+      field: 'performanceCount',
+      cellRenderer: DefaultCellRenderer,
+      headerClass: ['bgOrangeTextWhite'],
+      width: 70,
+    },
+    {
+      headerName: 'Perf Times',
+      field: 'performanceTimes',
+      cellRenderer: DefaultCellRenderer,
+      headerClass: ['bgOrangeTextWhite'],
+      width: 90,
+      minWidth: 90,
+    },
+    {
+      headerName: 'Miles',
+      field: 'miles',
+      valueFormatter: milesFormatter,
+      headerClass: ['bgOrangeTextWhite'],
+      cellStyle: milesCellStyle,
+      width: 80,
+    },
+    {
+      headerName: 'Travel Time',
+      field: 'travelTime',
+      width: 90,
+      valueFormatter: travelTimeFormatter,
+      headerClass: ['bgOrangeTextWhite'],
+      cellStyle: milesCellStyle,
+    },
+  ];
+
+  const notesColumn = {
     headerName: '',
     field: 'note',
     cellRenderer: NoteColumnRenderer,
@@ -196,8 +205,9 @@ export const columnDefs = [
       alignItems: 'center',
       overflow: 'visible',
     },
-  },
-];
+  };
+  return canAccessNotes ? [...columns, notesColumn] : columns;
+};
 
 export const getExportExtraContent = (
   showName: string,

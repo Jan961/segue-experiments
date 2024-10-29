@@ -17,6 +17,7 @@ import ExportModal from 'components/core-ui-lib/ExportModal';
 import { exportToExcel, exportToPDF } from 'utils/export';
 import axios from 'axios';
 import { venueHistoryOptionsSelector } from 'state/booking/selectors/venueHistoryOptionsSelector';
+import { accessBookingsHome } from 'state/account/selectors/permissionSelector';
 
 interface VenueHistoryProps {
   visible: boolean;
@@ -34,6 +35,7 @@ const TableWrapper = styled.div<TableWrapperProps>`
 `;
 
 export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) => {
+  const permissions = useRecoilValue(accessBookingsHome);
   const [showVenueSelectModal, setShowVenueSelect] = useState<boolean>(visible);
   const [showCompSelectModal, setShowCompSelect] = useState<boolean>(false);
   const [showResultsModal, setShowResults] = useState<boolean>(false);
@@ -238,16 +240,16 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
       <PopupModal
         show={showVenueSelectModal}
         title="Venue History"
-        titleClass="text-xl text-primary-navy font-bold -mt-2"
+        titleClass="text-xl text-primary-navy font-bold"
         onClose={handleModalCancel}
       >
-        <div className="w-[417px]">
+        <div className="w-[417px] p-2">
           {venueSelectView === 'select' ? (
-            <div>
-              <div className="text text-primary-navy">Please select a venue for comparison</div>
+            <div className="flex flex-col">
+              <div className="text text-primary-navy mb-4">Please select a venue for comparison</div>
 
               <Select
-                className={classNames('my-2 w-full !border-0 text-primary-navy')}
+                className={classNames('w-full !border-0 text-primary-navy')}
                 options={venueOptions}
                 isClearable
                 isSearchable
@@ -258,9 +260,9 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
                 testId="venue-filter"
               />
 
-              <div className="float-right flex flex-row">
-                {loading && <Spinner size="sm" className="mt-2 mr-3 -mb-1" />}
-                <Button className="px-8 mt-2 -mb-1" onClick={handleModalCancel} variant="secondary" text="Cancel" />
+              <div className="flex justify-end w-full mt-2">
+                {loading && <Spinner size="sm" className="mt-2 mr-3" />}
+                <Button className="px-8 mt-2" onClick={handleModalCancel} variant="secondary" text="Cancel" />
               </div>
             </div>
           ) : (
@@ -351,6 +353,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
             text="Export"
             iconProps={{ className: 'h-4 w-3' }}
             sufixIconName="excel"
+            disabled={!permissions.includes('EXPORT_VENUE_HISTORY')}
           />
           <Button className="ml-4 w-32 mr-1" variant="primary" text="Close" onClick={handleModalCancel} />
         </div>
@@ -399,6 +402,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
               text="Export"
               iconProps={{ className: 'h-4 w-3' }}
               sufixIconName="excel"
+              disabled={!permissions.includes('EXPORT_VENUE_HISTORY')}
             />
             <Button className="w-32" variant="primary" text="Close" onClick={() => setShowSalesSnapshot(false)} />
           </div>

@@ -508,3 +508,43 @@ export const convertMinutesToHoursMins = (timeInMins: number) => {
   const minutes = timeInMins % 60;
   return `${hours}:${minutes < 10 ? '0' : ''}${minutes}`;
 };
+
+type ComparisonOperator = '<' | '<=' | '>' | '>=' | '==' | '!=';
+/**
+ * Compares two dates without considering the time component.
+ *
+ * @param {Date | string | number} date1 - The first date to compare. Can be a Date object, a date string, or a timestamp.
+ * @param {Date | string | number} date2 - The second date to compare. Can be a Date object, a date string, or a timestamp.
+ * @param {ComparisonOperator} operator - The comparison operator to use ('<', '<=', '>', '>=', '==', '!=').
+ * @returns {boolean} - The result of the comparison.
+ *
+ * @throws {Error} - Throws an error if an unsupported comparison operator is provided.
+ */
+export const compareDatesWithoutTime = (
+  date1: Date | string | number,
+  date2: Date | string | number,
+  operator: ComparisonOperator,
+): boolean => {
+  const d1 = new Date(date1);
+  const d2 = new Date(date2);
+
+  const normalizedD1 = new Date(d1.getFullYear(), d1.getMonth(), d1.getDate());
+  const normalizedD2 = new Date(d2.getFullYear(), d2.getMonth(), d2.getDate());
+
+  switch (operator) {
+    case '<':
+      return normalizedD1 < normalizedD2;
+    case '<=':
+      return normalizedD1 <= normalizedD2;
+    case '>':
+      return normalizedD1 > normalizedD2;
+    case '>=':
+      return normalizedD1 >= normalizedD2;
+    case '==':
+      return normalizedD1.getTime() === normalizedD2.getTime();
+    case '!=':
+      return normalizedD1.getTime() !== normalizedD2.getTime();
+    default:
+      return false;
+  }
+};

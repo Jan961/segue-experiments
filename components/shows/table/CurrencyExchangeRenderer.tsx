@@ -4,6 +4,7 @@ import TextInputRenderer from 'components/core-ui-lib/Table/renderers/TextInputR
 
 interface ShowsTextInputRendererProps extends ICellRendererParams {
   placeholder: string;
+  disabled?: boolean;
 }
 
 const CurrencyExchangeRenderer = ({
@@ -14,6 +15,7 @@ const CurrencyExchangeRenderer = ({
   node,
   colDef,
   data,
+  disabled = true,
 }: ShowsTextInputRendererProps) => {
   const [inputValue, setInputValue] = useState(value);
   const { toSymbol, fromCurrencyCode } = data.exchange || {};
@@ -50,6 +52,7 @@ const CurrencyExchangeRenderer = ({
           className="w-full"
           value={inputValue}
           onChange={handleChange}
+          disabled={disabled}
         />
       </div>
       <div>{fromCurrencyCode}</div>

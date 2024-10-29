@@ -30,12 +30,14 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
 
     const newUser = await prisma.user.create({
       data: {
+        UserIsActive: true,
         UserFirstName: user.firstName,
         UserLastName: user.lastName,
         UserEmail: user.email,
         AccountUser: {
           create: {
             AccUserIsAdmin: user.isSystemAdmin,
+            AccUserIsActive: true,
             Account: {
               connect: {
                 AccountOrganisationId: organisationId,

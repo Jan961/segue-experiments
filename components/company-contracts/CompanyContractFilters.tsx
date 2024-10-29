@@ -90,8 +90,8 @@ const CompanyContractFilters = () => {
           />
         </div>
       </div>
-      <div className="flex justify-between gap-2">
-        <div className="px-4 flex items-center gap-4 flex-wrap  mt-2">
+      <div className="flex justify-between items-center gap-2 mt-2 ">
+        <div className="px-4 flex items-center gap-4 flex-wrap  ">
           <Label className="!text-base text-primary-input-text !font-bold" text="Contract Status" />
           <Select
             onChange={(value) => onChange({ target: { id: 'status', value } })}
@@ -109,7 +109,12 @@ const CompanyContractFilters = () => {
         </div>
         <div className="flex">
           <Button className="text-sm leading-8 px-6" text="Start New Contract" onClick={openContractSchedule} />
-          <Button className="text-sm leading-8 ml-4 px-6" text="View / Edit Contract Templates" onClick={noop} />
+          <Button
+            disabled
+            className="text-sm leading-8 ml-4 px-6"
+            text="View / Edit Contract Templates"
+            onClick={noop}
+          />
         </div>
       </div>
       {openContract && <ContractScheduleModal openContract={openContract} onClose={() => setOpenContract(false)} />}
