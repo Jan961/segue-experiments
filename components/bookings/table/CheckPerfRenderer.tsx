@@ -19,7 +19,6 @@ const CheckPerfRenderer = ({ eGridCell, data, dayTypeOptions, node, setValue, ap
   }, [data, dayTypeOptions]);
 
   const getDayType = (checked: boolean) => {
-    console.log(dayTypeOptions);
     if (checked) {
       return dayTypeOptions.find(({ text }) => text === 'Performance').value; // Performance Code
     } else {
