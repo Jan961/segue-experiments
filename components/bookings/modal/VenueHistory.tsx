@@ -17,6 +17,7 @@ import ExportModal from 'components/core-ui-lib/ExportModal';
 import { exportToExcel, exportToPDF } from 'utils/export';
 import axios from 'axios';
 import { venueHistoryOptionsSelector } from 'state/booking/selectors/venueHistoryOptionsSelector';
+import { accessBookingsHome } from 'state/account/selectors/permissionSelector';
 
 interface VenueHistoryProps {
   visible: boolean;
@@ -34,6 +35,7 @@ const TableWrapper = styled.div<TableWrapperProps>`
 `;
 
 export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) => {
+  const permissions = useRecoilValue(accessBookingsHome);
   const [showVenueSelectModal, setShowVenueSelect] = useState<boolean>(visible);
   const [showCompSelectModal, setShowCompSelect] = useState<boolean>(false);
   const [showResultsModal, setShowResults] = useState<boolean>(false);
@@ -351,6 +353,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
             text="Export"
             iconProps={{ className: 'h-4 w-3' }}
             sufixIconName="excel"
+            disabled={!permissions.includes('EXPORT_VENUE_HISTORY')}
           />
           <Button className="ml-4 w-32 mr-1" variant="primary" text="Close" onClick={handleModalCancel} />
         </div>
@@ -399,6 +402,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
               text="Export"
               iconProps={{ className: 'h-4 w-3' }}
               sufixIconName="excel"
+              disabled={!permissions.includes('EXPORT_VENUE_HISTORY')}
             />
             <Button className="w-32" variant="primary" text="Close" onClick={() => setShowSalesSnapshot(false)} />
           </div>
