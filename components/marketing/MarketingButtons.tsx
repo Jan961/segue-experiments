@@ -85,7 +85,7 @@ export const MarketingButtons: React.FC<MarketingBtnProps> = ({ venueName, venue
       <Button
         text="Venue Website"
         className="w-[155px] mt-[3px]"
-        disabled={!productionId || website === ''}
+        disabled={!productionId || website === '' || !permissions.includes('ACCESS_VENUE_WEBSITE')}
         onClick={() => window.open(website, '_blank')}
       />
 

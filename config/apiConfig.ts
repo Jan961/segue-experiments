@@ -22,7 +22,7 @@ const routePermissions = new Map<RegExp, string[]>([
   [/^\/touring-management$/, ['TOURING_MANAGEMENT']],
   [/^\/contracts$/, ['CONTRACTS']],
   [/^\/contracts\/venue-contracts$/, ['ACCESS_VENUE_CONTRACTS']],
-  [bookingsSlug, ['ACCESS_BOOKING_HOME']],
+  [bookingsSlug, ['ACCESS_BOOKING_HOME', 'ACCESS_BOOKING_DETAILS']],
   [marketingSlug, ['MARKETING']],
 ]);
 
