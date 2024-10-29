@@ -6,6 +6,8 @@ import { UploadedFile } from 'components/core-ui-lib/UploadModal/interface';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { isNullOrEmpty } from 'utils';
+import { accessBookingsHome } from 'state/account/selectors/permissionSelector';
+import { useRecoilValue } from 'recoil';
 
 interface TechSpecTableProps {
   venueId: number;
@@ -14,6 +16,7 @@ interface TechSpecTableProps {
 }
 
 export const TechSpecTable = ({ venueId, setFilesToSend, setFilesToDelete }: TechSpecTableProps) => {
+  const permissions = useRecoilValue(accessBookingsHome);
   const [uploadVisible, setUploadVisible] = useState<boolean>(null);
   const [rowData, setRowData] = useState([]);
   const [confirmVisible, setConfirmVisible] = useState<boolean>(false);
@@ -109,6 +112,7 @@ export const TechSpecTable = ({ venueId, setFilesToSend, setFilesToDelete }: Tec
             await fetchFileList();
             setUploadVisible(true);
           }}
+          disabled={!permissions.includes('UPLOAD_ATTACHMENTS')}
         />
       </div>
       {rowData.length > 0 && (

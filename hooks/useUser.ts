@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useState } from 'react';
 import { isNullOrEmpty, mapRecursive } from 'utils';
 import { useUrl } from 'nextjs-current-url';
-import { NEW_USER_CONFIRMATION_EMAIL_TEMPLATE } from 'config/global';
+import { NEW_USER_CONFIRMATION_EMAIL_TEMPLATE, SEND_ACCOUNT_PIN_TEMPLATE } from 'config/global';
 import { Production } from 'components/admin/modals/config';
 import { TreeItemOption } from 'components/global/TreeSelect/types';
 import { generateUserPassword } from 'utils/authUtils';
@@ -16,6 +16,7 @@ type UserDetails = {
   permissions: string[];
   productions: string[];
   accountId: number;
+  accountPIN?: number;
 };
 
 const useUser = () => {
@@ -68,6 +69,13 @@ const useUser = () => {
         data: { username: userDetails.email, password, Weblink: `${currentUrl}/auth/sign-in` },
       });
 
+      // Send out an email with the account PIN
+      await axios.post('/api/email/send', {
+        to: userDetails.email,
+        templateName: SEND_ACCOUNT_PIN_TEMPLATE,
+        data: { AccountPin: userDetails.accountPIN },
+      });
+
       // Create the user in our database
       const { data: createResponse } = await axios.post('/api/user/create', userDetails);
       if (createResponse.error) {
@@ -111,6 +119,21 @@ const useUser = () => {
     }
   };
 
+  /*
+   * An item can be partially selected if
+   * 1. The item is checked and
+   * 2. At least one of its children is partially selected or
+   * 3. At least one of its children is unchecked
+   * This function recursively sets the `isPartiallySelected` property for each item
+   * based on the above conditions
+   */
+  const setPartialSelection = (item) => {
+    if (!isNullOrEmpty(item.options)) {
+      item.options.forEach((o) => setPartialSelection(o));
+      item.isPartiallySelected = item.checked && item.options.some((o) => o.isPartiallySelected || !o.checked);
+    }
+  };
+
   const fetchPermissionsForSelectedUser = async (
     accountUserId: number,
     productions: Production[],
@@ -124,6 +147,9 @@ const useUser = () => {
       const userPermissions = mapRecursive(permissions, (p) =>
         data.permissions.includes(p.id) ? { ...p, checked: true } : p,
       );
+
+      // Set the `isPartiallySelected` property for each item so that it is represented correctly in the TreeSelect component
+      userPermissions.forEach((o) => setPartialSelection(o));
       return { prodPermissions, userPermissions, isSingleAdminUser: data.isSingleAdminUser };
     } catch (error) {
       console.log(error);

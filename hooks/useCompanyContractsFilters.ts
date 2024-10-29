@@ -1,6 +1,7 @@
 import { companyContractStatusOrder } from 'config/contracts';
 import { useMemo } from 'react';
 import { useRecoilValue } from 'recoil';
+import { compareDatesWithoutTime } from 'services/dateService';
 import { contractsFilterState } from 'state/contracts/contractsFilterState';
 import { contractListState } from 'state/contracts/contractsListState';
 import { compareStrings } from 'utils';
@@ -22,8 +23,8 @@ const useCompanyContractsFilter = () => {
           compareStrings(contract.lastName, contractText) ||
           compareStrings(contract.role, contractText)) &&
         (department === -1 || !department || department === contract.departmentId) &&
-        (!endDate || new Date(contract.dateIssued) <= endDate) &&
-        (!startDate || new Date(contract.dateIssued) >= startDate) &&
+        (!endDate || compareDatesWithoutTime(contract.dateIssued, endDate, '<=')) &&
+        (!startDate || compareDatesWithoutTime(contract.dateIssued, startDate, '>=')) &&
         (status === 'all' || status === contract.contractStatus)
       );
     });
