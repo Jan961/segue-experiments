@@ -37,6 +37,13 @@ import { UiVenue, VenueData, transformVenues } from 'utils/venue';
 import { ConfDialogVariant } from 'components/core-ui-lib/ConfirmationDialog/ConfirmationDialog';
 import { formatDecimalOnBlur, parseAndSortDates } from '../utils';
 import { currencyState } from 'state/global/currencyState';
+import { dealMemoExport } from 'pages/api/deal-memo/export';
+import { accountContactState } from 'state/contracts/accountContactState';
+
+export type UserAcc = {
+  email: string;
+  accountUserId: number;
+};
 
 const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClose: () => void }) => {
   const productionJumpState = useRecoilValue(currentProductionSelector);
@@ -49,6 +56,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
   const [venue, setVenue] = useState<Partial<VenueData>>({});
   const [barredVenues, setBarredVenues] = useState<Partial<UiVenue>[]>([]);
   const [dealHoldType, setDealHoldType] = useState<Array<DealMemoHoldType>>([]);
+  const accountContacts = useRecoilValue(accountContactState);
   const [formData, setFormData] = useState<Partial<VenueContractFormData>>({
     ...initialEditContractFormData,
     ...selectedTableCell.contract,
@@ -84,6 +92,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
   const [dealMemoCreated, setDealMemoCreated] = useState<boolean>(true);
   const [dealMemoButtonText, setDealMemoButtonText] = useState<string>('Deal Memo');
   const [currency, setCurrency] = useRecoilState(currencyState);
+  const [userAccList, setUserAccList] = useState<Array<UserAcc>>([]);
 
   const [errors, setErrors] = useState({
     royaltyPerc: false,
@@ -210,6 +219,14 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
   useEffect(() => {
     getCurrency(selectedTableCell.contract.Id);
   }, [selectedTableCell.contract.Id]);
+
+  useEffect(() => {
+    const userAccList = Object.values(users).map(({ AccUserId, Email = '' }) => ({
+      accountUserId: AccUserId,
+      email: Email || '',
+    }));
+    setUserAccList(userAccList);
+  }, [users]);
 
   const getCurrency = async (bookingId) => {
     try {
@@ -384,6 +401,18 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
     }
   };
 
+  const pdfExportDealMemo = () => {
+    dealMemoExport({
+      bookingId: selectedTableCell.contract.Id.toString(),
+      production: productionJumpState,
+      contract: selectedTableCell.contract,
+      venue,
+      accContacts: accountContacts,
+      users: userAccList,
+      fileType: 'pdf',
+    });
+  };
+
   return (
     <PopupModal
       show={visible}
@@ -405,6 +434,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                     }`}
                     variant="primary"
                     text="View as PDF"
+                    onClick={pdfExportDealMemo}
                   />
                 </div>
               </div>
@@ -889,6 +919,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
           demoModalData={demoModalData}
           venueData={venue}
           dealHoldType={dealHoldType}
+          userAccList={userAccList}
         />
       )}
       {isLoading && <LoadingOverlay />}

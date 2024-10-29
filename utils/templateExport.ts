@@ -29,7 +29,7 @@ import { formatDecimalValue, isNullOrUndefined } from 'utils';
  *    If the object key begins DEC_, a number NaN check is run on the value.
  *    If NaN, a space is returned else return the value.
  */
-export const formatTemplateObj = async (templateData: any) => {
+export const formatTemplateObj = (templateData: any) => {
   return {
     ...Object.fromEntries(
       Object.entries(templateData).map(([key, value]) => {

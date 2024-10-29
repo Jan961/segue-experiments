@@ -61,16 +61,12 @@ import {
 import { currencyState } from 'state/global/currencyState';
 import { decimalRegex, stringRegex } from 'utils/regexUtils';
 import { dealMemoExport } from 'pages/api/deal-memo/export';
+import { UserAcc } from './EditVenueContractModal';
 
 export interface PriceState {
   default: Array<DealMemoPriceType>;
   custom: Array<DealMemoPriceType>;
 }
-
-export type UserAcc = {
-  email: string;
-  accountUserId: number;
-};
 
 export const EditDealMemoContractModal = ({
   visible,
@@ -80,6 +76,7 @@ export const EditDealMemoContractModal = ({
   demoModalData,
   venueData,
   dealHoldType,
+  userAccList,
 }: {
   visible: boolean;
   onCloseDemoForm: () => void;
@@ -88,6 +85,7 @@ export const EditDealMemoContractModal = ({
   demoModalData: Partial<DealMemoContractFormData>;
   venueData;
   dealHoldType: Array<DealMemoHoldType>;
+  userAccList: Array<UserAcc>;
 }) => {
   const [formData, setFormData] = useRecoilState(dealMemoInitialState);
   const [dealMemoPriceData, setDealMemoPriceData] = useState<PriceState>({ default: [], custom: [] });
@@ -102,7 +100,6 @@ export const EditDealMemoContractModal = ({
   const currency = useRecoilValue(currencyState);
   const accountContacts = useRecoilValue(accountContactState);
   const [showSubmitError, setShowSubmitError] = useState<boolean>(false);
-  const [userAccList, setUserAccList] = useState<Array<UserAcc>>([]);
 
   const [errors, setErrors] = useState({
     ROTTPercentage: false,
@@ -248,14 +245,6 @@ export const EditDealMemoContractModal = ({
   );
 
   useEffect(() => {
-    const userAccList = Object.values(users).map(({ AccUserId, Email = '' }) => ({
-      accountUserId: AccUserId,
-      email: Email || '',
-    }));
-    setUserAccList(userAccList);
-  }, [users]);
-
-  useEffect(() => {
     const data = [...dealMemoTechProvision];
     setFormData((prevDealMemo) => ({
       ...prevDealMemo,
@@ -337,6 +326,7 @@ export const EditDealMemoContractModal = ({
         venue: venueData,
         accContacts: accountContacts,
         users: userAccList,
+        fileType: 'docx',
       });
 
     try {
@@ -545,8 +535,6 @@ export const EditDealMemoContractModal = ({
       const datetime = getDateWithOffset(new Date());
       datetime.setHours(hrs);
       datetime.setMinutes(min);
-
-      console.log(datetime, key);
 
       editDemoModalData(key, datetime, 'dealMemo');
     }
