@@ -69,7 +69,7 @@ export default forwardRef<Ref, DateInputProps>(function DateInput(
     }
   };
 
-  // Checks if datetime is dd/mm/yy 01:00, if date 00:00 add 1 hour
+  // Checks if datetime is < dd/mm/yy 01:00, if date between 00:00 nad 00:59 add 1 hour
   const onDateChange = (date: Date) => {
     if (date) {
       if (date.getHours() <= 0) {
