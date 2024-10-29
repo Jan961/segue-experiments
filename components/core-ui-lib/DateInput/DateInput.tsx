@@ -2,9 +2,10 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import TextInput from '../TextInput';
 import React, { createRef, forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
-import moment from 'moment';
 import Label from '../Label';
 import { Portal } from 'react-overlays';
+import { format, isValid } from 'date-fns';
+import { formatDate } from 'services/dateService';
 
 interface DateInputProps {
   value?: string | Date;
@@ -59,7 +60,7 @@ export default forwardRef<Ref, DateInputProps>(function DateInput(
         setInputValue(dateValue);
         setSelectedDate(new Date(dateValue));
       } else {
-        setInputValue(moment(dateValue).format('DD/MM/YY'));
+        setInputValue(formatDate(dateValue, 'dd/MM/yy'));
         setSelectedDate(dateValue as Date);
       }
     } else {
@@ -82,6 +83,16 @@ export default forwardRef<Ref, DateInputProps>(function DateInput(
     setErrorMsg(error);
   }, [error]);
 
+  const getDateFromInputValue = (): Date => {
+    if (inputValue) {
+      const vals = inputValue.split('/');
+      const date = new Date(`${vals[1]}/${vals[0]}/${vals[2]}`);
+      return date;
+    } else {
+      return null;
+    }
+  };
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setErrorMsg('');
@@ -90,7 +101,7 @@ export default forwardRef<Ref, DateInputProps>(function DateInput(
         let dateText = value.replace(/\D/g, '');
         dateText = dateText.replace(/(\d{2})(?=\d)/g, '$1/');
         setInputValue(dateText);
-        if (regex.test(inputValue) && !moment(inputValue, 'DD/MM/YY').isValid()) {
+        if (regex.test(inputValue) && !isValid(inputValue)) {
           setErrorMsg('Invalid Date');
         }
       }
@@ -106,13 +117,13 @@ export default forwardRef<Ref, DateInputProps>(function DateInput(
   const handleInputBlur = () => {
     setErrorMsg('');
     if (inputValue) {
-      if (regex.test(inputValue) && moment(inputValue, 'DD/MM/YY').isValid()) {
-        const date = moment.utc(inputValue, 'DD/MM/YY').toDate();
-        onChange(date);
-        setSelectedDate(date);
+      const d = getDateFromInputValue();
+      if (regex.test(inputValue) && isValid(d)) {
+        onChange(d);
+        setSelectedDate(d);
       } else {
         if (value) {
-          setInputValue(moment(value).format('DD/MM/YY'));
+          setInputValue(format(d, 'dd/MM/yy'));
         } else {
           setInputValue('');
         }
@@ -156,13 +167,11 @@ export default forwardRef<Ref, DateInputProps>(function DateInput(
           placeholderText={placeholder}
           dateFormat="dd/MM/yy"
           popperClassName={`!z-50 ${position}`}
-          onSelect={(e) => onChange(e)}
-          onChange={() => null}
+          onChange={(e) => onChange(e)}
           selected={selectedDate}
           openToDate={selectedDate}
           customInput={<div className="cursor-pointer w-4 h-4 " />}
           disabled={disabled}
-          locale="UTC"
           {...props}
         />
       </div>
