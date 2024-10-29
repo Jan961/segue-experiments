@@ -2329,20 +2329,20 @@ export const EditDealMemoContractModal = ({
           <div className="flex justify-end items-center">
             <Button onClick={() => handleCancelForm(false)} className="w-33" variant="secondary" text="Cancel" />
             <Button
-              onClick={() => submitForm(true)}
-              className="ml-4 w-28"
-              variant="primary"
-              text="Export"
-              iconProps={{ className: 'h-4 w-3' }}
-              sufixIconName="excel"
-              testId="deal-memo-export"
-            />
-            <Button
               onClick={() => submitForm(false)}
-              className="ml-4 w-33"
+              className="ml-4 w-28"
               variant="primary"
               text="Save and Close"
               testId="deal-memo-save-and-close"
+            />
+            <Button
+              onClick={() => submitForm(true)}
+              className="ml-4 w-44"
+              variant="primary"
+              text="Save, Close and Export"
+              testId="deal-memo-save-close-and-export"
+              iconProps={{ className: 'h-4 w-3' }}
+              sufixIconName="document-solid"
             />
           </div>
         </div>

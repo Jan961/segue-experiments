@@ -1,5 +1,5 @@
 import formatInputDate from './dateInputFormat';
-import { isNullOrUndefined } from 'utils';
+import { formatDecimalValue, isNullOrUndefined } from 'utils';
 /**
  *
  * @param templateData
@@ -29,7 +29,7 @@ import { isNullOrUndefined } from 'utils';
  *    If the object key begins DEC_, a number NaN check is run on the value.
  *    If NaN, a space is returned else return the value.
  */
-export const formatTemplateObj = (templateData: any) => {
+export const formatTemplateObj = async (templateData: any) => {
   return {
     ...Object.fromEntries(
       Object.entries(templateData).map(([key, value]) => {
@@ -45,14 +45,13 @@ export const formatTemplateObj = (templateData: any) => {
           const tmLongDt = new Date(value.toString());
           return [key, `${tmLongDt.getHours()} hour(s) ${tmLongDt.getMinutes()} minutes`];
         } else if (key.startsWith('TM_')) {
-          alert(value);
           const tmDt = new Date(value.toString());
           return [
             key,
             `${tmDt.getHours().toString().padStart(2, '0')}:${tmDt.getMinutes().toString().padStart(2, '0')}`,
           ];
         } else if (key.startsWith('DEC_')) {
-          return [key, Number.isNaN(value) ? ' ' : value];
+          return [key, Number.isNaN(value) ? ' ' : formatDecimalValue(value)];
         }
 
         // Return the unchanged key-value pair for other cases

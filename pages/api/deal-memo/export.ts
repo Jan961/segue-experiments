@@ -47,12 +47,11 @@ const getContact = (array, key, value) => {
 const fetchTemplateDocument = async () => {
   try {
     const response = await axios.get(
-      `/api/file/download?location=${'https://d1e9vbizioozy0.cloudfront.net/contracts/templates/DealMemo_v1.1.docx'}`,
+      `/api/file/download?location=${'https://d1e9vbizioozy0.cloudfront.net/contracts/templates/DealMemo_v1.1.7.docx'}`,
       {
         responseType: 'arraybuffer',
       },
     );
-
     const file = new File([response.data], 'template.docx', {
       type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
     });
@@ -89,7 +88,6 @@ const processPriceData = (priceData) => {
 export const dealMemoExport = async (props: DeMoExportProps) => {
   if (!isNullOrUndefined(props.bookingId)) {
     const deMoRaw = props.dealMemoData;
-    console.log(deMoRaw);
     const { data: currResponse } = await axios.get(`/api/marketing/currency/booking/${props.bookingId}`);
     const { data: holdTypes } = await axios.get<Array<DealMemoHoldType>>(`/api/deal-memo/hold-type/read`);
     const primaryAddress = props.venue.VenueAddress.find((address) => address.TypeName === 'Main');
@@ -157,6 +155,13 @@ export const dealMemoExport = async (props: DeMoExportProps) => {
         Phone: tidyString(companyPoc?.AccContPhone),
       },
       SalesReportRecipients: salesRepEmails,
+      LaundryFacilities: [
+        deMoRaw.NumFacilitiesLaundry ? 'Washer' : null,
+        deMoRaw.NumFacilitiesDrier ? 'Dryer' : null,
+        deMoRaw.NumFacilitiesLaundryRoom ? 'Laundry Room' : null,
+      ]
+        .filter(Boolean)
+        .join(', '),
     };
 
     const toBeFormatted = {
