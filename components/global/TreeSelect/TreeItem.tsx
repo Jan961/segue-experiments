@@ -24,21 +24,11 @@ export default memo(function TreeItem({ value, onChange, defaultOpen }: TreeItem
   const handleSelectionChange = (checked) => {
     let updatedOptions = [];
     if (!isLeafNode) {
-      updatedOptions = mapRecursive(itemOptions, (o) => ({ ...o, checked }));
+      updatedOptions = mapRecursive(itemOptions, (o) => ({ ...o, checked, isPartiallySelected: false }));
       setItemOptions(updatedOptions);
     }
     setSelected(checked);
     return updatedOptions;
-  };
-
-  const hasPartiallySelectedChildren = (options) => {
-    // partial selection
-    const partiallySelectedNode = options.find(({ isPartiallySelected }) => !!isPartiallySelected);
-    if (partiallySelectedNode) {
-      return true;
-    }
-    const selectedNodes = options.filter(({ checked }) => checked);
-    return selectedNodes.length !== 0 && selectedNodes.length < itemOptions.length;
   };
 
   const areAllChildrenSelected = (options) => {
@@ -51,19 +41,17 @@ export default memo(function TreeItem({ value, onChange, defaultOpen }: TreeItem
   }, [checked]);
 
   useEffect(() => {
-    const isPartiallySelected = hasPartiallySelectedChildren(options);
     setShowIntermediateState(isPartiallySelected);
+  }, [isPartiallySelected]);
+
+  useEffect(() => {
     setItemOptions(options);
-  }, [options]);
+  }, [options, isPartiallySelected]);
 
   const handleGroupToggle = (e: React.ChangeEvent<HTMLInputElement>) => {
     const isChecked = e.target.checked;
     const updatedOptions = handleSelectionChange(isChecked);
-    if (isChecked) {
-      setShowIntermediateState(false);
-    } else {
-      setShowIntermediateState(areAllChildrenSelected(updatedOptions));
-    }
+    setShowIntermediateState(false);
 
     onChange({ ...value, options: updatedOptions, checked: isChecked, isPartiallySelected: false });
   };
@@ -75,18 +63,14 @@ export default memo(function TreeItem({ value, onChange, defaultOpen }: TreeItem
 
   const handleOptionToggle = (toggledOption: TreeItemOption) => {
     const updatedOptions = itemOptions.map((o) => (o.id === toggledOption.id ? { ...toggledOption } : { ...o }));
-    let isPartiallySelected = toggledOption.isPartiallySelected;
+    const allChildrenSelected = areAllChildrenSelected(updatedOptions);
+    const isPartiallySelected = toggledOption.isPartiallySelected || !allChildrenSelected;
     // If child node is partially selected, then this node will be partially selected as well
     if (isPartiallySelected) {
       setShowIntermediateState(true);
-    } else {
-      // If this is not a leaf node, evaluate if this node should be partially selected
-      isPartiallySelected = hasPartiallySelectedChildren(updatedOptions);
-      setShowIntermediateState(isPartiallySelected);
+    } else if (allChildrenSelected) {
+      setSelected(allChildrenSelected);
     }
-    const allChildrenSelected = areAllChildrenSelected(updatedOptions);
-    setSelected(allChildrenSelected);
-
     setItemOptions(updatedOptions);
     onChange({
       ...value,

@@ -15,4 +15,5 @@ export type MenuOption = {
   expanded?: boolean;
   labelClass?: string;
   testId?: string;
+  permission?: string;
 };

@@ -9,8 +9,11 @@ import Checkbox from 'components/core-ui-lib/Checkbox';
 import Button from 'components/core-ui-lib/Button';
 import { useEffect, useMemo, useState } from 'react';
 import { getAllCurrencylist, getRegionlist } from 'services/productionService';
+import { useRecoilValue } from 'recoil';
+import { accessShows } from 'state/account/selectors/permissionSelector';
 
 export default function Index(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  const permissions = useRecoilValue(accessShows);
   const { showsList = [] } = props;
   const [isArchived, setIsArchived] = useState<boolean>(false);
   const [isAddRow, setIsAddRow] = useState<boolean>(false);
@@ -50,7 +53,11 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
               disabled={isEdited}
               onChange={() => setIsArchived(!isArchived)}
             />
-            <Button disabled={isAddRow} onClick={addNewRow} text="Add New Show" />
+            <Button
+              disabled={isAddRow || !permissions.includes('ADD_NEW_SHOW')}
+              onClick={addNewRow}
+              text="Add New Show"
+            />
           </div>
         </div>
         <ShowsTable

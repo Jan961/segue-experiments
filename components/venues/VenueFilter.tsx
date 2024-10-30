@@ -5,6 +5,7 @@ import { useRecoilValue } from 'recoil';
 import { productionOptionsSelector } from 'state/booking/selectors/productionOptionsSelector';
 import { defaultVenueFilters } from 'config/bookings';
 import { VenueFilters } from 'pages/bookings/venues';
+import { accessBookingsHome } from 'state/account/selectors/permissionSelector';
 
 export default function VenueFilter({
   countryOptions,
@@ -19,6 +20,7 @@ export default function VenueFilter({
   onFilterChange: (change: Partial<VenueFilters>) => void;
   showVenueModal: () => void;
 }) {
+  const permissions = useRecoilValue(accessBookingsHome);
   const productionOptions = useRecoilValue(productionOptionsSelector(true));
   const onChange = (e: any) => {
     onFilterChange({ ...filters, [e.target.id]: e.target.value });
@@ -83,7 +85,13 @@ export default function VenueFilter({
                   className="w-[120px]"
                   onClick={onClearFilters}
                 />
-                <Button testId="venues-add-new-btn" onClick={showVenueModal} text="Add New" className="w-[120px]" />
+                <Button
+                  testId="venues-add-new-btn"
+                  onClick={showVenueModal}
+                  text="Add New"
+                  className="w-[120px]"
+                  disabled={!permissions.includes('ADD_NEW_VENUE')}
+                />
               </div>
             </div>
           </div>

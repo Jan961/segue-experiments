@@ -22,6 +22,7 @@ import { Direction } from 'components/bookings/table/AddDeleteRowRenderer';
 import axios from 'axios';
 import { BarredVenue } from 'pages/api/productions/venue/barringCheck';
 import MoveBooking from '../../moveBooking';
+import { accessBookingsHome } from 'state/account/selectors/permissionSelector';
 
 type NewBookingDetailsProps = {
   formData: TForm;
@@ -60,6 +61,7 @@ export default function NewBookingDetailsView({
   updateBarringConflicts,
   updateBookingConflicts,
 }: NewBookingDetailsProps) {
+  const permissions = useRecoilValue(accessBookingsHome);
   const { fromDate, toDate, dateType, venueId, isRunOfDates } = formData;
   const venueDict = useRecoilValue(venueState);
   const [bookingData, setBookingData] = useState<BookingItem[]>([]);
@@ -90,19 +92,31 @@ export default function NewBookingDetailsView({
   }, [bookingData]);
 
   const addRowToTable = (index: number, data: any, direction: Direction) => {
+    const api = tableRef.current.getApi();
+    const initRows = api.getRenderedNodes();
+    if (initRows.length === 1) {
+      initRows[0].data.isRunOfDates = true;
+    }
     const rowDate =
       direction === 'before' ? subDays(parseISO(data.dateAsISOString), 1) : addDays(parseISO(data.dateAsISOString), 1);
     const date = formattedDateWithWeekDay(rowDate, 'Short');
     const dateAsISOString = rowDate.toISOString();
     const rowToAdd = { ...data, noPerf: null, times: '', date, dateAsISOString, id: null, isRunOfDates: true };
     applyTransactionToGrid(tableRef, { add: [rowToAdd], addIndex: direction === 'before' ? 0 : index + 1 });
-    tableRef.current.getApi().redrawRows();
+    api.redrawRows();
   };
 
   const removeRowFromTable = (data: any) => {
+    const api = tableRef.current.getApi();
     applyTransactionToGrid(tableRef, { remove: [data] });
-    tableRef.current.getApi().redrawRows();
+    const rows = api.getRenderedNodes();
+    if (rows.length === 1) {
+      rows[0].data.isRunOfDates = false;
+    }
+    api.redrawRows();
   };
+
+  // test
 
   useEffect(() => {
     if (isNewBooking) {
@@ -432,20 +446,23 @@ export default function NewBookingDetailsView({
                   variant="tertiary"
                   text="Delete Booking"
                   onClick={handleDeleteBooking}
-                  disabled={changeBookingLength}
+                  disabled={changeBookingLength || !permissions.includes('DELETE_BOOKING')}
                 />
                 <Button
                   className="w-33 "
                   variant="primary"
                   text="Move Booking"
                   onClick={handleMoveBooking}
-                  disabled={changeBookingLength || changeBookingLengthConfirmed}
+                  disabled={
+                    changeBookingLength || changeBookingLengthConfirmed || !permissions.includes('MOVE_BOOKING')
+                  }
                 />
                 <Button
                   className="w-33 px-4"
                   variant="primary"
                   text={`${changeBookingLength ? 'Confirm New' : 'Change Booking'} Length`}
                   onClick={handleChangeOrConfirmBooking}
+                  disabled={!permissions.includes('CHANGE_BOOKING_LENGTH')}
                 />
               </>
             )}
