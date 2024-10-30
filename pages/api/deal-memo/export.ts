@@ -5,7 +5,7 @@ import { days } from 'config/global';
 import { TemplateHandler } from 'easy-template-x';
 import { createResolver } from 'easy-template-x-angular-expressions';
 import { DealMemoHoldType, ProductionDTO } from 'interfaces';
-import { formatDecimalValue, isNullOrUndefined, isUndefined, numberToOrdinal, tidyString } from 'utils';
+import { formatDecimalValue, isNullOrEmpty, isNullOrUndefined, isUndefined, numberToOrdinal, tidyString } from 'utils';
 import { formatTemplateObj } from 'utils/templateExport';
 
 type ExportType = 'pdf' | 'docx';
@@ -76,7 +76,9 @@ const processPriceData = (priceData) => {
       };
     });
   } else {
-    const pricesJoined = [...priceData.default, ...priceData.custom];
+    const pricesJoined = [...priceData.default, ...priceData.custom].filter(
+      (price) => !isNullOrEmpty(price.DMPTicketName),
+    );
     result = pricesJoined.map((price) => {
       return {
         ...price,

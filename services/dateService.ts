@@ -1,4 +1,4 @@
-import {
+import { parse ,
   startOfWeek,
   differenceInWeeks,
   addWeeks,
@@ -371,6 +371,15 @@ export const formatDateWithTimezoneOffset = ({
     date = new Date(date);
   }
   return moment(date).utcOffset(-timezoneOffset).format(dateFormat);
+};
+
+export const getDateWithOffset = (date: Date) => {
+  const dateWithOffset = formatDateWithTimezoneOffset({
+    dateFormat: 'MMMM do yyyy, h:mm:ss a',
+    date,
+    timezoneOffset: getTimezonOffset(),
+  });
+  return parse(dateWithOffset, 'MMMM do yyyy, h:mm:ss a', new Date());
 };
 
 export const convertTimeToTodayDateFormat = (time: string) => {

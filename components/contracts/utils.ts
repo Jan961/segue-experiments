@@ -1,7 +1,7 @@
 import { Time } from 'components/core-ui-lib/TimeInput/TimeInput';
-import { startOfDay , parse } from 'date-fns';
+import { startOfDay } from 'date-fns';
 import { pick } from 'radash';
-import { formatDateWithTimezoneOffset, getShortWeekFormat, getTimezonOffset } from 'services/dateService';
+import { getDateWithOffset, getShortWeekFormat } from 'services/dateService';
 import { formatDecimalValue, isNullOrEmpty, isNullOrUndefined, isUndefined } from 'utils';
 import formatInputDate from 'utils/dateInputFormat';
 import { PriceState } from './modal/EditDealMemoContractModal';
@@ -324,13 +324,4 @@ export const formatSeatKillValues = (dmHoldData: any, dmTypes: any) => {
 
 export const formatAddress = (...fields: (string | null)[]): string => {
   return fields.filter((field) => !isNullOrEmpty(field)).join(', ');
-};
-
-export const getDateWithOffset = (date: Date) => {
-  const dateWithOffset = formatDateWithTimezoneOffset({
-    dateFormat: 'MMMM do yyyy, h:mm:ss a',
-    date,
-    timezoneOffset: getTimezonOffset(),
-  });
-  return parse(dateWithOffset, 'MMMM do yyyy, h:mm:ss a', new Date());
 };

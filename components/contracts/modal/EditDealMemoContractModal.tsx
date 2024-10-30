@@ -41,10 +41,9 @@ import {
   defaultCustomPrice,
   formatAddress,
   defaultTechProvision,
-  getDateWithOffset,
 } from '../utils';
 import { dealMemoInitialState } from 'state/contracts/contractsFilterState';
-import { dateToTimeString } from 'services/dateService';
+import { dateToTimeString , getDateWithOffset } from 'services/dateService';
 import StandardSeatKillsTable, { SeatKillRow } from '../table/StandardSeatKillsTable';
 import LoadingOverlay from 'components/shows/LoadingOverlay';
 import { CustomOption } from 'components/core-ui-lib/Table/renderers/SelectCellRenderer';
