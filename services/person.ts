@@ -197,29 +197,74 @@ export const handleEmergencyContacts = async (personId: number, emergencyContact
   }
 };
 
-export const upsertEmergencyContact = async (personId: number, contactDetails, role = 'emergencycontact', tx) => {
-  const { id, addressId, firstName, lastName, email, mobileNumber, landline } = contactDetails;
-  const address = await upsertAddress(addressId, pick(contactDetails, addressFields), tx);
+export const upsertEmergencyContact = async (
+  personId: number,
+  contactDetails,
+  role = 'emergencycontact',
+  tx,
+  existingPPId?: number,
+) => {
+  // Early return if no firstName (required field)
+  if (!contactDetails.firstName) return null;
+
+  const {
+    id,
+    addressId,
+    firstName,
+    lastName,
+    email,
+    mobileNumber,
+    landline,
+    address1,
+    address2,
+    address3,
+    town,
+    postcode,
+    country,
+  } = contactDetails;
+
+  // Only proceed with address if any address field has a value
+  const hasAddressData = [address1, address2, address3, town, postcode, country].some(
+    (field) => field !== null && field !== undefined && field !== '',
+  );
+
+  let addressResult = null;
+  if (hasAddressData) {
+    addressResult = await upsertAddress(addressId, { address1, address2, address3, town, postcode, country }, tx);
+  }
+
   const contactData = {
-    PersonFirstName: firstName,
-    PersonLastName: lastName,
-    PersonEmail: email,
-    PersonMobile: mobileNumber,
-    PersonPhone: landline,
-    PersonAddressId: address.AddressId,
+    PersonFirstName: firstName, // Required field
+    PersonLastName: lastName || '', // Provide empty string for nullable fields
+    PersonEmail: email || null,
+    PersonMobile: mobileNumber || null,
+    PersonPhone: landline || null,
+    ...(addressResult && { PersonAddressId: addressResult.AddressId }),
   };
+
+  const existingPersonPerson = id
+    ? await tx.personPerson.findUnique({
+        where: { PPId: id },
+        select: { PPRolePersonId: true },
+      })
+    : null;
+
+  const personIdToUse = existingPersonPerson?.PPRolePersonId || 0;
 
   // Upsert emergency contact person
   const emergencyContact = await tx.person.upsert({
-    where: { PersonId: contactDetails?.personId || 0 },
+    where: { PersonId: personIdToUse },
     update: contactData,
     create: contactData,
   });
 
-  // Link this person to the main person via PersonPerson with role "emergencycontact"
+  // Use the provided PPId or the existing one from the ordered list
+  const ppIdToUse = id || existingPPId || 0;
+
+  // Link this person to the main person via PersonPerson
   await tx.personPerson.upsert({
     where: {
-      PPId: id || 0,
+      PPId: ppIdToUse,
     },
     create: {
       PPPersonId: personId,
@@ -232,42 +277,137 @@ export const upsertEmergencyContact = async (personId: number, contactDetails, r
       PPRoleType: role,
     },
   });
+
+  return emergencyContact;
 };
 
-export const handleAgencyDetails = async (personId: number, agencyDetails, tx) => {
-  if (!agencyDetails) return;
+export const handleAgencyDetails = async (personId: number, agencyDetails: any, tx) => {
+  if (!agencyDetails || !agencyDetails.hasAgent) {
+    // Handle removal of agency relationship
+    await removeAgencyRelationships(personId, tx);
+    return;
+  }
 
-  const agencyPersonId = agencyDetails.agencyPersonId || 0;
+  // Early return if required fields are missing
+  if (!agencyDetails.firstName || !agencyDetails.name) return;
 
-  // Create or update agency person
-  const agencyPerson = await tx.person.upsert({
+  const { agencyPersonId = 0, website, name } = agencyDetails;
+
+  // Handle the agency contact person
+  const agencyContactData: Partial<Person> = {
+    PersonFirstName: agencyDetails.firstName,
+    PersonLastName: agencyDetails.lastName || '',
+    PersonEmail: agencyDetails.email || null,
+    PersonPhone: agencyDetails.landline || null,
+    PersonMobile: agencyDetails.mobileNumber || null,
+  };
+
+  // Create or update address if address fields are present
+  let addressId = null;
+  const hasAddressData = [
+    agencyDetails.address1,
+    agencyDetails.address2,
+    agencyDetails.address3,
+    agencyDetails.town,
+    agencyDetails.postcode,
+    agencyDetails.country,
+  ].some((field) => field !== null && field !== undefined && field !== '');
+
+  if (hasAddressData) {
+    const address = await upsertAddress(agencyDetails.addressId || 0, agencyDetails, tx);
+    addressId = address.AddressId;
+  }
+
+  if (addressId) {
+    agencyContactData.PersonAddressId = addressId;
+  }
+
+  // Create or update the agency contact person
+  const agencyContact = await tx.person.upsert({
     where: { PersonId: agencyPersonId || 0 },
-    update: {
-      PersonFirstName: agencyDetails.firstName,
-      PersonLastName: agencyDetails.lastName,
-      PersonEmail: agencyDetails.email,
-      PersonPhone: agencyDetails.landline,
-      PersonMobile: agencyDetails.mobileNumber,
+    update: agencyContactData,
+    create: agencyContactData,
+  });
+
+  // Create or update organisation first
+  const organisation = await tx.organisation.upsert({
+    where: {
+      OrgId: agencyDetails.id || 0,
     },
     create: {
-      PersonFirstName: agencyDetails.firstName,
-      PersonLastName: agencyDetails.lastName,
-      PersonEmail: agencyDetails.email,
-      PersonPhone: agencyDetails.landline,
-      PersonMobile: agencyDetails.mobileNumber,
+      OrgName: name,
+      OrgWebsite: website || null,
+      OrgContactPersonId: agencyContact.PersonId,
+    },
+    update: {
+      OrgName: name,
+      OrgWebsite: website || null,
+      OrgContactPersonId: agencyContact.PersonId,
     },
   });
 
-  // Create or update the address for the agency person
-  if (agencyDetails.addressId) {
-    await upsertAddress(agencyDetails.addressId, agencyDetails, tx);
-  }
-
-  // Link this person to the main person in the Organisation via the `Person_Organisation_OrgContactPersonIdToPerson` table
+  // Then update the person with the new organisation ID
   await tx.person.update({
     where: { PersonId: personId },
     data: {
-      PersonAgencyOrgId: agencyPerson.PersonId, // Link agency person to main person
+      PersonAgencyOrgId: organisation.OrgId,
     },
   });
+
+  return {
+    agencyContact,
+    organisation,
+  };
+};
+
+// Updated helper function to remove agency relationships
+const removeAgencyRelationships = async (personId: number, tx) => {
+  try {
+    // First get the current person with their agency relationship
+    const person = await tx.person.findUnique({
+      where: { PersonId: personId },
+      select: {
+        PersonAgencyOrgId: true,
+        Organisation_Person_PersonAgencyOrgIdToOrganisation: {
+          select: {
+            OrgId: true,
+            Person_Person_PersonAgencyOrgIdToOrganisation: {
+              select: {
+                PersonId: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!person?.PersonAgencyOrgId) return;
+
+    // First remove the agency link from the person
+    await tx.person.update({
+      where: { PersonId: personId },
+      data: {
+        PersonAgencyOrgId: null,
+      },
+    });
+
+    const org = person.Organisation_Person_PersonAgencyOrgIdToOrganisation;
+
+    if (org) {
+      // Check if this was the only person linked to this organization
+      const linkedPersons = org.Person_Person_PersonAgencyOrgIdToOrganisation;
+
+      if (linkedPersons.length <= 1) {
+        // If this was the only link, we can safely delete the organization
+        await tx.organisation.delete({
+          where: {
+            OrgId: org.OrgId,
+          },
+        });
+      }
+    }
+  } catch (error) {
+    console.error('Error removing agency relationships:', error);
+    throw error;
+  }
 };

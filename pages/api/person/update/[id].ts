@@ -27,14 +27,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       } = validatedData;
 
       // Update or create the main person record
-      const updatedPerson = await upsertPerson(personDetails, salaryAccountDetails, expenseAccountDetails, tx);
-
+      await upsertPerson(personDetails, salaryAccountDetails, expenseAccountDetails, tx);
       await all([
         handleAgencyDetails(personDetails.id, agencyDetails, tx),
         handleEmergencyContacts(personDetails.id, emergencyContact1, emergencyContact2, tx),
       ]);
-
-      res.status(200).json({ message: 'Person updated successfully', updatedPerson });
     });
 
     res.status(200).json({ message: 'Person and related details updated successfully', ok: true });
