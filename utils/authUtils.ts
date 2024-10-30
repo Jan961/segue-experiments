@@ -3,7 +3,7 @@ export const EMAIL_NOT_FOUND = 'form_identifier_not_found';
 export const EMAIL_ALREADY_EXISTS = 'form_identifier_exists';
 export const PASSWORD_INCORRECT = 'form_password_incorrect';
 export const SESSION_ALREADY_EXISTS = 'session_exists';
-export const INVALID_COMPANY_ID = 'Invalid Company Id';
+export const INVALID_EMAIL_OR_COMPANY_NAME = 'Invalid Email or Company Name';
 export const INVALID_VERIFICATION_STRATEGY = 'strategy_for_user_invalid';
 
 export const errorsMap = {
@@ -26,7 +26,46 @@ export const validateEmail = (value: string) => {
   return value ? /^[\w-\\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(value) : false;
 };
 
-export const generateUserPin = (): string => {
+// Regex ensures: at least one lowercase letter, one uppercase letter, one digit, one symbol, exactly 8 characters long
+export const validatePassword = (value: string) => {
+  return value ? /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d])[A-Za-z\d\W]{8}$/.test(value) : false;
+};
+
+/*
+  Validate PIN Regex checks for the following
+    1. Exactly 5 digits long.
+    2. Does not contain more than 2 consecutive ascending or descending numbers.
+    3. Does not contain fully ascending or descending sequences.
+*/
+export const validatePin = (value: number) => {
+  if (typeof value !== 'number' || !/^\d{5}$/.test(value.toString())) {
+    return { valid: false, message: 'Not a 5-digit number' };
+  }
+
+  const digits = value.toString().split('').map(Number);
+
+  // Check for more than 2 consecutive numbers in any order
+  for (let i = 0; i < digits.length - 2; i++) {
+    const diff1 = digits[i + 1] - digits[i];
+    const diff2 = digits[i + 2] - digits[i + 1];
+
+    if ((diff1 === 1 && diff2 === 1) || (diff1 === -1 && diff2 === -1)) {
+      return { valid: false, message: 'More than 2 consecutive numbers' };
+    }
+  }
+
+  // Check for fully ascending or descending sequences
+  const isAscending = digits.every((digit, i, arr) => i === 0 || digit > arr[i - 1]);
+  const isDescending = digits.every((digit, i, arr) => i === 0 || digit < arr[i - 1]);
+
+  if (isAscending || isDescending) {
+    return { valid: false, message: 'All numbers in sequence ascending or descending' };
+  }
+
+  return { valid: true, message: '' };
+};
+
+export const generateUserPin = (): number => {
   const pin = generator.generate({
     length: 5,
     numbers: true,
@@ -35,7 +74,7 @@ export const generateUserPin = (): string => {
     uppercase: false,
     strict: true,
   });
-  return pin;
+  return Number(pin);
 };
 
 export const generateUserPassword = (): string => {
