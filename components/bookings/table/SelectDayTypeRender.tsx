@@ -21,7 +21,7 @@ const SelectDayTypeRender = ({
   const [selectedDateType, setSelectedDateType] = useState<string>('');
 
   const options = useMemo(() => {
-    return data.isRunOfDates
+    return data.isRunOfDates && node.rowIndex !== 0
       ? dayTypeOptions?.filter(({ text }) => RUN_OF_DATES_DAY_TYPE_FILTERS.includes(text))
       : dayTypeOptions;
   }, [data, dayTypeOptions]);
@@ -60,7 +60,7 @@ const SelectDayTypeRender = ({
         onChange={handleChange}
         inline
         isSearchable
-        isClearable={!data?.isRunOfDates}
+        isClearable={false}
       />
     </div>
   );
