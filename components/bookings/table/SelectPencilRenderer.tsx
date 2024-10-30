@@ -1,6 +1,5 @@
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import { ICellRendererParams, IRowNode } from 'ag-grid-community';
-
 import SelectRenderer from 'components/core-ui-lib/Table/renderers/SelectRenderer';
 import { useEffect, useState } from 'react';
 import { statusOptions } from 'config/bookings';
@@ -47,6 +46,7 @@ const SelectPencilRenderer = ({ eGridCell, value, setValue, data, api, node }: S
         inline
         isSearchable={false}
         disabled={isDisabled}
+        isClearable={false}
       />
     </div>
   );

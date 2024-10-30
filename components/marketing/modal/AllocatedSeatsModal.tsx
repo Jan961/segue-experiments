@@ -39,7 +39,7 @@ interface FormInterface {
   custName: string;
   email: string;
   numSeatsReq: number;
-  seatNumList: number;
+  seatNumList: string;
   requestBy: string;
   comments: string;
   arrangedBy: number;
@@ -65,7 +65,7 @@ export default function AllocatedSeatsModal({
     custName: '',
     email: '',
     numSeatsReq: null,
-    seatNumList: 0,
+    seatNumList: '',
     requestBy: '',
     comments: '',
     arrangedBy: null,
@@ -211,7 +211,7 @@ export default function AllocatedSeatsModal({
       custName: '',
       email: '',
       numSeatsReq: null,
-      seatNumList: 0,
+      seatNumList: '',
       requestBy: '',
       comments: '',
       arrangedBy: null,
@@ -328,13 +328,13 @@ export default function AllocatedSeatsModal({
     <div>
       <PopupModal show={visible} onClose={() => handleClose('close')} showCloseIcon={true} hasOverlay={showConfirm}>
         <div className="h-[552px] w-[448px]">
-          <div className="text-xl text-primary-navy font-bold mb-4 -mt-3">Allocated Seats</div>
+          <div className="text-xl text-primary-navy font-bold mb-4 mt-3">Allocated Seats</div>
           <div className="flex flex-row">
             <Label text="Performance" required className={labelClass} />
             <div className="flex flex-col w-2/3 mb-2">
               <Select
                 testId="perf-date-or-time"
-                className="w-full"
+                className={classNames('w-full', errors.arrangedBy ? '' : 'mb-4')}
                 options={perfList}
                 value={form.perfSelected}
                 onChange={(e) => handleChange({ target: { name: 'perfSelected', value: e } })}
@@ -379,9 +379,9 @@ export default function AllocatedSeatsModal({
 
           <div className="flex flex-row">
             <Label text="Number of Seats Required" required className={labelClass} />
-            <div className="flex flex-col w-2/3 mb-2">
+            <div className={classNames('flex flex-col w-2/3')}>
               <TextInput
-                className="w-full"
+                className={classNames('w-full', errors.numberOfSeats ? '' : 'mb-4')}
                 testId="no-of-seats"
                 placeholder="Enter No. Seats"
                 id="seatsRequired"
@@ -406,7 +406,6 @@ export default function AllocatedSeatsModal({
                 name="seatNumList"
                 value={form.seatNumList}
                 onChange={handleChange}
-                type="number"
               />
             </div>
           </div>
@@ -445,7 +444,7 @@ export default function AllocatedSeatsModal({
             <Label text="Arranged By" required className={labelClass} />
             <div className="flex flex-col w-2/3 mb-2">
               <Select
-                className={classNames('w-full text-primary-input-text')}
+                className={classNames('w-full text-primary-input-text', errors.arrangedBy ? '' : 'mb-4')}
                 testId="select-user"
                 options={userList}
                 value={form.arrangedBy}
@@ -460,10 +459,10 @@ export default function AllocatedSeatsModal({
           </div>
 
           <div className="flex flex-row">
-            <Label text={'Venue' + '\n' + 'Confirmation' + '\n' + 'notes'} className={labelClass} />
-            <div className="flex flex-col">
+            <Label text={'Venue \n Confirmation \n Notes'} className={labelClass} />
+            <div className="flex flex-col w-2/3">
               <TextArea
-                className="w-[300px] h-[80px]"
+                className="w-full h-[80px] mb-4"
                 testId="venue-confirmation-notes"
                 value={form.venueConfNotes}
                 placeholder="Notes Field"
@@ -476,10 +475,22 @@ export default function AllocatedSeatsModal({
             <FormError error="Please ensure you fill in the required fields" className="mt-4 -mb-2 float-right" />
           )}
 
-          <div className="flex flex-row mt-5 pb-5 float-right">
-            <Button className="w-32" variant="secondary" text="Cancel" onClick={() => handleConfirm('cancel')} />
-            <Button className="ml-4 w-32" onClick={() => handleConfirm('delete')} variant="tertiary" text="Delete" />
-            <Button className="ml-4 w-32" variant="primary" text="Save and Close" onClick={handleSave} />
+          <div className="float-right flex flex-row mt-5">
+            <Button
+              className="ml-4 w-32 flex float-left"
+              variant="secondary"
+              text="Cancel"
+              onClick={() => handleConfirm('cancel')}
+            />
+            {type !== 'new' && (
+              <Button className="ml-4 w-32" onClick={() => handleConfirm('delete')} variant="tertiary" text="Delete" />
+            )}
+            <Button
+              className="ml-4 w-32 flex float-right"
+              variant="primary"
+              text="Save and Close"
+              onClick={handleSave}
+            />
           </div>
         </div>
       </PopupModal>

@@ -4,7 +4,6 @@ import { BookingItem, PreviewDataItem, TForm } from '../reducer';
 import { useRecoilValue } from 'recoil';
 import { rowsSelector } from 'state/booking/selectors/rowsSelector';
 import { calculateWeekNumber } from 'services/dateService';
-
 import { addDays, subDays, parseISO, isWithinInterval } from 'date-fns';
 import { venueState } from 'state/booking/venueState';
 import { bookingStatusMap } from 'config/bookings';
@@ -148,6 +147,27 @@ export default function PreviewBookingDetails({
     return sortedFilteredBookings;
   };
 
+  const getVenue = (item) => {
+    if (!item.perf) {
+      return dayTypeOptions.find((option) => option.value === item.dayType)?.text;
+    }
+    return item.venue
+      ? venueDict[item.venue].Name
+      : dayTypeOptions.find((option) => option.value === item.dayType)?.text;
+  };
+
+  const getPerformanceTimes = (item) => {
+    const times = item.times.split(';');
+    const accTimes = times.slice(0, item.noPerf);
+    let str = '';
+    for (let i = 0; i < accTimes.length - 1; i++) {
+      str += `${accTimes[i]}; `;
+    }
+    str += accTimes[accTimes.length - 1];
+    item.times = str;
+    return str;
+  };
+
   const formatRowData = (data) => {
     const rowItems: PreviewDataItem[] = data.map((item: any) => {
       const calculateWeek = () => {
@@ -156,17 +176,15 @@ export default function PreviewBookingDetails({
       return {
         ...item,
         highlightRow: true,
-        venue: item.venue
-          ? venueDict[item.venue].Name
-          : dayTypeOptions.find((option) => option.value === item.dayType)?.text,
+        venue: getVenue(item),
         town: item.venue && item.dayType !== null ? venueDict[item.venue].Town : '',
         capacity: item.venue && item.dayType !== null ? venueDict[item.venue].Seats : null,
         dayType: dayTypeOptions.find((option) => option.value === item.dayType)?.text,
         production: productionCode.split(' ')[0],
         bookingStatus: bookingStatusMap[item.bookingStatus],
         status: item.bookingStatus,
-        performanceCount: item.noPerf?.toString() || '',
-        performanceTimes: item.times,
+        performanceCount: item.perf ? item.noPerf?.toString() || '' : '',
+        performanceTimes: getPerformanceTimes(item),
         week: calculateWeek(),
         miles: '',
         travelTime: '',
