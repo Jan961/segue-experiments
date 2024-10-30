@@ -14,6 +14,8 @@ import { BuildNewContract, BuildNewContractProps } from './edit-contract-modal/B
 import { defaultContractSchedule } from './ContractSchedule';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import { objectify } from 'radash';
+import { accessArtisteContracts } from 'state/account/selectors/permissionSelector';
+import { CellClickedEvent } from 'ag-grid-community';
 
 interface ContractsTableProps {
   rowData?: IContractSummary[];
@@ -27,6 +29,7 @@ const defaultEditContractState = {
 };
 
 export default function CompanyContractsTable({ rowData = [] }: ContractsTableProps) {
+  const permissions = useRecoilValue(accessArtisteContracts);
   const tableRef = useRef(null);
   const { users } = useRecoilValue(userState);
   const { productions } = useRecoilValue(productionJumpState);
@@ -56,7 +59,17 @@ export default function CompanyContractsTable({ rowData = [] }: ContractsTablePr
       ).sort((a, b) => a.text.localeCompare(b.text)),
     [users],
   );
-  const columnDefs = useMemo(() => getCompanyContractsColumnDefs(userOptionList), [userOptionList]);
+
+  const columnDefs = useMemo(
+    () =>
+      getCompanyContractsColumnDefs(
+        !permissions.includes('EDIT_ARTISTE_CONTRACT_STATUS_DROPDOWNS'),
+        !permissions.includes('EXPORT_ARTISTE_CONTRACT'),
+        !permissions.includes('EDIT_CONTRACT_ARTISTE'),
+        userOptionList,
+      ),
+    [userOptionList],
+  );
   const cancelToken = useAxiosCancelToken();
 
   const getProductionCode = (id: number) => {
@@ -70,12 +83,15 @@ export default function CompanyContractsTable({ rowData = [] }: ContractsTablePr
     const roleName = role ? `${role}` : '';
     return `${code} ${name} ${roleName}`;
   };
-  const handleCellClick = (e) => {
-    if (e.column.colId === 'notes') {
-      setNotesPopupContext({ visible: true, contract: e.data });
+
+  const handleCellClick = (e: CellClickedEvent) => {
+    const colId = e.column.getColId();
+    const data = e.data;
+    if (colId === 'notes') {
+      setNotesPopupContext({ visible: true, contract: data });
     }
-    if (e.column.colId === 'edit') {
-      const { departmentId, productionId, personId, role, id, templateId } = e.data;
+    if (colId === 'edit' && permissions.includes('EDIT_CONTRACT_ARTISTE')) {
+      const { departmentId, productionId, personId, role, id, templateId } = data;
       setEditContract({
         visible: true,
         contractId: id,
@@ -87,6 +103,10 @@ export default function CompanyContractsTable({ rowData = [] }: ContractsTablePr
           templateId,
         },
       });
+    }
+    if (colId === 'pdf' && permissions.includes('EXPORT_ARTISTE_CONTRACT')) {
+      // Export PDF
+      console.log('ExportPDF needs implementation');
     }
   };
 

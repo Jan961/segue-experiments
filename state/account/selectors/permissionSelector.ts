@@ -30,6 +30,15 @@ const CONTRACTS_HOME_PERMISSIONS = [
   'ACCESS_SM_/_CREW_/_TECH_CONTRACTS',
 ];
 
+const CONTRACTS_ARTISTE_PERMISSIONS = [
+  'ADD_NEW_ARTISTE_CONTRACT',
+  'ADD_NEW_PERSON_ARTISTE',
+  'EDIT_ARTISTE_CONTRACT_STATUS_DROPDOWNS',
+  'EDIT_CONTRACT_ARTISTE',
+  'EDIT_PERSON_DETAILS_ARTISTE',
+  'EXPORT_ARTISTE_CONTRACT',
+];
+
 const BOOKINGS_HOME_PERMISSIONS = [
   'BOOKINGS',
   'ACCESS_BOOKINGS',
@@ -99,11 +108,19 @@ export const accessMarketingHome = selector({
   },
 });
 
-export const accesContractsHome = selector({
+export const accessContractsHome = selector({
   key: 'accesContractsHomeSelector',
   get: ({ get }) => {
     const { permissions = [] } = get(userPermissionsState);
     return permissions.filter((x) => CONTRACTS_HOME_PERMISSIONS.includes(x));
+  },
+});
+
+export const accessArtisteContracts = selector({
+  key: 'accessArtisteContractsSelector',
+  get: ({ get }) => {
+    const { permissions = [] } = get(userPermissionsState);
+    return permissions.filter((x) => CONTRACTS_ARTISTE_PERMISSIONS.includes(x));
   },
 });
 

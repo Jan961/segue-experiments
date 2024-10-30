@@ -10,6 +10,7 @@ import PersonalDetails, { defaultPersonDetails } from '../../../contracts/Person
 import AccountDetailsForm, { defaultBankAccount } from '../../../contracts/PersonForm/AccountDetailsForm';
 import EmergencyContact, { defaultEmergencyContactData } from '../../../contracts/PersonForm/EmergencyContact';
 import { IPerson } from '../../../contracts/types';
+import { accessArtisteContracts } from 'state/account/selectors/permissionSelector';
 
 const defaultContractDetails = {
   personDetails: defaultPersonDetails,
@@ -21,6 +22,7 @@ const defaultContractDetails = {
 };
 
 interface ContractPersonDataFormProps {
+  type: 'Edit' | 'New';
   person?: Partial<IPerson>;
   height: string;
   updateFormData: (data: Partial<IPerson>) => void;
@@ -55,7 +57,8 @@ const mergeContractData = (contractDetailsD, contractDetailsV) => {
   };
 };
 
-export const PersonDetailsTab = ({ person = {}, height, updateFormData }: ContractPersonDataFormProps) => {
+export const PersonDetailsTab = ({ person = {}, height, updateFormData, type }: ContractPersonDataFormProps) => {
+  const permissions = useRecoilValue(accessArtisteContracts);
   const [personData, setPersonData] = useState<IPerson>(mergeContractData(defaultContractDetails, person));
   const {
     personDetails,
@@ -92,11 +95,19 @@ export const PersonDetailsTab = ({ person = {}, height, updateFormData }: Contra
     [personData, updateFormData, setPersonData],
   );
 
+  const isPersonDetailsDisabled = (): boolean => {
+    if (type === 'Edit' && !permissions.includes('EDIT_PERSON_DETAILS_ARTISTE')) {
+      return true;
+    }
+    return false;
+  };
+
   return (
     <>
       <div className={`${height} w-full`}>
         <div className="text-xl text-primary-navy font-bold mb-3">Person Details</div>
         <PersonalDetails
+          disabled={isPersonDetailsDisabled()}
           details={personDetails}
           countryOptionList={countryOptionList}
           booleanOptions={booleanOptions}

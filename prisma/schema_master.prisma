@@ -229,11 +229,13 @@ view AccountUserView {
   AccountName           String  @db.VarChar(50)
   AccUserId             Int     @default(0)
   AccUserIsAdmin        Boolean @default(dbgenerated("(b'0')")) @db.Bit(1)
+  AccUserIsActive       Boolean @default(dbgenerated("(b'0')")) @db.Bit(1)
   AccUserPIN            String? @db.VarChar(4)
   UserId                Int     @default(0)
   UserFirstName         String  @db.VarChar(50)
   UserLastName          String? @db.VarChar(50)
   UserEmail             String  @db.VarChar(120)
+  UserIsActive          Boolean @default(dbgenerated("(b'0')")) @db.Bit(1)
 
   @@ignore
 }

@@ -12,7 +12,6 @@ import SelectCellRenderer from 'components/core-ui-lib/Table/renderers/SelectCel
 import { companyContractStatusOptions, statusToBgColorMap } from 'config/contracts';
 import DateRenderer from 'components/core-ui-lib/Table/renderers/DateRenderer';
 import NotesRenderer from 'components/core-ui-lib/Table/renderers/NotesRenderer';
-import DownloadButtonRenderer from 'components/core-ui-lib/Table/renderers/DownloadButtonRenderer';
 import TextInputRenderer from 'components/core-ui-lib/Table/renderers/TextInputRenderer';
 import CurrencyInputRenderer from 'components/core-ui-lib/Table/renderers/CurrencyInputRenderer';
 import { formatValue } from './utils';
@@ -79,7 +78,12 @@ export const contractsColumnDefs = [
   },
 ];
 
-export const getCompanyContractsColumnDefs = (userList = []) => [
+export const getCompanyContractsColumnDefs = (
+  editContractStatus: boolean,
+  pdfDisabled: boolean,
+  editDisabled: boolean,
+  userList = [],
+) => [
   {
     headerName: 'First Name',
     field: 'firstName',
@@ -117,6 +121,7 @@ export const getCompanyContractsColumnDefs = (userList = []) => [
     cellRendererParams: () => ({
       options: companyContractStatusOptions,
       isSearchable: true,
+      disabled: editContractStatus,
     }),
   },
   {
@@ -128,6 +133,7 @@ export const getCompanyContractsColumnDefs = (userList = []) => [
       buttonText: 'Edit',
       variant: 'primary',
       width: 60,
+      disabled: editDisabled,
     },
     resizable: false,
     headerClass: 'text-center',
@@ -136,13 +142,13 @@ export const getCompanyContractsColumnDefs = (userList = []) => [
     headerName: '',
     field: 'pdf',
     width: 100,
-    cellRenderer: DownloadButtonRenderer,
-    cellRendererParams: (params) => ({
+    cellRenderer: ButtonRenderer,
+    cellRendererParams: {
       buttonText: 'Save as PDF',
       variant: 'primary',
       width: 90,
-      href: `/api/company-contracts/export/${params.data?.id}`,
-    }),
+      disabled: pdfDisabled,
+    },
     cellStyle: {
       paddingRight: '0.5em',
     },

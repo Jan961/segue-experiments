@@ -50,7 +50,7 @@ export const ContractNewPersonModal = ({ openNewPersonContract, onClose }: Contr
       onClose={() => onClose?.()}
     >
       <div className="overflow-y-scroll">
-        <PersonDetailsTab updateFormData={setFormData} height="h-[80vh]" />
+        <PersonDetailsTab type="New" updateFormData={setFormData} height="h-[80vh]" />
       </div>
       <div className="w-full mt-4 flex justify-end items-center">
         <Button onClick={() => onClose?.()} className="w-33" variant="secondary" text="Cancel" />

@@ -12,8 +12,10 @@ import { ContractScheduleModal } from './ContractSchedule';
 import { Label } from 'components/core-ui-lib';
 import { personState } from 'state/contracts/PersonState';
 import { getAllOptions, noop, transformToOptions } from 'utils';
+import { accessArtisteContracts } from 'state/account/selectors/permissionSelector';
 
 const CompanyContractFilters = () => {
+  const permissions = useRecoilValue(accessArtisteContracts);
   const [filter, setFilter] = useRecoilState(contractsFilterState);
   const { selected: productionId } = useRecoilValue(productionJumpState);
   const personMap = useRecoilValue(personState);
@@ -108,7 +110,12 @@ const CompanyContractFilters = () => {
           <Button className="text-sm leading-8 ml-6 px-6" text="Clear Filters" onClick={onClearFilters} />
         </div>
         <div className="flex">
-          <Button className="text-sm leading-8 px-6" text="Start New Contract" onClick={openContractSchedule} />
+          <Button
+            className="text-sm leading-8 px-6"
+            text="Start New Contract"
+            onClick={openContractSchedule}
+            disabled={!permissions.includes('ADD_NEW_ARTISTE_CONTRACT')}
+          />
           <Button
             disabled
             className="text-sm leading-8 ml-4 px-6"
