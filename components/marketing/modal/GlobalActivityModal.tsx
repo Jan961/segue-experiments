@@ -17,6 +17,8 @@ import { Table } from 'components/core-ui-lib';
 import { isValidDate } from 'services/dateService';
 import axios from 'axios';
 import LoadingOverlay from 'components/shows/LoadingOverlay';
+import { useRecoilValue } from 'recoil';
+import { accessMarketingHome } from 'state/account/selectors/permissionSelector';
 
 export type ActivityModalVariant = 'add' | 'edit' | 'delete' | 'view';
 
@@ -59,6 +61,7 @@ export default function GlobalActivityModal({
   venues = [],
   tourWeeks,
 }: Partial<ActivityModalProps>) {
+  const permissions = useRecoilValue(accessMarketingHome);
   const [visible, setVisible] = useState<boolean>(show);
   const [actName, setActName] = useState<string>(null);
   const [actType, setActType] = useState<number>(null);
@@ -280,7 +283,7 @@ export default function GlobalActivityModal({
             id="activityName"
             value={actName}
             onChange={(event) => setActName(event.target.value)}
-            disabled={variant === 'view'}
+            disabled={variant === 'view' || !permissions.includes('EDIT_GLOBAL_ACTIVITY')}
           />
 
           <Select
@@ -292,7 +295,7 @@ export default function GlobalActivityModal({
             isClearable
             isSearchable
             label="Type"
-            disabled={variant === 'view'}
+            disabled={variant === 'view' || !permissions.includes('EDIT_GLOBAL_ACTIVITY')}
             variant={variant === 'view' ? 'transparent' : 'colored'}
           />
 
@@ -306,7 +309,7 @@ export default function GlobalActivityModal({
                 label="Date"
                 inputClass="!border-0 !shadow-none"
                 labelClassName="text-primary-input-text"
-                disabled={variant === 'view'}
+                disabled={variant === 'view' || !permissions.includes('EDIT_GLOBAL_ACTIVITY')}
               />
             </div>
 
@@ -319,7 +322,7 @@ export default function GlobalActivityModal({
                 name="followUpRequired"
                 checked={actFollowUp}
                 onChange={(e) => setActFollowUp(e.target.checked)}
-                disabled={variant === 'view'}
+                disabled={variant === 'view' || !permissions.includes('EDIT_GLOBAL_ACTIVITY')}
               />
             </div>
           </div>
@@ -335,7 +338,7 @@ export default function GlobalActivityModal({
                   label="Date"
                   inputClass="!border-0 !shadow-none"
                   labelClassName="text-primary-input-text"
-                  disabled={variant === 'view'}
+                  disabled={variant === 'view' || !permissions.includes('EDIT_GLOBAL_ACTIVITY')}
                 />
               </div>
             </div>
@@ -356,7 +359,7 @@ export default function GlobalActivityModal({
                   id="cost"
                   value={cost}
                   onChange={(event) => setCostValue(event.target.value)}
-                  disabled={variant === 'view'}
+                  disabled={variant === 'view' || !permissions.includes('EDIT_GLOBAL_ACTIVITY')}
                 />
               </div>
             </div>
@@ -368,7 +371,7 @@ export default function GlobalActivityModal({
             value={actNotes}
             placeholder="Notes Field"
             onChange={(e) => setActNotes(e.target.value)}
-            disabled={variant === 'view'}
+            disabled={variant === 'view' || !permissions.includes('EDIT_GLOBAL_ACTIVITY')}
             defaultDisabled={false}
           />
 
@@ -401,7 +404,13 @@ export default function GlobalActivityModal({
                 variant="secondary"
                 text="Cancel"
               />
-              <Button className="ml-4 w-[132px] mr-1" variant="primary" text="Save and Close" onClick={handleSave} />
+              <Button
+                className="ml-4 w-[132px] mr-1"
+                variant="primary"
+                text="Save and Close"
+                onClick={handleSave}
+                disabled={!permissions.includes('EDIT_GLOBAL_ACTIVITY')}
+              />
             </div>
           )}
         </div>

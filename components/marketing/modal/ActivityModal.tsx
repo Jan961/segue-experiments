@@ -12,7 +12,9 @@ import { startOfDay } from 'date-fns';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import { hasActivityChanged } from '../utils';
 import { ConfDialogVariant } from 'components/core-ui-lib/ConfirmationDialog/ConfirmationDialog';
-import { checkDecimalStringFormat } from 'utils';
+import { checkDecimalStringFormat, isNull } from 'utils';
+import { useRecoilValue } from 'recoil';
+import { accessMarketingHome } from 'state/account/selectors/permissionSelector';
 
 export type ActivityModalVariant = 'add' | 'edit' | 'delete';
 
@@ -42,6 +44,7 @@ export default function ActivityModal({
   bookingId,
   data,
 }: Partial<ActivityModalProps>) {
+  const permissions = useRecoilValue(accessMarketingHome);
   const [visible, setVisible] = useState<boolean>(show);
   const [actName, setActName] = useState<string>(null);
   const [actType, setActType] = useState<number>(null);
@@ -136,7 +139,7 @@ export default function ActivityModal({
         BookingId: bookingId,
         CompanyCost: parseFloat(companyCost),
         VenueCost: parseFloat(venueCost),
-        Date: startOfDay(new Date(actDate)),
+        Date: !isNull(actDate) ? startOfDay(new Date(actDate)) : null,
         FollowUpRequired: actFollowUp,
         Name: actName,
         Notes: actNotes,
@@ -178,6 +181,7 @@ export default function ActivityModal({
             placeholder="Enter Activity Name"
             testId="enter-activity-name"
             id="activityName"
+            disabled={!permissions.includes('EDIT_ACTIVITY')}
             value={actName}
             onChange={(event) => {
               if (event.target.value.length <= 30) {
@@ -193,6 +197,7 @@ export default function ActivityModal({
             testId="select-activity-type"
             options={activityTypes}
             value={actType}
+            disabled={!permissions.includes('EDIT_ACTIVITY')}
             onChange={(value) => changeActivityType(value)}
             placeholder="Please select Activity Type"
             isClearable
@@ -211,6 +216,7 @@ export default function ActivityModal({
                 testId="new-activity-date"
                 inputClass="!border-0 !shadow-none"
                 labelClassName="text-primary-input-text"
+                disabled={!permissions.includes('EDIT_ACTIVITY')}
               />
             </div>
 
@@ -223,6 +229,7 @@ export default function ActivityModal({
                 name="followUpRequired"
                 checked={actFollowUp}
                 onChange={(e) => setActFollowUp(e.target.checked)}
+                disabled={!permissions.includes('EDIT_ACTIVITY')}
               />
             </div>
           </div>
@@ -238,6 +245,7 @@ export default function ActivityModal({
                   label="Date"
                   inputClass="!border-0 !shadow-none"
                   labelClassName="text-primary-input-text"
+                  disabled={!permissions.includes('EDIT_ACTIVITY')}
                 />
               </div>
             </div>
@@ -258,6 +266,7 @@ export default function ActivityModal({
                     id="companyCost"
                     value={companyCost}
                     onChange={(event) => validateCost('companyCost', event.target.value, 8, 2)}
+                    disabled={!permissions.includes('EDIT_ACTIVITY')}
                   />
                 </div>
               </div>
@@ -277,6 +286,7 @@ export default function ActivityModal({
                     id="venueCost"
                     value={venueCost}
                     onChange={(event) => validateCost('venueCost', event.target.value, 8, 2)}
+                    disabled={!permissions.includes('EDIT_ACTIVITY')}
                   />
                 </div>
               </div>
@@ -290,6 +300,7 @@ export default function ActivityModal({
             value={actNotes}
             placeholder="Notes Field"
             onChange={(e) => setActNotes(e.target.value)}
+            disabled={!permissions.includes('EDIT_ACTIVITY')}
           />
 
           <div className="float-right flex flex-row mt-5 py-2">
@@ -299,7 +310,13 @@ export default function ActivityModal({
               variant="secondary"
               text="Cancel"
             />
-            <Button className="ml-4 w-[132px] mr-1" variant="primary" text="Save and Close" onClick={handleSave} />
+            <Button
+              disabled={!permissions.includes('EDIT_ACTIVITY')}
+              className="ml-4 w-[132px] mr-1"
+              variant="primary"
+              text="Save and Close"
+              onClick={handleSave}
+            />
           </div>
         </div>
       </PopupModal>
