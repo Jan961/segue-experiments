@@ -39,6 +39,15 @@ const CONTRACTS_ARTISTE_PERMISSIONS = [
   'EXPORT_ARTISTE_CONTRACT',
 ];
 
+const CONTRACTS_CREATIVES_PERMISSIONS = [
+  'ADD_NEW_CREATIVE_CONTRACT',
+  'ADD_NEW_PERSON_CREATIVE',
+  'EDIT_CONTRACT_CREATIVE',
+  'EDIT_CREATIVE_CONTRACT_STATUS_DROPDOWNS',
+  'EDIT_PERSON_DETAILS_CREATIVE',
+  'EXPORT_CREATIVE_CONTRACT',
+];
+
 const BOOKINGS_HOME_PERMISSIONS = [
   'BOOKINGS',
   'ACCESS_BOOKINGS',
@@ -113,6 +122,14 @@ export const accessContractsHome = selector({
   get: ({ get }) => {
     const { permissions = [] } = get(userPermissionsState);
     return permissions.filter((x) => CONTRACTS_HOME_PERMISSIONS.includes(x));
+  },
+});
+
+export const accessCreativesContracts = selector({
+  key: 'accessCreativesContractsSelector',
+  get: ({ get }) => {
+    const { permissions = [] } = get(userPermissionsState);
+    return permissions.filter((x) => CONTRACTS_CREATIVES_PERMISSIONS.includes(x));
   },
 });
 

@@ -14,9 +14,22 @@ const ContractsPage = (props: InferGetServerSidePropsType<typeof getServerSidePr
   return (
     <Layout title="Contracts | Segue" flush>
       <div className="mb-8">
-        <CompanyContractFilters />
+        <CompanyContractFilters
+          permissions={{
+            disableNewPerson: true,
+            disableNewContract: true,
+          }}
+        />
       </div>
-      <CompanyContractsTable rowData={rows} />
+      <CompanyContractsTable
+        rowData={rows}
+        permissions={{
+          editRow: true,
+          savePDF: true,
+          changeStatus: true,
+          editPerson: true,
+        }}
+      />
     </Layout>
   );
 };

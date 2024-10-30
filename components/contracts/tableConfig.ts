@@ -79,7 +79,7 @@ export const contractsColumnDefs = [
 ];
 
 export const getCompanyContractsColumnDefs = (
-  editContractStatus: boolean,
+  contractStatusDisable: boolean,
   pdfDisabled: boolean,
   editDisabled: boolean,
   userList = [],
@@ -117,11 +117,10 @@ export const getCompanyContractsColumnDefs = (
     cellRenderer: SelectCellRenderer,
     valueGetter: (params) => params?.data?.contractStatus,
     flex: 1,
-    editable: true,
     cellRendererParams: () => ({
       options: companyContractStatusOptions,
       isSearchable: true,
-      disabled: editContractStatus,
+      disabled: !contractStatusDisable,
     }),
   },
   {
@@ -133,7 +132,7 @@ export const getCompanyContractsColumnDefs = (
       buttonText: 'Edit',
       variant: 'primary',
       width: 60,
-      disabled: editDisabled,
+      disabled: !editDisabled,
     },
     resizable: false,
     headerClass: 'text-center',
@@ -147,7 +146,7 @@ export const getCompanyContractsColumnDefs = (
       buttonText: 'Save as PDF',
       variant: 'primary',
       width: 90,
-      disabled: pdfDisabled,
+      disabled: !pdfDisabled,
     },
     cellStyle: {
       paddingRight: '0.5em',

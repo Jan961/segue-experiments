@@ -13,7 +13,6 @@ import { PersonMinimalDTO } from 'interfaces';
 import { IContractSchedule } from '../contracts/types';
 import { contractDepartmentState } from 'state/contracts/contractDepartmentState';
 import { contractTemplateState } from 'state/contracts/contractTemplateState';
-import { accessArtisteContracts } from 'state/account/selectors/permissionSelector';
 
 export const defaultContractSchedule = {
   production: null,
@@ -23,8 +22,15 @@ export const defaultContractSchedule = {
   templateId: null,
 };
 
-export const ContractScheduleModal = ({ openContract, onClose }: { openContract: boolean; onClose: () => void }) => {
-  const permissions = useRecoilValue(accessArtisteContracts);
+export const ContractScheduleModal = ({
+  openContract,
+  onClose,
+  newPersonDisabled,
+}: {
+  openContract: boolean;
+  onClose: () => void;
+  newPersonDisabled: boolean;
+}) => {
   const { productions } = useRecoilValue(productionJumpState);
   const [personMap, setPersonMap] = useRecoilState(personState);
   const departmentMap = useRecoilValue(contractDepartmentState);
@@ -126,7 +132,8 @@ export const ContractScheduleModal = ({ openContract, onClose }: { openContract:
         </div>
         <div className="flex justify-end mr-2">
           <Button
-            disabled={!production || !permissions.includes('ADD_NEW_PERSON_ARTISTE')}
+            disabled={!production || newPersonDisabled}
+            // disabled={!production || !permissions.includes('ADD_NEW_PERSON_ARTISTE')}
             className="w-33"
             variant="secondary"
             text="Add New Person"
@@ -192,6 +199,7 @@ export const ContractScheduleModal = ({ openContract, onClose }: { openContract:
             setOpenNewBuildContract(false);
             onClose?.();
           }}
+          editPerson={false}
         />
       )}
     </PopupModal>

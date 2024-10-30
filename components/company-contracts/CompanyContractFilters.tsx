@@ -12,10 +12,15 @@ import { ContractScheduleModal } from './ContractSchedule';
 import { Label } from 'components/core-ui-lib';
 import { personState } from 'state/contracts/PersonState';
 import { getAllOptions, noop, transformToOptions } from 'utils';
-import { accessArtisteContracts } from 'state/account/selectors/permissionSelector';
 
-const CompanyContractFilters = () => {
-  const permissions = useRecoilValue(accessArtisteContracts);
+interface Props {
+  permissions: {
+    disableNewPerson: boolean;
+    disableNewContract: boolean;
+  };
+}
+
+const CompanyContractFilters = (props: Props) => {
   const [filter, setFilter] = useRecoilState(contractsFilterState);
   const { selected: productionId } = useRecoilValue(productionJumpState);
   const personMap = useRecoilValue(personState);
@@ -114,7 +119,7 @@ const CompanyContractFilters = () => {
             className="text-sm leading-8 px-6"
             text="Start New Contract"
             onClick={openContractSchedule}
-            disabled={!permissions.includes('ADD_NEW_ARTISTE_CONTRACT')}
+            disabled={props.permissions.disableNewContract}
           />
           <Button
             disabled
@@ -124,7 +129,13 @@ const CompanyContractFilters = () => {
           />
         </div>
       </div>
-      {openContract && <ContractScheduleModal openContract={openContract} onClose={() => setOpenContract(false)} />}
+      {openContract && (
+        <ContractScheduleModal
+          openContract={openContract}
+          onClose={() => setOpenContract(false)}
+          newPersonDisabled={props.permissions.disableNewPerson}
+        />
+      )}
     </div>
   );
 };

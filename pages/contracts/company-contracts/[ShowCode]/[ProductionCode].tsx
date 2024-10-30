@@ -16,17 +16,34 @@ import { IContractDepartment, IContractSummary } from 'interfaces/contracts';
 import useCompanyContractsFilter from 'hooks/useCompanyContractsFilters';
 import { getAccountContacts } from 'services/contactService';
 import { fetchAllTemplates } from 'services/templateService';
+import { useRecoilValue } from 'recoil';
+import { accessCreativesContracts } from 'state/account/selectors/permissionSelector';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const ContractsPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  const permissions = useRecoilValue(accessCreativesContracts);
+
   const rows = useCompanyContractsFilter();
 
   return (
     <Layout title="Contracts | Segue" flush>
       <div className="mb-8">
-        <CompanyContractFilters />
+        <CompanyContractFilters
+          permissions={{
+            disableNewPerson: !permissions.includes('ADD_NEW_PERSON_CREATIVE'),
+            disableNewContract: !permissions.includes('ADD_NEW_CREATIVE_CONTRACT'),
+          }}
+        />
       </div>
-      <CompanyContractsTable rowData={rows} />
+      <CompanyContractsTable
+        rowData={rows}
+        permissions={{
+          editRow: permissions.includes('EDIT_CONTRACT_CREATIVE'),
+          savePDF: permissions.includes('EXPORT_CREATIVE_CONTRACT'),
+          changeStatus: permissions.includes('EDIT_CREATIVE_CONTRACT_STATUS_DROPDOWNS'),
+          editPerson: permissions.includes('EDIT_PERSON_DETAILS_CREATIVE'),
+        }}
+      />
     </Layout>
   );
 };
