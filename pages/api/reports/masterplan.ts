@@ -1,10 +1,11 @@
 import ExcelJS from 'exceljs';
 import getPrismaClient from 'lib/prisma';
 import Decimal from 'decimal.js';
+import { add, parseISO, differenceInDays } from 'date-fns';
 import { COLOR_HEXCODE, colorCell, colorTextAndBGCell, fillRowBGColorAndTextColor } from 'services/salesSummaryService';
-import { formatDateWithTimezoneOffset } from 'services/dateService';
+import { formatDate, formatDateWithTimezoneOffset } from 'services/dateService';
 import { convertToPDF } from 'utils/report';
-import { format, add, differenceInDays } from 'date-fns';
+import { getExportedAtTitle } from 'utils/export';
 
 type SCHEDULE_VIEW = {
   ProductionId: number;
@@ -131,9 +132,9 @@ const handler = async (req, res) => {
     const workbook = new ExcelJS.Workbook();
     const formattedData = data.map((x) => ({
       ...x,
-      EntryDate: format(x.EntryDate, 'yyyy-MM-dd'),
-      ProductionStartDate: format(x.ProductionStartDate, 'yyyy-MM-dd'),
-      ProductionEndDate: format(x.ProductionEndDate, 'yyyy-MM-dd'),
+      EntryDate: formatDate(x.EntryDate, 'yyyy-MM-dd'),
+      ProductionStartDate: formatDate(x.ProductionStartDate, 'yyyy-MM-dd'),
+      ProductionEndDate: formatDate(x.ProductionEndDate, 'yyyy-MM-dd'),
     }));
 
     const showNameAndProductionCode: { [key: string]: string[] } = formattedData.reduce((acc, x) => {
@@ -163,19 +164,12 @@ const handler = async (req, res) => {
       pageSetup: { fitToPage: true, fitToHeight: 5, fitToWidth: 7 },
       views: [{ state: 'frozen', xSplit: 2, ySplit: 6 }],
     });
-    const title = `All Productions Masterplan ${format(new Date(formatedFromDateString), 'dd-MM-yy')} to ${format(
-      new Date(formatedToDateString),
+    const title = `All Productions Masterplan ${formatDate(formatedFromDateString, 'dd-MM-yy')} to ${formatDate(
+      formatedToDateString,
       'dd-MM-yy',
     )}`;
     worksheet.addRow([title]);
-    const date = new Date();
-    worksheet.addRow([
-      `Exported: ${formatDateWithTimezoneOffset({
-        date,
-        dateFormat: 'dd/MM/yy',
-        timezoneOffset,
-      })} at ${formatDateWithTimezoneOffset({ date, dateFormat: 'HH:mm', timezoneOffset })}`,
-    ]);
+    worksheet.addRow([getExportedAtTitle(timezoneOffset)]);
     worksheet.addRow([]);
     worksheet.addRow(['', '', ...distinctShowNames.map((x) => x.ShowName)]);
     worksheet.addRow(['DAY', 'DATE', ...distinctShowNames.map((x) => x.FullProductionCode)]);
@@ -245,8 +239,8 @@ const handler = async (req, res) => {
 
     let rowNo = 6;
     for (let i = 1; i <= daysDiff; i++) {
-      const weekDay = format(add(new Date(fromDate), { days: i - 1 }), 'dddd');
-      const dateInIncomingFormat = format(add(new Date(fromDate), { days: i - 1 }), 'yyyy-mm-dd');
+      const weekDay = formatDate(add(parseISO(fromDate), { days: i - 1 }), 'eeee');
+      const dateInIncomingFormat = formatDate(add(new Date(fromDate), { days: i - 1 }), 'yyyy-MM-dd');
       const date = formatDateWithTimezoneOffset({ date: dateInIncomingFormat, timezoneOffset });
 
       const values: string[] = distinctShowNames.map(({ FullProductionCode, ShowName }) => {
