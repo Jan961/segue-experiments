@@ -10,7 +10,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         AccountMainEmail: email,
       },
     });
-    console.log('accounts', accounts, companyName, email);
+
     return res.status(200).json({ accountExists: accounts?.length === 1 });
   } catch (err) {
     console.log(err);
