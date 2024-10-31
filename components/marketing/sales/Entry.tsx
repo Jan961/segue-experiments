@@ -11,6 +11,7 @@ import { Spinner } from 'components/global/Spinner';
 import { currencyState } from 'state/global/currencyState';
 import { UpdateWarningModal } from '../modal/UpdateWarning';
 import axios from 'axios';
+import { accessMarketingHome } from 'state/account/selectors/permissionSelector';
 
 export type TourResponse = {
   data: Array<SelectOption>;
@@ -72,6 +73,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
   const [warningIssued, setWarningIssued] = useState<boolean>(false);
   const currency = useRecoilValue(currencyState);
   const [salesApiAction, setSalesApiAction] = useState('create');
+  const permissions = useRecoilValue(accessMarketingHome);
 
   const compareSalesFigures = (prev: SalesFigure, curr: SalesFigure) => {
     // If prev is null, there are no errors.
@@ -852,6 +854,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                   placeholder="Notes Field"
                   onChange={(e) => setBookingSaleNotes(e.target.value)}
                   onBlur={(e) => editBooking('salesNotes', e.target.value)}
+                  disabled={!permissions.includes('EDIT_BOOKING_SALES_NOTES')}
                 />
               </div>
             </div>

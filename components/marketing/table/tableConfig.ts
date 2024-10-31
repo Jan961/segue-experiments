@@ -97,7 +97,6 @@ export const activityColDefs = (
     headerName: 'Due By Date',
     field: 'followUpDt',
     cellRenderer: function (params) {
-      console.log(editPermission);
       return isValidDate(params.data.followUpDt) ? formatInputDate(params.data.followUpDt) : '';
     },
     width: 100,
