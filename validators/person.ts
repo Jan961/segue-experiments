@@ -15,7 +15,7 @@ export const personShape = {
   passportName: yup.string().nullable(),
   passportNumber: yup.string().nullable(),
   hasUKWorkPermit: yup.boolean().nullable(),
-  passportExpiryDate: yup.date().nullable(),
+  passportExpiryDate: yup.string().nullable(),
   postcode: yup.string().nullable(),
   checkedBy: yup.number().integer().nullable(),
   country: yup.number().integer().nullable(),
@@ -26,7 +26,7 @@ export const personShape = {
   healthDetails: yup.string().nullable(),
   otherWorkTypes: yup
     .array()
-    .of(yup.object().shape({ id: yup.number().nullable(), name: yup.string().required() }))
+    .of(yup.object().shape({ id: yup.number().nullable(), name: yup.string().nullable() }))
     .nullable(),
   notes: yup.string().nullable(),
 };

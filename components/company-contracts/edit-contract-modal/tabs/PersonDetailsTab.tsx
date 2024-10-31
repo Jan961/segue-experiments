@@ -94,7 +94,7 @@ export const PersonDetailsTab = ({ person = {}, height, updateFormData }: Contra
 
   return (
     <>
-      <div className={`${height} w-full`}>
+      <div className={`${height} w-full py-5`}>
         <div className="text-xl text-primary-navy font-bold mb-3">Person Details</div>
         <PersonalDetails
           details={personDetails}

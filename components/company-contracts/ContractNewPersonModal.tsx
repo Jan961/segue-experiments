@@ -16,6 +16,7 @@ export const ContractNewPersonModal = ({ openNewPersonContract, onClose }: Contr
   // const [validationErrors, setValidationErrors] = useState({});
   const validateForm = async (data) => {
     try {
+      console.log(data);
       await createPersonSchema.validate({ ...data }, { abortEarly: false });
       return true;
     } catch (validationErrors) {
@@ -49,12 +50,14 @@ export const ContractNewPersonModal = ({ openNewPersonContract, onClose }: Contr
       titleClass="text-xl text-primary-navy font-bold -mt-2"
       onClose={() => onClose?.()}
     >
-      <div className="overflow-y-scroll">
-        <PersonDetailsTab updateFormData={setFormData} height="h-[80vh]" />
-      </div>
-      <div className="w-full mt-4 flex justify-end items-center">
-        <Button onClick={() => onClose?.()} className="w-33" variant="secondary" text="Cancel" />
-        <Button onClick={onSave} className="ml-4 w-33" variant="primary" text="Save and Return to Contracts" />
+      <div className="flex flex-col gap-2">
+        <div className="overflow-y-scroll grow-1 px-5">
+          <PersonDetailsTab updateFormData={setFormData} height="h-[80vh]" />
+        </div>
+        <div className="w-full mt-4 flex justify-end items-center">
+          <Button onClick={() => onClose?.()} className="w-33" variant="secondary" text="Cancel" />
+          <Button onClick={onSave} className="ml-4 w-33 px-6" variant="primary" text="Save and Return to Contracts" />
+        </div>
       </div>
     </PopupModal>
   );

@@ -92,7 +92,7 @@ export default function PopupModal({
                 <Dialog.Title as="h3" className={`-mt-6 text-lg font-bold leading-6 ${titleClass}`}>
                   {title}
                 </Dialog.Title>
-                <div className="overflow-y-auto mt-3">{children}</div>
+                <div className="mt-3">{children}</div>
               </Dialog.Panel>
             </Transition.Child>
           </div>

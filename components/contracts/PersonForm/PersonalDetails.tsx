@@ -176,7 +176,7 @@ const PersonalDetails = ({
         </div>
 
         <div className="flex flex-col gap-2">
-          <div className="flex items-center">
+          <div className="flex items-start gap-4">
             <div className="text-primary-input-text font-bold w-44">Email Address</div>
             <div className="grow">
               <TextInput
@@ -188,7 +188,7 @@ const PersonalDetails = ({
               />
             </div>
           </div>
-          <div className="flex items-center">
+          <div className="flex items-start gap-4">
             <div className="text-primary-input-text font-bold w-44">Landline Number</div>
             <div className="grow">
               <TextInput
@@ -200,7 +200,7 @@ const PersonalDetails = ({
               />
             </div>
           </div>
-          <div className="flex items-center">
+          <div className="flex items-start gap-4">
             <div className="text-primary-input-text font-bold w-44">Mobile Number</div>
             <div className="grow">
               <TextInput
@@ -212,7 +212,7 @@ const PersonalDetails = ({
               />
             </div>
           </div>
-          <div className="flex items-center">
+          <div className="flex items-start gap-4">
             <div className="text-primary-input-text font-bold w-44">Full Name as it appears on Passport</div>
             <div className="max-w-96">
               <TextInput
@@ -224,7 +224,7 @@ const PersonalDetails = ({
               />
             </div>
           </div>
-          <div className="flex items-center">
+          <div className="flex items-start gap-4">
             <div className="text-primary-input-text font-bold w-44">Passport Number</div>
             <div className="max-w-96">
               <TextInput
@@ -236,7 +236,7 @@ const PersonalDetails = ({
               />
             </div>
           </div>
-          <div className="flex items-center">
+          <div className="flex items-center gap-4">
             <div className="text-primary-input-text font-bold w-44">Passport Expiry Date</div>
             <div className="max-w-96 flex items-center">
               <DateInput
@@ -250,7 +250,7 @@ const PersonalDetails = ({
               </div>
             </div>
           </div>
-          <div className="flex items-center">
+          <div className="flex items-center gap-4">
             <div className="text-primary-input-text font-bold w-44">Eligible to Work in the UK</div>
             <div className="max-w-96  flex items-center">
               <Select
@@ -258,37 +258,39 @@ const PersonalDetails = ({
                 onChange={(value) => handleChange('hasUKWorkPermit', value as string)}
                 value={hasUKWorkPermit}
                 className="bg-primary-white w-40"
-                placeholder="YES/NO."
+                placeholder="YES/NO"
                 options={booleanOptions}
                 isClearable
                 isSearchable
               />
-              <div className="text-primary-input-text font-bold ml-2 mr-2 w-20">Checked</div>
-              <div className="grow">
-                <Select
-                  testId="person-checked-by"
-                  onChange={(value) => handleChange('checkedBy', value as number)}
-                  value={checkedBy}
-                  className="bg-primary-white w-full"
-                  placeholder="Please select..."
-                  options={userOptionList}
-                  isClearable
-                  isSearchable
-                />
-              </div>
             </div>
           </div>
-          <div className="flex items-center">
-            <div className="text-primary-input-text font-bold w-44">
+          <div className="flex items-center gap-4">
+            <div className="text-primary-input-text font-bold  w-44">Checked</div>
+            <div className="max-w-96 grow flex items-center">
+              <Select
+                testId="person-checked-by"
+                onChange={(value) => handleChange('checkedBy', value as number)}
+                value={checkedBy}
+                className="bg-primary-white w-full"
+                placeholder="Please select..."
+                options={userOptionList}
+                isClearable
+                isSearchable
+              />
+            </div>
+          </div>
+          <div className="flex items-center gap-4 justify-between w-full">
+            <div className="text-primary-input-text font-bold ">
               Is FEU (Foreign Entertainer Union) permission required
             </div>
-            <div className="grow ">
+            <div className="grow float-right">
               <Select
                 testId="person-is-feu-required"
                 onChange={(value) => handleChange('isFEURequired', value as string)}
                 value={isFEURequired}
                 className="bg-primary-white w-40 mr-3 max-w-96"
-                placeholder="Please select.."
+                placeholder="YES/NO"
                 options={booleanOptions}
                 isClearable
                 isSearchable
