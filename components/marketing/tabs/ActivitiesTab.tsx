@@ -70,6 +70,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [bookings, setBookings] = useRecoilState(bookingJumpState);
   const currency = useRecoilValue(currencyState);
+  const canEditActChecks = permissions.includes('EDIT_ACTIVITIES_CHECKS');
 
   const { selected: productionId, productions } = useRecoilValue(productionJumpState);
 
@@ -493,7 +494,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
               checked={onSaleCheck}
               onChange={(e) => editBooking('ticketsOnSale', e.target.checked)}
               className="w-[19px] h-[19px] mt-[2px]"
-              disabled={!permissions.includes('EDIT_ACTIVITIES_CHECKS')}
+              disabled={!canEditActChecks}
               testId="checkOnSale"
             />
             <div className="text-base text-primary-input-text font-bold ml-2">On Sale</div>
@@ -505,7 +506,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
               onChange={(value) => editBooking('ticketsOnSaleFromDate', value)}
               value={onSaleFromDt}
               testId="dtInOnSaleDate"
-              disabled={!permissions.includes('EDIT_ACTIVITIES_CHECKS')}
+              disabled={!canEditActChecks}
             />
           </div>
 
@@ -517,7 +518,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
               onChange={(e) => editBooking('marketingPlanReceived', e.target.checked)}
               className="w-[19px] h-[19px] mt-[2px]"
               testId="checkMarketPlanIn"
-              disabled={!permissions.includes('EDIT_ACTIVITIES_CHECKS')}
+              disabled={!canEditActChecks}
             />
             <div className="text-base text-primary-input-text font-bold ml-2">Marketing Plans Received</div>
           </div>
@@ -530,7 +531,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
               onChange={(e) => editBooking('printReqsReceived', e.target.checked)}
               className="w-[19px] h-[19px] mt-[2px]"
               testId="checkPrintReqIn"
-              disabled={!permissions.includes('EDIT_ACTIVITIES_CHECKS')}
+              disabled={!canEditActChecks}
             />
             <div className="text-base text-primary-input-text font-bold ml-2">Print Requirements Received</div>
           </div>
@@ -543,7 +544,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
               onChange={(e) => editBooking('contactInfoReceived', e.target.checked)}
               className="w-[19px] h-[19px] mt-[2px]"
               testId="checkContactInfoIn"
-              disabled={!permissions.includes('EDIT_ACTIVITIES_CHECKS')}
+              disabled={!canEditActChecks}
             />
             <div className="text-base text-primary-input-text font-bold ml-2">Contact Info Received</div>
           </div>
