@@ -43,7 +43,7 @@ import {
   defaultTechProvision,
 } from '../utils';
 import { dealMemoInitialState } from 'state/contracts/contractsFilterState';
-import { convertTimeToTodayDateFormat, dateToTimeString } from 'services/dateService';
+import { dateToTimeString, getDateWithOffset } from 'services/dateService';
 import StandardSeatKillsTable, { SeatKillRow } from '../table/StandardSeatKillsTable';
 import LoadingOverlay from 'components/shows/LoadingOverlay';
 import { CustomOption } from 'components/core-ui-lib/Table/renderers/SelectCellRenderer';
@@ -60,33 +60,31 @@ import {
 import { currencyState } from 'state/global/currencyState';
 import { decimalRegex, stringRegex } from 'utils/regexUtils';
 import { dealMemoExport } from 'pages/api/deal-memo/export';
+import { UserAcc } from './EditVenueContractModal';
 
 export interface PriceState {
   default: Array<DealMemoPriceType>;
   custom: Array<DealMemoPriceType>;
 }
 
-export type UserAcc = {
-  email: string;
-  accountUserId: number;
-};
-
 export const EditDealMemoContractModal = ({
   visible,
   onCloseDemoForm,
-  productionJumpState,
+  currentProduction,
   selectedTableCell,
   demoModalData,
   venueData,
   dealHoldType,
+  userAccList,
 }: {
   visible: boolean;
   onCloseDemoForm: () => void;
-  productionJumpState: Partial<ProductionDTO>;
+  currentProduction: Partial<ProductionDTO>;
   selectedTableCell: AddEditContractsState;
   demoModalData: Partial<DealMemoContractFormData>;
   venueData;
   dealHoldType: Array<DealMemoHoldType>;
+  userAccList: Array<UserAcc>;
 }) => {
   const [formData, setFormData] = useRecoilState(dealMemoInitialState);
   const [dealMemoPriceData, setDealMemoPriceData] = useState<PriceState>({ default: [], custom: [] });
@@ -101,7 +99,6 @@ export const EditDealMemoContractModal = ({
   const currency = useRecoilValue(currencyState);
   const accountContacts = useRecoilValue(accountContactState);
   const [showSubmitError, setShowSubmitError] = useState<boolean>(false);
-  const [userAccList, setUserAccList] = useState<Array<UserAcc>>([]);
 
   const [errors, setErrors] = useState({
     ROTTPercentage: false,
@@ -203,16 +200,24 @@ export const EditDealMemoContractModal = ({
 
     setDealMemoTechProvision(processedTechProvision);
 
+    // get techArrivalTime with time offset
+    const techArrivalTime = getDateWithOffset(new Date());
+    if (isNullOrUndefined(demoModalData.TechArrivalTime)) {
+      techArrivalTime.setHours(9);
+    } else {
+      const timeArrive = new Date(demoModalData.TechArrivalTime);
+      techArrivalTime.setHours(timeArrive.getHours());
+      techArrivalTime.setMinutes(timeArrive.getMinutes());
+    }
+
     setFormData({
       ...demoModalData,
       DateIssued: isUndefined(demoModalData.DateIssued) ? new Date() : demoModalData.DateIssued,
-      TechArrivalTime: isUndefined(demoModalData.TechArrivalTime)
-        ? convertTimeToTodayDateFormat('09:00')
-        : demoModalData.TechArrivalTime,
+      TechArrivalTime: techArrivalTime,
       TechArrivalDate: isUndefined(demoModalData.TechArrivalDate)
         ? new Date(selectedTableCell.contract.dateTime)
         : demoModalData.TechArrivalDate,
-      RunningTime: timeToDateTime(productionJumpState.RunningTime),
+      RunningTime: timeToDateTime(currentProduction.RunningTime),
       PrintDelUseVenueAddress: isUndefined(demoModalData.PrintDelUseVenueAddress)
         ? true
         : demoModalData.PrintDelUseVenueAddress,
@@ -237,14 +242,6 @@ export const EditDealMemoContractModal = ({
       })),
     [users],
   );
-
-  useEffect(() => {
-    const userAccList = Object.values(users).map(({ AccUserId, Email = '' }) => ({
-      accountUserId: AccUserId,
-      email: Email || '',
-    }));
-    setUserAccList(userAccList);
-  }, [users]);
 
   useEffect(() => {
     const data = [...dealMemoTechProvision];
@@ -298,7 +295,7 @@ export const EditDealMemoContractModal = ({
     setDealMemoTechProvision(techProvisionData);
   };
 
-  const saveDemoModalData = async () => {
+  const submitForm = async (exportForm: boolean) => {
     // if errors array has any error set to true - show submission error and return
     // create a single array if error statuses
     const { callData, ...errorList } = errors;
@@ -317,6 +314,19 @@ export const EditDealMemoContractModal = ({
       ...formatDecimalFields(formData, 'float'),
       DealMemoPrice: dealMemoPriceData,
     };
+
+    // run the export process if the exportForm is true
+    exportForm &&
+      dealMemoExport({
+        bookingId: selectedTableCell.contract.Id.toString(),
+        dealMemoData,
+        production: currentProduction,
+        contract: selectedTableCell.contract,
+        venue: venueData,
+        accContacts: accountContacts,
+        users: userAccList,
+        fileType: 'docx',
+      });
 
     try {
       await axios.post(`/api/deal-memo/update/${selectedTableCell.contract.Id}`, {
@@ -521,8 +531,10 @@ export const EditDealMemoContractModal = ({
     const { hrs, min } = times[key];
 
     if (hrs && min) {
-      const timeStr = `${hrs}:${min}`;
-      const datetime = convertTimeToTodayDateFormat(timeStr);
+      const datetime = getDateWithOffset(new Date());
+      datetime.setHours(hrs);
+      datetime.setMinutes(min);
+
       editDemoModalData(key, datetime, 'dealMemo');
     }
   };
@@ -592,7 +604,7 @@ export const EditDealMemoContractModal = ({
                 <TextInput
                   className="w-full text-primary-input-text font-bold"
                   disabled
-                  value={productionJumpState.ShowName}
+                  value={currentProduction.ShowName}
                   testId="show-name-in-deal-memo"
                 />
               </div>
@@ -625,7 +637,7 @@ export const EditDealMemoContractModal = ({
           </div>
           <div className="text-primary-input-text mt-4">
             Please read this carefully to ensure it reflects the terms as agreed between{' '}
-            {`${productionJumpState.ProductionCompany ? productionJumpState.ProductionCompany.ProdCoName : ''}`} and{' '}
+            {`${currentProduction.ProductionCompany ? currentProduction.ProductionCompany.ProdCoName : ''}`} and{' '}
             {`${selectedTableCell.contract.venue}`}.
             <br />
             Please note that any terms not specifically mentioned here are still to be negotiated. If you have any
@@ -649,7 +661,7 @@ export const EditDealMemoContractModal = ({
           </div>
           <div className="text-primary-input-text mt-4">
             If we have requested anything that incurs a cost, it must be agreed with
-            {` ${productionJumpState.ProductionCompany ? productionJumpState.ProductionCompany.ProdCoName : ''} `}
+            {` ${currentProduction.ProductionCompany ? currentProduction.ProductionCompany.ProdCoName : ''} `}
             prior to our arrival. No extras will be paid without a pre-authorisation
             {` (this includes internet access).`} Unless otherwise agreed, all staff calls will be scheduled within the
             contractual allowance - if you foresee any overtime, please advise immediately.
@@ -712,7 +724,7 @@ export const EditDealMemoContractModal = ({
                 testId="performance-show-title"
                 className="w-[400px] text-primary-input-text font-bold"
                 disabled
-                value={productionJumpState.ShowName}
+                value={currentProduction.ShowName}
               />
               <div className="text-primary-input-text font-bold ml-8 mr-4"> No. of Performances</div>
               <TextInput
@@ -746,12 +758,7 @@ export const EditDealMemoContractModal = ({
               />
               <div className=" text-primary-input-text font-bold ml-8 mr-4">Notes</div>
 
-              <TextInput
-                testId="runningNote"
-                className="w-[55vw]"
-                disabled
-                value={productionJumpState.RunningTimeNote}
-              />
+              <TextInput testId="runningNote" className="w-[55vw]" disabled value={currentProduction.RunningTimeNote} />
             </div>
           </div>
           <div className="flex mt-4">
@@ -1529,7 +1536,7 @@ export const EditDealMemoContractModal = ({
                   className="w-auto"
                   pattern={/^\d*(\.\d*)?$/}
                   value={formData.BookingFees}
-                  onChange={(value) => editDemoModalData('BookingFees', parseFloat(value.target.value), 'dealMemo')}
+                  onChange={(value) => editDemoModalData('BookingFees', value.target.value, 'dealMemo')}
                   onBlur={(value) => editDemoModalData('BookingFees', formatDecimalOnBlur(value), 'dealMemo')}
                 />
                 <div className="text-primary-input-text font-bold ml-[100px] mr-2">Credit Card Commission</div>
@@ -1594,7 +1601,7 @@ export const EditDealMemoContractModal = ({
             <div className="w-1/5"> </div>
             <div className="w-4/5 flex text-primary-input-text mb-2">
               No other discounts without written agreement from{' '}
-              {`${productionJumpState.ProductionCompany ? productionJumpState.ProductionCompany.ProdCoName : ''}`}
+              {`${currentProduction.ProductionCompany ? currentProduction.ProductionCompany.ProdCoName : ''}`}
             </div>
           </div>
           {[
@@ -1657,7 +1664,7 @@ export const EditDealMemoContractModal = ({
               <TextInput
                 testId="sales-report-frequency"
                 className="w-[20vw]"
-                value={productionJumpState.SalesFrequency === 'W' ? 'Weekly' : 'Daily'}
+                value={currentProduction.SalesFrequency === 'W' ? 'Weekly' : 'Daily'}
                 disabled={true}
               />
               <div className=" text-primary-input-text font-bold ml-20 mr-4">If Weekly, on</div>
@@ -1669,7 +1676,7 @@ export const EditDealMemoContractModal = ({
                 isClearable
                 isSearchable
                 value={formData.SalesDayNum}
-                disabled={productionJumpState.SalesFrequency !== 'W'}
+                disabled={currentProduction.SalesFrequency !== 'W'}
                 testId="select-day-for-sales-frequency"
               />
             </div>
@@ -1680,7 +1687,7 @@ export const EditDealMemoContractModal = ({
               <TextInput
                 testId="sales-frequency-report-sent-to"
                 className="w-full"
-                value={productionJumpState.SalesEmail || ''}
+                value={currentProduction.SalesEmail || ''}
                 placeholder="Add to Production Details"
                 disabled
               />
@@ -1843,7 +1850,7 @@ export const EditDealMemoContractModal = ({
             <div className="w-1/5"> </div>
             <div className="w-4/5 flex text-primary-input-text text-sm">
               Any expenditure needs pre-approval from{' '}
-              {`${productionJumpState.ProductionCompany ? productionJumpState.ProductionCompany.ProdCoName : ''}`}
+              {`${currentProduction.ProductionCompany ? currentProduction.ProductionCompany.ProdCoName : ''}`}
             </div>
           </div>
           <hr className="bg-primary h-[3px] mt-2 mb-4" />
@@ -2261,7 +2268,7 @@ export const EditDealMemoContractModal = ({
           </div>
           <div className="flex items-center mt-4">
             <div className="w-1/5 text-primary-input-text font-bold">
-              {productionJumpState.ProductionCompany ? productionJumpState.ProductionCompany.ProdCoName : ''} VAT No.
+              {currentProduction.ProductionCompany ? currentProduction.ProductionCompany.ProdCoName : ''} VAT No.
             </div>
             <div className="w-4/5 flex">
               <div className="w-full">
@@ -2269,8 +2276,8 @@ export const EditDealMemoContractModal = ({
                   testId="vat-no"
                   className="w-full"
                   value={
-                    productionJumpState.ProductionCompany
-                      ? productionJumpState.ProductionCompany.ProdCoVATCode
+                    currentProduction.ProductionCompany
+                      ? currentProduction.ProductionCompany.ProdCoVATCode
                       : 'To add a VAT number, please contact your system administrator'
                   }
                   disabled
@@ -2304,30 +2311,20 @@ export const EditDealMemoContractModal = ({
           <div className="flex justify-end items-center">
             <Button onClick={() => handleCancelForm(false)} className="w-33" variant="secondary" text="Cancel" />
             <Button
-              onClick={() =>
-                dealMemoExport({
-                  bookingId: selectedTableCell.contract.Id.toString(),
-                  dealMemoData: formData,
-                  production: productionJumpState,
-                  contract: selectedTableCell.contract,
-                  venue: venueData,
-                  accContacts: accountContacts,
-                  users: userAccList,
-                })
-              }
+              onClick={() => submitForm(false)}
               className="ml-4 w-28"
-              variant="primary"
-              text="Export"
-              iconProps={{ className: 'h-4 w-3' }}
-              sufixIconName="excel"
-              testId="deal-memo-export"
-            />
-            <Button
-              onClick={() => saveDemoModalData()}
-              className="ml-4 w-33"
               variant="primary"
               text="Save and Close"
               testId="deal-memo-save-and-close"
+            />
+            <Button
+              onClick={() => submitForm(true)}
+              className="ml-4 w-44"
+              variant="primary"
+              text="Save, Close and Export"
+              testId="deal-memo-save-close-and-export"
+              iconProps={{ className: 'h-4 w-3' }}
+              sufixIconName="document-solid"
             />
           </div>
         </div>

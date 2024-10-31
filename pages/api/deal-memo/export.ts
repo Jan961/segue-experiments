@@ -1,12 +1,14 @@
 import axios from 'axios';
-import { UserAcc } from 'components/contracts/modal/EditDealMemoContractModal';
-import { defaultPrice, parseAndSortDates } from 'components/contracts/utils';
+import { UserAcc } from 'components/contracts/modal/EditVenueContractModal';
+import { defaultPrice, filterPrice, parseAndSortDates } from 'components/contracts/utils';
 import { days } from 'config/global';
 import { TemplateHandler } from 'easy-template-x';
 import { createResolver } from 'easy-template-x-angular-expressions';
 import { DealMemoHoldType, ProductionDTO } from 'interfaces';
-import { formatDecimalValue, isNullOrUndefined, isUndefined, numberToOrdinal, tidyString } from 'utils';
+import { formatDecimalValue, isNullOrEmpty, isNullOrUndefined, isUndefined, numberToOrdinal, tidyString } from 'utils';
 import { formatTemplateObj } from 'utils/templateExport';
+
+type ExportType = 'pdf' | 'docx';
 
 type DeMoExportProps = {
   bookingId: string;
@@ -15,17 +17,9 @@ type DeMoExportProps = {
   venue: any;
   accContacts: any;
   users: Array<UserAcc>;
-  dealMemoData: any;
+  dealMemoData?: any;
+  fileType: ExportType;
 };
-
-// Notes for SK-494 - comment will be removed when actioned
-/*  
-   1. SellNotes has been changed to MerchNotes
-   2. SettlementSameDay has been added to store the boolean field
-   3. NumDressingRooms removed from object but was not used and not in DB
-   4. PrintUseDelVenueAddressId changed to PrintDelVenueAddressLine and made a long text field
-   5. SeatKillNotes field added - this will remain disconnected from BookingHoldNotes - for the time being the value from the deal memo will need to be copied over manually (from RCK)
-*/
 
 const formatPerfs = (performances) => {
   const perfDays = parseAndSortDates(performances);
@@ -56,12 +50,11 @@ const getContact = (array, key, value) => {
 const fetchTemplateDocument = async () => {
   try {
     const response = await axios.get(
-      `/api/file/download?location=${'https://d1e9vbizioozy0.cloudfront.net/contracts/templates/DealMemo.docx'}`,
+      `/api/file/download?location=${'https://d1e9vbizioozy0.cloudfront.net/contracts/templates/DealMemo_v1.1.7.docx'}`,
       {
         responseType: 'arraybuffer',
       },
     );
-
     const file = new File([response.data], 'template.docx', {
       type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
     });
@@ -72,11 +65,87 @@ const fetchTemplateDocument = async () => {
   }
 };
 
+const processPriceData = (priceData) => {
+  let result = [];
+  if (isUndefined(priceData)) {
+    result = defaultPrice.map((price) => {
+      return {
+        ...price,
+        DMPNumTickets: '',
+        DMPTicketPrice: '',
+      };
+    });
+  } else {
+    const pricesJoined = [...priceData.default, ...priceData.custom].filter(
+      (price) => !isNullOrEmpty(price.DMPTicketName),
+    );
+    result = pricesJoined.map((price) => {
+      return {
+        ...price,
+        DMPTicketPrice: formatDecimalValue(price.DMPTicketPrice),
+      };
+    });
+  }
+
+  return result;
+};
+
+const prepareFile = async (processedData, fileType: ExportType) => {
+  // Need to include this so that Angular Expressions are supported
+  const handler = new TemplateHandler({
+    scopeDataResolver: createResolver({
+      angularFilters: {
+        upper: (input: string) => (input || '').toUpperCase(),
+        lower: (input: string) => (input || '').toLowerCase(),
+      },
+    }),
+  });
+
+  const templateFile = await fetchTemplateDocument();
+  const docx = await handler.process(templateFile, processedData);
+
+  switch (fileType) {
+    case 'docx': {
+      return docx;
+    }
+
+    case 'pdf': {
+      try {
+        const tokenresponse = await axios.post('/api/pdfconvert/token/create/');
+        const convertFormData = new FormData();
+        convertFormData.append('token', String(tokenresponse.data.token));
+        convertFormData.append('file', docx);
+
+        const response = await axios.post(process.env.NEXT_PUBLIC_DOC_TO_PDF_BASE_URL, convertFormData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+          responseType: 'arraybuffer',
+        });
+
+        const pdf = new Blob([response.data], { type: 'application/pdf' });
+        return pdf;
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  }
+};
+
 export const dealMemoExport = async (props: DeMoExportProps) => {
   if (!isNullOrUndefined(props.bookingId)) {
-    const deMoRaw = props.dealMemoData;
     const { data: currResponse } = await axios.get(`/api/marketing/currency/booking/${props.bookingId}`);
     const { data: holdTypes } = await axios.get<Array<DealMemoHoldType>>(`/api/deal-memo/hold-type/read`);
+
+    // if dealMemoData is undfefined, get the data from the database
+    // this is to reduce latency when the user clicks - 'save, close and export'
+    let deMoRaw = props.dealMemoData;
+    if (isNullOrUndefined(deMoRaw)) {
+      const { data } = await axios.get(`/api/deal-memo/read/${props.bookingId}`);
+      const priceData = filterPrice(data.DealMemoPrice);
+      deMoRaw = { ...data, DealMemoPrice: priceData };
+    }
+
     const primaryAddress = props.venue.VenueAddress.find((address) => address.TypeName === 'Main');
     const programmer = getContact(props.venue.VenueContact, 'Id', deMoRaw.ProgrammerVenueContactId);
     const boManager = getContact(props.venue.VenueContact, 'Id', deMoRaw.BOMVenueContactId);
@@ -142,6 +211,13 @@ export const dealMemoExport = async (props: DeMoExportProps) => {
         Phone: tidyString(companyPoc?.AccContPhone),
       },
       SalesReportRecipients: salesRepEmails,
+      LaundryFacilities: [
+        deMoRaw.NumFacilitiesLaundry ? 'Washer' : null,
+        deMoRaw.NumFacilitiesDrier ? 'Dryer' : null,
+        deMoRaw.NumFacilitiesLaundryRoom ? 'Laundry Room' : null,
+      ]
+        .filter(Boolean)
+        .join(', '),
     };
 
     const toBeFormatted = {
@@ -178,54 +254,41 @@ export const dealMemoExport = async (props: DeMoExportProps) => {
                 DMHoldSeats: hold.DMHoldSeats === 0 ? '' : hold.DMHoldSeats,
               };
             }),
-      DealMemoPrice: isUndefined(deMoRaw.DealMemoPrice)
-        ? defaultPrice.map((price) => {
-            return {
-              ...price,
-              DMPNumTickets: '',
-              DMPTicketPrice: '',
-            };
-          })
-        : deMoRaw.DealMemoPrice.map((price) => {
-            return {
-              ...price,
-              DMPTicketPrice: formatDecimalValue(price.DMPTicketPrice),
-            };
-          }),
+      DealMemoPrice: processPriceData(deMoRaw.DealMemoPrice),
       SalesDay: deMoRaw.SalesDayNum ? days[deMoRaw.SalesDayNum] : '',
       WeeklySales: props.production.SalesFrequency === 'W',
+      DEC_ROTTPercentage: deMoRaw.ROTTPercentage,
+      DEC_VenueRental: deMoRaw.VenueRental,
+      DEC_StaffingContra: deMoRaw.StaffingContra,
+      DEC_AgreedContraItems: deMoRaw.AgreedContraItems,
+      DEC_RestorationLevy: deMoRaw.RestorationLevy,
+      DEC_BookingFees: deMoRaw.BookingFees,
+      DEC_TxnChargeAmount: deMoRaw.TxnChargeAmount,
+      DEC_LocalMarketingBudget: deMoRaw.LocalMarketingBudget,
+      DEC_LocalMarketingContra: deMoRaw.LocalMarketingContra,
+      DEC_SellPitchFee: deMoRaw.SellPitchFee,
     };
 
     const formattedData = formatTemplateObj(toBeFormatted);
 
     const strKeys = formatObjKeys(formattedData);
+
     const processedData = {
       ...strKeys,
       ...generalData,
     };
 
-    // Need to include this so that Angular Expressions are supported
-    const handler = new TemplateHandler({
-      scopeDataResolver: createResolver({
-        angularFilters: {
-          upper: (input: string) => (input || '').toUpperCase(),
-          lower: (input: string) => (input || '').toLowerCase(),
-        },
-      }),
-    });
-
-    const templateFile = await fetchTemplateDocument();
-    const docx = await handler.process(templateFile, processedData);
+    const exportFile = await prepareFile(processedData, props.fileType);
 
     // get downloadable url from the blob
-    const blobUrl = URL.createObjectURL(docx);
+    const blobUrl = URL.createObjectURL(exportFile);
 
     // create temp link element
     let link = document.createElement('a');
 
     link.download = `Deal Memo ${props.production.ShowCode + props.production.Code} ${props.production.ShowName} ${
       props.venue.Name
-    }.docx`;
+    }.${props.fileType}`;
     link.href = blobUrl;
 
     // use the link to invoke a download
