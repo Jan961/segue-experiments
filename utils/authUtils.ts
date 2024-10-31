@@ -13,6 +13,9 @@ export const errorsMap = {
   form_identifier_exists: 'Email already exists. Please try logging in.',
 };
 
+// Ensures that the pin number is maximum 5 digits
+export const PIN_REGEX = /^\d{1,5}$/;
+
 /* 
   Validate Email Rexgex checks for the following
     1. Starts with one or more alphanumeric characters, hyphens, or dots.
@@ -35,7 +38,7 @@ export const validatePassword = (value: string) => {
   Validate PIN Regex checks for the following
     1. Exactly 5 digits long.
     2. Does not contain more than 2 consecutive ascending or descending numbers.
-    3. Does not contain fully ascending or descending sequences.
+    3. Does not contain all digits thst are the same number.
 */
 export const validatePin = (value: number) => {
   if (typeof value !== 'number' || !/^\d{5}$/.test(value.toString())) {
@@ -43,6 +46,12 @@ export const validatePin = (value: number) => {
   }
 
   const digits = value.toString().split('').map(Number);
+
+  // check if all numbers are same
+  const allSame = digits.every((digit) => digit === digits[0]);
+  if (allSame) {
+    return { valid: false, message: 'All numbers are the same' };
+  }
 
   // Check for more than 2 consecutive numbers in any order
   for (let i = 0; i < digits.length - 2; i++) {
@@ -54,36 +63,39 @@ export const validatePin = (value: number) => {
     }
   }
 
-  // Check for fully ascending or descending sequences
-  const isAscending = digits.every((digit, i, arr) => i === 0 || digit > arr[i - 1]);
-  const isDescending = digits.every((digit, i, arr) => i === 0 || digit < arr[i - 1]);
-
-  if (isAscending || isDescending) {
-    return { valid: false, message: 'All numbers in sequence ascending or descending' };
-  }
-
   return { valid: true, message: '' };
 };
 
+const PIN_CONSTRAINTS = {
+  length: 5,
+  numbers: true,
+  symbols: false,
+  lowercase: false,
+  uppercase: false,
+  strict: true,
+};
+
+const PASSWORD_CONSTRAINTS = {
+  length: 8,
+  numbers: true,
+  symbols: true,
+  lowercase: true,
+  uppercase: true,
+  strict: true,
+};
+
 export const generateUserPin = (): number => {
-  const pin = generator.generate({
-    length: 5,
-    numbers: true,
-    symbols: false,
-    lowercase: false,
-    uppercase: false,
-    strict: true,
-  });
+  let pin = generator.generate(PIN_CONSTRAINTS);
+  while (!validatePin(Number(pin)).valid) {
+    pin = generator.generate(PIN_CONSTRAINTS);
+  }
   return Number(pin);
 };
 
 export const generateUserPassword = (): string => {
-  return generator.generate({
-    length: 8,
-    numbers: true,
-    symbols: true,
-    lowercase: true,
-    uppercase: true,
-    strict: true,
-  });
+  let password = generator.generate(PASSWORD_CONSTRAINTS);
+  while (!validatePassword(password)) {
+    password = generator.generate(PASSWORD_CONSTRAINTS);
+  }
+  return password;
 };

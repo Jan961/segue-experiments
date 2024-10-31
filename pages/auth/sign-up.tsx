@@ -9,6 +9,7 @@ import {
   EMAIL_NOT_FOUND,
   INVALID_VERIFICATION_STRATEGY,
   SESSION_ALREADY_EXISTS,
+  PIN_REGEX,
 } from 'utils/authUtils';
 import { calibri } from 'lib/fonts';
 import Image from 'next/image';
@@ -16,7 +17,7 @@ import axios from 'axios';
 import { useClerk, useSignIn, useSignUp } from '@clerk/nextjs';
 import Link from 'next/link';
 
-import { validateUserPreSignUpSchema, validateUserSignUpSchema } from 'validators/auth';
+import { userPreSignUpSchema, userSignUpSchema } from 'validators/auth';
 
 const DEFAULT_ACCOUNT_DETAILS = {
   firstName: '',
@@ -26,8 +27,8 @@ const DEFAULT_ACCOUNT_DETAILS = {
   phoneNumber: '',
   password: '',
   confirmPassword: '',
-  pin: '',
-  repeatPin: '',
+  pin: 0,
+  repeatPin: 0,
 };
 
 const SignUp = () => {
@@ -69,7 +70,7 @@ const SignUp = () => {
   const verifyCredentials = async () => {
     try {
       setError('');
-      await validateUserPreSignUpSchema.validate(accountDetails, { abortEarly: false });
+      await userPreSignUpSchema.validate(accountDetails, { abortEarly: false });
 
       // Check for valid company id
       const { data } = await axios.post('/api/account/validate', {
@@ -137,13 +138,12 @@ const SignUp = () => {
   const handleSaveUser = async () => {
     setShowLogout(false);
     try {
-      await validateUserSignUpSchema.validate(accountDetails, { abortEarly: false });
-
+      await userSignUpSchema.validate(accountDetails, { abortEarly: false });
       // Create the user within clerk
       await createNewUserWithClerk();
 
       // Create the user in our database
-      await axios.post('/api/user/create', accountDetails);
+      await axios.post('/api/user/createAdminUser', accountDetails);
 
       router.push('/auth/user-created');
     } catch (error: any) {
@@ -156,6 +156,7 @@ const SignUp = () => {
         }, {});
         setValidationError(formattedErrors);
       } else {
+        console.error(error);
         setError('Something went wrong, please try again');
       }
     }
@@ -352,6 +353,7 @@ const SignUp = () => {
                 type="number"
                 onChange={handleAccountDetailsChange}
                 error={validationError?.pin}
+                pattern={PIN_REGEX}
               />
               {validationError?.pin && <AuthError error={validationError.pin[0]} />}
             </div>
@@ -375,6 +377,7 @@ const SignUp = () => {
                 value={accountDetails.repeatPin}
                 type="number"
                 onChange={handleAccountDetailsChange}
+                pattern={PIN_REGEX}
                 error={validationError?.repeatPin}
               />
               {validationError?.repeatPin && <AuthError error={validationError.repeatPin[0]} />}

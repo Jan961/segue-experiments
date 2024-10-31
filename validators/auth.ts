@@ -31,16 +31,22 @@ export const loginSchema = yup.object().shape({
 });
 
 export const accountLoginSchema = yup.object().shape({
-  pin: yup.string().required('PIN is a required field').test(validatePin),
+  pin: yup
+    .number()
+    .required('PIN is a required field')
+    .test({
+      name: 'validatePin',
+      test: (value) => validatePin(value).valid,
+      message: 'PIN does not match the required format.',
+    }),
   company: yup.string().required('Company is a required field'),
 });
 
-export const validateUserPreSignUpSchema = emailSchema.shape({
+export const userPreSignUpSchema = emailSchema.shape({
   companyName: yup.string().required('Company Name is a required field'),
 });
 
-export const validateUserSignUpSchema = yup.object().shape({
-  validateUserPreSignUpSchema,
+export const userSignUpSchema = yup.object().shape({
   password: passwordSchmea,
   confirmPassword: yup
     .string()
@@ -57,7 +63,7 @@ export const validateUserSignUpSchema = yup.object().shape({
       message: 'PIN does not match the required format.',
     }),
   repeatPin: yup
-    .string()
+    .number()
     .required('Repeat PIN is a required field')
     .oneOf([yup.ref('pin'), null], 'PINs must match'),
 });

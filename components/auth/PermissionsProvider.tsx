@@ -11,7 +11,14 @@ export const LoadingOverlay = () => (
   </div>
 );
 
-const publicPaths = ['/account/sign-up', '/access-denied', '/auth/sign-in', '/auth/sign-up', '/auth/password-reset'];
+const publicPaths = [
+  '/account/sign-up',
+  '/access-denied',
+  '/auth/sign-in',
+  '/auth/sign-up',
+  '/auth/password-reset',
+  '/auth/user-created',
+];
 
 const PermissionsProvider = ({ children }: { children: React.ReactNode }) => {
   const { isSignedIn, user } = useUser();
