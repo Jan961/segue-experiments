@@ -14,7 +14,7 @@ export const errorsMap = {
 };
 
 // Ensures that the pin number is maximum 5 digits
-export const PIN_REGEX = /^\d{1,5}$/;
+export const PIN_REGEX = /^\d{0,5}$/;
 
 /* 
   Validate Email Rexgex checks for the following

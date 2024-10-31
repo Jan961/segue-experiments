@@ -24,7 +24,7 @@ const PasswordInput = (props: TextInputProps) => {
           testId="password-input-icon"
           aria-hidden="true"
           iconName={isVisible ? 'hide-password' : 'show-password'}
-          onClick={togglePasswordVisibility}
+          onClick={!props.disabled ? togglePasswordVisibility : null}
         />
       </div>
     </div>
