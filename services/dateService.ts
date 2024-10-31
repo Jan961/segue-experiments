@@ -1,4 +1,4 @@
-import { parse ,
+import {
   startOfWeek,
   differenceInWeeks,
   addWeeks,
@@ -9,6 +9,7 @@ import { parse ,
   isSameDay,
   isSameWeek,
   set,
+  addMinutes,
 } from 'date-fns';
 import { toZonedTime } from 'date-fns-tz';
 import moment from 'moment';
@@ -373,13 +374,18 @@ export const formatDateWithTimezoneOffset = ({
   return moment(date).utcOffset(-timezoneOffset).format(dateFormat);
 };
 
+/**
+ *
+ * Used to apply the timezone offset to the date supplied and return it in the same format
+ *
+ * @param date // date in which the offset should be applied to
+ * @returns // date in JS date format
+ */
 export const getDateWithOffset = (date: Date) => {
-  const dateWithOffset = formatDateWithTimezoneOffset({
-    dateFormat: 'MMMM do yyyy, h:mm:ss a',
-    date,
-    timezoneOffset: getTimezonOffset(),
-  });
-  return parse(dateWithOffset, 'MMMM do yyyy, h:mm:ss a', new Date());
+  const timezoneOffset = getTimezonOffset();
+  const dateWithOffset = addMinutes(date, -timezoneOffset);
+
+  return dateWithOffset;
 };
 
 export const convertTimeToTodayDateFormat = (time: string) => {

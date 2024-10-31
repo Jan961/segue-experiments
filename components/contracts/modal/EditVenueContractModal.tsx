@@ -9,7 +9,6 @@ import TextInput from 'components/core-ui-lib/TextInput';
 import { statusOptions, dealTypeOptions, initialEditContractFormData } from 'config/contracts';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { useRouter } from 'next/router';
-import { currentProductionSelector } from 'state/booking/selectors/currentProductionSelector';
 import { addEditContractsState } from 'state/contracts/contractsState';
 import axios from 'axios';
 import { bookingStatusMap } from 'config/bookings';
@@ -39,6 +38,7 @@ import { formatDecimalOnBlur, parseAndSortDates } from '../utils';
 import { currencyState } from 'state/global/currencyState';
 import { dealMemoExport } from 'pages/api/deal-memo/export';
 import { accountContactState } from 'state/contracts/accountContactState';
+import { productionJumpState } from 'state/booking/productionJumpState';
 
 export type UserAcc = {
   email: string;
@@ -46,8 +46,9 @@ export type UserAcc = {
 };
 
 const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClose: () => void }) => {
-  const productionJumpState = useRecoilValue(currentProductionSelector);
   const selectedTableCell = useRecoilValue(addEditContractsState);
+  const { productions } = useRecoilValue(productionJumpState);
+  const currentProduction = productions.find((production) => production.Id === selectedTableCell.contract.productionId);
   const [saveContractFormData, setSaveContractFormData] = useState<Partial<SaveContractFormState>>({});
   const [saveBookingFormData, setSaveBookingFormData] = useState<Partial<SaveContractBookingFormState>>({});
   const [saveDealMemoFormData, setSaveDealMemoFormData] = useState<Partial<DealMemoContractFormData>>({});
@@ -91,13 +92,20 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
   const [confirmationVariant, setConfirmationVariant] = useState<string>('cancel');
   const [dealMemoCreated, setDealMemoCreated] = useState<boolean>(true);
   const [dealMemoButtonText, setDealMemoButtonText] = useState<string>('Deal Memo');
+
   const [currency, setCurrency] = useRecoilState(currencyState);
-  const [userAccList, setUserAccList] = useState<Array<UserAcc>>([]);
+  const userAccList = useMemo(() => {
+    return Object.values(users).map(({ AccUserId, Email = '' }) => ({
+      accountUserId: AccUserId,
+      email: Email || '',
+    }));
+  }, [users]);
 
   const [errors, setErrors] = useState({
     royaltyPerc: false,
     promoterPerc: false,
   });
+
   const producerList = useMemo(() => {
     const list = {};
     Object.values(users).forEach((listData) => {
@@ -219,14 +227,6 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
   useEffect(() => {
     getCurrency(selectedTableCell.contract.Id);
   }, [selectedTableCell.contract.Id]);
-
-  useEffect(() => {
-    const userAccList = Object.values(users).map(({ AccUserId, Email = '' }) => ({
-      accountUserId: AccUserId,
-      email: Email || '',
-    }));
-    setUserAccList(userAccList);
-  }, [users]);
 
   const getCurrency = async (bookingId) => {
     try {
@@ -404,7 +404,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
   const pdfExportDealMemo = () => {
     dealMemoExport({
       bookingId: selectedTableCell.contract.Id.toString(),
-      production: productionJumpState,
+      production: currentProduction,
       contract: selectedTableCell.contract,
       venue,
       accContacts: accountContacts,
@@ -914,7 +914,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
         <EditDealMemoContractModal
           visible={editDealMemoModal}
           onCloseDemoForm={() => handleDemoFormClose()}
-          productionJumpState={productionJumpState}
+          currentProduction={currentProduction}
           selectedTableCell={selectedTableCell}
           demoModalData={demoModalData}
           venueData={venue}
