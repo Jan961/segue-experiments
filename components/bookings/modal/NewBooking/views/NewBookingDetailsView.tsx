@@ -432,7 +432,7 @@ export default function NewBookingDetailsView({
             className="w-33 "
             text="Check Mileage"
             onClick={handeCheckMileageClick}
-            disabled={changeBookingLength}
+            disabled={!permissions.includes('CHECK_MILEAGE') || changeBookingLength}
           />
           <div className="flex justify-end  justify-items-end gap-4">
             {isNewBooking && (
