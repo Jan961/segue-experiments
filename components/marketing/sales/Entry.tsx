@@ -6,7 +6,7 @@ import { bookingJumpState } from 'state/marketing/bookingJumpState';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import { SelectOption } from '../MarketingHome';
 import { addDurationToDate, getMonday, toISO } from 'services/dateService';
-import { isNullOrEmpty } from 'utils';
+import { isNullOrEmpty, isNullOrUndefined } from 'utils';
 import { Spinner } from 'components/global/Spinner';
 import { currencyState } from 'state/global/currencyState';
 import { UpdateWarningModal } from '../modal/UpdateWarning';
@@ -275,7 +275,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
     }
   };
 
-  const setSalesFigures = async (inputDate: Date, previous: boolean) => {
+  const setSalesFigures = async (inputDate: Date, previous: boolean, bookingId: number) => {
     try {
       setLoading(true);
 
@@ -309,7 +309,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
 
       // handle when the useImperitive calls this function on selection of a sales week/day before the booking is selected
       // this will happen on first launch of the module
-      if (bookings.selected === undefined || bookings.selected === null) {
+      if (isNullOrUndefined(bookingId)) {
         return;
       }
 
@@ -323,7 +323,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
       }
 
       const salesReadInput = {
-        bookingId: bookings.selected,
+        bookingId,
         salesDate,
         frequency,
       };
@@ -383,7 +383,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
           compHoldSetId = holdCompData.setId;
         }
 
-        const booking = bookings.bookings.find((booking) => booking.Id === bookings.selected);
+        const booking = bookings.bookings.find((booking) => booking.Id === bookingId);
 
         setBookingSaleNotes(booking.BookingSalesNotes === null ? '' : booking.BookingSalesNotes);
         setCompNotes(booking.BookingCompNotes === null ? '' : booking.BookingCompNotes);
@@ -480,14 +480,14 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
           setSalesDate(new Date());
         }
 
-        setSalesFigures(inputDate, false);
-        setSalesFigures(inputDate, true);
+        setSalesFigures(inputDate, false, bookings.selected);
+        setSalesFigures(inputDate, true, bookings.selected);
       } catch (error) {
         console.log(error);
       }
     };
 
-    if (bookings.selected !== undefined && bookings.selected !== null) {
+    if (!isNullOrUndefined(bookings.selected)) {
       initForm();
     }
   }, [bookings.selected]);
@@ -511,8 +511,8 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
   useImperativeHandle(ref, () => ({
     resetForm: (week) => {
       setSalesDate(new Date(week));
-      setSalesFigures(new Date(week), false);
-      setSalesFigures(new Date(week), true);
+      setSalesFigures(new Date(week), false, null);
+      setSalesFigures(new Date(week), true, null);
     },
   }));
 
