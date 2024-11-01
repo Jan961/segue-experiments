@@ -62,6 +62,7 @@ export default function BookingsTable({ rowData, tableRef }: BookingsTableProps)
   const handleCellClick = (e) => {
     if (
       e.column.colId === 'note' &&
+      canAccessNotes &&
       permissions.includes('EDIT_BOOKING_NOTES') &&
       e.data.venue &&
       !isNullOrEmpty(e.data.dayType)
@@ -72,20 +73,20 @@ export default function BookingsTable({ rowData, tableRef }: BookingsTableProps)
   };
 
   const handleRowDoubleClicked = (e: RowDoubleClickedEvent) => {
-    if (permissions.includes('EDIT_BOOKING_DETAILS')) {
+    if (['CREATE_NEW_BOOKING', 'EDIT_BOOKING_DETAILS'].some((perm) => permissions.includes(perm))) {
       if (!currentProduction) {
         setShowConfirmationModal(true);
         return;
       }
       const { data } = e;
       setBookingInfo(data);
-      if (!data.Id) {
+      if (!data.Id && permissions.includes('CREATE_NEW_BOOKING')) {
         setShowAddEditBookingModal({
           visible: true,
           startDate: e.data.dateTime,
           endDate: e.data.dateTime,
         });
-      } else {
+      } else if (permissions.includes('EDIT_BOOKING_DETAILS')) {
         setShowAddEditBookingModal({
           visible: true,
           startDate: data.dateTime,

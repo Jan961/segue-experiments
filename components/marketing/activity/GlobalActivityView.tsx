@@ -13,6 +13,7 @@ import { filterState } from 'state/marketing/filterState';
 import fuseFilter from 'utils/fuseFilter';
 import { isNullOrEmpty } from 'utils';
 import axios from 'axios';
+import { accessMarketingHome } from 'state/account/selectors/permissionSelector';
 
 type GlobalActivitiesResponse = {
   activities: GlobalActivity[];
@@ -29,6 +30,7 @@ export interface SalesEntryRef {
 }
 
 const GlobalActivityView = () => {
+  const permissions = useRecoilValue(accessMarketingHome);
   const [loading, setLoading] = useState<boolean>(false);
   const { selected: productionId } = useRecoilValue(productionJumpState);
   const currency = useRecoilValue(currencyState);
@@ -213,7 +215,14 @@ const GlobalActivityView = () => {
     setLoading(true);
     getGlobalActivities();
     getTourWeeks(productionId);
-    setColDefs(globalActivityColDefs(toggleModal, currency.symbol));
+    setColDefs(
+      globalActivityColDefs(
+        toggleModal,
+        currency.symbol,
+        permissions.includes('ACCESS_EDIT_GLOBAL_ACTIVITY'),
+        permissions.includes('DELETE_GLOBAL_ACTIVITY'),
+      ),
+    );
   }, [productionId]);
 
   useEffect(() => {
@@ -245,7 +254,12 @@ const GlobalActivityView = () => {
       ) : (
         <div>
           <div className="flex flex-row w-full justify-end">
-            <Button text="Add New Activity" className="w-[160px] mb-5" onClick={() => showAddActivity()} />
+            <Button
+              text="Add New Activity"
+              className="w-[160px] mb-5"
+              onClick={() => showAddActivity()}
+              disabled={!permissions.includes('ADD_NEW_GLOBAL_ACTIVITY')}
+            />
           </div>
 
           <Table
