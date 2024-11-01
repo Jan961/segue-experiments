@@ -14,10 +14,12 @@ import {
 import { calibri } from 'lib/fonts';
 import Image from 'next/image';
 import axios from 'axios';
-import { useClerk, useSignIn, useSignUp } from '@clerk/nextjs';
+import { useClerk, useSignUp } from '@clerk/nextjs';
 import Link from 'next/link';
 
 import { userPreSignUpSchema, userSignUpSchema } from 'validators/auth';
+import useAuth from 'hooks/useAuth';
+import usePermissions from 'hooks/usePermissions';
 
 const DEFAULT_ACCOUNT_DETAILS = {
   firstName: '',
@@ -33,13 +35,15 @@ const DEFAULT_ACCOUNT_DETAILS = {
 
 const SignUp = () => {
   const router = useRouter();
+  const { signIn, navigateToHome } = useAuth();
+  const { setUserPermissions } = usePermissions();
   const [error, setError] = useState('');
   const [validationError, setValidationError] = useState(null);
   const [showLogout, setShowLogout] = useState(false);
   const { signOut } = useClerk();
   const { isLoaded: signUpLoaded, signUp } = useSignUp();
-  const [authMode, setAuthMode] = useState<'default' | 'signUp' | 'signIn'>('default');
-  const { signIn } = useSignIn();
+  const [authMode, setAuthMode] = useState<'default' | 'newUser' | 'existingUser'>('default');
+
   const [accountDetails, setAccountDetails] = useState(DEFAULT_ACCOUNT_DETAILS);
 
   const handleAccountDetailsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -54,13 +58,13 @@ const SignUp = () => {
   const verifyUserExits = async () => {
     try {
       const { data } = await axios.post('/api/user/verify', {
-        organisationId: accountDetails.companyName,
-        Email: accountDetails.email,
+        companyName: accountDetails.companyName,
+        email: accountDetails.email,
       });
-      if (data.id) {
-        setAccountDetails((prev) => ({ ...prev, accountId: data.id }));
+      if (data.userId) {
+        router.push('/auth/sign-in');
       } else {
-        setAuthMode('signIn');
+        setAuthMode('existingUser');
       }
     } catch (err) {
       setError(err.errors[0].message);
@@ -84,10 +88,7 @@ const SignUp = () => {
       }
       setAccountDetails((prev) => ({ ...prev, accountId: data.id }));
       // Check if user already registered with Clerk. The create method will error if the user already exists
-      await signIn.create({
-        identifier: accountDetails.email,
-        password: 'dummy_password',
-      });
+      await signIn(accountDetails.email, 'dummy_password');
       return true;
     } catch (error) {
       if (error instanceof yup.ValidationError) {
@@ -102,7 +103,7 @@ const SignUp = () => {
         const errorCode = error?.errors[0]?.code;
 
         if (errorCode === EMAIL_NOT_FOUND) {
-          setAuthMode('signUp');
+          setAuthMode('newUser');
         } else if (errorCode === PASSWORD_INCORRECT || errorCode === INVALID_VERIFICATION_STRATEGY) {
           // 'User already registeredwith clerk. Verify if they have a pin registered'
           verifyUserExits();
@@ -135,7 +136,7 @@ const SignUp = () => {
     }
   };
 
-  const handleSaveUser = async () => {
+  const saveNewUser = async () => {
     setShowLogout(false);
     try {
       await userSignUpSchema.validate(accountDetails, { abortEarly: false });
@@ -162,12 +163,35 @@ const SignUp = () => {
     }
   };
 
-  const handleUpdateUser = async () => {
+  const saveExistingUser = async () => {
+    setShowLogout(false);
     try {
-      await axios.post('/api/user/update', accountDetails);
-      router.push('/auth/sign-in ');
+      await userSignUpSchema.validate(
+        { ...accountDetails, repeatPassword: accountDetails.password },
+        { abortEarly: false },
+      );
+      // Authenticate the user within clerk
+      await signIn(accountDetails.email, accountDetails.password);
+
+      // Create the user in our database
+      const { data } = await axios.post('/api/user/createAdminUser', { accountDetails, fetchPermissions: true });
+
+      setUserPermissions(data.organisationId, data.permissions);
+
+      navigateToHome();
     } catch (error: any) {
-      setError('Something went wrong, please try again');
+      if (error instanceof yup.ValidationError) {
+        const formattedErrors = error.inner.reduce((acc, err) => {
+          return {
+            ...acc,
+            [err.path]: acc[err.path] ? [...acc[err.path], err.errors[0]] : [err.errors[0]],
+          };
+        }, {});
+        setValidationError(formattedErrors);
+      } else {
+        console.error(error);
+        setError('Something went wrong, please try again');
+      }
     }
   };
 
@@ -175,10 +199,10 @@ const SignUp = () => {
     clearErrors();
     if (authMode === 'default') {
       verifyCredentials();
-    } else if (authMode === 'signUp') {
-      handleSaveUser();
-    } else if (authMode === 'signIn') {
-      handleUpdateUser();
+    } else if (authMode === 'newUser') {
+      saveNewUser();
+    } else if (authMode === 'existingUser') {
+      saveExistingUser();
     }
   };
 
@@ -208,12 +232,12 @@ const SignUp = () => {
           person who will be fulfilling that role, please advise the relevant member of the team to create the account.
           Additional Users can be added later in the process.
         </p>
-        {authMode === 'signUp' && (
+        {authMode === 'newUser' && (
           <p className="mt-5 text-primary-red">
             This email address is not yet associated with a Segue account. Please create a password.
           </p>
         )}
-        {authMode === 'signIn' && (
+        {authMode === 'existingUser' && (
           <p className="mt-5 text-primary-red">
             This email address is already associated with a Segue account. Please enter your password.
           </p>
@@ -221,7 +245,7 @@ const SignUp = () => {
       </div>
 
       <div className="flex flex-col mx-auto w-[23rem] gap-3 mt-6">
-        {authMode === 'signUp' && (
+        {authMode === 'newUser' && (
           <>
             <div className="w-full">
               <Label text="System Administrator First Name" required />
@@ -269,7 +293,7 @@ const SignUp = () => {
         {authMode !== 'default' && (
           <div className="w-full">
             <div className="flex items-center gap-1">
-              <Label text={authMode === 'signUp' ? 'Create Password' : 'Password'} required />
+              <Label text={authMode === 'newUser' ? 'Create Password' : 'Password'} required />
               <Tooltip
                 body="Password should be at least 8 characters long with at least one uppercase letter, one lowercase letter, one special character and one number."
                 position="right"
@@ -289,7 +313,7 @@ const SignUp = () => {
               error={validationError?.password}
             />
             {validationError?.password && <AuthError error={validationError.password[0]} />}
-            {authMode === 'signIn' && (
+            {authMode === 'existingUser' && (
               <div className="text-right mt-1">
                 <Link className="text-primary-input-text text-sm" href="/forgot-password">
                   Forgotten password?
@@ -298,7 +322,7 @@ const SignUp = () => {
             )}
           </div>
         )}
-        {authMode === 'signUp' && (
+        {authMode === 'newUser' && (
           <div className="w-full">
             <Label text="Repeat Password" required />
             <PasswordInput

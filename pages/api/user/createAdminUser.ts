@@ -1,5 +1,6 @@
 import { userMapper } from 'lib/mappers';
 import prisma from 'lib/prisma_master';
+import { createPrismaClient } from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 
 const getPermissions = async () => {
@@ -42,6 +43,9 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       return;
     }
 
+    const prismaClient = await createPrismaClient(AccountOrganisationId);
+    const permissions = await getPermissions();
+
     const newUser = await prisma.user.create({
       data: {
         UserIsActive: true,
@@ -59,7 +63,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
             },
             AccountUserPermission: {
               createMany: {
-                data: await getPermissions(),
+                data: permissions,
               },
             },
           },
@@ -71,7 +75,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     });
 
     if (newUser) {
-      console.log('Updating PIN', AccountOrganisationId, user.pin);
+      // Set PIN for the account
       await prisma.account.update({
         where: {
           AccountOrganisationId,
@@ -80,9 +84,19 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           AccountPIN: user.pin,
         },
       });
-    }
 
-    res.status(200).json(userMapper(newUser));
+      // Create Production permisisons
+      const productions = (await prismaClient.production.findMany({})).map(({ Id }) => ({
+        AUPProductionId: Id,
+        AUPAccUserId: newUser.AccUserId,
+      }));
+
+      await prismaClient.accountUserProduction.createMany({
+        data: productions,
+      });
+    }
+    const accountUser = userMapper(newUser);
+    res.status(200).json({ user: accountUser, organisationId: AccountOrganisationId });
   } catch (err) {
     console.log(err);
     res.status(500).json({ err: 'Error occurred while creating the user.' });
