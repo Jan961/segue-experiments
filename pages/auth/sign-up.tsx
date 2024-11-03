@@ -20,6 +20,8 @@ import Link from 'next/link';
 import { userPreSignUpSchema, userSignUpSchema } from 'validators/auth';
 import useAuth from 'hooks/useAuth';
 import usePermissions from 'hooks/usePermissions';
+import { isNullOrEmpty } from 'utils';
+import Spinner from 'components/core-ui-lib/Spinner';
 
 const DEFAULT_ACCOUNT_DETAILS = {
   firstName: '',
@@ -33,9 +35,16 @@ const DEFAULT_ACCOUNT_DETAILS = {
   repeatPin: 0,
 };
 
+export const LoadingOverlay = () => (
+  <div className="inset-0 absolute bg-white bg-opacity-50 z-50 flex justify-center items-center top-20 left-20 right-20 bottom-20">
+    <Spinner size="lg" />
+  </div>
+);
+
 const SignUp = () => {
   const router = useRouter();
   const { signIn, navigateToHome } = useAuth();
+  const [isBusy, setIsBusy] = useState(false);
   const { isSignedIn, setUserPermissions } = usePermissions();
   const [error, setError] = useState('');
   const [validationError, setValidationError] = useState(null);
@@ -141,6 +150,7 @@ const SignUp = () => {
   };
 
   const saveNewUser = async () => {
+    setIsBusy(true);
     setShowLogout(false);
     try {
       await userSignUpSchema.validate(accountDetails, { abortEarly: false });
@@ -164,10 +174,13 @@ const SignUp = () => {
         console.error(error);
         setError('Something went wrong, please try again');
       }
+    } finally {
+      setIsBusy(false);
     }
   };
 
   const saveExistingUser = async () => {
+    setIsBusy(true);
     setShowLogout(false);
     try {
       await userSignUpSchema.validate(
@@ -190,10 +203,16 @@ const SignUp = () => {
           };
         }, {});
         setValidationError(formattedErrors);
+      } else if (!isNullOrEmpty(error.errors)) {
+        // We have a clerk error
+        const errorCode = error.errors[0].code;
+        setError(errorCode);
       } else {
         console.error(error);
         setError('Something went wrong, please try again');
       }
+    } finally {
+      setIsBusy(false);
     }
   };
 
@@ -439,6 +458,7 @@ const SignUp = () => {
           />
         </div>
       </div>
+      {isBusy && <LoadingOverlay />}
     </div>
   );
 };

@@ -33,6 +33,7 @@ const usePermissions = () => {
   const setUserPermissions = async (organisationId: string, permissions: string[]) => {
     try {
       if (isSignedIn) {
+        console.log('Updating user permissions', user, organisationId);
         user.update({
           unsafeMetadata: {
             organisationId,
