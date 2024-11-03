@@ -35,7 +35,7 @@ const PermissionsProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   useEffect(() => {
-    if (isSignedIn) {
+    if (!publicPaths.includes(router.pathname) && isSignedIn) {
       const organisationId = user.unsafeMetadata.organisationId as string;
       if (!organisationId) {
         router.push('/auth/sign-in');

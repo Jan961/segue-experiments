@@ -2,7 +2,7 @@ import AuthError from 'components/auth/AuthError';
 import { Button, Icon, Label, PasswordInput, TextInput, Tooltip } from 'components/core-ui-lib';
 import { useRouter } from 'next/router';
 import * as yup from 'yup';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   PASSWORD_INCORRECT,
   INVALID_EMAIL_OR_COMPANY_NAME,
@@ -36,14 +36,17 @@ const DEFAULT_ACCOUNT_DETAILS = {
 const SignUp = () => {
   const router = useRouter();
   const { signIn, navigateToHome } = useAuth();
-  const { setUserPermissions } = usePermissions();
+  const { isSignedIn, setUserPermissions } = usePermissions();
   const [error, setError] = useState('');
   const [validationError, setValidationError] = useState(null);
   const [showLogout, setShowLogout] = useState(false);
   const { signOut } = useClerk();
   const { isLoaded: signUpLoaded, signUp } = useSignUp();
   const [authMode, setAuthMode] = useState<'default' | 'newUser' | 'existingUser'>('default');
-
+  const [signedInExistingUserDetails, setSignedInExistingUserDetails] = useState({
+    organisationId: '',
+    permissions: [],
+  });
   const [accountDetails, setAccountDetails] = useState(DEFAULT_ACCOUNT_DETAILS);
 
   const handleAccountDetailsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -61,9 +64,10 @@ const SignUp = () => {
         companyName: accountDetails.companyName,
         email: accountDetails.email,
       });
-      if (data.userId) {
+      if (data.accountUserExists) {
         router.push('/auth/sign-in');
       } else {
+        setAccountDetails((prev) => ({ ...prev, firstName: data.firstName, lastName: data.lastName }));
         setAuthMode('existingUser');
       }
     } catch (err) {
@@ -144,7 +148,7 @@ const SignUp = () => {
       await createNewUserWithClerk();
 
       // Create the user in our database
-      await axios.post('/api/user/createAdminUser', accountDetails);
+      await axios.post('/api/user/createAdminUser', { user: accountDetails, accountUserOnly: false });
 
       router.push('/auth/user-created');
     } catch (error: any) {
@@ -167,18 +171,16 @@ const SignUp = () => {
     setShowLogout(false);
     try {
       await userSignUpSchema.validate(
-        { ...accountDetails, repeatPassword: accountDetails.password },
+        { ...accountDetails, confirmPassword: accountDetails.password },
         { abortEarly: false },
       );
-      // Authenticate the user within clerk
+      // Authenticate the user within clerk first to check if we have a valid password
       await signIn(accountDetails.email, accountDetails.password);
 
       // Create the user in our database
-      const { data } = await axios.post('/api/user/createAdminUser', { accountDetails, fetchPermissions: true });
+      const { data } = await axios.post('/api/user/createAdminUser', { user: accountDetails, accountUserOnly: true });
 
-      setUserPermissions(data.organisationId, data.permissions);
-
-      navigateToHome();
+      setSignedInExistingUserDetails({ organisationId: data.organisationId, permissions: data.permissions });
     } catch (error: any) {
       if (error instanceof yup.ValidationError) {
         const formattedErrors = error.inner.reduce((acc, err) => {
@@ -194,6 +196,17 @@ const SignUp = () => {
       }
     }
   };
+
+  useEffect(() => {
+    const setDataForSignedInUser = async (organisationId, permissions) => {
+      await setUserPermissions(organisationId, permissions);
+      navigateToHome();
+    };
+
+    if (isSignedIn && signedInExistingUserDetails.organisationId) {
+      setDataForSignedInUser(signedInExistingUserDetails.organisationId, signedInExistingUserDetails.permissions);
+    }
+  }, [isSignedIn, signedInExistingUserDetails]);
 
   const handleSubmit = async () => {
     clearErrors();
@@ -374,7 +387,7 @@ const SignUp = () => {
                 placeholder="Enter PIN"
                 className="w-32 mb-1"
                 value={accountDetails.pin}
-                type="number"
+                type="password"
                 onChange={handleAccountDetailsChange}
                 error={validationError?.pin}
                 pattern={PIN_REGEX}
@@ -399,7 +412,7 @@ const SignUp = () => {
                 placeholder="Repeat PIN"
                 className="w-32 mb-1"
                 value={accountDetails.repeatPin}
-                type="number"
+                type="password"
                 onChange={handleAccountDetailsChange}
                 pattern={PIN_REGEX}
                 error={validationError?.repeatPin}

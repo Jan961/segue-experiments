@@ -18,6 +18,7 @@ const useAuth = () => {
   };
 
   const signIn = async (username, password) => {
+    // Attempt to sign in with Clerk
     const signInAttempt = await clerkSignIn.create({
       identifier: username,
       password,
