@@ -48,6 +48,15 @@ const CONTRACTS_CREATIVES_PERMISSIONS = [
   'EXPORT_CREATIVE_CONTRACT',
 ];
 
+const CONTRACTS_TECH_PERMISSIONS = [
+  'ADD_NEW_TECH_CONTRACT',
+  'ADD_TECH_NEW_PERSON',
+  'EDIT_TECH_CONTRACT',
+  'EDIT_TECH_CONTRACT_STATUS_DROPDOWNS',
+  'EDIT_TECH_PERSON_DETAILS',
+  'EXPORT_TECH_CONTRACT',
+];
+
 const BOOKINGS_HOME_PERMISSIONS = [
   'BOOKINGS',
   'ACCESS_BOOKINGS',
@@ -138,6 +147,24 @@ export const accessArtisteContracts = selector({
   get: ({ get }) => {
     const { permissions = [] } = get(userPermissionsState);
     return permissions.filter((x) => CONTRACTS_ARTISTE_PERMISSIONS.includes(x));
+  },
+});
+
+export const accessTechContracts = selector({
+  key: 'accessTechContractsSelector',
+  get: ({ get }) => {
+    const { permissions = [] } = get(userPermissionsState);
+    return permissions.filter((x) => CONTRACTS_TECH_PERMISSIONS.includes(x));
+  },
+});
+
+export const accessAllContracts = selector({
+  key: 'accessAllContracts',
+  get: ({ get }) => {
+    const { permissions = [] } = get(userPermissionsState);
+    return permissions.filter((x) =>
+      [...CONTRACTS_ARTISTE_PERMISSIONS, ...CONTRACTS_CREATIVES_PERMISSIONS, ...CONTRACTS_TECH_PERMISSIONS].includes(x),
+    );
   },
 });
 

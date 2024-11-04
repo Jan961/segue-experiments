@@ -10,6 +10,7 @@ import PersonalDetails, { defaultPersonDetails } from '../../../contracts/Person
 import AccountDetailsForm, { defaultBankAccount } from '../../../contracts/PersonForm/AccountDetailsForm';
 import EmergencyContact, { defaultEmergencyContactData } from '../../../contracts/PersonForm/EmergencyContact';
 import { IPerson } from '../../../contracts/types';
+import { ContractPermissionGroup } from 'interfaces';
 
 const defaultContractDetails = {
   personDetails: defaultPersonDetails,
@@ -25,9 +26,8 @@ interface ContractPersonDataFormProps {
   person?: Partial<IPerson>;
   height: string;
   updateFormData: (data: Partial<IPerson>) => void;
-  permissions: {
-    editPerson: boolean;
-  };
+  permissions: ContractPermissionGroup;
+  departmentId: number;
 }
 
 const mergeContractData = (contractDetailsD, contractDetailsV) => {
@@ -65,6 +65,7 @@ export const PersonDetailsTab = ({
   updateFormData,
   type,
   permissions,
+  departmentId,
 }: ContractPersonDataFormProps) => {
   const [personData, setPersonData] = useState<IPerson>(mergeContractData(defaultContractDetails, person));
   const {
@@ -102,11 +103,18 @@ export const PersonDetailsTab = ({
     [personData, updateFormData, setPersonData],
   );
 
-  const isPersonDetailsDisabled = (): boolean => {
-    if (type === 'Edit' && !permissions.editPerson) {
-      return true;
+  const isPersonDetailsDisabled = (departmentId: number): boolean => {
+    if (
+      type === 'Edit' &&
+      ((departmentId === 1 && permissions.artisteContracts) ||
+        (departmentId === 2 && permissions.creativeContracts) ||
+        (departmentId === 3 && permissions.smTechCrewContracts))
+    ) {
+      return false;
+    } else if (type === 'New') {
+      return false;
     }
-    return false;
+    return true;
   };
 
   return (
@@ -114,7 +122,7 @@ export const PersonDetailsTab = ({
       <div className={`${height} w-full`}>
         <div className="text-xl text-primary-navy font-bold mb-3">Person Details</div>
         <PersonalDetails
-          disabled={isPersonDetailsDisabled()}
+          disabled={isPersonDetailsDisabled(departmentId)}
           details={personDetails}
           countryOptionList={countryOptionList}
           booleanOptions={booleanOptions}

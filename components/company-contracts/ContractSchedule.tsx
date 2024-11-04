@@ -9,7 +9,7 @@ import { productionJumpState } from 'state/booking/productionJumpState';
 import { personState } from 'state/contracts/PersonState';
 import axios from 'axios';
 import { objectify } from 'radash';
-import { PersonMinimalDTO } from 'interfaces';
+import { ContractPermissionGroup, PersonMinimalDTO } from 'interfaces';
 import { IContractSchedule } from '../contracts/types';
 import { contractDepartmentState } from 'state/contracts/contractDepartmentState';
 import { contractTemplateState } from 'state/contracts/contractTemplateState';
@@ -26,10 +26,12 @@ export const ContractScheduleModal = ({
   openContract,
   onClose,
   newPersonDisabled,
+  accessPermissions,
 }: {
   openContract: boolean;
   onClose: () => void;
-  newPersonDisabled: boolean;
+  newPersonDisabled: ContractPermissionGroup;
+  accessPermissions: ContractPermissionGroup;
 }) => {
   const { productions } = useRecoilValue(productionJumpState);
   const [personMap, setPersonMap] = useRecoilState(personState);
@@ -100,6 +102,20 @@ export const ContractScheduleModal = ({
     }
   }, [production, department, role, personId, templateId, setOpenNewBuildContract]);
 
+  const isNewPersonDisabled = () => {
+    if (!production) {
+      return true;
+    }
+    if (
+      newPersonDisabled.artisteContracts ||
+      newPersonDisabled.creativeContracts ||
+      newPersonDisabled.smTechCrewContracts
+    ) {
+      return false;
+    }
+    return true;
+  };
+
   return (
     <PopupModal
       show={openContract}
@@ -132,7 +148,7 @@ export const ContractScheduleModal = ({
         </div>
         <div className="flex justify-end mr-2">
           <Button
-            disabled={!production || newPersonDisabled}
+            disabled={isNewPersonDisabled()} // CHANGE
             // disabled={!production || !permissions.includes('ADD_NEW_PERSON_ARTISTE')}
             className="w-33"
             variant="secondary"
@@ -158,7 +174,12 @@ export const ContractScheduleModal = ({
             value={department}
             className="bg-primary-white"
             placeholder="Please select department"
-            options={departmentOptions}
+            options={departmentOptions.filter(
+              (x) =>
+                (x.value === 1 && accessPermissions.artisteContracts) ||
+                (x.value === 2 && accessPermissions.creativeContracts) ||
+                (x.value === 3 && accessPermissions.smTechCrewContracts),
+            )}
             isClearable
             isSearchable
           />
@@ -189,7 +210,11 @@ export const ContractScheduleModal = ({
         </div>
       </div>
       {openNewPersonContract && (
-        <ContractNewPersonModal openNewPersonContract={openNewPersonContract} onClose={onCloseCreateNewPerson} />
+        <ContractNewPersonModal
+          permissions={newPersonDisabled}
+          openNewPersonContract={openNewPersonContract}
+          onClose={onCloseCreateNewPerson}
+        />
       )}
       {openNewBuildContract && (
         <BuildNewContract
@@ -199,7 +224,7 @@ export const ContractScheduleModal = ({
             setOpenNewBuildContract(false);
             onClose?.();
           }}
-          editPerson={false}
+          editPerson={newPersonDisabled}
         />
       )}
     </PopupModal>

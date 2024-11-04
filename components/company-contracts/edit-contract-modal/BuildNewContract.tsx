@@ -20,6 +20,7 @@ import { TemplateFormRow, TemplateFormRowPopulated, ContractData } from '../type
 import { contractTemplateState } from 'state/contracts/contractTemplateState';
 import { getFileUrl } from 'lib/s3';
 import { populateContractData, populateTemplateWithValues } from './utils';
+import { ContractPermissionGroup } from 'interfaces';
 
 export interface BuildNewContractProps {
   contractSchedule?: Partial<IContractSchedule>;
@@ -27,7 +28,7 @@ export interface BuildNewContractProps {
   contractId?: number;
   isEdit?: boolean;
   onClose: () => void;
-  editPerson: boolean;
+  editPerson: ContractPermissionGroup;
 }
 
 export const BuildNewContract = ({
@@ -36,7 +37,7 @@ export const BuildNewContract = ({
   contractId,
   isEdit = false,
   onClose = noop,
-  editPerson = true,
+  editPerson = { artisteContracts: false, creativeContracts: false, smTechCrewContracts: false },
 }: BuildNewContractProps) => {
   const { productions } = useRecoilValue(productionJumpState);
   const [contractPerson, setContractPerson] = useState(null);
@@ -277,9 +278,8 @@ export const BuildNewContract = ({
                   person={contractPerson}
                   updateFormData={setContractPerson}
                   height=""
-                  permissions={{
-                    editPerson,
-                  }}
+                  permissions={editPerson}
+                  departmentId={contractSchedule.department}
                 />
               </div>
             )}
