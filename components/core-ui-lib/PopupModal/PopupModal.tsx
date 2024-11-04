@@ -80,18 +80,20 @@ export default function PopupModal({
                   panelClass,
                 )}
               >
-                {showCloseIcon && (
-                  <Icon
-                    iconName="cross"
-                    variant="lg"
-                    className="hover:scale-105 sticky left-full"
-                    onClick={onClose}
-                    data-testid="close-icon"
-                  />
-                )}
-                <Dialog.Title as="h3" className={`-mt-6 text-lg font-bold leading-6 ${titleClass}`}>
-                  {title}
-                </Dialog.Title>
+                <header>
+                  {showCloseIcon && (
+                    <Icon
+                      iconName="cross"
+                      variant="lg"
+                      className="sticky left-full"
+                      onClick={onClose}
+                      data-testid="close-icon"
+                    />
+                  )}
+                  <Dialog.Title as="h3" className={`-mt-6 text-lg font-bold leading-6 ${titleClass}`}>
+                    {title}
+                  </Dialog.Title>
+                </header>
                 <div className="overflow-y-auto mt-3">{children}</div>
               </Dialog.Panel>
             </Transition.Child>
