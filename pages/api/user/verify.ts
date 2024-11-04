@@ -1,24 +1,37 @@
 import prisma from 'lib/prisma_master';
 import { NextApiRequest, NextApiResponse } from 'next';
+import { isNullOrEmpty } from 'utils';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const { Email, organisationId } = req.body;
+    const { email, companyName } = req.body;
 
     const users = await prisma.accountUser.findMany({
       where: {
-        Account: {
-          AccountOrganisationId: organisationId,
-        },
         User: {
-          UserEmail: Email,
+          UserEmail: email,
         },
       },
+      select: {
+        User: true,
+        Account: true,
+      },
     });
-    console.log('users', users);
-    return res.status(200).json({ id: users.length > 0 ? users[0].Id : null });
+
+    let accountUser = { firstName: '', lastName: '', accountUserExists: false };
+    if (!isNullOrEmpty(users)) {
+      const userWithSameAccount = users.find((u) => u.Account.AccountName === companyName);
+      // A user exists for the same company/account or a different company/account
+      accountUser = {
+        firstName: users[0].User.UserFirstName,
+        lastName: users[0].User.UserLastName,
+        accountUserExists: !!userWithSameAccount,
+      };
+    }
+
+    return res.status(200).json(accountUser);
   } catch (err) {
     console.log(err);
-    res.status(500).json({ err: 'Error occurred whileverifying pin.' });
+    res.status(500).json({ err: 'Error occurred while verifying user.' });
   }
 }

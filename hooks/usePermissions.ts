@@ -39,6 +39,7 @@ const usePermissions = () => {
             permissions,
           },
         });
+
         setPermissionsState({
           permissions,
           accountId: organisationId,
@@ -51,7 +52,7 @@ const usePermissions = () => {
     }
   };
 
-  return { setUserPermissions };
+  return { isSignedIn, setUserPermissions };
 };
 
 export default usePermissions;
