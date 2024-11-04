@@ -14,7 +14,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         select: {
           AccountUserPermission: { select: { UserAuthPermissionId: true } },
           AccUserIsAdmin: true,
-          AccUserPIN: true,
+          Account: { select: { AccountPIN: true } },
         },
       });
 
@@ -32,7 +32,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       });
 
       const results = {
-        pin: userPermissions?.AccUserPIN,
+        pin: userPermissions?.Account.AccountPIN,
         isSystemAdmin: userPermissions?.AccUserIsAdmin,
         permissions: formattedUserPermissions || [],
         productions: formattedProductionPermissions || [],

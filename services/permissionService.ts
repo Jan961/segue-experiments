@@ -214,3 +214,12 @@ export const getPermissionGroupsList = async (req) => {
     console.log('Error fetching permission groups', err);
   }
 };
+
+export const getAllPermissionsWithIdAndName = async () => {
+  return await prismaMaster.permission.findMany({
+    select: {
+      PermissionId: true,
+      PermissionName: true,
+    },
+  });
+};
