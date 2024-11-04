@@ -1,69 +1,8 @@
 import prisma from 'lib/prisma_master';
 import { createPrismaClient } from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
-
-const getPermissions = async () => {
-  return await prisma.permission.findMany({
-    select: {
-      PermissionId: true,
-      PermissionName: true,
-    },
-  });
-};
-
-const createNewUser = async (user, organisationId, permissions) => {
-  return await prisma.user.create({
-    data: {
-      UserIsActive: true,
-      UserFirstName: user.firstName,
-      UserLastName: user.lastName,
-      UserEmail: user.email,
-      AccountUser: {
-        create: {
-          AccUserIsAdmin: true,
-          AccUserIsActive: true,
-          Account: {
-            connect: {
-              AccountOrganisationId: organisationId,
-            },
-          },
-          AccountUserPermission: {
-            createMany: {
-              data: permissions,
-            },
-          },
-        },
-      },
-    },
-    include: {
-      AccountUser: true,
-    },
-  });
-};
-
-const createNewAccountUser = async (user, organisationId, permissions) => {
-  return await prisma.accountUser.create({
-    data: {
-      AccUserIsAdmin: true,
-      AccUserIsActive: true,
-      User: {
-        connect: {
-          UserEmail: user.email,
-        },
-      },
-      Account: {
-        connect: {
-          AccountOrganisationId: organisationId,
-        },
-      },
-      AccountUserPermission: {
-        createMany: {
-          data: permissions,
-        },
-      },
-    },
-  });
-};
+import { getAllPermissionsWithIdAndName } from 'services/permissionService';
+import { createNewAccountUser, createNewUser } from 'services/userService';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -85,7 +24,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     }
 
     const prismaClient = await createPrismaClient(AccountOrganisationId);
-    const permissions = await getPermissions();
+    const permissions = await getAllPermissionsWithIdAndName();
     const permissionIds = permissions.map(({ PermissionId }) => ({ UserAuthPermissionId: PermissionId }));
 
     const newUser = accountUserOnly

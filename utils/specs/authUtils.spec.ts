@@ -12,13 +12,12 @@ describe('test generateUserPin', () => {
   it('should return a 5 digit number', () => {
     const pin = generateUserPin();
     const { valid } = validatePin(pin);
-    console.log(valid);
     expect(valid).toBe(true);
   });
 });
 
 describe('test validatePin', () => {
-  it('It is Exactly 5 digits long, Does not contain more than 2 consecutive numbers, Does not contain all digits thst are the same number', () => {
+  it('It is Exactly 5 digits long, Does not contain more than 2 consecutive numbers, Does not contain all digits that are the same number', () => {
     expect(validatePin(34195).valid).toBe(true);
   });
 

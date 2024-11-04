@@ -17,7 +17,10 @@ const useAuth = () => {
     }
   };
 
-  const signIn = async (username, password) => {
+  const signIn = async (username: string, password: string) => {
+    if (!username || !password) {
+      return false;
+    }
     // Attempt to sign in with Clerk
     const signInAttempt = await clerkSignIn.create({
       identifier: username,
@@ -28,6 +31,7 @@ const useAuth = () => {
       await setActive({ session: signInAttempt.createdSessionId });
       return true;
     }
+    return false;
   };
 
   const navigateToHome = () => {

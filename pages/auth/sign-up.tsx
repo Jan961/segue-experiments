@@ -33,6 +33,7 @@ const DEFAULT_ACCOUNT_DETAILS = {
   confirmPassword: '',
   pin: 0,
   repeatPin: 0,
+  isSystemAdmin: true,
 };
 
 export const LoadingOverlay = () => (
@@ -158,7 +159,7 @@ const SignUp = () => {
       await createNewUserWithClerk();
 
       // Create the user in our database
-      await axios.post('/api/user/createAdminUser', { user: accountDetails, accountUserOnly: false });
+      await axios.post('/api/user/create-admin-user', { user: accountDetails, accountUserOnly: false });
 
       router.push('/auth/user-created');
     } catch (error: any) {
@@ -191,7 +192,7 @@ const SignUp = () => {
       await signIn(accountDetails.email, accountDetails.password);
 
       // Create the user in our database
-      const { data } = await axios.post('/api/user/createAdminUser', { user: accountDetails, accountUserOnly: true });
+      const { data } = await axios.post('/api/user/create-admin-user', { user: accountDetails, accountUserOnly: true });
 
       setSignedInExistingUserDetails({ organisationId: data.organisationId, permissions: data.permissions });
     } catch (error: any) {
