@@ -1,9 +1,11 @@
-import { useClerk } from '@clerk/nextjs';
+import { useClerk, useSignIn } from '@clerk/nextjs';
 import { useRouter } from 'next/router';
 
 const useAuth = () => {
   const { signOut: clerkSignOut } = useClerk();
+  const { signIn: clerkSignIn, setActive } = useSignIn();
   const router = useRouter();
+
   const signOut = async () => {
     try {
       // Sign out from Clerk
@@ -15,11 +17,28 @@ const useAuth = () => {
     }
   };
 
+  const signIn = async (username: string, password: string) => {
+    if (!username || !password) {
+      return false;
+    }
+    // Attempt to sign in with Clerk
+    const signInAttempt = await clerkSignIn.create({
+      identifier: username,
+      password,
+    });
+
+    if (signInAttempt.status === 'complete') {
+      await setActive({ session: signInAttempt.createdSessionId });
+      return true;
+    }
+    return false;
+  };
+
   const navigateToHome = () => {
     router.push('/');
   };
 
-  return { signOut, navigateToHome };
+  return { signIn, signOut, navigateToHome };
 };
 
 export default useAuth;

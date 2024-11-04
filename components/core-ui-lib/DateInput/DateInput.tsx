@@ -4,7 +4,7 @@ import TextInput from '../TextInput';
 import React, { createRef, forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import Label from '../Label';
 import { Portal } from 'react-overlays';
-import { add, format, isValid } from 'date-fns';
+import { format, isValid } from 'date-fns';
 import { formatDate } from 'services/dateService';
 
 interface DateInputProps {
@@ -69,20 +69,6 @@ export default forwardRef<Ref, DateInputProps>(function DateInput(
     }
   };
 
-  // Checks if datetime is < dd/mm/yy 01:00, if date between 00:00 nad 00:59 add 1 hour
-  const onDateChange = (date: Date) => {
-    if (date) {
-      if (date.getHours() <= 0) {
-        const newDate = add(date, { hours: 1 });
-        onChange(newDate);
-      } else {
-        onChange(date);
-      }
-    } else {
-      onChange(null);
-    }
-  };
-
   useImperativeHandle(ref, () => ({
     setValue: (value: Date | null, useIfValueNull: Date | null) => {
       setDateValue(value, useIfValueNull);
@@ -133,7 +119,7 @@ export default forwardRef<Ref, DateInputProps>(function DateInput(
     if (inputValue) {
       const d = getDateFromInputValue();
       if (regex.test(inputValue) && isValid(d)) {
-        onDateChange(d);
+        onChange(d);
         setSelectedDate(d);
       } else {
         if (value) {
@@ -144,7 +130,7 @@ export default forwardRef<Ref, DateInputProps>(function DateInput(
       }
     } else {
       setSelectedDate(null);
-      onDateChange(null);
+      onChange(null);
     }
   };
 
@@ -181,7 +167,7 @@ export default forwardRef<Ref, DateInputProps>(function DateInput(
           placeholderText={placeholder}
           dateFormat="dd/MM/yy"
           popperClassName={`!z-50 ${position}`}
-          onChange={(e) => onDateChange(e)}
+          onChange={(e) => onChange(e)}
           selected={selectedDate}
           openToDate={selectedDate}
           customInput={<div className="cursor-pointer w-4 h-4 " />}

@@ -16,6 +16,7 @@ import { dateToSimple } from 'services/dateService';
 import { exportToExcel } from 'utils/export';
 import { ProductionDTO, VenueMinimalDTO } from 'interfaces';
 import { productionJumpState } from 'state/booking/productionJumpState';
+import { accessBookingsHome } from 'state/account/selectors/permissionSelector';
 
 type BarringProps = {
   visible: boolean;
@@ -42,6 +43,7 @@ const barringGridOptions = {
 };
 
 export default function Barring({ visible, onClose }: BarringProps) {
+  const permissions = useRecoilValue(accessBookingsHome);
   const [rows, setRows] = useState<BarredVenue[] | null>(null);
   const [loading, setIsLoading] = useState<boolean>(false);
   const [selectedVenueIds, setSelectedVenueIds] = useState([]);
@@ -155,6 +157,7 @@ export default function Barring({ visible, onClose }: BarringProps) {
                 text="Export"
                 iconProps={{ className: 'h-4 w-3' }}
                 sufixIconName="excel"
+                disabled={!permissions.includes('EXPORT_BARRING_CHECK')}
               />
               <Button
                 onClick={onClose}
