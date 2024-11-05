@@ -16,6 +16,7 @@ import { productionJumpState } from 'state/booking/productionJumpState';
 import { objectify } from 'radash';
 import { CellClickedEvent } from 'ag-grid-community';
 import { ContractPermissionGroup } from 'interfaces';
+import { contractDepartmentOptions } from 'config/contracts';
 
 interface ContractsTableProps {
   rowData?: IContractSummary[];
@@ -98,20 +99,17 @@ export default function CompanyContractsTable({
     const colId = e.column.getColId();
     const data = e.data;
     const { departmentId, productionId, personId, role, id, templateId } = data;
-    console.log(
-      departmentId,
-      permissions.savePDF.artisteContracts,
-      permissions.savePDF.creativeContracts,
-      permissions.savePDF.smTechCrewContracts,
-    );
     if (colId === 'notes') {
       setNotesPopupContext({ visible: true, contract: data });
     }
     if (
       colId === 'edit' &&
-      ((departmentId === 1 && permissions.editRow.artisteContracts) ||
-        (departmentId === 2 && permissions.editRow.creativeContracts) ||
-        (departmentId === 3 && permissions.editRow.smTechCrewContracts))
+      ((departmentId === contractDepartmentOptions.find((x) => x.text === 'Artiste').value &&
+        permissions.editRow.artisteContracts) ||
+        (departmentId === contractDepartmentOptions.find((x) => x.text === 'Creative').value &&
+          permissions.editRow.creativeContracts) ||
+        (departmentId === contractDepartmentOptions.find((x) => x.text === 'SM / Tech / Crew').value &&
+          permissions.editRow.smTechCrewContracts))
     ) {
       setEditContract({
         visible: true,
@@ -127,9 +125,12 @@ export default function CompanyContractsTable({
     }
     if (
       colId === 'pdf' &&
-      ((departmentId === 1 && permissions.savePDF.artisteContracts) ||
-        (departmentId === 2 && permissions.savePDF.creativeContracts) ||
-        (departmentId === 3 && permissions.savePDF.smTechCrewContracts))
+      ((departmentId === contractDepartmentOptions.find((x) => x.text === 'Artiste').value &&
+        permissions.savePDF.artisteContracts) ||
+        (departmentId === contractDepartmentOptions.find((x) => x.text === 'Creative').value &&
+          permissions.savePDF.creativeContracts) ||
+        (departmentId === contractDepartmentOptions.find((x) => x.text === 'SM / Tech / Crew').value &&
+          permissions.savePDF.smTechCrewContracts))
     ) {
       // Export PDF
       console.log('ExportPDF needs implementation');
@@ -168,22 +169,25 @@ export default function CompanyContractsTable({
   }, []);
 
   // Trim table data based on permissions
-  const trimData = () => {
+  const trimData = useMemo(() => {
     const data = rowData.filter(
       (x) =>
-        (x.departmentId === 1 && permissions.accessContracts.artisteContracts) ||
-        (x.departmentId === 2 && permissions.accessContracts.creativeContracts) ||
-        (x.departmentId === 3 && permissions.accessContracts.smTechCrewContracts),
+        (x.departmentId === contractDepartmentOptions.find((x) => x.text === 'Artiste').value &&
+          permissions.accessContracts.artisteContracts) ||
+        (x.departmentId === contractDepartmentOptions.find((x) => x.text === 'Creative').value &&
+          permissions.accessContracts.creativeContracts) ||
+        (x.departmentId === contractDepartmentOptions.find((x) => x.text === 'SM / Tech / Crew').value &&
+          permissions.accessContracts.smTechCrewContracts),
     );
     return data;
-  };
+  }, [rowData]);
 
   return (
     <>
       <div className="w-full h-[calc(100%-140px)]">
         <Table
           columnDefs={columnDefs}
-          rowData={trimData()}
+          rowData={trimData}
           ref={tableRef}
           styleProps={contractsStyleProps}
           onCellValueChange={onCellValueChange}
