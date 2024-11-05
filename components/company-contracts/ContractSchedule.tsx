@@ -9,7 +9,7 @@ import { productionJumpState } from 'state/booking/productionJumpState';
 import { personState } from 'state/contracts/PersonState';
 import axios from 'axios';
 import { objectify } from 'radash';
-import { PersonMinimalDTO } from 'interfaces';
+import { ContractPermissionGroup, PersonMinimalDTO } from 'interfaces';
 import { IContractSchedule } from '../contracts/types';
 import { contractDepartmentState } from 'state/contracts/contractDepartmentState';
 import { contractTemplateState } from 'state/contracts/contractTemplateState';
@@ -22,7 +22,17 @@ export const defaultContractSchedule = {
   templateId: null,
 };
 
-export const ContractScheduleModal = ({ openContract, onClose }: { openContract: boolean; onClose: () => void }) => {
+export const ContractScheduleModal = ({
+  openContract,
+  onClose,
+  newPersonDisabled,
+  accessPermissions,
+}: {
+  openContract: boolean;
+  onClose: () => void;
+  newPersonDisabled: ContractPermissionGroup;
+  accessPermissions: ContractPermissionGroup;
+}) => {
   const { productions } = useRecoilValue(productionJumpState);
   const [personMap, setPersonMap] = useRecoilState(personState);
   const departmentMap = useRecoilValue(contractDepartmentState);
@@ -55,8 +65,8 @@ export const ContractScheduleModal = ({ openContract, onClose }: { openContract:
 
   const templateOptions = useMemo(() => transformToOptions(Object.values(templateMap), 'name', 'id'), [templateMap]);
 
-  const [openNewPersonContract, setOpenNewPersonContract] = useState(false);
-  const [openNewBuildContract, setOpenNewBuildContract] = useState(false);
+  const [openNewPersonContract, setOpenNewPersonContract] = useState<boolean>(false);
+  const [openNewBuildContract, setOpenNewBuildContract] = useState<boolean>(false);
   const [contractSchedule, setContractSchedule] = useState<IContractSchedule>(defaultContractSchedule);
   const { production, department, role, personId, templateId } = contractSchedule;
 
@@ -101,6 +111,20 @@ export const ContractScheduleModal = ({ openContract, onClose }: { openContract:
     }
   }, [production, department, role, personId, templateId, setOpenNewBuildContract]);
 
+  const isNewPersonDisabled = () => {
+    if (!production) {
+      return true;
+    }
+    if (
+      newPersonDisabled.artisteContracts ||
+      newPersonDisabled.creativeContracts ||
+      newPersonDisabled.smTechCrewContracts
+    ) {
+      return false;
+    }
+    return true;
+  };
+
   return (
     <PopupModal
       show={openContract}
@@ -133,7 +157,8 @@ export const ContractScheduleModal = ({ openContract, onClose }: { openContract:
         </div>
         <div className="flex justify-end mr-2">
           <Button
-            disabled={!production}
+            disabled={isNewPersonDisabled()} // CHANGE
+            // disabled={!production || !permissions.includes('ADD_NEW_PERSON_ARTISTE')}
             className="w-33"
             variant="secondary"
             text="Add New Person"
@@ -189,7 +214,11 @@ export const ContractScheduleModal = ({ openContract, onClose }: { openContract:
         </div>
       </div>
       {openNewPersonContract && (
-        <ContractNewPersonModal openNewPersonContract={openNewPersonContract} onClose={onCloseCreateNewPerson} />
+        <ContractNewPersonModal
+          permissions={newPersonDisabled}
+          openNewPersonContract={openNewPersonContract}
+          onClose={onCloseCreateNewPerson}
+        />
       )}
       {openNewBuildContract && (
         <BuildNewContract
@@ -199,6 +228,7 @@ export const ContractScheduleModal = ({ openContract, onClose }: { openContract:
             setOpenNewBuildContract(false);
             onClose?.();
           }}
+          editPerson={newPersonDisabled}
         />
       )}
     </PopupModal>

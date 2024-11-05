@@ -265,6 +265,10 @@ export const paymentTypes = [
 
 export const contractDepartmentOptions = [
   {
+    text: 'All',
+    value: -1,
+  },
+  {
     text: 'Artiste',
     value: 1,
   },

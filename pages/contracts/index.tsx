@@ -1,10 +1,10 @@
 import Layout from 'components/Layout';
 import { SwitchBoardItem } from 'components/global/SwitchBoardItem';
 import { useRecoilValue } from 'recoil';
-import { accesContractsHome } from 'state/account/selectors/permissionSelector';
+import { accessContractsHome } from 'state/account/selectors/permissionSelector';
 
 const Index = () => {
-  const permissions = useRecoilValue(accesContractsHome);
+  const permissions = useRecoilValue(accessContractsHome);
 
   const links = [
     {
