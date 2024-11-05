@@ -22,7 +22,7 @@ const defaultContractDetails = {
 
 interface ContractPersonDataFormProps {
   person?: Partial<IPerson>;
-  height: string;
+  height?: string;
   updateFormData: (data: Partial<IPerson>) => void;
 }
 

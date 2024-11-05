@@ -270,7 +270,13 @@ export const BuildNewContract = ({
           <div className="border-solid border-2 border-primary-navy rounded p-2 h-[70vh] overflow-y-scroll">
             {activeViewIndex === 0 && contractPerson && (
               <div className="flex flex-col gap-8 px-16">
-                <PersonDetailsTab person={contractPerson} updateFormData={setContractPerson} height="" />
+                <PersonDetailsTab
+                  type="Edit"
+                  person={contractPerson}
+                  updateFormData={setContractPerson}
+                  permissions={editPerson}
+                  departmentId={contractSchedule.department}
+                />
               </div>
             )}
             {activeViewIndex === 1 && (

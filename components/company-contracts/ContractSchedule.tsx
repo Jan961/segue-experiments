@@ -84,6 +84,15 @@ export const ContractScheduleModal = ({ openContract, onClose }: { openContract:
     [setOpenNewPersonContract, setPersonMap],
   );
 
+  const getDepartmentOptions = useMemo(() => {
+    return departmentOptions.filter(
+      (x) =>
+        (x.value === 1 && accessPermissions.artisteContracts) ||
+        (x.value === 2 && accessPermissions.creativeContracts) ||
+        (x.value === 3 && accessPermissions.smTechCrewContracts),
+    );
+  }, [department]);
+
   const onOpenBuildContract = useCallback(() => {
     if (production && department && role && personId && templateId) {
       setOpenNewBuildContract(true);
@@ -149,7 +158,7 @@ export const ContractScheduleModal = ({ openContract, onClose }: { openContract:
             value={department}
             className="bg-primary-white"
             placeholder="Please select department"
-            options={departmentOptions}
+            options={getDepartmentOptions}
             isClearable
             isSearchable
           />
