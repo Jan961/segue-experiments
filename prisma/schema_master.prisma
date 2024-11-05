@@ -80,7 +80,6 @@ model AccountUser {
   AccUserUserId         Int
   AccUserAccountId      Int
   AccUserIsAdmin        Boolean                 @default(dbgenerated("(b'0')")) @db.Bit(1)
-  AccUserPIN            String?                 @db.VarChar(4)
   AccUserIsActive       Boolean                 @default(dbgenerated("(b'0')")) @db.Bit(1)
   Account               Account                 @relation(fields: [AccUserAccountId], references: [AccountId], onDelete: Cascade, map: "Account_AccountUser")
   User                  User                    @relation(fields: [AccUserUserId], references: [UserId], onDelete: Cascade, map: "User_AccountUser")
@@ -229,11 +228,12 @@ view AccountUserView {
   AccountName           String  @db.VarChar(50)
   AccUserId             Int     @default(0)
   AccUserIsAdmin        Boolean @default(dbgenerated("(b'0')")) @db.Bit(1)
-  AccUserPIN            String? @db.VarChar(4)
+  AccUserIsActive       Boolean @default(dbgenerated("(b'0')")) @db.Bit(1)
   UserId                Int     @default(0)
   UserFirstName         String  @db.VarChar(50)
   UserLastName          String? @db.VarChar(50)
   UserEmail             String  @db.VarChar(120)
+  UserIsActive          Boolean @default(dbgenerated("(b'0')")) @db.Bit(1)
 
   @@ignore
 }

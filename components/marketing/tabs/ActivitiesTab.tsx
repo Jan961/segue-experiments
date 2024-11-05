@@ -22,6 +22,7 @@ import { exportExcelReport } from 'components/bookings/modal/request';
 import { notify } from 'components/core-ui-lib';
 import GlobalActivityModal, { GlobalActivity } from '../modal/GlobalActivityModal';
 import axios from 'axios';
+import { accessMarketingHome } from 'state/account/selectors/permissionSelector';
 
 interface ActivitiesTabProps {
   bookingId: string;
@@ -38,6 +39,7 @@ const approvalStatusList = [
 ];
 
 const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref) => {
+  const permissions = useRecoilValue(accessMarketingHome);
   const [actTypeList, setActTypeList] = useState<Array<SelectOption>>(null);
   const [actColDefs, setActColDefs] = useState([]);
   const [actRowData, setActRowData] = useState([]);
@@ -68,6 +70,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [bookings, setBookings] = useRecoilState(bookingJumpState);
   const currency = useRecoilValue(currencyState);
+  const canEditActChecks = permissions.includes('EDIT_ACTIVITIES_CHECKS');
 
   const { selected: productionId, productions } = useRecoilValue(productionJumpState);
 
@@ -94,7 +97,14 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
 
   const getActivities = async (bookingId: string) => {
     try {
-      setActColDefs(activityColDefs(activityUpdate, currency.symbol));
+      setActColDefs(
+        activityColDefs(
+          activityUpdate,
+          currency.symbol,
+          permissions.includes('ACCESS_EDIT_ACTIVITY_MODAL'),
+          permissions.includes('DELETE_ACTIVITY'),
+        ),
+      );
       setIsLoading(true);
 
       const { data } = await axios.get(`/api/marketing/activities/${bookingId}`);
@@ -163,7 +173,13 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
 
         setGlobalTotalCost(globalActivities.activities.reduce((sum, item) => sum + item.Cost, 0));
 
-        setGlobalColDefs(globalActivityTabColDefs(viewGlobalActivity, currency.symbol));
+        setGlobalColDefs(
+          globalActivityTabColDefs(
+            viewGlobalActivity,
+            currency.symbol,
+            permissions.includes('ACCESS_GLOBAL_ACTIVITY_DETAIL'),
+          ),
+        );
         setGlobalRowData(tempGlobList);
       }
 
@@ -478,6 +494,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
               checked={onSaleCheck}
               onChange={(e) => editBooking('ticketsOnSale', e.target.checked)}
               className="w-[19px] h-[19px] mt-[2px]"
+              disabled={!canEditActChecks}
               testId="checkOnSale"
             />
             <div className="text-base text-primary-input-text font-bold ml-2">On Sale</div>
@@ -489,6 +506,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
               onChange={(value) => editBooking('ticketsOnSaleFromDate', value)}
               value={onSaleFromDt}
               testId="dtInOnSaleDate"
+              disabled={!canEditActChecks}
             />
           </div>
 
@@ -500,6 +518,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
               onChange={(e) => editBooking('marketingPlanReceived', e.target.checked)}
               className="w-[19px] h-[19px] mt-[2px]"
               testId="checkMarketPlanIn"
+              disabled={!canEditActChecks}
             />
             <div className="text-base text-primary-input-text font-bold ml-2">Marketing Plans Received</div>
           </div>
@@ -512,6 +531,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
               onChange={(e) => editBooking('printReqsReceived', e.target.checked)}
               className="w-[19px] h-[19px] mt-[2px]"
               testId="checkPrintReqIn"
+              disabled={!canEditActChecks}
             />
             <div className="text-base text-primary-input-text font-bold ml-2">Print Requirements Received</div>
           </div>
@@ -524,6 +544,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
               onChange={(e) => editBooking('contactInfoReceived', e.target.checked)}
               className="w-[19px] h-[19px] mt-[2px]"
               testId="checkContactInfoIn"
+              disabled={!canEditActChecks}
             />
             <div className="text-base text-primary-input-text font-bold ml-2">Contact Info Received</div>
           </div>
@@ -542,6 +563,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
                   placeholder="Select Approval Status"
                   isClearable={false}
                   testId="selectApprStat"
+                  disabled={!permissions.includes('EDIT_MARKETING_COSTS')}
                 />
               </div>
               <div className="flex flex-col mt-8 ml-8">
@@ -549,6 +571,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
                   onChange={(value) => editBooking('marketingCostsApprovalDate', value)}
                   value={changeDate}
                   testId="dtInApprDate"
+                  disabled={!permissions.includes('EDIT_MARKETING_COSTS')}
                 />
               </div>
               <div className="flex flex-col ml-8 mt-1">
@@ -559,6 +582,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
                   onBlur={(e) => editBooking('marketingCostsNotes', e.target.value)}
                   onChange={(e) => setChangeNotes(e.target.value)}
                   testId="textAreaCostNotes"
+                  disabled={!permissions.includes('EDIT_MARKETING_COSTS')}
                 />
               </div>
             </div>
@@ -574,7 +598,13 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
               testId="btnActivityRep"
             />
 
-            <Button text="Add New Activity" className="w-[160px]" onClick={addActivity} testId="btnAddNewAct" />
+            <Button
+              text="Add New Activity"
+              className="w-[160px]"
+              onClick={addActivity}
+              testId="btnAddNewAct"
+              disabled={!permissions.includes('ADD_NEW_ACTIVITY')}
+            />
           </div>
         </div>
         <div className="w-[1086px] h-[375px]">
