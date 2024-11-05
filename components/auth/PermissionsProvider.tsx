@@ -11,7 +11,14 @@ export const LoadingOverlay = () => (
   </div>
 );
 
-const publicPaths = ['/account/sign-up', '/access-denied', '/auth/sign-in', '/auth/sign-up', '/auth/password-reset'];
+const publicPaths = [
+  '/account/sign-up',
+  '/access-denied',
+  '/auth/sign-in',
+  '/auth/sign-up',
+  '/auth/password-reset',
+  '/auth/user-created',
+];
 
 const PermissionsProvider = ({ children }: { children: React.ReactNode }) => {
   const { isSignedIn, user } = useUser();
@@ -28,7 +35,7 @@ const PermissionsProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   useEffect(() => {
-    if (isSignedIn) {
+    if (!publicPaths.includes(router.pathname) && isSignedIn) {
       const organisationId = user.unsafeMetadata.organisationId as string;
       if (!organisationId) {
         router.push('/auth/sign-in');
