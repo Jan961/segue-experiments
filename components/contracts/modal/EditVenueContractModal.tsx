@@ -47,7 +47,6 @@ export type UserAcc = {
 };
 
 const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClose: () => void }) => {
-  const permissions = useRecoilValue(accessVenueContracts);
   const selectedTableCell = useRecoilValue(addEditContractsState);
   const { productions } = useRecoilValue(productionJumpState);
   const currentProduction = productions.find((production) => production.Id === selectedTableCell.contract.productionId);
@@ -94,6 +93,15 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
   const [confirmationVariant, setConfirmationVariant] = useState<string>('cancel');
   const [dealMemoCreated, setDealMemoCreated] = useState<boolean>(true);
   const [dealMemoButtonText, setDealMemoButtonText] = useState<string>('Deal Memo');
+
+  const permissions = useRecoilValue(accessVenueContracts);
+  const editModal = permissions.includes('EDIT_DEAL_MEMO_AND_CONRTACT_OVERVIEW');
+  const createDealMemo = permissions.includes('CREATE_DEAL_MEMO');
+  const addAttachment = permissions.includes('UPLOAD_CONTRACT_ATTACHMENTS');
+  const editDealMemo = permissions.includes('ACCESS_EDIT_DEAL_MEMO');
+  const exportDealMemo = permissions.includes('EXPORT_DEAL_MEMO');
+  const viewAttachments = permissions.includes('VIEW_ATTACHMENTS');
+  // const exportVenuecontract = false; // EDIT% EXPORT_VENUE_CONTRACT_DETAILS
 
   const [currency, setCurrency] = useRecoilState(currencyState);
   const userAccList = useMemo(() => {
@@ -338,9 +346,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
   };
 
   const handleEditDealMemo = () => {
-    if (permissions.includes('ACCESS_EDIT_DEAL_MEMO')) {
-      setEditDealMemoModal(true);
-    }
+    setEditDealMemoModal(true);
   };
 
   const handleDemoFormClose = () => {
@@ -373,7 +379,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
   };
 
   const handleCellClicked = (event) => {
-    if (event.column.colId === 'ViewBtn') {
+    if (event.column.colId === 'ViewBtn' && viewAttachments) {
       const fileUrl = event.data.FileURL;
       window.open(fileUrl, '_blank');
     } else if (event.column.colId === 'icons') {
@@ -417,6 +423,10 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
     });
   };
 
+  useEffect(() => {
+    console.log(dealMemoButtonText, createDealMemo, editDealMemo, editModal);
+  }, [dealMemoButtonText]);
+
   return (
     <PopupModal
       show={visible}
@@ -431,15 +441,24 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
               <div className="flex justify-between">
                 <div className="text-primary-input-text font-bold text-lg">Deal Memo</div>
                 <div className="flex gap-x-2">
-                  <Button className="w-32" variant="primary" text={dealMemoButtonText} onClick={handleEditDealMemo} />
                   <Button
-                    className={`w-32 ${
-                      dealMemoCreated ? '' : ' text-gray-500 pointer-events-none select-none opacity-25'
-                    }`}
+                    className="w-32"
+                    variant="primary"
+                    text={dealMemoButtonText}
+                    onClick={handleEditDealMemo}
+                    disabled={
+                      (dealMemoButtonText === 'Create Deal Memo' && !createDealMemo) ||
+                      (dealMemoButtonText === 'Edit Deal Memo' && !editDealMemo) ||
+                      !editModal
+                    }
+                  />
+                  <Button
+                    className="w-32"
                     variant="primary"
                     text="Export to PDF"
                     onClick={pdfExportDealMemo}
                     sufixIconName="document-solid"
+                    disabled={!exportDealMemo || !editModal}
                   />
                 </div>
               </div>
@@ -453,6 +472,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                   value={dealMemoFormData.Status}
                   isClearable
                   isSearchable
+                  disabled={!editModal}
                 />
 
                 <div className=" text-primary-input-text font-bold text-sm mt-6">Completed By</div>
@@ -464,6 +484,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                   isClearable
                   isSearchable
                   placeholder="Select User"
+                  disabled={!editModal}
                 />
 
                 <div className=" text-primary-input-text font-bold text-sm mt-6">Approved By</div>
@@ -475,6 +496,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                   isClearable
                   isSearchable
                   placeholder="Select User"
+                  disabled={!editModal}
                 />
                 <div className="flex items-center mt-6 justify-between px-3 select-none">
                   <div>
@@ -486,6 +508,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                         editDealMemoData('DateIssued', value)
                       }
                       value={dealMemoFormData.DateIssued}
+                      disabled={!editModal}
                     />
                   </div>
 
@@ -498,6 +521,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                         editDealMemoData('DateReturned', value)
                       }
                       value={dealMemoFormData.DateReturned}
+                      disabled={!editModal}
                     />
                   </div>
                 </div>
@@ -507,6 +531,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                   onChange={(e) => editDealMemoData('Notes', e.target.value)}
                   className="h-auto w-[400px]"
                   value={dealMemoFormData.Notes}
+                  disabled={!editModal}
                 />
               </div>
             </div>
@@ -517,11 +542,12 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                   className="mr-1 w-33"
                   variant="primary"
                   text="Add Attachments"
+                  disabled={!addAttachment || !editModal}
                 />
               </div>
               <div className="w-[423px]">
                 <Table
-                  columnDefs={attachmentsColDefs}
+                  columnDefs={attachmentsColDefs(viewAttachments)}
                   rowData={contractAttatchmentRows}
                   styleProps={contractsStyleProps}
                   testId="tableVenueAttach"
@@ -534,6 +560,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
           <div className="w-[652px] h-fit rounded border-2 border-secondary ml-2 p-3 bg-primary-blue bg-opacity-15">
             {/* 
             NEEDS TO BE KEPT FOR NOW
+            EXPORT_VENUE_CONTRACT_DETAILS
             <div className="flex justify-between">
               <div className=" text-primary-input-text font-bold text-lg">Venue Contract</div>
               <div className="flex mr-2">
@@ -575,6 +602,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                   options={statusOptions}
                   isClearable
                   isSearchable
+                  disabled={!editModal}
                 />
               </div>
             </div>
@@ -591,6 +619,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                   isClearable
                   isSearchable
                   value={formData.SignedBy ? producerList[formData.SignedBy] : ''}
+                  disabled={!editModal}
                 />
 
                 <div className="flex items-center">
@@ -603,6 +632,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                     }}
                     position="!-left-24"
                     value={formData.SignedDate}
+                    disabled={!editModal}
                   />
                 </div>
               </div>
@@ -619,6 +649,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                       editContractModalData('ReturnDate', value, 'contract');
                   }}
                   value={formData.ReturnDate}
+                  disabled={!editModal}
                 />
                 <div className="flex items-center">
                   <div className=" text-primary-input-text font-bold text-sm mr-2">Returned from Venue</div>
@@ -632,6 +663,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                     value={formData.ReceivedBackDate}
                     className="z-[1000]"
                     position="!-left-24"
+                    disabled={!editModal}
                   />
                 </div>
               </div>
@@ -647,6 +679,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                     editContractModalData('BankDetailsSent', e.target.value, 'contract');
                   }}
                   checked={formData.BankDetailsSent}
+                  disabled={!editModal}
                 />
               </div>
               <div className="flex flex-1 items-center justify-center">
@@ -659,6 +692,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                     editContractModalData('TechSpecSent', e.target.value, 'contract');
                   }}
                   checked={formData.TechSpecSent}
+                  disabled={!editModal}
                 />
               </div>
               <div className="flex flex-1 items-center justify-end">
@@ -671,6 +705,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                     editContractModalData('PRSCertSent', e.target.value, 'contract');
                   }}
                   checked={formData.PRSCertSent}
+                  disabled={!editModal}
                 />
               </div>
             </div>
@@ -688,6 +723,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                   options={dealTypeOptions}
                   isClearable
                   isSearchable
+                  disabled={!editModal}
                 />
               </div>
             </div>
@@ -701,6 +737,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                   value={formData.DealNotes}
                   onChange={(value) => editContractModalData('DealNotes', value.target.value, 'booking')}
                   placeholder="Enter Deal Details"
+                  disabled={!editModal}
                 />
               </div>
             </div>
@@ -723,6 +760,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                     onBlur={(e) => {
                       editContractModalData('GP', formatDecimalOnBlur(e), 'contract');
                     }}
+                    disabled={!editModal}
                   />
                 </div>
                 <div className="flex  items-center">
@@ -741,6 +779,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
 
                       editContractModalData('RoyaltyPercentage', e.target.value, 'contract');
                     }}
+                    disabled={!editModal}
                   />{' '}
                   <div className=" text-primary-input-text font-bold text-sm ml-1">%</div>
                 </div>
@@ -759,6 +798,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                       }
                       editContractModalData('PromoterPercent', e.target.value, 'contract');
                     }}
+                    disabled={!editModal}
                   />{' '}
                   <div className=" text-primary-input-text font-bold text-sm ml-1">%</div>
                 </div>
@@ -779,6 +819,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                   value={formData.TicketPriceNotes}
                   onChange={(value) => editContractModalData('TicketPriceNotes', value.target.value, 'booking')}
                   placeholder="Enter Ticket Pricing Notes"
+                  disabled={!editModal}
                 />
               </div>
             </div>
@@ -792,6 +833,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                   value={formData.MarketingDealNotes}
                   onChange={(value) => editContractModalData('MarketingDealNotes', value.target.value, 'booking')}
                   placeholder="Enter Marketing Deal"
+                  disabled={!editModal}
                 />
               </div>
             </div>
@@ -805,6 +847,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                   value={formData.CrewNotes}
                   onChange={(value) => editContractModalData('CrewNotes', value.target.value, 'booking')}
                   placeholder="Enter Crew Notes"
+                  disabled={!editModal}
                 />
               </div>
             </div>
@@ -859,6 +902,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                   value={formData.Exceptions}
                   onChange={(value) => editContractModalData('Exceptions', value.target.value, 'contract')}
                   placeholder="Enter Exceptions Notes"
+                  disabled={!editModal}
                 />
               </div>
             </div>
@@ -872,6 +916,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                   value={formData.Notes}
                   onChange={(value) => editContractModalData('Notes', value.target.value, 'contract')}
                   placeholder="Enter Contract Notes"
+                  disabled={!editModal}
                 />
               </div>
             </div>
@@ -885,6 +930,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                   value={formData.MerchandiseNotes}
                   onChange={(value) => editContractModalData('MerchandiseNotes', value.target.value, 'booking')}
                   placeholder="Enter Merchandise Notes"
+                  disabled={!editModal}
                 />
               </div>
             </div>

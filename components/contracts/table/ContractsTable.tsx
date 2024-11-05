@@ -54,9 +54,9 @@ export default function ContractsTable({ rowData }: ContractsTableProps) {
   }, [rowData]);
 
   const handleRowDoubleClicked = (e: RowDoubleClickedEvent) => {
-    if (e.data.dayType === 'Performance') {
+    if (e.data.dayType === 'Performance' && permissions.includes('ACCESS_DEAL_MEMO_AND_CONTRACT_OVERVIEW')) {
       setEditContractData({
-        visible: !!permissions.includes('ACCESS_DEAL_MEMO_AND_CONTRACT_OVERVIEW'),
+        visible: true,
         contract: e.data,
       });
     }
