@@ -39,6 +39,7 @@ import { currencyState } from 'state/global/currencyState';
 import { dealMemoExport } from 'pages/api/deal-memo/export';
 import { accountContactState } from 'state/contracts/accountContactState';
 import { productionJumpState } from 'state/booking/productionJumpState';
+import { accessVenueContracts } from 'state/account/selectors/permissionSelector';
 
 export type UserAcc = {
   email: string;
@@ -46,6 +47,7 @@ export type UserAcc = {
 };
 
 const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClose: () => void }) => {
+  const permissions = useRecoilValue(accessVenueContracts);
   const selectedTableCell = useRecoilValue(addEditContractsState);
   const { productions } = useRecoilValue(productionJumpState);
   const currentProduction = productions.find((production) => production.Id === selectedTableCell.contract.productionId);
@@ -336,7 +338,9 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
   };
 
   const handleEditDealMemo = () => {
-    setEditDealMemoModal(true);
+    if (permissions.includes('ACCESS_EDIT_DEAL_MEMO')) {
+      setEditDealMemoModal(true);
+    }
   };
 
   const handleDemoFormClose = () => {
@@ -433,8 +437,9 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                       dealMemoCreated ? '' : ' text-gray-500 pointer-events-none select-none opacity-25'
                     }`}
                     variant="primary"
-                    text="View as PDF"
+                    text="Export to PDF"
                     onClick={pdfExportDealMemo}
+                    sufixIconName="document-solid"
                   />
                 </div>
               </div>
@@ -527,12 +532,14 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
             </div>
           </div>
           <div className="w-[652px] h-fit rounded border-2 border-secondary ml-2 p-3 bg-primary-blue bg-opacity-15">
+            {/* 
+            NEEDS TO BE KEPT FOR NOW
             <div className="flex justify-between">
               <div className=" text-primary-input-text font-bold text-lg">Venue Contract</div>
               <div className="flex mr-2">
-                <Button className="ml-4 w-33" variant="primary" text="View as PDF" />
+                <Button className="ml-4 w-33" variant="primary" text="Export to PDF" />
               </div>
-            </div>
+            </div> */}
             <div className="flex mt-2.5">
               <div className="w-1/5">
                 <div className=" text-primary-input-text font-bold text-sm">Booking Status</div>

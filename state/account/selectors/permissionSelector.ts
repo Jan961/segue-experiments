@@ -46,6 +46,17 @@ const CONTRACTS_HOME_PERMISSIONS = [
   'ACCESS_SM_/_CREW_/_TECH_CONTRACTS',
 ];
 
+const CONTRACTS_VENUE_PERMISSIONS = [
+  'ACCESS_DEAL_MEMO_AND_CONTRACT_OVERVIEW',
+  'ACCESS_EDIT_DEAL_MEMO',
+  'CREATE_DEAL_MEMO',
+  'EDIT_DEAL_MEMO_AND_CONRTACT_OVERVIEW',
+  'EXPORT_DEAL_MEMO',
+  'EXPORT_VENUE_CONTRACT_DETAILS',
+  'UPLOAD_CONTRACT_ATTACHMENTS',
+  'VIEW_ATTACHMENTS',
+];
+
 const BOOKINGS_HOME_PERMISSIONS = [
   'BOOKINGS',
   'ACCESS_BOOKINGS',
@@ -141,6 +152,14 @@ export const accessShows = selector({
   get: ({ get }) => {
     const { permissions = [] } = get(userPermissionsState);
     return permissions.filter((x) => SHOWS_PERMISSIONS.includes(x));
+  },
+});
+
+export const accessVenueContracts = selector({
+  key: 'accessVenueContracts',
+  get: ({ get }) => {
+    const { permissions = [] } = get(userPermissionsState);
+    return permissions.filter((x) => CONTRACTS_VENUE_PERMISSIONS.includes(x));
   },
 });
 
