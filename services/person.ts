@@ -1,7 +1,7 @@
 import getPrismaClient from 'lib/prisma';
 import { IOtherWorkType, IPersonDetails } from 'components/contracts/types';
 import { prepareQuery } from 'utils/apiUtils';
-import { Person, Prisma } from 'prisma/generated/prisma-client';
+import { Person, Prisma, PrismaClient } from 'prisma/generated/prisma-client';
 import { upsertAddress } from './address';
 import { pick } from 'radash';
 import { isNullOrEmpty } from 'utils';
@@ -188,21 +188,25 @@ export const updatePersonRoles = async (
   }
 };
 
-export const handleEmergencyContacts = async (personId: number, emergencyContact1, emergencyContact2, tx) => {
+export const handleEmergencyContacts = async (
+  personId: number,
+  emergencyContact1,
+  emergencyContact2,
+  tx: PrismaClient,
+) => {
   if (!isNullOrEmpty(emergencyContact1)) {
-    await upsertEmergencyContact(personId, emergencyContact1, 'emergencycontact', tx);
+    await upsertEmergencyContact(personId, emergencyContact1, tx, 'emergencycontact');
   }
   if (!isNullOrEmpty(emergencyContact2)) {
-    await upsertEmergencyContact(personId, emergencyContact2, 'emergencycontact', tx);
+    await upsertEmergencyContact(personId, emergencyContact2, tx, 'emergencycontact');
   }
 };
 
 export const upsertEmergencyContact = async (
   personId: number,
   contactDetails,
+  tx: PrismaClient,
   role = 'emergencycontact',
-  tx,
-  existingPPId?: number,
 ) => {
   // Early return if no firstName (required field)
   if (!contactDetails.firstName) return null;
@@ -259,7 +263,7 @@ export const upsertEmergencyContact = async (
   });
 
   // Use the provided PPId or the existing one from the ordered list
-  const ppIdToUse = id || existingPPId || 0;
+  const ppIdToUse = id || 0;
 
   // Link this person to the main person via PersonPerson
   await tx.personPerson.upsert({
@@ -282,14 +286,14 @@ export const upsertEmergencyContact = async (
 };
 
 export const handleAgencyDetails = async (personId: number, agencyDetails: any, tx) => {
-  if (!agencyDetails || !agencyDetails.hasAgent) {
+  if (!agencyDetails?.hasAgent) {
     // Handle removal of agency relationship
     await removeAgencyRelationships(personId, tx);
     return;
   }
 
   // Early return if required fields are missing
-  if (!agencyDetails.firstName || !agencyDetails.name) return;
+  if (!agencyDetails?.firstName || !agencyDetails?.name) return;
 
   const { agencyPersonId = 0, website, name } = agencyDetails;
 

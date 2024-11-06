@@ -56,7 +56,12 @@ const mergeContractData = (contractDetailsD, contractDetailsV) => {
   };
 };
 
-export const PersonDetailsTab = ({ person = {}, height, updateFormData, className='' }: ContractPersonDataFormProps) => {
+export const PersonDetailsTab = ({
+  person = {},
+  height,
+  updateFormData,
+  className = '',
+}: ContractPersonDataFormProps) => {
   const [personData, setPersonData] = useState<IPerson>(mergeContractData(defaultContractDetails, person));
   const {
     personDetails,
@@ -66,7 +71,7 @@ export const PersonDetailsTab = ({ person = {}, height, updateFormData, classNam
     salaryAccountDetails,
     expenseAccountDetails,
   } = personData;
-  const [hideAgencyDetails, setHideAgencyDetails] = useState(!agencyDetails?.id && true);
+  const [hideAgencyDetails, setHideAgencyDetails] = useState(!agencyDetails?.id);
   const countryList = useRecoilValue(countryState) || [];
   const { users = [] } = useRecoilValue(userState);
   const userOptionList = useMemo(
