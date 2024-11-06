@@ -5,13 +5,19 @@ import { useState } from 'react';
 import axios from 'axios';
 import { createPersonSchema } from 'validators/person';
 import { debug } from 'utils/logging';
+import { ContractPermissionGroup } from 'interfaces';
 
 interface ContractNewPersonModalProps {
   openNewPersonContract: boolean;
   onClose: (flag?: boolean) => void;
+  permissions: ContractPermissionGroup;
 }
 
-export const ContractNewPersonModal = ({ openNewPersonContract, onClose }: ContractNewPersonModalProps) => {
+export const ContractNewPersonModal = ({
+  openNewPersonContract,
+  onClose,
+  permissions,
+}: ContractNewPersonModalProps) => {
   const [formData, setFormData] = useState({});
   // const [validationErrors, setValidationErrors] = useState({});
   const validateForm = async (data) => {
@@ -50,7 +56,13 @@ export const ContractNewPersonModal = ({ openNewPersonContract, onClose }: Contr
       onClose={() => onClose?.()}
     >
       <div className="overflow-y-scroll">
-        <PersonDetailsTab updateFormData={setFormData} height="h-[80vh]" />
+        <PersonDetailsTab
+          type="New"
+          updateFormData={setFormData}
+          height="h-[80vh]"
+          permissions={permissions}
+          departmentId={0}
+        />
       </div>
       <div className="w-full mt-4 flex justify-end items-center">
         <Button onClick={() => onClose?.()} className="w-33" variant="secondary" text="Cancel" />
