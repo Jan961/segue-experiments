@@ -68,19 +68,15 @@ pipelines:
           caches:
             - node
           script:
-            - npm ci
+            - npm install
             - npm run test:ci
             - npm run build
+      - step:
+          name: SonarQube Analysis
+          image: node:18.20.4
+          script:
             - pipe: sonarsource/sonarcloud-scan:2.0.0
             - pipe: sonarsource/sonarcloud-quality-gate:0.1.6
-  branches:
-      main:
-        - step:
-            name: SonarQube Analysis
-            image: node:18.20.4
-            script:
-              - pipe: sonarsource/sonarcloud-scan:2.0.0
-              - pipe: sonarsource/sonarcloud-quality-gate:0.1.6
 definitions:
   caches:
     npm: ~/.npm
