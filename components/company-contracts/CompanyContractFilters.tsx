@@ -53,22 +53,17 @@ const CompanyContractFilters = (props: Props) => {
 
   const canCreateContract = useMemo(() => {
     return hasAnyPermissions(props.permissions.accessNewContract);
-  }, []);
+  }, [props.permissions.accessNewContract]);
 
   // Change dropdown-options based on permissions
   const getDropdownOptions = useMemo(() => {
-    let options = [];
-    if (props.permissions.accessContracts.artisteContracts) {
-      options.push(contractDepartmentOptions.find((x) => x.text === 'Artiste'));
-    }
-    if (props.permissions.accessContracts.creativeContracts) {
-      options.push(contractDepartmentOptions.find((x) => x.text === 'Creative'));
-    }
-    if (props.permissions.accessContracts.smTechCrewContracts) {
-      options.push(contractDepartmentOptions.find((x) => x.text === 'SM / Tech / Crew'));
-    }
+    const options = Object.entries(props.permissions.accessContracts)
+      .filter(([key]) => props.permissions.accessContracts[key])
+      .map(([, text]) => contractDepartmentOptions.find((x) => x.text === text))
+      .filter(Boolean);
+
     if (options.length > 1) {
-      options = [contractDepartmentOptions.find((X) => X.text === 'All'), ...options]; // Set ALL to top of dropdown if valid
+      options.unshift(contractDepartmentOptions.find((x) => x.text === 'All')); // Set ALL to top of dropdown if valid
     }
     return options;
   }, [props.permissions]);
@@ -161,7 +156,7 @@ const CompanyContractFilters = (props: Props) => {
         <ContractScheduleModal
           openContract={openContract}
           onClose={() => setOpenContract(false)}
-          newPersonDisabled={props.permissions.accessNewPerson}
+          accessNewPerson={props.permissions.accessNewPerson}
           accessPermissions={props.permissions.accessNewContract}
         />
       )}

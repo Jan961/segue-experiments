@@ -25,12 +25,12 @@ export const defaultContractSchedule = {
 export const ContractScheduleModal = ({
   openContract,
   onClose,
-  newPersonDisabled,
+  accessNewPerson,
   accessPermissions,
 }: {
   openContract: boolean;
   onClose: () => void;
-  newPersonDisabled: ContractPermissionGroup;
+  accessNewPerson: ContractPermissionGroup;
   accessPermissions: ContractPermissionGroup;
 }) => {
   const { productions } = useRecoilValue(productionJumpState);
@@ -115,11 +115,7 @@ export const ContractScheduleModal = ({
     if (!production) {
       return true;
     }
-    if (
-      newPersonDisabled.artisteContracts ||
-      newPersonDisabled.creativeContracts ||
-      newPersonDisabled.smTechCrewContracts
-    ) {
+    if (accessNewPerson.artisteContracts || accessNewPerson.creativeContracts || accessNewPerson.smTechCrewContracts) {
       return false;
     }
     return true;
@@ -215,7 +211,7 @@ export const ContractScheduleModal = ({
       </div>
       {openNewPersonContract && (
         <ContractNewPersonModal
-          permissions={newPersonDisabled}
+          permissions={accessNewPerson}
           openNewPersonContract={openNewPersonContract}
           onClose={onCloseCreateNewPerson}
         />
@@ -228,7 +224,7 @@ export const ContractScheduleModal = ({
             setOpenNewBuildContract(false);
             onClose?.();
           }}
-          editPerson={newPersonDisabled}
+          editPerson={accessNewPerson}
         />
       )}
     </PopupModal>
