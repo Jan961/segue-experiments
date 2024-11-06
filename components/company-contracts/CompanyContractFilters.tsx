@@ -13,6 +13,7 @@ import { Label } from 'components/core-ui-lib';
 import { personState } from 'state/contracts/PersonState';
 import { getAllOptions, noop, transformToOptions } from 'utils';
 import { ContractPermissionGroup } from 'interfaces';
+import { getContractDropdownOptions } from 'utils/contracts';
 
 interface Props {
   permissions: {
@@ -57,13 +58,9 @@ const CompanyContractFilters = (props: Props) => {
 
   // Change dropdown-options based on permissions
   const getDropdownOptions = useMemo(() => {
-    const options = Object.entries(props.permissions.accessContracts)
-      .filter(([key]) => props.permissions.accessContracts[key])
-      .map(([, text]) => contractDepartmentOptions.find((x) => x.text === text))
-      .filter(Boolean);
-
+    const options = getContractDropdownOptions(props.permissions.accessContracts);
     if (options.length > 1) {
-      options.unshift(contractDepartmentOptions.find((x) => x.text === 'All')); // Set ALL to top of dropdown if valid
+      options.unshift(contractDepartmentOptions.find((x) => x.text === 'All')); // Add "All" to the top if multiple options are available
     }
     return options;
   }, [props.permissions]);
