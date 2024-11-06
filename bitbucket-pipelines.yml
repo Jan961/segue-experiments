@@ -34,14 +34,13 @@ pipelines:
             - npm ci
             # Run Cypress tests in headless mode
             - npm run cy:alltests --browser chrome || true                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
-            - ls -al
             # - npm run cy:permissions --browser chrome
             - apt-get update && apt-get install -y zip jq tree
-            - npx mochawesome-merge cypress/report/*.json -o output.json
-            - npx marge output.json
-            - ls -al
             - zip -r reports.zip cypress/reports/
             - tree -I "node_modules"
+            - npx mochawesome-merge cypress/reports/*.json -o output.json
+            - npx marge output.json
+            - ls -al
           after-script:
             - ALERT_TYPE="success"
             - if [[ $BITBUCKET_EXIT_CODE -ne 0 ]]; then 
