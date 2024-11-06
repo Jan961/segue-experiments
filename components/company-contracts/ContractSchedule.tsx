@@ -121,6 +121,15 @@ export const ContractScheduleModal = ({
     return true;
   };
 
+  const getDepartmentOptions = useMemo(() => {
+    return departmentOptions.filter(
+      (x) =>
+        (x.value === 1 && accessPermissions.artisteContracts) ||
+        (x.value === 2 && accessPermissions.creativeContracts) ||
+        (x.value === 3 && accessPermissions.smTechCrewContracts),
+    );
+  }, [accessPermissions]);
+
   return (
     <PopupModal
       show={openContract}
