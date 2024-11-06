@@ -45,7 +45,7 @@ import {
 import { dealMemoInitialState } from 'state/contracts/contractsFilterState';
 import { dateToTimeString, getDateWithOffset } from 'services/dateService';
 import StandardSeatKillsTable, { SeatKillRow } from '../table/StandardSeatKillsTable';
-import LoadingOverlay from 'components/shows/LoadingOverlay';
+import LoadingOverlay from 'components/core-ui-lib/LoadingOverlay';
 import { CustomOption } from 'components/core-ui-lib/Table/renderers/SelectCellRenderer';
 import { trasformVenueAddress } from 'utils/venue';
 import { accountContactState } from 'state/contracts/accountContactState';

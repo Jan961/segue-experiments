@@ -1,6 +1,6 @@
 import { Button, PopupModal, Checkbox } from 'components/core-ui-lib';
 import { useState } from 'react';
-import LoadingOverlay from 'components/shows/LoadingOverlay';
+import LoadingOverlay from 'components/core-ui-lib/LoadingOverlay';
 import TextBoxConfirmation from './TextBoxConfirmation/TextBoxConfirmation';
 
 interface SpreadsheetDeleteModalProps {

@@ -11,13 +11,7 @@ import { isNullOrEmpty } from 'utils';
 import { SESSION_ALREADY_EXISTS } from 'utils/authUtils';
 import Head from 'next/head';
 import useAuth from 'hooks/useAuth';
-import Spinner from 'components/core-ui-lib/Spinner';
-
-export const LoadingOverlay = () => (
-  <div className="inset-0 absolute bg-white bg-opacity-50 z-50 flex justify-center items-center top-20 left-20 right-20 bottom-20">
-    <Spinner size="lg" />
-  </div>
-);
+import LoadingOverlay from '../../components/core-ui-lib/LoadingOverlay';
 
 const PasswordReset = () => {
   const { signOut } = useAuth();
@@ -217,7 +211,7 @@ const PasswordReset = () => {
           </div>
         )}
       </div>
-      {isBusy && <LoadingOverlay />}
+      {isBusy && <LoadingOverlay className="top-20 left-20 right-20 bottom-20" />}
     </div>
   );
 };

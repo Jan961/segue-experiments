@@ -25,7 +25,7 @@ import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import { formattedDateWithDay, toISO } from 'services/dateService';
 import { EditDealMemoContractModal } from './EditDealMemoContractModal';
 import { isNullOrEmpty, transformToOptions, checkDecimalStringFormat } from 'utils';
-import LoadingOverlay from 'components/shows/LoadingOverlay';
+import LoadingOverlay from 'components/core-ui-lib/LoadingOverlay';
 import { attachmentsColDefs, contractsStyleProps } from '../tableConfig';
 import Table from 'components/core-ui-lib/Table';
 import { UploadModal } from 'components/core-ui-lib';

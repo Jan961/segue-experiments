@@ -8,7 +8,7 @@ import useAxiosCancelToken from 'hooks/useCancelToken';
 import { PersonDetailsTab } from './tabs/PersonDetailsTab';
 import { PreviewTab } from './tabs/PreviewTab';
 import ContractDetailsTab from './tabs/ContractDetailsTab';
-import LoadingOverlay from 'components/shows/LoadingOverlay';
+import LoadingOverlay from 'components/core-ui-lib/LoadingOverlay';
 import { IContractSchedule, IScheduleDay } from '../../contracts/types';
 import { useRecoilValue } from 'recoil';
 import { productionJumpState } from 'state/booking/productionJumpState';
