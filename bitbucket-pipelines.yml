@@ -36,13 +36,11 @@ pipelines:
             - npm run cy:alltests --browser chrome || true                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
             - ls -al
             # - npm run cy:permissions --browser chrome
-          after-script:
-            - cd cypress-tests/cypress
             - apt-get update && apt-get install -y zip jq tree
+            - ls -al cypress/
             - zip -r reports.zip cypress/reports/
             - tree -I "node_modules"
-            - ls -al
-            - zip -r reports.zip cypress/reports/
+          after-script:
             - ALERT_TYPE="success"
             - if [[ $BITBUCKET_EXIT_CODE -ne 0 ]]; then 
                 ALERT_TYPE="error";
