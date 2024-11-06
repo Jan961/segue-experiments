@@ -5,6 +5,7 @@ import { useState } from 'react';
 import axios from 'axios';
 import { createPersonSchema } from 'validators/person';
 import { debug } from 'utils/logging';
+import { IPerson } from 'components/contracts/types';
 
 interface ContractNewPersonModalProps {
   openNewPersonContract: boolean;
@@ -12,49 +13,54 @@ interface ContractNewPersonModalProps {
 }
 
 export const ContractNewPersonModal = ({ openNewPersonContract, onClose }: ContractNewPersonModalProps) => {
-  const [formData, setFormData] = useState({});
-  // const [validationErrors, setValidationErrors] = useState({});
+  const [formData, setFormData] = useState<Partial<IPerson>>({});
   const validateForm = async (data) => {
     try {
-      console.log(data);
       await createPersonSchema.validate({ ...data }, { abortEarly: false });
-      return true;
+      return { status: true };
     } catch (validationErrors) {
       const errors = {};
       validationErrors.inner.forEach((error) => {
         errors[error.path] = error.message;
       });
-      // setValidationErrors(errors);
       debug('validationErrors:', errors);
-      return false;
+      return { status: false, errors: errors };
     }
   };
 
   const onSave = async () => {
     const validation = await validateForm(formData);
-    if (!validation) {
-      notify.error('Person FirstName, LastName are required');
+    if (!validation.status) {
+      Object.values(validation?.errors||{}).forEach((error) => notify.error(error));
       return;
     }
+    const personFirstName = formData?.personDetails?.firstName;
     try {
-      await axios.post('/api/company-contracts/create/person', formData);
-      onClose(true);
+      notify.promise(
+        axios.post('/api/company-contracts/create/person', formData).then(() => onClose(true)),
+        {
+          loading: `Creating ${personFirstName||'person'}`,
+          success: `${personFirstName||'Person'} Created successfully`,
+          error: `Error creating ${personFirstName||'person'}`,
+        },
+      );
     } catch (error) {
-      console.log(error);
+      debug(error);
     }
   };
   return (
     <PopupModal
       show={openNewPersonContract}
       title="Add New Person"
-      titleClass="text-xl text-primary-navy font-bold -mt-2"
+      titleClass="text-xl text-primary-navy font-bold"
+      panelClass="h-[90vh]"
       onClose={() => onClose?.()}
     >
-      <div className="flex flex-col gap-2">
-        <div className="overflow-y-scroll grow-1 px-5">
-          <PersonDetailsTab updateFormData={setFormData} height="h-[80vh]" />
+      <div className="flex flex-col h-full">
+        <div className="flex-1 min-h-0">
+          <PersonDetailsTab updateFormData={setFormData} className="h-full overflow-y-auto pb-4" height="100%" />
         </div>
-        <div className="w-full mt-4 flex justify-end items-center">
+        <div className="mt-4 flex justify-end items-center pt-4 bg-white">
           <Button onClick={() => onClose?.()} className="w-33" variant="secondary" text="Cancel" />
           <Button onClick={onSave} className="ml-4 w-33 px-6" variant="primary" text="Save and Return to Contracts" />
         </div>

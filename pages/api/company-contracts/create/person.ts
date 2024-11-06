@@ -13,7 +13,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     const prisma = await getPrismaClient(req);
-
     const validatedData = await createPersonSchema.validate(req.body, { abortEarly: false });
 
     const {
@@ -28,6 +27,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const result = await prisma.$transaction(async (tx) => {
       let agencyPersonId = null;
       let organisationId = null;
+
       if (!isEmpty(agencyDetails)) {
         const agencyPersonAddressData = prepareAddressQueryData(pick(agencyDetails, addressFields), true);
         const agencyPersonData = preparePersonQueryData(
@@ -38,35 +38,43 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           undefined,
           true,
         );
-        const formattedAgencyPersonData = agencyPersonData.map((p) => ({
-          ...p,
-          Address: { create: agencyPersonAddressData },
-        }));
-        if (agencyPersonData) {
+
+        if (agencyPersonData?.PersonFirstName) {
+          const personCreateData = {
+            PersonFirstName: agencyPersonData?.PersonFirstName,
+            ...agencyPersonData,
+            ...(agencyPersonAddressData && {
+              Address: {
+                create: agencyPersonAddressData
+              }
+            })
+          };
+
           const agencyPerson = await tx.person.create({
-            data: {
-              ...formattedAgencyPersonData,
-            },
+            data: personCreateData
           });
           agencyPersonId = agencyPerson.PersonId;
         }
+
         const organisationData = prepareOrganisationQueryData(
           pick(agencyDetails, organisationFields),
           agencyPersonId,
           true,
         );
-        const formattedOrganisationData = organisationData.map((o) => ({
-          ...o,
-        }));
-        if (organisationData) {
+
+        if (organisationData?.OrgName) {
           const organisation = await tx.organisation.create({
-            data: formattedOrganisationData,
+            data: {
+              OrgName: organisationData?.OrgName,
+              ...organisationData
+            }
           });
           organisationId = organisation.OrgId;
         }
       }
 
       const emergencyContactList = [];
+      
       if (!isEmpty(emergencyContact1)) {
         const emergencyContactAddressData = prepareAddressQueryData(pick(emergencyContact1, addressFields), true);
         const emergencyContactData = preparePersonQueryData(
@@ -76,35 +84,53 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           undefined,
           undefined,
           true,
-        );
-        const formattedEmergencyContactData = emergencyContactData.map((p) => ({
-          ...p,
-          Address: { create: emergencyContactAddressData },
-        }));
-        const emergencyContact1Person = await tx.person.create({
-          data: formattedEmergencyContactData,
-        });
-        emergencyContactList.push(emergencyContact1Person.PersonId);
+        ) ;
+
+        if (emergencyContactData?.PersonFirstName) {
+          const personCreateData = {
+            PersonFirstName: emergencyContactData.PersonFirstName,
+            ...emergencyContactData,
+            ...(emergencyContactAddressData && {
+              Address: {
+                create: emergencyContactAddressData
+              }
+            })
+          };
+
+          const emergencyContact1Person = await tx.person.create({
+            data: personCreateData
+          });
+          emergencyContactList.push(emergencyContact1Person.PersonId);
+        }
       }
 
       if (!isEmpty(emergencyContact2)) {
-        const emergencyContactAddressData = prepareAddressQueryData(pick(emergencyContact1, addressFields), true);
+        const emergencyContactAddressData = prepareAddressQueryData(pick(emergencyContact2, addressFields), true);
         const emergencyContactData = preparePersonQueryData(
-          omit(emergencyContact1, addressFields),
+          omit(emergencyContact2, addressFields),
           null,
           null,
           undefined,
           undefined,
           true,
-        );
-        const formattedEmergencyContactData = emergencyContactData.map((p) => ({
-          ...p,
-          Address: { create: emergencyContactAddressData },
-        }));
-        const emergencyContact2Person = await tx.person.create({
-          data: formattedEmergencyContactData,
-        });
-        emergencyContactList.push(emergencyContact2Person.PersonId);
+        ) ;
+
+        if (emergencyContactData?.PersonFirstName) {
+          const personCreateData = {
+            PersonFirstName: emergencyContactData.PersonFirstName,
+            ...emergencyContactData,
+            ...(emergencyContactAddressData && {
+              Address: {
+                create: emergencyContactAddressData
+              }
+            })
+          };
+
+          const emergencyContact2Person = await tx.person.create({
+            data: personCreateData
+          });
+          emergencyContactList.push(emergencyContact2Person.PersonId);
+        }
       }
 
       const personAddressData = prepareAddressQueryData(pick(personDetails, addressFields), true);
@@ -115,14 +141,24 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         salaryAccountDetails,
         expenseAccountDetails,
         true,
-      );
+      ) ;
 
-      const formattedPersonData = personData.map((p) => ({
-        ...p,
-        Address: { create: personAddressData },
-      }));
+      if (!personData?.PersonFirstName) {
+        throw new Error('PersonFirstName is required for main person');
+      }
+
+      const mainPersonCreateData = {
+        PersonFirstName: personData.PersonFirstName,
+        ...personData,
+        ...(personAddressData && {
+          Address: {
+            create: personAddressData
+          }
+        })
+      };
+
       const mainPerson = await tx.person.create({
-        data: formattedPersonData,
+        data: mainPersonCreateData
       });
 
       if (emergencyContactList.length) {
@@ -134,6 +170,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           })),
         });
       }
+
       return mainPerson;
     });
 

@@ -23,6 +23,7 @@ const defaultContractDetails = {
 interface ContractPersonDataFormProps {
   person?: Partial<IPerson>;
   height: string;
+  className?: string;
   updateFormData: (data: Partial<IPerson>) => void;
 }
 
@@ -55,7 +56,7 @@ const mergeContractData = (contractDetailsD, contractDetailsV) => {
   };
 };
 
-export const PersonDetailsTab = ({ person = {}, height, updateFormData }: ContractPersonDataFormProps) => {
+export const PersonDetailsTab = ({ person = {}, height, updateFormData, className='' }: ContractPersonDataFormProps) => {
   const [personData, setPersonData] = useState<IPerson>(mergeContractData(defaultContractDetails, person));
   const {
     personDetails,
@@ -94,7 +95,7 @@ export const PersonDetailsTab = ({ person = {}, height, updateFormData }: Contra
 
   return (
     <>
-      <div className={`${height} w-full py-5`}>
+      <div className={`${height} w-full py-5 ${className}`}>
         <div className="text-xl text-primary-navy font-bold mb-3">Person Details</div>
         <PersonalDetails
           details={personDetails}

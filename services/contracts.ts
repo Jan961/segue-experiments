@@ -130,25 +130,28 @@ export const prepareContractUpdateData = (data: any) => {
 };
 
 export const prepareAccountUpdateData = (accountDetails: Partial<BankAccount>, isSalary: boolean) => {
-  const fieldMappings = [
-    { key: 'paidTo', updateKey: isSalary ? 'PersonPaymentTo' : 'PersonExpensesTo' },
-    { key: 'accountName', updateKey: isSalary ? 'PersonPaymentAccountName' : 'PersonExpensesAccountName' },
-    { key: 'accountNumber', updateKey: isSalary ? 'PersonPaymentAccount' : 'PersonExpensesAccount' },
-    { key: 'sortCode', updateKey: isSalary ? 'PersonPaymentSortCode' : 'PersonExpensesSortCode' },
-    { key: 'swift', updateKey: isSalary ? 'PersonPaymentSWIFTBIC' : 'PersonExpensesSWIFTBIC' },
-    { key: 'iban', updateKey: isSalary ? 'PersonPaymentIBAN' : 'PersonExpensesIBAN' },
-    // foreign key connections
-    {
-      key: 'country',
-      updateKey: isSalary
-        ? 'Country_Person_PersonPaymentBankCountryIdToCountry'
-        : 'Country_Person_PersonExpensesBankCountryIdToCountry',
-      foreignKeyId: 'Id',
-      isForeignKey: true,
-    },
-  ];
+  if (!accountDetails) return null;
 
-  return prepareQuery(accountDetails, fieldMappings);
+  const prefix = isSalary ? 'PersonPayment' : 'PersonExpenses';
+  const data: Record<string, any> = {
+    [`${prefix}To`]: accountDetails.paidTo || '',
+    [`${prefix}AccountName`]: accountDetails.accountName || '',
+    [`${prefix}Account`]: accountDetails.accountNumber || '',
+    [`${prefix}SortCode`]: accountDetails.sortCode || '',
+    [`${prefix}SWIFTBIC`]: accountDetails.swift || '',
+    [`${prefix}IBAN`]: accountDetails.iban || '',
+  };
+
+  // Only add the country relation if there's a country value
+  const countryField = isSalary 
+    ? 'Country_Person_PersonPaymentBankCountryIdToCountry'
+    : 'Country_Person_PersonExpensesBankCountryIdToCountry';
+
+  if (accountDetails.country) {
+    data[countryField] = accountDetails.country;
+  }
+
+  return data;
 };
 
 export const prepareAgencyOrganisationUpdateData = (agencyDetails: any) => {

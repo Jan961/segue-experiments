@@ -31,20 +31,6 @@ export const personShape = {
   notes: yup.string().nullable(),
 };
 
-export const createPersonSchema = yup.object().shape({
-  personDetails: yup
-    .object()
-    .shape({
-      ...personShape,
-      firstName: yup.string().required(),
-      lastName: yup.string().required(),
-    })
-    .required(),
-  agencyDetails: yup.object().nullable(),
-  emergencyContact1: yup.object().nullable(),
-  emergencyContact2: yup.object().nullable(),
-});
-
 const personFields = {
   id: yup.number().integer().nullable(),
   firstName: yup.string().nullable(),
@@ -229,6 +215,33 @@ export const updatePersonSchema = yup.object().shape({
 
   expenseAccountDetails: yup.object().shape(accountDetailsShape).nullable(),
 
+  emergencyContact1: createEmergencyContactShape(1),
+  emergencyContact2: createEmergencyContactShape(2),
+});
+
+
+export const createPersonSchema = yup.object().shape({
+  personDetails: yup
+    .object()
+    .shape({
+      ...personShape,
+      firstName: yup.string().required(),
+      lastName: yup.string().required(),
+      otherWorkTypes: yup
+      .array()
+      .of(
+        yup.object({
+          name: yup.string().required('Name is required for other work types')
+        })
+      )
+      .optional()
+      .transform((value, originalValue) => {
+        if (!value) return value;
+        return value.map(item => item.name).filter(x => x);
+      })
+    })
+    .required(),
+  agencyDetails: yup.object().nullable(),
   emergencyContact1: createEmergencyContactShape(1),
   emergencyContact2: createEmergencyContactShape(2),
 });

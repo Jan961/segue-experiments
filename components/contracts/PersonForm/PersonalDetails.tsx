@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react';
 import { DateInput, Icon, Select, TextInput } from 'components/core-ui-lib';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
+import { CustomOption } from 'components/core-ui-lib/Table/renderers/SelectCellRenderer';
 import { workTypeOptions } from 'config/contracts';
 import { insertAtPos, removeAtPos, replaceAtPos } from 'utils';
 import { IOtherWorkType, IPersonDetails } from '../types';
@@ -69,7 +70,7 @@ const PersonalDetails = ({
     advisoryNotes,
     generalNotes,
     healthDetails,
-    otherWorkTypes,
+    otherWorkTypes=[{ name: '' }],
     notes,
   } = formData;
   const handleChange = useCallback(
@@ -348,6 +349,7 @@ const PersonalDetails = ({
               className="bg-primary-white w-full max-w-96"
               placeholder="Please select.."
               options={workTypeOptions}
+              renderOption={(option) => <CustomOption option={option} isMulti={true} />}
               isMulti
               isClearable
               isSearchable
