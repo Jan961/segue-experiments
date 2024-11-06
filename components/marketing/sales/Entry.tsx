@@ -275,12 +275,17 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
     }
   };
 
+  // helper function for setSalesFigures to reduce duplicate code
+  const createSalesFigure = (fig: SalesFigure | undefined) => ({
+    seatsReserved: validateSale(fig?.seatsReserved),
+    seatsReservedVal: validateSale(fig?.seatsReservedVal),
+    seatsSold: validateSale(fig?.seatsSold),
+    seatsSoldVal: validateSale(fig?.seatsSoldVal),
+  });
+
   const setSalesFigures = async (inputDate: Date, previous: boolean, bookingId: number) => {
     try {
       setLoading(true);
-
-      let salesSetId = -1;
-      let compHoldSetId = -1;
 
       const emptySalesSet = {
         setId: 0,
@@ -298,113 +303,80 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
         },
       };
 
+      // Set default sales figure set based on 'previous' flag
       if (previous) {
         setPrevSalesFigureSet(emptySalesSet);
       } else {
         setCurrSalesFigureSet(emptySalesSet);
-
-        // resetting api action every time a new week is selected
         setSalesApiAction('create');
       }
 
-      // handle when the useImperitive calls this function on selection of a sales week/day before the booking is selected
-      // this will happen on first launch of the module
-      if (isNullOrUndefined(bookingId)) {
-        return;
-      }
+      if (isNullOrUndefined(bookingId)) return;
 
       const frequency = await getSalesFrequency();
-
       const duration = frequency === 'W' ? 7 : 1;
       let salesDate = frequency === 'W' ? getMonday(inputDate) : inputDate;
 
-      if (previous) {
-        salesDate = addDurationToDate(salesDate, duration, false);
-      }
+      if (previous) salesDate = addDurationToDate(salesDate, duration, false);
 
-      const salesReadInput = {
+      const salesResponse = await axios.post('/api/marketing/sales/current/read', {
         bookingId,
         salesDate,
         frequency,
-      };
+      });
 
-      // get the salesFigures for the selected date/week if they exist
-      const salesResponse = await axios.post('/api/marketing/sales/current/read', salesReadInput);
       const sales = salesResponse.data;
+
+      let salesSetId = -1;
+      let compHoldSetId = -1;
 
       if (typeof sales === 'object' && !isNullOrEmpty(sales)) {
         const salesFigures = sales as SalesFigureSet;
+        if (!previous) setSalesApiAction('update');
 
-        // if the code gets into this block - there will be sales figures and therefore when running the api, it should update opposed to create
-        // previous check as we only want to do this for the selected week
-        if (!previous) {
-          setSalesApiAction('update');
-        }
-
-        // set the sales figures, if available
-        const general: SalesFigure = {
-          seatsReserved: validateSale(salesFigures.general?.seatsReserved),
-          seatsReservedVal: validateSale(salesFigures.general?.seatsReservedVal),
-          seatsSold: validateSale(salesFigures.general?.seatsSold),
-          seatsSoldVal: validateSale(salesFigures.general?.seatsSoldVal),
-        };
-
-        const schools: SalesFigure = {
-          seatsReserved: validateSale(salesFigures.schools?.seatsReserved),
-          seatsReservedVal: validateSale(salesFigures.schools?.seatsReservedVal),
-          seatsSold: validateSale(salesFigures.schools?.seatsSold),
-          seatsSoldVal: validateSale(salesFigures.schools?.seatsSoldVal),
+        const updatedSalesSet = {
+          general: createSalesFigure(salesFigures.general),
+          schools: createSalesFigure(salesFigures.schools),
+          setId: salesFigures.setId,
         };
 
         if (previous) {
-          setPrevSalesFigureSet({ general, schools, setId: salesFigures.setId });
+          setPrevSalesFigureSet(updatedSalesSet);
         } else {
-          // only ever set the setId for the current week
           salesSetId = salesFigures.setId;
-          setCurrSalesFigureSet({ general, schools, setId: salesFigures.setId });
+          setCurrSalesFigureSet(updatedSalesSet);
         }
       }
 
       if (!previous) {
-        // holds and comps - only run if not retrieving previous values - previous is only valid for the main sales
-        const response = await axios.post('/api/marketing/sales/read/hold-comp', {
+        const holdCompResponse = await axios.post('/api/marketing/sales/read/hold-comp', {
           bookingId: bookings.selected,
           salesDate,
           productionId,
         });
 
-        const holdCompList = response.data;
-
+        const holdCompList = holdCompResponse.data;
         if (typeof holdCompList === 'object') {
           const holdCompData = holdCompList as HoldCompSet;
-
           setHoldData(holdCompData.holds);
           setCompData(holdCompData.comps);
           compHoldSetId = holdCompData.setId;
         }
 
-        const booking = bookings.bookings.find((booking) => booking.Id === bookingId);
-
-        setBookingSaleNotes(booking.BookingSalesNotes === null ? '' : booking.BookingSalesNotes);
-        setCompNotes(booking.BookingCompNotes === null ? '' : booking.BookingCompNotes);
-        setHoldNotes(booking.BookingHoldNotes === null ? '' : booking.BookingHoldNotes);
-        setBookingHasSchoolSales(booking.BookingHasSchoolsSales);
-
-        // by default - we will set the sales setId to the set connected to the sales values
-        // if, for some reason, the hold/comps are set first, the setId from holds/comps will be used
-        // if both are -1, it will remain -1 and the API will know to create a setId
-        if (salesSetId > -1) {
-          setSetId(salesSetId);
-        } else if (compHoldSetId > -1) {
-          setSetId(compHoldSetId);
-        } else {
-          setSetId(-1);
+        const booking = bookings.bookings.find((b) => b.Id === bookingId);
+        if (booking) {
+          setBookingSaleNotes(booking.BookingSalesNotes || '');
+          setCompNotes(booking.BookingCompNotes || '');
+          setHoldNotes(booking.BookingHoldNotes || '');
+          setBookingHasSchoolSales(booking.BookingHasSchoolsSales);
         }
+
+        setSetId(salesSetId > -1 ? salesSetId : compHoldSetId > -1 ? compHoldSetId : -1);
       }
 
       setLoading(false);
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
 
