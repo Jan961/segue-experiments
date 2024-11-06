@@ -6,7 +6,7 @@ import { getUserPermisisons } from 'services/userService';
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
     const { email, companyName, pin } = req.body;
-    const { AccountOrganisationId } = await prisma.AccountUser.findFirst({
+    const accountUser = await prisma.AccountUser.findFirst({
       where: {
         AccUserIsActive: true,
         User: {
@@ -22,6 +22,12 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         Account: true,
       },
     });
+
+    if (!accountUser) {
+      return res.status(200).json({ isValid: false, permissions: [] });
+    }
+
+    const { AccountOrganisationId } = accountUser.Account;
 
     const permissions = await getUserPermisisons(email, AccountOrganisationId);
 
