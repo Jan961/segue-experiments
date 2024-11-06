@@ -104,17 +104,12 @@ export const PersonDetailsTab = ({
   );
 
   const isPersonDetailsDisabled = (departmentId: number): boolean => {
-    if (
-      type === 'Edit' &&
+    return type === 'Edit' &&
       ((departmentId === 1 && permissions.artisteContracts) ||
         (departmentId === 2 && permissions.creativeContracts) ||
         (departmentId === 3 && permissions.smTechCrewContracts))
-    ) {
-      return false;
-    } else if (type === 'New') {
-      return false;
-    }
-    return true;
+      ? false
+      : type !== 'New';
   };
 
   return (
