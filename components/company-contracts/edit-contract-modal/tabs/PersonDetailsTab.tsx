@@ -109,7 +109,7 @@ export const PersonDetailsTab = ({
         (departmentId === 2 && permissions.creativeContracts) ||
         (departmentId === 3 && permissions.smTechCrewContracts))
       ? false
-      : type !== 'New';
+      : type === 'New';
   };
 
   return (
