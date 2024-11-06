@@ -9,6 +9,7 @@ import BookingHelper from 'utils/booking';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import { filterState } from 'state/booking/filterState';
 import { pick } from 'radash';
+import { accessBookingsHome } from 'state/account/selectors/permissionSelector';
 
 interface BookingReportProps {
   visible: boolean;
@@ -18,6 +19,7 @@ interface BookingReportProps {
 }
 
 export const BookingReports = ({ visible = false, onClose, productionId }: BookingReportProps) => {
+  const permissions = useRecoilValue(accessBookingsHome);
   const { productions, selected } = useRecoilValue(productionJumpState);
   const filters = useRecoilValue(filterState);
   const lastShowDate = useMemo(() => {
@@ -72,7 +74,7 @@ export const BookingReports = ({ visible = false, onClose, productionId }: Booki
           iconProps={{ className: 'h-4 w-3 ml-5' }}
           sufixIconName="excel"
           onClick={() => onExport('tourSchedule')}
-          disabled={selected === -1}
+          disabled={selected === -1 || !permissions.includes('EXPORT_TOUR_SCHEDULE')}
         />
 
         <Button
@@ -82,7 +84,7 @@ export const BookingReports = ({ visible = false, onClose, productionId }: Booki
           iconProps={{ className: 'h-4 w-3 ml-5' }}
           sufixIconName="excel"
           onClick={() => onExport('tourSummary')}
-          disabled={selected === -1}
+          disabled={selected === -1 || !permissions.includes('EXPORT_TRAVEL_SUMMARY')}
         />
 
         <Button
@@ -92,6 +94,7 @@ export const BookingReports = ({ visible = false, onClose, productionId }: Booki
           iconProps={{ className: 'h-4 w-3 ml-5' }}
           sufixIconName="excel"
           onClick={() => onExport('masterPlan')}
+          disabled={!permissions.includes('EXPORT_ALL_PRODUCTIONS_MASTERPLAN')}
         />
 
         <Button
@@ -100,6 +103,7 @@ export const BookingReports = ({ visible = false, onClose, productionId }: Booki
           className="w-[230px] mb-3 pl-6"
           iconProps={{ className: 'h-4 w-3 ml-5' }}
           sufixIconName="excel"
+          disabled={!permissions.includes('EXPORT_MULTIPLE_PENCIL_REPORT')}
         />
         <Button
           testId="booking-reports-export-mytrbk"
@@ -107,6 +111,7 @@ export const BookingReports = ({ visible = false, onClose, productionId }: Booki
           className="w-[230px] mb-3 pl-6"
           iconProps={{ className: 'h-4 w-3 ml-5' }}
           sufixIconName="excel"
+          disabled={!permissions.includes('EXPORT_TO_MYTRBK')}
         />
       </div>
       {showMasterPlanReportModal && (

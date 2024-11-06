@@ -36,13 +36,14 @@ export const generateChildCol = (
   };
 };
 
-export const showsTableConfig = [
+export const showsTableConfig = (permissions = []) => [
   {
     headerName: 'Show Name',
     field: 'Name',
     cellRenderer: ShowsTextInputRenderer,
     cellRendererParams: {
       placeholder: 'Please enter Show Name',
+      disabled: !permissions.includes('EDIT_SHOW_NAME_AND_CODE'),
     },
     headerClass: 'text-center',
     width: 396,
@@ -55,6 +56,7 @@ export const showsTableConfig = [
     field: 'Code',
     cellRendererParams: {
       placeholder: 'Please enter Show Code',
+      disabled: !permissions.includes('EDIT_SHOW_NAME_AND_CODE'),
     },
     cellRenderer: ShowsTextInputRenderer,
     width: 130,
@@ -69,7 +71,7 @@ export const showsTableConfig = [
     cellRendererParams: (params) => {
       return {
         buttonText: 'View/Edit',
-        disabled: isNullOrEmpty(params?.data?.Id),
+        disabled: isNullOrEmpty(params?.data?.Id) || !permissions.includes('ACCESS_VIEW_EDIT_PRODUCTIONS'),
         tpActive: isNullOrEmpty(params?.data?.Id),
         body: 'Please save prior to adding production details',
         position: 'right',
@@ -88,19 +90,21 @@ export const showsTableConfig = [
     maxWidth: 92,
     cellRenderer: TableCheckboxRenderer,
     cellRendererParams: (params) => {
-      return {
-        ...(!isUndefined(params.data.productions) &&
-        params.data.productions.length > 0 &&
-        params.data.productions.some((production) => production.IsArchived === false)
-          ? {
-              disabled: true,
-              tpActive: true,
-              body: 'Please archive all Productions before archiving a Show',
-              position: 'right',
-              width: 'w-40',
-            }
-          : {}),
-      };
+      return !permissions.includes('ARCHIVE_SHOW')
+        ? { disabled: true }
+        : {
+            ...(!isUndefined(params.data.productions) &&
+            params.data.productions.length > 0 &&
+            params.data.productions.some((production) => production.IsArchived === false)
+              ? {
+                  disabled: true,
+                  tpActive: true,
+                  body: 'Please archive all Productions before archiving a Show',
+                  position: 'right',
+                  width: 'w-40',
+                }
+              : {}),
+          };
     },
     cellStyle: {
       display: 'flex',
@@ -128,18 +132,20 @@ export const showsTableConfig = [
     width: 70,
     cellRenderer: ButtonRenderer,
     cellRendererParams: (params) => {
-      return {
-        buttonText: 'Delete',
-        variant: 'tertiary',
-        ...(!isUndefined(params.data.productions) &&
-          params.data.productions.length > 0 && {
-            disabled: true,
-            tpActive: true,
-            body: 'Please delete all Productions before deleting a Show',
-            position: 'right',
-            width: 'w-36',
-          }),
-      };
+      return !permissions.includes('DELETE_SHOW')
+        ? { disabled: true, buttonText: 'Delete', variant: 'tertiary', position: 'right', width: 'w-36' }
+        : {
+            buttonText: 'Delete',
+            variant: 'tertiary',
+            ...(!isUndefined(params.data.productions) &&
+              params.data.productions.length > 0 && {
+                disabled: true,
+                tpActive: true,
+                body: 'Please delete all Productions before deleting a Show',
+                position: 'right',
+                width: 'w-36',
+              }),
+          };
     },
     cellStyle: {
       paddingRight: '0.5em',
@@ -149,7 +155,7 @@ export const showsTableConfig = [
   },
 ];
 
-export const currencyConversionTableConfig = [
+export const currencyConversionTableConfig = (permissions) => [
   {
     headerName: 'Currency',
     headerClass: 'justify-center font-bold text-base ',
@@ -196,6 +202,9 @@ export const currencyConversionTableConfig = [
     width: 300,
     autoHeaderHeight: true,
     resizable: false,
+    cellRendererParams: {
+      disabled: !permissions.includes('EDIT_CURRENCY_CONVERSION'),
+    },
     cellStyle: {
       paddingRight: '0.75em',
       paddingLeft: '0.75em',
@@ -205,7 +214,7 @@ export const currencyConversionTableConfig = [
   },
 ];
 
-export const productionsTableConfig = [
+export const productionsTableConfig = (permissions) => [
   {
     headerName: 'Production',
     headerClass: 'justify-center font-bold text-base ',
@@ -239,6 +248,7 @@ export const productionsTableConfig = [
     field: 'editId',
     cellRenderer: ButtonRenderer,
     cellRendererParams: {
+      disabled: !permissions.includes('ACCESS_EDIT_PRODUCTION DETAILS'),
       buttonText: 'View/Edit',
     },
     resizable: false,
@@ -251,6 +261,7 @@ export const productionsTableConfig = [
     width: 270,
     cellRenderer: ButtonRenderer,
     cellRendererParams: {
+      disabled: !permissions.includes('ACCESS_CURRENCY_CONVERSION'),
       buttonText: 'SET CURRENCY CONVERSION RATES',
       variant: 'secondary',
       width: 270,
@@ -263,17 +274,20 @@ export const productionsTableConfig = [
     field: 'delete',
     width: 70,
     cellRenderer: ButtonRenderer,
-    cellRendererParams: (params) => ({
-      buttonText: 'Delete',
-      variant: 'tertiary',
-      ...(!params.data.IsArchived && {
-        disabled: true,
-        tpActive: true,
-        body: 'Please archive the production prior to deleting',
-        position: 'right',
-        width: 'w-36',
-      }),
-    }),
+    cellRendererParams: (params) =>
+      !permissions.includes('DELETE_PRODUCTION')
+        ? { disabled: true, buttonText: 'Delete', variant: 'tertiary', position: 'right', width: 'w-36' }
+        : {
+            buttonText: 'Delete',
+            variant: 'tertiary',
+            ...(!params.data.IsArchived && {
+              disabled: true,
+              tpActive: true,
+              body: 'Please archive the production prior to deleting',
+              position: 'right',
+              width: 'w-36',
+            }),
+          },
     cellStyle: {
       paddingRight: '0.5em',
     },

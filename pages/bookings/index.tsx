@@ -33,7 +33,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   */
   const productionJump = await getProductionJumpState(ctx, 'bookings');
   const ProductionId = productionJump.selected;
-  console.log('ProductionId', ProductionId, productionJump);
+
   // See _app.tsx for how this is picked up
   const initialState: InitialState = {
     global: {

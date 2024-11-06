@@ -4,9 +4,16 @@ import TextInputRenderer from 'components/core-ui-lib/Table/renderers/TextInputR
 
 interface ShowsTextInputRendererProps extends ICellRendererParams {
   placeholder: string;
+  disabled?: boolean;
 }
 
-const ShowsTextInputRenderer = ({ value, setValue, eGridCell, placeholder }: ShowsTextInputRendererProps) => {
+const ShowsTextInputRenderer = ({
+  value,
+  setValue,
+  eGridCell,
+  placeholder,
+  disabled = true,
+}: ShowsTextInputRendererProps) => {
   const [inputValue, setInputValue] = useState(value || '');
 
   const [error, setError] = useState<string>('');
@@ -35,6 +42,7 @@ const ShowsTextInputRenderer = ({ value, setValue, eGridCell, placeholder }: Sho
         value={inputValue}
         error={error}
         onChange={handleChange}
+        disabled={disabled}
       />
     </div>
   );

@@ -1,6 +1,5 @@
-import { dateTimeToTime } from 'services/dateService';
 import formatInputDate from './dateInputFormat';
-import { isNullOrUndefined } from 'utils';
+import { formatDecimalValue, isNullOrUndefined } from 'utils';
 /**
  *
  * @param templateData
@@ -25,6 +24,10 @@ import { isNullOrUndefined } from 'utils';
  *    Times are stored as 2024-10-02T02:45:00.000Z in the db.
  *    When the TM_ prefix is added to the front of the object key, the hh:mm representation of the value
  *    will be returned.
+ *
+ * 4. Numbers/Decimal Values
+ *    If the object key begins DEC_, a number NaN check is run on the value.
+ *    If NaN, a space is returned else return the value.
  */
 export const formatTemplateObj = (templateData: any) => {
   return {
@@ -39,12 +42,16 @@ export const formatTemplateObj = (templateData: any) => {
         if (key.startsWith('DT_')) {
           return [key, formatInputDate(value)];
         } else if (key.startsWith('TM_LONG_')) {
-          const tmLongDt = new Date(value.toString()).toISOString();
-          const hrMinArray = dateTimeToTime(tmLongDt.toString()).split(':');
-          return [key, `${hrMinArray[0]} hour(s) ${hrMinArray[1]} minutes`];
+          const tmLongDt = new Date(value.toString());
+          return [key, `${tmLongDt.getHours()} hour(s) ${tmLongDt.getMinutes()} minutes`];
         } else if (key.startsWith('TM_')) {
-          const tmDt = new Date(value.toString()).toISOString();
-          return [key, dateTimeToTime(tmDt.toString())];
+          const tmDt = new Date(value.toString());
+          return [
+            key,
+            `${tmDt.getHours().toString().padStart(2, '0')}:${tmDt.getMinutes().toString().padStart(2, '0')}`,
+          ];
+        } else if (key.startsWith('DEC_')) {
+          return [key, Number.isNaN(value) ? ' ' : formatDecimalValue(value)];
         }
 
         // Return the unchanged key-value pair for other cases
