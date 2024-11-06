@@ -12,9 +12,10 @@ describe('LoadingOverlay Component', () => {
     expect(overlay).toHaveClass('inset-0 absolute bg-white bg-opacity-50 z-50 flex justify-center items-center');
 
     // Check if the SpinIcon is rendered
-    const spinner = within(overlay).getByTestId('core-ui-lib-spinner-undefined');
+    const spinner = within(overlay).getByRole('status');
     expect(spinner).toBeInTheDocument();
-    expect(spinner).toHaveAttribute('size', 'lg');
+    // Check if the default size 'lg' is applied to the spinner
+    expect(spinner).toHaveClass('h-32 w-32');
   });
 
   test('renders loading overlay with loader and custom classNames', () => {
@@ -27,12 +28,15 @@ describe('LoadingOverlay Component', () => {
     expect(loader).toBeInTheDocument();
 
     // Check if the default classes are applied to the loader
-    expect(loader).toHaveClass('ml-2');
+    expect(loader).toHaveClass('flex items-center gap-2 ml-2');
+
+    // spin icon
+    const spinIcon = within(loader).getByTestId('spinIcon');
 
     // Check if the default iconProps are applied to the loader
-    expect(loader).toHaveProperty('iconProps', { stroke: '#FFF' });
+    expect(spinIcon).toHaveAttribute('stroke', '#FFF');
 
     // Check if the custom variant 'lg' is applied to the loader
-    expect(loader).toHaveAttribute('variant', 'lg');
+    expect(spinIcon).toHaveAttribute('height', '22px');
   });
 });
