@@ -14,10 +14,15 @@ import { TreeItemOption } from 'components/global/TreeSelect/types';
 import { dateBlockMapper } from 'lib/mappers';
 import { getAccountIdFromReq, getUsersWithPermissions } from 'services/userService';
 import { getAccountPIN } from 'services/accountService';
+import { accessAdminHome } from 'state/account/selectors/permissionSelector';
+import { useRecoilValue } from 'recoil';
 
 const getTableGridOptions = (uniqueKey: string, config = {}) => ({
   ...config,
   getRowNodeId: (data) => {
+    return data[uniqueKey];
+  },
+  getRowId: ({ data }) => {
     return data[uniqueKey];
   },
   onRowDataUpdated: (params) => {
@@ -34,6 +39,7 @@ export default function Users({
   users,
   accountPIN,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  const adminPermissions = useRecoilValue(accessAdminHome);
   const deleteType = useRef<'user' | 'group'>(null);
   const [showUsersModal, setShowUsersModal] = useState(false);
   const [showPermissionGroupModal, setShowPermissionGroupModal] = useState(false);
@@ -72,7 +78,7 @@ export default function Users({
       setShowUsersModal(true);
     } else if (type === 'delete') {
       deleteType.current = 'user';
-      setSelectedGroup(data);
+      setSelectedUser(data);
       setShowConfirmationDialog(true);
     }
   };
@@ -99,8 +105,20 @@ export default function Users({
   };
 
   const deleteUser = async () => {
-    // Add API call to deactivate user
-    setSelectedUser(null);
+    try {
+      if (selectedUser) {
+        await axios.delete('/api/user/delete', {
+          data: {
+            accountUserId: selectedUser.accountUserId,
+            email: selectedUser.email,
+          },
+        });
+        setSelectedUser(null);
+        router.replace(router.asPath);
+      }
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   const handleConfirmClick = async () => {
@@ -171,19 +189,21 @@ export default function Users({
             text="Add New Touring Management User"
             testId="add-new-touring-mgmt-user-button"
           />
-          <Button
-            className="px-8 mt-2 -mb-1"
-            variant="secondary"
-            text="Add New Full User"
-            onClick={() => setShowUsersModal(true)}
-            testId="add-new-full-user-button"
-          />
+          {adminPermissions.includes('ADD_NEW_USER') && (
+            <Button
+              className="px-8 mt-2 -mb-1"
+              variant="secondary"
+              text="Add New Full User"
+              onClick={() => setShowUsersModal(true)}
+              testId="add-new-full-user-button"
+            />
+          )}
         </div>
       </div>
 
       <Table
         testId="admin-users-table"
-        columnDefs={usersColDef(handleUserEdit)}
+        columnDefs={usersColDef(handleUserEdit, adminPermissions)}
         rowData={users}
         styleProps={styleProps}
         tableHeight={300}
@@ -195,19 +215,21 @@ export default function Users({
           <div className="flex flex-row justify-between items-center my-4">
             <div className="text-primary-navy text-xl font-bold">Your Permission Groups</div>
             <div className="flex flex-row gap-4">
-              <Button
-                className="px-8 mt-2 -mb-1"
-                variant="secondary"
-                text="Add New Permission Group"
-                onClick={() => setShowPermissionGroupModal(true)}
-                testId="add-new-permission-group-button"
-              />
+              {adminPermissions.includes('CREATE_USER_PERMSSION_GROUP') && (
+                <Button
+                  className="px-8 mt-2 -mb-1"
+                  variant="secondary"
+                  text="Add New Permission Group"
+                  onClick={() => setShowPermissionGroupModal(true)}
+                  testId="add-new-permission-group-button"
+                />
+              )}
             </div>
           </div>
 
           <Table
             testId="admin-permission-group-table"
-            columnDefs={permissionGroupColDef(handlePermissionGroupEdit)}
+            columnDefs={permissionGroupColDef(handlePermissionGroupEdit, adminPermissions)}
             rowData={permisisonGroups}
             styleProps={styleProps}
             tableHeight={300}

@@ -22,6 +22,7 @@ import Label from 'components/core-ui-lib/Label';
 import { areDatesSame, dateToSimple, formattedDateWithWeekDay, getArrayOfDatesBetween } from 'services/dateService';
 import { debug } from 'utils/logging';
 import { isNullOrEmpty } from 'utils';
+import { accessBookingsHome } from 'state/account/selectors/permissionSelector';
 
 type AddBookingProps = {
   formData: TForm;
@@ -51,7 +52,7 @@ const NewBookingView = ({
   updateModalTitle,
 }: AddBookingProps) => {
   const { goToStep } = useWizard();
-
+  const permissions = useRecoilValue(accessBookingsHome);
   const currentProduction = useRecoilValue(currentProductionSelector);
   const scheduleRange = useRecoilValue(dateBlockSelector);
   const [stage, setStage] = useState<number>(0);
@@ -102,6 +103,9 @@ const NewBookingView = ({
   };
 
   const goToNext = () => {
+    if (formData.isDateTypeOnly && formData.isRunOfDates) {
+      onChange({ isRunOfDates: false });
+    }
     fetchData({
       url: '/api/bookings/conflict',
       method: 'POST',
@@ -284,7 +288,9 @@ const NewBookingView = ({
         >
           <Button
             onClick={handleCheckMileageClick}
-            disabled={!venueId || !fromDate || !toDate || isDateTypeOnly}
+            disabled={
+              !permissions.includes('ACCESS_MILEAGE_CHECK') || !venueId || !fromDate || !toDate || isDateTypeOnly
+            }
             className="px-6"
             text="Check Mileage"
           />

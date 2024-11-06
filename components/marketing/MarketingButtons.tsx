@@ -7,6 +7,7 @@ import { bookingJumpState } from 'state/marketing/bookingJumpState';
 import { formatUrl } from 'utils/formatUrl';
 import useAxios from 'hooks/useAxios';
 import { MarketingReports } from './modal/MarketingReportsModal';
+import { accessMarketingHome } from 'state/account/selectors/permissionSelector';
 
 type MarketingBtnProps = {
   venueName: string;
@@ -15,6 +16,7 @@ type MarketingBtnProps = {
 };
 
 export const MarketingButtons: React.FC<MarketingBtnProps> = ({ venueName, venueId, setModalLandingURL }) => {
+  const permissions = useRecoilValue(accessMarketingHome);
   const { selected: productionId } = useRecoilValue(productionJumpState);
   const [bookingJump, setBookingJump] = useRecoilState(bookingJumpState);
   const [showEditUrlModal, setShowEditUrl] = useState<boolean>(false);
@@ -67,7 +69,7 @@ export const MarketingButtons: React.FC<MarketingBtnProps> = ({ venueName, venue
       <Button
         text={landingUrl === '' ? 'Add Landing Page' : 'Edit Landing Page'}
         className="w-[155px] mt-5"
-        disabled={bookingJump.selected === null || !productionId}
+        disabled={bookingJump.selected === null || !productionId || !permissions.includes('EDIT_LANDING_PAGE')}
         onClick={() => setShowEditUrl(true)}
       />
 
@@ -83,7 +85,7 @@ export const MarketingButtons: React.FC<MarketingBtnProps> = ({ venueName, venue
       <Button
         text="Venue Website"
         className="w-[155px] mt-[3px]"
-        disabled={!productionId || website === ''}
+        disabled={!productionId || website === '' || !permissions.includes('ACCESS_VENUE_WEBSITE')}
         onClick={() => window.open(website, '_blank')}
       />
 

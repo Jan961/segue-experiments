@@ -2,6 +2,7 @@ import React, { forwardRef, useEffect, useRef } from 'react';
 
 export interface TextInputProps {
   id?: string;
+  name?: string;
   value?: string;
   disabled?: boolean;
   defaultDisabled?: boolean;
@@ -26,6 +27,7 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextInputProps>(
       onClick,
       onBlur,
       testId,
+      name,
     },
     ref,
   ) => {
@@ -70,6 +72,7 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextInputProps>(
           onChange={handleChange}
           placeholder={placeholder}
           value={value || ''}
+          name={name}
           onBlur={onBlur}
         />
       </div>

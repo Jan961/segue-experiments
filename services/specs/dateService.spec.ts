@@ -1,4 +1,12 @@
-import { getNextMondayDateString, getTimeFromDateAndTime, addDurationToDate, isValidDate } from '../dateService';
+import {
+  getNextMondayDateString,
+  getTimeFromDateAndTime,
+  addDurationToDate,
+  isValidDate,
+  compareDatesWithoutTime,
+  getDateWithOffset,
+} from '../dateService';
+import { parse } from 'date-fns';
 
 // ----------------- getNextMondayDateString -----------------
 describe('getNextMondayDateString Utility Function', () => {
@@ -160,5 +168,99 @@ describe('isValidDate', () => {
 
   test('returns true for date object as a string', () => {
     expect(isValidDate(new Date().toString())).toBe(true);
+  });
+});
+
+// ----------------- compare dates -----------------
+describe('compareDatesWithoutTime', () => {
+  test('should return true when date1 < date2', () => {
+    expect(compareDatesWithoutTime('2023-01-01', '2023-01-02', '<')).toBe(true);
+  });
+
+  test('should return false when date1 >= date2 with operator "<"', () => {
+    expect(compareDatesWithoutTime('2023-01-02', '2023-01-01', '<')).toBe(false);
+  });
+
+  test('should return true when date1 <= date2 with the same date', () => {
+    expect(compareDatesWithoutTime('2023-01-01', '2023-01-01', '<=')).toBe(true);
+  });
+
+  test('should return true when date1 > date2', () => {
+    expect(compareDatesWithoutTime('2023-01-02', '2023-01-01', '>')).toBe(true);
+  });
+
+  test('should return false when date1 <= date2 with operator ">"', () => {
+    expect(compareDatesWithoutTime('2023-01-01', '2023-01-02', '>')).toBe(false);
+  });
+
+  test('should return true when date1 >= date2 with the same date', () => {
+    expect(compareDatesWithoutTime('2023-01-01', '2023-01-01', '>=')).toBe(true);
+  });
+
+  test('should return true when date1 == date2', () => {
+    expect(compareDatesWithoutTime('2023-01-01', '2023-01-01', '==')).toBe(true);
+  });
+
+  test('should return false when date1 != date2 with same date', () => {
+    expect(compareDatesWithoutTime('2023-01-01', '2023-01-01', '!=')).toBe(false);
+  });
+
+  test('should return true when date1 != date2 with different dates', () => {
+    expect(compareDatesWithoutTime('2023-01-01', '2023-01-02', '!=')).toBe(true);
+  });
+
+  test('should work correctly with Date objects as inputs', () => {
+    expect(compareDatesWithoutTime(new Date('2023-01-01'), new Date('2023-01-02'), '<')).toBe(true);
+  });
+
+  test('should work correctly with numeric timestamps as inputs', () => {
+    const date1 = new Date('2023-01-01').getTime();
+    const date2 = new Date('2023-01-02').getTime();
+    expect(compareDatesWithoutTime(date1, date2, '<')).toBe(true);
+  });
+
+  test('should normalize time correctly and only compare dates', () => {
+    const date1 = new Date('2023-01-01T12:00:00');
+    const date2 = new Date('2023-01-01T08:00:00');
+    expect(compareDatesWithoutTime(date1, date2, '==')).toBe(true);
+  });
+});
+
+// ----------------- getDateWithOffset -----------------
+describe('getDateWithOffset', () => {
+  test('should return a correctly formatted date with offset', () => {
+    const inputDate = new Date('2024-10-31T12:00:00Z');
+    const result = getDateWithOffset(inputDate);
+
+    // Use date string as expected output to ensure we match format
+    const expectedDateString = 'October 31st 2024, 12:00:00 PM';
+    const expectedDate = parse(expectedDateString, 'MMMM do yyyy, h:mm:ss a', new Date());
+
+    expect(result.toDateString()).toBe(expectedDate.toDateString());
+  });
+
+  test('should handle an invalid date input gracefully', () => {
+    const invalidDate = new Date('Invalid Date');
+    const result = getDateWithOffset(invalidDate);
+
+    expect(result.toString()).toBe('Invalid Date');
+  });
+
+  test('should return the same date when timezone offset is zero', () => {
+    const inputDate = new Date('2024-10-31T12:00:00Z');
+    const result = getDateWithOffset(inputDate);
+
+    expect(result.toDateString()).toBe(inputDate.toDateString());
+  });
+
+  test('should correctly parse a known date string back into a Date object', () => {
+    const inputDate = new Date('2024-10-31T14:00:00Z');
+    const result = getDateWithOffset(inputDate);
+
+    // Adjust expectation to align with specific date-time results
+    const expectedParsedDateString = 'October 31st 2024, 2:00:00 PM';
+    const parsedDate = parse(expectedParsedDateString, 'MMMM do yyyy, h:mm:ss a', new Date());
+
+    expect(result.toISOString()).toBe(parsedDate.toISOString());
   });
 });

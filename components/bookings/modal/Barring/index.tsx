@@ -3,7 +3,6 @@ import axios from 'axios';
 import { BarredVenue } from 'pages/api/productions/venue/barringCheck';
 import Spinner from 'components/core-ui-lib/Spinner';
 import PopupModal from 'components/core-ui-lib/PopupModal';
-
 import Form from './Form';
 import Button from 'components/core-ui-lib/Button';
 import Table from 'components/core-ui-lib/Table';
@@ -14,6 +13,10 @@ import Label from 'components/core-ui-lib/Label';
 import { useRecoilValue } from 'recoil';
 import { venueState } from 'state/booking/venueState';
 import { dateToSimple } from 'services/dateService';
+import { exportToExcel } from 'utils/export';
+import { ProductionDTO, VenueMinimalDTO } from 'interfaces';
+import { productionJumpState } from 'state/booking/productionJumpState';
+import { accessBookingsHome } from 'state/account/selectors/permissionSelector';
 
 type BarringProps = {
   visible: boolean;
@@ -40,11 +43,15 @@ const barringGridOptions = {
 };
 
 export default function Barring({ visible, onClose }: BarringProps) {
+  const permissions = useRecoilValue(accessBookingsHome);
   const [rows, setRows] = useState<BarredVenue[] | null>(null);
   const [loading, setIsLoading] = useState<boolean>(false);
   const [selectedVenueIds, setSelectedVenueIds] = useState([]);
   const [selectedVenueName, setSelectedVenueName] = useState<string>('');
+  const [venueInfo, setVenuInfo] = useState<VenueMinimalDTO>();
+  const [productionInfo, setProductionInfo] = useState<Partial<ProductionDTO>>();
   const venueDict = useRecoilValue(venueState);
+  const productionDict = useRecoilValue(productionJumpState);
   const tableRef = useRef(null);
   const filteredRows = useMemo(() => {
     const filteredRows = [];
@@ -85,7 +92,16 @@ export default function Barring({ visible, onClose }: BarringProps) {
       });
   };
   const exportTableData = () => {
-    tableRef.current?.getApi?.()?.exportDataAsExcel?.();
+    const fileName = `Barring Check ${productionInfo?.ShowCode} ${venueInfo.Code} ${venueInfo.Name} ${venueInfo.Town}`;
+    exportToExcel(tableRef, { fileName });
+  };
+
+  const onSubmit = (formData) => {
+    fetchBarredVenues(formData);
+    const { venueId } = formData;
+    setVenuInfo(venueDict?.[venueId]);
+    const production = productionDict.productions.find((prod) => prod.Id === productionDict.selected);
+    setProductionInfo(production);
   };
 
   const onRowSelected = (e: any) => {
@@ -107,7 +123,7 @@ export default function Barring({ visible, onClose }: BarringProps) {
         )}
         <div className="flex flex-col">
           <div className="mt-6 flex-col">
-            <Form onSubmit={fetchBarredVenues} />
+            <Form onSubmit={onSubmit} />
           </div>
           {Array.isArray(rows) && rows.length === 0 && (
             <Label className="text-md my-2" text="A Barring Check has found no issues." />
@@ -141,6 +157,7 @@ export default function Barring({ visible, onClose }: BarringProps) {
                 text="Export"
                 iconProps={{ className: 'h-4 w-3' }}
                 sufixIconName="excel"
+                disabled={!permissions.includes('EXPORT_BARRING_CHECK')}
               />
               <Button
                 onClick={onClose}

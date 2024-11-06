@@ -76,26 +76,17 @@ export default function PopupModal({
             >
               <Dialog.Panel
                 className={classNames(
-                  // transform also a cause for problem
-                  'px-7 pt-7 pb-5 transform bg-primary-white text-left align-middle shadow-xl transition-all max-w-full',
-                  'overflow-x-auto',
-                  'overflow-y-hidden',
+                  'bg-primary-white flex flex-col max-h-[90vh] px-5 pt-5 pb-5 transform text-left align-middle shadow-xl transition-all max-w-full overflow-x-auto overflow-y-hidden',
                   panelClass,
                 )}
               >
-                {showCloseIcon && (
-                  <Icon
-                    iconName="cross"
-                    variant="lg"
-                    className="hover:scale-105 sticky left-full"
-                    onClick={onClose}
-                    data-testid="close-icon"
-                  />
-                )}
-                <Dialog.Title as="h3" className={`-mt-6 text-lg font-bold leading-6 ${titleClass}`}>
-                  {title}
-                </Dialog.Title>
-                <div className="mt-4">{children}</div>
+                <header className="flex justify-between items-center">
+                  <Dialog.Title as="h3" className={`text-lg font-bold leading-6 ${titleClass}`}>
+                    {title}
+                  </Dialog.Title>
+                  {showCloseIcon && <Icon iconName="cross" variant="lg" onClick={onClose} data-testid="close-icon" />}
+                </header>
+                <div className="overflow-y-auto mt-3 pr-3">{children}</div>
               </Dialog.Panel>
             </Transition.Child>
           </div>

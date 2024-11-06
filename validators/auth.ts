@@ -1,3 +1,4 @@
+import { validatePin } from 'utils/authUtils';
 import * as yup from 'yup';
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -30,6 +31,39 @@ export const loginSchema = yup.object().shape({
 });
 
 export const accountLoginSchema = yup.object().shape({
-  pin: yup.string().required('PIN is a required field'),
+  pin: yup
+    .number()
+    .required('PIN is a required field')
+    .test({
+      name: 'validatePin',
+      test: (value) => validatePin(value).valid,
+      message: 'PIN does not match the required format.',
+    }),
   company: yup.string().required('Company is a required field'),
+});
+
+export const userPreSignUpSchema = emailSchema.shape({
+  companyName: yup.string().required('Company Name is a required field'),
+});
+
+export const userSignUpSchema = yup.object().shape({
+  password: passwordSchmea,
+  confirmPassword: yup
+    .string()
+    .required('Repeat Password is required')
+    .oneOf([yup.ref('password'), null], 'Passwords must match'),
+  firstName: yup.string().required('First Name is a required field'),
+  lastName: yup.string().required('Last Name is a required field'),
+  pin: yup
+    .number()
+    .required('PIN is a required field')
+    .test({
+      name: 'validatePin',
+      test: (value) => validatePin(value).valid,
+      message: 'PIN does not match the required format.',
+    }),
+  repeatPin: yup
+    .number()
+    .required('Repeat PIN is a required field')
+    .oneOf([yup.ref('pin'), null], 'PINs must match'),
 });
