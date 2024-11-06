@@ -77,6 +77,12 @@ const getBookngType = (booking: BookingItem) => {
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
     const { original, updated } = req.body;
+
+    // This API only deals witha single type of bookingand hence the original array is expected to ahve a single ite (the Bookings table row being edited)
+    if (original?.length !== 1) {
+      throw new Error('Original array is expected to have a single item');
+    }
+    const originalItem = original[0];
     const prisma = await getPrismaClient(req);
     const rowsMap = {
       booking: { rowsToInsert: [], rowsToUpdate: [], rowsToDelete: [] },
@@ -86,22 +92,27 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     };
     // Check if this is a straight forward update or a delete-insert
     const acc: typeof rowsMap = updated.reduce((acc, booking: BookingItem) => {
-      const originalBooking = original.find(({ id }) => id === booking.id) as BookingItem;
-      const originalType = originalBooking ? getBookngType(originalBooking) : null;
-      const updatedType = getBookngType(booking);
-
-      if (!booking.id) {
-        acc[updatedType].rowsToInsert.push(formatNewBookingToPrisma(booking));
+      const shouldUpdateBooking = originalItem.isBooking && booking.isBooking;
+      if (shouldUpdateBooking) {
+        acc.booking.rowsToUpdate.push(formatExistingBookingToPrisma({ ...booking, id: originalItem.id }));
       } else {
-        const canUpdate =
-          originalBooking.isBooking === booking.isBooking &&
-          originalBooking.isRehearsal === booking.isRehearsal &&
-          originalBooking.isGetInFitUp === booking.isGetInFitUp;
-        if (canUpdate) {
-          acc[updatedType].rowsToUpdate.push(formatExistingBookingToPrisma(booking));
-        } else {
-          acc[originalType].rowsToDelete.push(originalBooking);
+        const editedItem = original.find(({ id }) => id === booking.id) as BookingItem;
+        const originalType = editedItem ? getBookngType(editedItem) : null;
+        const updatedType = getBookngType(booking);
+
+        if (!booking.id) {
           acc[updatedType].rowsToInsert.push(formatNewBookingToPrisma(booking));
+        } else {
+          const canUpdate =
+            editedItem.isBooking === booking.isBooking &&
+            editedItem.isRehearsal === booking.isRehearsal &&
+            editedItem.isGetInFitUp === booking.isGetInFitUp;
+          if (canUpdate) {
+            acc[updatedType].rowsToUpdate.push(formatExistingBookingToPrisma(booking));
+          } else {
+            acc[originalType].rowsToDelete.push(editedItem);
+            acc[updatedType].rowsToInsert.push(formatNewBookingToPrisma(booking));
+          }
         }
       }
       return acc;
