@@ -62,10 +62,10 @@ export const sellerOptions = [
 ];
 
 export const contractsStatusMap = {
-  CSAR: 'Received Not Returned',
-  U: 'Received, Questions Raised',
-  X: 'Producer Signed, Returned to Venue',
-  CSAF: 'Countersigned and Filed',
+  RNR: 'Received, Not Returned',
+  RQR: 'Received, Questions Raised',
+  SAR: 'Producer Signed and Returned',
+  CSF: 'Countersigned and Filed',
   NONE: 'None',
 };
 
