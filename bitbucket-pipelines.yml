@@ -38,7 +38,7 @@ pipelines:
             - apt-get update && apt-get install -y zip jq tree
             - zip -r reports.zip cypress/reports/
             - tree -I "node_modules"
-            - npx mochawesome-merge cypress/reports/*.json -o output.json
+            - npx mochawesome-merge cypress/reports/mocha/*.json -o output.json
             - npx marge output.json
             - ls -al
           after-script:
@@ -56,7 +56,6 @@ pipelines:
                 FROM: 'asara97911@gmail.com'
                 TO: 'asara97911@gmail.com'
                 HOST: 'smtp.gmail.com'
-                PORT: 465
                 SUBJECT: '${ALERT_TYPE}:Bitbucket Pipe Notification for ${BITBUCKET_BRANCH}'
                 ATTACHMENTS: 'cypress-tests/cypress/reports.zip'
           artifacts:
