@@ -37,7 +37,9 @@ pipelines:
             - ls -al
             # - npm run cy:permissions --browser chrome
             - apt-get update && apt-get install -y zip jq tree
-            - ls -al cypress/
+            - npx mochawesome-merge cypress/report/*.json -o output.json
+            - npx marge output.json
+            - ls -al
             - zip -r reports.zip cypress/reports/
             - tree -I "node_modules"
           after-script:
@@ -52,7 +54,7 @@ pipelines:
               variables:
                 USERNAME: $SMTP_USERNAME
                 PASSWORD: $SMTP_PASSWORD
-                FROM: 'seguetesting@gmail.com'
+                FROM: 'asara97911@gmail.com'
                 TO: 'asara97911@gmail.com'
                 HOST: 'smtp.gmail.com'
                 PORT: 465
