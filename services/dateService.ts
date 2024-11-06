@@ -42,8 +42,7 @@ export const dateStringToPerformancePair = (dateString: string) => {
 };
 
 // expects a string in DD/MM/YY format
-export const simpleToDate = (stringToFormat: string) => {
-  if (!stringToFormat) return stringToFormat;
+export const simpleToDate = (stringToFormat: string): Date => {
   const parts = stringToFormat?.split?.('/');
   return new Date(Number(`20${parts[2]}`), Number(Number(parts[0]) - 1), Number(parts[1]));
 };
@@ -149,7 +148,6 @@ export const weeks = (showDate: string, firstShowDate: string): number => {
 
 // Working one. AFAIK
 export const calculateWeekNumber = (productionStart: Date, dateToNumber: Date): number => {
-  console.log(productionStart, dateToNumber);
   const weekOneStart = startOfWeek(productionStart, { weekStartsOn: 1 });
   let weekNumber = differenceInWeeks(dateToNumber, weekOneStart);
 
