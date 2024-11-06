@@ -10,6 +10,7 @@ import {
   isSameWeek,
   set,
   addMinutes,
+  differenceInDays,
 } from 'date-fns';
 import { toZonedTime } from 'date-fns-tz';
 import moment from 'moment';
@@ -522,6 +523,13 @@ export const convertMinutesToHoursMins = (timeInMins: number) => {
   const hours = Math.floor(timeInMins / 60);
   const minutes = timeInMins % 60;
   return `${hours}:${minutes < 10 ? '0' : ''}${minutes}`;
+};
+
+/**
+ * Returns the difference between two dates
+ */
+export const getDifferenceInDays = (from: string, to: string) => {
+  return differenceInDays(parseISO(to), parseISO(from));
 };
 
 type ComparisonOperator = '<' | '<=' | '>' | '>=' | '==' | '!=';
