@@ -40,7 +40,9 @@ pipelines:
             - zip -r reports.zip cypress/reports/
             - tree -I "node_modules"
           after-script:
+            - cd cypress-tests/cypress
             - ls -al
+            - zip -r reports.zip cypress/reports/
             - ALERT_TYPE="success"
             - if [[ $BITBUCKET_EXIT_CODE -ne 0 ]]; then ALERT_TYPE="error" ; fi
             - echo "$SMTP_USERNAME"
