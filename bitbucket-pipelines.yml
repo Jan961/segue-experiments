@@ -37,11 +37,39 @@ pipelines:
             # - npm run cy:permissions --browser chrome
             - apt-get update && apt-get install -y zip jq tree
             - zip -r reports.zip cypress/reports/
-            - tree -I "node_modules"
             - npx mochawesome-merge cypress/reports/mocha/*.json -o output.json
             - npx marge output.json
             - ls -al
           after-script:
+            - tree -I "node_modules"
+            - cd cypress-tests/cypress
+            - apt-get update && apt-get install -y jq
+            # Create email content using existing cucumber-report.html
+            - |
+              echo "
+              <!DOCTYPE html>
+              <html>
+              <head>
+                <style>
+                  body { font-family: Arial, sans-serif; }
+                  .summary { margin: 20px 0; padding: 20px; background: #f5f5f5; }
+                  .success { color: green; font-weight: bold; }
+                  .failure { color: red; font-weight: bold; }
+                </style>
+              </head>
+              <body>
+                <div class='summary'>
+                  <h2>Cypress Test Report - ${BITBUCKET_BRANCH}</h2>
+                  <p>Build Status: $(if [[ $BITBUCKET_EXIT_CODE -eq 0 ]]; then echo '<span class=\"success\">Success</span>'; else echo '<span class=\"failure\">Failed</span>'; fi)</p>
+                  <p>Repository: ${BITBUCKET_REPO_FULL_NAME}</p>
+                  <p>Branch: ${BITBUCKET_BRANCH}</p>
+                  <p>Commit: ${BITBUCKET_COMMIT}</p>
+                  <p>Run Date: $(date)</p>
+                </div>
+                $(cat cucumber-report.html)
+              </body>
+              </html>
+              " > email_report.html
             - ALERT_TYPE="success"
             - if [[ $BITBUCKET_EXIT_CODE -ne 0 ]]; then 
                 ALERT_TYPE="error";
