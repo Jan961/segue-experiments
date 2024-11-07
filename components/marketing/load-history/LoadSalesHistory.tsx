@@ -253,7 +253,7 @@ const LoadSalesHistory = () => {
         <SpreadsheetDeleteModal
           visible={showConfirmDelete}
           onNoClick={() => setShowConfirmDelete(false)}
-          onDeleteClick={() => deleteSalesHistory()}
+          onDeleteClick={deleteSalesHistory}
           salesHistoryRows={salesHistoryRows}
         />
       )}

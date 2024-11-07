@@ -30,7 +30,7 @@ export const SpreadsheetDeleteModal = ({
       a.click();
       document.body.removeChild(a);
     }
-    await onDeleteClick();
+    onDeleteClick();
     setIsLoading(false);
   };
 

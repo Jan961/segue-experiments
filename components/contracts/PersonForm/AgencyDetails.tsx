@@ -19,6 +19,7 @@ export const defaultAgencyDetails = {
   town: null,
   postcode: null,
   country: null,
+  id: null,
 };
 
 interface AgencyDetailsProps {
