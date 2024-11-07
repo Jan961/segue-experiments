@@ -95,6 +95,17 @@ export default function CompanyContractsTable({
     return `${code} ${name} ${roleName}`;
   };
 
+  const checkDepartmentPermissions = (departmentId: number): boolean => {
+    return (
+      (departmentId === contractDepartmentOptions.find((x) => x.text === 'Artiste').value &&
+        permissions.editRow.artisteContracts) ||
+      (departmentId === contractDepartmentOptions.find((x) => x.text === 'Creative').value &&
+        permissions.editRow.creativeContracts) ||
+      (departmentId === contractDepartmentOptions.find((x) => x.text === 'SM / Tech / Crew').value &&
+        permissions.editRow.smTechCrewContracts)
+    );
+  };
+
   const handleCellClick = (e: CellClickedEvent) => {
     const colId = e.column.getColId();
     const data = e.data;
@@ -102,15 +113,7 @@ export default function CompanyContractsTable({
     if (colId === 'notes') {
       setNotesPopupContext({ visible: true, contract: data });
     }
-    if (
-      colId === 'edit' &&
-      ((departmentId === contractDepartmentOptions.find((x) => x.text === 'Artiste').value &&
-        permissions.editRow.artisteContracts) ||
-        (departmentId === contractDepartmentOptions.find((x) => x.text === 'Creative').value &&
-          permissions.editRow.creativeContracts) ||
-        (departmentId === contractDepartmentOptions.find((x) => x.text === 'SM / Tech / Crew').value &&
-          permissions.editRow.smTechCrewContracts))
-    ) {
+    if (colId === 'edit' && checkDepartmentPermissions(departmentId)) {
       setEditContract({
         visible: true,
         contractId: id,
@@ -123,15 +126,7 @@ export default function CompanyContractsTable({
         },
       });
     }
-    if (
-      colId === 'pdf' &&
-      ((departmentId === contractDepartmentOptions.find((x) => x.text === 'Artiste').value &&
-        permissions.savePDF.artisteContracts) ||
-        (departmentId === contractDepartmentOptions.find((x) => x.text === 'Creative').value &&
-          permissions.savePDF.creativeContracts) ||
-        (departmentId === contractDepartmentOptions.find((x) => x.text === 'SM / Tech / Crew').value &&
-          permissions.savePDF.smTechCrewContracts))
-    ) {
+    if (colId === 'pdf' && checkDepartmentPermissions(departmentId)) {
       // Export PDF
       console.log('ExportPDF needs implementation');
     }

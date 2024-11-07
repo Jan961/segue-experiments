@@ -6,6 +6,7 @@ import { calculateWeekNumber } from 'services/dateService';
 import { group } from 'radash';
 import { loggingService } from 'services/loggingService';
 import { getCurrencyCodeFromCountryId } from 'services/venueCurrencyService';
+import { isNull } from 'utils';
 
 export type SummaryResponseDTO = {
   Performances: PerformanceDTO[];
@@ -69,29 +70,55 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
 
     const NumberOfPerformances: number = performances.length;
 
-    const salesSummary = await prisma.salesSetTotalsView.findFirst({
+    const generalSales = await prisma.salesSetTotalsView.findFirst({
       where: {
-        SaleTypeName: {
-          in: ['General Sales', 'School Sales'],
-        },
+        SaleTypeName: 'General Sales',
         SetBookingId: BookingId,
-        Seats: {
-          not: 0,
-        },
-        Value: {
-          not: 0,
-        },
-      },
-      select: {
-        SetSalesFiguresDate: true,
-        SetIsFinalFigures: true,
-        Seats: true,
-        Value: true,
+        Seats: { not: 0 },
+        Value: { not: 0 },
       },
       orderBy: {
         SetSalesFiguresDate: 'desc',
       },
+      select: {
+        Seats: true,
+        Value: true,
+        SetSalesFiguresDate: true,
+      },
     });
+
+    const schoolSales = await prisma.salesSetTotalsView.findFirst({
+      where: {
+        SaleTypeName: 'School Sales',
+        SetBookingId: BookingId,
+        Seats: { not: 0 },
+        Value: { not: 0 },
+      },
+      orderBy: {
+        SetSalesFiguresDate: 'desc',
+      },
+      select: {
+        Seats: true,
+        Value: true,
+        SetSalesFiguresDate: true,
+      },
+    });
+
+    const schProcessed = isNull(schoolSales)
+      ? { Seats: 0, Value: 0 }
+      : {
+          Seats: parseInt(schoolSales.Seats.valueOf().toString()),
+          Value: parseFloat(schoolSales.Value.valueOf().toString()),
+        };
+    const genProcessed = isNull(generalSales)
+      ? { Seats: 0, Value: 0 }
+      : {
+          Seats: parseInt(generalSales.Seats.valueOf().toString()),
+          Value: parseFloat(generalSales.Value.valueOf().toString()),
+        };
+
+    const seatsSoldTotal = genProcessed.Seats + schProcessed.Seats;
+    const valueSoldTotal = genProcessed.Value + schProcessed.Value;
 
     const booking: any = await prisma.booking.findFirst({
       select: {
@@ -149,25 +176,25 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       select: { CurrencySymbolUnicode: true },
     });
 
-    const SymbolUnicode = unicodeQuery?.CurrencySymbolUnicode;
+    const symbolUnicode = unicodeQuery?.CurrencySymbolUnicode;
 
     const { ConversionRate } = performance?.DateBlock?.Production?.ConversionRate || {};
-    const AvgTicketPrice = salesSummary === null ? 0 : Number(salesSummary.Value) / Number(salesSummary.Seats);
-    const TotalSeats = Capacity * NumberOfPerformances;
-    const GrossProfit = AvgTicketPrice === 0 ? 0 : AvgTicketPrice * TotalSeats;
-    const seatsSalePercentage = salesSummary === null ? 0 : (Number(salesSummary?.Seats) / TotalSeats) * 100;
+    const avgTicketPrice = valueSoldTotal / seatsSoldTotal;
+    const totalSeats = Capacity * NumberOfPerformances;
+    const grossProfit = avgTicketPrice === 0 ? 0 : avgTicketPrice * totalSeats;
+    const seatsSalePercentage = (Number(seatsSoldTotal) / totalSeats) * 100;
     const currentProductionWeekNum = calculateWeekNumber(new Date(), new Date(booking.FirstDate));
 
     const result: SummaryResponseDTO = {
       Performances: performances,
       Info: {
-        SeatsSold: salesSummary?.Seats === undefined ? 0 : Number(salesSummary?.Seats),
-        Seats: TotalSeats,
-        SalesValue: salesSummary?.Value === undefined ? 0 : Number(salesSummary?.Value),
-        AvgTicketPrice: AvgTicketPrice && parseFloat(AvgTicketPrice.toFixed(2)),
-        GrossPotential: GrossProfit && parseFloat(GrossProfit.toFixed(2)),
+        SeatsSold: Number(seatsSoldTotal),
+        Seats: totalSeats,
+        SalesValue: Number(valueSoldTotal),
+        AvgTicketPrice: avgTicketPrice,
+        GrossPotential: grossProfit,
         VenueCurrencyCode: currencyCode,
-        VenueCurrencySymbol: SymbolUnicode,
+        VenueCurrencySymbol: symbolUnicode,
         seatsSalePercentage: seatsSalePercentage && parseFloat(seatsSalePercentage.toFixed(1)),
         ConversionRate,
         Capacity,
@@ -175,7 +202,8 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       ProductionInfo: {
         StartDate: booking?.DateBlock.StartDate,
         Date: performances?.[0]?.Date,
-        salesFigureDate: salesSummary?.SetSalesFiguresDate.toISOString(),
+        salesFigureDate:
+          generalSales?.SetSalesFiguresDate.toISOString() || schoolSales?.SetSalesFiguresDate.toISOString(),
         week: currentProductionWeekNum,
         lastDate: performances?.[performances?.length - 1]?.Date,
         numberOfDays: Object.keys(group(performances, (performance) => performance.Date)).length,

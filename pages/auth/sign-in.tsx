@@ -15,12 +15,7 @@ import { isNullOrEmpty } from 'utils';
 import { PIN_REGEX, SESSION_ALREADY_EXISTS } from 'utils/authUtils';
 import usePermissions from 'hooks/usePermissions';
 import useAuth from 'hooks/useAuth';
-
-export const LoadingOverlay = () => (
-  <div className="inset-0 absolute bg-white bg-opacity-50 z-50 flex justify-center items-center top-20 left-20 right-20 bottom-20">
-    <Spinner size="lg" />
-  </div>
-);
+import LoadingOverlay from 'components/core-ui-lib/LoadingOverlay';
 
 const SignIn = () => {
   const { setUserPermissions } = usePermissions();
@@ -301,7 +296,7 @@ const SignIn = () => {
           </div>
         )}
       </div>
-      {isBusy && <LoadingOverlay />}
+      {isBusy && <LoadingOverlay className="top-20 left-20 right-20 bottom-20" />}
     </div>
   );
 };
