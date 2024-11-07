@@ -194,8 +194,8 @@ const LoadSalesHistory = () => {
           )}
 
           <div className="flex gap-x-3 place-content-end">
-            <Button text="Instructions" className="w-[155px]" onClick={() => downloadInstructions()} />
-            <Button text="Download Template" className="w-[155px]" onClick={() => downloadExample()} />
+            <Button text="Instructions" className="w-[155px]" onClick={downloadInstructions} />
+            <Button text="Download Template" className="w-[155px]" onClick={downloadExample} />
             <Button
               text="Upload Spreadsheet"
               className="w-[155px]"
