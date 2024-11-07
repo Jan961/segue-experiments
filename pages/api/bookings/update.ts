@@ -4,9 +4,9 @@ import {
   createNewBooking,
   createNewRehearsal,
   createOtherBooking,
-  deleteBookingById,
   deleteGetInFitUpById,
   deleteOtherById,
+  deletePerformanceById,
   deleteRehearsalById,
   updateBooking,
   updateGetInFitUp,
@@ -93,6 +93,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     // Check if this is a straight forward update or a delete-insert
     const acc: typeof rowsMap = updated.reduce((acc, booking: BookingItem) => {
       const shouldUpdateBooking = originalItem.isBooking && booking.isBooking;
+      console.log('shouldUpdateBooking', shouldUpdateBooking, originalItem, booking);
       if (shouldUpdateBooking) {
         acc.booking.rowsToUpdate.push(formatExistingBookingToPrisma({ ...booking, id: originalItem.id }));
       } else {
@@ -118,8 +119,13 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       return acc;
     }, rowsMap);
 
-    const promises = [];
+    // check if the original item needs deleting
+    if (!updated.find(({ id }) => id === originalItem.id)) {
+      const type = getBookngType(originalItem);
+      acc[type].rowsToDelete.push(originalItem);
+    }
 
+    const promises = [];
     for (const bookingType of Object.entries(acc)) {
       const [model, { rowsToInsert, rowsToUpdate, rowsToDelete }] = bookingType;
 
@@ -157,7 +163,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       rowsToDelete.forEach((rowToDelete) => {
         switch (model) {
           case 'booking':
-            promises.push(deleteBookingById(rowToDelete.id, prisma));
+            promises.push(deletePerformanceById(rowToDelete.id, prisma));
             break;
           case 'rehearsal':
             promises.push(deleteRehearsalById(rowToDelete.id, prisma));

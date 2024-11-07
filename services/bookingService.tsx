@@ -135,6 +135,14 @@ export const deleteBookingById = async (id: number, tx) => {
   });
 };
 
+export const deletePerformanceById = async (id: number, tx) => {
+  await tx.performance.delete({
+    where: {
+      Id: id,
+    },
+  });
+};
+
 export const deleteRehearsalById = async (id: number, tx) => {
   await tx.rehearsal.delete({
     where: {
