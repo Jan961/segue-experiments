@@ -1,19 +1,21 @@
 import Table from 'components/core-ui-lib/Table';
 import { contractsStyleProps, contractsColumnDefs } from 'components/contracts/tableConfig';
 import { useEffect, useRef, useState } from 'react';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { contractsFilterState } from 'state/contracts/contractsFilterState';
 import { formatRowsForMultipeBookingsAtSameVenue, formatRowsForPencilledBookings } from '../../bookings/utils';
 import { ContractTableRowType } from 'interfaces';
 import EditVenueContractModal from '../modal/EditVenueContractModal';
 import { addEditContractsState } from '../../../state/contracts/contractsState';
 import { RowDoubleClickedEvent } from 'ag-grid-community';
+import { accessVenueContracts } from 'state/account/selectors/permissionSelector';
 
 interface ContractsTableProps {
   rowData?: ContractTableRowType;
 }
 
 export default function ContractsTable({ rowData }: ContractsTableProps) {
+  const permissions = useRecoilValue(accessVenueContracts);
   const tableRef = useRef(null);
   const [filter, setFilter] = useRecoilState(contractsFilterState);
   const [editContractData, setEditContractData] = useRecoilState(addEditContractsState);
@@ -52,7 +54,7 @@ export default function ContractsTable({ rowData }: ContractsTableProps) {
   }, [rowData]);
 
   const handleRowDoubleClicked = (e: RowDoubleClickedEvent) => {
-    if (e.data.dayType === 'Performance') {
+    if (e.data.dayType === 'Performance' && permissions.includes('ACCESS_DEAL_MEMO_AND_CONTRACT_OVERVIEW')) {
       setEditContractData({
         visible: true,
         contract: e.data,

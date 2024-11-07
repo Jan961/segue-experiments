@@ -274,7 +274,7 @@ export const seatKillsColDefs = (handleChange, currencySymbol) => [
   },
 ];
 
-export const attachmentsColDefs = [
+export const attachmentsColDefs = (exportPdfPermission: boolean) => [
   {
     headerName: 'Title',
     field: 'FileOriginalFilename',
@@ -300,6 +300,7 @@ export const attachmentsColDefs = [
     cellRenderer: ButtonRenderer,
     cellRendererParams: {
       buttonText: 'View',
+      disabled: !exportPdfPermission,
     },
     width: 100,
   },
