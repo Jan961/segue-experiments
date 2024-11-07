@@ -1,7 +1,7 @@
 import { getTimeInMins } from 'components/bookings/panel/utils/AddNewBooking';
 import Button from 'components/core-ui-lib/Button';
 import Checkbox from 'components/core-ui-lib/Checkbox';
-import LoadingOverlay from 'components/shows/LoadingOverlay';
+import LoadingOverlay from 'components/core-ui-lib/LoadingOverlay';
 import TextInput from 'components/core-ui-lib/TextInput';
 import TimeInput from 'components/core-ui-lib/TimeInput';
 import { DEFAULT_GAP_SUGGEST_FORM_STATE } from 'config/AddBooking';
