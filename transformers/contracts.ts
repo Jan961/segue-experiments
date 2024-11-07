@@ -40,6 +40,7 @@ export const transformPersonDetails = (personData: any): PersonDetails => {
     address1: personData.Address?.Address1 || null,
     address2: personData.Address?.Address2 || null,
     address3: personData.Address?.Address3 || null,
+    country: personData.Address?.AddressCountryId || null,
     town: personData.Address?.AddressTown || null,
     mobileNumber: personData.PersonMobile || null,
     passportName: personData.PersonPassportName || null,
@@ -48,9 +49,8 @@ export const transformPersonDetails = (personData: any): PersonDetails => {
     passportExpiryDate: personData.PersonPassportExpiryDate ? personData.PersonPassportExpiryDate.toISOString() : null,
     postcode: personData.Address?.AddressPostcode || null,
     checkedBy: null,
-    country: personData.Address?.CountryId || null,
     isFEURequired: personData.PersonFEURequired,
-    workType: personData.PersonPersonRole?.map((role: any) => role.PersonRoleId),
+    workType: personData.PersonPersonRole?.map((role: any) => role.PersonRole.PersonRoleId),
     advisoryNotes: personData.PersonAdvisoryNotes || null,
     generalNotes: personData.PersonNotes || null,
     healthDetails: personData.PersonHealthNotes || null,
@@ -64,6 +64,7 @@ export const transformPersonDetails = (personData: any): PersonDetails => {
 
 interface OrganisationDetails {
   agencyPersonId?: number;
+  id?: number;
   firstName: string | null;
   lastName: string | null;
   email: string | null;
@@ -102,8 +103,9 @@ export const transformOrganisationDetails = (organisationData: any): Organisatio
     website: organisationData.OrgWebsite || null,
     town: contactPerson?.Address?.AddressTown || null,
     postcode: contactPerson?.Address?.AddressPostcode || null,
-    country: contactPerson?.Address?.CountryId || null,
+    country: contactPerson?.Address?.AddressCountryId || null,
     agencyName: organisationData.OrgName || null,
+    id: organisationData?.OrgId || null,
     landlineNumber: contactPerson?.PersonPhone || null,
   };
 };

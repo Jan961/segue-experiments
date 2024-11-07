@@ -4,6 +4,8 @@ module.exports = {
   collectCoverageFrom: ['**/*.{ts,tsx}', '!**/*.d.ts', '!**/node_modules/**', '!**/*.stories.tsx'],
   modulePaths: ['<rootDir>'],
   moduleNameMapper: {
+    uuid: require.resolve('uuid'),
+
     // Handle CSS imports (with CSS modules)
     // https://jestjs.io/docs/webpack#mocking-css-modules
     '^.+\\.module\\.(css|sass|scss)$': 'identity-obj-proxy',
