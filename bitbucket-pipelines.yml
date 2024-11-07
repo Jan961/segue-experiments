@@ -39,9 +39,7 @@ pipelines:
             - zip -r reports.zip cypress/reports/
             - npx mochawesome-merge cypress/reports/mocha/*.json -o output.json
             - npx marge output.json
-            - ls -al
           after-script:
-            - tree -I "node_modules"
             - cd cypress-tests/cypress
             - apt-get update && apt-get install -y jq
             # Create a custom HTML report from output.json
@@ -136,16 +134,12 @@ pipelines:
                 ALERT_TYPE="error";
                 echo "Tests failed but continuing with report generation";
               fi
-            - echo "$SMTP_USERNAME"
-            - echo "$SMTP_PASSWORD"
-            - tree -I "node_modules"
-            - cat test-report.html
             - pipe: atlassian/email-notify:0.13.2
               variables:
                 USERNAME: $SMTP_USERNAME
                 PASSWORD: $SMTP_PASSWORD
-                FROM: 'asara97911@gmail.com'
-                TO: 'asara97911@gmail.com'
+                FROM: 'seguetesting@gmail.com'
+                TO: 'testing@segue360.co.uk'
                 HOST: 'smtp.gmail.com'
                 SUBJECT: '${ALERT_TYPE}:Bitbucket Pipe Notification for ${BITBUCKET_BRANCH}'
                 ATTACHMENTS: 'reports.zip'
