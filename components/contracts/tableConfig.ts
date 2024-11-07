@@ -12,10 +12,10 @@ import SelectCellRenderer from 'components/core-ui-lib/Table/renderers/SelectCel
 import { companyContractStatusOptions, statusToBgColorMap } from 'config/contracts';
 import DateRenderer from 'components/core-ui-lib/Table/renderers/DateRenderer';
 import NotesRenderer from 'components/core-ui-lib/Table/renderers/NotesRenderer';
-import DownloadButtonRenderer from 'components/core-ui-lib/Table/renderers/DownloadButtonRenderer';
 import TextInputRenderer from 'components/core-ui-lib/Table/renderers/TextInputRenderer';
 import CurrencyInputRenderer from 'components/core-ui-lib/Table/renderers/CurrencyInputRenderer';
 import { formatValue } from './utils';
+import { ContractPermissionGroup } from 'interfaces';
 
 export const contractsStyleProps = { headerColor: tileColors.contracts };
 
@@ -79,7 +79,12 @@ export const contractsColumnDefs = [
   },
 ];
 
-export const getCompanyContractsColumnDefs = (userList = []) => [
+export const getCompanyContractsColumnDefs = (
+  contractStatusDisable: ContractPermissionGroup,
+  pdfDisabled: ContractPermissionGroup,
+  editDisabled: ContractPermissionGroup,
+  userList = [],
+) => [
   {
     headerName: 'First Name',
     field: 'firstName',
@@ -113,10 +118,13 @@ export const getCompanyContractsColumnDefs = (userList = []) => [
     cellRenderer: SelectCellRenderer,
     valueGetter: (params) => params?.data?.contractStatus,
     flex: 1,
-    editable: true,
-    cellRendererParams: () => ({
+    cellRendererParams: (params) => ({
       options: companyContractStatusOptions,
       isSearchable: true,
+      disabled:
+        (params.data.departmentId === 1 && !contractStatusDisable.artisteContracts) ||
+        (params.data.departmentId === 2 && !contractStatusDisable.creativeContracts) ||
+        (params.data.departmentId === 3 && !contractStatusDisable.smTechCrewContracts),
     }),
   },
   {
@@ -124,11 +132,15 @@ export const getCompanyContractsColumnDefs = (userList = []) => [
     field: 'edit',
     width: 60,
     cellRenderer: ButtonRenderer,
-    cellRendererParams: {
+    cellRendererParams: (params) => ({
       buttonText: 'Edit',
       variant: 'primary',
       width: 60,
-    },
+      disabled:
+        (params.data.departmentId === 1 && !editDisabled.artisteContracts) ||
+        (params.data.departmentId === 2 && !editDisabled.creativeContracts) ||
+        (params.data.departmentId === 3 && !editDisabled.smTechCrewContracts),
+    }),
     resizable: false,
     headerClass: 'text-center',
   },
@@ -136,12 +148,15 @@ export const getCompanyContractsColumnDefs = (userList = []) => [
     headerName: '',
     field: 'pdf',
     width: 100,
-    cellRenderer: DownloadButtonRenderer,
+    cellRenderer: ButtonRenderer,
     cellRendererParams: (params) => ({
       buttonText: 'Save as PDF',
       variant: 'primary',
       width: 90,
-      href: `/api/company-contracts/export/${params.data?.id}`,
+      disabled:
+        (params.data.departmentId === 1 && !pdfDisabled.artisteContracts) ||
+        (params.data.departmentId === 2 && !pdfDisabled.creativeContracts) ||
+        (params.data.departmentId === 3 && !pdfDisabled.smTechCrewContracts),
     }),
     cellStyle: {
       paddingRight: '0.5em',
