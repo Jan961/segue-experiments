@@ -1,3 +1,4 @@
+import classNames from 'classnames';
 import React, { forwardRef, useEffect, useRef } from 'react';
 
 export interface TextInputProps {
@@ -51,7 +52,7 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextInputProps>(
 
     const baseClass = `block min-w-fit h-[1.9375rem] text-sm shadow-input-shadow text-primary-input-text rounded-md !border-primary-border outline-none focus:ring-2 focus:ring-primary-input-text ring-inset`;
     const disabledClass = disabled
-      ? `${defaultDisabled ? '!bg-disabled-input' : 'disabled-input'} !cursor-not-allowed !pointer-events-none`
+      ? `${defaultDisabled ? 'disabled-input' : 'disabled-input'} !cursor-not-allowed !pointer-events-none`
       : '';
 
     return (
@@ -67,7 +68,7 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextInputProps>(
             }
           }}
           id={id}
-          className={`${baseClass} ${disabledClass} ${className}`}
+          className={classNames(baseClass, disabledClass, className)}
           disabled={disabled}
           onChange={handleChange}
           placeholder={placeholder}

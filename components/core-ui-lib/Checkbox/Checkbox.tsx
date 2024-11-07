@@ -69,7 +69,7 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
           focus:checked:bg-primary-input-text 
           checked:hover:bg-primary-input-text  
           checked:bg-primary-input-text
-          ${disabled ? 'bg-[#E9EBF0CC]' : 'bg-[#FFF]'}
+          ${disabled ? 'disabled-input' : ''}
           `}
         />
 
