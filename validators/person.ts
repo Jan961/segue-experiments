@@ -219,7 +219,6 @@ export const updatePersonSchema = yup.object().shape({
   emergencyContact2: createEmergencyContactShape(2),
 });
 
-
 export const createPersonSchema = yup.object().shape({
   personDetails: yup
     .object()
@@ -228,17 +227,17 @@ export const createPersonSchema = yup.object().shape({
       firstName: yup.string().required(),
       lastName: yup.string().required(),
       otherWorkTypes: yup
-      .array()
-      .of(
-        yup.object({
-          name: yup.string().required('Name is required for other work types')
-        })
-      )
-      .optional()
-      .transform((value, originalValue) => {
-        if (!value) return value;
-        return value.map(item => item.name).filter(x => x);
-      })
+        .array()
+        .of(
+          yup.object({
+            name: yup.string().required('Name is required for other work types'),
+          }),
+        )
+        .optional()
+        .transform((value) => {
+          if (!value) return value;
+          return value.map((item) => item.name).filter((x) => x);
+        }),
     })
     .required(),
   agencyDetails: yup.object().nullable(),

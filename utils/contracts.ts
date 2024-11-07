@@ -1,4 +1,6 @@
+import { contractOptionMapping, contractDepartmentOptions } from 'config/contracts';
 import {
+  ContractPermissionGroup,
   ContractsDTO,
   DateBlockDTO,
   GetInFitUpDTO,
@@ -149,6 +151,13 @@ export const formatMinutes = (minutes: number) => {
   const hours = Math.floor(minutes / 60);
   const remainingMinutes = minutes % 60;
   return `${hours ? hours + ' hr ' : ''} ${remainingMinutes ? remainingMinutes + ' min' : ''}`;
+};
+
+export const getContractDropdownOptions = (permissions: ContractPermissionGroup) => {
+  return Object.entries(contractOptionMapping)
+    .filter(([key]) => permissions[key])
+    .map(([, text]) => contractDepartmentOptions.find((x) => x.text === text))
+    .filter(Boolean);
 };
 
 export default ContractsHelper;

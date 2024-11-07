@@ -1,7 +1,7 @@
 import classNames from 'classnames';
 import { SpinIcon } from '../assets/svg';
 
-type variant = 'xs' | 'sm' | 'md' | 'lg';
+export type variant = 'xs' | 'sm' | 'md' | 'lg';
 
 interface LoaderProps {
   text?: string;

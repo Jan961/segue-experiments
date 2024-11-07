@@ -143,7 +143,7 @@ export const prepareAccountUpdateData = (accountDetails: Partial<BankAccount>, i
   };
 
   // Only add the country relation if there's a country value
-  const countryField = isSalary 
+  const countryField = isSalary
     ? 'Country_Person_PersonPaymentBankCountryIdToCountry'
     : 'Country_Person_PersonExpensesBankCountryIdToCountry';
 
