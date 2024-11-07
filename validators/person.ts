@@ -1,7 +1,8 @@
+import { omit } from 'radash';
 import * as yup from 'yup';
 
 export const personShape = {
-  firstName: yup.string().nullable(),
+  firstName: yup.string().nullable().required(),
   lastName: yup.string().nullable(),
   email: yup.string().email().nullable(),
   landline: yup.string().nullable(),
@@ -14,7 +15,7 @@ export const personShape = {
   passportName: yup.string().nullable(),
   passportNumber: yup.string().nullable(),
   hasUKWorkPermit: yup.boolean().nullable(),
-  passportExpiryDate: yup.date().nullable(),
+  passportExpiryDate: yup.string().nullable(),
   postcode: yup.string().nullable(),
   checkedBy: yup.number().integer().nullable(),
   country: yup.number().integer().nullable(),
@@ -25,24 +26,137 @@ export const personShape = {
   healthDetails: yup.string().nullable(),
   otherWorkTypes: yup
     .array()
-    .of(yup.object().shape({ id: yup.number().nullable(), name: yup.string().required() }))
+    .of(yup.object().shape({ id: yup.number().nullable(), name: yup.string().nullable() }))
     .nullable(),
   notes: yup.string().nullable(),
 };
 
-export const createPersonSchema = yup.object().shape({
-  personDetails: yup
+const personFields = {
+  id: yup.number().integer().nullable(),
+  firstName: yup.string().nullable(),
+  lastName: yup.string().nullable(),
+  email: yup.string().email('Invalid email').nullable(),
+  landline: yup.string().nullable(),
+  addressId: yup.number().nullable(),
+  address1: yup.string().nullable(),
+  address2: yup.string().nullable(),
+  address3: yup.string().nullable(),
+  town: yup.string().nullable(),
+  postcode: yup.string().nullable(),
+  country: yup.number().integer().nullable(),
+  mobileNumber: yup.string().nullable(),
+};
+
+// Common contact fields that extend personFields
+const contactFields = {
+  ...personFields,
+  passportName: yup.string().nullable(),
+  passportNumber: yup.string().nullable(),
+  hasUKWorkPermit: yup.boolean().nullable(),
+  passportExpiryDate: yup.date().nullable(),
+  checkedBy: yup.number().integer().nullable(),
+  isFEURequired: yup.boolean().nullable(),
+  advisoryNotes: yup.string().nullable(),
+  generalNotes: yup.string().nullable(),
+  healthDetails: yup.string().nullable(),
+  notes: yup.string().nullable(),
+};
+
+// Account details schema
+const accountDetailsShape = {
+  paidTo: yup.string().nullable(),
+  accountName: yup.string().nullable(),
+  accountNumber: yup.string().nullable(),
+  sortCode: yup.string().nullable(),
+  swift: yup.string().nullable(),
+  iban: yup.string().nullable(),
+  country: yup.number().integer().nullable(),
+};
+
+// Agency details specific fields
+const agencyRelevantFields = [
+  'lastName',
+  'email',
+  'mobileNumber',
+  'landline',
+  'website',
+  'address1',
+  'address2',
+  'address3',
+  'town',
+  'postcode',
+  'country',
+];
+const agencyFields = {
+  ...omit(personFields, ['firstName']),
+  agencyPersonId: yup.number().integer().nullable(),
+  website: yup.string().url().nullable(),
+  agencyName: yup.string().nullable(),
+  landlineNumber: yup.string().nullable(),
+};
+
+const hasNonEmptyValues = (obj, fields) => {
+  return fields.some((field) => {
+    const value = obj?.[field];
+    return value !== null && value !== undefined && value !== '';
+  });
+};
+
+// Helper function to create emergency contact validation
+const createEmergencyContactShape = (contactNumber) => {
+  // Define emergency contact specific fields to check
+  const emergencyContactFields = [
+    'lastName',
+    'email',
+    'mobileNumber',
+    'landline',
+    'address1',
+    'address2',
+    'address3',
+    'town',
+    'postcode',
+    'country',
+  ];
+
+  return yup
     .object()
     .shape({
-      ...personShape,
-      firstName: yup.string().required(),
-      lastName: yup.string().required(),
+      ...contactFields,
+      firstName: yup
+        .string()
+        .nullable()
+        .when(['id', ...emergencyContactFields], {
+          is: (id: number, ...values) => {
+            return !id && values.some((value) => !!value);
+          },
+          then: (schema) => schema.required(`Emergency Contact ${contactNumber} First Name is required`),
+          otherwise: (schema) => schema.nullable(),
+        }),
     })
-    .required(),
-  agencyDetails: yup.object().nullable(),
-  emergencyContact1: yup.object().nullable(),
-  emergencyContact2: yup.object().nullable(),
-});
+    .nullable()
+    .transform((value, originalValue) => {
+      if (!value || !originalValue) return null;
+
+      const allFieldsEmpty = ['firstName', ...emergencyContactFields].every((field) => {
+        const fieldValue = originalValue[field];
+        return fieldValue === null || fieldValue === undefined || fieldValue === '';
+      });
+
+      return allFieldsEmpty ? null : value;
+    });
+};
+
+const transformAgencyDetails = (value, originalValue) => {
+  if (originalValue?.id) return value;
+  if (!value || !originalValue || (!originalValue.hasAgent && !originalValue.id)) return null;
+
+  const allFieldsEmpty = Object.keys(agencyFields).every((field) => {
+    const fieldValue = originalValue[field];
+    return fieldValue === null || fieldValue === undefined || fieldValue === '';
+  });
+
+  return allFieldsEmpty ? null : value;
+};
 
 export const updatePersonSchema = yup.object().shape({
   personDetails: yup
@@ -53,107 +167,80 @@ export const updatePersonSchema = yup.object().shape({
   agencyDetails: yup
     .object()
     .shape({
-      agencyPersonId: yup.number().integer().nullable(),
+      ...agencyFields,
       firstName: yup.string().nullable(),
-      lastName: yup.string().nullable(),
-      email: yup.string().email('Invalid email provided for Agency Details').nullable(),
-      landline: yup.string().nullable(),
-      addressId: yup.number().nullable(),
-      address1: yup.string().nullable(),
-      address2: yup.string().nullable(),
-      address3: yup.string().nullable(),
       name: yup.string().nullable(),
-      mobileNumber: yup.string().nullable(),
-      website: yup.string().url().nullable(),
-      town: yup.string().nullable(),
-      postcode: yup.string().nullable(),
-      country: yup.number().integer().nullable(),
-      agencyName: yup.string().nullable(),
-      landlineNumber: yup.string().nullable(),
     })
-    .nullable(),
+    .nullable()
+    .test({
+      name: 'agency-required-fields',
+      test: function (value) {
+        if (!value) return true;
 
-  salaryAccountDetails: yup
+        // First check hasAgent
+        if (!value.hasAgent) return true;
+
+        const hasValues = hasNonEmptyValues(value, ['firstName', 'name', ...agencyRelevantFields]);
+
+        if (!hasValues) return true;
+
+        const errors = [];
+        if (!value.firstName) {
+          errors.push(
+            this.createError({
+              path: `${this.path}.firstName`,
+              message: 'Agency Contact First Name is required',
+            }),
+          );
+        }
+        if (!value.name) {
+          errors.push(
+            this.createError({
+              path: `${this.path}.name`,
+              message: 'Agency Name is required',
+            }),
+          );
+        }
+
+        if (errors.length > 0) {
+          throw new yup.ValidationError(errors);
+        }
+
+        return true;
+      },
+    })
+    .transform(transformAgencyDetails),
+
+  salaryAccountDetails: yup.object().shape(accountDetailsShape).nullable(),
+
+  expenseAccountDetails: yup.object().shape(accountDetailsShape).nullable(),
+
+  emergencyContact1: createEmergencyContactShape(1),
+  emergencyContact2: createEmergencyContactShape(2),
+});
+
+export const createPersonSchema = yup.object().shape({
+  personDetails: yup
     .object()
     .shape({
-      paidTo: yup.string().nullable(),
-      accountName: yup.string().nullable(),
-      accountNumber: yup.string().nullable(),
-      sortCode: yup.string().nullable(),
-      swift: yup.string().nullable(),
-      iban: yup.string().nullable(),
-      country: yup.number().integer().nullable(),
+      ...personShape,
+      firstName: yup.string().required(),
+      lastName: yup.string().required(),
+      otherWorkTypes: yup
+        .array()
+        .of(
+          yup.object({
+            name: yup.string().required('Name is required for other work types'),
+          }),
+        )
+        .optional()
+        .transform((value) => {
+          if (!value) return value;
+          return value.map((item) => item.name).filter((x) => x);
+        }),
     })
-    .nullable(),
-
-  expenseAccountDetails: yup
-    .object()
-    .shape({
-      paidTo: yup.string().nullable(),
-      accountName: yup.string().nullable(),
-      accountNumber: yup.string().nullable(),
-      sortCode: yup.string().nullable(),
-      swift: yup.string().nullable(),
-      iban: yup.string().nullable(),
-      country: yup.number().integer().nullable(),
-    })
-    .nullable(),
-
-  emergencyContact1: yup
-    .object()
-    .shape({
-      id: yup.number().integer().nullable(),
-      firstName: yup.string().nullable(),
-      lastName: yup.string().nullable(),
-      email: yup.string().email('Invalid email provided for Emergency Contact 1').nullable(),
-      landline: yup.string().nullable(),
-      addressId: yup.number().nullable(),
-      address1: yup.string().nullable(),
-      address2: yup.string().nullable(),
-      address3: yup.string().nullable(),
-      town: yup.string().nullable(),
-      mobileNumber: yup.string().nullable(),
-      passportName: yup.string().nullable(),
-      passportNumber: yup.string().nullable(),
-      hasUKWorkPermit: yup.boolean().nullable(),
-      passportExpiryDate: yup.date().nullable(),
-      postcode: yup.string().nullable(),
-      checkedBy: yup.number().integer().nullable(),
-      country: yup.number().integer().nullable(),
-      isFEURequired: yup.boolean().nullable(),
-      advisoryNotes: yup.string().nullable(),
-      generalNotes: yup.string().nullable(),
-      healthDetails: yup.string().nullable(),
-      notes: yup.string().nullable(),
-    })
-    .nullable(),
-
-  emergencyContact2: yup
-    .object()
-    .shape({
-      id: yup.number().integer().nullable(),
-      firstName: yup.string().nullable(),
-      lastName: yup.string().nullable(),
-      email: yup.string().email('Invalid email provided for Emergency Contact 2').nullable(),
-      addressId: yup.number().nullable(),
-      landline: yup.string().nullable(),
-      address1: yup.string().nullable(),
-      address2: yup.string().nullable(),
-      address3: yup.string().nullable(),
-      town: yup.string().nullable(),
-      mobileNumber: yup.string().nullable(),
-      passportName: yup.string().nullable(),
-      passportNumber: yup.string().nullable(),
-      hasUKWorkPermit: yup.boolean().nullable(),
-      passportExpiryDate: yup.date().nullable(),
-      postcode: yup.string().nullable(),
-      checkedBy: yup.number().integer().nullable(),
-      country: yup.number().integer().nullable(),
-      isFEURequired: yup.boolean().nullable(),
-      advisoryNotes: yup.string().nullable(),
-      generalNotes: yup.string().nullable(),
-      healthDetails: yup.string().nullable(),
-      notes: yup.string().nullable(),
-    })
-    .nullable(),
+    .required(),
+  agencyDetails: yup.object().nullable(),
+  emergencyContact1: createEmergencyContactShape(1),
+  emergencyContact2: createEmergencyContactShape(2),
 });

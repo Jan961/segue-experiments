@@ -12,15 +12,10 @@ import AuthError from 'components/auth/AuthError';
 import Spinner from 'components/core-ui-lib/Spinner';
 import Head from 'next/head';
 import { isNullOrEmpty } from 'utils';
-import { SESSION_ALREADY_EXISTS } from 'utils/authUtils';
+import { PIN_REGEX, SESSION_ALREADY_EXISTS } from 'utils/authUtils';
 import usePermissions from 'hooks/usePermissions';
 import useAuth from 'hooks/useAuth';
-
-export const LoadingOverlay = () => (
-  <div className="inset-0 absolute bg-white bg-opacity-50 z-50 flex justify-center items-center top-20 left-20 right-20 bottom-20">
-    <Spinner size="lg" />
-  </div>
-);
+import LoadingOverlay from 'components/core-ui-lib/LoadingOverlay';
 
 const SignIn = () => {
   const { setUserPermissions } = usePermissions();
@@ -273,16 +268,16 @@ const SignIn = () => {
               >
                 <Icon iconName="info-circle-solid" variant="xs" className="text-primary-blue ml-2" />
               </Tooltip>
-
-              <TextInput
+              <PasswordInput
                 name="pin"
                 placeholder="Enter PIN"
+                className="w-32 mb-1 ml-4"
                 value={loginDetails.pin}
+                type="password"
                 onChange={handleLoginDetailsChange}
-                className="w-24 ml-4"
-                type="text"
-                maxlength={4}
+                error={validationError?.pin}
                 autoComplete="off"
+                pattern={PIN_REGEX}
               />
             </div>
             {validationError?.pin && <AuthError error={validationError.pin[0]} />}
@@ -301,7 +296,7 @@ const SignIn = () => {
           </div>
         )}
       </div>
-      {isBusy && <LoadingOverlay />}
+      {isBusy && <LoadingOverlay className="top-20 left-20 right-20 bottom-20" />}
     </div>
   );
 };

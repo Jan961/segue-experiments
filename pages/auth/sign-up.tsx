@@ -1,23 +1,27 @@
 import AuthError from 'components/auth/AuthError';
 import { Button, Icon, Label, PasswordInput, TextInput, Tooltip } from 'components/core-ui-lib';
 import { useRouter } from 'next/router';
-import React, { useMemo, useState } from 'react';
+import * as yup from 'yup';
+import React, { useEffect, useState } from 'react';
 import {
   PASSWORD_INCORRECT,
-  validateEmail,
-  INVALID_COMPANY_ID,
+  INVALID_EMAIL_OR_COMPANY_NAME,
   EMAIL_NOT_FOUND,
   INVALID_VERIFICATION_STRATEGY,
   SESSION_ALREADY_EXISTS,
+  PIN_REGEX,
 } from 'utils/authUtils';
 import { calibri } from 'lib/fonts';
 import Image from 'next/image';
 import axios from 'axios';
-import { useClerk, useSignIn, useSignUp } from '@clerk/nextjs';
+import { useClerk, useSignUp } from '@clerk/nextjs';
 import Link from 'next/link';
-import classNames from 'classnames';
 
-const PIN_REGEX = /^[0-9]{4}$/;
+import { userPreSignUpSchema, userSignUpSchema } from 'validators/auth';
+import useAuth from 'hooks/useAuth';
+import usePermissions from 'hooks/usePermissions';
+import { isNullOrEmpty } from 'utils';
+import LoadingOverlay from '../../components/core-ui-lib/LoadingOverlay';
 
 const DEFAULT_ACCOUNT_DETAILS = {
   firstName: '',
@@ -27,48 +31,48 @@ const DEFAULT_ACCOUNT_DETAILS = {
   phoneNumber: '',
   password: '',
   confirmPassword: '',
-  organisationId: '',
-  pin: '',
-  repeatPin: '',
+  pin: 0,
+  repeatPin: 0,
+  isSystemAdmin: true,
 };
 
 const SignUp = () => {
   const router = useRouter();
+  const { signIn, navigateToHome } = useAuth();
+  const [isBusy, setIsBusy] = useState(false);
+  const { isSignedIn, setUserPermissions } = usePermissions();
   const [error, setError] = useState('');
+  const [validationError, setValidationError] = useState(null);
   const [showLogout, setShowLogout] = useState(false);
   const { signOut } = useClerk();
   const { isLoaded: signUpLoaded, signUp } = useSignUp();
-  const [authMode, setAuthMode] = useState<'default' | 'signUp' | 'signIn'>('default');
-  const { signIn } = useSignIn();
+  const [authMode, setAuthMode] = useState<'default' | 'newUser' | 'existingUser'>('default');
+  const [signedInExistingUserDetails, setSignedInExistingUserDetails] = useState({
+    organisationId: '',
+    permissions: [],
+  });
   const [accountDetails, setAccountDetails] = useState(DEFAULT_ACCOUNT_DETAILS);
-
-  const isValidEmail = useMemo(() => validateEmail(accountDetails.email), [accountDetails.email]);
-
-  const isFormValid = useMemo(() => {
-    switch (authMode) {
-      case 'default':
-        return isValidEmail && accountDetails.organisationId;
-      case 'signUp':
-        return PIN_REGEX.test(accountDetails.pin) && accountDetails.pin === accountDetails.repeatPin;
-      case 'signIn':
-        return true;
-    }
-  }, [accountDetails, isValidEmail, authMode]);
 
   const handleAccountDetailsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setAccountDetails({ ...accountDetails, [e.target.name]: e.target.value });
   };
 
+  const clearErrors = () => {
+    setValidationError(null);
+    setError('');
+  };
+
   const verifyUserExits = async () => {
     try {
       const { data } = await axios.post('/api/user/verify', {
-        organisationId: accountDetails.organisationId,
-        Email: accountDetails.email,
+        companyName: accountDetails.companyName,
+        email: accountDetails.email,
       });
-      if (data.id) {
-        setAccountDetails((prev) => ({ ...prev, accountId: data.id }));
+      if (data.accountUserExists) {
+        router.push('/auth/sign-in');
       } else {
-        setAuthMode('signIn');
+        setAccountDetails((prev) => ({ ...prev, firstName: data.firstName, lastName: data.lastName }));
+        setAuthMode('existingUser');
       }
     } catch (err) {
       setError(err.errors[0].message);
@@ -77,36 +81,46 @@ const SignUp = () => {
 
   const verifyCredentials = async () => {
     try {
+      setError('');
+      await userPreSignUpSchema.validate(accountDetails, { abortEarly: false });
+
       // Check for valid company id
       const { data } = await axios.post('/api/account/validate', {
-        organisationId: accountDetails.organisationId,
+        companyName: accountDetails.companyName,
         email: accountDetails.email,
       });
 
-      if (!data.id) {
-        setError(INVALID_COMPANY_ID);
+      if (!data.accountExists) {
+        setError(INVALID_EMAIL_OR_COMPANY_NAME);
         return;
       }
       setAccountDetails((prev) => ({ ...prev, accountId: data.id }));
-      // Check if user already registered with Clerk
-      await signIn.create({
-        identifier: accountDetails.email,
-        password: 'dummy_password',
-      });
+      // Check if user already registered with Clerk. The create method will error if the user already exists
+      await signIn(accountDetails.email, 'dummy_password');
       return true;
-    } catch (err) {
-      const errorCode = err.errors[0].code;
-
-      if (errorCode === EMAIL_NOT_FOUND) {
-        setAuthMode('signUp');
-      } else if (errorCode === PASSWORD_INCORRECT || errorCode === INVALID_VERIFICATION_STRATEGY) {
-        // 'User already registeredwith clerk. Verify if they have a pin registered'
-        verifyUserExits();
-      } else if (errorCode === SESSION_ALREADY_EXISTS) {
-        setShowLogout(true);
-        setError('Please log out of the current session and try again');
+    } catch (error) {
+      if (error instanceof yup.ValidationError) {
+        const formattedErrors = error.inner.reduce((acc, err) => {
+          return {
+            ...acc,
+            [err.path]: acc[err.path] ? [...acc[err.path], err.errors[0]] : [err.errors[0]],
+          };
+        }, {});
+        setValidationError(formattedErrors);
       } else {
-        setError(err.errors[0].messsage);
+        const errorCode = error?.errors[0]?.code;
+
+        if (errorCode === EMAIL_NOT_FOUND) {
+          setAuthMode('newUser');
+        } else if (errorCode === PASSWORD_INCORRECT || errorCode === INVALID_VERIFICATION_STRATEGY) {
+          // 'User already registeredwith clerk. Verify if they have a pin registered'
+          verifyUserExits();
+        } else if (errorCode === SESSION_ALREADY_EXISTS) {
+          setShowLogout(true);
+          setError('Please log out of the current session and try again');
+        } else {
+          setError(error?.errors[0]?.messsage || 'An error occurred, please try again');
+        }
       }
     }
   };
@@ -130,44 +144,98 @@ const SignUp = () => {
     }
   };
 
-  const handleSaveUser = async () => {
+  const saveNewUser = async () => {
+    setIsBusy(true);
     setShowLogout(false);
     try {
+      await userSignUpSchema.validate(accountDetails, { abortEarly: false });
       // Create the user within clerk
       await createNewUserWithClerk();
 
       // Create the user in our database
-      await axios.post('/api/user/create', accountDetails);
+      await axios.post('/api/user/create-admin-user', { user: accountDetails, accountUserOnly: false });
 
       router.push('/auth/user-created');
     } catch (error: any) {
-      setError('Something went wrong, please try again');
+      if (error instanceof yup.ValidationError) {
+        const formattedErrors = error.inner.reduce((acc, err) => {
+          return {
+            ...acc,
+            [err.path]: acc[err.path] ? [...acc[err.path], err.errors[0]] : [err.errors[0]],
+          };
+        }, {});
+        setValidationError(formattedErrors);
+      } else {
+        console.error(error);
+        setError('Something went wrong, please try again');
+      }
+    } finally {
+      setIsBusy(false);
     }
   };
 
-  const handleUpdateUser = async () => {
+  const saveExistingUser = async () => {
+    setIsBusy(true);
+    setShowLogout(false);
     try {
-      await axios.post('/api/user/update', accountDetails);
-      router.push('/auth/sign-in ');
+      await userSignUpSchema.validate(
+        { ...accountDetails, confirmPassword: accountDetails.password },
+        { abortEarly: false },
+      );
+      // Authenticate the user within clerk first to check if we have a valid password
+      await signIn(accountDetails.email, accountDetails.password);
+
+      // Create the user in our database
+      const { data } = await axios.post('/api/user/create-admin-user', { user: accountDetails, accountUserOnly: true });
+
+      setSignedInExistingUserDetails({ organisationId: data.organisationId, permissions: data.permissions });
     } catch (error: any) {
-      setError('Something went wrong, please try again');
+      if (error instanceof yup.ValidationError) {
+        const formattedErrors = error.inner.reduce((acc, err) => {
+          return {
+            ...acc,
+            [err.path]: acc[err.path] ? [...acc[err.path], err.errors[0]] : [err.errors[0]],
+          };
+        }, {});
+        setValidationError(formattedErrors);
+      } else if (!isNullOrEmpty(error.errors)) {
+        // We have a clerk error
+        const errorCode = error.errors[0].code;
+        setError(errorCode);
+      } else {
+        console.error(error);
+        setError('Something went wrong, please try again');
+      }
+    } finally {
+      setIsBusy(false);
     }
   };
+
+  useEffect(() => {
+    const setDataForSignedInUser = async (organisationId, permissions) => {
+      await setUserPermissions(organisationId, permissions);
+      navigateToHome();
+    };
+
+    if (isSignedIn && signedInExistingUserDetails.organisationId) {
+      setDataForSignedInUser(signedInExistingUserDetails.organisationId, signedInExistingUserDetails.permissions);
+    }
+  }, [isSignedIn, signedInExistingUserDetails]);
 
   const handleSubmit = async () => {
-    setError('');
+    clearErrors();
     if (authMode === 'default') {
       verifyCredentials();
-    } else if (authMode === 'signUp') {
-      handleSaveUser();
-    } else if (authMode === 'signIn') {
-      handleUpdateUser();
+    } else if (authMode === 'newUser') {
+      saveNewUser();
+    } else if (authMode === 'existingUser') {
+      saveExistingUser();
     }
   };
 
   const handleLogout = async () => {
     try {
-      setError('');
+      clearErrors();
 
       // Sign out from Clerk
       await signOut();
@@ -191,12 +259,12 @@ const SignUp = () => {
           person who will be fulfilling that role, please advise the relevant member of the team to create the account.
           Additional Users can be added later in the process.
         </p>
-        {authMode === 'signUp' && (
+        {authMode === 'newUser' && (
           <p className="mt-5 text-primary-red">
             This email address is not yet associated with a Segue account. Please create a password.
           </p>
         )}
-        {authMode === 'signIn' && (
+        {authMode === 'existingUser' && (
           <p className="mt-5 text-primary-red">
             This email address is already associated with a Segue account. Please enter your password.
           </p>
@@ -204,59 +272,57 @@ const SignUp = () => {
       </div>
 
       <div className="flex flex-col mx-auto w-[23rem] gap-3 mt-6">
-        <div className="w-full">
-          <Label text="Company ID (please refer to setup email" required />
-          <TextInput
-            name="organisationId"
-            placeholder="Enter Company Id"
-            className="w-full"
-            value={accountDetails.organisationId}
-            onChange={handleAccountDetailsChange}
-            disabled={authMode !== 'default'}
-          />
-          {error === INVALID_COMPANY_ID && <AuthError error={error} />}
-        </div>
-        {authMode === 'signUp' && (
+        {authMode === 'newUser' && (
           <>
             <div className="w-full">
               <Label text="System Administrator First Name" required />
               <TextInput
                 name="firstName"
                 placeholder="Enter First Name"
-                className="w-full"
+                className="w-full mb-1"
                 value={accountDetails.firstName}
                 onChange={handleAccountDetailsChange}
+                error={validationError?.firstName}
               />
+              {validationError?.firstName && <AuthError error={validationError.firstName[0]} />}
             </div>
             <div className="w-full">
               <Label text="System Administrator Last Name" required />
               <TextInput
                 name="lastName"
                 placeholder="Enter Last Name"
-                className="w-full"
+                className="w-full mb-1"
                 value={accountDetails.lastName}
                 onChange={handleAccountDetailsChange}
+                error={validationError?.lastName}
               />
+              {validationError?.lastName && <AuthError error={validationError.lastName[0]} />}
             </div>
           </>
         )}
+
         <div className="w-full">
           <Label text="System Administrator Email Address" required />
           <TextInput
             name="email"
             placeholder="Enter Email Address"
-            className="w-full"
+            className="w-full mb-1"
             value={accountDetails.email}
             onChange={handleAccountDetailsChange}
             disabled={authMode !== 'default'}
+            error={
+              validationError?.email || error === INVALID_EMAIL_OR_COMPANY_NAME ? INVALID_EMAIL_OR_COMPANY_NAME : ''
+            }
           />
+          {validationError?.email && <AuthError error={validationError.email[0]} />}
         </div>
+
         {authMode !== 'default' && (
           <div className="w-full">
             <div className="flex items-center gap-1">
-              <Label text={authMode === 'signUp' ? 'Create Password' : 'Password'} required />
+              <Label text={authMode === 'newUser' ? 'Create Password' : 'Password'} required />
               <Tooltip
-                body="Password should be at least 8 characters long with at least one uppercase letter, one lowercase letter and one number."
+                body="Password should be at least 8 characters long with at least one uppercase letter, one lowercase letter, one special character and one number."
                 position="right"
                 width="w-[140px]"
                 bgColorClass="primary-input-text"
@@ -268,38 +334,61 @@ const SignUp = () => {
               name="password"
               placeholder="Enter Password"
               inputClassName="w-full"
-              className="w-full"
+              className="w-full mb-1"
               value={accountDetails.password}
               onChange={handleAccountDetailsChange}
+              error={validationError?.password}
             />
-            <div className="text-right mt-1">
-              <Link className="text-primary-input-text text-sm" href="/forgot-password">
-                Forgotten password?
-              </Link>
-            </div>
+            {validationError?.password && <AuthError error={validationError.password[0]} />}
+            {authMode === 'existingUser' && (
+              <div className="text-right mt-1">
+                <Link className="text-primary-input-text text-sm" href="/forgot-password">
+                  Forgotten password?
+                </Link>
+              </div>
+            )}
           </div>
         )}
-        {authMode === 'signUp' && (
+        {authMode === 'newUser' && (
           <div className="w-full">
             <Label text="Repeat Password" required />
             <PasswordInput
               name="confirmPassword"
               placeholder="Enter Password"
               inputClassName="w-full"
-              className="w-full"
+              className="w-full mb-1"
               value={accountDetails.confirmPassword}
               onChange={handleAccountDetailsChange}
+              error={validationError?.confirmPassword}
             />
-            {error === PASSWORD_INCORRECT && <AuthError error={error} />}
+            {validationError?.confirmPassword && <AuthError error={validationError.confirmPassword[0]} />}
           </div>
         )}
+        <div className="w-full">
+          <Label text="Company Name" required />
+          <TextInput
+            name="companyName"
+            testId="company-name"
+            placeholder="Enter Company Name"
+            className="w-full mb-1"
+            value={accountDetails.companyName}
+            onChange={handleAccountDetailsChange}
+            disabled={authMode !== 'default'}
+            error={
+              validationError?.companyName || error === INVALID_EMAIL_OR_COMPANY_NAME
+                ? INVALID_EMAIL_OR_COMPANY_NAME
+                : ''
+            }
+          />
+          {validationError?.companyName && <AuthError error={validationError.companyName[0]} />}
+        </div>
         {authMode !== 'default' && (
           <div className="w-full flex items-center justify-between">
             <div>
               <div className="flex items-center gap-1">
                 <Label text="Create PIN for this account" required />
                 <Tooltip
-                  body="Please create a 4 digit pin for this account."
+                  body="Please create a 5 digit pin for this account. The PIN must not contain more than 2 consecutive numbers, and not contain fully ascending or descending sequences"
                   position="right"
                   width="w-[140px]"
                   bgColorClass="primary-input-text"
@@ -310,17 +399,21 @@ const SignUp = () => {
               <PasswordInput
                 name="pin"
                 placeholder="Enter PIN"
-                className="w-32"
+                className="w-32 mb-1"
                 value={accountDetails.pin}
-                maxlength={4}
+                type="password"
                 onChange={handleAccountDetailsChange}
+                error={validationError?.pin}
+                pattern={PIN_REGEX}
               />
+              {validationError?.pin && <AuthError error={validationError.pin[0]} />}
             </div>
+
             <div>
               <div className="flex items-center gap-1">
                 <Label text="Repeat PIN" required />
                 <Tooltip
-                  body="Please repeat the 4 digit pin."
+                  body="Please repeat the 5 digit pin."
                   position="right"
                   width="w-[140px]"
                   bgColorClass="primary-input-text"
@@ -330,26 +423,25 @@ const SignUp = () => {
               </div>
               <PasswordInput
                 name="repeatPin"
-                placeholder="Enter PIN"
-                className="w-32"
+                placeholder="Repeat PIN"
+                className="w-32 mb-1"
                 value={accountDetails.repeatPin}
-                maxlength={4}
+                type="password"
                 onChange={handleAccountDetailsChange}
+                pattern={PIN_REGEX}
+                error={validationError?.repeatPin}
               />
+              {validationError?.repeatPin && <AuthError error={validationError.repeatPin[0]} />}
             </div>
           </div>
         )}
-        {error.includes('current session') && (
+        {error && (
           <div className="flex gap-3 items-center mt-5">
             <AuthError error={error} className="items-end" />
             {showLogout && <Button variant="secondary" text="Logout" onClick={handleLogout} />}
           </div>
         )}
-        <div
-          className={classNames('w-full flex items-center gap-2 mt-5 justify-end', {
-            'justify-between': authMode !== 'default',
-          })}
-        >
+        <div className="mt-3 w-full flex items-center gap-2 justify-end">
           {authMode !== 'default' && (
             <Button text="Back" variant="secondary" onClick={() => setAuthMode('default')} className="w-32" />
           )}
@@ -357,10 +449,11 @@ const SignUp = () => {
             text={authMode !== 'default' ? 'Sign Up' : 'Next'}
             onClick={handleSubmit}
             className="w-32"
-            disabled={!isFormValid || !signUpLoaded}
+            disabled={!signUpLoaded}
           />
         </div>
       </div>
+      {isBusy && <LoadingOverlay className="top-20 left-20 right-20 bottom-20" />}
     </div>
   );
 };
