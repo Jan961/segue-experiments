@@ -1,4 +1,3 @@
-import { Prisma } from 'prisma/generated/prisma-client';
 import ExcelJS from 'exceljs';
 import { format } from 'date-fns';
 import getPrismaClient from 'lib/prisma';
@@ -26,7 +25,6 @@ import {
   makeCellTextBold,
   salesReportName,
   addCellBorder,
-  convertDateFormat,
   makeRowTextNormal,
   applyFormattingToRange,
   colorTextAndBGCell,
@@ -48,7 +46,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { styleHeader } from './masterplan';
 import { currencyCodeToSymbolMap } from 'config/Reports';
 import { convertToPDF } from 'utils/report';
-import { calculateWeekNumber, getWeeksBetweenDates } from 'services/dateService';
+import { calculateWeekNumber, formatDate, getWeeksBetweenDates } from 'services/dateService';
 import { group, unique } from 'radash';
 import { addBorderToAllCells } from 'utils/export';
 
@@ -82,38 +80,30 @@ interface ProductionSummary {
 let prisma = null;
 
 const fetchProductionBookings = async (productionId: number): Promise<ProductionSummary[]> => {
-  const conditions: Prisma.Sql[] = [];
-  if (productionId) {
-    conditions.push(Prisma.sql`ProductionId = ${productionId} `);
-  }
-  conditions.push(Prisma.sql` SaleTypeName=${SALES_TYPE_NAME.GENERAL_SALES}`);
-  const where: Prisma.Sql = conditions.length ? Prisma.sql` ${Prisma.join(conditions, ' and ')}` : Prisma.empty;
-  const data: any[] = await prisma.$queryRaw`select 
-                                                FullProductionCode, 
-                                                ProductionStartDate as StartDate, 
-                                                ProductionEndDate as EndDate, 
-                                                EntryName as Venue, 
-                                                ProductionWeekNum,
-                                                VenueCurrencyCode, 
-                                                Location as Town, 
-                                                EntryId as BookingId, 
-                                                EntryDate as BookingFirstDate, 
-                                                EntryStatusCode as BookingStatusCode,
-                                                Value,
-                                                ConversionRate,
-                                                FinalSetSalesFiguresDate,
-                                                NotOnSaleDate
-                                              FROM SalesSummaryView  
-                                              WHERE ${where} 
-                                              order by BookingFirstDate;`;
-  const summary = unique(data, (entry) => entry.BookingId)
+  const data: any[] = await prisma.SalesSummaryView.findMany({
+    where: {
+      SaleTypeName: SALES_TYPE_NAME.GENERAL_SALES,
+      ...(productionId && { ProductionId: productionId }),
+    },
+    orderBy: {
+      EntryDate: 'asc',
+    },
+  });
+  const summary = unique(data, (entry) => entry.EntryId)
     .map((entry) => ({
       ...entry,
-      Day: format(new Date(entry.BookingFirstDate), 'EEEE'),
+      Day: entry.BookingFirstDate ? format(new Date(entry.BookingFirstDate), 'EEEE') : '',
       Week: formatWeek(entry.ProductionWeekNum),
-      Date: entry.BookingFirstDate,
+      Date: entry.EntryDate,
       VenueCurrencySymbol: currencyCodeToSymbolMap[entry.VenueCurrencyCode],
       FormattedFinalFiguresValue: entry.Value?.toNumber?.() || 0,
+      Town: entry.Location,
+      BookingStatusCode: entry.EntryStatusCode,
+      BookingId: entry.EntryId,
+      Venue: entry.EntryName,
+      StartDate: entry.ProductionStartDate,
+      EndDate: entry.ProductionEndDate,
+      BookingFirstDate: entry.EntryDate,
     }))
     .sort((a, b) => new Date(a.BookingFirstDate).getTime() - new Date(b.BookingFirstDate).getTime());
   return summary;
@@ -133,18 +123,22 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       ...week,
     }));
     const workbook = new ExcelJS.Workbook();
-    const conditions: Prisma.Sql[] = [];
-    if (productionId) {
-      conditions.push(Prisma.sql`ProductionId = ${parseInt(productionId)}`);
-    }
-    if (fromWeek && toWeek) {
-      conditions.push(Prisma.sql`setProductionWeekDate BETWEEN ${fromWeek} AND ${toWeek}`);
-    }
-    conditions.push(Prisma.sql` SaleTypeName=${SALES_TYPE_NAME.GENERAL_SALES}`);
-    const where: Prisma.Sql = conditions.length ? Prisma.sql`${Prisma.join(conditions, ' and ')}` : Prisma.empty;
-    const data: TSalesView[] =
-      await prisma.$queryRaw`select * FROM SalesView WHERE ${where} order by BookingFirstDate, SetSalesFiguresDate;`;
-
+    const data: TSalesView[] = await prisma.SalesView.findMany({
+      where: {
+        SaleTypeName: SALES_TYPE_NAME.GENERAL_SALES,
+        ...(productionId && {
+          ProductionId: productionId,
+        }),
+        ...(fromWeek &&
+          toWeek && {
+            SetProductionWeekDate: {
+              gte: new Date(fromWeek),
+              lte: new Date(toWeek),
+            },
+          }),
+      },
+    });
+    // prisma.$queryRaw`select * FROM SalesView WHERE ${where} order by BookingFirstDate, SetSalesFiguresDate;`;
     const jsonArray: TRequiredFields[] = data
       .filter((x) => x.SaleTypeName === SALES_TYPE_NAME.GENERAL_SALES)
       .map(
@@ -195,7 +189,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       Value: x.Value || 0,
       FormattedSetProductionWeekNum: formatWeek(x.SetProductionWeekNum),
       FormattedFinalFiguresValue: x.FinalFiguresValue || 0,
-      Day: moment(x.BookingFirstDate).format('dddd'),
+      Day: x.BookingFirstDate ? moment(x.BookingFirstDate).format('dddd') : '',
       Date: x.BookingFirstDate,
       Town: x.VenueTown,
       Venue: x.VenueName,
@@ -244,7 +238,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       'Date',
       'Town',
       'Venue',
-      ...headerWeekDates.map((week) => convertDateFormat(new Date(week))),
+      ...headerWeekDates.map((week) => formatDate(week, 'dd/MM/yy')),
       'Last Week',
       ...(isSeatsDataRequired ? ['Sold', 'Capacity', 'vs Capacity'] : []),
     ]);

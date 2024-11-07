@@ -12,8 +12,18 @@ import { ContractScheduleModal } from './ContractSchedule';
 import { Label } from 'components/core-ui-lib';
 import { personState } from 'state/contracts/PersonState';
 import { getAllOptions, noop, transformToOptions } from 'utils';
+import { ContractPermissionGroup } from 'interfaces';
+import { getContractDropdownOptions } from 'utils/contracts';
 
-const CompanyContractFilters = () => {
+interface Props {
+  permissions: {
+    accessNewPerson: ContractPermissionGroup;
+    accessNewContract: ContractPermissionGroup;
+    accessContracts: ContractPermissionGroup;
+  };
+}
+
+const CompanyContractFilters = (props: Props) => {
   const [filter, setFilter] = useRecoilState(contractsFilterState);
   const { selected: productionId } = useRecoilValue(productionJumpState);
   const personMap = useRecoilValue(personState);
@@ -37,6 +47,23 @@ const CompanyContractFilters = () => {
       ...intialContractsFilterState,
     });
   };
+
+  const hasAnyPermissions = (perms: ContractPermissionGroup) => {
+    return perms.artisteContracts || perms.creativeContracts || perms.smTechCrewContracts;
+  };
+
+  const canCreateContract = useMemo(() => {
+    return hasAnyPermissions(props.permissions.accessNewContract);
+  }, [props.permissions.accessNewContract]);
+
+  // Change dropdown-options based on permissions
+  const getDropdownOptions = useMemo(() => {
+    const options = getContractDropdownOptions(props.permissions.accessContracts);
+    if (options.length > 1) {
+      options.unshift(contractDepartmentOptions.find((x) => x.text === 'All')); // Add "All" to the top if multiple options are available
+    }
+    return options;
+  }, [props.permissions]);
 
   const openContractSchedule = () => {
     setOpenContract(true);
@@ -84,7 +111,7 @@ const CompanyContractFilters = () => {
             value={filter.department}
             disabled={!productionId}
             placeholder="Department"
-            options={[{ text: 'All', value: -1 }, ...contractDepartmentOptions]}
+            options={getDropdownOptions}
             isClearable
             isSearchable
           />
@@ -108,7 +135,12 @@ const CompanyContractFilters = () => {
           <Button className="text-sm leading-8 ml-6 px-6" text="Clear Filters" onClick={onClearFilters} />
         </div>
         <div className="flex">
-          <Button className="text-sm leading-8 px-6" text="Start New Contract" onClick={openContractSchedule} />
+          <Button
+            className="text-sm leading-8 px-6"
+            text="Start New Contract"
+            onClick={openContractSchedule}
+            disabled={!canCreateContract}
+          />
           <Button
             disabled
             className="text-sm leading-8 ml-4 px-6"
@@ -117,7 +149,14 @@ const CompanyContractFilters = () => {
           />
         </div>
       </div>
-      {openContract && <ContractScheduleModal openContract={openContract} onClose={() => setOpenContract(false)} />}
+      {openContract && (
+        <ContractScheduleModal
+          openContract={openContract}
+          onClose={() => setOpenContract(false)}
+          accessNewPerson={props.permissions.accessNewPerson}
+          accessPermissions={props.permissions.accessNewContract}
+        />
+      )}
     </div>
   );
 };

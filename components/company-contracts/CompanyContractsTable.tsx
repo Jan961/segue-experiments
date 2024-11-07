@@ -14,9 +14,19 @@ import { BuildNewContract, BuildNewContractProps } from './edit-contract-modal/B
 import { defaultContractSchedule } from './ContractSchedule';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import { objectify } from 'radash';
+import { CellClickedEvent } from 'ag-grid-community';
+import { ContractPermissionGroup } from 'interfaces';
+import { contractDepartmentOptions } from 'config/contracts';
 
 interface ContractsTableProps {
   rowData?: IContractSummary[];
+  permissions: {
+    accessContracts: ContractPermissionGroup;
+    editRow: ContractPermissionGroup;
+    savePDF: ContractPermissionGroup;
+    changeStatus: ContractPermissionGroup;
+    editPerson: ContractPermissionGroup;
+  };
 }
 const defaultNotesPopupContext = { visible: false, contract: null };
 const defaultEditContractState = {
@@ -26,7 +36,16 @@ const defaultEditContractState = {
   contractSchedule: defaultContractSchedule,
 };
 
-export default function CompanyContractsTable({ rowData = [] }: ContractsTableProps) {
+export default function CompanyContractsTable({
+  rowData = [],
+  permissions = {
+    accessContracts: { artisteContracts: false, creativeContracts: false, smTechCrewContracts: false },
+    editRow: { artisteContracts: false, creativeContracts: true, smTechCrewContracts: false },
+    savePDF: { artisteContracts: false, creativeContracts: true, smTechCrewContracts: false },
+    changeStatus: { artisteContracts: false, creativeContracts: true, smTechCrewContracts: false },
+    editPerson: { artisteContracts: false, creativeContracts: true, smTechCrewContracts: false },
+  },
+}: ContractsTableProps) {
   const tableRef = useRef(null);
   const { users } = useRecoilValue(userState);
   const { productions } = useRecoilValue(productionJumpState);
@@ -56,7 +75,12 @@ export default function CompanyContractsTable({ rowData = [] }: ContractsTablePr
       ).sort((a, b) => a.text.localeCompare(b.text)),
     [users],
   );
-  const columnDefs = useMemo(() => getCompanyContractsColumnDefs(userOptionList), [userOptionList]);
+
+  const columnDefs = useMemo(
+    () =>
+      getCompanyContractsColumnDefs(permissions.changeStatus, permissions.savePDF, permissions.editRow, userOptionList),
+    [userOptionList],
+  );
   const cancelToken = useAxiosCancelToken();
 
   const getProductionCode = (id: number) => {
@@ -70,12 +94,26 @@ export default function CompanyContractsTable({ rowData = [] }: ContractsTablePr
     const roleName = role ? `${role}` : '';
     return `${code} ${name} ${roleName}`;
   };
-  const handleCellClick = (e) => {
-    if (e.column.colId === 'notes') {
-      setNotesPopupContext({ visible: true, contract: e.data });
+
+  const checkDepartmentPermissions = (departmentId: number): boolean => {
+    return (
+      (departmentId === contractDepartmentOptions.find((x) => x.text === 'Artiste').value &&
+        permissions.editRow.artisteContracts) ||
+      (departmentId === contractDepartmentOptions.find((x) => x.text === 'Creative').value &&
+        permissions.editRow.creativeContracts) ||
+      (departmentId === contractDepartmentOptions.find((x) => x.text === 'SM / Tech / Crew').value &&
+        permissions.editRow.smTechCrewContracts)
+    );
+  };
+
+  const handleCellClick = (e: CellClickedEvent) => {
+    const colId = e.column.getColId();
+    const data = e.data;
+    const { departmentId, productionId, personId, role, id, templateId } = data;
+    if (colId === 'notes') {
+      setNotesPopupContext({ visible: true, contract: data });
     }
-    if (e.column.colId === 'edit') {
-      const { departmentId, productionId, personId, role, id, templateId } = e.data;
+    if (colId === 'edit' && checkDepartmentPermissions(departmentId)) {
       setEditContract({
         visible: true,
         contractId: id,
@@ -87,6 +125,10 @@ export default function CompanyContractsTable({ rowData = [] }: ContractsTablePr
           templateId,
         },
       });
+    }
+    if (colId === 'pdf' && checkDepartmentPermissions(departmentId)) {
+      // Export PDF
+      console.log('ExportPDF needs implementation');
     }
   };
 
@@ -121,12 +163,26 @@ export default function CompanyContractsTable({ rowData = [] }: ContractsTablePr
     setEditContract(defaultEditContractState);
   }, []);
 
+  // Trim table data based on permissions
+  const trimData = useMemo(() => {
+    const data = rowData.filter(
+      (x) =>
+        (x.departmentId === contractDepartmentOptions.find((x) => x.text === 'Artiste').value &&
+          permissions.accessContracts.artisteContracts) ||
+        (x.departmentId === contractDepartmentOptions.find((x) => x.text === 'Creative').value &&
+          permissions.accessContracts.creativeContracts) ||
+        (x.departmentId === contractDepartmentOptions.find((x) => x.text === 'SM / Tech / Crew').value &&
+          permissions.accessContracts.smTechCrewContracts),
+    );
+    return data;
+  }, [rowData]);
+
   return (
     <>
       <div className="w-full h-[calc(100%-140px)]">
         <Table
           columnDefs={columnDefs}
-          rowData={rowData}
+          rowData={trimData}
           ref={tableRef}
           styleProps={contractsStyleProps}
           onCellValueChange={onCellValueChange}
@@ -143,7 +199,13 @@ export default function CompanyContractsTable({ rowData = [] }: ContractsTablePr
           />
         )}
         {editContract.visible && (
-          <BuildNewContract {...editContract} visible={editContract?.visible} onClose={closeEditContractModal} isEdit />
+          <BuildNewContract
+            {...editContract}
+            visible={editContract?.visible}
+            onClose={closeEditContractModal}
+            isEdit
+            editPerson={permissions.editPerson}
+          />
         )}
       </div>
     </>

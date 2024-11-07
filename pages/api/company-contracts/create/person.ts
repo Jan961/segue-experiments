@@ -1,10 +1,92 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import getPrismaClient from 'lib/prisma';
 import * as yup from 'yup';
-import { isEmpty, omit, pick } from 'radash';
+import { all, isEmpty, omit, pick } from 'radash';
 import { prepareAddressQueryData, prepareOrganisationQueryData, preparePersonQueryData } from 'services/personService';
 import { createPersonSchema } from 'validators/person';
 import { addressFields, organisationFields } from 'services/person';
+import { PrismaClient } from 'prisma/generated/prisma-client';
+
+// Helper function to create a person with address
+async function createPersonWithAddress(tx: PrismaClient, personData, addressData) {
+  if (!personData?.PersonFirstName) {
+    return null;
+  }
+
+  const createData = {
+    PersonFirstName: personData.PersonFirstName,
+    ...personData,
+    ...(addressData && {
+      Address: {
+        create: addressData,
+      },
+    }),
+  };
+
+  return await tx.person.create({ data: createData });
+}
+
+// Helper function to create organization
+async function createOrganization(tx: PrismaClient, orgData) {
+  if (!orgData?.OrgName) {
+    return null;
+  }
+
+  return await tx.organisation.create({
+    data: {
+      OrgName: orgData.OrgName,
+      ...orgData,
+    },
+  });
+}
+
+// Helper function to handle agency creation
+async function handleAgencyCreation(tx: PrismaClient, agencyDetails) {
+  if (isEmpty(agencyDetails)) {
+    return { agencyPersonId: null, organisationId: null };
+  }
+
+  const agencyPersonAddressData = prepareAddressQueryData(pick(agencyDetails, addressFields), true);
+  const agencyPersonData = preparePersonQueryData(
+    omit(agencyDetails, [...addressFields, ...organisationFields]),
+    null,
+    null,
+    undefined,
+    undefined,
+    true,
+  );
+
+  const agencyPerson = await createPersonWithAddress(tx, agencyPersonData, agencyPersonAddressData);
+  const agencyPersonId = agencyPerson?.PersonId || null;
+
+  const organisationData = prepareOrganisationQueryData(pick(agencyDetails, organisationFields), agencyPersonId, true);
+
+  const organisation = await createOrganization(tx, organisationData);
+  return {
+    agencyPersonId,
+    organisationId: organisation?.OrgId || null,
+  };
+}
+
+// Helper function to create emergency contact
+async function createEmergencyContact(tx: PrismaClient, contactDetails) {
+  if (isEmpty(contactDetails)) {
+    return null;
+  }
+
+  const contactAddressData = prepareAddressQueryData(pick(contactDetails, addressFields), true);
+  const contactPersonData = preparePersonQueryData(
+    omit(contactDetails, addressFields),
+    null,
+    null,
+    undefined,
+    undefined,
+    true,
+  );
+
+  const contact = await createPersonWithAddress(tx, contactPersonData, contactAddressData);
+  return contact?.PersonId || null;
+}
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -13,9 +95,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     const prisma = await getPrismaClient(req);
-
     const validatedData = await createPersonSchema.validate(req.body, { abortEarly: false });
-
     const {
       personDetails,
       agencyDetails,
@@ -25,88 +105,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       expenseAccountDetails,
     } = validatedData;
 
-    const result = await prisma.$transaction(async (tx) => {
-      let agencyPersonId = null;
-      let organisationId = null;
-      if (!isEmpty(agencyDetails)) {
-        const agencyPersonAddressData = prepareAddressQueryData(pick(agencyDetails, addressFields), true);
-        const agencyPersonData = preparePersonQueryData(
-          omit(agencyDetails, [...addressFields, ...organisationFields]),
-          null,
-          null,
-          undefined,
-          undefined,
-          true,
-        );
-        const formattedAgencyPersonData = agencyPersonData.map((p) => ({
-          ...p,
-          Address: { create: agencyPersonAddressData },
-        }));
-        if (agencyPersonData) {
-          const agencyPerson = await tx.person.create({
-            data: {
-              ...formattedAgencyPersonData,
-            },
-          });
-          agencyPersonId = agencyPerson.PersonId;
-        }
-        const organisationData = prepareOrganisationQueryData(
-          pick(agencyDetails, organisationFields),
-          agencyPersonId,
-          true,
-        );
-        const formattedOrganisationData = organisationData.map((o) => ({
-          ...o,
-        }));
-        if (organisationData) {
-          const organisation = await tx.organisation.create({
-            data: formattedOrganisationData,
-          });
-          organisationId = organisation.OrgId;
-        }
-      }
+    const result = await prisma.$transaction(async (tx: PrismaClient) => {
+      // Handle agency and organization creation
+      const { organisationId } = await handleAgencyCreation(tx, agencyDetails);
 
-      const emergencyContactList = [];
-      if (!isEmpty(emergencyContact1)) {
-        const emergencyContactAddressData = prepareAddressQueryData(pick(emergencyContact1, addressFields), true);
-        const emergencyContactData = preparePersonQueryData(
-          omit(emergencyContact1, addressFields),
-          null,
-          null,
-          undefined,
-          undefined,
-          true,
-        );
-        const formattedEmergencyContactData = emergencyContactData.map((p) => ({
-          ...p,
-          Address: { create: emergencyContactAddressData },
-        }));
-        const emergencyContact1Person = await tx.person.create({
-          data: formattedEmergencyContactData,
-        });
-        emergencyContactList.push(emergencyContact1Person.PersonId);
-      }
+      // Create emergency contacts
+      const emergencyContactIds = [];
+      const [contact1Id, contact2Id] = await all([
+        createEmergencyContact(tx, emergencyContact1),
+        createEmergencyContact(tx, emergencyContact2),
+      ]);
 
-      if (!isEmpty(emergencyContact2)) {
-        const emergencyContactAddressData = prepareAddressQueryData(pick(emergencyContact1, addressFields), true);
-        const emergencyContactData = preparePersonQueryData(
-          omit(emergencyContact1, addressFields),
-          null,
-          null,
-          undefined,
-          undefined,
-          true,
-        );
-        const formattedEmergencyContactData = emergencyContactData.map((p) => ({
-          ...p,
-          Address: { create: emergencyContactAddressData },
-        }));
-        const emergencyContact2Person = await tx.person.create({
-          data: formattedEmergencyContactData,
-        });
-        emergencyContactList.push(emergencyContact2Person.PersonId);
-      }
+      if (contact1Id) emergencyContactIds.push(contact1Id);
+      if (contact2Id) emergencyContactIds.push(contact2Id);
 
+      // Create main person
       const personAddressData = prepareAddressQueryData(pick(personDetails, addressFields), true);
       const personData = preparePersonQueryData(
         omit(personDetails, addressFields),
@@ -117,23 +130,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         true,
       );
 
-      const formattedPersonData = personData.map((p) => ({
-        ...p,
-        Address: { create: personAddressData },
-      }));
-      const mainPerson = await tx.person.create({
-        data: formattedPersonData,
-      });
+      if (!personData?.PersonFirstName) {
+        throw new Error('PersonFirstName is required for main person');
+      }
 
-      if (emergencyContactList.length) {
+      const mainPerson = await createPersonWithAddress(tx, personData, personAddressData);
+
+      // Create emergency contact relationships
+      if (emergencyContactIds.length) {
         await tx.personPerson.createMany({
-          data: emergencyContactList.map((ContactId) => ({
+          data: emergencyContactIds.map((ContactId) => ({
             PPRoleType: 'emergencycontact',
             PPPersonId: mainPerson.PersonId,
             PPRolePersonId: ContactId,
           })),
         });
       }
+
       return mainPerson;
     });
 

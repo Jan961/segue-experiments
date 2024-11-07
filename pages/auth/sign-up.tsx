@@ -21,7 +21,7 @@ import { userPreSignUpSchema, userSignUpSchema } from 'validators/auth';
 import useAuth from 'hooks/useAuth';
 import usePermissions from 'hooks/usePermissions';
 import { isNullOrEmpty } from 'utils';
-import Spinner from 'components/core-ui-lib/Spinner';
+import LoadingOverlay from '../../components/core-ui-lib/LoadingOverlay';
 
 const DEFAULT_ACCOUNT_DETAILS = {
   firstName: '',
@@ -35,12 +35,6 @@ const DEFAULT_ACCOUNT_DETAILS = {
   repeatPin: 0,
   isSystemAdmin: true,
 };
-
-export const LoadingOverlay = () => (
-  <div className="inset-0 absolute bg-white bg-opacity-50 z-50 flex justify-center items-center top-20 left-20 right-20 bottom-20">
-    <Spinner size="lg" />
-  </div>
-);
 
 const SignUp = () => {
   const router = useRouter();
@@ -459,7 +453,7 @@ const SignUp = () => {
           />
         </div>
       </div>
-      {isBusy && <LoadingOverlay />}
+      {isBusy && <LoadingOverlay className="top-20 left-20 right-20 bottom-20" />}
     </div>
   );
 };
