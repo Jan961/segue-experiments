@@ -144,6 +144,17 @@ const LoadSalesHistory = () => {
     }
   };
 
+  const downloadInstructions = () => {
+    // window.open(getFileUrl('marketing/salesHistory/instructions/Sales_History_Upload_Instructions.pdf'), '_blank')
+    // let a = document.createElement('a');
+    // a.href = getFileUrl('marketing/salesHistory/instructions/Sales_History_Upload_Instructions.pdf');
+    // a.download = "test.pdf";
+    window.open(getFileUrl('marketing/salesHistory/instructions/Sales_History_Upload_Instructions.pdf'), '_blank');
+    // document.body.appendChild(a);
+    // a.click();
+    // document.body.removeChild(a);
+  };
+
   const downloadExample = () => {
     const a = document.createElement('a');
     a.href = getFileUrl('marketing/salesHistory/exampleTemplate/ExampleTemplate_v2.xlsx');
@@ -190,6 +201,7 @@ const LoadSalesHistory = () => {
           )}
 
           <div className="flex gap-x-3 place-content-end">
+            <Button text="Instructions" className="w-[155px]" onClick={() => downloadInstructions()} />
             <Button text="Download Template" className="w-[155px]" onClick={() => downloadExample()} />
             <Button
               text="Upload Spreadsheet"
