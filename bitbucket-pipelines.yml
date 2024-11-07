@@ -87,10 +87,11 @@ pipelines:
                 HOST: 'smtp.gmail.com'
                 SUBJECT: '${ALERT_TYPE}:Bitbucket Pipe Notification for ${BITBUCKET_BRANCH}'
                 ATTACHMENTS: 'cypress-tests/cypress/reports.zip'
-                BODY_HTML: 'file://email_report.html'
+                BODY_HTML: 'email_report.html'
           artifacts:
             - cypress-tests/cypress/reports/**
             - cypress-tests/cypress/reports.zip
+            - cypress-tests/cypress/email_report.html
   default:
       - step:
           name: Build and Test
