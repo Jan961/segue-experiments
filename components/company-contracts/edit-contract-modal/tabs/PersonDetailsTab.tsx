@@ -24,8 +24,8 @@ const defaultContractDetails = {
 interface ContractPersonDataFormProps {
   type: 'Edit' | 'New';
   person?: Partial<IPerson>;
-  height: string;
   className?: string;
+  height?: string;
   updateFormData: (data: Partial<IPerson>) => void;
   permissions: ContractPermissionGroup;
   departmentId: number;
