@@ -33,6 +33,7 @@ export const defaultPersonDetails = {
 };
 
 interface PersonalDetailsProps {
+  disabled: boolean;
   countryOptionList: SelectOption[];
   booleanOptions: SelectOption[];
   userOptionList: SelectOption[];
@@ -41,6 +42,7 @@ interface PersonalDetailsProps {
 }
 
 const PersonalDetails = ({
+  disabled,
   countryOptionList,
   booleanOptions,
   userOptionList,
@@ -70,7 +72,7 @@ const PersonalDetails = ({
     advisoryNotes,
     generalNotes,
     healthDetails,
-    otherWorkTypes=[{ name: '' }],
+    otherWorkTypes = [{ name: '' }],
     notes,
   } = formData;
   const handleChange = useCallback(
@@ -94,6 +96,7 @@ const PersonalDetails = ({
                 className="text-primary-input-text font-bold w-full max-w-96"
                 onChange={(event) => handleChange('firstName', event.target.value)}
                 value={firstName}
+                disabled={disabled}
               />
             </div>
           </div>
@@ -106,6 +109,7 @@ const PersonalDetails = ({
                 className="text-primary-input-text font-bold w-full max-w-96"
                 onChange={(event) => handleChange('lastName', event.target.value)}
                 value={lastName}
+                disabled={disabled}
               />
             </div>
           </div>
@@ -118,6 +122,7 @@ const PersonalDetails = ({
                 className="text-primary-input-text font-bold w-full max-w-96"
                 onChange={(event) => handleChange('address1', event.target.value)}
                 value={address1}
+                disabled={disabled}
               />
               <TextInput
                 testId="person-address-2"
@@ -125,6 +130,7 @@ const PersonalDetails = ({
                 className="text-primary-input-text font-bold w-full mt-2 max-w-96"
                 onChange={(event) => handleChange('address2', event.target.value)}
                 value={address2}
+                disabled={disabled}
               />
               <TextInput
                 testId="person-address-3"
@@ -132,6 +138,7 @@ const PersonalDetails = ({
                 className="text-primary-input-text font-bold w-full mt-2 max-w-96"
                 onChange={(event) => handleChange('address3', event.target.value)}
                 value={address3}
+                disabled={disabled}
               />
             </div>
           </div>
@@ -144,6 +151,7 @@ const PersonalDetails = ({
                 className=" text-primary-input-text font-bold w-full max-w-96"
                 onChange={(event) => handleChange('town', event.target.value)}
                 value={town}
+                disabled={disabled}
               />
             </div>
           </div>
@@ -156,6 +164,7 @@ const PersonalDetails = ({
                 className=" text-primary-input-text font-bold w-full max-w-96"
                 onChange={(event) => handleChange('postcode', event.target.value)}
                 value={postcode}
+                disabled={disabled}
               />
             </div>
           </div>
@@ -171,6 +180,7 @@ const PersonalDetails = ({
                 value={country}
                 isClearable
                 isSearchable
+                disabled={disabled}
               />
             </div>
           </div>
@@ -186,6 +196,7 @@ const PersonalDetails = ({
                 className="text-primary-input-text font-bold w-full max-w-96"
                 onChange={(event) => handleChange('email', event.target.value)}
                 value={email}
+                disabled={disabled}
               />
             </div>
           </div>
@@ -198,6 +209,7 @@ const PersonalDetails = ({
                 className="text-primary-input-text font-bold w-full max-w-96"
                 onChange={(event) => handleChange('landline', event.target.value)}
                 value={landline}
+                disabled={disabled}
               />
             </div>
           </div>
@@ -210,6 +222,7 @@ const PersonalDetails = ({
                 className="text-primary-input-text font-bold w-full max-w-96"
                 onChange={(event) => handleChange('mobileNumber', event.target.value)}
                 value={mobileNumber}
+                disabled={disabled}
               />
             </div>
           </div>
@@ -222,6 +235,7 @@ const PersonalDetails = ({
                 className="text-primary-input-text font-bold w-full max-w-96"
                 onChange={(event) => handleChange('passportName', event.target.value)}
                 value={passportName}
+                disabled={disabled}
               />
             </div>
           </div>
@@ -234,6 +248,7 @@ const PersonalDetails = ({
                 className="text-primary-input-text font-bold w-full max-w-96"
                 onChange={(event) => handleChange('passportNumber', event.target.value)}
                 value={passportNumber}
+                disabled={disabled}
               />
             </div>
           </div>
@@ -244,6 +259,7 @@ const PersonalDetails = ({
                 testId="person-passport-expiry-date"
                 onChange={(value) => handleChange('passportExpiryDate', value?.toISOString?.() || '')}
                 value={passportExpiryDate}
+                disabled={disabled}
               />
               <div className="text-xs text-primary-input-text font-bold ml-4">
                 (<span className="underline">NOTE:</span> Expiry date is 10 years from{' '}
@@ -263,6 +279,7 @@ const PersonalDetails = ({
                 options={booleanOptions}
                 isClearable
                 isSearchable
+                disabled={disabled}
               />
             </div>
           </div>
@@ -295,6 +312,7 @@ const PersonalDetails = ({
                 options={booleanOptions}
                 isClearable
                 isSearchable
+                disabled={disabled}
               />
             </div>
           </div>
@@ -310,6 +328,7 @@ const PersonalDetails = ({
             placeholder="Notes"
             onChange={(event) => handleChange('generalNotes', event.target.value)}
             value={generalNotes}
+            disabled={disabled}
           />
         </div>
       </div>
@@ -322,6 +341,7 @@ const PersonalDetails = ({
             placeholder="Notes"
             onChange={(event) => handleChange('healthDetails', event.target.value)}
             value={healthDetails}
+            disabled={disabled}
           />
         </div>
       </div>
@@ -335,6 +355,7 @@ const PersonalDetails = ({
             placeholder="Notes"
             onChange={(event) => handleChange('advisoryNotes', event.target.value)}
             value={advisoryNotes}
+            disabled={disabled}
           />
         </div>
       </div>
@@ -353,6 +374,7 @@ const PersonalDetails = ({
               isMulti
               isClearable
               isSearchable
+              disabled={disabled}
             />
             {otherWorkTypes.map((otherWorkType: IOtherWorkType, i) => (
               <div key={i} className="flex items-center gap-2 w-full">
@@ -372,8 +394,9 @@ const PersonalDetails = ({
                   }
                   placeholder="Other Type of Work"
                   value={otherWorkType.name}
+                  disabled={disabled}
                 />
-                {i === 0 && (
+                {i === 0 && !disabled && (
                   <div
                     className="cursor-pointer"
                     onClick={() =>
@@ -386,7 +409,7 @@ const PersonalDetails = ({
                     <Icon iconName="plus-circle-solid" />
                   </div>
                 )}
-                {i > 0 && (
+                {i > 0 && !disabled && (
                   <div
                     className="cursor-pointer"
                     onClick={() => handleChange('otherWorkTypes', removeAtPos(otherWorkTypes, i) as string[])}
@@ -403,6 +426,7 @@ const PersonalDetails = ({
               onChange={(event) => handleChange('notes', event.target.value)}
               value={notes}
               placeholder="Notes Field"
+              disabled={disabled}
             />
           </div>
         </div>

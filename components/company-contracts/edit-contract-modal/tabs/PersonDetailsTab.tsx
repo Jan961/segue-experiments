@@ -10,6 +10,7 @@ import PersonalDetails, { defaultPersonDetails } from '../../../contracts/Person
 import AccountDetailsForm, { defaultBankAccount } from '../../../contracts/PersonForm/AccountDetailsForm';
 import EmergencyContact, { defaultEmergencyContactData } from '../../../contracts/PersonForm/EmergencyContact';
 import { IPerson } from '../../../contracts/types';
+import { ContractPermissionGroup } from 'interfaces';
 
 const defaultContractDetails = {
   personDetails: defaultPersonDetails,
@@ -21,10 +22,13 @@ const defaultContractDetails = {
 };
 
 interface ContractPersonDataFormProps {
+  type: 'Edit' | 'New';
   person?: Partial<IPerson>;
   height: string;
   className?: string;
   updateFormData: (data: Partial<IPerson>) => void;
+  permissions: ContractPermissionGroup;
+  departmentId: number;
 }
 
 const mergeContractData = (contractDetailsD, contractDetailsV) => {
@@ -61,6 +65,9 @@ export const PersonDetailsTab = ({
   height,
   updateFormData,
   className = '',
+  type,
+  permissions,
+  departmentId,
 }: ContractPersonDataFormProps) => {
   const [personData, setPersonData] = useState<IPerson>(mergeContractData(defaultContractDetails, person));
   const {
@@ -98,11 +105,21 @@ export const PersonDetailsTab = ({
     [personData, updateFormData, setPersonData],
   );
 
+  const isPersonDetailsDisabled = (departmentId: number): boolean => {
+    return type === 'Edit' &&
+      ((departmentId === 1 && permissions.artisteContracts) ||
+        (departmentId === 2 && permissions.creativeContracts) ||
+        (departmentId === 3 && permissions.smTechCrewContracts))
+      ? false
+      : type !== 'New';
+  };
+
   return (
     <>
       <div className={`${height} w-full py-5 ${className}`}>
         <div className="text-xl text-primary-navy font-bold mb-3">Person Details</div>
         <PersonalDetails
+          disabled={isPersonDetailsDisabled(departmentId)}
           details={personDetails}
           countryOptionList={countryOptionList}
           booleanOptions={booleanOptions}

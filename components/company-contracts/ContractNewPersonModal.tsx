@@ -6,13 +6,19 @@ import axios from 'axios';
 import { createPersonSchema } from 'validators/person';
 import { debug } from 'utils/logging';
 import { IPerson } from 'components/contracts/types';
+import { ContractPermissionGroup } from 'interfaces';
 
 interface ContractNewPersonModalProps {
   openNewPersonContract: boolean;
   onClose: (flag?: boolean) => void;
+  permissions: ContractPermissionGroup;
 }
 
-export const ContractNewPersonModal = ({ openNewPersonContract, onClose }: ContractNewPersonModalProps) => {
+export const ContractNewPersonModal = ({
+  openNewPersonContract,
+  onClose,
+  permissions,
+}: ContractNewPersonModalProps) => {
   const [formData, setFormData] = useState<Partial<IPerson>>({});
   const validateForm = async (data) => {
     try {
@@ -24,14 +30,14 @@ export const ContractNewPersonModal = ({ openNewPersonContract, onClose }: Contr
         errors[error.path] = error.message;
       });
       debug('validationErrors:', errors);
-      return { status: false, errors: errors };
+      return { status: false, errors };
     }
   };
 
   const onSave = async () => {
     const validation = await validateForm(formData);
     if (!validation.status) {
-      Object.values(validation?.errors||{}).forEach((error) => notify.error(error));
+      Object.values(validation?.errors || {}).forEach((error) => notify.error(error));
       return;
     }
     const personFirstName = formData?.personDetails?.firstName;
@@ -39,9 +45,9 @@ export const ContractNewPersonModal = ({ openNewPersonContract, onClose }: Contr
       notify.promise(
         axios.post('/api/company-contracts/create/person', formData).then(() => onClose(true)),
         {
-          loading: `Creating ${personFirstName||'person'}`,
-          success: `${personFirstName||'Person'} Created successfully`,
-          error: `Error creating ${personFirstName||'person'}`,
+          loading: `Creating ${personFirstName || 'person'}`,
+          success: `${personFirstName || 'Person'} Created successfully`,
+          error: `Error creating ${personFirstName || 'person'}`,
         },
       );
     } catch (error) {
@@ -58,7 +64,14 @@ export const ContractNewPersonModal = ({ openNewPersonContract, onClose }: Contr
     >
       <div className="flex flex-col h-full">
         <div className="flex-1 min-h-0">
-          <PersonDetailsTab updateFormData={setFormData} className="h-full overflow-y-auto pb-4" height="100%" />
+          <PersonDetailsTab
+            type="New"
+            updateFormData={setFormData}
+            permissions={permissions}
+            departmentId={0}
+            className="h-full overflow-y-auto pb-4"
+            height="100%"
+          />
         </div>
         <div className="mt-4 flex justify-end items-center pt-4 bg-white">
           <Button onClick={() => onClose?.()} className="w-33" variant="secondary" text="Cancel" />

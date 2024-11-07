@@ -851,3 +851,9 @@ export interface UserPermission {
   permissionId: number;
   permissionName: string;
 }
+
+export interface ContractPermissionGroup {
+  artisteContracts: boolean;
+  creativeContracts: boolean;
+  smTechCrewContracts: boolean;
+}
