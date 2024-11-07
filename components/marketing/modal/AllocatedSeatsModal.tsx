@@ -105,7 +105,7 @@ export default function AllocatedSeatsModal({
         requestBy: data.RequestedBy,
         comments: data.Comments,
         arrangedBy: null,
-        venueConfNotes: data.VenuteConfirmationNotes,
+        venueConfNotes: data.VenueConfirmationNotes,
       });
       setAllocId(data.Id);
 
@@ -389,7 +389,7 @@ export default function AllocatedSeatsModal({
                 value={form.numSeatsReq}
                 onChange={handleChange}
                 error={errors.numberOfSeats ? 'Seat number required' : ''}
-                type="number"
+                pattern={/^(0|[1-9][0-9]*)?$/}
               />
               {errors.numberOfSeats && <FormError error="This is a Required Field" className="mt-2 ml-2" />}
             </div>
