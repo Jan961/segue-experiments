@@ -145,14 +145,7 @@ const LoadSalesHistory = () => {
   };
 
   const downloadInstructions = () => {
-    // window.open(getFileUrl('marketing/salesHistory/instructions/Sales_History_Upload_Instructions.pdf'), '_blank')
-    // let a = document.createElement('a');
-    // a.href = getFileUrl('marketing/salesHistory/instructions/Sales_History_Upload_Instructions.pdf');
-    // a.download = "test.pdf";
     window.open(getFileUrl('marketing/salesHistory/instructions/Sales_History_Upload_Instructions.pdf'), '_blank');
-    // document.body.appendChild(a);
-    // a.click();
-    // document.body.removeChild(a);
   };
 
   const downloadExample = () => {
