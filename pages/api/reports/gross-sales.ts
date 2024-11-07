@@ -281,7 +281,6 @@ const handler = async (req, res) => {
         weekPending = false;
       }
       colNo++;
-      prevValue = value;
     }
 
     for (let i = 0; i <= 2; i++) {
