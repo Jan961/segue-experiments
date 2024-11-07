@@ -4,7 +4,6 @@ import ImagePreviewModal from './ImagePreviewModal';
 import { useState } from 'react';
 
 export default {
-  title: 'Components/ImagePreviewModal',
   component: ImagePreviewModal,
 } as Meta<typeof ImagePreviewModal>;
 
@@ -19,7 +18,7 @@ const Template = () => {
 
   // return a modal with a placeholder image
   return (
-    <div className="p-4">
+    <div className="p-4 w-[300px] h-[300px]">
       <ImagePreviewModal
         show={isOpen}
         onClose={handleModalClose}

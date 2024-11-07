@@ -3,7 +3,6 @@ import UploadModal from './UploadModal';
 
 const meta: Meta<typeof UploadModal> = {
   component: UploadModal,
-  title: 'Components/UploadModal',
   argTypes: {},
 };
 

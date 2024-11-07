@@ -2,7 +2,6 @@ import type { Meta, StoryFn } from '@storybook/react';
 import Spinner from './Spinner';
 
 export default {
-  title: 'Components/Spinner',
   component: Spinner,
   argTypes: {
     size: {

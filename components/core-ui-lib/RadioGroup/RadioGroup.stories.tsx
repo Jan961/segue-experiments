@@ -3,7 +3,6 @@ import type { Meta, StoryObj } from '@storybook/react';
 import RadioGroup, { Direction, RadioGroupProps } from './RadioGroup';
 
 export default {
-  title: 'Components/RadioGroup',
   component: RadioGroup,
   argTypes: {
     direction: {
