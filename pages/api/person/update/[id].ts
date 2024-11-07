@@ -5,6 +5,7 @@ import { handleAgencyDetails, handleEmergencyContacts, upsertPerson } from 'serv
 import { updatePersonSchema } from 'validators/person';
 import { ERROR_CODES } from 'config/apiConfig';
 import { all } from 'radash';
+import { PrismaClient } from 'prisma/generated/prisma-client';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -15,7 +16,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const prisma = await getPrismaClient(req);
     const validatedData = await updatePersonSchema.validate(req.body, { abortEarly: false });
 
-    await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx: PrismaClient) => {
       // Process the personDetails
       const {
         personDetails,
