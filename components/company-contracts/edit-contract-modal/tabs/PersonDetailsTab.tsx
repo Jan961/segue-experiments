@@ -24,6 +24,7 @@ const defaultContractDetails = {
 interface ContractPersonDataFormProps {
   type: 'Edit' | 'New';
   person?: Partial<IPerson>;
+  className?: string;
   height?: string;
   updateFormData: (data: Partial<IPerson>) => void;
   permissions: ContractPermissionGroup;
@@ -63,6 +64,7 @@ export const PersonDetailsTab = ({
   person = {},
   height,
   updateFormData,
+  className = '',
   type,
   permissions,
   departmentId,
@@ -76,7 +78,7 @@ export const PersonDetailsTab = ({
     salaryAccountDetails,
     expenseAccountDetails,
   } = personData;
-  const [hideAgencyDetails, setHideAgencyDetails] = useState(!agencyDetails?.hasAgent && true);
+  const [hideAgencyDetails, setHideAgencyDetails] = useState(!agencyDetails?.id);
   const countryList = useRecoilValue(countryState) || [];
   const { users = [] } = useRecoilValue(userState);
   const userOptionList = useMemo(
@@ -114,7 +116,7 @@ export const PersonDetailsTab = ({
 
   return (
     <>
-      <div className={`${height} w-full`}>
+      <div className={`${height} w-full py-5 ${className}`}>
         <div className="text-xl text-primary-navy font-bold mb-3">Person Details</div>
         <PersonalDetails
           disabled={isPersonDetailsDisabled(departmentId)}
