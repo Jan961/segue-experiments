@@ -8,7 +8,7 @@ import applyTransactionToGrid from 'utils/applyTransactionToGrid';
 import { useRouter } from 'next/router';
 import { omit } from 'radash';
 import { ProductionDTO } from 'interfaces';
-import LoadingOverlay from './LoadingOverlay';
+import LoadingOverlay from 'components/core-ui-lib/LoadingOverlay';
 import { showsTableConfig } from './table/tableConfig';
 import ProductionsView from './modal/Views/ProductionsView';
 import { notify } from 'components/core-ui-lib';

@@ -10,7 +10,6 @@ import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import { useRef, useState } from 'react';
 import axios from 'axios';
 import applyTransactionToGrid from 'utils/applyTransactionToGrid';
-import Loader from 'components/core-ui-lib/Loader';
 import { useRouter } from 'next/router';
 import AddTask from 'components/tasks/modals/AddTask';
 import Filters from 'components/tasks/master/Filters';
@@ -19,12 +18,7 @@ import ProductionTaskList from 'components/tasks/modals/ProductionTaskList';
 import MasterTaskList from 'components/tasks/modals/MasterTaskList';
 import NotesPopup from 'components/tasks/NotesPopup';
 import { isNullOrEmpty } from 'utils';
-
-export const LoadingOverlay = () => (
-  <div className="inset-0 absolute bg-white bg-opacity-50 z-50 flex justify-center items-center">
-    <Loader variant="lg" iconProps={{ stroke: '#FFF' }} />
-  </div>
-);
+import LoadingOverlay from '../../components/core-ui-lib/LoadingOverlay';
 
 const MasterTasks = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const { masterTask = [], usersList } = props;
@@ -173,7 +167,7 @@ const MasterTasks = (props: InferGetServerSidePropsType<typeof getServerSideProp
         onNoClick={() => setConfirm(false)}
         hasOverlay={false}
       />
-      {isLoading && <LoadingOverlay />}
+      {isLoading && <LoadingOverlay spinner={false} loaderVariant="lg" />}
       <AddTask
         visible={showAddTask}
         isMasterTask={true}
