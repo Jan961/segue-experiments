@@ -1,6 +1,5 @@
 import ExcelJS from 'exceljs';
 import getPrismaClient from 'lib/prisma';
-import moment from 'moment';
 import Decimal from 'decimal.js';
 import { COLOR_HEXCODE } from 'services/salesSummaryService';
 import { ALIGNMENT, alignCellText, styleHeader } from './masterplan';
@@ -10,6 +9,7 @@ import { convertToPDF } from 'utils/report';
 import { BOOK_STATUS_CODES, SALES_TYPE_NAME } from 'types/MarketingTypes';
 import { formatDate, getDifferenceInDays } from 'services/dateService';
 import { SCHEDULE_VIEW } from 'services/reports/schedule-report';
+import { add, parseISO } from 'date-fns';
 
 type SALES_SUMMARY = {
   ProductionId: number;
@@ -71,7 +71,7 @@ const colorTextAndBGCell = ({
   }
   const cell = worksheet.getCell(row, col);
   if (textColor) {
-    cell.font = { color: { argb: textColor || 'ffffff' }, bold: true };
+    cell.font = { color: { argb: textColor }, bold: true };
   }
   if (numFmt) {
     cell.numFmt = numFmt;
@@ -191,14 +191,12 @@ const handler = async (req, res) => {
       numFmt?: string;
     }[] = [];
     const totalOfCurrency: { [key: string]: number } = { '£': 0, '€': 0 };
-    let prevValue: SALES_SUMMARY;
     for (let i = 1; i <= daysDiff || weekPending; i++) {
       weekPending = true;
-      const weekDay = moment(moment(fromDate).add(i - 1, 'day')).format('dddd');
-      const dateInIncomingFormat = moment(moment(fromDate).add(i - 1, 'day')).format('YYYY-MM-DD');
-      const nextDateInIncomingFormat = moment(moment(fromDate).add(i, 'day')).format('YYYY-MM-DD');
+      const weekDay = formatDate(add(parseISO(fromDate?.toISOString()), { days: i - 1 }), 'eeee');
+      const dateInIncomingFormat = formatDate(add(parseISO(fromDate?.toISOString()), { days: i - 1 }), 'yyyy-MM-dd');
+      const nextDateInIncomingFormat = formatDate(add(parseISO(fromDate?.toISOString()), { days: i }), 'yyyy-MM-dd');
       const date = formatDate(dateInIncomingFormat, 'dd/MM/yy');
-
       if (i % 7 === 1) {
         r4.push(`Week ${Math.floor(i / 7) + 1}`);
         r5.push('');
@@ -237,10 +235,11 @@ const handler = async (req, res) => {
           cellColor.push({ cell: { rowNo: 7, colNo }, cellColor: COLOR_HEXCODE.RED, textColor: COLOR_HEXCODE.WHITE });
           cellColor.push({ cell: { rowNo: 8, colNo }, cellColor: COLOR_HEXCODE.RED, textColor: COLOR_HEXCODE.WHITE });
           mergeRowCol.push({ row: [7, 8], col: [colNo, colNo] });
+          r8.push('');
           r9.push(``);
         } else {
-          r7.push('');
-          r8.push('');
+          r7.push(scheduleValue?.Location || '');
+          r8.push(scheduleValue?.EntryName || '');
           r9.push('');
         }
       } else {
@@ -248,27 +247,21 @@ const handler = async (req, res) => {
         if (!conversionRate && value.ConversionRate && Number(value.ConversionRate) !== 1) {
           conversionRate = value.ConversionRate;
         }
-        r7.push(value.Location || '');
-        r8.push(value.EntryName || '');
+        r7.push(value.Location || scheduleValue?.Location || '');
+        r8.push(value.EntryName || scheduleValue?.EntryName || '');
         if (nextValue && nextValue.EntryId === value.EntryId) {
           // This skips adding value for cell if it is repeating value
           r9.push(``);
         } else {
           r9.push(value.Value ? value.Value : '');
           // This adds blue background for Final Sales
-          if (prevValue && nextValue && prevValue.EntryId === value.EntryId && value.EntryId !== nextValue.EntryId) {
-            cellColor.push({
-              cell: { rowNo: 9, colNo },
-              cellColor: COLOR_HEXCODE.BLUE,
-              numFmt: (value.VenueCurrencySymbol || '') + '#,##0.00',
-            });
-          } else {
-            cellColor.push({
-              cell: { rowNo: 9, colNo },
-              ...(value.EntryStatusCode === 'X' && { textColor: COLOR_HEXCODE.GREY, cellColor: COLOR_HEXCODE.WHITE }),
-              numFmt: (value.VenueCurrencySymbol || '') + '#,##0.00',
-            });
-          }
+          cellColor.push({
+            cell: { rowNo: 9, colNo },
+            cellColor: COLOR_HEXCODE.BLUE,
+            ...(value.EntryStatusCode === 'X' && { textColor: COLOR_HEXCODE.GREY, cellColor: COLOR_HEXCODE.WHITE }),
+            numFmt: (value.VenueCurrencySymbol || '') + '#,##0.00',
+          });
+
           if (value.VenueCurrencySymbol && value.Value && value.EntryStatusCode !== 'X') {
             const val = totalOfCurrency[value.VenueCurrencySymbol];
             if (val || val === 0) {
