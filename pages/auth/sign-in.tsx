@@ -1,6 +1,6 @@
 import { Button, Icon, Label, PasswordInput, Select, TextInput, Tooltip } from 'components/core-ui-lib';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { calibri } from 'lib/fonts';
 import { useSignIn, useClerk, useUser } from '@clerk/nextjs';
 import { useRouter } from 'next/router';
@@ -29,6 +29,7 @@ const SignIn = () => {
   const [showLogout, setShowLogout] = useState(false);
   const [accounts, setAccounts] = useState([]);
   const router = useRouter();
+  const sessionId = useRef(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loginDetails, setLoginDetails] = useState({
     email: '',
@@ -76,7 +77,7 @@ const SignIn = () => {
           // If sign-in process is complete, set the created session as active
           // and redirect the user
           if (signInAttempt.status === 'complete') {
-            await setActive({ session: signInAttempt.createdSessionId, organization: loginDetails.company });
+            sessionId.current = signInAttempt.createdSessionId;
             setIsAuthenticated(true);
             fetchAccounts(loginDetails.email);
           } else {
@@ -135,8 +136,8 @@ const SignIn = () => {
         organisationId: loginDetails.company,
       });
       if (data.isValid) {
+        await setActive({ session: sessionId.current, organization: loginDetails.company });
         const permissions = data.permissions;
-
         setUserPermissions(loginDetails.company, permissions);
         navigateToHome();
       } else {
