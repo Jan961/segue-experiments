@@ -103,8 +103,8 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
   };
 
   const saveAllocatedSeats = async (data, perfId, type) => {
-    const holdRecIndex = holdList.findIndex((hold) => hold.info.Id === perfId);
-    const recData = { AvailableCompId: holdList[holdRecIndex].availableCompId, ...data };
+    const holdRecIndex = holdList.findIndex((hold) => hold?.info?.Id === perfId);
+    const recData = { AvailableCompId: holdList[holdRecIndex]?.availableCompId, ...data };
 
     const apiRoute = {
       new: 'create',
