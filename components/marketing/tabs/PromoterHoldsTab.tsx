@@ -81,13 +81,14 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
 
       if ((promData.allocations && Array.isArray(promData.allocations)) || Array.isArray(promData.holds)) {
         setHoldList(promData.holds);
-
         setAllocRows(
           promData.allocations.map((allocRow) => {
-            const user = Object.values(users).find((user) => user.AccUserId === allocRow.ArrangedByAccUserId);
-            const firstname = isNullOrEmpty(user.FirstName) ? '' : user.FirstName;
-            const surname = isNullOrEmpty(user.LastName) ? '' : user.LastName;
-            return { ...allocRow, ArrangedByAccUserId: firstname + ' ' + surname };
+            const arrangedByUser = getNameFromId(allocRow.ArrangedByAccUserId);
+            return {
+              ...allocRow,
+              ArrangedByAccUserId: arrangedByUser,
+              name_email: `${allocRow.TicketHolderName}\n${allocRow.TicketHolderEmail}`,
+            };
           }),
         );
 
@@ -101,9 +102,9 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
     }
   };
 
-  const saveAllocatedSeats = async (data, perfId, type: string) => {
-    const holdRec = holdList.find((hold) => hold.info.Id === perfId);
-    const recData = { AvailableCompId: holdRec.availableCompId, ...data };
+  const saveAllocatedSeats = async (data, perfId, type) => {
+    const holdRecIndex = holdList.findIndex((hold) => hold?.info?.Id === perfId);
+    const recData = { AvailableCompId: holdList[holdRecIndex]?.availableCompId, ...data };
 
     const apiRoute = {
       new: 'create',
@@ -111,9 +112,53 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
       delete: 'delete',
     };
 
-    await axios.post(`/api/marketing/allocated-seats/${apiRoute[type]}`, recData);
-    getPromoterHoldData(bookingIdVal);
+    const { data: row } = await axios.post(`/api/marketing/allocated-seats/${apiRoute[type]}`, recData);
+
+    if (type === 'new' || type === 'edit') {
+      const arrangedByUser = getNameFromId(recData.ArrangedByAccUserId);
+      const tableRow = {
+        ...recData,
+        ArrangedByAccUserId: arrangedByUser,
+        name_email: `${recData.TicketHolderName}\n${recData.TicketHolderEmail}`,
+        Id: row.id,
+      };
+
+      if (type === 'new') {
+        updateHoldRows(tableRow.Seats, holdRecIndex);
+        setAllocRows([...allocRows, tableRow]);
+      } else if (type === 'edit') {
+        const rowIndex = allocRows.findIndex((rec) => rec.Id === row.id);
+        if (rowIndex !== -1) {
+          const seatsChange = tableRow.Seats - allocRows[rowIndex].Seats;
+          const updatedAllocRows = allocRows.map((row, index) => (index === rowIndex ? { ...row, ...tableRow } : row));
+          updateHoldRows(seatsChange, holdRecIndex);
+          setAllocRows(updatedAllocRows);
+        }
+      }
+    } else if (type === 'delete') {
+      const seats = allocRows.find((rec) => rec.Id === row.id).Seats;
+      const updatedAllocRows = allocRows.filter((rec) => rec.Id !== row.id);
+      updateHoldRows(-seats, holdRecIndex);
+      setAllocRows(updatedAllocRows);
+    }
+
     setShowAllocSeatsModal(false);
+  };
+
+  const updateHoldRows = (seatsChange: number, index: number) => {
+    const holdRows = holdList.map((row) => ({ ...row }));
+    holdRows[index] = {
+      ...holdRows[index],
+      totalAllocated: holdRows[index].totalAllocated + seatsChange,
+    };
+    setHoldList(holdRows);
+  };
+
+  const getNameFromId = (id: number) => {
+    const user = Object.values(users).find((user) => user.AccUserId === id);
+    const firstname = isNullOrEmpty(user.FirstName) ? '' : user.FirstName;
+    const surname = isNullOrEmpty(user.LastName) ? '' : user.LastName;
+    return firstname + ' ' + surname;
   };
 
   const updateBooking = async (type: string, value: any) => {
