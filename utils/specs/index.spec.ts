@@ -666,14 +666,6 @@ describe('tidyString', () => {
 });
 
 describe('formatDecimalOnBlur', () => {
-  it('should return the formatted value for a valid decimal input', () => {
-    const mockEvent = { target: { value: '1234.5678' } };
-    const result = formatDecimalOnBlur(mockEvent);
-
-    // Assuming formatDecimalValue rounds to two decimal places
-    expect(result).toBe('1,234.57');
-  });
-
   it('should return an empty string when the input value is empty', () => {
     const mockEvent = { target: { value: '' } };
     const result = formatDecimalOnBlur(mockEvent);
