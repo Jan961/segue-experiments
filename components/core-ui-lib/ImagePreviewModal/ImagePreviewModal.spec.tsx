@@ -1,26 +1,37 @@
+import { render, fireEvent, screen } from '@testing-library/react';
 import ImagePreviewModal from './ImagePreviewModal';
-import { useState } from 'react';
 
-export default {
-  component: ImagePreviewModal,
-};
+describe('ImagePreviewModal', () => {
+  const mockClose = jest.fn();
 
-const Template = (args) => {
-  const [isClosed, setIsClosed] = useState<boolean>(true);
+  it('renders correctly', () => {
+    const imageUrl = 'https://example.com/test-image.jpg';
+    const altText = 'Test Image';
 
-  const handleModalClose = () => {
-    setIsClosed(!isClosed);
-  };
+    render(<ImagePreviewModal show={true} onClose={mockClose} imageUrl={imageUrl} altText={altText} />);
+    const image = screen.getByTestId('preview-image');
+    expect(image).toHaveAttribute('src', imageUrl);
+    expect(image).toHaveAttribute('alt', altText);
+  });
 
-  return (
-    <div className="p-4">
-      <ImagePreviewModal show={isClosed} onClose={handleModalClose} imageUrl={args.srcUrl} altText={args.alt} />
-    </div>
-  );
-};
+  it('displays the image with the correct src and alt text', () => {
+    render(
+      <ImagePreviewModal
+        show={true}
+        onClose={mockClose}
+        imageUrl="https://example.com/test-image.jpg"
+        altText="Test Image"
+      />,
+    );
+    const image = screen.getByTestId('preview-image');
+    expect(image).toHaveAttribute('src', 'https://example.com/test-image.jpg');
+    expect(image).toHaveAttribute('alt', 'Test Image');
+  });
 
-export const DefaultImage = Template.bind({});
-DefaultImage.args = {
-  srcUrl: 'https://upload.wikimedia.org/wikipedia/en/a/a9/Example.jpg', // Replace with your image URL or path
-  alt: 'Default Image',
-};
+  it('calls onClose when the overlay is clicked', () => {
+    render(<ImagePreviewModal show={true} onClose={mockClose} imageUrl="https://example.com/test-image.jpg" />);
+
+    fireEvent.click(screen.getByTestId('overlay')); // Ensure your PopupModal has a testId on the overlay div
+    expect(mockClose).toHaveBeenCalled();
+  });
+});
