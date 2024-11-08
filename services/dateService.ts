@@ -523,10 +523,25 @@ export const convertMinutesToHoursMins = (timeInMins: number) => {
 };
 
 /**
- * Returns the difference between two dates
+ * Calculates the difference in days between two dates.
+ *
+ * @param from - The start date as an ISO string (e.g., '2024-01-01').
+ * @param to - The end date as an ISO string (e.g., '2024-01-10').
+ * @returns The number of days between the 'from' and 'to' dates.
  */
-export const getDifferenceInDays = (from: string, to: string) => {
-  return differenceInDays(parseISO(to), parseISO(from));
+export const getDifferenceInDays = (from: string, to: string): number => {
+  if (!from || !to) {
+    return NaN;
+  }
+
+  const fromDate = parseISO(from);
+  const toDate = parseISO(to);
+
+  if (!isValid(fromDate) || !isValid(toDate)) {
+    return NaN;
+  }
+
+  return differenceInDays(toDate, fromDate);
 };
 
 type ComparisonOperator = '<' | '<=' | '>' | '>=' | '==' | '!=';
