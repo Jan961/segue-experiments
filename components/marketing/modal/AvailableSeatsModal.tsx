@@ -113,7 +113,7 @@ export default function AvailableSeatsModal({
                 placeholder="Enter Number"
                 id="seatsNo"
                 value={available.toString()}
-                pattern={/^(?:0|[1-9]\d*)?$/}
+                pattern={/^(0|\d+)?$/}
                 onChange={(event) => setAvailable(event.target.value)}
               />
             </div>

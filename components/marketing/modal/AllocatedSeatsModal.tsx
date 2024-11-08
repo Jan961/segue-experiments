@@ -389,7 +389,7 @@ export default function AllocatedSeatsModal({
                 value={form.numSeatsReq}
                 onChange={handleChange}
                 error={errors.numberOfSeats ? 'Seat number required' : ''}
-                pattern={/^(0|[1-9][0-9]*)?$/}
+                pattern={/^(0|\d+)?$/}
               />
               {errors.numberOfSeats && <FormError error="This is a Required Field" className="mt-2 ml-2" />}
             </div>
