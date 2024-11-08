@@ -10,6 +10,7 @@ import { UpdateAvailableSeatsParams } from 'pages/api/marketing/available-seats/
 import { ConfDialogVariant } from 'components/core-ui-lib/ConfirmationDialog/ConfirmationDialog';
 import { days } from 'config/global';
 import { isNullOrEmpty } from 'utils';
+import { decRegexLeadingZero } from 'utils/regexUtils';
 
 interface AvailableSeatsModalProps {
   show: boolean;
@@ -113,7 +114,7 @@ export default function AvailableSeatsModal({
                 placeholder="Enter Number"
                 id="seatsNo"
                 value={available.toString()}
-                pattern={/^(0|\d+)?$/}
+                pattern={decRegexLeadingZero}
                 onChange={(event) => setAvailable(event.target.value)}
               />
             </div>

@@ -33,7 +33,6 @@ import {
   defaultDemoCall,
   filterPrice,
   parseAndSortDates,
-  formatDecimalOnBlur,
   timeToDateTime,
   dtToTime,
   formatDecimalFields,
@@ -50,6 +49,7 @@ import { CustomOption } from 'components/core-ui-lib/Table/renderers/SelectCellR
 import { trasformVenueAddress } from 'utils/venue';
 import { accountContactState } from 'state/contracts/accountContactState';
 import {
+  formatDecimalOnBlur,
   formatDecimalValue,
   formatPercentageValue,
   isNull,

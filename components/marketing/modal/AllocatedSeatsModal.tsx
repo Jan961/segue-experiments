@@ -15,6 +15,7 @@ import { hasAllocSeatsChanged } from '../utils';
 import { isNullOrEmpty } from 'utils';
 import FormError from 'components/core-ui-lib/FormError';
 import { Label } from 'components/core-ui-lib';
+import { decRegexLeadingZero } from 'utils/regexUtils';
 import { PerformanceType } from '../tabs/PromoterHoldsTab';
 
 interface AllocatedModalProps {
@@ -345,7 +346,7 @@ export default function AllocatedSeatsModal({
                 value={form.numSeatsReq}
                 onChange={handleChange}
                 error={errors.numberOfSeats ? 'Seat number required' : ''}
-                pattern={/^(0|\d+)?$/}
+                pattern={decRegexLeadingZero}
               />
               {errors.numberOfSeats && <FormError error="This is a Required Field" className="mt-2 ml-2" />}
             </div>
