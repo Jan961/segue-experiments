@@ -5,28 +5,28 @@ import { CompAllocation } from 'prisma/generated/prisma-client';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const data = req.body as CompAllocation;
-    const prisma = await getPrismaClient(req);
+    const newAlloc = req.body as CompAllocation;
+    const dbClient = await getPrismaClient(req);
 
-    const response = await prisma.compAllocation.create({
+    const createResponse = await dbClient.compAllocation.create({
       data: {
         AvailableComp: {
           connect: {
-            Id: data.AvailableCompId,
+            Id: newAlloc.AvailableCompId,
           },
         },
-        TicketHolderName: data.TicketHolderName,
-        Seats: data.Seats,
-        Comments: data.Comments,
-        RequestedBy: data.RequestedBy,
-        VenueConfirmationNotes: data.VenueConfirmationNotes,
-        TicketHolderEmail: data.TicketHolderEmail,
-        SeatsAllocated: data.SeatsAllocated,
-        ArrangedByAccUserId: data.ArrangedByAccUserId,
+        TicketHolderName: newAlloc.TicketHolderName,
+        Seats: newAlloc.Seats,
+        Comments: newAlloc.Comments,
+        RequestedBy: newAlloc.RequestedBy,
+        VenueConfirmationNotes: newAlloc.VenueConfirmationNotes,
+        TicketHolderEmail: newAlloc.TicketHolderEmail,
+        SeatsAllocated: newAlloc.SeatsAllocated,
+        ArrangedByAccUserId: newAlloc.ArrangedByAccUserId,
       },
     });
 
-    res.status(200).json({ id: response.Id });
+    res.status(200).json({ id: createResponse.Id });
   } catch (err) {
     await loggingService.logError(err);
     console.log(err);
