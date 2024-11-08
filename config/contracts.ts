@@ -263,6 +263,12 @@ export const paymentTypes = [
   },
 ];
 
+export const contractOptionMapping = {
+  artisteContracts: 'Artiste',
+  creativeContracts: 'Creative',
+  smTechCrewContracts: 'SM / Tech / Crew',
+};
+
 export const contractDepartmentOptions = [
   {
     text: 'All',

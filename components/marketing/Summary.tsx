@@ -8,6 +8,7 @@ import classNames from 'classnames';
 import SummaryRow from './SummaryRow';
 import { useRecoilValue } from 'recoil';
 import { currencyState } from 'state/global/currencyState';
+import { isNull } from 'utils';
 
 export interface SummaryRef {
   resetData: () => void;
@@ -33,7 +34,7 @@ const Summary = forwardRef<SummaryRef, SummaryProps>((props, ref) => {
   }));
 
   const formatCost = (amount: number) => {
-    if (amount === 0) {
+    if (amount === 0 || isNull(amount)) {
       return currency.symbol + ' -';
     } else {
       return currency.symbol + parseFloat(amount.toString()).toFixed(2);

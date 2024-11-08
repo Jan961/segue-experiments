@@ -97,6 +97,10 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
 
   const getActivities = async (bookingId: string) => {
     try {
+      // reset the table and totals before retrieving data
+      setActRowData([]);
+      calculateActivityTotals([]);
+
       setActColDefs(
         activityColDefs(
           activityUpdate,
@@ -109,14 +113,14 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
 
       const { data } = await axios.get(`/api/marketing/activities/${bookingId}`);
 
+      const actTypes = data.activityTypes.map((type) => ({
+        text: type.Name,
+        value: type.Id,
+      }));
+
+      setActTypeList(actTypes);
+
       if (data && Array.isArray(data.activities) && data.activities.length > 0 && Array.isArray(data.activityTypes)) {
-        const actTypes = data.activityTypes.map((type) => ({
-          text: type.Name,
-          value: type.Id,
-        }));
-
-        setActTypeList(actTypes);
-
         const sortedActivities = data.activities.sort(
           (a, b) => new Date(a.Date).getTime() - new Date(b.Date).getTime(),
         );

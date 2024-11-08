@@ -5,6 +5,7 @@ import { handleAgencyDetails, handleEmergencyContacts, upsertPerson } from 'serv
 import { updatePersonSchema } from 'validators/person';
 import { ERROR_CODES } from 'config/apiConfig';
 import { all } from 'radash';
+import { PrismaClient } from 'prisma/generated/prisma-client';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -15,7 +16,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const prisma = await getPrismaClient(req);
     const validatedData = await updatePersonSchema.validate(req.body, { abortEarly: false });
 
-    await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx: PrismaClient) => {
       // Process the personDetails
       const {
         personDetails,
@@ -27,14 +28,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       } = validatedData;
 
       // Update or create the main person record
-      const updatedPerson = await upsertPerson(personDetails, salaryAccountDetails, expenseAccountDetails, tx);
-
+      await upsertPerson(personDetails, salaryAccountDetails, expenseAccountDetails, tx);
       await all([
         handleAgencyDetails(personDetails.id, agencyDetails, tx),
         handleEmergencyContacts(personDetails.id, emergencyContact1, emergencyContact2, tx),
       ]);
-
-      res.status(200).json({ message: 'Person updated successfully', updatedPerson });
     });
 
     res.status(200).json({ message: 'Person and related details updated successfully', ok: true });

@@ -25,12 +25,12 @@ export const defaultContractSchedule = {
 export const ContractScheduleModal = ({
   openContract,
   onClose,
-  newPersonDisabled,
+  accessNewPerson,
   accessPermissions,
 }: {
   openContract: boolean;
   onClose: () => void;
-  newPersonDisabled: ContractPermissionGroup;
+  accessNewPerson: ContractPermissionGroup;
   accessPermissions: ContractPermissionGroup;
 }) => {
   const { productions } = useRecoilValue(productionJumpState);
@@ -94,6 +94,15 @@ export const ContractScheduleModal = ({
     [setOpenNewPersonContract, setPersonMap],
   );
 
+  const getDepartmentOptions = useMemo(() => {
+    return departmentOptions.filter(
+      (x) =>
+        (x.value === 1 && accessPermissions.artisteContracts) ||
+        (x.value === 2 && accessPermissions.creativeContracts) ||
+        (x.value === 3 && accessPermissions.smTechCrewContracts),
+    );
+  }, [accessPermissions]);
+
   const onOpenBuildContract = useCallback(() => {
     if (production && department && role && personId && templateId) {
       setOpenNewBuildContract(true);
@@ -103,27 +112,12 @@ export const ContractScheduleModal = ({
   }, [production, department, role, personId, templateId, setOpenNewBuildContract]);
 
   const isNewPersonDisabled = () => {
-    if (!production) {
-      return true;
-    }
-    if (
-      newPersonDisabled.artisteContracts ||
-      newPersonDisabled.creativeContracts ||
-      newPersonDisabled.smTechCrewContracts
-    ) {
-      return false;
-    }
-    return true;
-  };
-
-  const getDepartmentOptions = useMemo(() => {
-    return departmentOptions.filter(
-      (x) =>
-        (x.value === 1 && accessPermissions.artisteContracts) ||
-        (x.value === 2 && accessPermissions.creativeContracts) ||
-        (x.value === 3 && accessPermissions.smTechCrewContracts),
+    return !(
+      accessNewPerson.artisteContracts ||
+      accessNewPerson.creativeContracts ||
+      accessNewPerson.smTechCrewContracts
     );
-  }, [accessPermissions]);
+  };
 
   return (
     <PopupModal
@@ -157,8 +151,7 @@ export const ContractScheduleModal = ({
         </div>
         <div className="flex justify-end mr-2">
           <Button
-            disabled={isNewPersonDisabled()} // CHANGE
-            // disabled={!production || !permissions.includes('ADD_NEW_PERSON_ARTISTE')}
+            disabled={!production || isNewPersonDisabled()}
             className="w-33"
             variant="secondary"
             text="Add New Person"
@@ -215,7 +208,7 @@ export const ContractScheduleModal = ({
       </div>
       {openNewPersonContract && (
         <ContractNewPersonModal
-          permissions={newPersonDisabled}
+          permissions={accessNewPerson}
           openNewPersonContract={openNewPersonContract}
           onClose={onCloseCreateNewPerson}
         />
@@ -228,7 +221,7 @@ export const ContractScheduleModal = ({
             setOpenNewBuildContract(false);
             onClose?.();
           }}
-          editPerson={newPersonDisabled}
+          editPerson={accessNewPerson}
         />
       )}
     </PopupModal>
