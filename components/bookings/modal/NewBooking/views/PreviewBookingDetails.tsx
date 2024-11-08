@@ -148,7 +148,7 @@ export default function PreviewBookingDetails({
   };
 
   const getVenue = (item) => {
-    if (!item.perf) {
+    if (!item.perf && item.dayType) {
       return dayTypeOptions.find((option) => option.value === item.dayType)?.text;
     }
     return item.venue
@@ -171,6 +171,7 @@ export default function PreviewBookingDetails({
   };
 
   const formatRowData = (data) => {
+    console.log('Rows', data);
     const rowItems: PreviewDataItem[] = data.map((item: any) => {
       const calculateWeek = () => {
         return calculateWeekNumber(new Date(production.StartDate), new Date(item.dateAsISOString));

@@ -1,4 +1,4 @@
-import { ICellRendererParams } from 'ag-grid-community';
+import { ICellRendererParams, IRowNode } from 'ag-grid-community';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import CheckboxRenderer from 'components/core-ui-lib/Table/renderers/CheckboxRenderer';
 import { statusOptions } from 'config/bookings';
@@ -18,20 +18,21 @@ const CheckPerfRenderer = ({ eGridCell, data, dayTypeOptions, node, setValue, ap
     setPerfChecked(isChecked);
   }, [data, dayTypeOptions]);
 
-  const getDayType = (checked: boolean) => {
+  const getDayType = (checked: boolean): string | number | boolean => {
     if (checked) {
-      return dayTypeOptions.find(({ text }) => text === 'Performance').value; // Performance Code
+      return dayTypeOptions.find(({ text }) => text === 'Performance').value; // Set default dayType for check of permance
     } else {
       if (node.rowIndex === 0) {
-        return dayTypeOptions.find(({ text }) => text === 'TBA').value; // TBA code
+        return dayTypeOptions.find(({ text }) => text === 'TBA').value; // Set default dayType for uncheck of performance for top row only
       }
-      return dayTypeOptions.find(({ text }) => text === 'Day Off').value; // Day off Code
+      return dayTypeOptions.find(({ text }) => text === 'Day Off').value; // Set default dayType for uncheck of permormance
     }
   };
 
-  const getBookingStatus = (checked: boolean) => {
+  const getBookingStatus = (checked: boolean): string | number | boolean => {
     if (checked) {
-      if (data.rowIndex === 0) {
+      if (node.rowIndex === 0 && node.data.bookingStatus === null) {
+        api.forEachNode((node: IRowNode) => node.setData({ ...node.data, bookingStatus: pencilledStatus }));
         return pencilledStatus;
       } else {
         return api.getRenderedNodes()[0].data.bookingStatus;
@@ -52,7 +53,6 @@ const CheckPerfRenderer = ({ eGridCell, data, dayTypeOptions, node, setValue, ap
       perf: checked,
       dayType: getDayType(checked),
       bookingStatus: getBookingStatus(checked),
-      pencilNo: null,
       isBooking,
       isRehearsal,
       isGetInFitUp,

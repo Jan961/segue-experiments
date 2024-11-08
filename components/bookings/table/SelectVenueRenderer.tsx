@@ -20,20 +20,22 @@ export default function SelectVenueRenderer({
   const [isDisabled, setIsDisabled] = useState<boolean>(false);
 
   const handleVenueChange = (venue: number) => {
-    setValue(venue);
     if (data.isRunOfDates && node.rowIndex === 0) {
       api.forEachNode((node: IRowNode) => node.setData({ ...node.data, venue }));
+    } else {
+      setValue(venue);
     }
   };
 
   useEffect(() => {
+    console.log(value);
     if (data) {
       if (data.isRunOfDates) {
         setIsDisabled(node.rowIndex > 0);
       }
       setValue(value);
     }
-  }, [data, node, setIsDisabled]);
+  }, [data, node]);
 
   return (
     <div className="pl-1 pr-2 mt-1">

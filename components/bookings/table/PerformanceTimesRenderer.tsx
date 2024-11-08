@@ -73,6 +73,7 @@ const PerformanceTimesRenderer = ({ data, setValue, eGridCell }: CustomCellRende
           return { hrs: '', min: '' };
         });
 
+      setValue(newTimes);
       setPerformanceTimes(newTimes);
     } else {
       setValue('');
