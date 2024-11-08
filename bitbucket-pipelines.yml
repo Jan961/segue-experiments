@@ -35,93 +35,12 @@ pipelines:
             # Run Cypress tests in headless mode
             - npm run cy:alltests --browser chrome || true                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
             # - npm run cy:permissions --browser chrome
-            - apt-get update && apt-get install -y zip jq tree
-            - zip -r reports.zip cypress/reports/
             - npx mochawesome-merge cypress/reports/mocha/*.json -o output.json
-            - npx marge output.json
           after-script:
             - cd cypress-tests/cypress
-            - apt-get update && apt-get install -y jq
             # Create a custom HTML report from output.json
-            - |
-              echo '
-              <!DOCTYPE html>
-              <html>
-              <head>
-                <title>Cypress Test Report</title>
-                <style>
-                  body { font-family: Arial, sans-serif; margin: 20px; }
-                  .header { background: #f5f5f5; padding: 20px; margin-bottom: 20px; }
-                  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 20px; }
-                  .stat-box { background: #fff; padding: 15px; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-                  .test-case { margin-bottom: 15px; padding: 15px; border-radius: 5px; }
-                  .passed { background: #e8f5e9; border-left: 5px solid #4caf50; }
-                  .failed { background: #ffebee; border-left: 5px solid #f44336; }
-                  .skipped { background: #f5f5f5; border-left: 5px solid #9e9e9e; }
-                  .error-details { background: #fff; padding: 10px; margin-top: 10px; border-radius: 3px; font-family: monospace; white-space: pre-wrap; }
-                  .suite-title { font-size: 1.2em; font-weight: bold; margin-bottom: 15px; }
-                  .duration { color: #666; font-size: 0.9em; }
-                </style>
-              </head>
-              <body>' > test-report.html
-
-              # Extract test results and append to HTML
-              jq -r '"
-              <div class=\"header\">
-                <h1>Cypress Test Report</h1>
-                <p>Run Date: $(date)</p>
-                <div class=\"stats\">
-                  <div class=\"stat-box\">
-                    <h3>Total Tests: \(.stats.testsRegistered)</h3>
-                  </div>
-                  <div class=\"stat-box\">
-                    <h3>Passed: \(.stats.passes)</h3>
-                  </div>
-                  <div class=\"stat-box\">
-                    <h3>Failed: \(.stats.failures)</h3>
-                  </div>
-                  <div class=\"stat-box\">
-                    <h3>Skipped: \(.stats.skipped)</h3>
-                  </div>
-                  <div class=\"stat-box\">
-                    <h3>Duration: \(.stats.duration / 1000)s</h3>
-                  </div>
-                  <div class=\"stat-box\">
-                    <h3>Pass Rate: \(.stats.passPercent)%</h3>
-                  </div>
-                </div>
-              </div>
-              <div class=\"test-results\">"' output.json >> test-report.html
-
-              # Process each test suite and its tests
-              jq -r '.results[0].suites[] | "
-              <div class=\"suite\">
-                <div class=\"suite-title\">\(.title)</div>
-                \(.tests[] | 
-                  if .state == "passed" then
-                    "<div class=\"test-case passed\">
-                      <h3>✓ \(.title)</h3>
-                      <div class=\"duration\">Duration: \(.duration)ms</div>
-                    </div>"
-                  elif .state == "failed" then
-                    "<div class=\"test-case failed\">
-                      <h3>✖ \(.title)</h3>
-                      <div class=\"duration\">Duration: \(.duration)ms</div>
-                      <div class=\"error-details\">\(.err.message)</div>
-                      <div class=\"error-details\">\(.err.estack)</div>
-                    </div>"
-                  else
-                    "<div class=\"test-case skipped\">
-                      <h3>- \(.title)</h3>
-                      <div class=\"duration\">Skipped</div>
-                    </div>"
-                  end
-                )
-              </div>"' output.json >> test-report.html
-
-              # Close HTML tags
-              echo '</div></body></html>' >> test-report.html
-
+            - npm run merge:reports
+            - npm run generate:report
             # Set alert type based on test results
             - ALERT_TYPE="success"
             - |
@@ -138,16 +57,14 @@ pipelines:
               variables:
                 USERNAME: $SMTP_USERNAME
                 PASSWORD: $SMTP_PASSWORD
-                FROM: 'seguetesting@gmail.com'
-                TO: 'testing@segue360.co.uk'
+                FROM: $SMTP_USERNAME
+                TO: $TESTERS_GROUP_EMAIL
                 HOST: 'smtp.gmail.com'
                 SUBJECT: '${ALERT_TYPE}:Bitbucket Pipe Notification for ${BITBUCKET_BRANCH}'
-                ATTACHMENTS: 'reports.zip'
-                BODY_HTML: 'test-report.html'
+                BODY_HTML: 'cypress/reports/mocha/test-report.html'
           artifacts:
             - cypress-tests/cypress/reports/**
-            - cypress-tests/cypress/reports.zip
-            - cypress-tests/cypress/test-report.html
+            - cypress-tests/cypress/cypress/reports/mocha/test-report.html
   default:
       - step:
           name: Build and Test
