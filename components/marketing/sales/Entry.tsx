@@ -6,11 +6,12 @@ import { bookingJumpState } from 'state/marketing/bookingJumpState';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import { SelectOption } from '../MarketingHome';
 import { addDurationToDate, getMonday, toISO } from 'services/dateService';
-import { isNullOrEmpty, isNullOrUndefined } from 'utils';
+import { formatDecimalOnBlur, formatDecimalValue, isNullOrEmpty, isNullOrUndefined } from 'utils';
 import { Spinner } from 'components/global/Spinner';
 import { currencyState } from 'state/global/currencyState';
 import { UpdateWarningModal } from '../modal/UpdateWarning';
 import axios from 'axios';
+import { decRegexLeadingZero } from 'utils/regexUtils';
 
 export type TourResponse = {
   data: Array<SelectOption>;
@@ -32,10 +33,10 @@ interface HoldCompSet {
 }
 
 interface SalesFigure {
-  seatsReserved: number;
-  seatsReservedVal: number;
-  seatsSold: number;
-  seatsSoldVal: number;
+  seatsReserved: string;
+  seatsReservedVal: string;
+  seatsSold: string;
+  seatsSoldVal: string;
 }
 
 interface SalesFigureSet {
@@ -73,7 +74,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
   const currency = useRecoilValue(currencyState);
   const [salesApiAction, setSalesApiAction] = useState('create');
 
-  const compareSalesFigures = (prev: SalesFigure, curr: SalesFigure) => {
+  const compareSalesFigures = (prev, curr) => {
     // If prev is null, there are no errors.
     if (!prev) {
       return null;
@@ -97,11 +98,33 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
     return errors.length > 0 ? errors : null;
   };
 
+  const convertSalesFigures = (salesFigures) => {
+    const result = {
+      setId: salesFigures.setId,
+      general: {
+        seatsReserved: parseInt(salesFigures.general.seatsReserved),
+        seatsReservedVal: parseFloat(salesFigures.general.seatsReservedVal),
+        seatsSold: parseInt(salesFigures.general.seatsSold),
+        seatsSoldVal: parseFloat(salesFigures.general.seatsSoldVal),
+      },
+      schools: {
+        seatsReserved: parseInt(salesFigures.schools.seatsReserved),
+        seatsReservedVal: parseFloat(salesFigures.schools.seatsReservedVal),
+        seatsSold: parseInt(salesFigures.schools.seatsSold),
+        seatsSoldVal: parseFloat(salesFigures.schools.seatsSoldVal),
+      },
+    };
+    return result;
+  };
+
   const handleUpdate = async () => {
+    const prevFigs = convertSalesFigures(prevSalesFigureSet);
+    const currFigs = convertSalesFigures(currSalesFigureSet);
+
     try {
       if (!warningIssued) {
-        const generalErrors = compareSalesFigures(prevSalesFigureSet.general, currSalesFigureSet.general);
-        const schoolErrors = compareSalesFigures(prevSalesFigureSet.schools, currSalesFigureSet.schools);
+        const generalErrors = compareSalesFigures(prevFigs.general, currFigs.general);
+        const schoolErrors = compareSalesFigures(prevFigs.schools, currFigs.schools);
 
         let figuresHaveIssue = false;
 
@@ -125,8 +148,8 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
         bookingId: bookings.selected,
         salesDate,
         setId,
-        general: currSalesFigureSet.general,
-        schools: {},
+        general: currFigs.general,
+        schools: currFigs.schools,
         action: salesApiAction,
       };
 
@@ -137,8 +160,8 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
         seatsSoldVal: 0,
       };
 
-      if (JSON.stringify(currSalesFigureSet.schools) !== JSON.stringify(emptySchools)) {
-        data = { ...data, schools: currSalesFigureSet.schools };
+      if (JSON.stringify(currFigs.schools) !== JSON.stringify(emptySchools)) {
+        data = { ...data, schools: currFigs.schools };
       }
 
       const response = await axios.post('/api/marketing/sales/entry/v2/upsert', data);
@@ -246,18 +269,6 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
     copyPreviousWeeks();
   };
 
-  const sanitiseSalesFigue = (value: string): number => {
-    if (value === '') {
-      return 0;
-    } else {
-      const regexPattern = /^-?\d*(\.\d*)?$/;
-
-      if (regexPattern.test(value)) {
-        return parseInt(value);
-      }
-    }
-  };
-
   const getSalesFrequency = async () => {
     try {
       const response = await axios.get(`/api/marketing/sales/tourWeeks/${productionId.toString()}`);
@@ -277,10 +288,10 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
 
   // helper function for setSalesFigures to reduce duplicate code
   const createSalesFigure = (fig: SalesFigure | undefined) => ({
-    seatsReserved: validateSale(fig?.seatsReserved),
-    seatsReservedVal: validateSale(fig?.seatsReservedVal),
-    seatsSold: validateSale(fig?.seatsSold),
-    seatsSoldVal: validateSale(fig?.seatsSoldVal),
+    seatsReserved: fig?.seatsReserved,
+    seatsReservedVal: formatDecimalValue(fig?.seatsReservedVal),
+    seatsSold: fig?.seatsSold,
+    seatsSoldVal: formatDecimalValue(fig?.seatsSoldVal),
   });
 
   const setSalesFigures = async (inputDate: Date, previous: boolean, bookingId: number) => {
@@ -290,16 +301,16 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
       const emptySalesSet = {
         setId: 0,
         general: {
-          seatsReserved: 0,
-          seatsReservedVal: 0,
-          seatsSold: 0,
-          seatsSoldVal: 0,
+          seatsReserved: '0',
+          seatsReservedVal: '0.00',
+          seatsSold: '0',
+          seatsSoldVal: '0.00',
         },
         schools: {
-          seatsReserved: 0,
-          seatsReservedVal: 0,
-          seatsSold: 0,
-          seatsSoldVal: 0,
+          seatsReserved: '0',
+          seatsReservedVal: '0.00',
+          seatsSold: '0',
+          seatsSoldVal: '0.00',
         },
       };
 
@@ -380,14 +391,6 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
     }
   };
 
-  const validateSale = (saleFigure) => {
-    if (isNullOrEmpty(saleFigure)) {
-      return 0;
-    } else {
-      return parseInt(saleFigure);
-    }
-  };
-
   const editBooking = async (field: string, value: any) => {
     try {
       const updObj = { [field]: value };
@@ -440,6 +443,16 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
 
   const copyPreviousWeeks = () => {
     setCurrSalesFigureSet(prevSalesFigureSet);
+  };
+
+  const handleSalesFigChange = (key: string, type: string, value: string) => {
+    setCurrSalesFigureSet({
+      ...currSalesFigureSet,
+      [type]: {
+        ...currSalesFigureSet[type],
+        [key]: value,
+      },
+    });
   };
 
   useEffect(() => {
@@ -523,15 +536,8 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                           placeholder="Enter Seats"
                           id="genSeatsSold"
                           value={currSalesFigureSet.general.seatsSold}
-                          onChange={(event) =>
-                            setCurrSalesFigureSet({
-                              ...currSalesFigureSet,
-                              general: {
-                                ...currSalesFigureSet.general,
-                                seatsSold: sanitiseSalesFigue(event.target.value),
-                              },
-                            })
-                          }
+                          pattern={decRegexLeadingZero}
+                          onChange={(event) => handleSalesFigChange('seatsSold', 'general', event.target.value)}
                         />
                       </div>
 
@@ -544,15 +550,8 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                           placeholder="Enter Seats"
                           id="genSeatsReserved"
                           value={currSalesFigureSet.general.seatsReserved}
-                          onChange={(event) =>
-                            setCurrSalesFigureSet({
-                              ...currSalesFigureSet,
-                              general: {
-                                ...currSalesFigureSet.general,
-                                seatsReserved: sanitiseSalesFigue(event.target.value),
-                              },
-                            })
-                          }
+                          pattern={decRegexLeadingZero}
+                          onChange={(event) => handleSalesFigChange('seatsReserved', 'general', event.target.value)}
                         />
                       </div>
                     </div>
@@ -567,14 +566,10 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                           placeholder="Enter Value"
                           id="genSeatsSoldVal"
                           value={currSalesFigureSet.general.seatsSoldVal}
-                          onChange={(event) =>
-                            setCurrSalesFigureSet({
-                              ...currSalesFigureSet,
-                              general: {
-                                ...currSalesFigureSet.general,
-                                seatsSoldVal: sanitiseSalesFigue(event.target.value),
-                              },
-                            })
+                          pattern={/^\d*(\.\d*)?$/}
+                          onChange={(event) => handleSalesFigChange('seatsSoldVal', 'general', event.target.value)}
+                          onBlur={(event) =>
+                            handleSalesFigChange('seatsSoldVal', 'general', formatDecimalOnBlur(event))
                           }
                         />
                       </div>
@@ -588,14 +583,10 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                           placeholder="Enter Value"
                           id="genSeatsReservedVal"
                           value={currSalesFigureSet.general.seatsReservedVal}
-                          onChange={(event) =>
-                            setCurrSalesFigureSet({
-                              ...currSalesFigureSet,
-                              general: {
-                                ...currSalesFigureSet.general,
-                                seatsReservedVal: sanitiseSalesFigue(event.target.value),
-                              },
-                            })
+                          pattern={/^\d*(\.\d*)?$/}
+                          onChange={(event) => handleSalesFigChange('seatsReservedVal', 'general', event.target.value)}
+                          onBlur={(event) =>
+                            handleSalesFigChange('seatsReservedVal', 'general', formatDecimalOnBlur(event))
                           }
                         />
                       </div>
@@ -646,15 +637,8 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                               placeholder="Enter Seats"
                               id="schSeatsSold"
                               value={currSalesFigureSet.schools.seatsSold}
-                              onChange={(event) =>
-                                setCurrSalesFigureSet({
-                                  ...currSalesFigureSet,
-                                  schools: {
-                                    ...currSalesFigureSet.schools,
-                                    seatsSold: sanitiseSalesFigue(event.target.value),
-                                  },
-                                })
-                              }
+                              pattern={decRegexLeadingZero}
+                              onChange={(event) => handleSalesFigChange('seatsSold', 'schools', event.target.value)}
                             />
                           </div>
 
@@ -667,15 +651,8 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                               placeholder="Enter Seats"
                               id="schSeatsReserved"
                               value={currSalesFigureSet.schools.seatsReserved}
-                              onChange={(event) =>
-                                setCurrSalesFigureSet({
-                                  ...currSalesFigureSet,
-                                  schools: {
-                                    ...currSalesFigureSet.schools,
-                                    seatsReserved: sanitiseSalesFigue(event.target.value),
-                                  },
-                                })
-                              }
+                              pattern={decRegexLeadingZero}
+                              onChange={(event) => handleSalesFigChange('seatsReserved', 'schools', event.target.value)}
                             />
                           </div>
                         </div>
@@ -690,14 +667,10 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                               placeholder="Enter Value"
                               id="schSeatsSoldVal"
                               value={currSalesFigureSet.schools.seatsSoldVal}
-                              onChange={(event) =>
-                                setCurrSalesFigureSet({
-                                  ...currSalesFigureSet,
-                                  schools: {
-                                    ...currSalesFigureSet.schools,
-                                    seatsSoldVal: sanitiseSalesFigue(event.target.value),
-                                  },
-                                })
+                              pattern={/^\d*(\.\d*)?$/}
+                              onChange={(event) => handleSalesFigChange('seatsSoldVal', 'schools', event.target.value)}
+                              onBlur={(event) =>
+                                handleSalesFigChange('seatsSoldVal', 'schools', formatDecimalOnBlur(event))
                               }
                             />
                           </div>
@@ -711,14 +684,12 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                               placeholder="Enter Value"
                               id="schSeatsReservedVal"
                               value={currSalesFigureSet.schools.seatsReservedVal}
+                              pattern={/^\d*(\.\d*)?$/}
                               onChange={(event) =>
-                                setCurrSalesFigureSet({
-                                  ...currSalesFigureSet,
-                                  schools: {
-                                    ...currSalesFigureSet.schools,
-                                    seatsReservedVal: sanitiseSalesFigue(event.target.value),
-                                  },
-                                })
+                                handleSalesFigChange('seatsReservedVal', 'schools', event.target.value)
+                              }
+                              onBlur={(event) =>
+                                handleSalesFigChange('seatsReservedVal', 'schools', formatDecimalOnBlur(event))
                               }
                             />
                           </div>
