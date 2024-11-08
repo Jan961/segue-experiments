@@ -5,6 +5,7 @@ import {
   isValidDate,
   compareDatesWithoutTime,
   getDateWithOffset,
+  getDifferenceInDays,
 } from '../dateService';
 import { parse } from 'date-fns';
 
@@ -262,5 +263,71 @@ describe('getDateWithOffset', () => {
     const parsedDate = parse(expectedParsedDateString, 'MMMM do yyyy, h:mm:ss a', new Date());
 
     expect(result.toISOString()).toBe(parsedDate.toISOString());
+  });
+});
+
+// ----------------- getDifferenceInDays -----------------
+describe('getDifferenceInDays', () => {
+  test('should return the correct number of days between two valid dates', () => {
+    const from = '2023-10-01';
+    const to = '2023-10-10';
+    const result = getDifferenceInDays(from, to);
+    expect(result).toBe(9);
+  });
+
+  test('should return 0 when the dates are the same', () => {
+    const from = '2023-10-10';
+    const to = '2023-10-10';
+    const result = getDifferenceInDays(from, to);
+    expect(result).toBe(0);
+  });
+
+  test('should return a negative number when from date is later than to date', () => {
+    const from = '2023-10-10';
+    const to = '2023-10-01';
+    const result = getDifferenceInDays(from, to);
+    expect(result).toBe(-9);
+  });
+
+  test('should return NaN if one of the dates is invalid', () => {
+    const from = 'invalid-date';
+    const to = '2023-10-01';
+    const result = getDifferenceInDays(from, to);
+    expect(result).toBeNaN();
+  });
+
+  test('should return NaN if the input strings are empty', () => {
+    const from = '';
+    const to = '';
+    const result = getDifferenceInDays(from, to);
+    expect(result).toBeNaN();
+  });
+
+  test('should return NaN if "to" date is invalid', () => {
+    const from = '2023-10-01';
+    const to = 'invalid-date';
+    const result = getDifferenceInDays(from, to);
+    expect(result).toBeNaN();
+  });
+
+  test('should return the correct number of days between ISO format dates with time', () => {
+    const from = '2023-10-01T12:00:00.000Z';
+    const to = '2023-10-10T12:00:00.000Z';
+    const result = getDifferenceInDays(from, to);
+    expect(result).toBe(9);
+  });
+
+  test('should return the correct difference despite time zone information', () => {
+    const from = '2023-10-01T00:00:00+05:00';
+    const to = '2023-10-03T00:00:00-05:00';
+    const result = getDifferenceInDays(from, to);
+    expect(result).toBe(2);
+  });
+
+  test('should return -1 if to date is one day before from date', () => {
+    const from = '2023-10-10';
+    const to = '2023-10-09';
+    const result = getDifferenceInDays(from, to);
+    expect(result).toBe(-1);
   });
 });

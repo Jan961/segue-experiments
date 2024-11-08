@@ -406,6 +406,7 @@ export const getTimezonOffset = () => {
   return new Date().getTimezoneOffset();
 };
 
+type DateInput = Date | number | string;
 /**
  * Formats a date according to the specified format.
  *
@@ -413,7 +414,7 @@ export const getTimezonOffset = () => {
  * @param {string} dateFormat - The format string.
  * @returns {string} The formatted date.
  */
-export const formatDate = (date: Date | number | string, dateFormat: string): string => {
+export const formatDate = (date: DateInput, dateFormat: string): string => {
   let parsedDate: number | Date;
 
   if (date instanceof Date) {
@@ -466,7 +467,7 @@ export const formatUtcTime = (time) => {
  * @param {Date | number | string} date - The date input to convert.
  * @returns {Date | null} The corresponding Date object or null if the input is invalid.
  */
-export const getDateObject = (date: Date | number | string): Date | null => {
+export const getDateObject = (date: DateInput): Date | null => {
   if (date instanceof Date) {
     // If the input is already a Date object, return it
     return date;
@@ -493,7 +494,7 @@ export const getDateObject = (date: Date | number | string): Date | null => {
  * @param {Date | number | string} date2 - The second date.
  * @returns {boolean} Returns true if the two dates are the same day, otherwise false.
  */
-export const areDatesSame = (date1: Date | number | string, date2: Date | number | string): boolean => {
+export const areDatesSame = (date1: DateInput, date2: DateInput): boolean => {
   return isSameDay(getDateObject(date1), getDateObject(date2));
 };
 
@@ -505,11 +506,7 @@ export const areDatesSame = (date1: Date | number | string, date2: Date | number
  * @param {number} [weekStartsOn=0] - The first day of the week (0 = Sunday, 1 = Monday, etc.)
  * @returns {boolean} Returns true if both dates are in the same week, otherwise false.
  */
-export const areDatesInSameWeek = (
-  date1: Date | number | string,
-  date2: Date | number | string,
-  weekStartsOn: 0 | 1 | 2 | 3 | 4 | 5 | 6 = 0,
-) => {
+export const areDatesInSameWeek = (date1: DateInput, date2: DateInput, weekStartsOn: 0 | 1 | 2 | 3 | 4 | 5 | 6 = 0) => {
   return isSameWeek(getDateObject(date1), getDateObject(date2), { weekStartsOn });
 };
 
@@ -543,11 +540,7 @@ type ComparisonOperator = '<' | '<=' | '>' | '>=' | '==' | '!=';
  *
  * @throws {Error} - Throws an error if an unsupported comparison operator is provided.
  */
-export const compareDatesWithoutTime = (
-  date1: Date | string | number,
-  date2: Date | string | number,
-  operator: ComparisonOperator,
-): boolean => {
+export const compareDatesWithoutTime = (date1: DateInput, date2: DateInput, operator: ComparisonOperator): boolean => {
   const d1 = new Date(date1);
   const d2 = new Date(date2);
 
