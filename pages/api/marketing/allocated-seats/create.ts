@@ -30,6 +30,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   } catch (err) {
     await loggingService.logError(err);
     console.log(err);
-    res.status(500).json({ err: 'Error creating CompAllocation' });
+    res.status(500).json({ err: 'Error creating (CompAllocation) - seat allocation' });
   }
 }
