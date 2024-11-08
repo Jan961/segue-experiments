@@ -202,6 +202,11 @@ export const formatDecimalValue = (decimalString: any) => {
   return (Math.round(floatValue * 100) / 100).toFixed(2);
 };
 
+export const formatDecimalOnBlur = (event: any) => {
+  const value = event.target.value;
+  return formatDecimalValue(value);
+};
+
 export const formatPercentageValue = (percentageString: any) => {
   if (isNullOrEmpty(percentageString)) {
     return '';
