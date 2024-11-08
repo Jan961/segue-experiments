@@ -5,31 +5,31 @@ import { CompAllocation } from 'prisma/generated/prisma-client';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const updAlloc = req.body as CompAllocation;
-    const sqlClient = await getPrismaClient(req);
+    const data = req.body as CompAllocation;
+    const prisma = await getPrismaClient(req);
 
-    const updResponse = await sqlClient.compAllocation.update({
+    const response = await prisma.compAllocation.update({
       where: {
-        Id: updAlloc.Id,
+        Id: data.Id,
       },
       data: {
         AvailableComp: {
           connect: {
-            Id: updAlloc.AvailableCompId,
+            Id: data.AvailableCompId,
           },
         },
-        TicketHolderName: updAlloc.TicketHolderName,
-        Seats: updAlloc.Seats,
-        Comments: updAlloc.Comments,
-        RequestedBy: updAlloc.RequestedBy,
-        VenueConfirmationNotes: updAlloc.VenueConfirmationNotes,
-        TicketHolderEmail: updAlloc.TicketHolderEmail,
-        SeatsAllocated: updAlloc.SeatsAllocated,
-        ArrangedByAccUserId: updAlloc.ArrangedByAccUserId,
+        TicketHolderName: data.TicketHolderName,
+        Seats: data.Seats,
+        Comments: data.Comments,
+        RequestedBy: data.RequestedBy,
+        VenueConfirmationNotes: data.VenueConfirmationNotes,
+        TicketHolderEmail: data.TicketHolderEmail,
+        SeatsAllocated: data.SeatsAllocated,
+        ArrangedByAccUserId: data.ArrangedByAccUserId,
       },
     });
 
-    res.status(200).json({ id: updResponse.Id });
+    res.status(200).json({ id: response.Id });
   } catch (err) {
     await loggingService.logError(err);
     console.log(err);
