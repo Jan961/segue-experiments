@@ -2,7 +2,7 @@ import { Button, Icon, Label, PasswordInput, Select, TextInput, Tooltip } from '
 import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 import { calibri } from 'lib/fonts';
-import { useSignIn, useClerk, useUser } from '@clerk/nextjs';
+import { useSignIn, useUser } from '@clerk/nextjs';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import axios from 'axios';
@@ -20,10 +20,9 @@ import LoadingOverlay from 'components/core-ui-lib/LoadingOverlay';
 const SignIn = () => {
   const { setUserPermissions } = usePermissions();
   const { isLoaded, signIn, setActive } = useSignIn();
-  const { navigateToHome } = useAuth();
+  const { signOut, navigateToHome } = useAuth();
   const { user } = useUser();
   const [isBusy, setIsBusy] = useState(false);
-  const { signOut } = useClerk();
   const [error, setError] = useState('');
   const [validationError, setValidationError] = useState(null);
   const [showLogout, setShowLogout] = useState(false);
