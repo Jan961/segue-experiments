@@ -328,7 +328,8 @@ export default function NewBookingDetailsView({
 
   const validateBooking = (rowData: BookingItem[]) => {
     // Do not allow a performance booking to be changed to a non-performance booking
-    if (bookingRow.isBooking && !rowData.some((row) => row.isBooking)) {
+    const isPerformanceBooking = bookingData.some((row) => row.isBooking);
+    if (isPerformanceBooking && !rowData.some((row) => row.isBooking)) {
       setError('Cannot change a performance booking to a non-performance booking');
       return false;
     }

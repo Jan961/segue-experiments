@@ -93,7 +93,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     // Check if this is a straight forward update or a delete-insert
     const acc: typeof rowsMap = updated.reduce((acc, booking: BookingItem) => {
       const shouldUpdateBooking = originalItem.isBooking && booking.isBooking;
-      console.log('shouldUpdateBooking', shouldUpdateBooking, originalItem, booking);
       if (shouldUpdateBooking) {
         acc.booking.rowsToUpdate.push(formatExistingBookingToPrisma({ ...booking, id: originalItem.id }));
       } else {

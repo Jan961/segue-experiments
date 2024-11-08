@@ -87,12 +87,11 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       other: { rowsToInsert: [], rowsToUpdate: [], rowsToDelete: [] },
     };
 
+    // check if the original item needs deleting
     original.forEach((b) => {
       const originalChangedBooking = updated.find((u) => u.id === b.id);
-      // Mark a booking for deletion if it is of type performance(iBooking) or if the booking is being deleted after change of length
-      // or the booking daytype has chnaged which requires delete-insert into separate tables
+
       if (
-        b.isBooking ||
         !originalChangedBooking ||
         b.isBooking !== originalChangedBooking.isBooking ||
         b.isRehearsal !== originalChangedBooking.isRehearsal ||
@@ -102,6 +101,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       }
     });
 
+    // Update or Insert for all non-performance types
     updated.forEach((u) => {
       if (!u.isBooking) {
         const canUpdate = !!original.find(
@@ -119,8 +119,11 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       }
     });
 
-    // for a run of dates, we can have only one booking but multiple performances
-    // so we can use the first performance/isBooking row from updated for that
+    // Check if have a performance row in the edited run-of-dates booking
+    // if so, use the same booking id to insert performances
+    // if not, create a new booking
+    const editedPerformanceItem = original.find(({ isBooking }) => isBooking);
+
     const performances = updated.filter(({ isBooking }) => isBooking);
     if (!isNullOrEmpty(performances)) {
       const formattedPerformances = mapNewBookingToPrismaFields(performances);
@@ -132,7 +135,9 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         }
         return acc;
       }, {} as Partial<AddBookingsParams>);
-      rowsMap.booking.rowsToInsert.push(bookingToInsert);
+      editedPerformanceItem
+        ? rowsMap.booking.rowsToUpdate.push(bookingToInsert)
+        : rowsMap.booking.rowsToInsert.push(bookingToInsert);
     }
 
     const promises = [];
