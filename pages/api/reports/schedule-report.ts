@@ -261,9 +261,9 @@ const handler = async (req, res) => {
             performancesOnThisDay?.[1]?.performanceTime || '',
           ]);
           seats.push(Number(VenueSeats) || 0);
+          performancesPerDay.push(performancesOnThisDay?.length || 0);
           if (isFinalDay) {
             row = row.concat([Number(Mileage) || '', formattedTime]);
-            performancesPerDay.push(performances?.length || 0);
             time.push(Number(TimeMins) || 0);
             mileage.push(Number(Mileage) || 0);
           }
@@ -324,7 +324,7 @@ const handler = async (req, res) => {
       '',
       '',
       seats.reduce((acc, m) => acc + Number(m || 0), 0),
-      performancesPerDay.reduce((acc, m) => acc + Number(m || 0), 0),
+      sum(performancesPerDay),
       '',
       '',
       totalMileage.reduce((acc, m) => acc + Number(m || 0), 0),
