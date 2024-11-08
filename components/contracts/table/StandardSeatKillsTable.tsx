@@ -17,9 +17,16 @@ interface SeatKillProps {
   holdTypeList: Array<DealMemoHoldType>;
   handleFormUpdate?: (data: SeatKillRow, field: string, rows: any) => void;
   currency?: string;
+  disabled?: boolean;
 }
 
-export default function StandardSeatKillsTable({ rowData, holdTypeList, handleFormUpdate, currency }: SeatKillProps) {
+export default function StandardSeatKillsTable({
+  rowData,
+  holdTypeList,
+  handleFormUpdate,
+  currency,
+  disabled,
+}: SeatKillProps) {
   const tableRef = useRef(null);
   const [rows, setRows] = useState([]);
   const [dbData, setDbData] = useState([]);
@@ -81,7 +88,7 @@ export default function StandardSeatKillsTable({ rowData, holdTypeList, handleFo
     <>
       <div className="w-full">
         <Table
-          columnDefs={seatKillsColDefs(handleChange, currency)}
+          columnDefs={seatKillsColDefs(handleChange, currency, disabled)}
           rowData={rows}
           styleProps={contractsStyleProps}
           ref={tableRef}
