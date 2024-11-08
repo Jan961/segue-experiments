@@ -5,12 +5,10 @@ import Select from 'components/core-ui-lib/Select/Select';
 import classNames from 'classnames';
 import TextArea from 'components/core-ui-lib/TextArea/TextArea';
 import Button from 'components/core-ui-lib/Button';
-import { PerformanceDTO } from 'interfaces';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import { ConfDialogVariant } from 'components/core-ui-lib/ConfirmationDialog/ConfirmationDialog';
 import { useRecoilValue } from 'recoil';
 import { userState } from 'state/account/userState';
-import useAxios from 'hooks/useAxios';
 import formatInputDate from 'utils/dateInputFormat';
 import { getTimeFromDateAndTime } from 'services/dateService';
 import { hasAllocSeatsChanged } from '../utils';
@@ -18,21 +16,15 @@ import { isNullOrEmpty } from 'utils';
 import FormError from 'components/core-ui-lib/FormError';
 import { Label } from 'components/core-ui-lib';
 import { decRegexLeadingZero } from 'utils/regexUtils';
+import { PerformanceType } from '../tabs/PromoterHoldsTab';
 
 interface AllocatedModalProps {
   show: boolean;
   onCancel: () => void;
   onSave: (data, perfId, type: string) => void;
-  bookingId: number;
+  performances: Array<PerformanceType>;
   data?: any;
   type: string;
-}
-
-interface PerformanceType {
-  text: string;
-  value: number;
-  date: string;
-  time: string;
 }
 
 interface FormInterface {
@@ -51,14 +43,11 @@ export default function AllocatedSeatsModal({
   show = false,
   onCancel,
   onSave,
-  bookingId,
+  performances = [],
   data,
   type,
 }: Partial<AllocatedModalProps>) {
-  const { fetchData } = useAxios();
-
   const [visible, setVisible] = useState<boolean>(show);
-  const [perfList, setPerfList] = useState<PerformanceType[]>([]);
   const [userList, setUserList] = useState<{ value: number; text: string }[]>([]);
   const users = useRecoilValue(userState);
   const [form, setForm] = useState<FormInterface>({
@@ -93,7 +82,7 @@ export default function AllocatedSeatsModal({
     setUserList(userTempList);
 
     if (type === 'edit') {
-      const perf = perfList.find(
+      const perf = performances.find(
         (perfRec) => formatInputDate(perfRec.date) === data.date && getTimeFromDateAndTime(perfRec.date) === data.time,
       );
 
@@ -133,7 +122,7 @@ export default function AllocatedSeatsModal({
       return;
     }
 
-    const perf = perfList.find((perfRec) => perfRec.value === form.perfSelected);
+    const perf = performances.find((perfRec) => perfRec.value === form.perfSelected);
     let data = {
       ArrangedByAccUserId: form.arrangedBy,
       Comments: form.comments,
@@ -175,7 +164,7 @@ export default function AllocatedSeatsModal({
   // Confirmation popup cancel handling
   const handleConfCancel = () => {
     if (confVariant === 'delete') {
-      const perf = perfList.find((perfRec) => perfRec.value === form.perfSelected);
+      const perf = performances.find((perfRec) => perfRec.value === form.perfSelected);
       const data = {
         ArrangedBy: userList.find((user) => user.value === form.arrangedBy).text,
         Comments: form.comments,
@@ -254,7 +243,7 @@ export default function AllocatedSeatsModal({
         onCancel();
       }
     } else if (type === 'edit') {
-      const perf = perfList.find((perfRec) => perfRec.value === form.perfSelected);
+      const perf = performances.find((perfRec) => perfRec.value === form.perfSelected);
       const updatedRec = {
         ArrangedBy: userList.find((user) => user.value === form.arrangedBy).text,
         Comments: form.comments,
@@ -284,39 +273,6 @@ export default function AllocatedSeatsModal({
     }
   };
 
-  // Get performance list
-  const getPerformanceList = async (bookingId: number) => {
-    try {
-      const data = await fetchData({
-        url: '/api/performances/read/' + bookingId,
-        method: 'POST',
-      });
-
-      if (typeof data === 'object') {
-        const perfList = data as Array<PerformanceDTO>;
-        const optionList: PerformanceType[] = [];
-        perfList.forEach((perf) => {
-          optionList.push({
-            text: formatInputDate(perf.Date) + ' | ' + perf.Time.substring(0, 5),
-            value: perf.Id,
-            date: perf.Date,
-            time: perf.Time.substring(0, 5),
-          });
-        });
-
-        setPerfList(optionList);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  useEffect(() => {
-    if (bookingId !== null && bookingId !== undefined) {
-      getPerformanceList(bookingId);
-    }
-  }, [bookingId]);
-
   // Update state of the form popup when show var is changed
   useEffect(() => {
     if (show) {
@@ -335,8 +291,8 @@ export default function AllocatedSeatsModal({
             <div className="flex flex-col w-2/3 mb-2">
               <Select
                 testId="perf-date-or-time"
-                className={classNames('w-full', errors.arrangedBy ? '' : 'mb-4')}
-                options={perfList}
+                className={classNames('w-full', errors.performance ? '' : 'mb-4')}
+                options={performances}
                 value={form.perfSelected}
                 onChange={(e) => handleChange({ target: { name: 'perfSelected', value: e } })}
                 placeholder="Select Date/Time"
