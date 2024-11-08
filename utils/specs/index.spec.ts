@@ -18,6 +18,7 @@ import {
   mapObjectValues,
   flattenHierarchicalOptions,
   tidyString,
+  formatDecimalOnBlur,
 } from 'utils';
 
 describe('Tests for utility functions', () => {
@@ -661,5 +662,29 @@ describe('tidyString', () => {
 
   it('should return the original string if the value contains spaces', () => {
     expect(tidyString('   spaces   ')).toBe('   spaces   ');
+  });
+});
+
+describe('formatDecimalOnBlur', () => {
+  it('should return the formatted value for a valid decimal input', () => {
+    const mockEvent = { target: { value: '1234.5678' } };
+    const result = formatDecimalOnBlur(mockEvent);
+
+    // Assuming formatDecimalValue rounds to two decimal places
+    expect(result).toBe('1,234.57');
+  });
+
+  it('should return an empty string when the input value is empty', () => {
+    const mockEvent = { target: { value: '' } };
+    const result = formatDecimalOnBlur(mockEvent);
+
+    expect(result).toBe(''); // Expected empty string as result
+  });
+
+  it('should handle non-numeric values by returning "NaN"', () => {
+    const mockEvent = { target: { value: 'abc' } };
+    const result = formatDecimalOnBlur(mockEvent);
+
+    expect(result).toBe('NaN'); // Expected 'NaN' or appropriate error handling for non-numeric input
   });
 });
