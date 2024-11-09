@@ -6,7 +6,7 @@ import {
   createOtherBooking,
   deleteGetInFitUpById,
   deleteOtherById,
-  deletePerformanceById,
+  deletePerformancesForBooking,
   deleteRehearsalById,
   updateBooking,
   updateGetInFitUp,
@@ -162,7 +162,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       rowsToDelete.forEach((rowToDelete) => {
         switch (model) {
           case 'booking':
-            promises.push(deletePerformanceById(rowToDelete.id, prisma));
+            promises.push(deletePerformancesForBooking(rowToDelete.id, prisma));
             break;
           case 'rehearsal':
             promises.push(deleteRehearsalById(rowToDelete.id, prisma));

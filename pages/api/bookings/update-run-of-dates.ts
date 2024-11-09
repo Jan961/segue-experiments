@@ -4,7 +4,7 @@ import {
   createNewBooking,
   createNewRehearsal,
   createOtherBooking,
-  deleteBookingById,
+  deletePerformancesForBooking,
   deleteGetInFitUpById,
   deleteOtherById,
   deleteRehearsalById,
@@ -123,10 +123,13 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     // if so, use the same booking id to insert performances
     // if not, create a new booking
     const editedPerformanceItem = original.find(({ isBooking }) => isBooking);
-
     const performances = updated.filter(({ isBooking }) => isBooking);
+
     if (!isNullOrEmpty(performances)) {
-      const formattedPerformances = mapNewBookingToPrismaFields(performances);
+      const formattedPerformances = editedPerformanceItem
+        ? performances.map((p) => mapExistingBookingToPrismaFields(p))
+        : mapNewBookingToPrismaFields(performances);
+
       const bookingToInsert = formattedPerformances.reduce((acc, item, index) => {
         if (index === 0) {
           acc = item;
@@ -135,10 +138,18 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         }
         return acc;
       }, {} as Partial<AddBookingsParams>);
+
       editedPerformanceItem
         ? rowsMap.booking.rowsToUpdate.push(bookingToInsert)
         : rowsMap.booking.rowsToInsert.push(bookingToInsert);
     }
+
+    console.log(
+      'Bookings to insert',
+      rowsMap.booking.rowsToInsert,
+      rowsMap.booking.rowsToUpdate,
+      rowsMap.booking.rowsToDelete,
+    );
 
     const promises = [];
 
@@ -148,7 +159,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       rowsToDelete.forEach((rowToDelete) => {
         switch (type) {
           case 'booking':
-            deletePromises.push(deleteBookingById(rowToDelete.id, prisma));
+            deletePromises.push(deletePerformancesForBooking(rowToDelete.id, prisma));
             break;
           case 'rehearsal':
             deletePromises.push(deleteRehearsalById(rowToDelete.id, prisma));

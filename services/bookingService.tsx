@@ -135,10 +135,10 @@ export const deleteBookingById = async (id: number, tx) => {
   });
 };
 
-export const deletePerformanceById = async (id: number, tx) => {
+export const deletePerformancesForBooking = async (id: number, tx) => {
   await tx.performance.delete({
     where: {
-      Id: id,
+      BookingId: id,
     },
   });
 };
