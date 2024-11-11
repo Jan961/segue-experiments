@@ -7,8 +7,6 @@ import {
   format,
   parseISO,
   isSameDay,
-  isSameWeek,
-  set,
   addMinutes,
 } from 'date-fns';
 import { toZonedTime } from 'date-fns-tz';
@@ -17,43 +15,72 @@ import moment from 'moment';
 // regex for dd/mm/yy
 export const DATE_PATTERN = /(\d{2}\/\d{2}\/\d{2})/;
 
-export const safeDate = (date: Date | string) => {
-  if (typeof date === 'string') return new Date(date);
-  return date;
+// returns a date if the date is valid or the date string is valid
+export const safeDate = (date: Date | string): Date => {
+  if (!date) {
+    return null;
+  }
+  if (typeof date === 'string') {
+    const d = new Date(date);
+    if (isValid(d)) {
+      return d;
+    } else {
+      return null;
+    }
+  }
+  if (isValid(new Date(date))) {
+    return new Date(date);
+  } else {
+    return null;
+  }
 };
 
-export const getKey = (date: string) => date.split('T')[0];
-
-export const todayToSimple = () => {
-  const date = new Date();
-  return date.toDateString();
+// returns yyyy-mm-dd of a valid date string format yyyy-mm-ddT00:00:00Z | yyyy-mm-dd
+export const getKey = (date: string): string => {
+  return date ? (isValid(new Date(date)) ? date.split('T')[0] : null) : null;
 };
 
+// return ?
 export const dateStringToPerformancePair = (dateString: string) => {
-  const datePart = dateString.split('T')[0];
-  const timePart = dateString.split('T')[1];
+  if (!dateString) {
+    return null;
+  }
+  const split = dateString.split('T');
+  const datePart = split[0];
+  const timePart = split[1];
 
   const defaultDatePart = '1970-01-01';
+  const time = new Date(`${defaultDatePart}T${timePart}Z`);
+  const date = new Date(`${datePart}`);
 
   return {
-    Time: new Date(`${defaultDatePart}T${timePart}Z`),
-    Date: new Date(`${datePart}`),
+    Time: isValid(time) ? time : null,
+    Date: isValid(date) ? date : null,
   };
 };
 
-// expects a string in DD/MM/YY format
+// returns a date based on a date string of format mm/dd/yy
 export const simpleToDate = (stringToFormat: string): Date => {
+  if (!stringToFormat) {
+    return null;
+  }
   const parts = stringToFormat?.split?.('/');
-  return new Date(Number(`20${parts[2]}`), Number(Number(parts[0]) - 1), Number(parts[1]));
+  return parts.length > 2 ? new Date(Number(`20${parts[2]}`), Number(Number(parts[0]) - 1), Number(parts[1])) : null;
 };
 
-export const simpleToDateDMY = (dateStr: string) => {
+// returns a date based on a date string of format dd/mm/yy
+export const simpleToDateDMY = (dateStr: string): Date => {
+  if (!dateStr) {
+    return null;
+  }
   const [day, month, year] = dateStr.split('/').map(Number);
-  return new Date(year + 2000, month - 1, day);
+  const d = new Date(`${year + 2000}-${month}-${day}`);
+  return isValid(d) ? d : null;
 };
 
-export const dateToSimple = (dateToFormat: Date | string) => {
-  if (!dateToFormat) return 'DD/MM/YY';
+// returns a string or date in the form of mm/dd/yy
+export const dateToSimple = (dateToFormat: Date | string): string => {
+  if (!dateToFormat) return null;
   const date = safeDate(dateToFormat);
   const options: Intl.DateTimeFormatOptions = {
     year: '2-digit',
@@ -61,13 +88,14 @@ export const dateToSimple = (dateToFormat: Date | string) => {
     month: '2-digit',
     timeZone: 'UTC',
   };
-  return date.toLocaleDateString('en-GB', options);
+  return date ? date.toLocaleDateString('en-GB', options) : null;
 };
 
-export const formattedDateWithDay = (dateString: Date | string) => {
-  if (!dateString) return '';
-  const format = 'DD/MM/YY';
-  return moment(dateString).format(format);
+// returns a datestring with the day
+export const formattedDateWithDay = (date: Date) => {
+  if (!date) return '';
+  const dateFormat = 'EEE/MM/yy';
+  return format(date, dateFormat);
 };
 
 export const dateToPicker = (dateToFormat: Date | string) => {
@@ -95,19 +123,14 @@ export const toISO = (date: Date) => {
   return date.toISOString();
 };
 
-export const getDateDaysAgo = (date, daysToSubtract) => {
+export const getDateDaysAgo = (date: Date, daysToSubtract: number) => {
   date = new Date(date);
   return moment(date, 'dd/mm/yyyy').subtract(daysToSubtract, 'days');
 };
 
-export const getDateDaysInFuture = (date, daysToSubtract) => {
-  date = new Date(date);
-  return moment(date, 'dd/mm/yyyy').add(daysToSubtract, 'days');
-};
-
 export const getWeekDay = (dateToFormat: Date | string) => {
   const date = safeDate(dateToFormat);
-  return date.toLocaleDateString('en-US', { weekday: 'long' });
+  return date.toLocaleDateString('UTC', { weekday: 'long' });
 };
 
 export const getShortWeekFormat = (dateToFormat: Date | string) => {
@@ -120,11 +143,6 @@ export const getWeekDayShort = (dateToFormat: Date | string) => {
   return date.toLocaleDateString('en-US', { weekday: 'short' });
 };
 
-export const getWeekDayLong = (dateToFormat: Date | string) => {
-  const date = safeDate(dateToFormat);
-  return date.toLocaleDateString('en-US', { weekday: 'long' });
-};
-
 export const formattedDateWithWeekDay = (dateToFormat: Date | string, weekDayFormat: 'Long' | 'Short') => {
   if (!dateToFormat) return '';
   const shortFormat = 'ddd DD/MM/YY';
@@ -132,21 +150,6 @@ export const formattedDateWithWeekDay = (dateToFormat: Date | string, weekDayFor
   return moment(dateToFormat).format(weekDayFormat === 'Long' ? longFormat : shortFormat);
 };
 
-// Broken week number calculation
-export const weeks = (showDate: string, firstShowDate: string): number => {
-  const date = moment(showDate, 'YYYY-MM-DD');
-  const ProductionStartDate = moment(firstShowDate, 'YYYY-MM-DD');
-  const diff = moment.duration(ProductionStartDate.diff(date));
-
-  let week = Math.floor(diff.asWeeks());
-  if (week >= 0) {
-    week = week + 1;
-  }
-
-  return week;
-};
-
-// Working one. AFAIK
 export const calculateWeekNumber = (productionStart: Date, dateToNumber: Date): number => {
   const weekOneStart = startOfWeek(productionStart, { weekStartsOn: 1 });
   let weekNumber = differenceInWeeks(dateToNumber, weekOneStart);
@@ -161,18 +164,6 @@ export const calculateWeekNumber = (productionStart: Date, dateToNumber: Date): 
   return weekNumber;
 };
 
-export const timeNow = () => {
-  const today = new Date();
-  return today.getHours().toFixed() + ':' + today.getMinutes().toFixed() + ':' + today.getSeconds().toFixed();
-};
-
-export const formatTime = (timestamp) => {
-  // This will ignre date
-  const today = new Date(timestamp);
-  // const options = { hours: '2-digit', minutes: '2-digit', seconds: '2-digit' }
-  return today.toLocaleTimeString();
-};
-
 export const addOneMonth = (date: Date) => {
   const newDate = new Date(date);
   newDate.setMonth(newDate.getMonth() + 1);
@@ -184,34 +175,14 @@ export const timeFormat = (mins?: number) => {
   return `${Math.floor(mins / 60)}:${String(mins % 60).padStart(2, '0')}`;
 };
 
-export const formatDateUK = (date) => {
-  const today = new Date(date);
-  return today.toLocaleDateString('en-GB');
-};
-
-export const formatShortDateUK = (date) => {
+export const formatShortDateUK = (date: Date | string) => {
   return format(new Date(date), 'dd/MM/yy');
 };
 
-export const getMonday = (inputDate) => {
+export const getMonday = (inputDate: Date | string) => {
   const currentDateObj = new Date(inputDate);
   currentDateObj.setDate(currentDateObj.getDate() - ((currentDateObj.getDay() + 6) % 7));
   return currentDateObj;
-};
-
-export const getSunday = (inputDate) => {
-  const currentDateObj = new Date(inputDate);
-  currentDateObj.setDate(currentDateObj.getDate() - ((currentDateObj.getDay() + 7) % 7) + 1);
-  return currentDateObj;
-};
-
-export const quickISO = (DateString: string) => {
-  return new Date(DateString);
-};
-
-export const formDate = (DateString: string) => {
-  const formDateString = DateString.toString();
-  return formDateString.substring(0, 10);
 };
 
 export const getWeeksBetweenDates = (startDate: string, endDate: string) => {
@@ -229,26 +200,6 @@ export const getWeeksBetweenDates = (startDate: string, endDate: string) => {
   }
 
   return weeks;
-};
-
-export const getPreviousMonday = (date) => {
-  const dayOfWeek = date.getDay();
-  const difference = ((dayOfWeek + 6) % 7) + 7; // Calculate the difference to Monday
-  const previousMonday = new Date(date);
-  previousMonday.setDate(date.getDate() - difference);
-  return previousMonday;
-};
-
-export const getNextMondayDateString = (date: string) => {
-  const inputDate = moment.utc(date);
-  if (!inputDate.isValid()) {
-    return '';
-  }
-
-  const daysUntilNextMonday = (7 - inputDate.day() + 1) % 7;
-  const nextMondayDate = inputDate.add(daysUntilNextMonday, 'days');
-  const nextMondayDateStr = nextMondayDate.toISOString();
-  return nextMondayDateStr;
 };
 
 /**
@@ -309,19 +260,6 @@ export const isValidDate = (date?: Date | string | number | null) => {
   if (date === null || typeof date === 'boolean') return false;
   const d = new Date(date);
   return d instanceof Date && !isNaN(d.getTime());
-};
-
-export const convertLocalDateToUTC = (date: Date) => {
-  return new Date(
-    Date.UTC(
-      date.getFullYear(),
-      date.getMonth(),
-      date.getDate(),
-      date.getHours(),
-      date.getMinutes(),
-      date.getSeconds(),
-    ),
-  );
 };
 
 export const checkDateOverlap = (start1: Date, end1: Date, start2: Date, end2: Date): boolean => {
@@ -388,14 +326,6 @@ export const getDateWithOffset = (date: Date) => {
   return dateWithOffset;
 };
 
-export const convertTimeToTodayDateFormat = (time: string) => {
-  const today = new Date();
-  const [hours, minutes] = time.split(':').map(Number);
-
-  const updatedDate = set(today, { hours, minutes, seconds: 0, milliseconds: 0 });
-  return updatedDate;
-};
-
 export const dateToTimeString = (dateStr) => {
   const date = moment(dateStr);
   return date.format('HH:mm');
@@ -428,6 +358,7 @@ export const formatDate = (date: Date | number | string, dateFormat: string): st
     // If parsing as ISO fails, try to parse it using the default parser
     if (!isValid(parsedDate)) {
       parsedDate = new Date(date);
+      console.log('parsedDate', parsedDate);
     }
   } else {
     return '';
@@ -494,22 +425,6 @@ export const getDateObject = (date: Date | number | string): Date | null => {
  */
 export const areDatesSame = (date1: Date | number | string, date2: Date | number | string): boolean => {
   return isSameDay(getDateObject(date1), getDateObject(date2));
-};
-
-/**
- * Checks if two dates belong to the same week.
- *
- * @param {Date | number} date1 - The first date to compare.
- * @param {Date | number} date2 - The second date to compare.
- * @param {number} [weekStartsOn=0] - The first day of the week (0 = Sunday, 1 = Monday, etc.)
- * @returns {boolean} Returns true if both dates are in the same week, otherwise false.
- */
-export const areDatesInSameWeek = (
-  date1: Date | number | string,
-  date2: Date | number | string,
-  weekStartsOn: 0 | 1 | 2 | 3 | 4 | 5 | 6 = 0,
-) => {
-  return isSameWeek(getDateObject(date1), getDateObject(date2), { weekStartsOn });
 };
 
 /**
