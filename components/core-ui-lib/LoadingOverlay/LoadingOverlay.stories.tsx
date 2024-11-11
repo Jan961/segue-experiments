@@ -12,7 +12,11 @@ const Template = (spinner: boolean) => {
   // return a modal with a placeholder image
   return (
     <div>
-      <img className="fixed top-0 right-0" src="/storybook-assets/max-chen-lud4OaUCP4Q-unsplash.jpg" />
+      <img
+        className="fixed top-0 right-0"
+        src="/storybook-assets/max-chen-lud4OaUCP4Q-unsplash.jpg"
+        alt="placholder background image"
+      />
       <LoadingOverlay spinner={spinner} />
     </div>
   );
