@@ -103,6 +103,7 @@ export const EditDealMemoContractModal = ({
 
   const permissions = useRecoilValue(accessVenueContracts);
   const canEdit = permissions.includes('EDIT_DEAL_MEMO');
+  const canExport = permissions.includes('EXPORT_DEAL_MEMO');
 
   const [errors, setErrors] = useState({
     ROTTPercentage: false,
@@ -2394,6 +2395,7 @@ export const EditDealMemoContractModal = ({
               testId="deal-memo-save-close-and-export"
               iconProps={{ className: 'h-4 w-3' }}
               sufixIconName="document-solid"
+              disabled={!canExport}
             />
           </div>
         </div>

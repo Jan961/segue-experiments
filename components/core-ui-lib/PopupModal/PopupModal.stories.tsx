@@ -13,5 +13,6 @@ export const Primary: Story = {
   args: {
     title: 'Add booking',
     titleClass: 'text-primary-navy',
+    show: true,
   },
 };
