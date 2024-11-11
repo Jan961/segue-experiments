@@ -3,9 +3,11 @@ import { Dialog, Transition } from '@headlessui/react';
 import { calibri } from 'lib/fonts';
 import Icon from '../Icon';
 import classNames from 'classnames';
+import { isNullOrEmpty } from 'utils';
 
 interface PopupModalProps {
   title?: string;
+  subtitle?: string;
   children?: React.ReactNode;
   show: boolean;
   onClose?: () => void;
@@ -19,6 +21,7 @@ interface PopupModalProps {
 
 export default function PopupModal({
   title = '',
+  subtitle = '',
   children,
   show = false,
   onClose = () => null,
@@ -30,10 +33,15 @@ export default function PopupModal({
   hasOverflow = true,
 }: PopupModalProps) {
   const [overlay, setOverlay] = useState<boolean>(false);
+  const [subtitleText, setSubtitleText] = useState(subtitle);
 
   useEffect(() => {
     setOverlay(hasOverlay);
   }, [hasOverlay]);
+
+  useEffect(() => {
+    setSubtitleText(subtitle);
+  }, [subtitle]);
 
   const handleOverlayClick = () => {
     if (closeOnOverlayClick) {
@@ -81,11 +89,16 @@ export default function PopupModal({
                 )}
               >
                 <header className="flex justify-between items-center">
-                  <Dialog.Title as="h3" className={`text-lg font-bold leading-6 ${titleClass}`}>
+                  <Dialog.Title className={`text-xl font-bold leading-6 text-primary-navy ${titleClass}`}>
                     {title}
                   </Dialog.Title>
                   {showCloseIcon && <Icon iconName="cross" variant="lg" onClick={onClose} data-testid="close-icon" />}
                 </header>
+
+                {!isNullOrEmpty(subtitleText) && (
+                  <Dialog.Title className="text-xl font-bold leading-6 text-primary-navy">{subtitleText}</Dialog.Title>
+                )}
+
                 <div className="overflow-y-auto mt-3 pr-3">{children}</div>
               </Dialog.Panel>
             </Transition.Child>

@@ -279,7 +279,6 @@ export default function GlobalActivityModal({
         showCloseIcon={true}
         hasOverlay={showConfirm}
         title={titleOptions[variant]}
-        titleClass="text-xl text-primary-navy font-bold"
       >
         {loadingVisible && <LoadingOverlay />}
         <div className={`h-[${variant === 'view' ? 400 : 780}px] w-[450px]`}>

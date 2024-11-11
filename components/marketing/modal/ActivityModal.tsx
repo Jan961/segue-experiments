@@ -172,7 +172,6 @@ export default function ActivityModal({
         showCloseIcon={true}
         hasOverlay={showConfirm}
         title={titleOptions[variant]}
-        titleClass="text-xl text-primary-navy font-bold"
       >
         <div className="flex gap-x-2 align-middle">
           <div className="text-base font-bold text-primary-input-text">Activity Name</div>

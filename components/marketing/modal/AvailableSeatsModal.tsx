@@ -93,7 +93,6 @@ export default function AvailableSeatsModal({
         showCloseIcon={true}
         hasOverlay={showConfirm}
         title="Available Seats"
-        titleClass="text-xl text-primary-navy font-bold"
       >
         <div className="h-[450x] w-[325px]">
           <div className="flex flex-row mb-2">

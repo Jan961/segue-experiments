@@ -289,7 +289,6 @@ export default function AllocatedSeatsModal({
         showCloseIcon={true}
         hasOverlay={showConfirm}
         title="Allocated Seats"
-        titleClass="text-xl text-primary-navy font-bold"
       >
         <div className="h-[552px] w-[448px]">
           <div className="flex flex-row">
