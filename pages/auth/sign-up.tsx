@@ -14,7 +14,7 @@ import {
 import { calibri } from 'lib/fonts';
 import Image from 'next/image';
 import axios from 'axios';
-import { useClerk, useSignUp } from '@clerk/nextjs';
+import { useSignUp } from '@clerk/nextjs';
 import Link from 'next/link';
 
 import { userPreSignUpSchema, userSignUpSchema } from 'validators/auth';
@@ -38,13 +38,12 @@ const DEFAULT_ACCOUNT_DETAILS = {
 
 const SignUp = () => {
   const router = useRouter();
-  const { signIn, navigateToHome } = useAuth();
+  const { signIn, signOut, navigateToHome } = useAuth();
   const [isBusy, setIsBusy] = useState(false);
   const { isSignedIn, setUserPermissions } = usePermissions();
   const [error, setError] = useState('');
   const [validationError, setValidationError] = useState(null);
   const [showLogout, setShowLogout] = useState(false);
-  const { signOut } = useClerk();
   const { isLoaded: signUpLoaded, signUp } = useSignUp();
   const [authMode, setAuthMode] = useState<'default' | 'newUser' | 'existingUser'>('default');
   const [signedInExistingUserDetails, setSignedInExistingUserDetails] = useState({

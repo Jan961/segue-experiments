@@ -93,11 +93,6 @@ export const filterPercentage = (num: number) => {
   return 100;
 };
 
-export const formatDecimalOnBlur = (event: any) => {
-  const value = event.target.value;
-  return formatDecimalValue(value);
-};
-
 export const filterCurrencyNum = (num: number) => {
   return Math.floor(num * 100) / 100;
 };

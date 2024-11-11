@@ -22,7 +22,11 @@ const Index = () => {
       <div className="w-[800px] text-primary-input-text">
         <p>
           Only archived productions can be selected for Sales Data Upload. If your production does not appear in the
-          dropdown, please create and / or archive the production in the `Manage Shows / Productions` pages.
+          dropdown, please create and / or archive the production in the{' '}
+          <a href="/bookings/shows" className="text-primary-url">
+            `<u>Manage Shows / Productions</u>`
+          </a>{' '}
+          pages.
         </p>
       </div>
       <LoadSalesHistory />
