@@ -76,6 +76,7 @@ export default function NewBookingDetailsView({
   const tableRef = useRef(null);
   const confirmationType = useRef<ConfDialogVariant>('cancel');
   const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     updateModalTitle(`${isNewBooking ? 'New' : 'Edit'} Booking Details`);
@@ -314,18 +315,38 @@ export default function NewBookingDetailsView({
     }
   };
 
-  const storeBookingDetails = () => {
+  const getRowData = () => {
     if (tableRef.current.getApi()) {
       const rowData = [];
       tableRef.current.getApi().forEachNode((node) => {
         rowData.push(node.data);
       });
-      isNewBooking ? onSubmit(rowData) : onUpdate(rowData);
+      return rowData;
     }
+    return [];
+  };
+
+  const validateBooking = (rowData: BookingItem[]) => {
+    // Do not allow a performance booking to be changed to a non-performance booking
+    const isPerformanceBooking = bookingData.some((row) => row.isBooking);
+    if (isPerformanceBooking && !rowData.some((row) => row.isBooking)) {
+      setError('Cannot change a performance booking to a non-performance booking');
+      return false;
+    }
+    return true;
+  };
+
+  const storeBookingDetails = (rowData) => {
+    setError(null);
+    isNewBooking ? onSubmit(rowData) : onUpdate(rowData);
   };
 
   const handePreviewBookingClick = () => {
-    storeBookingDetails();
+    const rowData = getRowData();
+    if (!validateBooking(rowData)) {
+      return;
+    }
+    storeBookingDetails(rowData);
     const firstRow = tableRef.current.getApi().getDisplayedRowAtIndex(0);
     if (firstRow.data.venue && formData.venueId !== firstRow.data.venue) {
       checkForBarredVenues();
@@ -335,7 +356,7 @@ export default function NewBookingDetailsView({
   };
 
   const handeCheckMileageClick = () => {
-    storeBookingDetails();
+    storeBookingDetails(getRowData());
     goToStep(getStepIndex(isNewBooking, 'Check Mileage'));
   };
 
@@ -376,7 +397,7 @@ export default function NewBookingDetailsView({
 
   const handleChangeOrConfirmBooking = () => {
     if (changeBookingLength) {
-      storeBookingDetails();
+      storeBookingDetails(getRowData());
       checkForBookingConflicts();
     } else {
       // The user has opted to change the length of the booking, so we need to make it a run of dates if it is not already one
@@ -427,51 +448,54 @@ export default function NewBookingDetailsView({
           onSave={handleSaveNote}
           onCancel={handleNotesCancel}
         />
-        <div className="pt-8 w-full grid grid-cols-2 items-center ">
+        <div className="pt-8 w-full flex items-end justify-between">
           <Button
             className="w-33 "
             text="Check Mileage"
             onClick={handeCheckMileageClick}
             disabled={!permissions.includes('ACCESS_MILEAGE_CHECK') || changeBookingLength}
           />
-          <div className="flex justify-end  justify-items-end gap-4">
-            {isNewBooking && (
-              <Button className="w-33" variant="secondary" text="Back" onClick={handleBackButtonClick} />
-            )}
-            <Button className="w-33 " variant="secondary" text="Cancel" onClick={handleCancelButtonClick} />
-            {!isNewBooking && (
-              <>
-                <Button
-                  className="w-33"
-                  variant="tertiary"
-                  text="Delete Booking"
-                  onClick={handleDeleteBooking}
-                  disabled={changeBookingLength || !permissions.includes('DELETE_BOOKING')}
-                />
-                <Button
-                  className="w-33 "
-                  variant="primary"
-                  text="Move Booking"
-                  onClick={handleMoveBooking}
-                  disabled={
-                    changeBookingLength || changeBookingLengthConfirmed || !permissions.includes('MOVE_BOOKING')
-                  }
-                />
-                <Button
-                  className="w-33 px-4"
-                  variant="primary"
-                  text={`${changeBookingLength ? 'Confirm New' : 'Change Booking'} Length`}
-                  onClick={handleChangeOrConfirmBooking}
-                  disabled={!permissions.includes('CHANGE_BOOKING_LENGTH')}
-                />
-              </>
-            )}
-            <Button
-              className=" w-33"
-              text="Preview Booking"
-              onClick={handePreviewBookingClick}
-              disabled={changeBookingLength}
-            />
+          <div className="flex flex-col justify-end  justify-items-end">
+            {error && <span className="mb-3 text-right text-responsive-sm text-primary-red">{error}</span>}
+            <div className="flex justify-end  justify-items-end gap-4">
+              {isNewBooking && (
+                <Button className="w-33" variant="secondary" text="Back" onClick={handleBackButtonClick} />
+              )}
+              <Button className="w-33 " variant="secondary" text="Cancel" onClick={handleCancelButtonClick} />
+              {!isNewBooking && (
+                <>
+                  <Button
+                    className="w-33"
+                    variant="tertiary"
+                    text="Delete Booking"
+                    onClick={handleDeleteBooking}
+                    disabled={changeBookingLength || !permissions.includes('DELETE_BOOKING')}
+                  />
+                  <Button
+                    className="w-33 "
+                    variant="primary"
+                    text="Move Booking"
+                    onClick={handleMoveBooking}
+                    disabled={
+                      changeBookingLength || changeBookingLengthConfirmed || !permissions.includes('MOVE_BOOKING')
+                    }
+                  />
+                  <Button
+                    className="w-33 px-4"
+                    variant="primary"
+                    text={`${changeBookingLength ? 'Confirm New' : 'Change Booking'} Length`}
+                    onClick={handleChangeOrConfirmBooking}
+                    disabled={!permissions.includes('CHANGE_BOOKING_LENGTH')}
+                  />
+                </>
+              )}
+              <Button
+                className=" w-33"
+                text="Preview Booking"
+                onClick={handePreviewBookingClick}
+                disabled={changeBookingLength}
+              />
+            </div>
           </div>
         </div>
         {showMoveBookingModal && (
