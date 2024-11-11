@@ -9,35 +9,27 @@ import {
   isSameDay,
   addMinutes,
 } from 'date-fns';
-import { toZonedTime } from 'date-fns-tz';
 import moment from 'moment';
+import { UTCDate } from '@date-fns/utc';
 
 // regex for dd/mm/yy
 export const DATE_PATTERN = /(\d{2}\/\d{2}\/\d{2})/;
 
 // returns a date if the date is valid or the date string is valid
-export const safeDate = (date: Date | string): Date => {
+export const safeDate = (date: UTCDate | string): UTCDate => {
   if (!date) {
     return null;
   }
   if (typeof date === 'string') {
-    const d = new Date(date);
-    if (isValid(d)) {
-      return d;
-    } else {
-      return null;
-    }
+    const d = new UTCDate(date);
+    return isValid(d) ? d : null;
   }
-  if (isValid(new Date(date))) {
-    return new Date(date);
-  } else {
-    return null;
-  }
+  return isValid(date) ? date : null;
 };
 
 // returns yyyy-mm-dd of a valid date string format yyyy-mm-ddT00:00:00Z | yyyy-mm-dd
 export const getKey = (date: string): string => {
-  return date ? (isValid(new Date(date)) ? date.split('T')[0] : null) : null;
+  return date ? (isValid(new UTCDate(date)) ? date.split('T')[0] : null) : null;
 };
 
 // return ?
@@ -50,8 +42,8 @@ export const dateStringToPerformancePair = (dateString: string) => {
   const timePart = split[1];
 
   const defaultDatePart = '1970-01-01';
-  const time = new Date(`${defaultDatePart}T${timePart}Z`);
-  const date = new Date(`${datePart}`);
+  const time = new UTCDate(`${defaultDatePart}T${timePart}Z`);
+  const date = new UTCDate(`${datePart}`);
 
   return {
     Time: isValid(time) ? time : null,
@@ -60,26 +52,26 @@ export const dateStringToPerformancePair = (dateString: string) => {
 };
 
 // returns a date based on a date string of format mm/dd/yy
-export const simpleToDate = (stringToFormat: string): Date => {
-  if (!stringToFormat) {
+export const simpleToDate = (date: string): UTCDate => {
+  if (!date) {
     return null;
   }
-  const parts = stringToFormat?.split?.('/');
-  return parts.length > 2 ? new Date(Number(`20${parts[2]}`), Number(Number(parts[0]) - 1), Number(parts[1])) : null;
+  const parts = date?.split?.('/');
+  return parts.length > 2 ? new UTCDate(Number(`20${parts[2]}`), Number(Number(parts[0]) - 1), Number(parts[1])) : null;
 };
 
 // returns a date based on a date string of format dd/mm/yy
-export const simpleToDateDMY = (dateStr: string): Date => {
-  if (!dateStr) {
+export const simpleToDateDMY = (date: string): UTCDate => {
+  if (!date) {
     return null;
   }
-  const [day, month, year] = dateStr.split('/').map(Number);
-  const d = new Date(`${year + 2000}-${month}-${day}`);
+  const [day, month, year] = date.split('/').map(Number);
+  const d = new UTCDate(`${year + 2000}-${month}-${day}`);
   return isValid(d) ? d : null;
 };
 
 // returns a string or date in the form of mm/dd/yy
-export const dateToSimple = (dateToFormat: Date | string): string => {
+export const dateToSimple = (dateToFormat: UTCDate | string): string => {
   if (!dateToFormat) return null;
   const date = safeDate(dateToFormat);
   const options: Intl.DateTimeFormatOptions = {
@@ -91,13 +83,14 @@ export const dateToSimple = (dateToFormat: Date | string): string => {
   return date ? date.toLocaleDateString('en-GB', options) : null;
 };
 
-// returns a datestring with the day
+// returns a datestring with the day format ????
 export const formattedDateWithDay = (date: Date) => {
   if (!date) return '';
   const dateFormat = 'EEE/MM/yy';
   return format(date, dateFormat);
 };
 
+// deprecated?
 export const dateToPicker = (dateToFormat: Date | string) => {
   if (!dateToFormat) return '';
 
@@ -114,9 +107,12 @@ export const dateToPicker = (dateToFormat: Date | string) => {
   return dateToFormat;
 };
 
-export const dateTimeToTime = (dateToFormat: string) => {
-  const date = toZonedTime(dateToFormat, 'UTC');
-  return format(date, 'HH:mm');
+export const dateTimeToTime = (dateToFormat: string | Date) => {
+  if (!dateToFormat) {
+    return null;
+  }
+  const date = new UTCDate(dateToFormat);
+  return isValid(date) ? format(date, 'HH:mm') : null;
 };
 
 export const toISO = (date: Date) => {
@@ -128,7 +124,7 @@ export const getDateDaysAgo = (date: Date, daysToSubtract: number) => {
   return moment(date, 'dd/mm/yyyy').subtract(daysToSubtract, 'days');
 };
 
-export const getWeekDay = (dateToFormat: Date | string) => {
+export const getWeekDay = (dateToFormat: UTCDate | string) => {
   const date = safeDate(dateToFormat);
   return date.toLocaleDateString('UTC', { weekday: 'long' });
 };
@@ -138,7 +134,7 @@ export const getShortWeekFormat = (dateToFormat: Date | string) => {
   return weekdayName;
 };
 
-export const getWeekDayShort = (dateToFormat: Date | string) => {
+export const getWeekDayShort = (dateToFormat: UTCDate | string) => {
   const date = safeDate(dateToFormat);
   return date.toLocaleDateString('en-US', { weekday: 'short' });
 };

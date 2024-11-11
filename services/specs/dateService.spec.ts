@@ -1,3 +1,4 @@
+import { UTCDate } from '@date-fns/utc';
 import {
   safeDate,
   getKey,
@@ -6,6 +7,7 @@ import {
   dateToSimple,
   simpleToDateDMY,
   formattedDateWithDay,
+  dateTimeToTime,
 } from '../dateService';
 
 // --default()
@@ -18,25 +20,25 @@ import {
 describe('safeDate', () => {
   test('Should return correct date for a valid dateTime string', () => {
     const input = '2023-05-23T14:30:00Z';
-    const expectedResult = new Date('2023-05-23T14:30:00Z');
-    expect(safeDate(input)).toStrictEqual(expectedResult);
+    const expectedResult = new UTCDate('2023-05-23T14:30:00Z');
+    expect(safeDate(input).toISOString()).toStrictEqual(expectedResult);
   });
 
   test('Should return correct date for a valid dateTime', () => {
-    const input = new Date('2023-05-23T14:30:00Z');
-    const expectedResult = new Date('2023-05-23T14:30:00Z');
+    const input = new UTCDate('2023-05-23T14:30:00Z');
+    const expectedResult = new UTCDate('2023-05-23T14:30:00Z');
     expect(safeDate(input)).toStrictEqual(expectedResult);
   });
 
   test('Should return correct date for a valid date string', () => {
     const input = '2023-05-23';
-    const expectedResult = new Date('2023-05-23T00:00:00Z');
+    const expectedResult = new UTCDate('2023-05-23T00:00:00Z');
     expect(safeDate(input)).toStrictEqual(expectedResult);
   });
 
   test('Should return correct date for a valid date', () => {
-    const input = new Date('2023-05-23');
-    const expectedResult = new Date('2023-05-23T00:00:00Z');
+    const input = new UTCDate('2023-05-23');
+    const expectedResult = new UTCDate('2023-05-23T00:00:00Z');
     expect(safeDate(input)).toStrictEqual(expectedResult);
   });
 
@@ -46,7 +48,7 @@ describe('safeDate', () => {
   });
 
   test('Should return null for an invalid date', () => {
-    const input = new Date('77 fail');
+    const input = new UTCDate('77 fail');
     expect(safeDate(input)).toBeNull();
   });
 
@@ -98,7 +100,7 @@ describe('dateStringToperformancePair', () => {
     console.log(input);
     const output = {
       Time: null,
-      Date: new Date('10-10-10'),
+      Date: new UTCDate('10-10-10'),
     };
     expect(dateStringToPerformancePair(input)).toStrictEqual(output);
   });
@@ -118,7 +120,7 @@ describe('dateStringToperformancePair', () => {
 describe('simpleToDate', () => {
   test('Should return a Date for a date string mm/dd/yy', () => {
     const input = '12/15/23';
-    const expectedResult = new Date('2023-12-15T00:00:00Z');
+    const expectedResult = new UTCDate('2023-12-15T00:00:00Z');
     expect(simpleToDate(input)).toStrictEqual(expectedResult);
   });
 
@@ -142,7 +144,7 @@ describe('simpleToDate', () => {
 describe('simpleToDateDMY', () => {
   test('Should return a Date for a valid date string dd/mm/yy', () => {
     const input = '15/10/23';
-    const expectedResult = new Date('2023-10-15T00:00:00Z');
+    const expectedResult = new UTCDate('2023-10-15T00:00:00Z');
     expect(simpleToDateDMY(input)).toStrictEqual(expectedResult);
   });
 
@@ -171,13 +173,13 @@ describe('dateToSimple', () => {
   });
 
   test('Should return a date string dd/mm/yy from a date format mm/dd/yy', () => {
-    const input = new Date('01/02/03');
+    const input = new UTCDate('01/02/03');
     const expectedResult = '02/01/03';
     expect(dateToSimple(input)).toStrictEqual(expectedResult);
   });
 
   test('Should return a date string dd/mm/yy from a date format mm/dd/yyyy', () => {
-    const input = new Date('01/02/2003');
+    const input = new UTCDate('01/02/2003');
     const expectedResult = '02/01/03';
     expect(dateToSimple(input)).toStrictEqual(expectedResult);
   });
@@ -216,11 +218,47 @@ describe('dateToSimple', () => {
 });
 
 // --formattedDateWithDay()
-describe('default', () => {
+describe('formattedDateWithDay', () => {
   test('', () => {
-    const input = new Date('01/02/03');
-    const expectedResult = '';
+    const input = new UTCDate('01/02/03');
+    const expectedResult = 'Thu/01/03';
     expect(formattedDateWithDay(input)).toStrictEqual(expectedResult);
+  });
+});
+
+// --dateTimeToTime()
+describe('dateTimeToTime', () => {
+  test('Should return correct time for a date time string', () => {
+    const input = '2023-10-15T01:01:00Z';
+    const output = '01:01';
+    expect(dateTimeToTime(input)).toStrictEqual(output);
+  });
+
+  test('Should return correct time for a date time ISOString', () => {
+    const input = new UTCDate('2023-10-15T01:01:00Z').toISOString();
+    const output = '01:01';
+    expect(dateTimeToTime(input)).toStrictEqual(output);
+  });
+
+  test('Should return correct time for a date', () => {
+    const input = new UTCDate('2023-10-15T01:01:00Z');
+    const output = '01:01';
+    expect(dateTimeToTime(input)).toStrictEqual(output);
+  });
+
+  test('Should return null for invalid date input', () => {
+    const input = 'RR Fail';
+    expect(simpleToDateDMY(input)).toBeNull();
+  });
+
+  test('Should return null for null', () => {
+    const input = null;
+    expect(simpleToDateDMY(input)).toBeNull();
+  });
+
+  test('Should return null for empty string', () => {
+    const input = '';
+    expect(simpleToDateDMY(input)).toBeNull();
   });
 });
 
@@ -266,10 +304,10 @@ describe('default', () => {
 // // ----------------- addDurationToDate -----------------
 // describe('addDurationToDate', () => {
 //   test('adds duration to the date when add is true', () => {
-//     const startingDate = new Date('2024-05-30');
+//     const startingDate = new UTCDate('2024-05-30');
 //     const duration = 10;
 //     const result = addDurationToDate(startingDate, duration, true);
-//     const expectedDate = new Date('2024-06-09');
+//     const expectedDate = new UTCDate('2024-06-09');
 
 //     expect(result.getFullYear()).toBe(expectedDate.getFullYear());
 //     expect(result.getMonth()).toBe(expectedDate.getMonth());
@@ -277,10 +315,10 @@ describe('default', () => {
 //   });
 
 //   test('subtracts duration from the date when add is false', () => {
-//     const startingDate = new Date('2024-05-30');
+//     const startingDate = new UTCDate('2024-05-30');
 //     const duration = 10;
 //     const result = addDurationToDate(startingDate, duration, false);
-//     const expectedDate = new Date('2024-05-20');
+//     const expectedDate = new UTCDate('2024-05-20');
 
 //     expect(result.getFullYear()).toBe(expectedDate.getFullYear());
 //     expect(result.getMonth()).toBe(expectedDate.getMonth());
@@ -288,7 +326,7 @@ describe('default', () => {
 //   });
 
 //   test('returns the same date when duration is 0', () => {
-//     const startingDate = new Date('2024-05-30');
+//     const startingDate = new UTCDate('2024-05-30');
 //     const duration = 0;
 //     const resultAdd = addDurationToDate(startingDate, duration, true);
 //     const resultSubtract = addDurationToDate(startingDate, duration, false);
@@ -303,10 +341,10 @@ describe('default', () => {
 //   });
 
 //   test('handles crossing month boundaries correctly', () => {
-//     const startingDate = new Date('2024-01-30');
+//     const startingDate = new UTCDate('2024-01-30');
 //     const duration = 5;
 //     const result = addDurationToDate(startingDate, duration, true);
-//     const expectedDate = new Date('2024-02-04');
+//     const expectedDate = new UTCDate('2024-02-04');
 
 //     expect(result.getFullYear()).toBe(expectedDate.getFullYear());
 //     expect(result.getMonth()).toBe(expectedDate.getMonth());
@@ -314,10 +352,10 @@ describe('default', () => {
 //   });
 
 //   test('handles crossing year boundaries correctly', () => {
-//     const startingDate = new Date('2024-12-25');
+//     const startingDate = new UTCDate('2024-12-25');
 //     const duration = 10;
 //     const result = addDurationToDate(startingDate, duration, true);
-//     const expectedDate = new Date('2025-01-04');
+//     const expectedDate = new UTCDate('2025-01-04');
 
 //     expect(result.getFullYear()).toBe(expectedDate.getFullYear());
 //     expect(result.getMonth()).toBe(expectedDate.getMonth());
@@ -336,7 +374,7 @@ describe('default', () => {
 //   });
 
 //   test('returns true for valid date object', () => {
-//     expect(isValidDate(new Date())).toBe(true);
+//     expect(isValidDate(new UTCDate())).toBe(true);
 //   });
 
 //   test('returns true for valid Unix timestamp in milliseconds', () => {
@@ -356,7 +394,7 @@ describe('default', () => {
 //   });
 
 //   test('returns true for date object as a string', () => {
-//     expect(isValidDate(new Date().toString())).toBe(true);
+//     expect(isValidDate(new UTCDate().toString())).toBe(true);
 //   });
 // });
 
@@ -399,18 +437,18 @@ describe('default', () => {
 //   });
 
 //   test('should work correctly with Date objects as inputs', () => {
-//     expect(compareDatesWithoutTime(new Date('2023-01-01'), new Date('2023-01-02'), '<')).toBe(true);
+//     expect(compareDatesWithoutTime(new UTCDate('2023-01-01'), new UTCDate('2023-01-02'), '<')).toBe(true);
 //   });
 
 //   test('should work correctly with numeric timestamps as inputs', () => {
-//     const date1 = new Date('2023-01-01').getTime();
-//     const date2 = new Date('2023-01-02').getTime();
+//     const date1 = new UTCDate('2023-01-01').getTime();
+//     const date2 = new UTCDate('2023-01-02').getTime();
 //     expect(compareDatesWithoutTime(date1, date2, '<')).toBe(true);
 //   });
 
 //   test('should normalize time correctly and only compare dates', () => {
-//     const date1 = new Date('2023-01-01T12:00:00');
-//     const date2 = new Date('2023-01-01T08:00:00');
+//     const date1 = new UTCDate('2023-01-01T12:00:00');
+//     const date2 = new UTCDate('2023-01-01T08:00:00');
 //     expect(compareDatesWithoutTime(date1, date2, '==')).toBe(true);
 //   });
 // });
@@ -418,37 +456,37 @@ describe('default', () => {
 // // ----------------- getDateWithOffset -----------------
 // describe('getDateWithOffset', () => {
 //   test('should return a correctly formatted date with offset', () => {
-//     const inputDate = new Date('2024-10-31T12:00:00Z');
+//     const inputDate = new UTCDate('2024-10-31T12:00:00Z');
 //     const result = getDateWithOffset(inputDate);
 
 //     // Use date string as expected output to ensure we match format
 //     const expectedDateString = 'October 31st 2024, 12:00:00 PM';
-//     const expectedDate = parse(expectedDateString, 'MMMM do yyyy, h:mm:ss a', new Date());
+//     const expectedDate = parse(expectedDateString, 'MMMM do yyyy, h:mm:ss a', new UTCDate());
 
 //     expect(result.toDateString()).toBe(expectedDate.toDateString());
 //   });
 
 //   test('should handle an invalid date input gracefully', () => {
-//     const invalidDate = new Date('Invalid Date');
+//     const invalidDate = new UTCDate('Invalid Date');
 //     const result = getDateWithOffset(invalidDate);
 
 //     expect(result.toString()).toBe('Invalid Date');
 //   });
 
 //   test('should return the same date when timezone offset is zero', () => {
-//     const inputDate = new Date('2024-10-31T12:00:00Z');
+//     const inputDate = new UTCDate('2024-10-31T12:00:00Z');
 //     const result = getDateWithOffset(inputDate);
 
 //     expect(result.toDateString()).toBe(inputDate.toDateString());
 //   });
 
 //   test('should correctly parse a known date string back into a Date object', () => {
-//     const inputDate = new Date('2024-10-31T14:00:00Z');
+//     const inputDate = new UTCDate('2024-10-31T14:00:00Z');
 //     const result = getDateWithOffset(inputDate);
 
 //     // Adjust expectation to align with specific date-time results
 //     const expectedParsedDateString = 'October 31st 2024, 2:00:00 PM';
-//     const parsedDate = parse(expectedParsedDateString, 'MMMM do yyyy, h:mm:ss a', new Date());
+//     const parsedDate = parse(expectedParsedDateString, 'MMMM do yyyy, h:mm:ss a', new UTCDate());
 
 //     expect(result.toISOString()).toBe(parsedDate.toISOString());
 //   });
