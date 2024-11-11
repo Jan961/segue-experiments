@@ -16,6 +16,7 @@ import {
 
 import { BookingItem } from 'components/bookings/modal/NewBooking/reducer';
 import {
+  getBookingType,
   mapExistingBookingToPrismaFields,
   mapNewBookingToPrismaFields,
   mapNewOtherTypeToPrismaFields,
@@ -65,17 +66,6 @@ const formatNewBookingToPrisma = (booking: BookingItem) => {
   return mapNewOtherTypeToPrismaFields(booking);
 };
 
-const getBookngType = (booking: BookingItem) => {
-  if (booking.isBooking) {
-    return 'booking';
-  } else if (booking.isRehearsal) {
-    return 'rehearsal';
-  } else if (booking.isGetInFitUp) {
-    return 'getInFitUp';
-  }
-  return 'other';
-};
-
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
     const { original, updated } = req.body;
@@ -97,7 +87,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         b.isRehearsal !== originalChangedBooking.isRehearsal ||
         b.isGetInFitUp !== originalChangedBooking.isGetInFitUp
       ) {
-        rowsMap[getBookngType(b)].rowsToDelete.push(b);
+        rowsMap[getBookingType(b)].rowsToDelete.push(b);
       }
     });
 
@@ -111,7 +101,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
             b.isRehearsal === u.isRehearsal &&
             b.isGetInFitUp === u.isGetInFitUp,
         );
-        const bookingType = getBookngType(u);
+        const bookingType = getBookingType(u);
         const formatted = canUpdate ? formatExistingBookingToPrisma(u) : formatNewBookingToPrisma(u);
         canUpdate
           ? rowsMap[bookingType].rowsToUpdate.push(formatted)
@@ -136,6 +126,9 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         } else {
           acc.Performances = [...acc.Performances, ...item.Performances];
         }
+        // Sinc performances for an existing booking will be re-created, we need to delete the old ones
+        rowsMap.booking.rowsToDelete.push(item);
+
         return acc;
       }, {} as Partial<AddBookingsParams>);
 
@@ -143,13 +136,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         ? rowsMap.booking.rowsToUpdate.push(bookingToInsert)
         : rowsMap.booking.rowsToInsert.push(bookingToInsert);
     }
-
-    console.log(
-      'Bookings to insert',
-      rowsMap.booking.rowsToInsert,
-      rowsMap.booking.rowsToUpdate,
-      rowsMap.booking.rowsToDelete,
-    );
 
     const promises = [];
 

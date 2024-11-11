@@ -338,7 +338,7 @@ export const createNewRehearsal = (
           Id: DateBlockId,
         },
       },
-      ...(VenueId && { VenueId }),
+      ...(VenueId && { Venue: { connect: { Id: VenueId } } }),
     },
   });
 };

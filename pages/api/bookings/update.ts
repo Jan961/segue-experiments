@@ -16,6 +16,7 @@ import {
 
 import { BookingItem } from 'components/bookings/modal/NewBooking/reducer';
 import {
+  getBookingType,
   mapExistingBookingToPrismaFields,
   mapNewBookingToPrismaFields,
   mapNewOtherTypeToPrismaFields,
@@ -63,17 +64,6 @@ const formatNewBookingToPrisma = (booking: BookingItem) => {
   return mapNewOtherTypeToPrismaFields(booking);
 };
 
-const getBookngType = (booking: BookingItem) => {
-  if (booking.isBooking) {
-    return 'booking';
-  } else if (booking.isRehearsal) {
-    return 'rehearsal';
-  } else if (booking.isGetInFitUp) {
-    return 'getInFitUp';
-  }
-  return 'other';
-};
-
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
     const { original, updated } = req.body;
@@ -97,8 +87,8 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         acc.booking.rowsToUpdate.push(formatExistingBookingToPrisma({ ...booking, id: originalItem.id }));
       } else {
         const editedItem = original.find(({ id }) => id === booking.id) as BookingItem;
-        const originalType = editedItem ? getBookngType(editedItem) : null;
-        const updatedType = getBookngType(booking);
+        const originalType = editedItem ? getBookingType(editedItem) : null;
+        const updatedType = getBookingType(booking);
 
         if (!booking.id) {
           acc[updatedType].rowsToInsert.push(formatNewBookingToPrisma(booking));
@@ -120,7 +110,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
 
     // check if the original item needs deleting
     if (!updated.find(({ id }) => id === originalItem.id)) {
-      const type = getBookngType(originalItem);
+      const type = getBookingType(originalItem);
       acc[type].rowsToDelete.push(originalItem);
     }
 
