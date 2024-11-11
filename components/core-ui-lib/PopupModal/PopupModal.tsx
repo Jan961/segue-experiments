@@ -33,15 +33,10 @@ export default function PopupModal({
   hasOverflow = true,
 }: PopupModalProps) {
   const [overlay, setOverlay] = useState<boolean>(false);
-  const [subtitleText, setSubtitleText] = useState(subtitle);
 
   useEffect(() => {
     setOverlay(hasOverlay);
   }, [hasOverlay]);
-
-  useEffect(() => {
-    setSubtitleText(subtitle);
-  }, [subtitle]);
 
   const handleOverlayClick = () => {
     if (closeOnOverlayClick) {
@@ -95,8 +90,8 @@ export default function PopupModal({
                   {showCloseIcon && <Icon iconName="cross" variant="lg" onClick={onClose} data-testid="close-icon" />}
                 </header>
 
-                {!isNullOrEmpty(subtitleText) && (
-                  <Dialog.Title className="text-xl font-bold leading-6 text-primary-navy">{subtitleText}</Dialog.Title>
+                {!isNullOrEmpty(subtitle) && (
+                  <Dialog.Title className="text-xl font-bold leading-6 text-primary-navy">{subtitle}</Dialog.Title>
                 )}
 
                 <div className="overflow-y-auto mt-3 pr-3">{children}</div>
