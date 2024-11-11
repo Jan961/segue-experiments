@@ -48,7 +48,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       }
       formattedBookings = [...nonPerformances, performanceBooking];
     }
-    console.log('formattedBookings', formattedBookings);
+
     const { bookings, performances, rehearsals, getInFitUps, others } = await BookingService.createBookings(
       formattedBookings,
       req,

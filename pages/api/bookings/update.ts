@@ -68,7 +68,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   try {
     const { original, updated } = req.body;
 
-    // This API only deals witha single type of bookingand hence the original array is expected to ahve a single ite (the Bookings table row being edited)
+    // This API only deals with a single type of booking and hence the original array is expected to have a single item (the Bookings table row being edited)
     if (original?.length !== 1) {
       throw new Error('Original array is expected to have a single item');
     }
