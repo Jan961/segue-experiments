@@ -273,10 +273,15 @@ export default function GlobalActivityModal({
 
   return (
     <div>
-      <PopupModal show={visible} onClose={() => handleConfirm('close')} showCloseIcon={true} hasOverlay={showConfirm}>
+      <PopupModal
+        show={visible}
+        onClose={() => handleConfirm('close')}
+        showCloseIcon={true}
+        hasOverlay={showConfirm}
+        title={titleOptions[variant]}
+      >
         {loadingVisible && <LoadingOverlay />}
         <div className={`h-[${variant === 'view' ? 400 : 780}px] w-[450px]`}>
-          <div className="text-xl text-primary-navy font-bold mb-4">{titleOptions[variant]}</div>
           <div className="text-base font-bold text-primary-input-text">Activity Name</div>
           <TextInput
             className="w-full mb-4"

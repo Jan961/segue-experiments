@@ -193,6 +193,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
       setShowCompSelect(false);
       setShowVenueSelect(true);
     } else if (type === 'venue') {
+      setVenueDesc('');
       setVenueSelectView('select');
     }
   };
@@ -237,12 +238,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
   };
   return (
     <div>
-      <PopupModal
-        show={showVenueSelectModal}
-        title="Venue History"
-        titleClass="text-xl text-primary-navy font-bold"
-        onClose={handleModalCancel}
-      >
+      <PopupModal show={showVenueSelectModal} title="Venue History" onClose={handleModalCancel}>
         <div className="w-[417px] p-2">
           {venueSelectView === 'select' ? (
             <div className="flex flex-col">
@@ -287,10 +283,9 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
         titleClass="text-xl text-primary-navy font-bold -mt-2"
         onClose={handleModalCancel}
         hasOverlay={showSalesSnapshot}
+        subtitle={venueDesc}
       >
         <div className="w-[920px] h-auto">
-          <div className="text-xl text-primary-navy font-bold mb-4">{venueDesc}</div>
-
           {showCompSelectModal && (
             <SalesTable
               salesTableRef={salesTableRef}
@@ -323,10 +318,9 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
         title="Venue History"
         titleClass="text-xl text-primary-navy font-bold -mt-2"
         onClose={handleModalCancel}
+        subtitle={venueDesc}
       >
         <TableWrapper multiplier={selectedBookings.length}>
-          <div className="text-xl text-primary-navy font-bold mb-4">{venueDesc}</div>
-
           {showResultsModal && (
             <SalesTable
               salesTableRef={salesTableRef}
@@ -382,10 +376,9 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
         titleClass="text-xl text-primary-navy font-bold -mt-2"
         onClose={handleModalCancel}
         hasOverlay={false}
+        subtitle={venueDesc}
       >
         <div className="w-auto h-auto">
-          <div className="text-xl text-primary-navy font-bold mb-4">{venueDesc}</div>
-
           <SalesTable
             salesTableRef={salesTableRef}
             containerHeight="h-auto"

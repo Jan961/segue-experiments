@@ -6,6 +6,7 @@ import classNames from 'classnames';
 
 interface PopupModalProps {
   title?: string;
+  subtitle?: string;
   children?: React.ReactNode;
   show: boolean;
   onClose?: () => void;
@@ -19,6 +20,7 @@ interface PopupModalProps {
 
 export default function PopupModal({
   title = '',
+  subtitle = '',
   children,
   show = false,
   onClose = () => null,
@@ -81,11 +83,16 @@ export default function PopupModal({
                 )}
               >
                 <header className="flex justify-between items-center">
-                  <Dialog.Title as="h3" className={`text-lg font-bold leading-6 ${titleClass}`}>
+                  <Dialog.Title className={`text-xl font-bold leading-6 text-primary-navy ${titleClass}`}>
                     {title}
                   </Dialog.Title>
                   {showCloseIcon && <Icon iconName="cross" variant="lg" onClick={onClose} data-testid="close-icon" />}
                 </header>
+
+                {subtitle && (
+                  <Dialog.Title className="text-xl font-bold leading-6 text-primary-navy">{subtitle}</Dialog.Title>
+                )}
+
                 <div className="overflow-y-auto mt-3 pr-3">{children}</div>
               </Dialog.Panel>
             </Transition.Child>
