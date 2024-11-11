@@ -1,3 +1,4 @@
 cypress/**/*
 cypress.config.ts
 prisma/**/*/
+storybook-static/

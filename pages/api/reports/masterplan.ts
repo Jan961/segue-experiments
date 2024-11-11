@@ -138,7 +138,7 @@ const handler = async (req, res) => {
 
     const showNameAndProductionCode: { [key: string]: string[] } = formattedData.reduce((acc, x) => {
       const value = acc[x.ShowName];
-      if (value && value?.length) {
+      if (value?.length) {
         if (!value.includes(x.FullProductionCode)) {
           return {
             ...acc,
@@ -257,7 +257,7 @@ const handler = async (req, res) => {
           }
           return null;
         })
-        .filter((x) => !!x) as number[];
+        .filter((x) => !!x);
       targetCellIdx.forEach((col) =>
         colorTextAndBGCell({
           worksheet,

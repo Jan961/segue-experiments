@@ -8,7 +8,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const data = req.body as CompAllocation;
     const prisma = await getPrismaClient(req);
 
-    await prisma.compAllocation.update({
+    const response = await prisma.compAllocation.update({
       where: {
         Id: data.Id,
       },
@@ -28,10 +28,11 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         ArrangedByAccUserId: data.ArrangedByAccUserId,
       },
     });
-    res.status(200).json({});
+
+    res.status(200).json({ id: response.Id });
   } catch (err) {
     await loggingService.logError(err);
     console.log(err);
-    res.status(500).json({ err: 'Error updating CompAllocation' });
+    res.status(500).json({ err: 'Error updating (CompAllocation) - seat allocation' });
   }
 }

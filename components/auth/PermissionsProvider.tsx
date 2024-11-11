@@ -1,17 +1,18 @@
 import { useEffect } from 'react';
 import { useUser } from '@clerk/nextjs';
-import Spinner from 'components/core-ui-lib/Spinner';
+import LoadingOverlay from '../core-ui-lib/LoadingOverlay';
 import { useRouter } from 'next/router';
 import axios from 'axios';
 import usePermissions from 'hooks/usePermissions';
 
-export const LoadingOverlay = () => (
-  <div className="inset-0 absolute bg-white bg-opacity-50 z-50 flex justify-center items-center top-20 left-20 right-20 bottom-20">
-    <Spinner size="lg" />
-  </div>
-);
-
-const publicPaths = ['/account/sign-up', '/access-denied', '/auth/sign-in', '/auth/sign-up', '/auth/password-reset'];
+const publicPaths = [
+  '/account/sign-up',
+  '/access-denied',
+  '/auth/sign-in',
+  '/auth/sign-up',
+  '/auth/password-reset',
+  '/auth/user-created',
+];
 
 const PermissionsProvider = ({ children }: { children: React.ReactNode }) => {
   const { isSignedIn, user } = useUser();
@@ -28,7 +29,7 @@ const PermissionsProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   useEffect(() => {
-    if (isSignedIn) {
+    if (!publicPaths.includes(router.pathname) && isSignedIn) {
       const organisationId = user.unsafeMetadata.organisationId as string;
       if (!organisationId) {
         router.push('/auth/sign-in');
@@ -42,7 +43,7 @@ const PermissionsProvider = ({ children }: { children: React.ReactNode }) => {
     return <>{children}</>;
   }
 
-  return isSignedIn ? <>{children}</> : <LoadingOverlay />;
+  return isSignedIn ? <>{children}</> : <LoadingOverlay className="top-20 left-20 right-20 bottom-20" />;
 };
 
 export default PermissionsProvider;

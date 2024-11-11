@@ -6,7 +6,7 @@ declare const globalThis: {
   prismaGlobal: PrismaClient;
 } & typeof global;
 
-const prismaClientSingleton = async (orgId: string) => {
+export const createPrismaClient = async (orgId: string) => {
   try {
     const clientDBUrl = process.env.CLIENT_DATABASE_URL;
     const prismaUrl = `${clientDBUrl}_${process.env.DEPLOYMENT_ENV}_Segue_${orgId}`;
@@ -24,7 +24,7 @@ const getPrismaClient = async (req: NextApiRequest): Promise<PrismaClient> => {
     if (!orgId) {
       throw new Error('Unable to get orgId');
     }
-    return globalThis.prismaGlobal ?? prismaClientSingleton(orgId);
+    return globalThis.prismaGlobal ?? createPrismaClient(orgId);
   } else {
     throw new Error('In getPrismaClient, req is null');
   }

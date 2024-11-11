@@ -3,7 +3,7 @@ import { UploadedFile } from 'components/core-ui-lib/UploadModal/interface';
 import { UploadParamType } from 'types/SpreadsheetValidationTypes';
 import TextBoxConfirmation from './TextBoxConfirmation/TextBoxConfirmation';
 import { useState } from 'react';
-import LoadingOverlay from 'components/shows/LoadingOverlay';
+import LoadingOverlay from 'components/core-ui-lib/LoadingOverlay';
 
 interface SpreadsheetModalProps {
   visible: boolean;

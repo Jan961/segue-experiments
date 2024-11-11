@@ -1,8 +1,8 @@
 import { Button, Icon, Label, PasswordInput, Select, TextInput, Tooltip } from 'components/core-ui-lib';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { calibri } from 'lib/fonts';
-import { useSignIn, useClerk, useUser } from '@clerk/nextjs';
+import { useSignIn, useUser } from '@clerk/nextjs';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import axios from 'axios';
@@ -12,28 +12,23 @@ import AuthError from 'components/auth/AuthError';
 import Spinner from 'components/core-ui-lib/Spinner';
 import Head from 'next/head';
 import { isNullOrEmpty } from 'utils';
-import { SESSION_ALREADY_EXISTS } from 'utils/authUtils';
+import { PIN_REGEX, SESSION_ALREADY_EXISTS } from 'utils/authUtils';
 import usePermissions from 'hooks/usePermissions';
 import useAuth from 'hooks/useAuth';
-
-export const LoadingOverlay = () => (
-  <div className="inset-0 absolute bg-white bg-opacity-50 z-50 flex justify-center items-center top-20 left-20 right-20 bottom-20">
-    <Spinner size="lg" />
-  </div>
-);
+import LoadingOverlay from 'components/core-ui-lib/LoadingOverlay';
 
 const SignIn = () => {
   const { setUserPermissions } = usePermissions();
   const { isLoaded, signIn, setActive } = useSignIn();
-  const { navigateToHome } = useAuth();
+  const { signOut, navigateToHome } = useAuth();
   const { user } = useUser();
   const [isBusy, setIsBusy] = useState(false);
-  const { signOut } = useClerk();
   const [error, setError] = useState('');
   const [validationError, setValidationError] = useState(null);
   const [showLogout, setShowLogout] = useState(false);
   const [accounts, setAccounts] = useState([]);
   const router = useRouter();
+  const sessionId = useRef(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loginDetails, setLoginDetails] = useState({
     email: '',
@@ -81,7 +76,7 @@ const SignIn = () => {
           // If sign-in process is complete, set the created session as active
           // and redirect the user
           if (signInAttempt.status === 'complete') {
-            await setActive({ session: signInAttempt.createdSessionId, organization: loginDetails.company });
+            sessionId.current = signInAttempt.createdSessionId;
             setIsAuthenticated(true);
             fetchAccounts(loginDetails.email);
           } else {
@@ -140,8 +135,8 @@ const SignIn = () => {
         organisationId: loginDetails.company,
       });
       if (data.isValid) {
+        await setActive({ session: sessionId.current, organization: loginDetails.company });
         const permissions = data.permissions;
-
         setUserPermissions(loginDetails.company, permissions);
         navigateToHome();
       } else {
@@ -273,16 +268,16 @@ const SignIn = () => {
               >
                 <Icon iconName="info-circle-solid" variant="xs" className="text-primary-blue ml-2" />
               </Tooltip>
-
-              <TextInput
+              <PasswordInput
                 name="pin"
                 placeholder="Enter PIN"
+                className="w-32 mb-1 ml-4"
                 value={loginDetails.pin}
+                type="password"
                 onChange={handleLoginDetailsChange}
-                className="w-24 ml-4"
-                type="text"
-                maxlength={4}
+                error={validationError?.pin}
                 autoComplete="off"
+                pattern={PIN_REGEX}
               />
             </div>
             {validationError?.pin && <AuthError error={validationError.pin[0]} />}
@@ -301,7 +296,7 @@ const SignIn = () => {
           </div>
         )}
       </div>
-      {isBusy && <LoadingOverlay />}
+      {isBusy && <LoadingOverlay className="top-20 left-20 right-20 bottom-20" />}
     </div>
   );
 };
