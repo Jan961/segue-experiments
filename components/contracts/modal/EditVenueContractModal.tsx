@@ -24,7 +24,7 @@ import {
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import { formattedDateWithDay, toISO } from 'services/dateService';
 import { EditDealMemoContractModal } from './EditDealMemoContractModal';
-import { isNullOrEmpty, transformToOptions, checkDecimalStringFormat } from 'utils';
+import { isNullOrEmpty, transformToOptions, checkDecimalStringFormat, formatDecimalOnBlur } from 'utils';
 import LoadingOverlay from 'components/core-ui-lib/LoadingOverlay';
 import { attachmentsColDefs, contractsStyleProps } from '../tableConfig';
 import Table from 'components/core-ui-lib/Table';
@@ -34,7 +34,7 @@ import { headlessUploadMultiple } from 'requests/upload';
 import { getFileUrl } from 'lib/s3';
 import { UiVenue, VenueData, transformVenues } from 'utils/venue';
 import { ConfDialogVariant } from 'components/core-ui-lib/ConfirmationDialog/ConfirmationDialog';
-import { formatDecimalOnBlur, parseAndSortDates } from '../utils';
+import { parseAndSortDates } from '../utils';
 import { currencyState } from 'state/global/currencyState';
 import { dealMemoExport } from 'pages/api/deal-memo/export';
 import { accountContactState } from 'state/contracts/accountContactState';
@@ -422,10 +422,6 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
       fileType: 'pdf',
     });
   };
-
-  useEffect(() => {
-    console.log(dealMemoButtonText, createDealMemo, editDealMemo, editModal);
-  }, [dealMemoButtonText]);
 
   return (
     <PopupModal
