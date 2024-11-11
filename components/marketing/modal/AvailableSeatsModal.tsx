@@ -9,6 +9,8 @@ import { getTimeFromDateAndTime } from 'services/dateService';
 import { UpdateAvailableSeatsParams } from 'pages/api/marketing/available-seats/update';
 import { ConfDialogVariant } from 'components/core-ui-lib/ConfirmationDialog/ConfirmationDialog';
 import { days } from 'config/global';
+import { isNullOrEmpty } from 'utils';
+import { decRegexLeadingZero } from 'utils/regexUtils';
 
 interface AvailableSeatsModalProps {
   show: boolean;
@@ -53,18 +55,10 @@ export default function AvailableSeatsModal({
       Id: id,
       Note: notes,
       PerformanceId: perfId,
-      Seats: parseInt(available),
+      Seats: isNullOrEmpty(available) ? 0 : parseInt(available),
     };
 
     onSave(data);
-  };
-
-  const setNumericVal = (value: string) => {
-    const regexPattern = /^-?\d*(\.\d*)?$/;
-    // validate value with regex
-    if (regexPattern.test(value)) {
-      setAvailable(value);
-    }
   };
 
   const handleConfCancel = () => {
@@ -120,7 +114,8 @@ export default function AvailableSeatsModal({
                 placeholder="Enter Number"
                 id="seatsNo"
                 value={available.toString()}
-                onChange={(event) => setNumericVal(event.target.value)}
+                pattern={decRegexLeadingZero}
+                onChange={(event) => setAvailable(event.target.value)}
               />
             </div>
           </div>
