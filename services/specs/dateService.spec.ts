@@ -11,85 +11,41 @@ import {
 } from '../dateService';
 
 // --default()
-// describe('default', () => {
-//   test('', () => {
-//   });
-// });
+// describe.each([
+//   ["Input", "Expected"]
+// ])('Default', (input, expected) => {
+//   test(`Expect ${input === '' ? input : 'empty string'} to be ${expected}`, () => {
+//     expect(func(input).toStrictEqual(expected));
+//   })
+// })
 
 // -- safeDate()
-describe('safeDate', () => {
-  test('Should return correct date for a valid dateTime string', () => {
-    const input = '2023-05-23T14:30:00Z';
-    const expectedResult = new UTCDate('2023-05-23T14:30:00Z');
-    expect(safeDate(input).toISOString()).toStrictEqual(expectedResult);
-  });
-
-  test('Should return correct date for a valid dateTime', () => {
-    const input = new UTCDate('2023-05-23T14:30:00Z');
-    const expectedResult = new UTCDate('2023-05-23T14:30:00Z');
-    expect(safeDate(input)).toStrictEqual(expectedResult);
-  });
-
-  test('Should return correct date for a valid date string', () => {
-    const input = '2023-05-23';
-    const expectedResult = new UTCDate('2023-05-23T00:00:00Z');
-    expect(safeDate(input)).toStrictEqual(expectedResult);
-  });
-
-  test('Should return correct date for a valid date', () => {
-    const input = new UTCDate('2023-05-23');
-    const expectedResult = new UTCDate('2023-05-23T00:00:00Z');
-    expect(safeDate(input)).toStrictEqual(expectedResult);
-  });
-
-  test('Should return null for an invalid date string', () => {
-    const input = '77 fail';
-    expect(safeDate(input)).toBeNull();
-  });
-
-  test('Should return null for an invalid date', () => {
-    const input = new UTCDate('77 fail');
-    expect(safeDate(input)).toBeNull();
-  });
-
-  test('Should return null for null', () => {
-    const input = null;
-    expect(safeDate(input)).toBeNull();
-  });
-
-  test('Should return null for empty string', () => {
-    const input = '';
-    expect(safeDate(input)).toBeNull();
+describe.each([
+  ['2023-05-23', new UTCDate('2023-05-23T00:00:00Z')],
+  ['2023/05/23', new UTCDate('2023-05-23T00:00:00Z')],
+  ['2023-05-23T14:30:00Z', new UTCDate('2023-05-23T14:30:00Z')],
+  [new UTCDate('2023-05-23T14:30:00Z'), new UTCDate('2023-05-23T14:30:00Z')],
+  [new UTCDate('2023-05-23'), new UTCDate('2023-05-23T00:00:00Z')],
+  ['77 Fail', null],
+  [null, null],
+  ['', null],
+])('safeDate', (input, expected) => {
+  test(`Expect ${input === '' ? 'empty string' : input} to be ${expected}`, () => {
+    expect(safeDate(input)).toStrictEqual(expected);
   });
 });
 
 // --getKey()
-describe('getKey', () => {
-  test('Should return correct date string without time for a valid date string with time (yyyy-mm-dd)', () => {
-    const input = '2023-05-23T14:30:00Z';
-    const expectedResult = '2023-05-23';
-    expect(getKey(input)).toStrictEqual(expectedResult);
-  });
-
-  test('Should return correct date string without time for a valid date string without time (yyyy-mm-dd)', () => {
-    const input = '2023-05-23';
-    const expectedResult = '2023-05-23';
-    expect(getKey(input)).toStrictEqual(expectedResult);
-  });
-
-  test('Should return null for an invalid date string', () => {
-    const input = 'RR fail';
-    expect(getKey(input)).toBeNull();
-  });
-
-  test('Should return null for null', () => {
-    const input = null;
-    expect(getKey(input)).toBeNull();
-  });
-
-  test('Should return null for empty string', () => {
-    const input = '';
-    expect(getKey(input)).toBeNull();
+describe.each([
+  ['2023-05-23T14:30:00Z', '2023-05-23'],
+  ['2023-05-23', '2023-05-23'],
+  ['2023/05/23', '2023-05-23'],
+  ['RR fail', null],
+  [null, null],
+  ['', null],
+])('getKey', (input, expected) => {
+  test(`Expect ${input === '' ? 'empty string' : input} to be ${expected}`, () => {
+    expect(getKey(input)).toStrictEqual(expected);
   });
 });
 

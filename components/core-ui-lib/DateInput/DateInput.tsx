@@ -5,7 +5,6 @@ import React, { createRef, forwardRef, useEffect, useImperativeHandle, useRef, u
 import Label from '../Label';
 import { Portal } from 'react-overlays';
 import { format, isValid } from 'date-fns';
-import { formatDate } from 'services/dateService';
 
 interface DateInputProps {
   value?: string | Date;
@@ -60,8 +59,8 @@ export default forwardRef<Ref, DateInputProps>(function DateInput(
         setInputValue(dateValue);
         setSelectedDate(new Date(dateValue));
       } else {
-        setInputValue(formatDate(dateValue, 'dd/MM/yy'));
-        setSelectedDate(dateValue as Date);
+        setInputValue(format(dateValue, 'dd/MM/yy'));
+        setSelectedDate(new Date(dateValue));
       }
     } else {
       setInputValue('');
@@ -86,7 +85,7 @@ export default forwardRef<Ref, DateInputProps>(function DateInput(
   const getDateFromInputValue = (): Date => {
     if (inputValue) {
       const vals = inputValue.split('/');
-      const date = new Date(`${vals[1]}/${vals[0]}/${vals[2]}`);
+      const date = new Date(`${vals[1]}-${vals[0]}-${vals[2]}`);
       return date;
     } else {
       return null;

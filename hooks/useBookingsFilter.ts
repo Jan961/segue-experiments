@@ -20,6 +20,12 @@ const useBookingFilter = () => {
       if (!productionId || (!includeArchived && archivedProductionIds.includes(productionId))) {
         return false;
       }
+      console.log('Filter DateTime', filter.startDate, filter.endDate);
+      console.log(
+        'Filter logic',
+        !filter.startDate || new Date(dateTime) >= filter.startDate,
+        !filter.endDate || new Date(dateTime) <= filter.endDate,
+      );
       return (
         (selected === -1 || productionId === selected) &&
         (!filter.endDate || new Date(dateTime) <= filter.endDate) &&
@@ -27,6 +33,7 @@ const useBookingFilter = () => {
         (filter.status === 'all' || status === filter.status || (filter.status === 'A' && status === ''))
       );
     });
+    console.log(filteredRowList);
 
     if (filter.venueText) filteredRowList = fuseFilter(filteredRowList, filter.venueText, ['town', 'venue']);
 

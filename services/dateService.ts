@@ -28,8 +28,12 @@ export const safeDate = (date: UTCDate | string): UTCDate => {
 };
 
 // returns yyyy-mm-dd of a valid date string format yyyy-mm-ddT00:00:00Z | yyyy-mm-dd
-export const getKey = (date: string): string => {
-  return date ? (isValid(new UTCDate(date)) ? date.split('T')[0] : null) : null;
+export const getKey = (date: string | UTCDate): string => {
+  if (!date) {
+    return null;
+  }
+  const d = safeDate(date);
+  return d ? d.toISOString().split('T')[0] : null;
 };
 
 // return ?
@@ -42,8 +46,8 @@ export const dateStringToPerformancePair = (dateString: string) => {
   const timePart = split[1];
 
   const defaultDatePart = '1970-01-01';
-  const time = new UTCDate(`${defaultDatePart}T${timePart}Z`);
-  const date = new UTCDate(`${datePart}`);
+  const time = safeDate(`${defaultDatePart}T${timePart}Z`);
+  const date = safeDate(`${datePart}`);
 
   return {
     Time: isValid(time) ? time : null,
@@ -66,7 +70,7 @@ export const simpleToDateDMY = (date: string): UTCDate => {
     return null;
   }
   const [day, month, year] = date.split('/').map(Number);
-  const d = new UTCDate(`${year + 2000}-${month}-${day}`);
+  const d = safeDate(`${year + 2000}-${month}-${day}`);
   return isValid(d) ? d : null;
 };
 
@@ -107,7 +111,8 @@ export const dateToPicker = (dateToFormat: Date | string) => {
   return dateToFormat;
 };
 
-export const dateTimeToTime = (dateToFormat: string | Date) => {
+// returns the time of a date in hours and minutes
+export const dateTimeToTime = (dateToFormat: string | UTCDate) => {
   if (!dateToFormat) {
     return null;
   }
@@ -115,7 +120,8 @@ export const dateTimeToTime = (dateToFormat: string | Date) => {
   return isValid(date) ? format(date, 'HH:mm') : null;
 };
 
-export const toISO = (date: Date) => {
+// returns the ISO string of a date
+export const toISO = (date: UTCDate) => {
   return date.toISOString();
 };
 
