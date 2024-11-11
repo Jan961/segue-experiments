@@ -448,7 +448,7 @@ export default function NewBookingDetailsView({
           onSave={handleSaveNote}
           onCancel={handleNotesCancel}
         />
-        <div className="pt-8 w-full grid grid-cols-2 items-center ">
+        <div className="pt-8 w-full flex items-end justify-between">
           <Button
             className="w-33 "
             text="Check Mileage"
