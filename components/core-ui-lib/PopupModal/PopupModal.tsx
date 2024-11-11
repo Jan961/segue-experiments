@@ -3,7 +3,6 @@ import { Dialog, Transition } from '@headlessui/react';
 import { calibri } from 'lib/fonts';
 import Icon from '../Icon';
 import classNames from 'classnames';
-import { isNullOrEmpty } from 'utils';
 
 interface PopupModalProps {
   title?: string;
@@ -90,7 +89,7 @@ export default function PopupModal({
                   {showCloseIcon && <Icon iconName="cross" variant="lg" onClick={onClose} data-testid="close-icon" />}
                 </header>
 
-                {!isNullOrEmpty(subtitle) && (
+                {subtitle && (
                   <Dialog.Title className="text-xl font-bold leading-6 text-primary-navy">{subtitle}</Dialog.Title>
                 )}
 
