@@ -97,7 +97,6 @@ export const activityColDefs = (
     headerName: 'Due By Date',
     field: 'followUpDt',
     cellRenderer: function (params) {
-      console.log(editPermission);
       return isValidDate(params.data.followUpDt) ? formatInputDate(params.data.followUpDt) : '';
     },
     width: 100,
@@ -237,16 +236,10 @@ export const allocSeatsColDefs = [
     headerName: 'Name / Email of Person Receiving Tickets',
     field: 'name_email',
     cellRenderer: TwoLineRenderer,
-    cellRendererParams: (params) => {
-      return {
-        value: params.data.TicketHolderName + '\n' + params.data.TicketHolderEmail,
-      };
-    },
     cellStyle: {
       marginLeft: '4px',
     },
     wrapText: true,
-    autoHeight: true,
     width: 200,
   },
   {
