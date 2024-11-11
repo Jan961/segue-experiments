@@ -456,6 +456,7 @@ export default function NewBookingDetailsView({
             disabled={!permissions.includes('ACCESS_MILEAGE_CHECK') || changeBookingLength}
           />
           <div className="flex flex-col justify-end  justify-items-end">
+            {error && <span className="mb-3 text-right text-responsive-sm text-primary-red">{error}</span>}
             <div className="flex justify-end  justify-items-end gap-4">
               {isNewBooking && (
                 <Button className="w-33" variant="secondary" text="Back" onClick={handleBackButtonClick} />
@@ -495,7 +496,6 @@ export default function NewBookingDetailsView({
                 disabled={changeBookingLength}
               />
             </div>
-            {error && <span className="mt-3 text-right text-responsive-sm text-primary-red">{error}</span>}
           </div>
         </div>
         {showMoveBookingModal && (
