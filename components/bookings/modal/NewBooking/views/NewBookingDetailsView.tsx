@@ -170,7 +170,7 @@ export default function NewBookingDetailsView({
       setBookingData(dates);
     }
   }, [fromDate, toDate, dateType, venueId, dayTypeOptions, venueOptions, dateBlockId, isRunOfDates, isNewBooking]);
-  const productionCode = `${production?.ShowCode}${production?.Code}  ${production?.ShowName}`;
+
   const productionItem = useMemo(() => {
     return {
       production: `${production?.ShowCode}${production?.Code}`,
@@ -422,9 +422,6 @@ export default function NewBookingDetailsView({
 
   return (
     <>
-      <div className="flex justify-between">
-        <div className="text-primary-navy text-xl my-2 font-bold">{productionCode}</div>
-      </div>
       <div
         className="w-[750px] lg:w-[950px] xl:w-[1450px] h-full flex flex-col "
         data-testid="edit-booking-model"
