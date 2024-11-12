@@ -166,159 +166,162 @@ export default function ActivityModal({
 
   return (
     <div>
-      <PopupModal show={visible} onClose={() => handleConfirm('close')} showCloseIcon={true} hasOverlay={showConfirm}>
-        <div className="h-[526px] w-[404px]">
-          <div className="text-xl text-primary-navy font-bold mb-4">{titleOptions[variant]}</div>
-          <div className="flex gap-x-2 align-middle">
-            <div className="text-base font-bold text-primary-input-text">Activity Name</div>
-            {showNameLengthError && (
-              <div className="text-xs text-primary-red flex items-center">
-                Please enter a Name less than 30 characters
-              </div>
-            )}
+      <PopupModal
+        show={visible}
+        onClose={() => handleConfirm('close')}
+        showCloseIcon={true}
+        hasOverlay={showConfirm}
+        title={titleOptions[variant]}
+      >
+        <div className="flex gap-x-2 align-middle">
+          <div className="text-base font-bold text-primary-input-text">Activity Name</div>
+          {showNameLengthError && (
+            <div className="text-xs text-primary-red flex items-center">
+              Please enter a Name less than 30 characters
+            </div>
+          )}
+        </div>
+        <TextInput
+          className="w-full mb-4"
+          placeholder="Enter Activity Name"
+          testId="enter-activity-name"
+          id="activityName"
+          disabled={!canEditActivity}
+          value={actName}
+          onChange={(event) => {
+            if (event.target.value.length <= 30) {
+              setActName(event.target.value);
+            } else {
+              setShowNameLengthError(true);
+            }
+          }}
+        />
+
+        <Select
+          className={classNames('w-full !border-0 text-primary-input-text', error ? 'mb-2' : 'mb-4')}
+          testId="select-activity-type"
+          options={activityTypes}
+          value={actType}
+          disabled={!canEditActivity}
+          onChange={(value) => changeActivityType(value)}
+          placeholder="Please select Activity Type"
+          isClearable
+          isSearchable
+          label="Type"
+        />
+
+        {error && <div className="text text-base text-primary-red mb-4">Please select an Activity Type</div>}
+
+        <div className="flex flex-row mb-4">
+          <div className="flex flex-col">
+            <DateInput
+              onChange={(value) => setActDate(value)}
+              value={actDate}
+              label="Date"
+              testId="new-activity-date"
+              inputClass="!border-0 !shadow-none"
+              labelClassName="text-primary-input-text"
+              disabled={!canEditActivity}
+            />
           </div>
-          <TextInput
-            className="w-full mb-4"
-            placeholder="Enter Activity Name"
-            testId="enter-activity-name"
-            id="activityName"
-            disabled={!canEditActivity}
-            value={actName}
-            onChange={(event) => {
-              if (event.target.value.length <= 30) {
-                setActName(event.target.value);
-              } else {
-                setShowNameLengthError(true);
-              }
-            }}
-          />
 
-          <Select
-            className={classNames('w-full !border-0 text-primary-input-text', error ? 'mb-2' : 'mb-4')}
-            testId="select-activity-type"
-            options={activityTypes}
-            value={actType}
-            disabled={!canEditActivity}
-            onChange={(value) => changeActivityType(value)}
-            placeholder="Please select Activity Type"
-            isClearable
-            isSearchable
-            label="Type"
-          />
+          <div className="flex flex-col ml-[50px]">
+            <Checkbox
+              className="ml-5 mt-2"
+              labelClassName="!text-base text-primary-input-text"
+              label="Follow Up Required"
+              id="followUpRequired"
+              name="followUpRequired"
+              checked={actFollowUp}
+              onChange={(e) => setActFollowUp(e.target.checked)}
+              disabled={!canEditActivity}
+            />
+          </div>
+        </div>
 
-          {error && <div className="text text-base text-primary-red mb-4">Please select an Activity Type</div>}
+        {actFollowUp && (
+          <div className="flex flex-row mb-3">
+            <div className="text-base font-bold text-primary-input-text flex flex-col">Follow Up Date</div>
 
-          <div className="flex flex-row mb-4">
-            <div className="flex flex-col">
+            <div className="flex flex-col ml-5 -mt-1">
               <DateInput
-                onChange={(value) => setActDate(value)}
-                value={actDate}
+                onChange={(value) => setFollowUpDt(value)}
+                value={followUpDt}
                 label="Date"
-                testId="new-activity-date"
                 inputClass="!border-0 !shadow-none"
                 labelClassName="text-primary-input-text"
                 disabled={!canEditActivity}
               />
             </div>
-
-            <div className="flex flex-col ml-[50px]">
-              <Checkbox
-                className="ml-5 mt-2"
-                labelClassName="!text-base text-primary-input-text"
-                label="Follow Up Required"
-                id="followUpRequired"
-                name="followUpRequired"
-                checked={actFollowUp}
-                onChange={(e) => setActFollowUp(e.target.checked)}
-                disabled={!canEditActivity}
-              />
-            </div>
           </div>
+        )}
 
-          {actFollowUp && (
-            <div className="flex flex-row mb-3">
-              <div className="text-base font-bold text-primary-input-text flex flex-col">Follow Up Date</div>
-
-              <div className="flex flex-col ml-5 -mt-1">
-                <DateInput
-                  onChange={(value) => setFollowUpDt(value)}
-                  value={followUpDt}
-                  label="Date"
-                  inputClass="!border-0 !shadow-none"
-                  labelClassName="text-primary-input-text"
+        <div className="flex flex-row">
+          <div className="flex flex-col mr-[50px]">
+            <div className="text-base font-bold text-primary-input-text">Company Cost</div>
+            <div className="flex flex-row">
+              <div className="flex flex-col mr-2">
+                <div className="text-base font-bold text-primary-input-text">{venueCurrency}</div>
+              </div>
+              <div className="flex flex-col">
+                <TextInput
+                  className="w-full mb-4"
+                  testId="company-cost"
+                  placeholder="00.00"
+                  id="companyCost"
+                  value={companyCost}
+                  onChange={(event) => validateCost('companyCost', event.target.value, 8, 2)}
                   disabled={!canEditActivity}
                 />
               </div>
             </div>
-          )}
+          </div>
 
-          <div className="flex flex-row">
-            <div className="flex flex-col mr-[50px]">
-              <div className="text-base font-bold text-primary-input-text">Company Cost</div>
-              <div className="flex flex-row">
-                <div className="flex flex-col mr-2">
-                  <div className="text-base font-bold text-primary-input-text">{venueCurrency}</div>
-                </div>
-                <div className="flex flex-col">
-                  <TextInput
-                    className="w-full mb-4"
-                    testId="company-cost"
-                    placeholder="00.00"
-                    id="companyCost"
-                    value={companyCost}
-                    onChange={(event) => validateCost('companyCost', event.target.value, 8, 2)}
-                    disabled={!canEditActivity}
-                  />
-                </div>
+          <div className="flex flex-col">
+            <div className="text-base font-bold text-primary-input-text">Venue Cost</div>
+            <div className="flex flex-row">
+              <div className="flex flex-col mr-2">
+                <div className="text-base font-bold text-primary-input-text">{venueCurrency}</div>
               </div>
-            </div>
-
-            <div className="flex flex-col">
-              <div className="text-base font-bold text-primary-input-text">Venue Cost</div>
-              <div className="flex flex-row">
-                <div className="flex flex-col mr-2">
-                  <div className="text-base font-bold text-primary-input-text">{venueCurrency}</div>
-                </div>
-                <div className="flex flex-col">
-                  <TextInput
-                    className="w-full mb-4"
-                    testId="venue-cost"
-                    placeholder="00.00"
-                    id="venueCost"
-                    value={venueCost}
-                    onChange={(event) => validateCost('venueCost', event.target.value, 8, 2)}
-                    disabled={!canEditActivity}
-                  />
-                </div>
+              <div className="flex flex-col">
+                <TextInput
+                  className="w-full mb-4"
+                  testId="venue-cost"
+                  placeholder="00.00"
+                  id="venueCost"
+                  value={venueCost}
+                  onChange={(event) => validateCost('venueCost', event.target.value, 8, 2)}
+                  disabled={!canEditActivity}
+                />
               </div>
             </div>
           </div>
+        </div>
 
-          <div className="text-base font-bold text-primary-input-text">Notes</div>
-          <TextArea
-            className="mt-2 h-[162px] w-full"
-            testId="activity-notes"
-            value={actNotes}
-            placeholder="Notes Field"
-            onChange={(e) => setActNotes(e.target.value)}
-            disabled={!canEditActivity}
+        <div className="text-base font-bold text-primary-input-text">Notes</div>
+        <TextArea
+          className="mt-2 h-[162px] w-full"
+          testId="activity-notes"
+          value={actNotes}
+          placeholder="Notes Field"
+          onChange={(e) => setActNotes(e.target.value)}
+          disabled={!canEditActivity}
+        />
+
+        <div className="float-right flex flex-row mt-5 py-2">
+          <Button
+            className="ml-4 w-[132px]"
+            onClick={() => handleConfirm('cancel')}
+            variant="secondary"
+            text="Cancel"
           />
-
-          <div className="float-right flex flex-row mt-5 py-2">
-            <Button
-              className="ml-4 w-[132px]"
-              onClick={() => handleConfirm('cancel')}
-              variant="secondary"
-              text="Cancel"
-            />
-            <Button
-              disabled={!canEditActivity}
-              className="ml-4 w-[132px] mr-1"
-              variant="primary"
-              text="Save and Close"
-              onClick={handleSave}
-            />
-          </div>
+          <Button
+            disabled={!canEditActivity}
+            className="ml-4 w-[132px] mr-1"
+            variant="primary"
+            text="Save and Close"
+            onClick={handleSave}
+          />
         </div>
       </PopupModal>
 

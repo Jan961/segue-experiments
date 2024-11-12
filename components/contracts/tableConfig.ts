@@ -12,10 +12,10 @@ import SelectCellRenderer from 'components/core-ui-lib/Table/renderers/SelectCel
 import { companyContractStatusOptions, statusToBgColorMap } from 'config/contracts';
 import DateRenderer from 'components/core-ui-lib/Table/renderers/DateRenderer';
 import NotesRenderer from 'components/core-ui-lib/Table/renderers/NotesRenderer';
-import DownloadButtonRenderer from 'components/core-ui-lib/Table/renderers/DownloadButtonRenderer';
 import TextInputRenderer from 'components/core-ui-lib/Table/renderers/TextInputRenderer';
 import CurrencyInputRenderer from 'components/core-ui-lib/Table/renderers/CurrencyInputRenderer';
 import { formatValue } from './utils';
+import { ContractPermissionGroup } from 'interfaces';
 
 export const contractsStyleProps = { headerColor: tileColors.contracts };
 
@@ -79,7 +79,12 @@ export const contractsColumnDefs = [
   },
 ];
 
-export const getCompanyContractsColumnDefs = (userList = []) => [
+export const getCompanyContractsColumnDefs = (
+  contractStatusDisable: ContractPermissionGroup,
+  pdfDisabled: ContractPermissionGroup,
+  editDisabled: ContractPermissionGroup,
+  userList = [],
+) => [
   {
     headerName: 'First Name',
     field: 'firstName',
@@ -113,10 +118,13 @@ export const getCompanyContractsColumnDefs = (userList = []) => [
     cellRenderer: SelectCellRenderer,
     valueGetter: (params) => params?.data?.contractStatus,
     flex: 1,
-    editable: true,
-    cellRendererParams: () => ({
+    cellRendererParams: (params) => ({
       options: companyContractStatusOptions,
       isSearchable: true,
+      disabled:
+        (params.data.departmentId === 1 && !contractStatusDisable.artisteContracts) ||
+        (params.data.departmentId === 2 && !contractStatusDisable.creativeContracts) ||
+        (params.data.departmentId === 3 && !contractStatusDisable.smTechCrewContracts),
     }),
   },
   {
@@ -124,11 +132,15 @@ export const getCompanyContractsColumnDefs = (userList = []) => [
     field: 'edit',
     width: 60,
     cellRenderer: ButtonRenderer,
-    cellRendererParams: {
+    cellRendererParams: (params) => ({
       buttonText: 'Edit',
       variant: 'primary',
       width: 60,
-    },
+      disabled:
+        (params.data.departmentId === 1 && !editDisabled.artisteContracts) ||
+        (params.data.departmentId === 2 && !editDisabled.creativeContracts) ||
+        (params.data.departmentId === 3 && !editDisabled.smTechCrewContracts),
+    }),
     resizable: false,
     headerClass: 'text-center',
   },
@@ -136,12 +148,15 @@ export const getCompanyContractsColumnDefs = (userList = []) => [
     headerName: '',
     field: 'pdf',
     width: 100,
-    cellRenderer: DownloadButtonRenderer,
+    cellRenderer: ButtonRenderer,
     cellRendererParams: (params) => ({
       buttonText: 'Save as PDF',
       variant: 'primary',
       width: 90,
-      href: `/api/company-contracts/export/${params.data?.id}`,
+      disabled:
+        (params.data.departmentId === 1 && !pdfDisabled.artisteContracts) ||
+        (params.data.departmentId === 2 && !pdfDisabled.creativeContracts) ||
+        (params.data.departmentId === 3 && !pdfDisabled.smTechCrewContracts),
     }),
     cellStyle: {
       paddingRight: '0.5em',
@@ -212,7 +227,7 @@ export const getCompanyContractsColumnDefs = (userList = []) => [
   },
 ];
 
-export const seatKillsColDefs = (handleChange, currencySymbol) => [
+export const seatKillsColDefs = (handleChange, currencySymbol, disabled: boolean) => [
   {
     headerName: 'Type',
     field: 'type',
@@ -233,6 +248,7 @@ export const seatKillsColDefs = (handleChange, currencySymbol) => [
       className: 'w-[108px] ml-1 mt-1 font-bold',
       value: formatValue(params.data.seats),
       pattern: /^\d*$/,
+      disabled: { disabled },
     }),
     width: 120,
     headerClass: 'right-border-full',
@@ -251,6 +267,7 @@ export const seatKillsColDefs = (handleChange, currencySymbol) => [
       value: formatValue(params.data.value),
       className: 'w-24 font-bold',
       pattern: /^\d*(\.\d*)?$/,
+      disabled: { disabled },
     }),
     width: 120,
     suppressMovable: true,
@@ -259,7 +276,7 @@ export const seatKillsColDefs = (handleChange, currencySymbol) => [
   },
 ];
 
-export const attachmentsColDefs = [
+export const attachmentsColDefs = (exportPdfPermission: boolean) => [
   {
     headerName: 'Title',
     field: 'FileOriginalFilename',
@@ -285,6 +302,7 @@ export const attachmentsColDefs = [
     cellRenderer: ButtonRenderer,
     cellRendererParams: {
       buttonText: 'View',
+      disabled: !exportPdfPermission,
     },
     width: 100,
   },

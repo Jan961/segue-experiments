@@ -2,6 +2,7 @@ import { performanceMapper } from 'lib/mappers';
 import getPrismaClient from 'lib/prisma';
 import { NextApiRequest } from 'next';
 import { dateToSimple, getTimeFromDateAndTime } from 'services/dateService';
+import { isNull } from 'utils';
 
 export const getPerformanceCompAllocationsByBookingId = async (bookingId: number, req: NextApiRequest) => {
   const prisma = await getPrismaClient(req);
@@ -40,7 +41,11 @@ export const getPerformanceCompAllocationsByBookingId = async (bookingId: number
       availableCompId = ac.Id;
 
       for (const ca of ac.CompAllocation) {
-        allocations.push({ ...ca, date: dateToSimple(p.Date), time: getTimeFromDateAndTime(p.Time) });
+        allocations.push({
+          ...ca,
+          date: dateToSimple(p.Date),
+          time: isNull(p.Time) ? 'TBC' : getTimeFromDateAndTime(p.Time),
+        });
         totalAllocated += ca.Seats;
       }
     }

@@ -9,6 +9,8 @@ import { getTimeFromDateAndTime } from 'services/dateService';
 import { UpdateAvailableSeatsParams } from 'pages/api/marketing/available-seats/update';
 import { ConfDialogVariant } from 'components/core-ui-lib/ConfirmationDialog/ConfirmationDialog';
 import { days } from 'config/global';
+import { isNullOrEmpty } from 'utils';
+import { decRegexLeadingZero } from 'utils/regexUtils';
 
 interface AvailableSeatsModalProps {
   show: boolean;
@@ -53,18 +55,10 @@ export default function AvailableSeatsModal({
       Id: id,
       Note: notes,
       PerformanceId: perfId,
-      Seats: parseInt(available),
+      Seats: isNullOrEmpty(available) ? 0 : parseInt(available),
     };
 
     onSave(data);
-  };
-
-  const setNumericVal = (value: string) => {
-    const regexPattern = /^-?\d*(\.\d*)?$/;
-    // validate value with regex
-    if (regexPattern.test(value)) {
-      setAvailable(value);
-    }
   };
 
   const handleConfCancel = () => {
@@ -93,10 +87,14 @@ export default function AvailableSeatsModal({
 
   return (
     <div>
-      <PopupModal show={visible} onClose={() => handleConfirm('close')} showCloseIcon={true} hasOverlay={showConfirm}>
+      <PopupModal
+        show={visible}
+        onClose={() => handleConfirm('close')}
+        showCloseIcon={true}
+        hasOverlay={showConfirm}
+        title="Available Seats"
+      >
         <div className="h-[450x] w-[325px]">
-          <div className="text-xl text-primary-navy font-bold mb-4 -mt-3">Available Seats</div>
-
           <div className="flex flex-row mb-2">
             <div className="text-base text-primary-input-text flex flex-col text-left w-1/3">Day</div>
             <div className="flex flex-col w-2/3 text-primary-input-text text-base">{dayName}</div>
@@ -120,7 +118,8 @@ export default function AvailableSeatsModal({
                 placeholder="Enter Number"
                 id="seatsNo"
                 value={available.toString()}
-                onChange={(event) => setNumericVal(event.target.value)}
+                pattern={decRegexLeadingZero}
+                onChange={(event) => setAvailable(event.target.value)}
               />
             </div>
           </div>

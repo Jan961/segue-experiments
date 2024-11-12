@@ -13,7 +13,7 @@ import { makeRowTextBoldAndAllignLeft } from './promoter-holds';
 import { convertToPDF } from 'utils/report';
 import { addBorderToAllCells } from 'utils/export';
 import { bookingStatusMap } from 'config/bookings';
-import { add, parseISO, format as dateFormat, differenceInDays } from 'date-fns';
+import { add, parseISO, differenceInDays } from 'date-fns';
 import {
   calculateWeekNumber,
   convertMinutesToHoursMins,
@@ -238,7 +238,7 @@ const handler = async (req, res) => {
     let totalMileage: number[] = [];
     for (let i = 1; i <= daysDiff; i++) {
       lastWeekMetaInfo = { ...lastWeekMetaInfo, weekTotalPrinted: false };
-      const weekDay = dateFormat(add(parseISO(from), { days: i - 1 }), 'eeee');
+      const weekDay = formatDate(add(parseISO(from), { days: i - 1 }), 'eeee');
       const nextDate = add(parseISO(from), { days: i });
       const dateInIncomingFormat = add(parseISO(from), { days: i - 1 });
       const formattedDate = formatDate(dateInIncomingFormat, 'yyyy-MM-dd');

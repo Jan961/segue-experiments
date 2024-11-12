@@ -144,9 +144,13 @@ const LoadSalesHistory = () => {
     }
   };
 
+  const downloadInstructions = () => {
+    window.open(getFileUrl('marketing/salesHistory/instructions/Sales_History_Upload_Instructions.pdf'), '_blank');
+  };
+
   const downloadExample = () => {
     const a = document.createElement('a');
-    a.href = getFileUrl('marketing/salesHistory/exampleTemplate/ExampleTemplate.xlsx');
+    a.href = getFileUrl('marketing/salesHistory/exampleTemplate/ExampleTemplate_v2.xlsx');
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -190,7 +194,8 @@ const LoadSalesHistory = () => {
           )}
 
           <div className="flex gap-x-3 place-content-end">
-            <Button text="Download Template" className="w-[155px]" onClick={() => downloadExample()} />
+            <Button text="Instructions" className="w-[155px]" onClick={downloadInstructions} />
+            <Button text="Download Template" className="w-[155px]" onClick={downloadExample} />
             <Button
               text="Upload Spreadsheet"
               className="w-[155px]"
@@ -241,7 +246,7 @@ const LoadSalesHistory = () => {
         <SpreadsheetDeleteModal
           visible={showConfirmDelete}
           onNoClick={() => setShowConfirmDelete(false)}
-          onDeleteClick={() => deleteSalesHistory()}
+          onDeleteClick={deleteSalesHistory}
           salesHistoryRows={salesHistoryRows}
         />
       )}
