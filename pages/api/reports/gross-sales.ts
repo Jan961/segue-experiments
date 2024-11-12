@@ -263,11 +263,11 @@ const handler = async (req, res) => {
           cellColor.push({
             cell: { rowNo: 9, colNo },
             cellColor: COLOR_HEXCODE.BLUE,
-            ...(isCancelled && { textColor: COLOR_HEXCODE.GREY, cellColor: COLOR_HEXCODE.WHITE }),
+            ...(isCancelled && isSuspended && { textColor: COLOR_HEXCODE.GREY, cellColor: COLOR_HEXCODE.WHITE }),
             numFmt: (value.VenueCurrencySymbol || '') + '#,##0.00',
           });
 
-          if (value.VenueCurrencySymbol && value.Value && isCancelled) {
+          if (value.VenueCurrencySymbol && value.Value && !isCancelled && !isSuspended) {
             const val = totalOfCurrency[value.VenueCurrencySymbol];
             if (val || val === 0) {
               totalOfCurrency[value.VenueCurrencySymbol] = new Decimal(val)
@@ -287,6 +287,11 @@ const handler = async (req, res) => {
           cell: { rowNo: 8, colNo },
           cellColor: isCancelled ? COLOR_HEXCODE.BLACK : COLOR_HEXCODE.PURPLE,
           textColor: COLOR_HEXCODE.WHITE,
+        });
+        cellColor.push({
+          cell: { rowNo: 9, colNo },
+          cellColor: COLOR_HEXCODE.WHITE,
+          textColor: COLOR_HEXCODE.GREY,
         });
       }
 
