@@ -87,10 +87,14 @@ export default function AvailableSeatsModal({
 
   return (
     <div>
-      <PopupModal show={visible} onClose={() => handleConfirm('close')} showCloseIcon={true} hasOverlay={showConfirm}>
+      <PopupModal
+        show={visible}
+        onClose={() => handleConfirm('close')}
+        showCloseIcon={true}
+        hasOverlay={showConfirm}
+        title="Available Seats"
+      >
         <div className="h-[450x] w-[325px]">
-          <div className="text-xl text-primary-navy font-bold mb-4 -mt-3">Available Seats</div>
-
           <div className="flex flex-row mb-2">
             <div className="text-base text-primary-input-text flex flex-col text-left w-1/3">Day</div>
             <div className="flex flex-col w-2/3 text-primary-input-text text-base">{dayName}</div>

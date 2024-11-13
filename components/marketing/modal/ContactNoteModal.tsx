@@ -124,9 +124,14 @@ export default function ContactNoteModal({
 
   return (
     <div>
-      <PopupModal show={visible} onClose={() => handleConfirm('close')} showCloseIcon={true} hasOverlay={false}>
-        <div className="h-[526px] w-[404px]">
-          <div className="text-xl text-primary-navy font-bold mb-4">{titleOptions[variant]}</div>
+      <PopupModal
+        show={visible}
+        onClose={() => handleConfirm('close')}
+        showCloseIcon={true}
+        hasOverlay={false}
+        title={titleOptions[variant]}
+      >
+        <div>
           <div className="flex gap-x-2 align-middle">
             <div className="text-base font-bold text-primary-input-text">Name of Person Contacted</div>
             {showNameLengthError && (
