@@ -198,16 +198,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         row.font = {
           size: 11,
         };
-
-        // Format number columns
-        ['E', 'G'].forEach((key) => {
-          const cell = row.getCell(key);
-          cell.numFmt = '#,##0';
-          cell.alignment = {
-            vertical: 'middle',
-            horizontal: 'right',
-          };
-        });
       });
     }
     const numberOfColumns = worksheet.columnCount;
