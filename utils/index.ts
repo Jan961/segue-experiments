@@ -247,3 +247,12 @@ export const mapObjectValues = (obj: any, transformer: (key: string, value: any)
 
 // used to return the value if not null or undefined - otherwise the function will return an empty string
 export const tidyString = (value: string) => (isNullOrUndefined(value) ? '' : value);
+
+export const replaceTemplateString = (template, data, prefix, suffix) => {
+  const pattern = new RegExp(`${prefix}(.*?)${suffix}`, 'g');
+
+  console.log('regex', pattern);
+  return template.replace(pattern, (match, key) => {
+    return key in data ? data[key] : match;
+  });
+};
