@@ -11,7 +11,7 @@ describe('Button tests', () => {
   it('should render the button with provided text and additional classes', () => {
     const props = { text: 'Click Me', className: 'w-32' };
     cy.mount(<Wrapper props={props} />);
-    cy.get('button').contains(props.text).should('exist');
+    cy.get("[data-testid='core-ui-lib-btn']").contains(props.text).should('exist');
     cy.get('button').should('have.class', 'w-32');
     cy.get('button').should('have.class', 'bg-primary-navy');
     cy.get('button').should('have.class', 'text-primary-white');
