@@ -35,7 +35,7 @@ export const exportGapSuggestions = async (
     const contentDisposition = response.headers['content-disposition'];
     if (contentDisposition) {
       const match = contentDisposition.match(/filename="(.+)"/);
-      if (match && match[1]) {
+      if (match?.[1]) {
         suggestedName = match[1];
       }
     }
