@@ -56,10 +56,10 @@ describe('Toggle Component Tests', () => {
     function NoOnChangeWrapper() {
       const [checked, setChecked] = useState(false);
       return (
-        <>
+        <BaseComp>
           <button onClick={() => setChecked(!checked)}>Toggle Prop</button>
           <Toggle checked={checked} onChange={() => {}} />
-        </>
+        </BaseComp>
       );
     }
     mount(<NoOnChangeWrapper />);
