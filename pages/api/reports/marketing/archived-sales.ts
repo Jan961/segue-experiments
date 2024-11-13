@@ -6,6 +6,9 @@ import formatInputDate from 'utils/dateInputFormat';
 import { ALIGNMENT } from '../masterplan';
 import { addWidthAsPerContent } from 'services/reportsService';
 import getPrismaClient from 'lib/prisma';
+import { getCurrencyFromBookingId } from 'services/venueCurrencyService';
+import { getArchivedSalesList } from 'services/marketing/archivedSales';
+import { addBorderToAllCells } from 'utils/export';
 
 const createExcelFromData = (data, bookingInfo, productionName, venueAndDate) => {
   const workbook = new ExcelJS.Workbook();
@@ -154,7 +157,7 @@ const createExcelFromData = (data, bookingInfo, productionName, venueAndDate) =>
     rowsToIgnore: 5,
     maxColWidth: Infinity,
   });
-
+  addBorderToAllCells({ worksheet });
   return workbook;
 };
 
@@ -172,16 +175,8 @@ const handler = async (req, res) => {
   const prisma = await getPrismaClient(req);
   const bookingIds = bookingsSelection.map((booking) => booking.bookingId);
 
-  const data = await prisma.salesView.findMany({
-    where: {
-      BookingId: {
-        in: bookingIds,
-      },
-      SaleTypeName: 'General Sales',
-    },
-    orderBy: [{ BookingFirstDate: 'asc' }, { SetSalesFiguresDate: 'asc' }],
-    take: 300,
-  });
+  const currencySymbol = (await getCurrencyFromBookingId(req, bookingIds?.[0])) || '';
+  const data = await getArchivedSalesList(bookingIds, currencySymbol, prisma);
 
   const workbook = createExcelFromData(data, bookingsSelection, productionName, venueAndDate);
   const worksheet = workbook.getWorksheet('Archived Sales');
