@@ -8,7 +8,11 @@ import { FormInputSelect, SelectOption } from 'components/global/forms/FormInput
 import { venueState } from 'state/booking/venueState';
 import { findPrevAndNextBookings } from './utils/findPrevAndNextBooking';
 import { debounce } from 'radash';
-import { GapSuggestionReponse, GapSuggestionUnbalancedProps, VenueWithDistance } from 'pages/api/venue/read/distance';
+import {
+  GapSuggestionResponse,
+  GapSuggestionUnbalancedProps,
+  VenueWithDistance,
+} from 'services/booking/gapSuggestion/types';
 import { timeFormat } from 'services/dateService';
 import { Spinner } from 'components/global/Spinner';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -46,7 +50,7 @@ export const GapPanel = ({ finish, setGapVenueIds }: GapPanelProps) => {
   const { selectedDate } = useRecoilValue(viewState);
   const venueDict = useRecoilValue(venueState);
   const bookingDict = useRecoilValue(bookingState);
-  const [results, setResults] = React.useState<GapSuggestionReponse>(undefined);
+  const [results, setResults] = React.useState<GapSuggestionResponse>(undefined);
   const [refreshing, setRefreshing] = React.useState(false);
   const [sliderActive, setSlidersActive] = React.useState(false);
   const { nextBookings, prevBookings } = findPrevAndNextBookings(bookingDict, selectedDate, selectedDate);
@@ -99,7 +103,7 @@ export const GapPanel = ({ finish, setGapVenueIds }: GapPanelProps) => {
       ExcludeLondonVenues: inputs.ExcludeLondonVenues,
       MinSeats: inputs.MinSeats,
     };
-    const { data } = await axios.post<GapSuggestionReponse>('/api/venue/read/distance', body);
+    const { data } = await axios.post<GapSuggestionResponse>('/api/venue/read/distance', body);
     setResults(data);
     setRefreshing(false);
   }, []);
@@ -125,7 +129,7 @@ export const GapPanel = ({ finish, setGapVenueIds }: GapPanelProps) => {
         EndVenue: venueInputs.EndVenue,
       };
 
-      const { data } = await axios.post<GapSuggestionReponse>('/api/venue/read/distance', body);
+      const { data } = await axios.post<GapSuggestionResponse>('/api/venue/read/distance', body);
 
       const { DefaultMin, SliderMax } = data;
 
