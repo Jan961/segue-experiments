@@ -88,7 +88,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
   try {
     const prisma = await getPrismaClient(req);
-    const params = req.body as GapSuggestionUnbalancedProps & { filteredVenueIds: number[] };
+    const params = req.body as GapSuggestionUnbalancedProps & { filteredVenueIds: number[]; prodCode: string };
+    const filename = `Venue Gap Suggestions ${params.prodCode || ''} ${formatDate(new Date(), 'dd.MM.yy')}`;
     // Get the gap suggestions data
     const result = await calculateGapSuggestions(prisma, omit(params, ['filteredVenueIds']));
     // Get all venue contacts at once
@@ -100,30 +101,13 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const contactsMap = await getVenueContacts(prisma, venueIds);
 
     const workbook = new ExcelJS.Workbook();
-    const worksheet = workbook.addWorksheet('Venue Suggestions', {
-      properties: {
-        defaultRowHeight: 25,
-      },
+    const worksheet = workbook.addWorksheet('Venue Gap Suggestions', {
+      pageSetup: { fitToPage: true, fitToHeight: 5, fitToWidth: 7 },
+      views: [{ state: 'frozen', ySplit: 3 }],
     });
 
-    // Define columns
-    worksheet.columns = [
-      { header: 'Venue', key: 'Name' },
-      { header: 'Town', key: 'Town' },
-      { header: 'Seats', key: 'Capacity' },
-      { header: 'Travel Time to Venue', key: 'MinsFromStart' },
-      { header: 'Miles to Venue', key: 'MileageFromStart' },
-      { header: 'Travel Time From Venue', key: 'MinsFromEnd' },
-      { header: 'Miles From Venue', key: 'MileageFromEnd' },
-      { header: 'Contact First Name', key: 'ContactFirstName' },
-      { header: 'Contact Last Name', key: 'ContactLastName' },
-      { header: 'Contact Email', key: 'ContactEmail' },
-      { header: 'Contact Phone', key: 'ContactPhone' },
-      { header: 'Contact Role', key: 'ContactRole' },
-    ];
-
     // Add title row
-    const titleRow = worksheet.addRow(['Venue Gap Suggestions']);
+    const titleRow = worksheet.addRow([filename]);
     titleRow.height = 30;
     titleRow.font = {
       bold: true,
@@ -190,20 +174,20 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       filteredVenueInfo.forEach((venue: VenueWithDistance) => {
         const contactInfo = contactsMap.get(venue.VenueId);
 
-        const row = worksheet.addRow({
-          Name: venue.Name,
-          Town: venue.Town,
-          Capacity: venue.Capacity,
-          MinsFromStart: formatMinutes(venue.MinsFromStart),
-          MileageFromStart: venue.MileageFromStart,
-          MinsFromEnd: formatMinutes(venue.MinsFromEnd),
-          MileageFromEnd: venue.MileageFromEnd,
-          ContactFirstName: contactInfo?.firstName || '',
-          ContactLastName: contactInfo?.lastName || '',
-          ContactEmail: contactInfo?.email || '',
-          ContactPhone: contactInfo?.phone || '',
-          ContactRole: contactInfo?.role || '',
-        });
+        const row = worksheet.addRow([
+          venue.Name,
+          venue.Town,
+          venue.Capacity,
+          formatMinutes(venue.MinsFromStart),
+          venue.MileageFromStart,
+          formatMinutes(venue.MinsFromEnd),
+          venue.MileageFromEnd,
+          contactInfo?.firstName || '',
+          contactInfo?.lastName || '',
+          contactInfo?.email || '',
+          contactInfo?.phone || '',
+          contactInfo?.role || '',
+        ]);
 
         // Style data rows
         row.height = 25;
@@ -216,9 +200,14 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         };
 
         // Format number columns
-        ['MileageFromStart', 'MileageFromEnd'].forEach((key) => {
+        ['E', 'G'].forEach((key) => {
           const cell = row.getCell(key);
-          cell.numFmt = '0';
+          console.log('cell', cell, row.getCell('E'));
+          cell.numFmt = '#,##0';
+          cell.alignment = {
+            vertical: 'middle',
+            horizontal: 'right',
+          };
         });
       });
     }
@@ -234,7 +223,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       rowsToIgnore: 2,
       maxColWidth: Infinity,
     });
-    const filename = `Venue Gap Suggestion -  ${formatDate(new Date(), 'dd.MM.yy')}`;
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     res.setHeader('Content-Disposition', `attachment; filename="${filename}.xlsx"`);
 

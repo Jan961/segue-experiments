@@ -33,7 +33,7 @@ export const gridOptions = {
   suppressRowClickSelection: true,
 };
 
-const GapSuggest = ({ startDate, endDate, productionId, onOkClick = () => null }: GapSuggestProps) => {
+const GapSuggest = ({ startDate, endDate, productionId, booking, onOkClick = () => null }: GapSuggestProps) => {
   const bookingDict = useRecoilValue(bookingState);
   const { rows: bookings } = useRecoilValue(rowsSelector);
   const [rows, setRows] = useState(null);
@@ -102,7 +102,7 @@ const GapSuggest = ({ startDate, endDate, productionId, onOkClick = () => null }
   const exportTableData = () => {
     // exportToExcel(tableRef, { fileName: excelFilename });
     const title = 'Venue Gap Suggestions';
-    notify.promise(exportGapSuggestions(formData, selectedVenueIds), {
+    notify.promise(exportGapSuggestions(formData, selectedVenueIds, booking?.production), {
       loading: `'Generating ${title}...`,
       success: `${title} downloaded successfully`,
       error: `Error generating ${title}`,

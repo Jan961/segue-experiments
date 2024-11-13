@@ -20,15 +20,16 @@ export const fetchBarredVenues = async (body: BarringCheckPayload): Promise<Barr
 export const exportGapSuggestions = async (
   payload: Partial<GapSuggestionUnbalancedProps>,
   filteredVenueIds: number[],
+  prodCode: string,
 ) => {
   const response = await axios.post(
     '/api/reports/booking/gap-suggestion',
-    { ...payload, filteredVenueIds },
+    { ...payload, filteredVenueIds, prodCode },
     { responseType: 'blob' },
   );
 
   if (response.status >= 200 && response.status < 300) {
-    const productionName = 'Venue Suggestions';
+    const productionName = 'Venue Gap Suggestions';
     let suggestedName: string | null = null;
 
     const contentDisposition = response.headers['content-disposition'];
