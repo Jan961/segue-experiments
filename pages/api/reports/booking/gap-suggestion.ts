@@ -202,7 +202,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         // Format number columns
         ['E', 'G'].forEach((key) => {
           const cell = row.getCell(key);
-          console.log('cell', cell, row.getCell('E'));
           cell.numFmt = '#,##0';
           cell.alignment = {
             vertical: 'middle',
