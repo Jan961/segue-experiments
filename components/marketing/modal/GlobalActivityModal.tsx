@@ -389,7 +389,7 @@ export default function GlobalActivityModal({
 
           <div className="flex flex-row mt-5">
             <div className="w-[450px]">
-              <Table columnDefs={venueColDefs} rowData={venueList} styleProps={styleProps} tableHeight={300} />
+              <Table columnDefs={venueColDefs} rowData={venueList} styleProps={styleProps} tableHeight={265} />
             </div>
           </div>
 

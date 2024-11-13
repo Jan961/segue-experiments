@@ -143,6 +143,7 @@ export default function Barring({ visible, onClose }: BarringProps) {
                   rowData={filteredRows?.slice(0, 30)}
                   styleProps={styleProps}
                   gridOptions={barringGridOptions}
+                  tableHeight={430}
                 />
               </div>
             </div>
