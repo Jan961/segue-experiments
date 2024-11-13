@@ -117,8 +117,6 @@ export default function NewBookingDetailsView({
     api.redrawRows();
   };
 
-  // test
-
   useEffect(() => {
     if (isNewBooking) {
       let dayTypeOption = null;
@@ -421,96 +419,94 @@ export default function NewBookingDetailsView({
   };
 
   return (
-    <>
-      <div
-        className="w-[750px] lg:w-[950px] xl:w-[1450px] h-full flex flex-col "
-        data-testid="edit-booking-model"
-        tabIndex={1}
-      >
-        <Table
-          testId="edit-booking-details-table"
-          ref={tableRef}
-          columnDefs={columnDefs}
-          rowData={bookingData}
-          styleProps={styleProps}
-          onCellClicked={handleCellClick}
-          onRowClicked={handleRowSelected}
-          gridOptions={gridOptions}
-          onCellValueChange={handleCellValueChange}
+    <div
+      className="w-[750px] lg:w-[950px] xl:w-[1450px] h-full flex flex-col "
+      data-testid="edit-booking-model"
+      tabIndex={1}
+    >
+      <Table
+        testId="edit-booking-details-table"
+        ref={tableRef}
+        columnDefs={columnDefs}
+        rowData={bookingData}
+        styleProps={styleProps}
+        onCellClicked={handleCellClick}
+        onRowClicked={handleRowSelected}
+        gridOptions={gridOptions}
+        onCellValueChange={handleCellValueChange}
+      />
+      <NotesPopup
+        testId="cnb-booking-details-tbl-notes"
+        show={showNotesModal}
+        productionItem={productionItem}
+        onSave={handleSaveNote}
+        onCancel={handleNotesCancel}
+      />
+      <div className="pt-8 w-full flex items-end justify-between">
+        <Button
+          className="w-33 "
+          text="Check Mileage"
+          onClick={handeCheckMileageClick}
+          disabled={!permissions.includes('ACCESS_MILEAGE_CHECK') || changeBookingLength}
         />
-        <NotesPopup
-          testId="cnb-booking-details-tbl-notes"
-          show={showNotesModal}
-          productionItem={productionItem}
-          onSave={handleSaveNote}
-          onCancel={handleNotesCancel}
-        />
-        <div className="pt-8 w-full flex items-end justify-between">
-          <Button
-            className="w-33 "
-            text="Check Mileage"
-            onClick={handeCheckMileageClick}
-            disabled={!permissions.includes('ACCESS_MILEAGE_CHECK') || changeBookingLength}
-          />
-          <div className="flex flex-col justify-end  justify-items-end">
-            {error && <span className="mb-3 text-right text-responsive-sm text-primary-red">{error}</span>}
-            <div className="flex justify-end  justify-items-end gap-4">
-              {isNewBooking && (
-                <Button className="w-33" variant="secondary" text="Back" onClick={handleBackButtonClick} />
-              )}
-              <Button className="w-33 " variant="secondary" text="Cancel" onClick={handleCancelButtonClick} />
-              {!isNewBooking && (
-                <>
-                  <Button
-                    className="w-33"
-                    variant="tertiary"
-                    text="Delete Booking"
-                    onClick={handleDeleteBooking}
-                    disabled={changeBookingLength || !permissions.includes('DELETE_BOOKING')}
-                  />
-                  <Button
-                    className="w-33 "
-                    variant="primary"
-                    text="Move Booking"
-                    onClick={handleMoveBooking}
-                    disabled={
-                      changeBookingLength || changeBookingLengthConfirmed || !permissions.includes('MOVE_BOOKING')
-                    }
-                  />
-                  <Button
-                    className="w-33 px-4"
-                    variant="primary"
-                    text={`${changeBookingLength ? 'Confirm New' : 'Change Booking'} Length`}
-                    onClick={handleChangeOrConfirmBooking}
-                    disabled={!permissions.includes('CHANGE_BOOKING_LENGTH')}
-                  />
-                </>
-              )}
-              <Button
-                className=" w-33"
-                text="Preview Booking"
-                onClick={handePreviewBookingClick}
-                disabled={changeBookingLength}
-              />
-            </div>
+        <div className="flex flex-col justify-end  justify-items-end">
+          {error && <span className="mb-3 text-right text-responsive-sm text-primary-red">{error}</span>}
+          <div className="flex justify-end  justify-items-end gap-4">
+            {isNewBooking && (
+              <Button className="w-33" variant="secondary" text="Back" onClick={handleBackButtonClick} />
+            )}
+            <Button className="w-33 " variant="secondary" text="Cancel" onClick={handleCancelButtonClick} />
+            {!isNewBooking && (
+              <>
+                <Button
+                  className="w-33"
+                  variant="tertiary"
+                  text="Delete Booking"
+                  onClick={handleDeleteBooking}
+                  disabled={changeBookingLength || !permissions.includes('DELETE_BOOKING')}
+                />
+                <Button
+                  className="w-33 "
+                  variant="primary"
+                  text="Move Booking"
+                  onClick={handleMoveBooking}
+                  disabled={
+                    changeBookingLength || changeBookingLengthConfirmed || !permissions.includes('MOVE_BOOKING')
+                  }
+                />
+                <Button
+                  className="w-33 px-4"
+                  variant="primary"
+                  text={`${changeBookingLength ? 'Confirm New' : 'Change Booking'} Length`}
+                  onClick={handleChangeOrConfirmBooking}
+                  disabled={!permissions.includes('CHANGE_BOOKING_LENGTH')}
+                />
+              </>
+            )}
+            <Button
+              className=" w-33"
+              text="Preview Booking"
+              onClick={handePreviewBookingClick}
+              disabled={changeBookingLength}
+            />
           </div>
         </div>
-        {showMoveBookingModal && (
-          <MoveBooking
-            visible={showMoveBookingModal}
-            onClose={handleMoveBookingClose}
-            bookings={bookingData}
-            venueOptions={venueOptions}
-          />
-        )}
-        <ConfirmationDialog
-          variant={confirmationType.current}
-          show={showConfirmation}
-          onYesClick={handleYesClick}
-          onNoClick={handleNoClick}
-          hasOverlay={false}
-        />
       </div>
-    </>
+      {showMoveBookingModal && (
+        <MoveBooking
+          visible={showMoveBookingModal}
+          onClose={handleMoveBookingClose}
+          bookings={bookingData}
+          venueOptions={venueOptions}
+        />
+      )}
+      <ConfirmationDialog
+        variant={confirmationType.current}
+        show={showConfirmation}
+        onYesClick={handleYesClick}
+        onNoClick={handleNoClick}
+        hasOverlay={false}
+      />
+    </div>
   );
 }
