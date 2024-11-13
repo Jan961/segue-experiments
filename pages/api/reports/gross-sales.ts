@@ -3,7 +3,7 @@ import getPrismaClient from 'lib/prisma';
 import Decimal from 'decimal.js';
 import { COLOR_HEXCODE } from 'services/salesSummaryService';
 import { ALIGNMENT, alignCellText, styleHeader } from './masterplan';
-import { addBorderToAllCells, getExportedAtTitle } from 'utils/export';
+import { getExportedAtTitle } from 'utils/export';
 import { currencyCodeToSymbolMap } from 'config/Reports';
 import { convertToPDF } from 'utils/report';
 import { BOOK_STATUS_CODES, SALES_TYPE_NAME } from 'types/MarketingTypes';
@@ -225,10 +225,15 @@ const handler = async (req, res) => {
       const value: SALES_SUMMARY = map[key];
       const nextValue: SALES_SUMMARY = map[nextKey];
       const scheduleValue: SCHEDULE_VIEW = scheduleMap[key];
+      const statusCode = (value || scheduleValue)?.EntryStatusCode;
+      const isCancelled = statusCode === 'X';
+      const isSuspended = statusCode === 'S';
       if (!value) {
         if (
           scheduleValue &&
-          (['Get In/Fit Up Day', 'Tech/Dress Day', 'Day Off', 'Travel Day'].includes(scheduleValue?.EntryName) ||
+          (['Get In/Fit Up Day', 'Tech/Dress Day', 'Day Off', 'Travel Day', 'Rehearsal Day'].includes(
+            scheduleValue?.EntryName,
+          ) ||
             scheduleValue?.EntryName?.toLowerCase?.().includes?.('holiday'))
         ) {
           r7.push(scheduleValue.EntryName);
@@ -258,11 +263,11 @@ const handler = async (req, res) => {
           cellColor.push({
             cell: { rowNo: 9, colNo },
             cellColor: COLOR_HEXCODE.BLUE,
-            ...(value.EntryStatusCode === 'X' && { textColor: COLOR_HEXCODE.GREY, cellColor: COLOR_HEXCODE.WHITE }),
+            ...(isCancelled && isSuspended && { textColor: COLOR_HEXCODE.GREY, cellColor: COLOR_HEXCODE.WHITE }),
             numFmt: (value.VenueCurrencySymbol || '') + '#,##0.00',
           });
 
-          if (value.VenueCurrencySymbol && value.Value && value.EntryStatusCode !== 'X') {
+          if (value.VenueCurrencySymbol && value.Value && !isCancelled && !isSuspended) {
             const val = totalOfCurrency[value.VenueCurrencySymbol];
             if (val || val === 0) {
               totalOfCurrency[value.VenueCurrencySymbol] = new Decimal(val)
@@ -271,10 +276,23 @@ const handler = async (req, res) => {
             }
           }
         }
-        if (value.EntryStatusCode === 'X') {
-          cellColor.push({ cell: { rowNo: 7, colNo }, cellColor: COLOR_HEXCODE.BLACK, textColor: COLOR_HEXCODE.WHITE });
-          cellColor.push({ cell: { rowNo: 8, colNo }, cellColor: COLOR_HEXCODE.BLACK, textColor: COLOR_HEXCODE.WHITE });
-        }
+      }
+      if (isCancelled || isSuspended) {
+        cellColor.push({
+          cell: { rowNo: 7, colNo },
+          cellColor: isCancelled ? COLOR_HEXCODE.BLACK : COLOR_HEXCODE.PURPLE,
+          textColor: COLOR_HEXCODE.WHITE,
+        });
+        cellColor.push({
+          cell: { rowNo: 8, colNo },
+          cellColor: isCancelled ? COLOR_HEXCODE.BLACK : COLOR_HEXCODE.PURPLE,
+          textColor: COLOR_HEXCODE.WHITE,
+        });
+        cellColor.push({
+          cell: { rowNo: 9, colNo },
+          cellColor: COLOR_HEXCODE.WHITE,
+          textColor: COLOR_HEXCODE.GREY,
+        });
       }
 
       if (i % 7 === 0) {
@@ -400,7 +418,6 @@ const handler = async (req, res) => {
     styleHeader({ worksheet, row: 2, bgColor: COLOR_HEXCODE.DARK_GREEN });
     alignCellText({ worksheet, row: 1, col: 1, align: ALIGNMENT.LEFT });
     alignCellText({ worksheet, row: 2, col: 1, align: ALIGNMENT.LEFT });
-    addBorderToAllCells({ worksheet });
     worksheet.getCell(1, 1).font = { size: 16, color: { argb: COLOR_HEXCODE.WHITE }, bold: true };
     if (format === 'pdf') {
       worksheet.pageSetup.printArea = `A1:${worksheet.getColumn(11).letter}${worksheet.rowCount}`;
