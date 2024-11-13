@@ -225,10 +225,9 @@ const ArchSalesDialog = ({
       title={title[variant]}
       titleClass={classNames('text-xl text-primary-navy font-bold -mt-2', variant === 'both' ? 'w-48' : '')}
       onClose={handleModalCancel}
+      subtitle={variant === 'both' ? '' : subTitle}
     >
       <div className="w-[340px] h-auto">
-        {variant !== 'both' && <div className="text-xl text-primary-navy font-bold mb-4">{subTitle}</div>}
-
         {variant === 'both' ? (
           <div>
             <Select
