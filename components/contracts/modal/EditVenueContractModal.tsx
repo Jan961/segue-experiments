@@ -424,12 +424,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
   };
 
   return (
-    <PopupModal
-      show={visible}
-      title={modalTitle}
-      titleClass={classNames('text-xl text-primary-navy font-bold -mt-2.5')}
-      onClose={() => handleCancelForm(false)}
-    >
+    <PopupModal show={visible} title={modalTitle} onClose={() => handleCancelForm(false)}>
       <div className="h-[80vh] w-auto overflow-y-scroll flex">
         <div className="h-[800px] flex">
           <div className="flex flex-col gap-y-3">
@@ -458,7 +453,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                   />
                 </div>
               </div>
-              <div className={`${dealMemoCreated ? '' : ' text-gray-500 pointer-events-none select-none opacity-50'}`}>
+              <div>
                 <div className=" text-primary-input-text font-bold text-sm mt-1.5">Deal Memo Status</div>
                 <Select
                   options={statusOptions}
@@ -468,7 +463,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                   value={dealMemoFormData.Status}
                   isClearable
                   isSearchable
-                  disabled={!editModal}
+                  disabled={!editModal || !dealMemoCreated}
                 />
 
                 <div className=" text-primary-input-text font-bold text-sm mt-6">Completed By</div>
@@ -480,7 +475,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                   isClearable
                   isSearchable
                   placeholder="Select User"
-                  disabled={!editModal}
+                  disabled={!editModal || !dealMemoCreated}
                 />
 
                 <div className=" text-primary-input-text font-bold text-sm mt-6">Approved By</div>
@@ -492,7 +487,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                   isClearable
                   isSearchable
                   placeholder="Select User"
-                  disabled={!editModal}
+                  disabled={!editModal || !dealMemoCreated}
                 />
                 <div className="flex items-center mt-6 justify-between px-3 select-none">
                   <div>
@@ -504,7 +499,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                         editDealMemoData('DateIssued', value)
                       }
                       value={dealMemoFormData.DateIssued}
-                      disabled={!editModal}
+                      disabled={!editModal || !dealMemoCreated}
                     />
                   </div>
 
@@ -517,7 +512,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                         editDealMemoData('DateReturned', value)
                       }
                       value={dealMemoFormData.DateReturned}
-                      disabled={!editModal}
+                      disabled={!editModal || !dealMemoCreated}
                     />
                   </div>
                 </div>
@@ -527,7 +522,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                   onChange={(e) => editDealMemoData('Notes', e.target.value)}
                   className="h-auto w-[400px]"
                   value={dealMemoFormData.Notes}
-                  disabled={!editModal}
+                  disabled={!editModal || !dealMemoCreated}
                 />
               </div>
             </div>
