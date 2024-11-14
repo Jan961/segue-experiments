@@ -114,6 +114,19 @@ export const PersonDetailsTab = ({
       : type !== 'New';
   };
 
+  const handleToggleAgencyDetails = (e) => {
+    setHideAgencyDetails(e.target.checked);
+    const updatedFormData = {
+      ...personData,
+      agencyDetails: {
+        ...personData.agencyDetails,
+        hasAgent: !e.target.checked,
+      },
+    };
+    setPersonData(updatedFormData);
+    updateFormData?.(updatedFormData);
+  };
+
   return (
     <div className={`${height} w-full py-5 ${className}`}>
       <div className="text-xl text-primary-navy font-bold mb-3">Person Details</div>
@@ -150,18 +163,7 @@ export const PersonDetailsTab = ({
           testId="toggle-agency-details"
           label="N/A"
           checked={hideAgencyDetails}
-          onChange={(e) => {
-            setHideAgencyDetails(e.target.checked);
-            const updatedFormData = {
-              ...personData,
-              agencyDetails: {
-                ...personData.agencyDetails,
-                hasAgent: !e.target.checked,
-              },
-            };
-            setPersonData(updatedFormData);
-            updateFormData?.(updatedFormData);
-          }}
+          onChange={handleToggleAgencyDetails}
         />
       </div>
       <AgencyDetails
