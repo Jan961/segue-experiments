@@ -1,3 +1,4 @@
+import classNames from 'classnames';
 import React, { forwardRef, useEffect, useRef } from 'react';
 
 export interface TextInputProps {
@@ -16,19 +17,7 @@ export interface TextInputProps {
 
 const TextArea = forwardRef<HTMLTextAreaElement, TextInputProps>(
   (
-    {
-      id,
-      value = '',
-      className = '',
-      disabled = false,
-      defaultDisabled = true,
-      onChange,
-      placeholder = '',
-      onClick,
-      onBlur,
-      testId,
-      name,
-    },
+    { id, value = '', className = '', disabled = false, onChange, placeholder = '', onClick, onBlur, testId, name },
     ref,
   ) => {
     const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
@@ -50,24 +39,24 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextInputProps>(
     };
 
     const baseClass = `block min-w-fit h-[1.9375rem] text-sm shadow-input-shadow text-primary-input-text rounded-md !border-primary-border outline-none focus:ring-2 focus:ring-primary-input-text ring-inset`;
-    const disabledClass = disabled
-      ? `${defaultDisabled ? '!bg-disabled-input' : 'disabled-input'} !cursor-not-allowed !pointer-events-none`
-      : '';
+    const disabledClass = disabled ? `disabled-input !cursor-not-allowed !pointer-events-none` : '';
+
+    const getRef = (node) => {
+      textAreaRef.current = node;
+      if (typeof ref === 'function') {
+        ref(node);
+      } else if (ref) {
+        (ref as React.MutableRefObject<HTMLTextAreaElement | null>).current = node;
+      }
+    };
 
     return (
       <div className="relative" onClick={onClick}>
         <textarea
           data-testid={testId || 'core-ui-lib-textarea'}
-          ref={(node) => {
-            textAreaRef.current = node;
-            if (typeof ref === 'function') {
-              ref(node);
-            } else if (ref) {
-              (ref as React.MutableRefObject<HTMLTextAreaElement | null>).current = node;
-            }
-          }}
+          ref={getRef}
           id={id}
-          className={`${baseClass} ${disabledClass} ${className}`}
+          className={classNames(baseClass, disabledClass, className)}
           disabled={disabled}
           onChange={handleChange}
           placeholder={placeholder}

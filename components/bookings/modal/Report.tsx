@@ -62,13 +62,13 @@ export default function Report({
   };
   return (
     <>
-      <PopupModal show={visible} onClose={onClose} title="Tour Summary" titleClass="text-primary-navy">
+      <PopupModal show={visible} onClose={onClose} title="Tour Summary">
         {loading && (
           <div className="w-full h-full absolute left-0 top-0 bg-white flex items-center opacity-95">
             <Spinner className="w-full" size="lg" />
           </div>
         )}
-        <div className="py-4 overflow-y-scroll overflow-x-hidden max-h-[85vh] w-[500px] no-scrollbar">
+        <div className="py-4 w-[500px]">
           {productionSummary.length ? (
             <>
               {productionSummary.map((item, index) => (

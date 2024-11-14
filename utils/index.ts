@@ -247,3 +247,26 @@ export const mapObjectValues = (obj: any, transformer: (key: string, value: any)
 
 // used to return the value if not null or undefined - otherwise the function will return an empty string
 export const tidyString = (value: string) => (isNullOrUndefined(value) ? '' : value);
+
+/**
+ * Replaces all the palceholders in the template string with the corresponding values in the data object.
+ * @returns {string}
+ * @param template - The template string containing placeholders. e.g. 'Hello, {name}!'
+ * @param data - The data object containing key-value pairs to replace the placeholders. e.g. {name: 'John'}
+ * @param prefix - The prefix used to identify the placeholders in the template string. Default is '{'.
+ * @param suffix - The suffix used to identify the placeholders in the template string. Default is '}'.
+ */
+export const replaceTemplateString = (template, data, prefix = '{', suffix = '}') => {
+  if (!template) return '';
+  if (isNullOrEmpty(data)) return template;
+
+  // Escape any special regex characters in prefix and suffix
+  const ESCAPE_REGEX = /[-/\\^$*+?.()|[\]{}]/g;
+  const escapedPrefix = prefix.replace(ESCAPE_REGEX, '\\$&');
+  const escapedSuffix = suffix.replace(ESCAPE_REGEX, '\\$&');
+  const pattern = new RegExp(`${escapedPrefix}(.*?)${escapedSuffix}`, 'g');
+
+  return template.replace(pattern, (match, key) => {
+    return key in data ? data[key] : match;
+  });
+};
