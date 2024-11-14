@@ -424,12 +424,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
   };
 
   return (
-    <PopupModal
-      show={visible}
-      title={modalTitle}
-      titleClass={classNames('text-xl text-primary-navy font-bold -mt-2.5')}
-      onClose={() => handleCancelForm(false)}
-    >
+    <PopupModal show={visible} title={modalTitle} onClose={() => handleCancelForm(false)}>
       <div className="h-[80vh] w-auto overflow-y-scroll flex">
         <div className="h-[800px] flex">
           <div className="flex flex-col gap-y-3">
