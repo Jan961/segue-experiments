@@ -30,6 +30,11 @@ interface PersonDetails {
 
 export const transformPersonDetails = (personData: any): PersonDetails => {
   if (!personData) return null;
+  const otherWorkTypes =
+    personData.PersonOtherRole?.map((role: any) => ({
+      id: role.PORId,
+      name: role.PORName,
+    })) || [];
   return {
     id: personData.PersonId,
     firstName: personData.PersonFirstName || null,
@@ -54,10 +59,7 @@ export const transformPersonDetails = (personData: any): PersonDetails => {
     advisoryNotes: personData.PersonAdvisoryNotes || null,
     generalNotes: personData.PersonNotes || null,
     healthDetails: personData.PersonHealthNotes || null,
-    otherWorkTypes: personData.PersonOtherRole?.map((role: any) => ({
-      id: role.PORId,
-      name: role.PORName,
-    })),
+    otherWorkTypes: Array.isArray(otherWorkTypes) && otherWorkTypes.length > 0 ? otherWorkTypes : [{ name: '' }],
     notes: personData.PersonNotes || null,
   };
 };
