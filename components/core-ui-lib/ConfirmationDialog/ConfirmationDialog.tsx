@@ -26,8 +26,8 @@ export interface ConfirmationDialogProps {
   onYesClick?: () => void;
   onNoClick?: () => void;
   variant: ConfDialogVariant;
-  yesBtnClass: string;
-  noBtnClass: string;
+  yesBtnClass?: string;
+  noBtnClass?: string;
   labelYes?: string;
   showNoButton?: boolean;
   labelNo?: string;

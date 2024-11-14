@@ -19,12 +19,6 @@ describe('ConfirmationDialog Component', () => {
     testId: 'test-confirmation-dialog',
   };
 
-  const Wrapper = ({ props }) => (
-    <BaseComp>
-      <ConfirmationDialog {...props} />
-    </BaseComp>
-  );
-
   it('should render correctly with default props', () => {
     mount(
       <BaseComp>
@@ -37,10 +31,10 @@ describe('ConfirmationDialog Component', () => {
     cy.get('[data-testid="confirmation-dialog-yes-btn"]').should('contain.text', 'Yes');
     cy.get('[data-testid="confirmation-dialog-no-btn"]').should('contain.text', 'No');
     cy.get('[data-testid="confirmation-dialog-yes-btn"]').invoke('attr', 'class').should('contain', 'bg-primary-red');
-    // secondary button for no should have the below class
+    // secondary button for yes should have the below class
     cy.get('[data-testid="confirmation-dialog-no-btn"]').should(
       'have.class',
-      // the delete variant should have a tertiary button for yes which has the below class
+      // the delete variant should have a tertiary button for no which has the below class
       'bg-primary-white',
     );
   });
