@@ -123,11 +123,10 @@ export const ContractScheduleModal = ({
     <PopupModal
       show={openContract}
       title="Contract Schedule"
-      titleClass="text-xl text-primary-navy font-bold -mt-2"
       onClose={onClose}
       hasOverlay={openNewPersonContract || openNewBuildContract}
     >
-      <div className="w-[430px] h-auto">
+      <div className="w-[430px] h-[380px]">
         <Select
           label="Production"
           testId="cs-production-selector"

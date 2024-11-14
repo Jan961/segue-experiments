@@ -285,7 +285,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
         hasOverlay={showSalesSnapshot}
         subtitle={venueDesc}
       >
-        <div className="w-[920px] h-auto">
+        <div className="w-[920px]">
           {showCompSelectModal && (
             <SalesTable
               salesTableRef={salesTableRef}
@@ -329,6 +329,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
               module="bookings"
               variant="salesComparison"
               data={salesCompData}
+              tableHeight={650}
             />
           )}
         </TableWrapper>
