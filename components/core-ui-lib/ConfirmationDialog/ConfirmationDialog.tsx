@@ -28,6 +28,7 @@ export interface ConfirmationDialogProps {
   yesBtnClass: string;
   noBtnClass: string;
   labelYes: string;
+  showNoButton: boolean;
   labelNo?: string;
   hasOverlay?: boolean;
   content?: ConfirmationDialogContent;
@@ -70,11 +71,12 @@ export default function ConfirmationDialog({
   onYesClick,
   onNoClick,
   labelYes = 'Yes',
+  showNoButton = true,
   labelNo = 'No',
   variant,
   hasOverlay = false,
   content,
-  testId,
+  testId = 'confirmation-dialog-wrapper',
 }: Partial<ConfirmationDialogProps>) {
   const [visible, setVisible] = useState<boolean>(show);
 
@@ -87,8 +89,10 @@ export default function ConfirmationDialog({
     action ? onYesClick() : onNoClick();
   };
 
+  console.log('label No', typeof labelNo);
+
   return (
-    <PopupModal data-testid={testId} show={visible} showCloseIcon={false} hasOverlay={hasOverlay}>
+    <PopupModal testId={testId} show={visible} showCloseIcon={false} hasOverlay={hasOverlay}>
       <div data-testid="confirmation-dialog" className="p-2 flex flex-col gap-4">
         <div className="text-center">
           <div data-testid="confirmation-dialog-question" className="text text-primary-navy font-bold text-xl">
@@ -99,7 +103,7 @@ export default function ConfirmationDialog({
           </div>
         </div>
         <div className="w-full flex justify-center items-center">
-          {labelNo && (
+          {showNoButton && (
             <Button
               testId="confirmation-dialog-no-btn"
               className="w-32"
