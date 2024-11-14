@@ -4,10 +4,10 @@ import { GapSuggestionUnbalancedProps, GapSuggestionResponse, VenueWithDistance 
 
 const SLIDER_MIN = 25;
 
-export async function calculateGapSuggestions(
+export const calculateGapSuggestions = async (
   prisma: PrismaClient,
   params: GapSuggestionUnbalancedProps,
-): Promise<GapSuggestionResponse> {
+): Promise<GapSuggestionResponse> => {
   const {
     StartVenue,
     EndVenue,
@@ -89,16 +89,16 @@ export async function calculateGapSuggestions(
     OriginalMins: initial[0]?.TimeMins,
     VenueInfo: venueInfo,
   };
-}
+};
 
-async function getVenueRelations(
+export const getVenueRelations = async (
   prisma: PrismaClient,
   venueId: number,
   isVenue1: boolean,
   minMiles: number,
   maxMiles: number,
   maxTime?: number,
-): Promise<Partial<VenueVenueTravelView>[]> {
+): Promise<Partial<VenueVenueTravelView>[]> => {
   return prisma.venueVenueTravelView.findMany({
     where: {
       [isVenue1 ? 'Venue1Id' : 'Venue2Id']: venueId,
@@ -111,14 +111,14 @@ async function getVenueRelations(
       Mileage: true,
     },
   });
-}
+};
 
-function processVenueRelations(
+export const processVenueRelations = (
   startVenue1: Partial<VenueVenueTravelView>[],
   startVenue2: Partial<VenueVenueTravelView>[],
   endVenue1: Partial<VenueVenueTravelView>[],
   endVenue2: Partial<VenueVenueTravelView>[],
-): VenueWithDistance[] {
+): VenueWithDistance[] => {
   const startVenueRelations = [
     ...startVenue1.map((v) => ({ VenueId: v.Venue2Id, Mileage: v.Mileage, Mins: v.TimeMins })),
     ...startVenue2.map((v) => ({ VenueId: v.Venue1Id, Mileage: v.Mileage, Mins: v.TimeMins })),
@@ -140,9 +140,9 @@ function processVenueRelations(
     MinsFromStart: startRelation.Mins,
     MinsFromEnd: endVenueRelationsMap.get(startRelation.VenueId).Mins,
   }));
-}
+};
 
-async function enrichVenueData(
+export const enrichVenueData = async (
   prisma: PrismaClient,
   venuesWithDistanceData: VenueWithDistance[],
   filters: {
@@ -151,7 +151,7 @@ async function enrichVenueData(
     MinSeats: number;
     MaxSeats: number;
   },
-): Promise<VenueWithDistance[]> {
+): Promise<VenueWithDistance[]> => {
   const VenueIds = unique(venuesWithDistanceData.map((x) => x.VenueId));
 
   const capacities = await prisma.venue.findMany({
@@ -212,4 +212,4 @@ async function enrichVenueData(
       (venue) =>
         venue && venue.Capacity >= filters.MinSeats && (filters.MaxSeats === 0 || venue.Capacity <= filters.MaxSeats),
     );
-}
+};
