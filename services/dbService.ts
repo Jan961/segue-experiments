@@ -89,6 +89,7 @@ export const createClientDB = async (organisationId: string) => {
       '[',
       ']',
     );
+    // await writeFileAsync('db_script_formatted.txt', formattedScript);
     await executeSQLFromFile(host, dboUser, process.env.DBO_PASSWORD, dbName, formattedScript);
   } else {
     throw new Error('Unable to create new DB');
