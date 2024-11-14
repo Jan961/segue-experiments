@@ -2,7 +2,7 @@ import axios from 'axios';
 import classNames from 'classnames';
 import { FormInputButton } from 'components/global/forms/FormInputButton';
 import { CreateBookingsParams } from 'pages/api/bookings/create';
-import { VenueWithDistance } from 'pages/api/venue/read/distance';
+import { VenueWithDistance } from 'services/booking/gapSuggestion/types';
 import React from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { bookingState } from 'state/booking/bookingState';
