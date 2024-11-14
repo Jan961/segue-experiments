@@ -1,13 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import ExportModal from './ExportModal';
+import { useState } from 'react';
 
-const meta: Meta<typeof ExportModal> = {
+export default {
   component: ExportModal,
-  title: 'Components/ExportModal',
-  argTypes: {},
-};
+} as Meta<typeof ExportModal>;
 
-export default meta;
 type Story = StoryObj<typeof ExportModal>;
 
 const excelIcon = {
@@ -25,12 +23,19 @@ const exportList = [
   { key: 'PDF', iconName: pdfIcon.iconName, iconProps: pdfIcon.iconProps },
 ];
 
-export const Example: Story = {
-  render: () => {
-    return (
-      <div className="w-[800px] h-vh bg-primary-dark-blue text-primary-white">
-        <ExportModal visible={true} onClose={() => console.log('Close modal')} ExportList={exportList} />
-      </div>
-    );
-  },
+const Template = () => {
+  const [isOpen, setIsOpen] = useState<boolean>(true);
+
+  const handleClose = () => {
+    setIsOpen(!isOpen);
+  };
+
+  // return a modal with a placeholder image
+  return (
+    <div className="w-[800px] h-vh bg-primary-dark-blue text-primary-white">
+      <ExportModal visible={true} onClose={handleClose} ExportList={exportList} />
+    </div>
+  );
 };
+
+export const Default: Story = Template.bind({});

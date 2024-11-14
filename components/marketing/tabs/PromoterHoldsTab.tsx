@@ -11,16 +11,24 @@ import Icon from 'components/core-ui-lib/Icon';
 import { bookingJumpState } from 'state/marketing/bookingJumpState';
 import { useRecoilValue } from 'recoil';
 import { userState } from 'state/account/userState';
-import { isNullOrEmpty } from 'utils';
+import { isNull, isNullOrEmpty } from 'utils';
 import { Spinner } from 'components/global/Spinner';
 import { exportExcelReport } from 'components/bookings/modal/request';
 import { notify } from 'components/core-ui-lib';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import axios from 'axios';
 import { dateTimeToTime } from 'services/dateService';
+import { PerformanceDTO } from 'interfaces';
 
 interface PromotorHoldsTabProps {
   bookingId: string;
+}
+
+export interface PerformanceType {
+  text: string;
+  value: number;
+  date: string;
+  time: string;
 }
 
 export interface PromoterHoldTabRef {
@@ -45,6 +53,7 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
   const users = useRecoilValue(userState);
   const { selected: productionId, productions } = useRecoilValue(productionJumpState);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [perfList, setPerfList] = useState<Array<PerformanceType>>([]);
 
   const gridOptions = {
     getRowId: (data) => {
@@ -76,18 +85,18 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
 
   const getPromoterHoldData = async (bookingId) => {
     try {
-      const response = await axios.get(`/api/marketing/promoter-holds/${bookingId}`);
-      const promData = response.data;
+      const { data: promData } = await axios.get(`/api/marketing/promoter-holds/${bookingId}`);
 
       if ((promData.allocations && Array.isArray(promData.allocations)) || Array.isArray(promData.holds)) {
         setHoldList(promData.holds);
-
         setAllocRows(
           promData.allocations.map((allocRow) => {
-            const user = Object.values(users).find((user) => user.AccUserId === allocRow.ArrangedByAccUserId);
-            const firstname = isNullOrEmpty(user.FirstName) ? '' : user.FirstName;
-            const surname = isNullOrEmpty(user.LastName) ? '' : user.LastName;
-            return { ...allocRow, ArrangedByAccUserId: firstname + ' ' + surname };
+            const arrangedByUser = getNameFromId(allocRow.ArrangedByAccUserId);
+            return {
+              ...allocRow,
+              ArrangedByAccUserId: arrangedByUser,
+              name_email: `${allocRow.TicketHolderName}\n${allocRow.TicketHolderEmail}`,
+            };
           }),
         );
 
@@ -101,9 +110,9 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
     }
   };
 
-  const saveAllocatedSeats = async (data, perfId, type: string) => {
-    const holdRec = holdList.find((hold) => hold.info.Id === perfId);
-    const recData = { AvailableCompId: holdRec.availableCompId, ...data };
+  const saveAllocatedSeats = async (data, perfId, type) => {
+    const holdRecIndex = holdList.findIndex((hold) => hold?.info?.Id === perfId);
+    const recData = { AvailableCompId: holdList[holdRecIndex]?.availableCompId, ...data };
 
     const apiRoute = {
       new: 'create',
@@ -111,9 +120,53 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
       delete: 'delete',
     };
 
-    await axios.post(`/api/marketing/allocated-seats/${apiRoute[type]}`, recData);
-    getPromoterHoldData(bookingIdVal);
+    const { data: row } = await axios.post(`/api/marketing/allocated-seats/${apiRoute[type]}`, recData);
+
+    if (type === 'new' || type === 'edit') {
+      const arrangedByUser = getNameFromId(recData.ArrangedByAccUserId);
+      const tableRow = {
+        ...recData,
+        ArrangedByAccUserId: arrangedByUser,
+        name_email: `${recData.TicketHolderName}\n${recData.TicketHolderEmail}`,
+        Id: row.id,
+      };
+
+      if (type === 'new') {
+        updateHoldRows(tableRow.Seats, holdRecIndex);
+        setAllocRows([...allocRows, tableRow]);
+      } else if (type === 'edit') {
+        const rowIndex = allocRows.findIndex((rec) => rec.Id === row.id);
+        if (rowIndex !== -1) {
+          const seatsChange = tableRow.Seats - allocRows[rowIndex].Seats;
+          const updatedAllocRows = allocRows.map((row, index) => (index === rowIndex ? { ...row, ...tableRow } : row));
+          updateHoldRows(seatsChange, holdRecIndex);
+          setAllocRows(updatedAllocRows);
+        }
+      }
+    } else if (type === 'delete') {
+      const seats = allocRows.find((rec) => rec.Id === row.id).Seats;
+      const updatedAllocRows = allocRows.filter((rec) => rec.Id !== row.id);
+      updateHoldRows(-seats, holdRecIndex);
+      setAllocRows(updatedAllocRows);
+    }
+
     setShowAllocSeatsModal(false);
+  };
+
+  const updateHoldRows = (seatsChange: number, index: number) => {
+    const holdRows = holdList.map((row) => ({ ...row }));
+    holdRows[index] = {
+      ...holdRows[index],
+      totalAllocated: holdRows[index].totalAllocated + seatsChange,
+    };
+    setHoldList(holdRows);
+  };
+
+  const getNameFromId = (id: number) => {
+    const user = Object.values(users).find((user) => user.AccUserId === id);
+    const firstname = isNullOrEmpty(user.FirstName) ? '' : user.FirstName;
+    const surname = isNullOrEmpty(user.LastName) ? '' : user.LastName;
+    return firstname + ' ' + surname;
   };
 
   const updateBooking = async (type: string, value: any) => {
@@ -139,10 +192,37 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
     setShowAllocSeatsModal(true);
   };
 
+  // Get performance list
+  const getPerformanceList = async (bookingId: string) => {
+    try {
+      setPerfList([]);
+      const { data } = await axios.get(`/api/performances/read/${bookingId}`);
+
+      if (typeof data === 'object') {
+        const perfList = data as Array<PerformanceDTO>;
+        const optionList: PerformanceType[] = [];
+        perfList.forEach((perf) => {
+          const perfTime = isNull(perf.Time) ? 'TBC' : perf.Time.substring(0, 5);
+          optionList.push({
+            text: formatInputDate(perf.Date) + ' | ' + perfTime,
+            value: perf.Id,
+            date: perf.Date,
+            time: perfTime,
+          });
+        });
+
+        setPerfList(optionList);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
     if (props.bookingId !== null && props.bookingId !== undefined) {
       getPromoterHoldData(props.bookingId.toString());
       setBookingIdVal(props.bookingId.toString());
+      getPerformanceList(props.bookingId.toString());
 
       const booking = bookings.bookings.find((booking) => booking.Id === props.bookingId);
       setCastRateArranged(booking.CastRateTicketsArranged);
@@ -280,6 +360,7 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
                 className="w-[160px]"
                 onClick={() => newAllocatedSeats()}
                 testId="btnAddNewAllocSeats"
+                disabled={perfList.length === 0}
               />
             </div>
           </div>
@@ -296,11 +377,11 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
 
           <AllocatedSeatsModal
             show={showAllocSeatsModal}
-            bookingId={bookingIdVal}
             onCancel={() => setShowAllocSeatsModal(false)}
             onSave={(data, perfId, type: string) => saveAllocatedSeats(data, perfId, type)}
             data={allocatedRow}
             type={allocType}
+            performances={perfList}
           />
 
           <AvailableSeatsModal
