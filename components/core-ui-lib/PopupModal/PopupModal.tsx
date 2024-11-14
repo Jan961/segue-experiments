@@ -31,7 +31,7 @@ export default function PopupModal({
   hasOverlay = false,
   closeOnOverlayClick = false, // Default to false
   hasOverflow = true,
-  testId = 'popup-modal-wrapper',
+  testId = 'overlay',
 }: PopupModalProps) {
   const [overlay, setOverlay] = useState<boolean>(false);
 
