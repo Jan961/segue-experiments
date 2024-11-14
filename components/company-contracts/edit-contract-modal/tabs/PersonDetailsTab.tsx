@@ -78,7 +78,7 @@ export const PersonDetailsTab = ({
     salaryAccountDetails,
     expenseAccountDetails,
   } = personData;
-  const [hideAgencyDetails, setHideAgencyDetails] = useState(!!(personDetails?.id && agencyDetails?.id));
+  const [hideAgencyDetails, setHideAgencyDetails] = useState(personDetails.id ? !agencyDetails.id : false);
   const countryList = useRecoilValue(countryState) || [];
   const { users = [] } = useRecoilValue(userState);
   const userOptionList = useMemo(

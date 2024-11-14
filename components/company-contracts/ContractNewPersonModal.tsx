@@ -22,6 +22,7 @@ export const ContractNewPersonModal = ({
 }: ContractNewPersonModalProps) => {
   const [formData, setFormData] = useState<Partial<IPerson>>({});
   const [confirm, setConfirm] = useState<boolean>(false);
+  const [isEdited, setIsEdited] = useState<boolean>(false);
   const validateForm = async (data) => {
     try {
       await createPersonSchema.validate({ ...data }, { abortEarly: false });
@@ -56,6 +57,20 @@ export const ContractNewPersonModal = ({
       debug(error);
     }
   };
+
+  const onFormDataChange = (data: Partial<IPerson>) => {
+    setFormData(data);
+    setIsEdited(true);
+  };
+
+  const onCancel = () => {
+    if (isEdited) {
+      setConfirm(true);
+    } else {
+      onClose?.();
+    }
+  };
+
   return (
     <div>
       <PopupModal show={openNewPersonContract} title="Add New Person" panelClass="h-[90vh]" onClose={() => onClose?.()}>
@@ -63,7 +78,7 @@ export const ContractNewPersonModal = ({
           <div className="flex-1 min-h-0">
             <PersonDetailsTab
               type="New"
-              updateFormData={setFormData}
+              updateFormData={onFormDataChange}
               permissions={permissions}
               departmentId={0}
               className="h-full overflow-y-auto pb-4"
@@ -71,7 +86,7 @@ export const ContractNewPersonModal = ({
             />
           </div>
           <div className="mt-4 flex justify-end items-center pt-4 bg-white">
-            <Button onClick={() => setConfirm(true)} className="w-33" variant="secondary" text="Cancel" />
+            <Button onClick={onCancel} className="w-33" variant="secondary" text="Cancel" />
             <Button onClick={onSave} className="ml-4 w-33 px-6" variant="primary" text="Save and Return to Contracts" />
           </div>
         </div>

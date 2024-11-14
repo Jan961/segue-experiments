@@ -90,7 +90,7 @@ const agencyRelevantFields = [
 const agencyFields = {
   ...omit(personFields, ['firstName']),
   agencyPersonId: yup.number().integer().nullable(),
-  website: yup.string().url().nullable(),
+  website: yup.string().url('Invalid agency website url').nullable(),
   agencyName: yup.string().nullable(),
   landlineNumber: yup.string().nullable(),
 };
@@ -122,6 +122,7 @@ const createEmergencyContactShape = (contactNumber) => {
     .object()
     .shape({
       ...contactFields,
+      email: yup.string().email(`Emergency Contact ${contactNumber} Email is invalid`).nullable(),
       firstName: yup
         .string()
         .nullable()
