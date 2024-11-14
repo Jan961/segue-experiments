@@ -524,89 +524,70 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                       </div>
                     </div>
                   )}
-
-                  <div className="flex flex-row justify-between">
-                    <div className="flex flex-col mr-[20px]">
-                      <div className="flex flex-row mt-4">
-                        <div className="flex flex-col">
-                          <div className="text-primary-dark-blue base font-bold mr-[52px]">Seats Sold</div>
-                        </div>
-                        <TextInput
-                          className="w-[137px] h-[31px] flex flex-col -mt-1"
-                          placeholder="Enter Seats"
-                          id="genSeatsSold"
-                          value={currSalesFigureSet.general.seatsSold}
-                          pattern={decRegexLeadingZero}
-                          onChange={(event) => handleSalesFigChange('seatsSold', 'general', event.target.value)}
-                        />
-                      </div>
-
-                      <div className="flex flex-row mt-4">
-                        <div className="flex flex-col">
-                          <div className="text-primary-dark-blue base font-bold mr-5">Reserved Seats</div>
-                        </div>
-                        <TextInput
-                          className="w-[137px] h-[31px] flex flex-col -mt-1"
-                          placeholder="Enter Seats"
-                          id="genSeatsReserved"
-                          value={currSalesFigureSet.general.seatsReserved}
-                          pattern={decRegexLeadingZero}
-                          onChange={(event) => handleSalesFigChange('seatsReserved', 'general', event.target.value)}
-                        />
-                      </div>
+                  <div className="grid grid-cols-12 gap-3">
+                    {/* Row1 */}
+                    <div className="flex justify-between items-center col-span-4">
+                      <span className="text-primary-dark-blue base font-bold">Seats Sold</span>
+                      <TextInput
+                        className="w-[137px]"
+                        placeholder="Enter Seats"
+                        id="genSeatsSold"
+                        value={currSalesFigureSet.general.seatsSold}
+                        pattern={decRegexLeadingZero}
+                        onChange={(event) => handleSalesFigChange('seatsSold', 'general', event.target.value)}
+                      />
                     </div>
-
-                    <div className="flex flex-col">
-                      <div className="flex flex-row mt-4">
-                        <div className="flex flex-col">
-                          <div className="text-primary-dark-blue base font-bold mr-[52px]">Seats Sold Value</div>
-                        </div>
-                        <TextInput
-                          className="w-[137px] h-[31px] flex flex-col -mt-1"
-                          placeholder="Enter Value"
-                          id="genSeatsSoldVal"
-                          value={currSalesFigureSet.general.seatsSoldVal}
-                          pattern={/^\d*(\.\d*)?$/}
-                          onChange={(event) => handleSalesFigChange('seatsSoldVal', 'general', event.target.value)}
-                          onBlur={(event) =>
-                            handleSalesFigChange('seatsSoldVal', 'general', formatDecimalOnBlur(event))
-                          }
-                        />
-                      </div>
-
-                      <div className="flex flex-row mt-4">
-                        <div className="flex flex-col">
-                          <div className="text-primary-dark-blue base font-bold mr-5">Reserved Seats Value</div>
-                        </div>
-                        <TextInput
-                          className="w-[137px] h-[31px] flex flex-col -mt-1"
-                          placeholder="Enter Value"
-                          id="genSeatsReservedVal"
-                          value={currSalesFigureSet.general.seatsReservedVal}
-                          pattern={/^\d*(\.\d*)?$/}
-                          onChange={(event) => handleSalesFigChange('seatsReservedVal', 'general', event.target.value)}
-                          onBlur={(event) =>
-                            handleSalesFigChange('seatsReservedVal', 'general', formatDecimalOnBlur(event))
-                          }
-                        />
-                      </div>
+                    <div className="flex justify-around items-center col-span-5">
+                      <span className="w-[141px] text-end text-primary-dark-blue base font-bold">Seats Sold Value</span>
+                      <TextInput
+                        className="w-[137px]"
+                        placeholder="Enter Value"
+                        id="genSeatsSoldVal"
+                        value={currSalesFigureSet.general.seatsSoldVal}
+                        pattern={/^\d*(\.\d*)?$/}
+                        onChange={(event) => handleSalesFigChange('seatsSoldVal', 'general', event.target.value)}
+                        onBlur={(event) => handleSalesFigChange('seatsSoldVal', 'general', formatDecimalOnBlur(event))}
+                      />
                     </div>
-
-                    <div className="flex flex-col mt-4 justify-end">
-                      <div className="flex flex-col items-end">
-                        <Button
-                          className="w-[132px] flex flex-row mb-2"
-                          variant="primary"
-                          text="Update"
-                          onClick={handleUpdate}
-                        />
-                        <Button
-                          className="w-[211px] flex flex-row"
-                          variant="primary"
-                          text="Copy Previous Week's Sales"
-                          onClick={copyPreviousWeeks}
-                        />
-                      </div>
+                    <div className="flex items-center justify-end col-span-3">
+                      <Button
+                        className="w-[132px] flex flex-row"
+                        variant="primary"
+                        text="Update"
+                        onClick={handleUpdate}
+                      />
+                    </div>
+                    {/* Row2 */}
+                    <div className="flex justify-between items-center col-span-4">
+                      <span className="text-primary-dark-blue base font-bold">Reserved Seats</span>
+                      <TextInput
+                        className="w-[137px] h-[31px] flex flex-col -mt-1"
+                        placeholder="Enter Seats"
+                        id="genSeatsReserved"
+                        value={currSalesFigureSet.general.seatsReserved}
+                        pattern={decRegexLeadingZero}
+                        onChange={(event) => handleSalesFigChange('seatsReserved', 'general', event.target.value)}
+                      />
+                    </div>
+                    <div className="flex justify-around items-center col-span-5">
+                      <span className="w-[141px] text-primary-dark-blue base font-bold">Reserved Seats Value</span>
+                      <TextInput
+                        className="w-[137px]"
+                        placeholder="Enter Value"
+                        id="genSeatsSoldVal"
+                        value={currSalesFigureSet.general.seatsSoldVal}
+                        pattern={/^\d*(\.\d*)?$/}
+                        onChange={(event) => handleSalesFigChange('seatsSoldVal', 'general', event.target.value)}
+                        onBlur={(event) => handleSalesFigChange('seatsSoldVal', 'general', formatDecimalOnBlur(event))}
+                      />
+                    </div>
+                    <div className="flex items-center justify-end col-span-3">
+                      <Button
+                        className="w-[211px] flex flex-row"
+                        variant="primary"
+                        text="Copy Previous Week's Sales"
+                        onClick={copyPreviousWeeks}
+                      />
                     </div>
                   </div>
 
@@ -615,14 +596,12 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                       <div className="leading-6 text-xl text-primary-input-text font-bold mt-5 flex-row">Schools</div>
 
                       {schoolErrors && schoolErrors.length > 0 && (
-                        <div className="flex flex-row">
-                          <div className="leading-6 text-base text-primary-red font-bold mt-5">
-                            {schoolErrors.map((error, index) => (
-                              <div className="flex flex-row" key={index}>
-                                {error}
-                              </div>
-                            ))}
-                          </div>
+                        <div className="flex flex-row leading-6 text-base text-primary-red font-bold mt-5">
+                          {schoolErrors.map((error, index) => (
+                            <div className="flex flex-row" key={index}>
+                              {error}
+                            </div>
+                          ))}
                         </div>
                       )}
 
@@ -695,30 +674,25 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                           </div>
                         </div>
 
-                        <div className="flex flex-col mt-4 justify-end">
-                          <div className="flex flex-col items-end">
-                            <div className="flex flex-row mb-5">
-                              <div className="text-base text-primary-dark-blue font-bold flex flex-col mr-3">
-                                School Sales not required
-                              </div>
-                              <div className="flex flex-col">
-                                <Checkbox
-                                  id="schSalesNotRequired"
-                                  name="schSalesNotRequired"
-                                  checked={false}
-                                  onChange={() => editBooking('hasSchoolsSales', false)}
-                                  className="w-[19px] h-[19px]"
-                                />
-                              </div>
+                        <div className="flex items-center mt-2">
+                          <div className="flex flex-row">
+                            <div className="text-base text-primary-dark-blue font-bold flex flex-col mr-3">
+                              School Sales not required
                             </div>
-
-                            <Button
-                              className="w-[132px] flex flex-row"
-                              variant="secondary"
-                              text="Cancel"
-                              onClick={handleCancel}
+                            <Checkbox
+                              id="schSalesNotRequired"
+                              name="schSalesNotRequired"
+                              checked={false}
+                              onChange={() => editBooking('hasSchoolsSales', false)}
+                              className="w-[19px] h-[19px]"
                             />
                           </div>
+                          <Button
+                            className="w-[132px] flex flex-row"
+                            variant="secondary"
+                            text="Cancel"
+                            onClick={handleCancel}
+                          />
                         </div>
                       </div>
                     </div>
