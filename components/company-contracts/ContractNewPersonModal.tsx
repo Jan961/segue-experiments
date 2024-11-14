@@ -55,13 +55,7 @@ export const ContractNewPersonModal = ({
     }
   };
   return (
-    <PopupModal
-      show={openNewPersonContract}
-      title="Add New Person"
-      titleClass="text-xl text-primary-navy font-bold"
-      panelClass="h-[90vh]"
-      onClose={() => onClose?.()}
-    >
+    <PopupModal show={openNewPersonContract} title="Add New Person" onClose={() => onClose?.()}>
       <div className="flex flex-col h-full">
         <div className="flex-1 min-h-0">
           <PersonDetailsTab
