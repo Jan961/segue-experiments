@@ -41,18 +41,20 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextInputProps>(
     const baseClass = `block min-w-fit h-[1.9375rem] text-sm shadow-input-shadow text-primary-input-text rounded-md !border-primary-border outline-none focus:ring-2 focus:ring-primary-input-text ring-inset`;
     const disabledClass = disabled ? `disabled-input !cursor-not-allowed !pointer-events-none` : '';
 
+    const getRef = (node) => {
+      textAreaRef.current = node;
+      if (typeof ref === 'function') {
+        ref(node);
+      } else if (ref) {
+        (ref as React.MutableRefObject<HTMLTextAreaElement | null>).current = node;
+      }
+    };
+
     return (
       <div className="relative" onClick={onClick}>
         <textarea
           data-testid={testId || 'core-ui-lib-textarea'}
-          ref={(node) => {
-            textAreaRef.current = node;
-            if (typeof ref === 'function') {
-              ref(node);
-            } else if (ref) {
-              (ref as React.MutableRefObject<HTMLTextAreaElement | null>).current = node;
-            }
-          }}
+          ref={getRef}
           id={id}
           className={classNames(baseClass, disabledClass, className)}
           disabled={disabled}
