@@ -31,7 +31,7 @@ describe('ImagePreviewModal', () => {
   it('calls onClose when the overlay is clicked', () => {
     render(<ImagePreviewModal show={true} onClose={mockClose} imageUrl="https://example.com/test-image.jpg" />);
 
-    fireEvent.click(screen.getByTestId('overlay')); // Ensure your PopupModal has a testId on the overlay div
+    fireEvent.click(screen.getByTestId('popup-modal-wrapper')); // Ensure your PopupModal has a testId on the overlay div
     expect(mockClose).toHaveBeenCalled();
   });
 });
