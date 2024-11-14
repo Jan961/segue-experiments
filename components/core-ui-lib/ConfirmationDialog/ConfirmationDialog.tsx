@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Button from '../Button';
 import PopupModal from '../PopupModal';
+import classNames from 'classnames';
 
 export type ConfDialogVariant = 'close' | 'cancel' | 'delete' | 'logout' | 'leave' | 'return' | 'continue';
 
@@ -21,17 +22,17 @@ export enum ConfVariant {
 
 export interface ConfirmationDialogProps {
   children?: React.ReactNode;
-  show: boolean;
+  show?: boolean;
   onYesClick?: () => void;
   onNoClick?: () => void;
-  variant?: ConfDialogVariant;
+  variant: ConfDialogVariant;
   yesBtnClass: string;
   noBtnClass: string;
-  labelYes: string;
-  showNoButton: boolean;
+  labelYes?: string;
+  showNoButton?: boolean;
   labelNo?: string;
   hasOverlay?: boolean;
-  content?: ConfirmationDialogContent;
+  content: ConfirmationDialogContent;
   testId?: string;
 }
 
@@ -73,6 +74,8 @@ export default function ConfirmationDialog({
   labelYes = 'Yes',
   showNoButton = true,
   labelNo = 'No',
+  yesBtnClass,
+  noBtnClass,
   variant,
   hasOverlay = false,
   content,
@@ -106,7 +109,7 @@ export default function ConfirmationDialog({
           {showNoButton && (
             <Button
               testId="confirmation-dialog-no-btn"
-              className="w-32"
+              className={classNames('w-32', noBtnClass)}
               variant="secondary"
               text={labelNo}
               onClick={() => handleAction(false)}
@@ -114,7 +117,7 @@ export default function ConfirmationDialog({
           )}
           <Button
             testId="confirmation-dialog-yes-btn"
-            className="ml-4 w-32"
+            className={classNames('ml-4 w-32', yesBtnClass)}
             variant={variant === 'delete' ? 'tertiary' : 'primary'}
             text={labelYes}
             onClick={() => handleAction(true)}
