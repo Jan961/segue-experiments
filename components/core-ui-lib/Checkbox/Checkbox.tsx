@@ -61,13 +61,7 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
         />
 
         {label && (
-          <Label
-            data-testid={`${testId}-label`}
-            text={label}
-            className={labelClassName}
-            variant="sm"
-            required={required}
-          />
+          <Label testId={`${testId}-label`} text={label} className={labelClassName} variant="sm" required={required} />
         )}
 
         {showIntermediate && (
