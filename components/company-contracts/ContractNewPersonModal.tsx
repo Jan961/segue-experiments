@@ -1,4 +1,4 @@
-import { Button, notify } from 'components/core-ui-lib';
+import { Button, ConfirmationDialog, notify } from 'components/core-ui-lib';
 import PopupModal from 'components/core-ui-lib/PopupModal';
 import { PersonDetailsTab } from './edit-contract-modal/tabs/PersonDetailsTab';
 import { useState } from 'react';
@@ -7,6 +7,7 @@ import { createPersonSchema } from 'validators/person';
 import { debug } from 'utils/logging';
 import { IPerson } from 'components/contracts/types';
 import { ContractPermissionGroup } from 'interfaces';
+import { ConfVariant } from 'components/core-ui-lib/ConfirmationDialog/ConfirmationDialog';
 
 interface ContractNewPersonModalProps {
   openNewPersonContract: boolean;
@@ -20,6 +21,7 @@ export const ContractNewPersonModal = ({
   permissions,
 }: ContractNewPersonModalProps) => {
   const [formData, setFormData] = useState<Partial<IPerson>>({});
+  const [confirm, setConfirm] = useState<boolean>(false);
   const validateForm = async (data) => {
     try {
       await createPersonSchema.validate({ ...data }, { abortEarly: false });
@@ -29,7 +31,7 @@ export const ContractNewPersonModal = ({
       validationErrors.inner.forEach((error) => {
         errors[error.path] = error.message;
       });
-      debug('validationErrors:', errors);
+      debug('validationErrors:', errors, data);
       return { status: false, errors };
     }
   };
@@ -55,29 +57,39 @@ export const ContractNewPersonModal = ({
     }
   };
   return (
-    <PopupModal
-      show={openNewPersonContract}
-      title="Add New Person"
-      titleClass="text-xl text-primary-navy font-bold"
-      panelClass="h-[90vh]"
-      onClose={() => onClose?.()}
-    >
-      <div className="flex flex-col h-full">
-        <div className="flex-1 min-h-0">
-          <PersonDetailsTab
-            type="New"
-            updateFormData={setFormData}
-            permissions={permissions}
-            departmentId={0}
-            className="h-full overflow-y-auto pb-4"
-            height="100%"
-          />
+    <div>
+      <PopupModal
+        show={openNewPersonContract}
+        title="Add New Person"
+        titleClass="text-xl text-primary-navy font-bold"
+        panelClass="h-[90vh]"
+        onClose={() => onClose?.()}
+      >
+        <div className="flex flex-col h-full">
+          <div className="flex-1 min-h-0">
+            <PersonDetailsTab
+              type="New"
+              updateFormData={setFormData}
+              permissions={permissions}
+              departmentId={0}
+              className="h-full overflow-y-auto pb-4"
+              height="100%"
+            />
+          </div>
+          <div className="mt-4 flex justify-end items-center pt-4 bg-white">
+            <Button onClick={() => setConfirm(true)} className="w-33" variant="secondary" text="Cancel" />
+            <Button onClick={onSave} className="ml-4 w-33 px-6" variant="primary" text="Save and Return to Contracts" />
+          </div>
         </div>
-        <div className="mt-4 flex justify-end items-center pt-4 bg-white">
-          <Button onClick={() => onClose?.()} className="w-33" variant="secondary" text="Cancel" />
-          <Button onClick={onSave} className="ml-4 w-33 px-6" variant="primary" text="Save and Return to Contracts" />
-        </div>
-      </div>
-    </PopupModal>
+      </PopupModal>
+      <ConfirmationDialog
+        testId="creat-new-person-confirmation-dialog"
+        variant={ConfVariant.Cancel}
+        show={confirm}
+        onYesClick={onClose}
+        onNoClick={() => setConfirm(false)}
+        hasOverlay={false}
+      />
+    </div>
   );
 };

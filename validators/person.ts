@@ -224,22 +224,22 @@ export const createPersonSchema = yup.object().shape({
     .object()
     .shape({
       ...personShape,
-      firstName: yup.string().required(),
-      lastName: yup.string().required(),
+      firstName: yup.string().required('Person First name is required'),
+      lastName: yup.string().required('Person Last name is required'),
       otherWorkTypes: yup
         .array()
         .of(
-          yup.object({
-            name: yup.string().required('Name is required for other work types'),
-          }),
+          yup
+            .string()
+            .required('Name is required for other work types')
+            .max(30, 'Name must be at most 30 characters long'),
         )
-        .optional()
         .transform((value) => {
-          if (!value) return value;
-          return value.map((item) => item.name).filter((x) => x);
+          if (!Array.isArray(value)) return [];
+          return value.filter?.((item) => item?.name)?.map((item) => item.name);
         }),
     })
-    .required(),
+    .required('Person Details are required'),
   agencyDetails: yup.object().nullable(),
   emergencyContact1: createEmergencyContactShape(1),
   emergencyContact2: createEmergencyContactShape(2),
