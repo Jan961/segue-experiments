@@ -18,6 +18,7 @@ import {
   mapObjectValues,
   flattenHierarchicalOptions,
   tidyString,
+  replaceTemplateString,
 } from 'utils';
 
 describe('Tests for utility functions', () => {
@@ -661,5 +662,26 @@ describe('tidyString', () => {
 
   it('should return the original string if the value contains spaces', () => {
     expect(tidyString('   spaces   ')).toBe('   spaces   ');
+  });
+});
+
+describe('replaceTemplateString', () => {
+  it('should return an empty string if template is null', () => {
+    expect(replaceTemplateString(null, { NAME: 'John' }, null, null)).toBe('');
+  });
+
+  it('should return the template if data is null', () => {
+    expect(replaceTemplateString('This a [template]', null, null, null)).toBe('This a [template]');
+  });
+
+  it('should return Hello, John!', () => {
+    expect(replaceTemplateString('Hello, {name}!', { name: 'John' }, '{', '}')).toBe('Hello, John!');
+  });
+
+  it('should replace all instances of  [DB_NAME] by frtxigoo_dev', () => {
+    const template = 'CREATE DATABASE [DB_NAME] WHERE [DB_NAME] IS NOT NULL; RETURN [DB_NAME];';
+    const replacements = { DB_NAME: 'frtxigoo_dev' };
+    const result = replaceTemplateString(template, replacements, '[', ']');
+    expect(result.split('frtxigoo_dev').length).toBe(4);
   });
 });
