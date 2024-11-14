@@ -302,7 +302,7 @@ export default forwardRef(function Select(
         <WindowedSelect
           ref={ref}
           instanceId={useId()} // eslint-disable-line react-hooks/exhaustive-deps
-          className={`w-full ${disabled ? 'disabled-input' : ''}`}
+          className="w-full"
           onInputChange={(inputValue) => {
             if (inputValue) {
               setFilteredOptions(fuseFilter(options, inputValue, ['text']).reverse());
