@@ -14,7 +14,8 @@ import {
   WeekAggregates,
 } from 'types/SalesSummaryTypes';
 import { format, formatDuration, intervalToDuration, isBefore } from 'date-fns';
-import { formatDate, simpleToDate } from './dateService';
+import { formatDate, simpleToDateMDY } from './dateService';
+import { UTCDate } from '@date-fns/utc';
 
 export enum COLOR_HEXCODE {
   PURPLE = 'ff7030a0',
@@ -57,7 +58,7 @@ export const getMapKeyForValue = (
   }: Pick<TRequiredFieldsFinalFormat, 'FormattedSetProductionWeekNum' | 'SetProductionWeekDate'>,
 ): string => `${Week} | ${Town} | ${Venue} | ${setProductionWeekNumVar} | ${setProductionWeekDateVar}`;
 
-export const convertDateFormat = (date: Date) => {
+export const convertDateFormat = (date: UTCDate) => {
   const parsedDate = formatDate(date, 'dd/MM/yy');
   return parsedDate;
 };
@@ -118,12 +119,12 @@ export const assignBackgroundColor = ({
   }
 
   // if (moment(Date).valueOf() < (SetProductionWeekDate).valueOf()) {
-  if (isBefore(simpleToDate(Date), simpleToDate(SetProductionWeekDate))) {
+  if (isBefore(simpleToDateMDY(Date), simpleToDateMDY(SetProductionWeekDate))) {
     colorCell({ worksheet, row, col, argbColor: COLOR_HEXCODE.BLUE });
   }
 
   // if (NotOnSalesDate && moment(SetProductionWeekDate).valueOf() < moment(NotOnSalesDate).valueOf()) {
-  if (NotOnSalesDate && isBefore(simpleToDate(SetProductionWeekDate), simpleToDate(NotOnSalesDate))) {
+  if (NotOnSalesDate && isBefore(simpleToDateMDY(SetProductionWeekDate), simpleToDateMDY(NotOnSalesDate))) {
     colorCell({ worksheet, row, col, argbColor: COLOR_HEXCODE.RED });
   }
   if (BookingStatusCode === BOOK_STATUS_CODES.X) {

@@ -5,39 +5,169 @@ import {
   isBefore,
   isValid,
   format,
-  parseISO,
   isSameDay,
   addMinutes,
+  subDays,
+  addMonths,
 } from 'date-fns';
 import moment from 'moment';
 import { UTCDate } from '@date-fns/utc';
 
 // regex for dd/mm/yy
-export const DATE_PATTERN = /(\d{2}\/\d{2}\/\d{2})/;
+export const DATE_PATTERNS = {
+  shortSlash: /(\d{2}\/\d{2}\/\d{2})/,
+  longSlash: /(\d{2}\/\d{2}\/\d{4})/,
+  shortDash: /\d{2}-\d{2}-\d{2}/,
+  longDash: /\d{2}-\d{2}-\d{4}/,
+  utcSlash: /(\d{4}\/\d{2}\/\d{2})/,
+  utcDash: /\d{4}-\d{2}-\d{2}/,
+};
+const YEAR_CONSTANT = 2000;
+type Locale = 'UK' | 'US';
 
-// returns a date if the date is valid or the date string is valid
-export const safeDate = (date: UTCDate | string): UTCDate => {
+// Disect the time string into hours, minutes and seconds
+const disectTime = (time: string) => {
+  if (!time) {
+    return { h: 0, m: 0, s: 0 };
+  }
+  const t = time.split(':');
+  const s = t[2].includes('.') ? t[2].split('.') : t[2];
+  return { h: Number(t[0]), m: Number(t[1]), s: Number(s[0].includes('z') ? s[0].slice(0, 1) : s[0]) };
+};
+
+// Function to create a new date, optional for a date string with a locale
+export const newDate = (date?: string, locale?: Locale): UTCDate => {
+  if (!date) {
+    return new UTCDate();
+  }
+  const d = date.split('T');
+  if (locale && !(date.match(DATE_PATTERNS.utcDash) || date.match(DATE_PATTERNS.utcSlash))) {
+    switch (locale) {
+      case 'US':
+        return getUTCFromUSDateString(date);
+      case 'UK':
+        return getUTCFromUKDateString(date);
+      default:
+        return null;
+    }
+  } else {
+    if (d[0].match(DATE_PATTERNS.utcSlash)) {
+      const split = d[0].split('/');
+      const time = disectTime(d[1]);
+      return new UTCDate(Number(split[0]), Number(split[1]) - 1, Number(split[2]), time.h, time.m, time.s);
+    }
+    if (d[0].match(DATE_PATTERNS.utcDash)) {
+      const split = d[0].split('-');
+      const time = disectTime(d[1]);
+      return new UTCDate(Number(split[0]), Number(split[1]) - 1, Number(split[2]), time.h, time.m, time.s);
+    }
+  }
+  return null;
+};
+
+// Return a UTCDate object from a UK datestring
+export const getUTCFromUKDateString = (date: string) => {
   if (!date) {
     return null;
   }
+  const d = date.split('T');
+  const time = disectTime(d[1]);
+  if (d[0].match(DATE_PATTERNS.longSlash)) {
+    const split = d[0].split('/');
+    return new UTCDate(Number(split[2]), Number(split[1]) - 1, Number(split[0]), time.h, time.m, time.s);
+  }
+  if (d[0].match(DATE_PATTERNS.longDash)) {
+    const split = d[0].split('-');
+    return new UTCDate(Number(split[2]), Number(split[1]) - 1, Number(split[0]), time.h, time.m, time.s);
+  }
+  if (d[0].match(DATE_PATTERNS.shortSlash)) {
+    const split = d[0].split('/');
+    return new UTCDate(
+      YEAR_CONSTANT + Number(split[2]),
+      Number(split[1]) - 1,
+      Number(split[0]),
+      time.h,
+      time.m,
+      time.s,
+    );
+  }
+  if (d[0].match(DATE_PATTERNS.shortDash)) {
+    const split = d[0].split('-');
+    return new UTCDate(
+      YEAR_CONSTANT + Number(split[2]),
+      Number(split[1]) - 1,
+      Number(split[0]),
+      time.h,
+      time.m,
+      time.s,
+    );
+  }
+  return null;
+};
+
+// Return a UTCDate object from a US datestring
+export const getUTCFromUSDateString = (date: string) => {
+  if (!date) {
+    return null;
+  }
+  const d = date.split('T');
+  const time = disectTime(d[1]);
+  if (d[0].match(DATE_PATTERNS.longSlash)) {
+    const split = d[0].split('/');
+    return new UTCDate(Number(split[2]), Number(split[0]) - 1, Number(split[1]), time.h, time.m, time.s);
+  }
+  if (d[0].match(DATE_PATTERNS.longDash)) {
+    const split = d[0].split('-');
+    return new UTCDate(Number(split[2]), Number(split[0]) - 1, Number(split[1]), time.h, time.m, time.s);
+  }
+  if (d[0].match(DATE_PATTERNS.shortSlash)) {
+    const split = d[0].split('/');
+    return new UTCDate(
+      YEAR_CONSTANT + Number(split[2]),
+      Number(split[0]) - 1,
+      Number(split[1]),
+      time.h,
+      time.m,
+      time.s,
+    );
+  }
+  if (d[0].match(DATE_PATTERNS.shortDash)) {
+    const split = d[0].split('-');
+    return new UTCDate(
+      YEAR_CONSTANT + Number(split[2]),
+      Number(split[0]) - 1,
+      Number(split[1]),
+      time.h,
+      time.m,
+      time.s,
+    );
+  }
+  return null;
+};
+
+// returns a date if the date is valid or the date string is valid
+export const safeDate = (date: UTCDate | string, locale?: Locale): UTCDate => {
+  if (!date) {
+    return newDate();
+  }
   if (typeof date === 'string') {
-    const d = new UTCDate(date);
+    const d = newDate(date, locale);
     return isValid(d) ? d : null;
   }
   return isValid(date) ? date : null;
 };
 
 // returns yyyy-mm-dd of a valid date string format yyyy-mm-ddT00:00:00Z | yyyy-mm-dd
-export const getKey = (date: string | UTCDate): string => {
+export const getKey = (date: string | UTCDate, locale?: Locale): string => {
   if (!date) {
     return null;
   }
-  const d = safeDate(date);
+  const d = safeDate(date, locale);
   return d ? d.toISOString().split('T')[0] : null;
 };
 
 // return ?
-export const dateStringToPerformancePair = (dateString: string) => {
+export const dateStringToPerformancePair = (dateString: string, locale?: Locale) => {
   if (!dateString) {
     return null;
   }
@@ -46,8 +176,8 @@ export const dateStringToPerformancePair = (dateString: string) => {
   const timePart = split[1];
 
   const defaultDatePart = '1970-01-01';
-  const time = safeDate(`${defaultDatePart}T${timePart}Z`);
-  const date = safeDate(`${datePart}`);
+  const time = safeDate(`${defaultDatePart}T${timePart}Z`, locale);
+  const date = safeDate(`${datePart}`, locale);
 
   return {
     Time: isValid(time) ? time : null,
@@ -55,29 +185,42 @@ export const dateStringToPerformancePair = (dateString: string) => {
   };
 };
 
-// returns a date based on a date string of format mm/dd/yy
-export const simpleToDate = (date: string): UTCDate => {
+// returns a date based on a date string of format mm-dd-yy
+export const simpleToDateMDY = (date: string) => {
   if (!date) {
     return null;
   }
-  const parts = date?.split?.('/');
-  return parts.length > 2 ? new UTCDate(Number(`20${parts[2]}`), Number(Number(parts[0]) - 1), Number(parts[1])) : null;
+  if (date.includes('/')) {
+    const [month, day, year] = date.split('/').map(Number);
+    const d = safeDate(`${year + 2000}-${month}-${day}`, 'US');
+    return isValid(d) ? d : null;
+  } else if (date.includes('-')) {
+    const [month, day, year] = date.split('-').map(Number);
+    const d = safeDate(`${year + 2000}-${month}-${day}`, 'US');
+    return isValid(d) ? d : null;
+  } else return new UTCDate();
 };
 
-// returns a date based on a date string of format dd/mm/yy
+// returns a date based on a date string of format dd-mm-yy
 export const simpleToDateDMY = (date: string): UTCDate => {
   if (!date) {
     return null;
   }
-  const [day, month, year] = date.split('/').map(Number);
-  const d = safeDate(`${year + 2000}-${month}-${day}`);
-  return isValid(d) ? d : null;
+  if (date.includes('/')) {
+    const [day, month, year] = date.split('/').map(Number);
+    const d = safeDate(`${year + 2000}-${month}-${day}`, 'UK');
+    return isValid(d) ? d : null;
+  } else if (date.includes('-')) {
+    const [day, month, year] = date.split('-').map(Number);
+    const d = safeDate(`${year + 2000}-${month}-${day}`, 'UK');
+    return isValid(d) ? d : null;
+  } else return new UTCDate();
 };
 
-// returns a string or date in the form of mm/dd/yy
-export const dateToSimple = (dateToFormat: UTCDate | string): string => {
+// returns a string or date in the form of dd/mm/yy
+export const dateToSimple = (dateToFormat: UTCDate | string, locale?: Locale) => {
   if (!dateToFormat) return null;
-  const date = safeDate(dateToFormat);
+  const date = safeDate(dateToFormat, locale);
   const options: Intl.DateTimeFormatOptions = {
     year: '2-digit',
     day: '2-digit',
@@ -87,8 +230,8 @@ export const dateToSimple = (dateToFormat: UTCDate | string): string => {
   return date ? date.toLocaleDateString('en-GB', options) : null;
 };
 
-// returns a datestring with the day format ????
-export const formattedDateWithDay = (date: Date) => {
+// DEPRECATED
+export const formattedDateWithDay = (date: UTCDate) => {
   if (!date) return '';
   const dateFormat = 'EEE/MM/yy';
   return format(date, dateFormat);
@@ -111,48 +254,111 @@ export const dateToPicker = (dateToFormat: Date | string) => {
   return dateToFormat;
 };
 
-// returns the time of a date in hours and minutes
-export const dateTimeToTime = (dateToFormat: string | UTCDate) => {
-  if (!dateToFormat) {
+/**
+ * Return the time component of a date.
+ *
+ * @param {UTCDate | string} date - The date to get the time value from.
+ * @param {Locale} locale - The locale value of the inputted date.
+ * @returns {string} Returns the time value of the inputted date.
+ */
+export const dateTimeToTime = (date: string | UTCDate, locale?: Locale): string => {
+  if (!date) {
     return null;
   }
-  const date = new UTCDate(dateToFormat);
-  return isValid(date) ? format(date, 'HH:mm') : null;
+  const newDate = safeDate(date, locale);
+  return isValid(newDate) ? format(newDate, 'HH:mm') : null;
 };
 
-// returns the ISO string of a date
-export const toISO = (date: UTCDate) => {
+/**
+ * Return the ISO value of a date.
+ *
+ * @param {UTCDate} date - The date to return ISO format of.
+ * @returns {UTCDate} Returns the ISO formate of inputted date.
+ */
+export const toISO = (date: UTCDate): string => {
   return date.toISOString();
 };
 
-export const getDateDaysAgo = (date: Date, daysToSubtract: number) => {
-  date = new Date(date);
-  return moment(date, 'dd/mm/yyyy').subtract(daysToSubtract, 'days');
+/**
+ * Return a date with x days difference.
+ *
+ * @param {UTCDate | string} date - The date to format.
+ * @param {number} days - The number of days between the dates.
+ * @param {Locale} locale - The locale value of the inputted date.
+ * @returns {UTCDate} Returns the date x days away from the inputted date.
+ */
+export const getDateDaysAway = (date: UTCDate | string, days: number, locale?: Locale): UTCDate => {
+  if (!date) {
+    return null;
+  }
+  const d = safeDate(date, locale);
+  return new UTCDate(subDays(d, days));
 };
 
-export const getWeekDay = (dateToFormat: UTCDate | string) => {
-  const date = safeDate(dateToFormat);
-  return date.toLocaleDateString('UTC', { weekday: 'long' });
+// DEPRECATED
+export const getDateDaysAgo = (date: UTCDate | string, days: number, locale?: Locale): UTCDate => {
+  if (!date) {
+    return null;
+  }
+  const d = safeDate(date, locale);
+  return new UTCDate(subDays(d, days));
 };
 
-export const getShortWeekFormat = (dateToFormat: Date | string) => {
-  const weekdayName = moment(dateToFormat).format('ddd');
-  return weekdayName;
+/**
+ * Return a day string formatted with the day in either short or long form.
+ *
+ * @param {UTCDate | string} dateToFormat - The date to format.
+ * @param {'Long' | 'Short'} format - Decide if the date should be formatted Long or Short.
+ * @param {Locale} locale - The locale value of the inputted date.
+ * @returns {string} Returns the day string formatted either Long or Short depending on input.
+ */
+export const getWeekDay = (dateToFormat: UTCDate | string, format: 'long' | 'short', locale?: Locale): string => {
+  if (!dateToFormat) {
+    return null;
+  }
+  const date = safeDate(dateToFormat, locale);
+  return date.toLocaleDateString('UTC', { weekday: format });
 };
 
-export const getWeekDayShort = (dateToFormat: UTCDate | string) => {
-  const date = safeDate(dateToFormat);
-  return date.toLocaleDateString('en-US', { weekday: 'short' });
+// DEPRECATED
+export const getWeekDayShort = (dateToFormat: UTCDate | string, locale?: Locale) => {
+  if (!dateToFormat) {
+    return null;
+  }
+  const date = safeDate(dateToFormat, locale);
+  return date.toLocaleDateString('UTC', { weekday: 'short' });
 };
 
-export const formattedDateWithWeekDay = (dateToFormat: Date | string, weekDayFormat: 'Long' | 'Short') => {
-  if (!dateToFormat) return '';
-  const shortFormat = 'ddd DD/MM/YY';
-  const longFormat = 'dddd DD/MM/YYYY';
-  return moment(dateToFormat).format(weekDayFormat === 'Long' ? longFormat : shortFormat);
+/**
+ * Return a date string formatted with the day in either short or long form.
+ *
+ * @param {UTCDate | string} dateToFormat - The date to format.
+ * @param {'Long' | 'Short'} weekDayFormat - Decide if the date should be formatted Long or Short.
+ * @param {Locale} locale - The locale value of the inputted date.
+ * @returns {string} Returns a date string formatted either Long or Short depending on input.
+ */
+export const formattedDateWithWeekDay = (
+  dateToFormat: UTCDate | string,
+  weekDayFormat: 'Long' | 'Short',
+  locale?: Locale,
+): string => {
+  if (!dateToFormat) {
+    return null;
+  }
+  const shortFormat = 'EEE dd/MM/yy';
+  const longFormat = 'EEEE dd/MM/yyyy';
+  const date = safeDate(dateToFormat, locale);
+  return format(date, weekDayFormat === 'Long' ? longFormat : shortFormat);
 };
 
-export const calculateWeekNumber = (productionStart: Date, dateToNumber: Date): number => {
+/**
+ * Returns the number of weeks passed from productionStart to dateToNumber.
+ *
+ * @param {UTCDate | string} productionStart - The date to calculate from.
+ * @param {UTCDate | string} dateToNumber - The date to calculate to.
+ * @returns {number} Returns the number of weeks passed.
+ */
+export const calculateWeekNumber = (productionStart: UTCDate, dateToNumber: UTCDate): number => {
   const weekOneStart = startOfWeek(productionStart, { weekStartsOn: 1 });
   let weekNumber = differenceInWeeks(dateToNumber, weekOneStart);
 
@@ -166,27 +372,66 @@ export const calculateWeekNumber = (productionStart: Date, dateToNumber: Date): 
   return weekNumber;
 };
 
-export const addOneMonth = (date: Date) => {
-  const newDate = new Date(date);
-  newDate.setMonth(newDate.getMonth() + 1);
-  return newDate;
+/**
+ * Returns a date 1 month after the given date.
+ *
+ * @param {UTCDate | string} date - The date to add 1 month to.
+ * @param {Locale?} locale - The locale value of the inputted date.
+ * @returns {UTCDate} Returns a date object 1 month after inputted date.
+ */
+export const addOneMonth = (date: UTCDate | string, locale?: Locale): UTCDate => {
+  if (!date) {
+    return null;
+  }
+  const newDate = safeDate(date, locale);
+  return new UTCDate(addMonths(newDate, 1));
 };
 
-export const timeFormat = (mins?: number) => {
-  if (!mins) return '';
+/**
+ * Format a given number into 'HH:mm'.
+ *
+ * @param {number} mins - The date of the week to get the Monday of.
+ * @returns {string} Returns the monday date object on the week of the inputted date.
+ */
+export const timeFormat = (mins?: number): string => {
+  if (!mins || mins < -1440 || mins > 1440) {
+    return null;
+  }
   return `${Math.floor(mins / 60)}:${String(mins % 60).padStart(2, '0')}`;
 };
 
-export const formatShortDateUK = (date: Date | string) => {
-  return format(new Date(date), 'dd/MM/yy');
+/**
+ * Formats a given date into short form in UK locale.
+ *
+ * @param {UTCDate | string} date - The date to format.
+ * @param {Locale?} locale - The locale value of the inputted date.
+ * @returns {string} Returns the date formatted to short form in UK locale.
+ */
+export const formatShortDateUK = (date: UTCDate | string, locale?: Locale): string => {
+  if (!date) {
+    return null;
+  }
+  const newDate = safeDate(date, locale);
+  return format(newDate, 'dd/MM/yy');
 };
 
-export const getMonday = (inputDate: Date | string) => {
-  const currentDateObj = new Date(inputDate);
+/**
+ * Get the monday of the given dates week.
+ *
+ * @param {UTCDate | string} inputDate - The date of the week to get the Monday of.
+ * @param {Locale?} locale - The locale value of the inputted date.
+ * @returns {UTCDate} Returns the monday date object on the week of the inputted date.
+ */
+export const getMonday = (inputDate: UTCDate | string, locale?: Locale): UTCDate => {
+  if (!inputDate) {
+    return null;
+  }
+  const currentDateObj = safeDate(inputDate, locale);
   currentDateObj.setDate(currentDateObj.getDate() - ((currentDateObj.getDay() + 6) % 7));
   return currentDateObj;
 };
 
+// ??
 export const getWeeksBetweenDates = (startDate: string, endDate: string) => {
   const currentSunday = moment.utc(startDate).startOf('isoWeek').subtract(1, 'day').set('hour', 0);
   const end = moment.utc(endDate);
@@ -204,12 +449,7 @@ export const getWeeksBetweenDates = (startDate: string, endDate: string) => {
   return weeks;
 };
 
-/**
- * Extracts the time (hours and minutes) from a given date and time string in UTC format.
- *
- * @param {string | Date} inputDate - The input date and time string.
- * @returns {string} The formatted time string in 'HH:mm' format, or an empty string if the input is invalid.
- */
+// DEPRECATED
 export const getTimeFromDateAndTime = (inputDate: string | Date): string => {
   const date = new Date(inputDate);
 
@@ -224,8 +464,15 @@ export const getTimeFromDateAndTime = (inputDate: string | Date): string => {
   return `${hours}:${minutes}`;
 };
 
-export const toSql = (date: string) => {
-  return new Date(date).toISOString()?.split?.('T')?.[0];
+/**
+ * Get date in format yyyy-mm-dd.
+ *
+ * @param {UTCDate | string} date - The date to convert to sql.
+ * @param {Locale?} locale - The locale value of the inputted date.
+ * @returns {string} Returns the date in the format yyyy-mm-dd.
+ */
+export const toSql = (date: string | UTCDate, locale?: Locale): string => {
+  return safeDate(date, locale).toISOString()?.split?.('T')?.[0];
 };
 
 export function getDuration(upTime: string, downTime: string): number {
@@ -238,6 +485,7 @@ export function getDuration(upTime: string, downTime: string): number {
   return diff;
 }
 
+// DEPRECATED
 export function formatDuration(
   duration: number,
   options?: {
@@ -258,16 +506,19 @@ export function formatDuration(
   }
 }
 
+// DEPRECATED
 export const isValidDate = (date?: Date | string | number | null) => {
   if (date === null || typeof date === 'boolean') return false;
   const d = new Date(date);
   return d instanceof Date && !isNaN(d.getTime());
 };
 
+// ??
 export const checkDateOverlap = (start1: Date, end1: Date, start2: Date, end2: Date): boolean => {
   return !((start1 < start2 && end1 < start2) || (start1 > end2 && end2 > end1));
 };
 
+// ??
 export const getArrayOfDatesBetween = (start: string, end: string) => {
   const arr = [];
   if (!isValid(new Date(start)) || !isValid(new Date(end))) {
@@ -276,19 +527,10 @@ export const getArrayOfDatesBetween = (start: string, end: string) => {
   for (let dt = moment.utc(start); dt <= moment.utc(end); dt = dt.add(1, 'days')) {
     arr.push(dt.toISOString());
   }
-  return arr.map(getKey);
+  return arr.map((x) => getKey(x));
 };
 
-/**
- *
- * @param {Date} inputDate // the date to add/subtract from
- * @param {number} duration // number of days to add/subtract
- * @param {boolean} add // controls whether days are added or subtracted - if true days are added
- * @returns
- *
- * This function is used to add / subtract days from thr supplied starting date
- *
- */
+// DEPRECATED
 export function addDurationToDate(inputDate: Date, duration: number, add: boolean) {
   const startingDate = new Date(inputDate.getTime());
   if (add) {
@@ -299,6 +541,7 @@ export function addDurationToDate(inputDate: Date, duration: number, add: boolea
   return startingDate;
 }
 
+// DEPRECATED
 export const formatDateWithTimezoneOffset = ({
   date,
   dateFormat = 'DD/MM/YY',
@@ -314,13 +557,7 @@ export const formatDateWithTimezoneOffset = ({
   return moment(date).utcOffset(-timezoneOffset).format(dateFormat);
 };
 
-/**
- *
- * Used to apply the timezone offset to the date supplied and return it in the same format
- *
- * @param date // date in which the offset should be applied to
- * @returns // date in JS date format
- */
+// DEPRECATED
 export const getDateWithOffset = (date: Date) => {
   const timezoneOffset = getTimezonOffset();
   const dateWithOffset = addMinutes(date, -timezoneOffset);
@@ -328,57 +565,33 @@ export const getDateWithOffset = (date: Date) => {
   return dateWithOffset;
 };
 
+// DEPRECATED
 export const dateToTimeString = (dateStr) => {
   const date = moment(dateStr);
   return date.format('HH:mm');
 };
 
+// DEPRECATED
 export const getTimezonOffset = () => {
   return new Date().getTimezoneOffset();
 };
 
 /**
- * Formats a date according to the specified format.
+ * Format a date.
  *
- * @param {Date | number | string} date - The date to format.
- * @param {string} dateFormat - The format string.
- * @returns {string} The formatted date.
+ * @param {UTCDate | string} date - The date to format.
+ * @param {string} dateFormat - The value of the format for the date.
+ * @returns {UTCDate} Returns formatted string of the date.
  */
-export const formatDate = (date: Date | number | string, dateFormat: string): string => {
-  let parsedDate: number | Date;
-
-  if (date instanceof Date) {
-    // If date is already a Date object, use it directly
-    parsedDate = date;
-  } else if (typeof date === 'number') {
-    // If date is a timestamp, convert it to a Date object
-    parsedDate = new Date(date);
-  } else if (typeof date === 'string') {
-    // If date is a string, try to parse it as an ISO string first
-    parsedDate = parseISO(date);
-
-    // If parsing as ISO fails, try to parse it using the default parser
-    if (!isValid(parsedDate)) {
-      parsedDate = new Date(date);
-      console.log('parsedDate', parsedDate);
-    }
-  } else {
-    return '';
+export const formatDate = (date: UTCDate | string, dateFormat: string): string => {
+  if (!date) {
+    return null;
   }
-
-  if (!isValid(parsedDate)) {
-    return '';
-  }
-
-  return format(parsedDate, dateFormat);
+  const newDate = safeDate(date);
+  return format(newDate, dateFormat);
 };
 
-/**
- * Convert a date or time to UTC and format it to 'HH:mm'.
- *
- * @param {Date | number | string} time - The time to format.
- * @returns {string} The formatted time in 'HH:mm' UTC.
- */
+// DEPRECATED
 export const formatUtcTime = (time) => {
   // Convert time to a Date object
   const date = new Date(time);
@@ -391,13 +604,7 @@ export const formatUtcTime = (time) => {
   return `${String(utcHours).padStart(2, '0')}:${String(utcMinutes).padStart(2, '0')}`;
 };
 
-/**
- * Converts the input (Date, number, or string) to a Date object.
- * Returns null if the input is invalid.
- *
- * @param {Date | number | string} date - The date input to convert.
- * @returns {Date | null} The corresponding Date object or null if the input is invalid.
- */
+// DEPRECATED
 export const getDateObject = (date: Date | number | string): Date | null => {
   if (date instanceof Date) {
     // If the input is already a Date object, return it
@@ -421,20 +628,15 @@ export const getDateObject = (date: Date | number | string): Date | null => {
 /**
  * Compare if two dates are the same.
  *
- * @param {Date | number | string} date1 - The first date.
- * @param {Date | number | string} date2 - The second date.
+ * @param {Date | string} date1 - The first date.
+ * @param {Date | string} date2 - The second date.
  * @returns {boolean} Returns true if the two dates are the same day, otherwise false.
  */
-export const areDatesSame = (date1: Date | number | string, date2: Date | number | string): boolean => {
-  return isSameDay(getDateObject(date1), getDateObject(date2));
+export const areDatesSame = (date1: UTCDate | string, date2: UTCDate | string): boolean => {
+  return isSameDay(safeDate(date1), safeDate(date2));
 };
 
-/**
- * Converts mins to HH:mm
- *
- * @param timeInMins
- * @returns
- */
+// DEPRECATED
 export const convertMinutesToHoursMins = (timeInMins: number) => {
   const hours = Math.floor(timeInMins / 60);
   const minutes = timeInMins % 60;
@@ -445,37 +647,34 @@ type ComparisonOperator = '<' | '<=' | '>' | '>=' | '==' | '!=';
 /**
  * Compares two dates without considering the time component.
  *
- * @param {Date | string | number} date1 - The first date to compare. Can be a Date object, a date string, or a timestamp.
- * @param {Date | string | number} date2 - The second date to compare. Can be a Date object, a date string, or a timestamp.
+ * @param {UTCDate | string} date1 - The first date to compare. Can be a Date object, a date string, or a timestamp.
+ * @param {UTCDate | string} date2 - The second date to compare. Can be a Date object, a date string, or a timestamp.
  * @param {ComparisonOperator} operator - The comparison operator to use ('<', '<=', '>', '>=', '==', '!=').
  * @returns {boolean} - The result of the comparison.
  *
  * @throws {Error} - Throws an error if an unsupported comparison operator is provided.
  */
 export const compareDatesWithoutTime = (
-  date1: Date | string | number,
-  date2: Date | string | number,
+  date1: UTCDate | string,
+  date2: UTCDate | string,
   operator: ComparisonOperator,
 ): boolean => {
-  const d1 = new Date(date1);
-  const d2 = new Date(date2);
-
-  const normalizedD1 = new Date(d1.getFullYear(), d1.getMonth(), d1.getDate());
-  const normalizedD2 = new Date(d2.getFullYear(), d2.getMonth(), d2.getDate());
+  const d1 = safeDate(date1);
+  const d2 = safeDate(date2);
 
   switch (operator) {
     case '<':
-      return normalizedD1 < normalizedD2;
+      return d1 < d2;
     case '<=':
-      return normalizedD1 <= normalizedD2;
+      return d1 <= d2;
     case '>':
-      return normalizedD1 > normalizedD2;
+      return d1 > d2;
     case '>=':
-      return normalizedD1 >= normalizedD2;
+      return d1 >= d2;
     case '==':
-      return normalizedD1.getTime() === normalizedD2.getTime();
+      return d1 === d2;
     case '!=':
-      return normalizedD1.getTime() !== normalizedD2.getTime();
+      return d1 !== d2;
     default:
       return false;
   }
