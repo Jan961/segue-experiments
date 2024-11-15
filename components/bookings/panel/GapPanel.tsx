@@ -1,6 +1,6 @@
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 import { FormInputButton } from 'components/global/forms/FormInputButton';
-import React from 'react';
 import { useRecoilValue } from 'recoil';
 import { viewState } from 'state/booking/viewState';
 import { bookingState } from 'state/booking/bookingState';
@@ -8,7 +8,11 @@ import { FormInputSelect, SelectOption } from 'components/global/forms/FormInput
 import { venueState } from 'state/booking/venueState';
 import { findPrevAndNextBookings } from './utils/findPrevAndNextBooking';
 import { debounce } from 'radash';
-import { GapSuggestionReponse, GapSuggestionUnbalancedProps, VenueWithDistance } from 'pages/api/venue/read/distance';
+import {
+  GapSuggestionResponse,
+  GapSuggestionUnbalancedProps,
+  VenueWithDistance,
+} from 'services/booking/gapSuggestion/types';
 import { timeFormat } from 'services/dateService';
 import { Spinner } from 'components/global/Spinner';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -46,13 +50,13 @@ export const GapPanel = ({ finish, setGapVenueIds }: GapPanelProps) => {
   const { selectedDate } = useRecoilValue(viewState);
   const venueDict = useRecoilValue(venueState);
   const bookingDict = useRecoilValue(bookingState);
-  const [results, setResults] = React.useState<GapSuggestionReponse>(undefined);
-  const [refreshing, setRefreshing] = React.useState(false);
-  const [sliderActive, setSlidersActive] = React.useState(false);
+  const [results, setResults] = useState<GapSuggestionResponse>(null);
+  const [refreshing, setRefreshing] = useState(false);
+  const [sliderActive, setSlidersActive] = useState(false);
   const { nextBookings, prevBookings } = findPrevAndNextBookings(bookingDict, selectedDate, selectedDate);
   const startVIds = prevBookings.map((id) => bookingDict[id].VenueId);
   const endVIds = nextBookings.map((id) => bookingDict[id].VenueId);
-  const [sliderMax, setSliderMax] = React.useState<number>(undefined);
+  const [sliderMax, setSliderMax] = useState<number>(null);
 
   const startDropDown = startVIds.map(
     (vId): SelectOption => ({
@@ -68,7 +72,7 @@ export const GapPanel = ({ finish, setGapVenueIds }: GapPanelProps) => {
     }),
   );
 
-  const [inputs, setInputs] = React.useState({
+  const [inputs, setInputs] = useState({
     From: [25, 200] as [number, number],
     To: [25, 200] as [number, number],
     VenueId: 0,
@@ -78,7 +82,7 @@ export const GapPanel = ({ finish, setGapVenueIds }: GapPanelProps) => {
     MinSeats: 0,
   });
 
-  const [venueInputs, setVenueInputs] = React.useState({
+  const [venueInputs, setVenueInputs] = useState({
     StartVenue: Number(startDropDown[0]?.value),
     EndVenue: Number(endDropDown[0]?.value),
   });
@@ -87,7 +91,7 @@ export const GapPanel = ({ finish, setGapVenueIds }: GapPanelProps) => {
     setGapVenueIds(results.VenueInfo);
   };
 
-  const search = React.useCallback(async (inputs: any) => {
+  const search = useCallback(async (inputs: any) => {
     const body: GapSuggestionUnbalancedProps = {
       ...inputs,
       StartVenue: inputs.StartVenue,
@@ -99,12 +103,12 @@ export const GapPanel = ({ finish, setGapVenueIds }: GapPanelProps) => {
       ExcludeLondonVenues: inputs.ExcludeLondonVenues,
       MinSeats: inputs.MinSeats,
     };
-    const { data } = await axios.post<GapSuggestionReponse>('/api/venue/read/distance', body);
+    const { data } = await axios.post<GapSuggestionResponse>('/api/venue/read/distance', body);
     setResults(data);
     setRefreshing(false);
   }, []);
 
-  const debouncedSearch = React.useMemo(
+  const debouncedSearch = useMemo(
     () =>
       debounce({ delay: 500 }, (inputs) => {
         search(inputs);
@@ -112,11 +116,11 @@ export const GapPanel = ({ finish, setGapVenueIds }: GapPanelProps) => {
     [search],
   );
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (refreshing) debouncedSearch(inputs);
   }, [inputs, debouncedSearch, refreshing]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const intitalSearch = async (initialInputs) => {
       setResults(undefined);
 
@@ -125,7 +129,7 @@ export const GapPanel = ({ finish, setGapVenueIds }: GapPanelProps) => {
         EndVenue: venueInputs.EndVenue,
       };
 
-      const { data } = await axios.post<GapSuggestionReponse>('/api/venue/read/distance', body);
+      const { data } = await axios.post<GapSuggestionResponse>('/api/venue/read/distance', body);
 
       const { DefaultMin, SliderMax } = data;
 
