@@ -5,7 +5,7 @@ import { COLOR_HEXCODE } from 'services/salesSummaryService';
 import { ALIGNMENT, alignCellText, styleHeader } from './masterplan';
 import { getExportedAtTitle } from 'utils/export';
 import { currencyCodeToSymbolMap } from 'config/Reports';
-import { convertToPDF } from 'utils/report';
+import { calculateRemainingDaysInWeek, convertToPDF } from 'utils/report';
 import { BOOK_STATUS_CODES, SALES_TYPE_NAME } from 'types/MarketingTypes';
 import { calculateWeekNumber, formatDate, getDateObject, getDifferenceInDays } from 'services/dateService';
 import { SCHEDULE_VIEW } from 'services/reports/schedule-report';
@@ -145,7 +145,7 @@ const handler = async (req, res) => {
       pageSetup: { fitToPage: true, fitToHeight: 5, fitToWidth: 7 },
     });
 
-    if (!formattedData?.length) {
+    if (!schedule?.length) {
       res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
       res.setHeader('Content-Disposition', `attachment; filename="${filename}.xlsx"`);
 
@@ -155,7 +155,7 @@ const handler = async (req, res) => {
       return;
     }
 
-    const { FullProductionCode = '', ShowName = '' } = data?.[0] || {};
+    const { FullProductionCode = '', ShowName = '' } = schedule?.[0] || {};
     filename = `${FullProductionCode} ${ShowName} Gross Sales`;
     worksheet.addRow([`${filename}`]);
     const exportedAtTitle = getExportedAtTitle(timezoneOffset);
@@ -168,12 +168,12 @@ const handler = async (req, res) => {
       (acc, x) => ({ ...acc, [getKey(x)]: x }),
       {},
     );
-    const { ProductionStartDate: fromDate, ProductionEndDate: toDate } = data[0];
+    const { ProductionStartDate: fromDate, ProductionEndDate: toDate } = schedule?.[0] || {};
 
-    const daysDiff = getDifferenceInDays(fromDate?.toISOString(), toDate?.toISOString());
+    // +1 is for including the endDate
+    const daysDiff = getDifferenceInDays(fromDate?.toISOString(), toDate?.toISOString()) + 1;
 
     let colNo = 1;
-    let weekPending = false;
     let conversionRate = 0;
 
     const r4: string[] = [];
@@ -192,28 +192,40 @@ const handler = async (req, res) => {
     }[] = [];
     const totalOfCurrency: { [key: string]: number } = { '£': 0, '€': 0 };
     const weekStartList = [];
-    for (let i = 1; i <= daysDiff || weekPending; i++) {
-      weekPending = true;
+    const addWeekDetails = (weekNumber: number, colNo: number, padding = 7) => {
+      r4.push(`Week ${weekNumber}`);
+      r5.push('');
+      r6.push('');
+      r8.push('');
+      r9.push('');
+
+      weekStartList.push(colNo);
+
+      mergeRowCol.push({ row: [7, 8], col: [colNo, colNo] });
+      mergeRowCol.push({
+        row: [4, 4],
+        col: [colNo, colNo + padding],
+      });
+
+      r7.push('Weekly Costs');
+    };
+    for (let i = 1; i <= daysDiff; i++) {
       const weekDay = formatDate(add(parseISO(fromDate?.toISOString()), { days: i - 1 }), 'eeee');
       const dateInIncomingFormat = formatDate(add(parseISO(fromDate?.toISOString()), { days: i - 1 }), 'yyyy-MM-dd');
       const nextDateInIncomingFormat = formatDate(add(parseISO(fromDate?.toISOString()), { days: i }), 'yyyy-MM-dd');
       const date = formatDate(dateInIncomingFormat, 'dd/MM/yy');
       const weekNumber = calculateWeekNumber(fromDate, getDateObject(dateInIncomingFormat));
+      if (i === 1 && weekDay !== 'Monday') {
+        // +2 is for including currentday and sunday
+        addWeekDetails(weekNumber, colNo, calculateRemainingDaysInWeek(weekDay) + 2);
+        colNo++;
+      }
       if (weekDay === 'Monday') {
         if (i > 1 && i < 7) {
           mergeRowCol.push({ row: [4, 4], col: [1, colNo - 1] });
         }
-        const remainingDays = daysDiff - i + 1;
-        r4.push(`Week ${weekNumber}`);
-        r5.push('');
-        r6.push('');
-        r8.push('');
-        r9.push('');
-        weekStartList.push(colNo);
-        mergeRowCol.push({ row: [7, 8], col: [colNo, colNo] });
-        // +1 for weekly costs column
-        mergeRowCol.push({ row: [4, 4], col: [colNo, Math.min(colNo + 7, colNo + remainingDays + 1)] });
-        r7.push('Weekly Costs');
+        const remainingDays = daysDiff - i;
+        addWeekDetails(weekNumber, colNo, remainingDays < 5 ? remainingDays + 1 : 7);
         colNo++;
       }
 
@@ -301,9 +313,6 @@ const handler = async (req, res) => {
         });
       }
 
-      if (i % 7 === 0) {
-        weekPending = false;
-      }
       colNo++;
     }
     weekStartList.push(colNo);
@@ -354,7 +363,11 @@ const handler = async (req, res) => {
 
     mergeRowCol.forEach((ele) => {
       const { row, col } = ele;
-      worksheet.mergeCells(row[0], col[0], row[1], col[1]);
+      try {
+        worksheet.mergeCells(row[0], col[0], row[1], col[1]);
+      } catch (e) {
+        console.log(e?.message || 'Merging cells failed');
+      }
     });
 
     const numberOfColumns = worksheet.columnCount;
