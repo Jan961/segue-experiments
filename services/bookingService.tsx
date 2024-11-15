@@ -135,6 +135,14 @@ export const deleteBookingById = async (id: number, tx) => {
   });
 };
 
+export const deletePerformancesForBooking = async (id: number, tx) => {
+  await tx.performance.delete({
+    where: {
+      BookingId: id,
+    },
+  });
+};
+
 export const deleteRehearsalById = async (id: number, tx) => {
   await tx.rehearsal.delete({
     where: {
@@ -330,7 +338,7 @@ export const createNewRehearsal = (
           Id: DateBlockId,
         },
       },
-      ...(VenueId && { VenueId }),
+      ...(VenueId && { Venue: { connect: { Id: VenueId } } }),
     },
   });
 };

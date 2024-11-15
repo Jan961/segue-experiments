@@ -8,12 +8,13 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const data = req.body as CompAllocation;
     const prisma = await getPrismaClient(req);
 
-    await prisma.compAllocation.delete({
+    const response = await prisma.compAllocation.delete({
       where: {
         Id: data.Id,
       },
     });
-    res.status(200).json({});
+
+    res.status(200).json({ id: response.Id });
   } catch (err) {
     await loggingService.logError(err);
     console.log(err);

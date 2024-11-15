@@ -16,7 +16,10 @@ const config: StorybookConfig = {
       },
     },
   ],
-  staticDirs: ['../public', { from: '../public/fonts', to: '/fonts' }],
+  staticDirs: [
+    { from: '../public/fonts', to: '/fonts' },
+    { from: '../components/core-ui-lib/assets/storybook-assets', to: '/storybook-assets' },
+  ],
   framework: {
     name: '@storybook/nextjs',
     options: { nextConfigPath: path.resolve(__dirname, '../next.config.js') },

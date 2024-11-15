@@ -24,7 +24,7 @@ import {
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import { formattedDateWithDay, toISO } from 'services/dateService';
 import { EditDealMemoContractModal } from './EditDealMemoContractModal';
-import { isNullOrEmpty, transformToOptions, checkDecimalStringFormat } from 'utils';
+import { isNullOrEmpty, transformToOptions, checkDecimalStringFormat, formatDecimalOnBlur } from 'utils';
 import LoadingOverlay from 'components/core-ui-lib/LoadingOverlay';
 import { attachmentsColDefs, contractsStyleProps } from '../tableConfig';
 import Table from 'components/core-ui-lib/Table';
@@ -34,7 +34,7 @@ import { headlessUploadMultiple } from 'requests/upload';
 import { getFileUrl } from 'lib/s3';
 import { UiVenue, VenueData, transformVenues } from 'utils/venue';
 import { ConfDialogVariant } from 'components/core-ui-lib/ConfirmationDialog/ConfirmationDialog';
-import { formatDecimalOnBlur, parseAndSortDates } from '../utils';
+import { parseAndSortDates } from '../utils';
 import { currencyState } from 'state/global/currencyState';
 import { dealMemoExport } from 'pages/api/deal-memo/export';
 import { accountContactState } from 'state/contracts/accountContactState';
@@ -423,17 +423,8 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
     });
   };
 
-  useEffect(() => {
-    console.log(dealMemoButtonText, createDealMemo, editDealMemo, editModal);
-  }, [dealMemoButtonText]);
-
   return (
-    <PopupModal
-      show={visible}
-      title={modalTitle}
-      titleClass={classNames('text-xl text-primary-navy font-bold -mt-2.5')}
-      onClose={() => handleCancelForm(false)}
-    >
+    <PopupModal show={visible} title={modalTitle} onClose={() => handleCancelForm(false)}>
       <div className="h-[80vh] w-auto overflow-y-scroll flex">
         <div className="h-[800px] flex">
           <div className="flex flex-col gap-y-3">
@@ -462,7 +453,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                   />
                 </div>
               </div>
-              <div className={`${dealMemoCreated ? '' : ' text-gray-500 pointer-events-none select-none opacity-50'}`}>
+              <div>
                 <div className=" text-primary-input-text font-bold text-sm mt-1.5">Deal Memo Status</div>
                 <Select
                   options={statusOptions}
@@ -472,7 +463,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                   value={dealMemoFormData.Status}
                   isClearable
                   isSearchable
-                  disabled={!editModal}
+                  disabled={!editModal || !dealMemoCreated}
                 />
 
                 <div className=" text-primary-input-text font-bold text-sm mt-6">Completed By</div>
@@ -484,7 +475,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                   isClearable
                   isSearchable
                   placeholder="Select User"
-                  disabled={!editModal}
+                  disabled={!editModal || !dealMemoCreated}
                 />
 
                 <div className=" text-primary-input-text font-bold text-sm mt-6">Approved By</div>
@@ -496,7 +487,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                   isClearable
                   isSearchable
                   placeholder="Select User"
-                  disabled={!editModal}
+                  disabled={!editModal || !dealMemoCreated}
                 />
                 <div className="flex items-center mt-6 justify-between px-3 select-none">
                   <div>
@@ -508,7 +499,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                         editDealMemoData('DateIssued', value)
                       }
                       value={dealMemoFormData.DateIssued}
-                      disabled={!editModal}
+                      disabled={!editModal || !dealMemoCreated}
                     />
                   </div>
 
@@ -521,7 +512,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                         editDealMemoData('DateReturned', value)
                       }
                       value={dealMemoFormData.DateReturned}
-                      disabled={!editModal}
+                      disabled={!editModal || !dealMemoCreated}
                     />
                   </div>
                 </div>
@@ -531,7 +522,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                   onChange={(e) => editDealMemoData('Notes', e.target.value)}
                   className="h-auto w-[400px]"
                   value={dealMemoFormData.Notes}
-                  disabled={!editModal}
+                  disabled={!editModal || !dealMemoCreated}
                 />
               </div>
             </div>

@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { useRecoilValue } from 'recoil';
+import { compareDatesWithoutTime } from 'services/dateService';
 import { filterState } from 'state/booking/filterState';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import { rowsSelector } from 'state/booking/selectors/rowsSelector';
@@ -28,8 +29,8 @@ const useBookingFilter = () => {
       );
       return (
         (selected === -1 || productionId === selected) &&
-        (!filter.endDate || new Date(dateTime) <= filter.endDate) &&
-        (!filter.startDate || new Date(dateTime) >= filter.startDate) &&
+        (!filter.endDate || compareDatesWithoutTime(dateTime, filter.endDate, '<=')) &&
+        (!filter.startDate || compareDatesWithoutTime(dateTime, filter.startDate, '>=')) &&
         (filter.status === 'all' || status === filter.status || (filter.status === 'A' && status === ''))
       );
     });

@@ -1,9 +1,8 @@
 import ExcelJS from 'exceljs';
 import getPrismaClient from 'lib/prisma';
-import Decimal from 'decimal.js';
 import { add, parseISO, differenceInDays } from 'date-fns';
 import { COLOR_HEXCODE, colorCell, colorTextAndBGCell, fillRowBGColorAndTextColor } from 'services/salesSummaryService';
-import { formatDate, formatDateWithTimezoneOffset } from 'services/dateService';
+import { calculateWeekNumber, formatDate, formatDateWithTimezoneOffset } from 'services/dateService';
 import { convertToPDF } from 'utils/report';
 import { getExportedAtTitle } from 'utils/export';
 
@@ -139,7 +138,7 @@ const handler = async (req, res) => {
 
     const showNameAndProductionCode: { [key: string]: string[] } = formattedData.reduce((acc, x) => {
       const value = acc[x.ShowName];
-      if (value && value?.length) {
+      if (value?.length) {
         if (!value.includes(x.FullProductionCode)) {
           return {
             ...acc,
@@ -186,21 +185,12 @@ const handler = async (req, res) => {
         const key = getShowAndProductionKey({ FullProductionCode, ShowName });
         const value = showNameAndProductionMap[key];
         if (!value) {
-          throw new Error('Missing Data');
+          return acc;
         }
-
-        const daysDiff = differenceInDays(new Date(fromDate), new Date(value.ProductionStartDate));
-        let week;
-        if (daysDiff >= 0 && daysDiff <= 6) {
-          week = 1;
-        } else if (daysDiff >= 7) {
-          week = Number(new Decimal(daysDiff).div(7).toFixed(0)) + 1;
-        } else {
-          week = Number(new Decimal(daysDiff).div(7).toFixed(0)) - 1;
-        }
+        const weekNo = calculateWeekNumber(new Date(value.ProductionStartDate), new Date(fromDate));
         return {
           ...acc,
-          [getShowAndProductionKey({ FullProductionCode, ShowName })]: week,
+          [getShowAndProductionKey({ FullProductionCode, ShowName })]: weekNo,
         };
       }, {}) || {};
 
@@ -209,7 +199,7 @@ const handler = async (req, res) => {
       const value = headerWeeks[key];
 
       if (!value) {
-        throw new Error(' Something went wrong');
+        return acc;
       }
       if (value === -1) {
         headerWeeks[key] = 1;
@@ -267,7 +257,7 @@ const handler = async (req, res) => {
           }
           return null;
         })
-        .filter((x) => !!x) as number[];
+        .filter((x) => !!x);
       targetCellIdx.forEach((col) =>
         colorTextAndBGCell({
           worksheet,
