@@ -7,7 +7,7 @@ import { bookingJumpState } from 'state/marketing/bookingJumpState';
 import { ProductionJumpMenu } from 'components/global/nav/ProductionJumpMenu';
 import useAxios from 'hooks/useAxios';
 import { SelectOption } from './MarketingHome';
-import { getWeekDayShort, DATE_PATTERN } from 'services/dateService';
+import { getWeekDayShort, DATE_PATTERNS } from 'services/dateService';
 import formatInputDate from 'utils/dateInputFormat';
 import { currencyState } from 'state/global/currencyState';
 import axios from 'axios';
@@ -107,7 +107,7 @@ const SalesEntryFilters: React.FC<Props> = ({ onDateChanged }) => {
         } else {
           return {
             ...option,
-            text: option.text.replace(DATE_PATTERN, `$1 to ${endDateDay.toUpperCase()} ${endDateStr}`),
+            text: option.text.replace(DATE_PATTERNS.shortSlash, `$1 to ${endDateDay.toUpperCase()} ${endDateStr}`),
           };
         }
       } else {

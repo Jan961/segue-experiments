@@ -11,7 +11,7 @@ import { bookingJumpState } from 'state/marketing/bookingJumpState';
 import MarketingButtons from './MarketingButtons';
 import formatInputDate from 'utils/dateInputFormat';
 import { reverseDate } from './utils';
-import { DATE_PATTERN, getWeekDayShort } from 'services/dateService';
+import { DATE_PATTERNS, getWeekDayShort } from 'services/dateService';
 import { currencyState } from 'state/global/currencyState';
 import axios from 'axios';
 import { LastPerfDate } from 'types/MarketingTypes';
@@ -52,7 +52,7 @@ const Filters = () => {
         } else {
           return {
             ...option,
-            text: option.text.replace(DATE_PATTERN, `$1 to ${endDateDay.toUpperCase() + ' ' + endDateStr}`),
+            text: option.text.replace(DATE_PATTERNS.shortSlash, `$1 to ${endDateDay.toUpperCase() + ' ' + endDateStr}`),
           };
         }
       } else {

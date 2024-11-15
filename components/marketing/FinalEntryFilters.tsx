@@ -5,7 +5,7 @@ import Select from 'components/core-ui-lib/Select';
 import { mapBookingsToProductionOptions } from 'mappers/productionCodeMapper';
 import { bookingJumpState } from 'state/marketing/bookingJumpState';
 import { ProductionJumpMenu } from 'components/global/nav/ProductionJumpMenu';
-import { getWeekDayShort, DATE_PATTERN } from 'services/dateService';
+import { getWeekDayShort, DATE_PATTERNS } from 'services/dateService';
 import formatInputDate from 'utils/dateInputFormat';
 import { currencyState } from 'state/global/currencyState';
 import axios from 'axios';
@@ -72,7 +72,7 @@ const FinalEntryFilters = () => {
         } else {
           return {
             ...option,
-            text: option.text.replace(DATE_PATTERN, `$1 to ${endDateDay.toUpperCase() + ' ' + endDateStr}`),
+            text: option.text.replace(DATE_PATTERNS.shortSlash, `$1 to ${endDateDay.toUpperCase() + ' ' + endDateStr}`),
           };
         }
       } else {

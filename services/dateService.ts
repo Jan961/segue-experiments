@@ -11,6 +11,7 @@ import {
   addMonths,
   set,
   parseISO,
+  differenceInDays,
 } from 'date-fns';
 import moment from 'moment';
 import { UTCDate } from '@date-fns/utc';
@@ -1003,4 +1004,20 @@ export const formatDate = (date: DateInput, dateFormat: string): string => {
   }
 
   return format(parsedDate, dateFormat);
+};
+
+// ?
+export const getDifferenceInDays = (from: string, to: string): number => {
+  if (!from || !to) {
+    return NaN;
+  }
+
+  const fromDate = parseISO(from);
+  const toDate = parseISO(to);
+
+  if (!isValid(fromDate) || !isValid(toDate)) {
+    return NaN;
+  }
+
+  return differenceInDays(toDate, fromDate);
 };

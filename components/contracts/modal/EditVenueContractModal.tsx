@@ -22,7 +22,7 @@ import {
   VenueContractFormData,
 } from 'interfaces';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
-import { formattedDateWithDay, toISO } from 'services/dateService';
+import { formattedDateWithDay, newDate, toISO } from 'services/dateService';
 import { EditDealMemoContractModal } from './EditDealMemoContractModal';
 import { isNullOrEmpty, transformToOptions, checkDecimalStringFormat, formatDecimalOnBlur } from 'utils';
 import LoadingOverlay from 'components/core-ui-lib/LoadingOverlay';
@@ -214,9 +214,9 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
     if (!lastDate) return;
     const formattedLastDate = formattedDateWithDay(lastDate);
     const lastPerformanceDate =
-      formattedLastDate === formattedDateWithDay(formData.FirstDate) ? '' : `to ${formattedLastDate}`;
+      formattedLastDate === formattedDateWithDay(newDate(formData.FirstDate)) ? '' : `to ${formattedLastDate}`;
     const title = `${selectedTableCell.contract.productionName.replace('- ', '')} | 
-    ${selectedTableCell.contract.venue} | ${formattedDateWithDay(formData.FirstDate)} ${lastPerformanceDate}`;
+    ${selectedTableCell.contract.venue} | ${formattedDateWithDay(newDate(formData.FirstDate))} ${lastPerformanceDate}`;
     setModalTitle(title);
   }, [lastDates]);
 
