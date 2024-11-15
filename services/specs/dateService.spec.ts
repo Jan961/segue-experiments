@@ -1,22 +1,22 @@
 import { UTCDate } from '@date-fns/utc';
 import {
-  safeDate,
-  getKey,
-  dateStringToPerformancePair,
   simpleToDateMDY,
-  dateToSimple,
-  simpleToDateDMY,
   formattedDateWithDay,
   newDate,
-  dateTimeToTime,
-  getDateDaysAgo,
-  getWeekDay,
-  formattedDateWithWeekDay,
   calculateWeekNumber,
-  addOneMonth,
-  timeFormat,
-  formatShortDateUK,
-  getMonday,
+  safeDateV2,
+  dateTimeToTimeV2,
+  addOneMonthV2,
+  dateToSimpleV2,
+  formatShortDateUKV2,
+  formattedDateWithWeekDayV2,
+  getKeyV2,
+  getMondayV2,
+  getWeekDayV2,
+  getDateDaysAway,
+  dateStringToPerformancePairV2,
+  timeFormatV2,
+  simpleToDateDMYV2,
 } from '../dateService';
 
 // --default()
@@ -99,7 +99,7 @@ describe.each([
   [{ date: '77 Fail' }, null],
 ])('safeDate', (input: { date: string; locale?: 'UK' | 'US' }, expected) => {
   test(`Expect ${input.date === '' ? 'empty string' : input.date} to be ${expected}`, () => {
-    const val = safeDate(input.date, input.locale);
+    const val = safeDateV2(input.date, input.locale);
     expect(val ? val.toISOString() : val).toStrictEqual(expected);
   });
 });
@@ -114,20 +114,20 @@ describe.each([
   [{ date: '' }, null],
 ])('getKey', (input: { date: string; locale?: 'UK' | 'US' }, expected) => {
   test(`Expect ${input.date === '' ? 'empty string' : input.date} to be ${expected}`, () => {
-    expect(getKey(input.date, input.locale)).toStrictEqual(expected);
+    expect(getKeyV2(input.date, input.locale)).toStrictEqual(expected);
   });
 });
 
 // --dateStringToperformancePair()
-describe('dateStringToperformancePair', () => {
+describe('dateStringToPerformancePair', () => {
   test('Should return null for null', () => {
     const input = null;
-    expect(dateStringToPerformancePair(input)).toBeNull();
+    expect(dateStringToPerformancePairV2(input)).toBeNull();
   });
 
   test('Should return null for empty string', () => {
     const input = '';
-    expect(dateStringToPerformancePair(input)).toBeNull();
+    expect(dateStringToPerformancePairV2(input)).toBeNull();
   });
 });
 
@@ -161,23 +161,17 @@ describe('simpleToDateDMY', () => {
   test('Should return a Date for a valid date string dd/mm/yy', () => {
     const input = '15/10/23';
     const expectedResult = new UTCDate('2023-10-15T00:00:00Z');
-    expect(simpleToDateDMY(input)).toStrictEqual(expectedResult);
-  });
-
-  test('Should return a null date string dd-mm-yy', () => {
-    const input = '12-15-23';
-    const expectedResult = new UTCDate('2023-12-15T00:00:00Z');
-    expect(simpleToDateMDY(input)).toStrictEqual(expectedResult);
+    expect(simpleToDateDMYV2(input)).toStrictEqual(expectedResult);
   });
 
   test('Should return null for null', () => {
     const input = null;
-    expect(simpleToDateDMY(input)).toBeNull();
+    expect(simpleToDateDMYV2(input)).toBeNull();
   });
 
   test('Should return null for empty string', () => {
     const input = '';
-    expect(simpleToDateDMY(input)).toBeNull();
+    expect(simpleToDateDMYV2(input)).toBeNull();
   });
 });
 
@@ -193,7 +187,7 @@ describe.each([
   [{ date: '15-10-24', locale: 'UK' }, '15/10/24'],
 ])('dateToSimple', (input: { date: string; locale: 'UK' | 'US' }, expected) => {
   test(`Expect '${input.date}'${input.locale ? ` in locale '${input.locale}'` : ''} to be '${expected}'`, () => {
-    const val = dateToSimple(input.date, input?.locale);
+    const val = dateToSimpleV2(input.date, input?.locale);
     expect(val).toStrictEqual(expected);
   });
 });
@@ -212,34 +206,34 @@ describe('dateTimeToTime', () => {
   test('Should return correct time for a date time string', () => {
     const input = '2023-10-15T01:01:00.000Z';
     const output = '01:01';
-    expect(dateTimeToTime(input)).toStrictEqual(output);
+    expect(dateTimeToTimeV2(input)).toStrictEqual(output);
   });
 
   test('Should return correct time for a date time ISOString', () => {
     const input = new UTCDate('2023-10-15T01:01:00.000Z').toISOString();
     const output = '01:01';
-    expect(dateTimeToTime(input)).toStrictEqual(output);
+    expect(dateTimeToTimeV2(input)).toStrictEqual(output);
   });
 
   test('Should return correct time for a date', () => {
     const input = new UTCDate('2023-10-15T01:01:00.000Z');
     const output = '01:01';
-    expect(dateTimeToTime(input)).toStrictEqual(output);
+    expect(dateTimeToTimeV2(input)).toStrictEqual(output);
   });
 
   test('Should return null for invalid date input', () => {
     const input = 'RR Fail';
-    expect(dateTimeToTime(input)).toBeNull();
+    expect(dateTimeToTimeV2(input)).toBeNull();
   });
 
   test('Should return null for null', () => {
     const input = null;
-    expect(simpleToDateDMY(input)).toBeNull();
+    expect(dateTimeToTimeV2(input)).toBeNull();
   });
 
   test('Should return null for empty string', () => {
     const input = '';
-    expect(simpleToDateDMY(input)).toBeNull();
+    expect(dateTimeToTimeV2(input)).toBeNull();
   });
 });
 
@@ -254,7 +248,7 @@ describe.each([
   [{ date: new UTCDate('2024-10-15T14:30:20.000Z'), daysToSubtract: 5 }, new UTCDate('2024-10-10T14:30:20Z')],
 ])('getDateDaysAgo', (input: { date: string; daysToSubtract: number; locale: 'UK' | 'US' }, expected) => {
   test(`Expect ${input.date} - ${input.daysToSubtract} days to be ${expected}`, () => {
-    expect(getDateDaysAgo(input.date, input.daysToSubtract, input.locale)).toStrictEqual(expected);
+    expect(getDateDaysAway(input.date, input.daysToSubtract, input.locale)).toStrictEqual(expected);
   });
 });
 
@@ -275,7 +269,7 @@ describe.each([
   [{ date: null }, null],
 ])('getWeekDay', (input: { date: string; format: 'long' | 'short'; locale: 'UK' | 'US' }, expected) => {
   test(`Expect ${input.date} to be ${expected}`, () => {
-    expect(getWeekDay(input.date, input.format, input.locale)).toStrictEqual(expected);
+    expect(getWeekDayV2(input.date, input.format, input.locale)).toStrictEqual(expected);
   });
 });
 
@@ -298,7 +292,7 @@ describe.each([
   'formattedDateWithWeekDay',
   (input: { date: string; weekDayFormat: 'Long' | 'Short'; locale: 'UK' | 'US' }, expected) => {
     test(`Expect ${input.date} to be ${expected}`, () => {
-      expect(formattedDateWithWeekDay(input.date, input.weekDayFormat, input.locale)).toStrictEqual(expected);
+      expect(formattedDateWithWeekDayV2(input.date, input.weekDayFormat, input.locale)).toStrictEqual(expected);
     });
   },
 );
@@ -325,7 +319,7 @@ describe.each([
   [{ date: new UTCDate('2024-10-15T14:30:20.000Z') }, new UTCDate('2024-11-15T14:30:20Z')],
 ])('addOneMonth', (input: { date: string; locale: 'UK' | 'US' }, expected) => {
   test(`Expect ${input.date} add one month to be ${expected}`, () => {
-    expect(addOneMonth(input.date, input.locale)).toStrictEqual(expected);
+    expect(addOneMonthV2(input.date, input.locale)).toStrictEqual(expected);
   });
 });
 
@@ -345,7 +339,7 @@ describe.each([
   [1440, '24:00'],
 ])('timeFormat', (input, expected) => {
   test(`Expect ${input} to be ${expected}`, () => {
-    expect(timeFormat(input)).toStrictEqual(expected);
+    expect(timeFormatV2(input)).toStrictEqual(expected);
   });
 });
 
@@ -367,7 +361,7 @@ describe.each([
   [{ date: null }, null],
 ])('formatShortDateUK', (input: { date: string; locale: 'UK' | 'US' }, expected) => {
   test(`Expect ${input.date} to be ${expected}`, () => {
-    expect(formatShortDateUK(input.date, input.locale)).toStrictEqual(expected);
+    expect(formatShortDateUKV2(input.date, input.locale)).toStrictEqual(expected);
   });
 });
 
@@ -391,7 +385,7 @@ describe.each([
   [{ date: null }, null],
 ])('getMonday', (input: { date: string; locale: 'UK' | 'US' }, expected) => {
   test(`Expect ${input.date} to be ${expected}`, () => {
-    expect(getMonday(input.date, input.locale)).toStrictEqual(expected);
+    expect(getMondayV2(input.date, input.locale)).toStrictEqual(expected);
   });
 });
 
