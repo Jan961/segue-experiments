@@ -5,8 +5,8 @@ import LoadingOverlay from 'components/core-ui-lib/LoadingOverlay';
 import TextInput from 'components/core-ui-lib/TextInput';
 import TimeInput from 'components/core-ui-lib/TimeInput';
 import { DEFAULT_GAP_SUGGEST_FORM_STATE } from 'config/AddBooking';
-import { GapSuggestionUnbalancedProps } from 'pages/api/venue/read/distance';
 import { useState } from 'react';
+import { GapSuggestionUnbalancedProps } from 'services/booking/gapSuggestion/types';
 
 type FormProps = {
   onSave: (
