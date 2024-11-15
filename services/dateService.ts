@@ -17,10 +17,10 @@ import { UTCDate } from '@date-fns/utc';
 export const DATE_PATTERNS = {
   shortSlash: /(\d{2}\/\d{2}\/\d{2})/,
   longSlash: /(\d{2}\/\d{2}\/\d{4})/,
-  shortDash: /\d{2}-\d{2}-\d{2}/,
-  longDash: /\d{2}-\d{2}-\d{4}/,
+  shortDash: /(\d{2}-\d{2}-\d{2})/,
+  longDash: /(\d{2}-\d{2}-\d{4})/,
   utcSlash: /(\d{4}\/\d{2}\/\d{2})/,
-  utcDash: /\d{4}-\d{2}-\d{2}/,
+  utcDash: /(\d{4}-\d{2}-\d{2})/,
 };
 const YEAR_CONSTANT = 2000;
 type Locale = 'UK' | 'US';
