@@ -25,14 +25,13 @@ export interface ConfirmationDialogProps {
   show?: boolean;
   onYesClick?: () => void;
   onNoClick?: () => void;
-  variant: ConfDialogVariant;
+  variant?: ConfDialogVariant;
   yesBtnClass?: string;
   noBtnClass?: string;
   labelYes?: string;
-  showNoButton?: boolean;
   labelNo?: string;
   hasOverlay?: boolean;
-  content: ConfirmationDialogContent;
+  content?: ConfirmationDialogContent;
   testId?: string;
 }
 
@@ -67,12 +66,12 @@ export const confOptions = {
   },
 };
 
+// The confirmation dialog component has to have a defined "variant" or a define "content" prop
 export default function ConfirmationDialog({
   show = false,
   onYesClick,
   onNoClick,
   labelYes = 'Yes',
-  showNoButton = true,
   labelNo = 'No',
   yesBtnClass,
   noBtnClass,
@@ -106,7 +105,7 @@ export default function ConfirmationDialog({
           </div>
         </div>
         <div className="w-full flex justify-center items-center">
-          {showNoButton && (
+          {noBtnClass?.trim() !== 'hidden' && (
             <Button
               testId="confirmation-dialog-no-btn"
               className={classNames('w-32', noBtnClass)}

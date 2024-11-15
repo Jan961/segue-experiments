@@ -102,7 +102,7 @@ describe('ConfirmationDialog Component', () => {
 
     mount(
       <BaseComp>
-        <ConfirmationDialog {...defaultProps} showNoButton={false} labelNo="No" onYesClick={onYesClickStub} />
+        <ConfirmationDialog {...defaultProps} noBtnClass="hidden" labelNo="No" onYesClick={onYesClickStub} />
       </BaseComp>,
     );
     cy.get('[data-testid="confirmation-dialog-no-btn"]').should('not.exist');
