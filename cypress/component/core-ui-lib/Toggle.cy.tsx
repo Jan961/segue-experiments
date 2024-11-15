@@ -7,13 +7,14 @@ import { useState } from 'react';
 describe('Toggle Component Tests', () => {
   it('renders correctly', () => {
     const onChange = cy.stub();
-    const props = { checked: false, onChange };
+    const props = { checked: false, onChange, label: 'Test Label', name: 'test-toggle' };
     mount(
       <BaseComp>
         <Toggle {...props} />
       </BaseComp>,
     );
-    cy.get('[data-testid="core-ui-lib-toggle"]').should('exist');
+    cy.get('[data-testid="test-toggle"]').should('exist');
+    cy.get('[data-testid="test-toggle"] .sr-only').should('have.text', 'Test Label');
   });
 
   it('is unchecked when "checked" prop is false', () => {
@@ -60,21 +61,11 @@ describe('Toggle Component Tests', () => {
         </BaseComp>
       );
     }
+
     mount(<NoOnChangeWrapper />);
     cy.get('[data-testid="core-ui-lib-toggle"] span[aria-hidden="true"]').should('have.class', 'translate-x-0');
     cy.contains('Toggle Prop').click();
     cy.get('[data-testid="core-ui-lib-toggle"] span[aria-hidden="true"]').should('have.class', 'translate-x-2');
-  });
-
-  it('renders with label when label prop is provided', () => {
-    const onChange = cy.stub();
-    const props = { checked: false, onChange, label: 'Test Label' };
-    mount(
-      <BaseComp>
-        <Toggle {...props} />
-      </BaseComp>,
-    );
-    cy.get('[data-testid="core-ui-lib-toggle"] .sr-only').should('have.text', 'Test Label');
   });
 
   it('applies className prop', () => {
@@ -86,16 +77,5 @@ describe('Toggle Component Tests', () => {
       </BaseComp>,
     );
     cy.get('[data-testid="core-ui-lib-toggle"]').should('have.class', 'test-class');
-  });
-
-  it('uses testId or name prop for data-testid', () => {
-    const onChange = cy.stub();
-    const props = { checked: false, onChange, name: 'test-toggle' };
-    mount(
-      <BaseComp>
-        <Toggle {...props} />
-      </BaseComp>,
-    );
-    cy.get('[data-testid="test-toggle"]').should('exist');
   });
 });
