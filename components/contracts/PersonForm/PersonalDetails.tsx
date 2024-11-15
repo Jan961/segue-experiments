@@ -18,12 +18,12 @@ export const defaultPersonDetails = {
   mobileNumber: '',
   passportName: '',
   passportNumber: '',
-  hasUKWorkPermit: false,
+  hasUKWorkPermit: null,
   passportExpiryDate: null,
   postcode: '',
   checkedBy: null,
   country: null,
-  isFEURequired: false,
+  isFEURequired: null,
   workType: [],
   advisoryNotes: '',
   generalNotes: '',
@@ -83,6 +83,14 @@ const PersonalDetails = ({
     },
     [onChange, setFormData, formData, details],
   );
+  const handleAddRemoveOtherWorkType = (position: number) => {
+    handleChange(
+      'otherWorkTypes',
+      position === otherWorkTypes?.length - 1
+        ? (insertAtPos(otherWorkTypes, { name: '' }, position + 1) as IOtherWorkType[])
+        : (removeAtPos(otherWorkTypes, position) as string[]),
+    );
+  };
   return (
     <>
       <div className="grid grid-cols-2 gap-x-4">
@@ -396,27 +404,10 @@ const PersonalDetails = ({
                   value={otherWorkType.name}
                   disabled={disabled}
                 />
-                {i === 0 && !disabled && (
-                  <div
-                    className="cursor-pointer"
-                    onClick={() =>
-                      handleChange(
-                        'otherWorkTypes',
-                        insertAtPos(otherWorkTypes, { name: '' }, i + 1) as IOtherWorkType[],
-                      )
-                    }
-                  >
-                    <Icon iconName="plus-circle-solid" />
-                  </div>
-                )}
-                {i > 0 && !disabled && (
-                  <div
-                    className="cursor-pointer"
-                    onClick={() => handleChange('otherWorkTypes', removeAtPos(otherWorkTypes, i) as string[])}
-                  >
-                    <Icon iconName="minus-circle-solid" />
-                  </div>
-                )}
+                <div className="cursor-pointer" onClick={() => handleAddRemoveOtherWorkType(i)}>
+                  <Icon iconName={i === otherWorkTypes?.length - 1 ? 'plus-circle-solid' : 'minus-circle-solid'} />
+                </div>
+                {/* )} */}
               </div>
             ))}
 

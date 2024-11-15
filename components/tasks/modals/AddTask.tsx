@@ -469,9 +469,8 @@ const AddTask = ({
       onClose={handleCancel}
       hasOverlay={showOverlay}
       title={inputs.Id ? 'Edit Task' : 'Create New Task'}
-      titleClass="text-primary-navy text-xl mb-4"
     >
-      <form className="flex flex-col gap-4">
+      <form className="flex flex-col gap-4 mt-2">
         {loading && <LoadingOverlay />}
         <div className="col-span-2 col-start-4 flex items-center justify-between">
           <Label className="!text-secondary pr-6 " text="Task Name" />
