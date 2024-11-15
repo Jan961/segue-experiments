@@ -16,6 +16,7 @@ interface PopupModalProps {
   hasOverlay?: boolean;
   closeOnOverlayClick?: boolean;
   hasOverflow?: boolean;
+  testId?: string;
 }
 
 export default function PopupModal({
@@ -30,6 +31,7 @@ export default function PopupModal({
   hasOverlay = false,
   closeOnOverlayClick = false,
   hasOverflow = true,
+  testId = 'overlay',
 }: PopupModalProps) {
   const [overlay, setOverlay] = useState<boolean>(false);
   const [isScrollbarVisible, setIsScrollbarVisible] = useState(false);
@@ -80,7 +82,7 @@ export default function PopupModal({
             hasOverflow ? 'overflow-y-auto' : '',
             overlay ? '' : 'bg-black/75',
           )}
-          data-testid="overlay"
+          data-testid={testId}
         >
           <div className="flex min-h-full items-center justify-center p-4 text-center">
             <Transition.Child
