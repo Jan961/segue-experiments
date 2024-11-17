@@ -589,9 +589,28 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                         onClick={copyPreviousWeeks}
                       />
                     </div>
+                    {!bookingHasSchoolSales && (
+                      <div className="flex items-center justify col-span-3">
+                        <span className="text-base text-primary-dark-blue font-bold mr-3 ">School Sales required</span>
+                        <div className="flex flex-col">
+                          <Checkbox
+                            id="schSalesRequired"
+                            name="schSalesRequired"
+                            checked={false}
+                            onChange={() => editBooking('hasSchoolsSales', true)}
+                            className="w-[19px] h-[19px]"
+                          />
+                        </div>
+                      </div>
+                    )}
+                    {!bookingHasSchoolSales && (
+                      <div className="flex justify-end items-center justify col-span-9">
+                        <Button className="w-[132px]" variant="secondary" text="Cancel" onClick={handleCancel} />
+                      </div>
+                    )}
                   </div>
 
-                  {bookingHasSchoolSales ? (
+                  {bookingHasSchoolSales && (
                     <div>
                       <div className="leading-6 text-xl text-primary-input-text font-bold mt-5 flex-row">Schools</div>
 
@@ -605,124 +624,86 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                         </div>
                       )}
                       {/* Schools Grid */}
-                      <div className="grid grid-cols-12 gap-1">
-                        {/* Row1 */}
-                        <div className="flex justify-between items-center col-span-4">
-                          <span className="text-primary-dark-blue base font-bold">Seats Sold</span>
-                          <TextInput
-                            className="w-[137px] h-[31px] flex flex-col -mt-1"
-                            placeholder="Enter Seats"
-                            id="schSeatsSold"
-                            value={currSalesFigureSet.schools.seatsSold}
-                            pattern={decRegexLeadingZero}
-                            onChange={(event) => handleSalesFigChange('seatsSold', 'schools', event.target.value)}
-                          />
-                        </div>
-                        <div className="flex justify-around items-center col-span-5">
-                          <span className="w-[141px] text-end text-primary-dark-blue base font-bold">
-                            Seats Sold Value
-                          </span>
-                          <TextInput
-                            className="w-[137px] h-[31px] flex flex-col -mt-1"
-                            placeholder="Enter Value"
-                            id="schSeatsSoldVal"
-                            value={currSalesFigureSet.schools.seatsSoldVal}
-                            pattern={/^\d*(\.\d*)?$/}
-                            onChange={(event) => handleSalesFigChange('seatsSoldVal', 'schools', event.target.value)}
-                            onBlur={(event) =>
-                              handleSalesFigChange('seatsSoldVal', 'schools', formatDecimalOnBlur(event))
-                            }
-                          />
-                        </div>
-                        <div className="flex items-center justify-end col-span-3">
-                          <div className="flex flex-row">
-                            <span className="text-base text-primary-dark-blue font-bold mr-3">
-                              School Sales not required
+                      {
+                        <div className="grid grid-cols-12 gap-1">
+                          {/* Row1 */}
+                          <div className="flex justify-between items-center col-span-4">
+                            <span className="text-primary-dark-blue base font-bold">Seats Sold</span>
+                            <TextInput
+                              className="w-[137px] h-[31px] flex flex-col -mt-1"
+                              placeholder="Enter Seats"
+                              id="schSeatsSold"
+                              value={currSalesFigureSet.schools.seatsSold}
+                              pattern={decRegexLeadingZero}
+                              onChange={(event) => handleSalesFigChange('seatsSold', 'schools', event.target.value)}
+                            />
+                          </div>
+                          <div className="flex justify-around items-center col-span-5">
+                            <span className="w-[141px] text-end text-primary-dark-blue base font-bold">
+                              Seats Sold Value
                             </span>
-                            <Checkbox
-                              id="schSalesNotRequired"
-                              name="schSalesNotRequired"
-                              checked={false}
-                              onChange={() => editBooking('hasSchoolsSales', false)}
-                              className="w-[19px] h-[19px]"
+                            <TextInput
+                              className="w-[137px] h-[31px] flex flex-col -mt-1"
+                              placeholder="Enter Value"
+                              id="schSeatsSoldVal"
+                              value={currSalesFigureSet.schools.seatsSoldVal}
+                              pattern={/^\d*(\.\d*)?$/}
+                              onChange={(event) => handleSalesFigChange('seatsSoldVal', 'schools', event.target.value)}
+                              onBlur={(event) =>
+                                handleSalesFigChange('seatsSoldVal', 'schools', formatDecimalOnBlur(event))
+                              }
                             />
                           </div>
-                        </div>
-                        {/* Row2 */}
-                        <div className="flex justify-between items-center col-span-4">
-                          <span className="text-primary-dark-blue base font-bold">Reserved Seats</span>
-                          <TextInput
-                            className="w-[137px] h-[31px] flex flex-col -mt-1"
-                            placeholder="Enter Seats"
-                            id="schSeatsReserved"
-                            value={currSalesFigureSet.schools.seatsReserved}
-                            pattern={decRegexLeadingZero}
-                            onChange={(event) => handleSalesFigChange('seatsReserved', 'schools', event.target.value)}
-                          />
-                        </div>
-                        <div className="flex justify-around items-center col-span-5">
-                          <span className="w-[141px] text-primary-dark-blue base font-bold">Reserved Seats Value</span>
-                          <TextInput
-                            className="w-[137px] h-[31px] flex flex-col -mt-1"
-                            placeholder="Enter Value"
-                            id="schSeatsReservedVal"
-                            value={currSalesFigureSet.schools.seatsReservedVal}
-                            pattern={/^\d*(\.\d*)?$/}
-                            onChange={(event) =>
-                              handleSalesFigChange('seatsReservedVal', 'schools', event.target.value)
-                            }
-                            onBlur={(event) =>
-                              handleSalesFigChange('seatsReservedVal', 'schools', formatDecimalOnBlur(event))
-                            }
-                          />
-                        </div>
-                        <div className="flex items-center justify-end col-span-3">
-                          <Button className="w-[132px] mt-3" variant="secondary" text="Cancel" onClick={handleCancel} />
-                        </div>
-                      </div>
-                      {/* Grid Ends */}
-
-                      <div className="flex flex-row justify-between">
-                        <div className="flex items-center mt-2">
-                          <div className="flex flex-row">
-                            <div className="text-base text-primary-dark-blue font-bold flex flex-col mr-3">
-                              School Sales not required
+                          <div className="flex items-center justify-end col-span-3">
+                            <div className="flex flex-row">
+                              <span className="text-base text-primary-dark-blue font-bold mr-3">
+                                School Sales not required
+                              </span>
+                              <Checkbox
+                                id="schSalesNotRequired"
+                                name="schSalesNotRequired"
+                                checked={false}
+                                onChange={() => editBooking('hasSchoolsSales', false)}
+                                className="w-[19px] h-[19px]"
+                              />
                             </div>
-                            <Checkbox
-                              id="schSalesNotRequired"
-                              name="schSalesNotRequired"
-                              checked={false}
-                              onChange={() => editBooking('hasSchoolsSales', false)}
-                              className="w-[19px] h-[19px]"
+                          </div>
+                          {/* Row2 */}
+                          <div className="flex justify-between items-center col-span-4">
+                            <span className="text-primary-dark-blue base font-bold">Reserved Seats</span>
+                            <TextInput
+                              className="w-[137px] h-[31px] flex flex-col -mt-1"
+                              placeholder="Enter Seats"
+                              id="schSeatsReserved"
+                              value={currSalesFigureSet.schools.seatsReserved}
+                              pattern={decRegexLeadingZero}
+                              onChange={(event) => handleSalesFigChange('seatsReserved', 'schools', event.target.value)}
                             />
                           </div>
-                          <Button
-                            className="w-[132px] flex flex-row"
-                            variant="secondary"
-                            text="Cancel"
-                            onClick={handleCancel}
-                          />
+                          <div className="flex justify-around items-center col-span-5">
+                            <span className="w-[141px] text-primary-dark-blue base font-bold">
+                              Reserved Seats Value
+                            </span>
+                            <TextInput
+                              className="w-[137px] h-[31px] flex flex-col -mt-1"
+                              placeholder="Enter Value"
+                              id="schSeatsReservedVal"
+                              value={currSalesFigureSet.schools.seatsReservedVal}
+                              pattern={/^\d*(\.\d*)?$/}
+                              onChange={(event) =>
+                                handleSalesFigChange('seatsReservedVal', 'schools', event.target.value)
+                              }
+                              onBlur={(event) =>
+                                handleSalesFigChange('seatsReservedVal', 'schools', formatDecimalOnBlur(event))
+                              }
+                            />
+                          </div>
+                          <div className="flex items-center justify-end col-span-3">
+                            <Button className="w-[132px]" variant="secondary" text="Cancel" onClick={handleCancel} />
+                          </div>
                         </div>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="gap-[510px] flex flex-row">
-                      <div className="flex flex-row mb-5 mt-5">
-                        <div className="text-base text-primary-dark-blue font-bold flex flex-col mr-3 ">
-                          School Sales required
-                        </div>
-                        <div className="flex flex-col">
-                          <Checkbox
-                            id="schSalesRequired"
-                            name="schSalesRequired"
-                            checked={false}
-                            onChange={() => editBooking('hasSchoolsSales', true)}
-                            className="w-[19px] h-[19px]"
-                          />
-                        </div>
-                      </div>
-
-                      <Button className="w-[132px] mt-3" variant="secondary" text="Cancel" onClick={handleCancel} />
+                      }
+                      {/* Grid Ends */}
                     </div>
                   )}
                 </div>
