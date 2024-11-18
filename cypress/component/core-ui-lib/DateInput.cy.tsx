@@ -115,9 +115,11 @@ describe('DateInput tests', () => {
     cy.get('@dateInput').type('324024').type('{enter}').should('have.value', '');
     cy.get('@dateInput').type('30224').type('{enter}').should('have.value', '');
 
-    // the below check doesn't pass the currently DateInput text does not validate dates re number of days in a month etc
-    // cy.get('@dateInput').type('{enter}').type('310221').should('have.value', '');
-    // cy.get('@dateInput').type('{enter}').type('310321').should('have.value', '31/03/21');
+    // the below check doesn't pass the currently DateInput text does not validate dates re number of days in a month
+    // etc - commented out
+    // cy.get('@dateInput').type('310221').type('{enter}').should('have.value', '');
+
+    cy.get('@dateInput').type('310321').type('{enter}').should('have.value', '31/03/21');
   });
 
   it('check if on change is called when a valid date is input', () => {
