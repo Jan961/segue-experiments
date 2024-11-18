@@ -31,3 +31,20 @@ export const exportWorkbook = async (
     });
   }
 };
+
+/**
+ * This function sanitises excel row data by handling Nan's, null, undefined as well as rounding numbers to 2 decimal places
+ * @param rowData
+ * @returns sanitised rowData (string[]|number[])
+ */
+export const sanitizeRowData = (rowData: any[]) => {
+  return rowData.map((value) => {
+    if (Number.isNaN(value)) return '';
+    if (typeof value === 'number') {
+      // Round numbers to 2 decimal places
+      return Number(value.toFixed(2));
+    }
+    // Convert null/undefined to empty string
+    return value ?? '';
+  });
+};
