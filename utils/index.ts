@@ -270,3 +270,28 @@ export const replaceTemplateString = (template, data, prefix = '{', suffix = '}'
     return key in data ? data[key] : match;
   });
 };
+
+export const getFastHostServerUrl = (endpoint: string) => {
+  const currEnvironment: string = process.env.DEPLOYMENT_ENV;
+  const baseUrl: string = process.env.FASTHOST_BASE_URL;
+
+  // if either DEPLOYMENT_ENV or FASTHOST_BASE_URL are undefined return an error
+  if (isUndefined(currEnvironment) || isUndefined(baseUrl)) {
+    console.error('either DEPLOYMENT_ENV or FASTHOST_BASE_URL is not set in the environment variables');
+    return;
+  }
+
+  let deploymentRoute = '';
+
+  // if active environment is production, remove the
+  if (currEnvironment === 'prod') {
+    deploymentRoute = '/api';
+
+    // otherwise, prepend the url with a slash
+  } else {
+    deploymentRoute = '/' + currEnvironment + '/api';
+  }
+
+  // concatenate the parts of the URL to form the complete api endpoint
+  return baseUrl + deploymentRoute + endpoint;
+};
