@@ -57,17 +57,24 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
           value={value}
           checked={checked}
           disabled={disabled}
-          className="peer relative appearance-none shrink-0 w-[1.1875rem] h-[1.1875rem] rounded-sm focus:ring-transparent  focus:checked:bg-primary-input-text checked:hover:bg-primary-input-text  checked:bg-primary-input-text border-2"
+          className={`
+          peer 
+          relative 
+          appearance-none 
+          shrink-0 
+          w-[1.1875rem] 
+          h-[1.1875rem] 
+          rounded-sm 
+          focus:ring-transparent  
+          focus:checked:bg-primary-input-text 
+          checked:hover:bg-primary-input-text  
+          checked:bg-primary-input-text
+          ${disabled ? 'disabled-input' : ''}
+          `}
         />
 
         {label && (
-          <Label
-            data-testid={`${testId}-label`}
-            text={label}
-            className={labelClassName}
-            variant="sm"
-            required={required}
-          />
+          <Label testId={`${testId}-label`} text={label} className={labelClassName} variant="sm" required={required} />
         )}
 
         {showIntermediate && (

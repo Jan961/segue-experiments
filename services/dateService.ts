@@ -360,21 +360,6 @@ export function addDurationToDate(inputDate: Date, duration: number, add: boolea
   return startingDate;
 }
 
-export const formatDateWithTimezoneOffset = ({
-  date,
-  dateFormat = 'DD/MM/YY',
-  timezoneOffset,
-}: {
-  date: string | Date;
-  dateFormat?: string;
-  timezoneOffset: number;
-}) => {
-  if (typeof date === 'string' || !date) {
-    date = new Date(date);
-  }
-  return moment(date).utcOffset(-timezoneOffset).format(dateFormat);
-};
-
 /**
  *
  * Used to apply the timezone offset to the date supplied and return it in the same format

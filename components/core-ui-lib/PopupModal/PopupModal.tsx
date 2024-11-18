@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from 'react';
+import React, { Fragment, useEffect, useState, useRef } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { calibri } from 'lib/fonts';
 import Icon from '../Icon';
@@ -14,8 +14,9 @@ interface PopupModalProps {
   showCloseIcon?: boolean;
   panelClass?: string;
   hasOverlay?: boolean;
-  closeOnOverlayClick?: boolean; // New prop to close on overlay click
+  closeOnOverlayClick?: boolean;
   hasOverflow?: boolean;
+  testId?: string;
 }
 
 export default function PopupModal({
@@ -28,14 +29,31 @@ export default function PopupModal({
   showCloseIcon = true,
   panelClass,
   hasOverlay = false,
-  closeOnOverlayClick = false, // Default to false
+  closeOnOverlayClick = false,
   hasOverflow = true,
+  testId = 'overlay',
 }: PopupModalProps) {
   const [overlay, setOverlay] = useState<boolean>(false);
+  const [isScrollbarVisible, setIsScrollbarVisible] = useState(false);
+  const panelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setOverlay(hasOverlay);
   }, [hasOverlay]);
+
+  useEffect(() => {
+    const checkScrollbarVisibility = () => {
+      if (panelRef.current) {
+        const hasHorizontalScrollbar = panelRef.current.scrollWidth > panelRef.current.clientWidth;
+        setIsScrollbarVisible(hasHorizontalScrollbar);
+      }
+    };
+
+    checkScrollbarVisibility();
+    window.addEventListener('resize', checkScrollbarVisibility);
+
+    return () => window.removeEventListener('resize', checkScrollbarVisibility);
+  }, [children]);
 
   const handleOverlayClick = () => {
     if (closeOnOverlayClick) {
@@ -64,7 +82,7 @@ export default function PopupModal({
             hasOverflow ? 'overflow-y-auto' : '',
             overlay ? '' : 'bg-black/75',
           )}
-          data-testid="overlay"
+          data-testid={testId}
         >
           <div className="flex min-h-full items-center justify-center p-4 text-center">
             <Transition.Child
@@ -77,9 +95,11 @@ export default function PopupModal({
               leaveTo="opacity-0 scale-95"
             >
               <Dialog.Panel
+                ref={panelRef}
                 className={classNames(
                   'bg-primary-white flex flex-col max-h-[90vh] px-5 pt-5 pb-5 transform text-left align-middle shadow-xl transition-all max-w-full overflow-x-auto overflow-y-hidden',
                   panelClass,
+                  isScrollbarVisible ? 'pr-[calc(1rem+16px)]' : 'pr-4', // Dynamic right padding based on scrollbar
                 )}
               >
                 <header className="flex justify-between items-center">
