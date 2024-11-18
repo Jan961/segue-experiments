@@ -2,32 +2,13 @@ import ExcelJS from 'exceljs';
 import getPrismaClient from 'lib/prisma';
 import moment from 'moment';
 import { NextApiRequest, NextApiResponse } from 'next';
+import { PromoterHoldsView } from 'prisma/generated/prisma-client';
 import { all } from 'radash';
 import { getProductionWithContent } from 'services/productionService';
 import { addWidthAsPerContent } from 'services/reportsService';
 import { COLOR_HEXCODE } from 'services/salesSummaryService';
 import { getExportedAtTitle } from 'utils/export';
 import { convertToPDF } from 'utils/report';
-
-type TPromoter = {
-  ProductionId: number;
-  FullProductionCode: string;
-  VenueCode: string;
-  VenueName: string;
-  BookingId: number;
-  PerformanceDate: string;
-  PerformanceTime: string;
-  AvailableCompSeats: number | null;
-  AvailableCompNotes: string | null;
-  CompAllocationSeats: number | null;
-  CompAllocationTicketHolderName: string | null;
-  CompAllocationSeatsAllocated: number | null;
-  CompAllocationTicketHolderEmail: string | null;
-  CompAllocationComments: string | null;
-  CompAllocationRequestedBy: string | null;
-  CompAllocationArrangedBy: string | null;
-  CompAllocationVenueConfirmationNotes: string | null;
-};
 
 interface ICellAlignment {
   horizontal?: string;
@@ -90,7 +71,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const { productionCode = '', fromDate, toDate, venue, productionId, format, exportedAt } = req.body || {};
 
     const workbook = new ExcelJS.Workbook();
-    const whereQuery = {};
+    const whereQuery: { ProductionId?: string; VenueCode?: string; PerformanceDate?: { gte: Date; lte: Date } } = {};
     if (productionId) {
       whereQuery.ProductionId = productionId;
     }
@@ -106,13 +87,13 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const getPromoterHolds = prisma.promoterHoldsView.findMany({
       where: {
         ...whereQuery,
+        ProductionId: Number(productionId),
       },
       orderBy: {
         PerformanceDate: 'asc',
       },
     });
     const [data, productionDetails] = await all([getPromoterHolds, getProductionWithContent(productionId, req)]);
-    console.log('date', data);
     const showName = (productionDetails as ProductionDetails)?.Show?.Name || '';
     const filename = `${productionCode} ${showName} Promoter Holds`;
     const worksheet = workbook.addWorksheet('Promoter Holds', {
@@ -142,7 +123,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       'VENUE CONFIRMATION',
     ]);
 
-    (data as TPromoter[]).forEach((x) => {
+    (data as PromoterHoldsView[]).forEach((x) => {
       const productionCode = x.FullProductionCode || '';
       const venueCode = x.VenueCode || '';
       const venueName = x.VenueName || '';

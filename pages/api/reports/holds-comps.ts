@@ -133,7 +133,12 @@ const groupBasedOnVenueAndSameDate = ({
   fetchedValues: BookingHoldCompsView[];
 }): TBookingHoldsGroupedByCommonKey =>
   fetchedValues.reduce((acc, obj: BookingHoldCompsView) => {
-    const key: string = getAggregateKey(obj);
+    const key: string = getAggregateKey({
+      FullProductionCode: obj.FullProductionCode,
+      VenueCode: obj.VenueCode,
+      VenueName: obj.VenueName,
+      BookingFirstDate: obj.BookingFirstDate.toISOString(),
+    });
     const val: TBookingHoldsGrouped = acc[key];
     if (val) {
       return {
@@ -186,7 +191,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     const prisma = await getPrismaClient(req);
     const workbook = new ExcelJS.Workbook();
-    const whereQuery = {};
+    const whereQuery: {
+      FullProductionCode?: string;
+      VenueCode?: string;
+      BookingFirstDate?: { gte: Date; lte: Date };
+      BookingStatusCode?: string;
+    } = {};
     if (productionCode) {
       whereQuery.FullProductionCode = productionCode;
     }
