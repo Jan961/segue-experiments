@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState, useRef } from 'react';
+import React, { Fragment, useEffect, useState, useRef, ReactNode } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { calibri } from 'lib/fonts';
 import Icon from '../Icon';
@@ -9,6 +9,8 @@ interface PopupModalProps {
   subtitle?: string;
   children?: React.ReactNode;
   show: boolean;
+  btnRowHandlers?: Array<() => void>;
+  btnRowComponent?: ReactNode;
   onClose?: () => void;
   titleClass?: string;
   showCloseIcon?: boolean;
@@ -32,6 +34,8 @@ export default function PopupModal({
   closeOnOverlayClick = false,
   hasOverflow = true,
   testId = 'overlay',
+  btnRowComponent,
+  btnRowHandlers = [],
 }: PopupModalProps) {
   const [overlay, setOverlay] = useState<boolean>(false);
   const [isScrollbarVisible, setIsScrollbarVisible] = useState(false);
@@ -59,6 +63,25 @@ export default function PopupModal({
     if (closeOnOverlayClick) {
       onClose();
     }
+  };
+
+  const renderBtnRowWithHandlers = () => {
+    if (!btnRowComponent) return null;
+
+    // Clone each child to attach click handlers
+    const buttonsWithHandlers = React.Children.map(btnRowComponent, (child, index) => {
+      if (React.isValidElement<HTMLButtonElement>(child)) {
+        const onClickHandler = btnRowHandlers[index];
+        return React.cloneElement(child as React.ReactElement, {
+          onClick: () => {
+            if (onClickHandler) onClickHandler();
+          },
+        });
+      }
+      return child; // Return child as-is if it's not a valid React element
+    });
+
+    return <div className="border-t border-gray-200 mt-4 flex justify-end space-x-3">{buttonsWithHandlers}</div>;
   };
 
   return (
@@ -114,6 +137,8 @@ export default function PopupModal({
                 )}
 
                 <div className="overflow-y-auto mt-3 pr-3">{children}</div>
+
+                {renderBtnRowWithHandlers()}
               </Dialog.Panel>
             </Transition.Child>
           </div>

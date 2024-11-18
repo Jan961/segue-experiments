@@ -424,8 +424,19 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
   };
 
   return (
-    <PopupModal show={visible} title={modalTitle} onClose={() => handleCancelForm(false)}>
-      <div className="h-[80vh] w-auto overflow-y-scroll flex">
+    <PopupModal
+      show={visible}
+      title={modalTitle}
+      onClose={() => handleCancelForm(false)}
+      btnRowComponent={
+        <div className="w-full mt-4 flex justify-end items-center">
+          <Button onClick={() => handleCancelForm(false)} className="w-33" variant="secondary" text="Cancel" />
+          <Button onClick={handleFormData} className="ml-4 w-33" variant="primary" text="Save and Close" />
+        </div>
+      }
+      btnRowHandlers={[() => handleCancelForm(false), handleFormData]}
+    >
+      <div className="flex">
         <div className="h-[800px] flex">
           <div className="flex flex-col gap-y-3">
             <div className="w-[423px] rounded border-2 border-secondary mr-2 p-3 bg-primary-blue bg-opacity-15">
@@ -544,20 +555,21 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                   testId="tableVenueAttach"
                   tableHeight={335}
                   onCellClicked={(e) => handleCellClicked(e)}
+                  gridOptions={{ suppressHorizontalScroll: true }}
                 />
               </div>
             </div>
           </div>
-          <div className="w-[652px] h-fit rounded border-2 border-secondary ml-2 p-3 bg-primary-blue bg-opacity-15">
-            {/* 
-            NEEDS TO BE KEPT FOR NOW
-            EXPORT_VENUE_CONTRACT_DETAILS
+          <div className="w-[652px] h-[88%] max-h-[88%] overflow-y-auto rounded border-2 border-secondary ml-2 p-3 bg-primary-blue bg-opacity-15">
             <div className="flex justify-between">
               <div className=" text-primary-input-text font-bold text-lg">Venue Contract</div>
+              {/* 
+            NEEDS TO BE KEPT FOR NOW
+            EXPORT_VENUE_CONTRACT_DETAILS
               <div className="flex mr-2">
                 <Button className="ml-4 w-33" variant="primary" text="Export to PDF" />
-              </div>
-            </div> */}
+              </div> */}
+            </div>
             <div className="flex mt-2.5">
               <div className="w-1/5">
                 <div className=" text-primary-input-text font-bold text-sm">Booking Status</div>
@@ -928,10 +940,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
           </div>
         </div>
       </div>
-      <div className="w-full mt-4 flex justify-end items-center">
-        <Button onClick={() => handleCancelForm(false)} className="w-33" variant="secondary" text="Cancel" />
-        <Button onClick={handleFormData} className="ml-4 w-33" variant="primary" text="Save and Close" />
-      </div>
+
       {showUploadModal && (
         <UploadModal
           visible={showUploadModal}
