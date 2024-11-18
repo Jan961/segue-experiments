@@ -20,6 +20,7 @@ export default function SelectedVenues({ activeProductions }: Props) {
       method: 'POST',
       body: JSON.stringify({
         productionId: parseInt(inputs.Production, 10),
+        exportedAt: new Date().toISOString(),
       }),
     })
       .then(async (response) => {
@@ -161,7 +162,7 @@ export default function SelectedVenues({ activeProductions }: Props) {
               </div>
             </div>
           </div>
-          <div className="opacity-25 fixed inset-0 z-40 bg-black"></div>
+          <div className="opacity-25 fixed inset-0 z-40 bg-black" />
         </>
       ) : null}
     </>
