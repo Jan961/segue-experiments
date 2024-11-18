@@ -102,21 +102,23 @@ describe('DateInput tests', () => {
 
   //currently date input does allow for invalid dates to be input - commented out
 
-  // it('check if only valid dates can be input', () => {
-  //
-  //   const props: DateInputProps = { testId: 'test-date-input', onChange: cy.stub()};
-  //
-  //   mount(
-  //     <BaseComp>
-  //       <DateInput {...props} />
-  //     </BaseComp>,
-  //   );
-  //
-  //   cy.get('[data-testid="test-date-input-input"] input').type('324024').should('have.value', '');
-  //   cy.get('[data-testid="test-date-input-input"] input').type('30224').should('have.value', '');
-  //   cy.get('[data-testid="test-date-input-input"] input').type('310321').should('have.value', '31/02/21');
-  //   cy.get('[data-testid="test-date-input-input"] input').type('310421').should('have.value', '');
-  // })
+  it('check if only valid dates can be input', () => {
+    const props: DateInputProps = { testId: 'test-date-input', onChange: cy.stub() };
+
+    mount(
+      <BaseComp>
+        <DateInput {...props} />
+      </BaseComp>,
+    );
+
+    cy.get('[data-testid="test-date-input-input"] input').as('dateInput');
+    cy.get('@dateInput').type('324024').type('{enter}').should('have.value', '');
+    cy.get('@dateInput').type('30224').type('{enter}').should('have.value', '');
+
+    // the below check doesn't pass the currently DateInput text does not validate dates re number of days in a month etc
+    // cy.get('@dateInput').type('{enter}').type('310221').should('have.value', '');
+    // cy.get('@dateInput').type('{enter}').type('310321').should('have.value', '31/03/21');
+  });
 
   it('check if on change is called when a valid date is input', () => {
     const onChange = cy.stub();
