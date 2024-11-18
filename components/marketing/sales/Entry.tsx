@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
+import { forwardRef, RefObject, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { Button, Checkbox, Table, TextArea, TextInput } from 'components/core-ui-lib';
 import { salesEntryColDefs, styleProps } from '../table/tableConfig';
 import { useRecoilState, useRecoilValue } from 'recoil';
@@ -73,6 +73,21 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
   const [warningIssued, setWarningIssued] = useState<boolean>(false);
   const currency = useRecoilValue(currencyState);
   const [salesApiAction, setSalesApiAction] = useState('create');
+
+  const textInputRefs = {
+    general: {
+      seatsReserved: useRef(null),
+      seatsReservedVal: useRef(null),
+      seatsSold: useRef(null),
+      seatsSoldVal: useRef(null),
+    },
+    schools: {
+      seatsReserved: useRef(null),
+      seatsReservedVal: useRef(null),
+      seatsSold: useRef(null),
+      seatsSoldVal: useRef(null),
+    },
+  };
 
   const compareSalesFigures = (prev, curr) => {
     // If prev is null, there are no errors.
@@ -477,6 +492,13 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
     }
   }, [bookings.selected]);
 
+  // used onFocus to select the contents on the field on click
+  const selectField = (ref: RefObject<HTMLInputElement>) => {
+    if (!isNullOrUndefined(ref)) {
+      ref.current.select();
+    }
+  };
+
   // functionality to send data to the db when the return key is pressed - using an event listener so the other set functions are interfered with.
   // Temp commented out because state for current field is not processed therefore new value is not sent to DB
   // useEffect(() => {
@@ -534,6 +556,8 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                         id="genSeatsSold"
                         value={currSalesFigureSet.general.seatsSold}
                         pattern={decRegexLeadingZero}
+                        ref={textInputRefs.general.seatsSold}
+                        onFocus={() => selectField(textInputRefs.general.seatsSold)}
                         onChange={(event) => handleSalesFigChange('seatsSold', 'general', event.target.value)}
                       />
                     </div>
@@ -544,6 +568,8 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                         placeholder="Enter Value"
                         id="genSeatsSoldVal"
                         value={currSalesFigureSet.general.seatsSoldVal}
+                        ref={textInputRefs.general.seatsSoldVal}
+                        onFocus={() => selectField(textInputRefs.general.seatsSoldVal)}
                         pattern={/^\d*(\.\d*)?$/}
                         onChange={(event) => handleSalesFigChange('seatsSoldVal', 'general', event.target.value)}
                         onBlur={(event) => handleSalesFigChange('seatsSoldVal', 'general', formatDecimalOnBlur(event))}
@@ -565,6 +591,8 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                         placeholder="Enter Seats"
                         id="genSeatsReserved"
                         value={currSalesFigureSet.general.seatsReserved}
+                        ref={textInputRefs.general.seatsReserved}
+                        onFocus={() => selectField(textInputRefs.general.seatsReserved)}
                         pattern={decRegexLeadingZero}
                         onChange={(event) => handleSalesFigChange('seatsReserved', 'general', event.target.value)}
                       />
@@ -575,7 +603,9 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                         className="w-[137px]"
                         placeholder="Enter Value"
                         id="genSeatsSoldVal"
-                        value={currSalesFigureSet.general.seatsSoldVal}
+                        value={currSalesFigureSet.general.seatsReservedVal}
+                        ref={textInputRefs.general.seatsReservedVal}
+                        onFocus={() => selectField(textInputRefs.general.seatsReservedVal)}
                         pattern={/^\d*(\.\d*)?$/}
                         onChange={(event) => handleSalesFigChange('seatsSoldVal', 'general', event.target.value)}
                         onBlur={(event) => handleSalesFigChange('seatsSoldVal', 'general', formatDecimalOnBlur(event))}
@@ -634,6 +664,8 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                               placeholder="Enter Seats"
                               id="schSeatsSold"
                               value={currSalesFigureSet.schools.seatsSold}
+                              ref={textInputRefs.schools.seatsSold}
+                              onFocus={() => selectField(textInputRefs.schools.seatsSold)}
                               pattern={decRegexLeadingZero}
                               onChange={(event) => handleSalesFigChange('seatsSold', 'schools', event.target.value)}
                             />
@@ -647,6 +679,8 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                               placeholder="Enter Value"
                               id="schSeatsSoldVal"
                               value={currSalesFigureSet.schools.seatsSoldVal}
+                              ref={textInputRefs.schools.seatsSoldVal}
+                              onFocus={() => selectField(textInputRefs.schools.seatsSoldVal)}
                               pattern={/^\d*(\.\d*)?$/}
                               onChange={(event) => handleSalesFigChange('seatsSoldVal', 'schools', event.target.value)}
                               onBlur={(event) =>
@@ -676,6 +710,8 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                               placeholder="Enter Seats"
                               id="schSeatsReserved"
                               value={currSalesFigureSet.schools.seatsReserved}
+                              ref={textInputRefs.schools.seatsReserved}
+                              onFocus={() => selectField(textInputRefs.schools.seatsReserved)}
                               pattern={decRegexLeadingZero}
                               onChange={(event) => handleSalesFigChange('seatsReserved', 'schools', event.target.value)}
                             />
@@ -689,6 +725,8 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                               placeholder="Enter Value"
                               id="schSeatsReservedVal"
                               value={currSalesFigureSet.schools.seatsReservedVal}
+                              ref={textInputRefs.schools.seatsReservedVal}
+                              onFocus={() => selectField(textInputRefs.schools.seatsReservedVal)}
                               pattern={/^\d*(\.\d*)?$/}
                               onChange={(event) =>
                                 handleSalesFigChange('seatsReservedVal', 'schools', event.target.value)
