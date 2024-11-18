@@ -577,12 +577,14 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                       <TextInput
                         className="w-[137px]"
                         placeholder="Enter Value"
-                        id="genSeatsSoldVal"
+                        id="genSeatsReservedVal"
                         value={currSalesFigureSet.general.seatsReservedVal}
                         onFocus={(event) => event?.target?.select?.()}
                         pattern={/^\d*(\.\d*)?$/}
-                        onChange={(event) => handleSalesFigChange('seatsSoldVal', 'general', event.target.value)}
-                        onBlur={(event) => handleSalesFigChange('seatsSoldVal', 'general', formatDecimalOnBlur(event))}
+                        onChange={(event) => handleSalesFigChange('seatsReservedVal', 'general', event.target.value)}
+                        onBlur={(event) =>
+                          handleSalesFigChange('seatsReservedVal', 'general', formatDecimalOnBlur(event))
+                        }
                       />
                     </div>
                     <div className="flex items-center justify-end col-span-3">
