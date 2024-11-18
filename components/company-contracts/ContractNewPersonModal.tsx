@@ -73,7 +73,7 @@ export const ContractNewPersonModal = ({
 
   return (
     <div>
-      <PopupModal show={openNewPersonContract} title="Add New Person" panelClass="h-[90vh]" onClose={() => onClose?.()}>
+      <PopupModal show={openNewPersonContract} title="Add New Person" panelClass="h-[90vh]" onClose={onCancel}>
         <div className="flex flex-col h-full">
           <div className="flex-1 min-h-0">
             <PersonDetailsTab
