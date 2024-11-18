@@ -2,7 +2,7 @@ import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
 import { pdfStandardColors } from 'config/global';
 import { ExcelExportParams, ExcelRow } from 'ag-grid-enterprise';
-import { formatDateWithTimezoneOffset } from 'services/dateService';
+import { formatDate } from 'services/dateService';
 import { COLOR_HEXCODE } from 'services/salesSummaryService';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
@@ -154,13 +154,8 @@ export const dateToReadableFormat = (isoDate) => {
   return readableDate;
 };
 
-export const getExportedAtTitle = (timezoneOffset = 0) => {
-  const date = new Date();
-  return `Exported: ${formatDateWithTimezoneOffset({
-    date,
-    dateFormat: 'DD/MM/YY',
-    timezoneOffset,
-  })} at ${formatDateWithTimezoneOffset({ date, dateFormat: 'HH:mm', timezoneOffset })}`;
+export const getExportedAtTitle = (dateStr: string) => {
+  return `Exported: ${formatDate(dateStr, 'dd/MM/yy')} at ${formatDate(dateStr, 'HH:mm')}`;
 };
 
 const borderStyles = {
