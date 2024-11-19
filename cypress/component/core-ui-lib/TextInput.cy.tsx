@@ -1,7 +1,7 @@
 // TextInput.cy.js
 import TextInput from '../../../components/core-ui-lib/TextInput';
 import { mount } from 'cypress/react18';
-import { createRef, useRef } from 'react';
+import { createRef } from 'react';
 
 describe('TextInput Component', () => {
   it('renders without crashing', () => {
