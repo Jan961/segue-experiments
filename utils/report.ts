@@ -2,6 +2,7 @@ import libre from 'libreoffice-convert';
 import util from 'util';
 import { NextApiResponse } from 'next';
 import ExcelJS from 'exceljs';
+import { differenceInDays, endOfWeek, parse } from 'date-fns';
 
 export const convertToPDF = async (workbook) => {
   const excelbuffer = await workbook.xlsx.writeBuffer();
@@ -47,4 +48,20 @@ export const sanitizeRowData = (rowData: any[]) => {
     // Convert null/undefined to empty string
     return value ?? '';
   });
+};
+
+/**
+ * This function calculates the remaining days in the week given a day
+ * @param day
+ * @returns remaining days in the week
+ */
+export const calculateRemainingDaysInWeek = (day: string) => {
+  // Parse the given day to a date (assumes the current week)
+  const currentDate = parse(day, 'eeee', new Date());
+
+  // Get the end of the week (assuming the week ends on Sunday)
+  const endOfCurrentWeek = endOfWeek(currentDate, { weekStartsOn: 0 });
+
+  // Calculate the remaining days in the week
+  return differenceInDays(endOfCurrentWeek, currentDate);
 };
