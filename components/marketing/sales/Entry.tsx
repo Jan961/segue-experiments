@@ -534,6 +534,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                         id="genSeatsSold"
                         value={currSalesFigureSet.general.seatsSold}
                         pattern={decRegexLeadingZero}
+                        onFocus={(event) => event?.target?.select?.()}
                         onChange={(event) => handleSalesFigChange('seatsSold', 'general', event.target.value)}
                       />
                     </div>
@@ -544,6 +545,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                         placeholder="Enter Value"
                         id="genSeatsSoldVal"
                         value={currSalesFigureSet.general.seatsSoldVal}
+                        onFocus={(event) => event?.target?.select?.()}
                         pattern={/^\d*(\.\d*)?$/}
                         onChange={(event) => handleSalesFigChange('seatsSoldVal', 'general', event.target.value)}
                         onBlur={(event) => handleSalesFigChange('seatsSoldVal', 'general', formatDecimalOnBlur(event))}
@@ -565,6 +567,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                         placeholder="Enter Seats"
                         id="genSeatsReserved"
                         value={currSalesFigureSet.general.seatsReserved}
+                        onFocus={(event) => event?.target?.select?.()}
                         pattern={decRegexLeadingZero}
                         onChange={(event) => handleSalesFigChange('seatsReserved', 'general', event.target.value)}
                       />
@@ -574,11 +577,14 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                       <TextInput
                         className="w-[137px]"
                         placeholder="Enter Value"
-                        id="genSeatsSoldVal"
-                        value={currSalesFigureSet.general.seatsSoldVal}
+                        id="genSeatsReservedVal"
+                        value={currSalesFigureSet.general.seatsReservedVal}
+                        onFocus={(event) => event?.target?.select?.()}
                         pattern={/^\d*(\.\d*)?$/}
-                        onChange={(event) => handleSalesFigChange('seatsSoldVal', 'general', event.target.value)}
-                        onBlur={(event) => handleSalesFigChange('seatsSoldVal', 'general', formatDecimalOnBlur(event))}
+                        onChange={(event) => handleSalesFigChange('seatsReservedVal', 'general', event.target.value)}
+                        onBlur={(event) =>
+                          handleSalesFigChange('seatsReservedVal', 'general', formatDecimalOnBlur(event))
+                        }
                       />
                     </div>
                     <div className="flex items-center justify-end col-span-3">
@@ -634,6 +640,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                               placeholder="Enter Seats"
                               id="schSeatsSold"
                               value={currSalesFigureSet.schools.seatsSold}
+                              onFocus={(event) => event?.target?.select?.()}
                               pattern={decRegexLeadingZero}
                               onChange={(event) => handleSalesFigChange('seatsSold', 'schools', event.target.value)}
                             />
@@ -647,6 +654,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                               placeholder="Enter Value"
                               id="schSeatsSoldVal"
                               value={currSalesFigureSet.schools.seatsSoldVal}
+                              onFocus={(event) => event?.target?.select?.()}
                               pattern={/^\d*(\.\d*)?$/}
                               onChange={(event) => handleSalesFigChange('seatsSoldVal', 'schools', event.target.value)}
                               onBlur={(event) =>
@@ -676,6 +684,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                               placeholder="Enter Seats"
                               id="schSeatsReserved"
                               value={currSalesFigureSet.schools.seatsReserved}
+                              onFocus={(event) => event?.target?.select?.()}
                               pattern={decRegexLeadingZero}
                               onChange={(event) => handleSalesFigChange('seatsReserved', 'schools', event.target.value)}
                             />
@@ -689,6 +698,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                               placeholder="Enter Value"
                               id="schSeatsReservedVal"
                               value={currSalesFigureSet.schools.seatsReservedVal}
+                              onFocus={(event) => event?.target?.select?.()}
                               pattern={/^\d*(\.\d*)?$/}
                               onChange={(event) =>
                                 handleSalesFigChange('seatsReservedVal', 'schools', event.target.value)
