@@ -16,6 +16,7 @@ export interface RadioGroupProps {
   className?: string;
   testId?: string;
   onChange: (value: string) => void;
+  disabled?: boolean;
 }
 
 const RadioGroup: FC<RadioGroupProps> = ({
@@ -24,6 +25,7 @@ const RadioGroup: FC<RadioGroupProps> = ({
   onChange,
   value,
   testId = 'core-ui-lib-radio-group',
+  disabled,
 }) => {
   const [selection, setSelection] = useState(value);
   // name has to be unique for the group
@@ -43,7 +45,7 @@ const RadioGroup: FC<RadioGroupProps> = ({
       })}
     >
       {options.map((option, i) => (
-        <Radio name={name} key={i} value={selection} handleChange={handleChange} option={option} />
+        <Radio name={name} key={i} value={selection} handleChange={handleChange} option={option} disabled={disabled} />
       ))}
     </div>
   );
