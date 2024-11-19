@@ -7,7 +7,7 @@ import { getExportedAtTitle } from 'utils/export';
 import { currencyCodeToSymbolMap } from 'config/Reports';
 import { convertToPDF } from 'utils/report';
 import { BOOK_STATUS_CODES, SALES_TYPE_NAME } from 'types/MarketingTypes';
-import { formatDate, getDifferenceInDays } from 'services/dateService';
+import { calculateWeekNumber, formatDate, getDateObject, getDifferenceInDays } from 'services/dateService';
 import { SCHEDULE_VIEW } from 'services/reports/schedule-report';
 import { add, parseISO } from 'date-fns';
 
@@ -105,8 +105,7 @@ const getTotalInPound = ({ totalOfCurrency, conversionRate }) => {
 const handler = async (req, res) => {
   try {
     const prisma = await getPrismaClient(req);
-    const timezoneOffset = parseInt(req.headers.timezoneoffset as string, 10) || 0;
-    const { productionId, format } = req.body || {};
+    const { productionId, format, exportedAt } = req.body || {};
     if (!productionId) {
       throw new Error('Params are missing');
     }
@@ -158,7 +157,7 @@ const handler = async (req, res) => {
     const { FullProductionCode = '', ShowName = '' } = data?.[0] || {};
     filename = `${FullProductionCode} ${ShowName} Gross Sales`;
     worksheet.addRow([`${filename}`]);
-    const exportedAtTitle = getExportedAtTitle(timezoneOffset);
+    const exportedAtTitle = getExportedAtTitle(exportedAt);
     worksheet.addRow([exportedAtTitle]);
 
     worksheet.addRow([]);
@@ -191,27 +190,33 @@ const handler = async (req, res) => {
       numFmt?: string;
     }[] = [];
     const totalOfCurrency: { [key: string]: number } = { '£': 0, '€': 0 };
+    const weekStartList = [];
     for (let i = 1; i <= daysDiff || weekPending; i++) {
       weekPending = true;
       const weekDay = formatDate(add(parseISO(fromDate?.toISOString()), { days: i - 1 }), 'eeee');
       const dateInIncomingFormat = formatDate(add(parseISO(fromDate?.toISOString()), { days: i - 1 }), 'yyyy-MM-dd');
       const nextDateInIncomingFormat = formatDate(add(parseISO(fromDate?.toISOString()), { days: i }), 'yyyy-MM-dd');
       const date = formatDate(dateInIncomingFormat, 'dd/MM/yy');
-      if (i % 7 === 1) {
-        r4.push(`Week ${Math.floor(i / 7) + 1}`);
+      const weekNumber = calculateWeekNumber(fromDate, getDateObject(dateInIncomingFormat));
+      if (weekDay === 'Monday') {
+        if (i > 1 && i < 7) {
+          mergeRowCol.push({ row: [4, 4], col: [1, colNo - 1] });
+        }
+        const remainingDays = daysDiff - i + 1;
+        r4.push(`Week ${weekNumber}`);
         r5.push('');
         r6.push('');
         r8.push('');
         r9.push('');
-
+        weekStartList.push(colNo);
         mergeRowCol.push({ row: [7, 8], col: [colNo, colNo] });
-        mergeRowCol.push({ row: [4, 4], col: [colNo, colNo + 7] });
-
+        // +1 for weekly costs column
+        mergeRowCol.push({ row: [4, 4], col: [colNo, Math.min(colNo + 7, colNo + remainingDays + 1)] });
         r7.push('Weekly Costs');
         colNo++;
       }
 
-      r4.push(`Week ${Math.floor(i / 7) + 1}`);
+      r4.push(`Week ${weekNumber}`);
       r5.push(date);
       r6.push(weekDay);
 
@@ -300,7 +305,7 @@ const handler = async (req, res) => {
       }
       colNo++;
     }
-
+    weekStartList.push(colNo);
     for (let i = 0; i <= 2; i++) {
       r4.push('Production Totals');
       r5.push('');
@@ -336,8 +341,8 @@ const handler = async (req, res) => {
       mergeRowCol.push({ row: [7, 8], col: [colNo, colNo] });
       colNo++;
     }
-
-    mergeRowCol.push({ row: [4, 4], col: [colNo, colNo + 2] });
+    weekStartList.push(colNo);
+    mergeRowCol.push({ row: [4, 4], col: [colNo - 3, colNo - 1] });
 
     worksheet.addRow(r4);
     worksheet.addRow(r5);
@@ -383,19 +388,12 @@ const handler = async (req, res) => {
       };
     }
 
-    for (let i = 1; i <= numberOfColumns; i++) {
-      if (i % 8 === 1) {
-        for (let row = 5; row <= 9; row++) {
-          worksheet.getCell(row, i).border = {
-            left: { style: 'thick' },
-          };
-        }
+    for (const col of weekStartList) {
+      for (let row = 5; row <= 9; row++) {
+        worksheet.getCell(row, col).border = {
+          left: { style: 'thick' },
+        };
       }
-    }
-    for (let row = 5; row <= 9; row++) {
-      worksheet.getCell(row, colNo + 3).border = {
-        left: { style: 'thick' },
-      };
     }
 
     cellColor.forEach((ele) => {
