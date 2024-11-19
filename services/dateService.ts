@@ -462,7 +462,7 @@ export const toSqlV2 = (date: string | UTCDate | number, locale?: Locale): strin
   return getKeyV2(d);
 };
 
-// ??
+// NEEDS REVIEW WITH ARUN
 export function getDurationV2(upTime: string, downTime: string): number {
   if (upTime === '' || downTime === '') {
     return 0;
@@ -473,8 +473,16 @@ export function getDurationV2(upTime: string, downTime: string): number {
   return diff;
 }
 
-// ??
-export const checkDateOverlapV2 = (start1: Date, end1: Date, start2: Date, end2: Date): boolean => {
+/**
+ * Check if the date ranges overlap.
+ *
+ * @param {UTCDate} start1 - First date for first date range.
+ * @param {UTCDate} end1 - Last date for first date range.
+ * @param {UTCDate} start2 - First date for second date range.
+ * @param {UTCDate} end2 - Last date for the second date range.
+ * @returns {boolean} Returns if there is an overlap in the date ranges.
+ */
+export const checkDateOverlapV2 = (start1: UTCDate, end1: UTCDate, start2: UTCDate, end2: UTCDate): boolean => {
   return !((start1 < start2 && end1 < start2) || (start1 > end2 && end2 > end1));
 };
 
@@ -582,7 +590,7 @@ export function addDurationToDate(inputDate: Date, duration: number, add: boolea
   return startingDate;
 }
 
-// DEPRECATED
+// DEPRECATED -- ARUN NEEDS CONSULTING
 export const formatDateWithTimezoneOffset = ({
   date,
   dateFormat = 'DD/MM/YY',
@@ -606,7 +614,7 @@ export const getDateWithOffset = (date: Date) => {
   return dateWithOffset;
 };
 
-// DEPRECATED
+// DEPRECATED ->
 export const dateToTimeString = (dateStr) => {
   const date = moment(dateStr);
   return date.format('HH:mm');
