@@ -18,7 +18,7 @@ import moment from 'moment';
 import { UTCDate } from '@date-fns/utc';
 import { toZonedTime } from 'date-fns-tz';
 
-// regex for dd/mm/yy
+// regex for date patterns
 export const DATE_PATTERNS = {
   shortSlash: /(\d{2}\/\d{2}\/\d{2})/,
   longSlash: /(\d{2}\/\d{2}\/\d{4})/,
@@ -41,7 +41,7 @@ const disectTime = (time: string) => {
 };
 
 /**
- * Return a UTCDate object from a string in any valid format.
+ * Return a UTCDate object from a string in any valid format or returns a new UTCDate object of the current day and time if there is no input.
  *
  * @param {string | number} date - The date to parse in any valid format.
  * @param {Locale} locale - The locale of the inputted date.
@@ -162,7 +162,12 @@ const getUTCFromUSDateString = (date: string) => {
   return null;
 };
 
-// returns a date if the date is valid or the date string is valid
+/**
+ * Returns a UTCDate object for any valid dates or returns a new UTCDate object of the current date and time if there is no input.
+ *
+ * @param {string | UTCDate | number} date - The date to be parsed.
+ * @returns {UTCDate} Returns a UTCDate object of the given date.
+ */
 export const safeDateV2 = (date: UTCDate | string | number, locale?: Locale): UTCDate => {
   if (!date) {
     return newDate();
@@ -184,7 +189,7 @@ export const safeDateV2 = (date: UTCDate | string | number, locale?: Locale): UT
  * @param {string | UTCDate | number} date - The date to get the key of.
  * @returns {string} Returns the key of a date in string format yyyy-mm-dd.
  */
-export const getKeyV2 = (date: string | UTCDate | number, locale?: Locale): string => {
+export const getKey = (date: string | UTCDate | number, locale?: Locale): string => {
   if (!date) {
     return null;
   }
@@ -459,7 +464,7 @@ export const toSqlV2 = (date: string | UTCDate | number, locale?: Locale): strin
     return null;
   }
   const d = safeDateV2(date, locale);
-  return getKeyV2(d);
+  return getKey(d);
 };
 
 // NEEDS REVIEW WITH ARUN
@@ -510,7 +515,7 @@ export const getArrayOfDatesBetweenV2 = (
   for (let dt = startDate; dt <= endDate; dt = getDateDaysAway(dt, 1)) {
     arr.push(dt.toISOString());
   }
-  return arr.map((x) => getKeyV2(x));
+  return arr.map((x) => getKey(x));
 };
 
 /**
@@ -756,9 +761,6 @@ export const safeDate = (date: Date | string) => {
   if (typeof date === 'string') return new Date(date);
   return date;
 };
-
-// DEPRECATED
-export const getKey = (date: string) => date.split('T')[0];
 
 // DEPRECATED
 export const todayToSimple = () => {
@@ -1023,7 +1025,7 @@ export const getArrayOfDatesBetween = (start: string, end: string) => {
   for (let dt = moment.utc(start); dt <= moment.utc(end); dt = dt.add(1, 'days')) {
     arr.push(dt.toISOString());
   }
-  return arr.map(getKey);
+  return arr.map((x) => getKey(x));
 };
 
 // DEPRECATED

@@ -1,5 +1,5 @@
 import React from 'react';
-import { dateToPicker, dateToSimple, getKey } from 'services/dateService';
+import { dateToPicker, dateToSimple, getKey, newDate } from 'services/dateService';
 import { StyledDialog } from 'components/global/StyledDialog';
 import { FormInputTextAttached } from 'components/global/forms/FormInputSetter';
 import { useRecoilState, useRecoilValue } from 'recoil';
@@ -24,16 +24,16 @@ interface ChangeBookingDateProps {
 
 const shiftDates = (dates: string[], days: number): string[] => {
   return dates.map((date) => {
-    const currentDate = new Date(date);
+    const currentDate = newDate(date);
     currentDate.setDate(currentDate.getDate() + days);
     return currentDate.toISOString().split('T')[0];
   });
 };
 
 const getDatesRange = (performances: PerformanceDTO[]): string[] => {
-  const dates = performances.map((performance) => new Date(getKey(performance.Date)).getTime());
-  const minDate = new Date(Math.min(...dates));
-  const maxDate = new Date(Math.max(...dates));
+  const dates = performances.map((performance) => newDate(getKey(performance.Date)).getTime());
+  const minDate = newDate(Math.min(...dates));
+  const maxDate = newDate(Math.max(...dates));
 
   const generateDates = (start: Date, end: Date): string[] => {
     const dateList: string[] = [];

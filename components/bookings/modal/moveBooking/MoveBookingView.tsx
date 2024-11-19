@@ -8,7 +8,6 @@ import { BookingItem } from '../NewBooking/reducer';
 import DateInput from 'components/core-ui-lib/DateInput';
 import { isNullOrEmpty } from 'utils';
 import { toWords } from 'number-to-words';
-import format from 'date-fns/format';
 import { addDays, parseISO } from 'date-fns';
 import { currentProductionSelector } from 'state/booking/selectors/currentProductionSelector';
 import Button from 'components/core-ui-lib/Button';
@@ -16,7 +15,7 @@ import axios from 'axios';
 import { BarredVenue } from 'pages/api/productions/venue/barringCheck';
 import { BookingWithVenueDTO } from 'interfaces';
 import { useWizard } from 'react-use-wizard';
-import { dateToSimple } from 'services/dateService';
+import { dateToSimple, formatDateV2 } from 'services/dateService';
 import { MoveParams } from '.';
 import { productionJumpState } from 'state/booking/productionJumpState';
 
@@ -221,7 +220,7 @@ const MoveBookingView = ({
       </div>
       <Label
         text={`Currently scheduled to start on ${
-          bookingDetails.moveDate ? format(parseISO(bookingDetails.moveDate), 'dd/MM/yy') : ''
+          bookingDetails.moveDate ? formatDateV2(bookingDetails.moveDate, 'dd/MM/yy') : ''
         }`}
       />
       <div className="flex item-center gap-2">
