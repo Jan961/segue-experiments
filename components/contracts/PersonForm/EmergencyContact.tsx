@@ -21,9 +21,10 @@ interface Props {
   emergencyContact?: Partial<EmergencyContact>;
   countryOptionList: SelectOption[];
   onChange: (data: Partial<EmergencyContact>) => void;
+  disabled?: boolean;
 }
 
-const EmergencyContactForm = ({ emergencyContact = {}, countryOptionList = [], onChange }: Props) => {
+const EmergencyContactForm = ({ emergencyContact = {}, countryOptionList = [], onChange, disabled }: Props) => {
   const [contact, setContact] = useState<EmergencyContact>({ ...defaultEmergencyContactData, ...emergencyContact });
   const { firstName, lastName, email, mobileNumber, landline, address1, address2, address3, town, postcode, country } =
     contact;
@@ -46,6 +47,7 @@ const EmergencyContactForm = ({ emergencyContact = {}, countryOptionList = [], o
             className=" text-primary-input-text font-bold w-full max-w-96"
             onChange={(e) => handleChange('firstName', e.target.value)}
             value={firstName}
+            disabled={disabled}
           />
         </div>
       </div>
@@ -58,6 +60,7 @@ const EmergencyContactForm = ({ emergencyContact = {}, countryOptionList = [], o
             className=" text-primary-input-text font-bold w-full max-w-96"
             onChange={(e) => handleChange('lastName', e.target.value)}
             value={lastName}
+            disabled={disabled}
           />
         </div>
       </div>
@@ -70,6 +73,7 @@ const EmergencyContactForm = ({ emergencyContact = {}, countryOptionList = [], o
             className=" text-primary-input-text font-bold w-full max-w-96"
             onChange={(e) => handleChange('address1', e.target.value)}
             value={address1}
+            disabled={disabled}
           />
           <TextInput
             testId="emergency-contact-address-2"
@@ -77,6 +81,7 @@ const EmergencyContactForm = ({ emergencyContact = {}, countryOptionList = [], o
             className=" text-primary-input-text font-bold w-full max-w-96"
             onChange={(e) => handleChange('address2', e.target.value)}
             value={address2}
+            disabled={disabled}
           />
           <TextInput
             testId="emergency-contact-address-3"
@@ -84,6 +89,7 @@ const EmergencyContactForm = ({ emergencyContact = {}, countryOptionList = [], o
             className=" text-primary-input-text font-bold w-full max-w-96"
             onChange={(e) => handleChange('address3', e.target.value)}
             value={address3}
+            disabled={disabled}
           />
         </div>
       </div>
@@ -96,6 +102,7 @@ const EmergencyContactForm = ({ emergencyContact = {}, countryOptionList = [], o
             className=" text-primary-input-text font-bold w-full max-w-96"
             onChange={(e) => handleChange('town', e.target.value)}
             value={town}
+            disabled={disabled}
           />
         </div>
       </div>
@@ -108,6 +115,7 @@ const EmergencyContactForm = ({ emergencyContact = {}, countryOptionList = [], o
             className=" text-primary-input-text font-bold w-full max-w-96"
             onChange={(e) => handleChange('postcode', e.target.value)}
             value={postcode}
+            disabled={disabled}
           />
         </div>
       </div>
@@ -120,6 +128,7 @@ const EmergencyContactForm = ({ emergencyContact = {}, countryOptionList = [], o
             className=" text-primary-input-text font-bold w-full max-w-96"
             onChange={(e) => handleChange('email', e.target.value)}
             value={email}
+            disabled={disabled}
           />
         </div>
       </div>
@@ -135,6 +144,7 @@ const EmergencyContactForm = ({ emergencyContact = {}, countryOptionList = [], o
             value={country}
             isSearchable
             isClearable
+            disabled={disabled}
           />
         </div>
       </div>
@@ -147,6 +157,7 @@ const EmergencyContactForm = ({ emergencyContact = {}, countryOptionList = [], o
             className=" text-primary-input-text font-bold w-full max-w-96"
             onChange={(e) => handleChange('landline', e.target.value)}
             value={landline}
+            disabled={disabled}
           />
         </div>
       </div>
@@ -159,6 +170,7 @@ const EmergencyContactForm = ({ emergencyContact = {}, countryOptionList = [], o
             className=" text-primary-input-text font-bold w-full max-w-96"
             onChange={(e) => handleChange('mobileNumber', e.target.value)}
             value={mobileNumber}
+            disabled={disabled}
           />
         </div>
       </div>
