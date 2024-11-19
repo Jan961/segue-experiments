@@ -7,7 +7,7 @@ import {
   safeDateV2,
   dateTimeToTimeV2,
   addOneMonthV2,
-  dateToSimpleV2,
+  dateToSimple,
   formatShortDateUKV2,
   formattedDateWithWeekDayV2,
   getKey,
@@ -189,7 +189,7 @@ describe.each([
   [{ date: '15-10-24', locale: 'UK' }, '15/10/24'],
 ])('dateToSimple', (input: { date; locale: Locale }, expected) => {
   test(`Expect '${input.date}'${input.locale ? ` in locale '${input.locale}'` : ''} to be '${expected}'`, () => {
-    const val = dateToSimpleV2(input.date, input?.locale);
+    const val = dateToSimple(input.date, input?.locale);
     expect(val).toStrictEqual(expected);
   });
 });

@@ -249,7 +249,7 @@ export const simpleToDateDMYV2 = (date: string): UTCDate => {
  * @param {Locale} locale - The locale value of the inputted date.
  * @returns {string} Return a date string of format dd/mm/yy.
  */
-export const dateToSimpleV2 = (dateToFormat: UTCDate | string | number, locale?: Locale): string => {
+export const dateToSimple = (dateToFormat: UTCDate | string | number, locale?: Locale): string => {
   if (!dateToFormat) return null;
   const date = safeDateV2(dateToFormat, locale);
   const options: Intl.DateTimeFormatOptions = {
@@ -791,19 +791,6 @@ export const simpleToDate = (stringToFormat: string): Date => {
 export const simpleToDateDMY = (dateStr: string) => {
   const [day, month, year] = dateStr.split('/').map(Number);
   return new Date(year + 2000, month - 1, day);
-};
-
-// DEPRECATED
-export const dateToSimple = (dateToFormat: Date | string) => {
-  if (!dateToFormat) return 'DD/MM/YY';
-  const date = safeDate(dateToFormat);
-  const options: Intl.DateTimeFormatOptions = {
-    year: '2-digit',
-    day: '2-digit',
-    month: '2-digit',
-    timeZone: 'UTC',
-  };
-  return date.toLocaleDateString('en-GB', options);
 };
 
 // DEPRECATED

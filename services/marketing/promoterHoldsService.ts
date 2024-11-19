@@ -1,3 +1,4 @@
+import { UTCDate } from '@date-fns/utc';
 import { performanceMapper } from 'lib/mappers';
 import getPrismaClient from 'lib/prisma';
 import { NextApiRequest } from 'next';
@@ -6,26 +7,33 @@ import { isNull } from 'utils';
 
 export const getPerformanceCompAllocationsByBookingId = async (bookingId: number, req: NextApiRequest) => {
   const prisma = await getPrismaClient(req);
-  const performanceRaw = await prisma.performance.findMany({
-    where: {
-      BookingId: bookingId,
-    },
-    orderBy: [
-      {
-        Date: 'asc',
+  const performanceRaw = await prisma.performance
+    .findMany({
+      where: {
+        BookingId: bookingId,
       },
-      {
-        Time: 'asc',
-      },
-    ],
-    include: {
-      AvailableComp: {
-        include: {
-          CompAllocation: true,
+      orderBy: [
+        {
+          Date: 'asc',
+        },
+        {
+          Time: 'asc',
+        },
+      ],
+      include: {
+        AvailableComp: {
+          include: {
+            CompAllocation: true,
+          },
         },
       },
-    },
-  });
+    })
+    .then((res) => {
+      const r = res.map((e) => {
+        return { ...e, Date: new UTCDate(e.Date), Time: new UTCDate(e.Time) };
+      });
+      return r;
+    });
 
   const holds = [];
   const allocations = [];
