@@ -31,7 +31,7 @@ interface ContractPersonDataFormProps {
   departmentId: number;
 }
 
-const mergeContractData = (contractDetailsD, contractDetailsV) => {
+const mergeContractData = (contractDetailsD: any, contractDetailsV: any) => {
   const {
     personDetails: personDetailsD,
     emergencyContact1: emergencyContact1D,
@@ -145,6 +145,7 @@ export const PersonDetailsTab = ({
             emergencyContact={emergencyContact1}
             countryOptionList={countryOptionList}
             onChange={(data) => onChange('emergencyContact1', data)}
+            disabled={isPersonDetailsDisabled(departmentId)}
           />
         </div>
         <div>
@@ -153,6 +154,7 @@ export const PersonDetailsTab = ({
             emergencyContact={emergencyContact2}
             countryOptionList={countryOptionList}
             onChange={(data) => onChange('emergencyContact2', data)}
+            disabled={isPersonDetailsDisabled(departmentId)}
           />
         </div>
       </div>
@@ -164,11 +166,12 @@ export const PersonDetailsTab = ({
           label="N/A"
           checked={hideAgencyDetails}
           onChange={handleToggleAgencyDetails}
+          disabled={isPersonDetailsDisabled(departmentId)}
         />
       </div>
       <AgencyDetails
         details={agencyDetails}
-        disabled={hideAgencyDetails}
+        disabled={hideAgencyDetails || isPersonDetailsDisabled(departmentId)}
         countryOptionList={countryOptionList}
         onChange={(data) => onChange('agencyDetails', data)}
       />
@@ -181,6 +184,7 @@ export const PersonDetailsTab = ({
             accountType="Salary"
             countryOptionList={countryOptionList}
             onChange={(data) => onChange('salaryAccountDetails', data)}
+            disabled={isPersonDetailsDisabled(departmentId)}
           />
         </div>
         <div>
@@ -190,6 +194,7 @@ export const PersonDetailsTab = ({
             accountType="Expenses"
             countryOptionList={countryOptionList}
             onChange={(data) => onChange('expenseAccountDetails', data)}
+            disabled={isPersonDetailsDisabled(departmentId)}
           />
         </div>
       </div>
