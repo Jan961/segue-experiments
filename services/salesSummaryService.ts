@@ -654,20 +654,21 @@ export const makeColumnTextBold = ({ worksheet, colAsChar }: { worksheet: any; c
 };
 
 export const salesReportName = ({ isWeeklyReport, isSeatsDataRequired, data }): string => {
+  let reportName = `Sales Summary`;
   if (isSeatsDataRequired) {
-    return `Sales Summary Vs Capacity`;
+    reportName = `Sales Summary Vs Capacity`;
   }
 
   if (isWeeklyReport) {
-    return `Sales Summary Weekly`;
+    reportName = `Sales Summary Weekly`;
   }
 
   if (data.length) {
     const { ShowName, FullProductionCode } = data[0];
-    return `${FullProductionCode} ${ShowName} Sales Summary`;
+    return `${FullProductionCode} ${ShowName} ${reportName}`;
   }
 
-  return `Sales Summary`;
+  return reportName;
 };
 
 export const applyFormattingToRange = ({
