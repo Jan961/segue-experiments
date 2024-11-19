@@ -1,7 +1,6 @@
 // Spinner.cy.tsx
 
 import Spinner from '../../../components/core-ui-lib/Spinner';
-import { mount } from 'cypress/react';
 
 describe('Spinner Component', () => {
   it('renders correctly with default props and undefined size', () => {
