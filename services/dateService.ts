@@ -500,7 +500,7 @@ export const checkDateOverlapV2 = (start1: UTCDate, end1: UTCDate, start2: UTCDa
  * @param {Locale} endLocale - The locale of the end date.
  * @returns {string[]} Returns a list of dates betwen the start date and the ends date.
  */
-export const getArrayOfDatesBetweenV2 = (
+export const getArrayOfDatesBetween = (
   start: string | UTCDate | number,
   end: string | UTCDate | number,
   startLocale?: Locale,
@@ -1001,18 +1001,6 @@ export const convertLocalDateToUTC = (date: Date) => {
 // DEPRECATED
 export const checkDateOverlap = (start1: Date, end1: Date, start2: Date, end2: Date): boolean => {
   return !((start1 < start2 && end1 < start2) || (start1 > end2 && end2 > end1));
-};
-
-// DEPRECATED
-export const getArrayOfDatesBetween = (start: string, end: string) => {
-  const arr = [];
-  if (!isValid(new Date(start)) || !isValid(new Date(end))) {
-    return [];
-  }
-  for (let dt = moment.utc(start); dt <= moment.utc(end); dt = dt.add(1, 'days')) {
-    arr.push(dt.toISOString());
-  }
-  return arr.map((x) => getKey(x));
 };
 
 // DEPRECATED

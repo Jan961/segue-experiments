@@ -17,7 +17,7 @@ import {
   dateStringToPerformancePairV2,
   timeFormatV2,
   simpleToDateDMYV2,
-  getArrayOfDatesBetweenV2,
+  getArrayOfDatesBetween,
   Locale,
 } from '../dateService';
 
@@ -400,6 +400,6 @@ describe.each([
   ],
 ])('getArrayOfDatesBetween', (input: { start; end }, expected) => {
   test(`Expect ${input.start} to ${input.end} to be ${expected}`, () => {
-    expect(getArrayOfDatesBetweenV2(input.start, input.end)).toStrictEqual(expected);
+    expect(getArrayOfDatesBetween(input.start, input.end)).toStrictEqual(expected);
   });
 });
