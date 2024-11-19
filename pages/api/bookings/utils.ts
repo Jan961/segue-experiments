@@ -82,6 +82,9 @@ export const mapNewRehearsalOrGIFUToPrismaFields = (booking) => ({
   PencilNum: Number(booking.pencilNo),
   Notes: booking.notes || '',
   RunTag: booking.runTag,
+  isBooking: false,
+  isRehearsal: booking.isRehearsal,
+  isGetInFitUp: booking.isGetInFitUp,
 });
 
 export const mapNewOtherTypeToPrismaFields = (booking) => ({
@@ -92,4 +95,18 @@ export const mapNewOtherTypeToPrismaFields = (booking) => ({
   PencilNum: Number(booking.pencilNo),
   Notes: booking.notes || '',
   RunTag: booking.runTag,
+  isBooking: false,
+  isRehearsal: false,
+  isGetInFitUp: false,
 });
+
+export const getBookingType = (booking: BookingItem) => {
+  if (booking.isBooking) {
+    return 'booking';
+  } else if (booking.isRehearsal) {
+    return 'rehearsal';
+  } else if (booking.isGetInFitUp) {
+    return 'getInFitUp';
+  }
+  return 'other';
+};

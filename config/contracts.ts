@@ -1,10 +1,10 @@
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
 
 export const statusOptions: SelectOption[] = [
-  { text: 'Received Not Returned', value: 'CSAR' },
-  { text: 'Received, Questions Raised', value: 'U' },
-  { text: 'Producer Signed, Returned to Venue', value: 'X' },
-  { text: 'Countersigned and Filed', value: 'CSAF' },
+  { text: 'Recieved, Not Returned', value: 'RNR' },
+  { text: 'Recieved, Questions Raised', value: 'RQR' },
+  { text: 'Producer Signed and Returned', value: 'SAR' },
+  { text: 'Countersigned and Filed', value: 'CSF' },
   { text: 'None', value: 'NONE' },
 ];
 
@@ -62,10 +62,10 @@ export const sellerOptions = [
 ];
 
 export const contractsStatusMap = {
-  CSAR: 'Received Not Returned',
-  U: 'Received, Questions Raised',
-  X: 'Producer Signed, Returned to Venue',
-  CSAF: 'Countersigned and Filed',
+  RNR: 'Received, Not Returned',
+  RQR: 'Received, Questions Raised',
+  SAR: 'Producer Signed and Returned',
+  CSF: 'Countersigned and Filed',
   NONE: 'None',
 };
 
@@ -262,6 +262,12 @@ export const paymentTypes = [
     value: 'O',
   },
 ];
+
+export const contractOptionMapping = {
+  artisteContracts: 'Artiste',
+  creativeContracts: 'Creative',
+  smTechCrewContracts: 'SM / Tech / Crew',
+};
 
 export const contractDepartmentOptions = [
   {

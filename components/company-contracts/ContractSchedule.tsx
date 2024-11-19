@@ -25,12 +25,12 @@ export const defaultContractSchedule = {
 export const ContractScheduleModal = ({
   openContract,
   onClose,
-  newPersonDisabled,
+  accessNewPerson,
   accessPermissions,
 }: {
   openContract: boolean;
   onClose: () => void;
-  newPersonDisabled: ContractPermissionGroup;
+  accessNewPerson: ContractPermissionGroup;
   accessPermissions: ContractPermissionGroup;
 }) => {
   const { productions } = useRecoilValue(productionJumpState);
@@ -94,28 +94,6 @@ export const ContractScheduleModal = ({
     [setOpenNewPersonContract, setPersonMap],
   );
 
-  const onOpenBuildContract = useCallback(() => {
-    if (production && department && role && personId && templateId) {
-      setOpenNewBuildContract(true);
-    } else {
-      notify.error('Please complete all the fields');
-    }
-  }, [production, department, role, personId, templateId, setOpenNewBuildContract]);
-
-  const isNewPersonDisabled = () => {
-    if (!production) {
-      return true;
-    }
-    if (
-      newPersonDisabled.artisteContracts ||
-      newPersonDisabled.creativeContracts ||
-      newPersonDisabled.smTechCrewContracts
-    ) {
-      return false;
-    }
-    return true;
-  };
-
   const getDepartmentOptions = useMemo(() => {
     return departmentOptions.filter(
       (x) =>
@@ -125,15 +103,30 @@ export const ContractScheduleModal = ({
     );
   }, [accessPermissions]);
 
+  const onOpenBuildContract = useCallback(() => {
+    if (production && department && role && personId && templateId) {
+      setOpenNewBuildContract(true);
+    } else {
+      notify.error('Please complete all the fields');
+    }
+  }, [production, department, role, personId, templateId, setOpenNewBuildContract]);
+
+  const isNewPersonDisabled = () => {
+    return !(
+      accessNewPerson.artisteContracts ||
+      accessNewPerson.creativeContracts ||
+      accessNewPerson.smTechCrewContracts
+    );
+  };
+
   return (
     <PopupModal
       show={openContract}
       title="Contract Schedule"
-      titleClass="text-xl text-primary-navy font-bold -mt-2"
       onClose={onClose}
       hasOverlay={openNewPersonContract || openNewBuildContract}
     >
-      <div className="w-[430px] h-auto">
+      <div className="w-[430px] h-[380px]">
         <Select
           label="Production"
           testId="cs-production-selector"
@@ -157,8 +150,7 @@ export const ContractScheduleModal = ({
         </div>
         <div className="flex justify-end mr-2">
           <Button
-            disabled={isNewPersonDisabled()} // CHANGE
-            // disabled={!production || !permissions.includes('ADD_NEW_PERSON_ARTISTE')}
+            disabled={!production || isNewPersonDisabled()}
             className="w-33"
             variant="secondary"
             text="Add New Person"
@@ -215,7 +207,7 @@ export const ContractScheduleModal = ({
       </div>
       {openNewPersonContract && (
         <ContractNewPersonModal
-          permissions={newPersonDisabled}
+          permissions={accessNewPerson}
           openNewPersonContract={openNewPersonContract}
           onClose={onCloseCreateNewPerson}
         />
@@ -228,7 +220,7 @@ export const ContractScheduleModal = ({
             setOpenNewBuildContract(false);
             onClose?.();
           }}
-          editPerson={newPersonDisabled}
+          editPerson={accessNewPerson}
         />
       )}
     </PopupModal>

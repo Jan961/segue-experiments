@@ -24,7 +24,8 @@ const defaultContractDetails = {
 interface ContractPersonDataFormProps {
   type: 'Edit' | 'New';
   person?: Partial<IPerson>;
-  height: string;
+  className?: string;
+  height?: string;
   updateFormData: (data: Partial<IPerson>) => void;
   permissions: ContractPermissionGroup;
   departmentId: number;
@@ -63,6 +64,7 @@ export const PersonDetailsTab = ({
   person = {},
   height,
   updateFormData,
+  className = '',
   type,
   permissions,
   departmentId,
@@ -76,7 +78,7 @@ export const PersonDetailsTab = ({
     salaryAccountDetails,
     expenseAccountDetails,
   } = personData;
-  const [hideAgencyDetails, setHideAgencyDetails] = useState(!agencyDetails?.hasAgent && true);
+  const [hideAgencyDetails, setHideAgencyDetails] = useState(personDetails.id ? !agencyDetails.id : false);
   const countryList = useRecoilValue(countryState) || [];
   const { users = [] } = useRecoilValue(userState);
   const userOptionList = useMemo(
@@ -112,90 +114,90 @@ export const PersonDetailsTab = ({
       : type !== 'New';
   };
 
+  const handleToggleAgencyDetails = (e) => {
+    setHideAgencyDetails(e.target.checked);
+    const updatedFormData = {
+      ...personData,
+      agencyDetails: {
+        ...personData.agencyDetails,
+        hasAgent: !e.target.checked,
+      },
+    };
+    setPersonData(updatedFormData);
+    updateFormData?.(updatedFormData);
+  };
+
   return (
-    <>
-      <div className={`${height} w-full`}>
-        <div className="text-xl text-primary-navy font-bold mb-3">Person Details</div>
-        <PersonalDetails
-          disabled={isPersonDetailsDisabled(departmentId)}
-          details={personDetails}
-          countryOptionList={countryOptionList}
-          booleanOptions={booleanOptions}
-          userOptionList={userOptionList}
-          onChange={(data) => onChange('personDetails', data)}
-        />
-        <div className="grid grid-cols-2 mt-10 gap-x-4">
-          <div>
-            <h3 className="text-xl text-primary-navy font-bold mb-3">Emergency Contact 1</h3>
-            <EmergencyContact
-              emergencyContact={emergencyContact1}
-              countryOptionList={countryOptionList}
-              onChange={(data) => onChange('emergencyContact1', data)}
-              disabled={isPersonDetailsDisabled(departmentId)}
-            />
-          </div>
-          <div>
-            <h3 className="text-xl text-primary-navy font-bold mb-3">Emergency Contact 2</h3>
-            <EmergencyContact
-              emergencyContact={emergencyContact2}
-              countryOptionList={countryOptionList}
-              onChange={(data) => onChange('emergencyContact2', data)}
-              disabled={isPersonDetailsDisabled(departmentId)}
-            />
-          </div>
-        </div>
-        <div className="flex gap-4 mt-8 mb-3">
-          <h3 className="text-xl text-primary-navy font-bold">Agency Details</h3>
-          <Checkbox
-            id="toggle-agency-details"
-            testId="toggle-agency-details"
-            label="N/A"
-            checked={hideAgencyDetails}
-            onChange={(e) => {
-              setHideAgencyDetails(e.target.checked);
-              const updatedFormData = {
-                ...personData,
-                agencyDetails: {
-                  ...personData.agencyDetails,
-                  hasAgent: !e.target.checked,
-                },
-              };
-              setPersonData(updatedFormData);
-              updateFormData?.(updatedFormData);
-            }}
+    <div className={`${height} w-full py-5 ${className}`}>
+      <div className="text-xl text-primary-navy font-bold mb-3">Person Details</div>
+      <PersonalDetails
+        disabled={isPersonDetailsDisabled(departmentId)}
+        details={personDetails}
+        countryOptionList={countryOptionList}
+        booleanOptions={booleanOptions}
+        userOptionList={userOptionList}
+        onChange={(data) => onChange('personDetails', data)}
+      />
+      <div className="grid grid-cols-2 mt-10 gap-x-4">
+        <div>
+          <h3 className="text-xl text-primary-navy font-bold mb-3">Emergency Contact 1</h3>
+          <EmergencyContact
+            emergencyContact={emergencyContact1}
+            countryOptionList={countryOptionList}
+            onChange={(data) => onChange('emergencyContact1', data)}
             disabled={isPersonDetailsDisabled(departmentId)}
           />
         </div>
-        <AgencyDetails
-          details={agencyDetails}
-          disabled={hideAgencyDetails || isPersonDetailsDisabled(departmentId)}
-          countryOptionList={countryOptionList}
-          onChange={(data) => onChange('agencyDetails', data)}
-        />
-        <h3 className="text-xl text-primary-navy font-bold mt-10">Salary Details</h3>
-        <div className="grid grid-cols-2 gap-x-4 my-8">
-          <div>
-            <h3 className="text-base text-primary-navy font-bold mb-3">Salary</h3>
-            <AccountDetailsForm
-              details={salaryAccountDetails}
-              accountType="Salary"
-              countryOptionList={countryOptionList}
-              onChange={(data) => onChange('salaryAccountDetails', data)}
-              disabled={isPersonDetailsDisabled(departmentId)}
-            />
-          </div>
-          <div>
-            <h3 className="text-base text-primary-navy font-bold mb-3">Expenses</h3>
-            <AccountDetailsForm
-              details={expenseAccountDetails}
-              accountType="Expenses"
-              countryOptionList={countryOptionList}
-              onChange={(data) => onChange('expenseAccountDetails', data)}
-              disabled={isPersonDetailsDisabled(departmentId)}
-            />
-          </div>
+        <div>
+          <h3 className="text-xl text-primary-navy font-bold mb-3">Emergency Contact 2</h3>
+          <EmergencyContact
+            emergencyContact={emergencyContact2}
+            countryOptionList={countryOptionList}
+            onChange={(data) => onChange('emergencyContact2', data)}
+            disabled={isPersonDetailsDisabled(departmentId)}
+          />
         </div>
       </div>
-    </>
+      <div className="flex gap-4 mt-8 mb-3">
+        <h3 className="text-xl text-primary-navy font-bold">Agency Details</h3>
+        <Checkbox
+          id="toggle-agency-details"
+          testId="toggle-agency-details"
+          label="N/A"
+          checked={hideAgencyDetails}
+          onChange={handleToggleAgencyDetails}
+          disabled={isPersonDetailsDisabled(departmentId)}
+        />
+      </div>
+      <AgencyDetails
+        details={agencyDetails}
+        disabled={hideAgencyDetails || isPersonDetailsDisabled(departmentId)}
+        countryOptionList={countryOptionList}
+        onChange={(data) => onChange('agencyDetails', data)}
+      />
+      <h3 className="text-xl text-primary-navy font-bold mt-10">Salary Details</h3>
+      <div className="grid grid-cols-2 gap-x-4 my-8">
+        <div>
+          <h3 className="text-base text-primary-navy font-bold mb-3">Salary</h3>
+          <AccountDetailsForm
+            details={salaryAccountDetails}
+            accountType="Salary"
+            countryOptionList={countryOptionList}
+            onChange={(data) => onChange('salaryAccountDetails', data)}
+            disabled={isPersonDetailsDisabled(departmentId)}
+          />
+        </div>
+        <div>
+          <h3 className="text-base text-primary-navy font-bold mb-3">Expenses</h3>
+          <AccountDetailsForm
+            details={expenseAccountDetails}
+            accountType="Expenses"
+            countryOptionList={countryOptionList}
+            onChange={(data) => onChange('expenseAccountDetails', data)}
+            disabled={isPersonDetailsDisabled(departmentId)}
+          />
+        </div>
+      </div>
+    </div>
   );
 };

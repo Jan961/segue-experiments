@@ -16,7 +16,7 @@ import { globalModalVenueColDefs, styleProps } from '../table/tableConfig';
 import { Table } from 'components/core-ui-lib';
 import { isValidDate } from 'services/dateService';
 import axios from 'axios';
-import LoadingOverlay from 'components/shows/LoadingOverlay';
+import LoadingOverlay from 'components/core-ui-lib/LoadingOverlay';
 import { useRecoilValue } from 'recoil';
 import { accessMarketingHome } from 'state/account/selectors/permissionSelector';
 
@@ -273,10 +273,15 @@ export default function GlobalActivityModal({
 
   return (
     <div>
-      <PopupModal show={visible} onClose={() => handleConfirm('close')} showCloseIcon={true} hasOverlay={showConfirm}>
+      <PopupModal
+        show={visible}
+        onClose={() => handleConfirm('close')}
+        showCloseIcon={true}
+        hasOverlay={showConfirm}
+        title={titleOptions[variant]}
+      >
         {loadingVisible && <LoadingOverlay />}
         <div className={`h-[${variant === 'view' ? 400 : 780}px] w-[450px]`}>
-          <div className="text-xl text-primary-navy font-bold mb-4">{titleOptions[variant]}</div>
           <div className="text-base font-bold text-primary-input-text">Activity Name</div>
           <TextInput
             className="w-full mb-4"
@@ -384,7 +389,7 @@ export default function GlobalActivityModal({
 
           <div className="flex flex-row mt-5">
             <div className="w-[450px]">
-              <Table columnDefs={venueColDefs} rowData={venueList} styleProps={styleProps} tableHeight={300} />
+              <Table columnDefs={venueColDefs} rowData={venueList} styleProps={styleProps} tableHeight={265} />
             </div>
           </div>
 

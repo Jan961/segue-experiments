@@ -13,6 +13,7 @@ import { Label } from 'components/core-ui-lib';
 import { personState } from 'state/contracts/PersonState';
 import { getAllOptions, noop, transformToOptions } from 'utils';
 import { ContractPermissionGroup } from 'interfaces';
+import { getContractDropdownOptions } from 'utils/contracts';
 
 interface Props {
   permissions: {
@@ -53,22 +54,13 @@ const CompanyContractFilters = (props: Props) => {
 
   const canCreateContract = useMemo(() => {
     return hasAnyPermissions(props.permissions.accessNewContract);
-  }, []);
+  }, [props.permissions.accessNewContract]);
 
   // Change dropdown-options based on permissions
   const getDropdownOptions = useMemo(() => {
-    let options = [];
-    if (props.permissions.accessContracts.artisteContracts) {
-      options.push(contractDepartmentOptions.find((x) => x.text === 'Artiste'));
-    }
-    if (props.permissions.accessContracts.creativeContracts) {
-      options.push(contractDepartmentOptions.find((x) => x.text === 'Creative'));
-    }
-    if (props.permissions.accessContracts.smTechCrewContracts) {
-      options.push(contractDepartmentOptions.find((x) => x.text === 'SM / Tech / Crew'));
-    }
+    const options = getContractDropdownOptions(props.permissions.accessContracts);
     if (options.length > 1) {
-      options = [contractDepartmentOptions.find((X) => X.text === 'All'), ...options]; // Set ALL to top of dropdown if valid
+      options.unshift(contractDepartmentOptions.find((x) => x.text === 'All')); // Add "All" to the top if multiple options are available
     }
     return options;
   }, [props.permissions]);
@@ -161,7 +153,7 @@ const CompanyContractFilters = (props: Props) => {
         <ContractScheduleModal
           openContract={openContract}
           onClose={() => setOpenContract(false)}
-          newPersonDisabled={props.permissions.accessNewPerson}
+          accessNewPerson={props.permissions.accessNewPerson}
           accessPermissions={props.permissions.accessNewContract}
         />
       )}

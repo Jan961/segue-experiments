@@ -14,6 +14,7 @@ import axios from 'axios';
 import { notify } from 'components/core-ui-lib';
 import { getCountriesAsSelectOptions, getCurrenciesAsSelectOptions } from 'services/globalService';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
+import LoadingOverlay from 'components/core-ui-lib/LoadingOverlay';
 
 export const getServerSideProps: GetServerSideProps = async () => {
   const planColors = ['#41a29a', '#0093c0', '#7b568d'];
@@ -82,8 +83,10 @@ const NewAccount = ({
   const stripe = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
   const [accountDetails, setAccountDetails] = useState<Account>(DEFAULT_ACCOUNT_DETAILS);
   const [subcriptionDetails, seSubscriptionDetails] = useState<Plan>(null);
+  const [loading, setLoading] = useState(false);
 
   const handleSaveAccountDetails = async (onSaveSuccess: () => void) => {
+    setLoading(true);
     try {
       const { data } = await axios.post(
         `/api/account/${accountDetails.accountId ? 'update' : 'create'}`,
@@ -95,6 +98,8 @@ const NewAccount = ({
     } catch (error) {
       console.error(error);
       notify.error(ACCOUNT_CREATION_FAILED_ERROR);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -118,6 +123,7 @@ const NewAccount = ({
         )}
         <AccountConfirmation />
       </Wizard>
+      {loading && <LoadingOverlay />}
     </div>
   );
 };

@@ -35,6 +35,8 @@ export const mapToAccountPrismaFields = (account: any) => {
     AccountOrganisationId: account.organisationId,
     AccountTermsAgreedBy: account.email,
     AccountTermsAgreedDate: new Date(),
+    // Dummy default PIN
+    AccountPIN: 'XXXXX',
   };
 };
 

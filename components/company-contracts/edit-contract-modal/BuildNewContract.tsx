@@ -8,7 +8,7 @@ import useAxiosCancelToken from 'hooks/useCancelToken';
 import { PersonDetailsTab } from './tabs/PersonDetailsTab';
 import { PreviewTab } from './tabs/PreviewTab';
 import ContractDetailsTab from './tabs/ContractDetailsTab';
-import LoadingOverlay from 'components/shows/LoadingOverlay';
+import LoadingOverlay from 'components/core-ui-lib/LoadingOverlay';
 import { IContractSchedule, IScheduleDay } from '../../contracts/types';
 import { useRecoilValue } from 'recoil';
 import { productionJumpState } from 'state/booking/productionJumpState';
@@ -241,23 +241,14 @@ export const BuildNewContract = ({
   };
 
   return (
-    <PopupModal
-      show={visible}
-      title="Contract Details"
-      titleClass="text-xl text-primary-navy font-bold -mt-2"
-      panelClass="h-[95vh] w-[100vw]"
-      hasOverflow={false}
-      onClose={onClose}
-    >
+    <PopupModal show={visible} title="Contract Details" hasOverflow={false} onClose={onClose}>
       <div className="flex flex-col justify-between ">
         <div>
-          <div className="">
-            <div className="text-xl text-primary-navy font-bold w-[50vw]">
-              Production - {`${selectedProduction.ShowCode}${selectedProduction.Code}`}
-            </div>
-            <div className="text-xl text-primary-navy font-bold w-[50vw]">
-              Department - {getDepartmentNameByID(contractSchedule.department, departmentMap)}
-            </div>
+          <div className="text-xl text-primary-navy font-bold w-[50vw]">
+            Production - {`${selectedProduction.ShowCode}${selectedProduction.Code}`}
+          </div>
+          <div className="text-xl text-primary-navy font-bold w-[50vw]">
+            Department - {getDepartmentNameByID(contractSchedule.department, departmentMap)}
           </div>
 
           <div className="flex justify-center w-[100%] pt-2 pb-2">
@@ -293,7 +284,7 @@ export const BuildNewContract = ({
             )}
           </div>
 
-          <div className="border-solid border-2 border-primary-navy rounded p-2 h-[70vh] overflow-y-scroll">
+          <div className="border-solid border-2 border-primary-navy rounded p-2 h-[65vh] overflow-y-auto">
             {activeViewIndex === 0 && contractPerson && (
               <div className="flex flex-col gap-8 px-16">
                 <PersonDetailsTab

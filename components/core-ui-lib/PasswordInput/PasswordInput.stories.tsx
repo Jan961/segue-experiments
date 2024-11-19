@@ -18,11 +18,6 @@ export const Input = () => {
   return <TextInput value={value} onChange={(e) => updateArgs({ value: e.target.value })} />;
 };
 
-export const SearchInput = () => {
-  const [{ value }, updateArgs] = useArgs<{ value: string }>();
-  return <TextInput iconName="search" value={value} onChange={(e) => updateArgs({ value: e.target.value })} />;
-};
-
 export const Disabled = () => {
   return <TextInput disabled value="I am disabled" />;
 };

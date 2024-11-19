@@ -157,15 +157,17 @@ export default function PreviewBookingDetails({
   };
 
   const getPerformanceTimes = (item) => {
-    const times = item.times.split(';');
-    const accTimes = times.slice(0, item.noPerf);
-    let str = '';
-    for (let i = 0; i < accTimes.length - 1; i++) {
-      str += `${accTimes[i]}; `;
-    }
-    str += accTimes[accTimes.length - 1];
-    item.times = str;
-    return str;
+    if (item.times) {
+      const times = item.times.split(';');
+      const accTimes = times.slice(0, item.noPerf);
+      let str = '';
+      for (let i = 0; i < accTimes.length - 1; i++) {
+        str += `${accTimes[i]}; `;
+      }
+      str += accTimes[accTimes.length - 1];
+      item.times = str;
+      return str;
+    } else return '';
   };
 
   const formatRowData = (data) => {
@@ -240,19 +242,14 @@ export default function PreviewBookingDetails({
   }, [originalRows, updatedRows]);
 
   return (
-    <>
-      <div className="flex justify-between">
-        <div className="text-primary-navy text-xl my-2 font-bold">{productionCode}</div>
-      </div>
-      <div className="w-[700px] lg:w-[1386px] h-full  z-[999] flex flex-col ">
-        <Table
-          testId="preview-booking-details"
-          gridOptions={gridOptions}
-          rowData={rows}
-          columnDefs={previewColumnDefs}
-          styleProps={styleProps}
-        />
-      </div>
-    </>
+    <div className="w-[700px] lg:w-[1386px] h-full  z-[999] flex flex-col ">
+      <Table
+        testId="preview-booking-details"
+        gridOptions={gridOptions}
+        rowData={rows}
+        columnDefs={previewColumnDefs}
+        styleProps={styleProps}
+      />
+    </div>
   );
 }

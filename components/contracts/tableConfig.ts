@@ -227,7 +227,7 @@ export const getCompanyContractsColumnDefs = (
   },
 ];
 
-export const seatKillsColDefs = (handleChange, currencySymbol) => [
+export const seatKillsColDefs = (handleChange, currencySymbol, disabled: boolean) => [
   {
     headerName: 'Type',
     field: 'type',
@@ -248,6 +248,7 @@ export const seatKillsColDefs = (handleChange, currencySymbol) => [
       className: 'w-[108px] ml-1 mt-1 font-bold',
       value: formatValue(params.data.seats),
       pattern: /^\d*$/,
+      disabled: { disabled },
     }),
     width: 120,
     headerClass: 'right-border-full',
@@ -266,6 +267,7 @@ export const seatKillsColDefs = (handleChange, currencySymbol) => [
       value: formatValue(params.data.value),
       className: 'w-24 font-bold',
       pattern: /^\d*(\.\d*)?$/,
+      disabled: { disabled },
     }),
     width: 120,
     suppressMovable: true,
@@ -274,7 +276,7 @@ export const seatKillsColDefs = (handleChange, currencySymbol) => [
   },
 ];
 
-export const attachmentsColDefs = [
+export const attachmentsColDefs = (exportPdfPermission: boolean) => [
   {
     headerName: 'Title',
     field: 'FileOriginalFilename',
@@ -300,6 +302,7 @@ export const attachmentsColDefs = [
     cellRenderer: ButtonRenderer,
     cellRendererParams: {
       buttonText: 'View',
+      disabled: !exportPdfPermission,
     },
     width: 100,
   },

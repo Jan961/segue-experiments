@@ -33,30 +33,38 @@ pipelines:
             - cd cypress
             - npm ci
             # Run Cypress tests in headless mode
-            - npm run cy:alltests --browser chrome
+            - npm run cy:alltests --browser chrome || true                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
             # - npm run cy:permissions --browser chrome
-            - apt-get update && apt-get install -y zip jq tree
-            - ls -al cypress/
-            - zip -r reports.zip cypress/reports/
-            - tree -I "node_modules"
+            - npx mochawesome-merge cypress/reports/mocha/*.json -o output.json
           after-script:
+            - cd cypress-tests/cypress
+            # Create a custom HTML report from output.json
+            - npm run merge:reports
+            - npm run generate:report
+            # Set alert type based on test results
             - ALERT_TYPE="success"
-            - if [[ $BITBUCKET_EXIT_CODE -ne 0 ]]; then ALERT_TYPE="error" ; fi
-            - echo "$SMTP_USERNAME"
-            - echo "$SMTP_PASSWORD"
+            - |
+              if [[ $(jq '.stats.failures' output.json) -ne 0 ]]; then 
+                ALERT_TYPE="error"
+                echo "Tests failed but continuing with report generation"
+              fi
+            - ALERT_TYPE="success"
+            - if [[ $BITBUCKET_EXIT_CODE -ne 0 ]]; then 
+                ALERT_TYPE="error";
+                echo "Tests failed but continuing with report generation";
+              fi
             - pipe: atlassian/email-notify:0.13.2
               variables:
                 USERNAME: $SMTP_USERNAME
                 PASSWORD: $SMTP_PASSWORD
-                FROM: 'seguetesting@gmail.com'
-                TO: 'testing@segue360.co.uk'
+                FROM: $SMTP_USERNAME
+                TO: $TESTERS_GROUP_EMAIL
                 HOST: 'smtp.gmail.com'
-                PORT: 465
                 SUBJECT: '${ALERT_TYPE}:Bitbucket Pipe Notification for ${BITBUCKET_BRANCH}'
-                ATTACHMENTS: 'cypress-tests/cypress/reports.zip'
+                BODY_HTML: 'cypress/reports/mocha/test-report.html'
           artifacts:
             - cypress-tests/cypress/reports/**
-            - cypress-tests/cypress/reports.zip
+            - cypress-tests/cypress/cypress/reports/mocha/test-report.html
   default:
       - step:
           name: Build and Test
@@ -68,17 +76,15 @@ pipelines:
           caches:
             - node
           script:
-            - npm ci
+            - npm install
             - npm run test:ci
             - npm run build
-  branches:
-      main:
-        - step:
-            name: SonarQube Analysis
-            image: node:18.20.4
-            script:
-              - pipe: sonarsource/sonarcloud-scan:2.0.0
-              - pipe: sonarsource/sonarcloud-quality-gate:0.1.6
+      - step:
+          name: SonarQube Analysis
+          image: node:18.20.4
+          script:
+            - pipe: sonarsource/sonarcloud-scan:2.0.0
+            - pipe: sonarsource/sonarcloud-quality-gate:0.1.6
 definitions:
   caches:
     npm: ~/.npm

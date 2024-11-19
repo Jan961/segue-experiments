@@ -9,7 +9,6 @@ const colorsConfig = {
   'primary-blue': '#0093C0',
   'soft-primary-blue': '#80c5e1',
   'primary-purple': '#7B568D',
-
   'primary-pink': '#E94580',
   'primary-navy': '#082B4B',
   'primary-dark-blue': '#21345B',
@@ -36,6 +35,7 @@ const colorsConfig = {
   'secondary-yellow': '#FFE606',
   'secondary-red': '#ED1111',
   'silver-gray-100': '#d9d9d9',
+  'primary-url': '#0258FF',
   primary: '#082B4B',
   secondary: '#617293',
 };
@@ -87,7 +87,7 @@ module.exports = {
           '&:hover': {
             cursor: 'not-allowed !important',
           },
-          opacity: 0.6,
+          opacity: 0.5,
           pointerEvents: 'none',
         },
       });
