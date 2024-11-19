@@ -21,6 +21,7 @@ import { contractTemplateState } from 'state/contracts/contractTemplateState';
 import { getFileUrl } from 'lib/s3';
 import { populateContractData, populateTemplateWithValues } from './utils';
 import { ContractPermissionGroup } from 'interfaces';
+// import { accessAllContracts } from 'state/account/selectors/permissionSelector';
 
 export interface BuildNewContractProps {
   contractSchedule?: Partial<IContractSchedule>;
@@ -64,6 +65,13 @@ export const BuildNewContract = ({
   const [templateFormStructure, setTemplateFormStructure] = useState<TemplateFormRow[]>(null);
   const [formData, setFormData] = useState<TemplateFormRowPopulated[]>(null);
   const [contractData, setContractData] = useState<ContractData[]>(null);
+
+  // const permissions = useRecoilValue(accessAllContracts);
+  // const {exportTech, exportCreative, exportArtiste} = {
+  //   exportTech: permissions.includes('EXPORT_TECH_CONTRACT'),
+  //   exportCreative: permissions.includes('EXPORT_CREATIVE_CONTRACT'),
+  //   exportArtiste: permissions.includes('EXPORT_ARTISTE_CONTRACT'),
+  //   }
 
   useEffect(() => {
     const fetchTemplateDocument = async () => {
