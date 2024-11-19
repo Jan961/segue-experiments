@@ -1,7 +1,7 @@
 import { UTCDate } from '@date-fns/utc';
 import { useMemo } from 'react';
 import { useRecoilValue } from 'recoil';
-import { compareDatesWithoutTime } from 'services/dateService';
+import { compareDatesWithoutTime, newDate } from 'services/dateService';
 import { filterState } from 'state/booking/filterState';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import { rowsSelector } from 'state/booking/selectors/rowsSelector';
@@ -22,12 +22,6 @@ const useBookingFilter = () => {
       if (!productionId || (!includeArchived && archivedProductionIds.includes(productionId))) {
         return false;
       }
-      console.log('Filter DateTime', filter.startDate, filter.endDate);
-      console.log(
-        'Filter logic',
-        !filter.startDate || new Date(dateTime) >= filter.startDate,
-        !filter.endDate || new Date(dateTime) <= filter.endDate,
-      );
       return (
         (selected === -1 || productionId === selected) &&
         (!filter.endDate || compareDatesWithoutTime(dateTime, new UTCDate(filter.endDate), '<=')) &&
@@ -35,12 +29,11 @@ const useBookingFilter = () => {
         (filter.status === 'all' || status === filter.status || (filter.status === 'A' && status === ''))
       );
     });
-    console.log(filteredRowList);
 
     if (filter.venueText) filteredRowList = fuseFilter(filteredRowList, filter.venueText, ['town', 'venue']);
 
     return filteredRowList.sort((a, b) => {
-      return new Date(a.dateTime).valueOf() - new Date(b.dateTime).valueOf();
+      return newDate(a.dateTime).valueOf() - newDate(b.dateTime).valueOf();
     });
   }, [productions, rows, filter.endDate, filter.startDate, filter.status, filter.venueText, includeArchived, selected]);
 

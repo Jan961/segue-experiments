@@ -1,6 +1,5 @@
 import ExcelJS from 'exceljs';
 import getPrismaClient from 'lib/prisma';
-import { Performance } from 'prisma/generated/prisma-client';
 import {
   COLOR_HEXCODE,
   colorCell,
@@ -13,17 +12,21 @@ import { makeRowTextBoldAndAllignLeft } from './promoter-holds';
 import { convertToPDF } from 'utils/report';
 import { addBorderToAllCells } from 'utils/export';
 import { bookingStatusMap } from 'config/bookings';
-import { add, parseISO, differenceInDays } from 'date-fns';
+import { parseISO, differenceInDays } from 'date-fns';
 import {
   calculateWeekNumber,
   convertMinutesToHoursMins,
   formatDate,
   formatUtcTime,
+  getDateDaysAway,
   getDateObject,
+  newDate,
+  timeFormatV2,
 } from 'services/dateService';
 import { PerformanceInfo } from 'services/reports/schedule-report';
 import { sum } from 'radash';
 import { getProductionWithContent } from 'services/productionService';
+import { UTCDate } from '@date-fns/utc';
 
 type SCHEDULE_VIEW = {
   ProductionId: number;
@@ -101,41 +104,55 @@ const handler = async (req, res) => {
   try {
     const prisma = await getPrismaClient(req);
     // Construct the Prisma query
-    const data = await prisma.scheduleView.findMany({
-      where: {
-        AND: [
-          {
-            EntryDate: {
-              gte: formatedFromDate,
-              lte: formatedToDate,
+    const data = await prisma.scheduleView
+      .findMany({
+        where: {
+          AND: [
+            {
+              EntryDate: {
+                gte: formatedFromDate,
+                lte: formatedToDate,
+              },
             },
-          },
-          {
-            ProductionId,
-          },
-          status && status !== 'all'
-            ? {
-                EntryStatusCode: status,
-              }
-            : {},
-        ],
-      },
-      orderBy: {
-        EntryDate: 'asc',
-      },
-    });
+            {
+              ProductionId,
+            },
+            status && status !== 'all'
+              ? {
+                  EntryStatusCode: status,
+                }
+              : {},
+          ],
+        },
+        orderBy: {
+          EntryDate: 'asc',
+        },
+      })
+      .then((res) => {
+        return res.map((e) => ({
+          ...e,
+          EntryDate: new UTCDate(e.EntryDate),
+          ProductionStartDate: new UTCDate(e.ProductionStartDate),
+          ProductionEndDate: new UTCDate(e.ProductionEndDate),
+        }));
+      });
 
     const bookingIdPerformanceMap: Record<number, PerformanceInfo[]> = {};
     const bookingIdList: number[] =
       data.map((entry) => (entry.EntryType === 'Booking' ? entry.EntryId : null)).filter((id) => id) || [];
 
-    const performances: Performance[] = await prisma.performance.findMany({
-      where: {
-        BookingId: {
-          in: bookingIdList,
+    const performances = await prisma.performance
+      .findMany({
+        where: {
+          BookingId: {
+            in: bookingIdList,
+          },
         },
-      },
-    });
+      })
+      .then((res) => {
+        const r = res.map((e) => ({ ...e, Date: new UTCDate(e.Date) }));
+        return r;
+      });
 
     let maxNumOfPerformances = 0;
     performances.forEach((performance) => {
@@ -173,7 +190,7 @@ const handler = async (req, res) => {
       const productionCode = productionDetails?.Code || '';
       const showCode = productionDetails?.Show?.Code || '';
       const filename = `${productionCode} ${showName} Holds and Comps`;
-      const title = `${showCode}${productionCode} ${showName} Travel Summary - ${formatDate(new Date(), 'dd.MM.yy')}`;
+      const title = `${showCode}${productionCode} ${showName} Travel Summary - ${formatDate(newDate(), 'dd.MM.yy')}`;
       const headerRowsLength = addHeaderWithFilters(worksheet, {
         title,
         from: from ? formatedFromDate : null,
@@ -199,7 +216,7 @@ const handler = async (req, res) => {
     }
 
     const { ShowName, FullProductionCode, ProductionStartDate } = data[0];
-    const title = `${FullProductionCode} ${ShowName} Travel Summary - ${formatDate(new Date(), 'dd.MM.yy')}`;
+    const title = `${FullProductionCode} ${ShowName} Travel Summary - ${formatDate(newDate(), 'dd.MM.yy')}`;
     const headerRowsLength = addHeaderWithFilters(worksheet, {
       title,
       from: from ? formatedFromDate : null,
@@ -238,9 +255,9 @@ const handler = async (req, res) => {
     let totalMileage: number[] = [];
     for (let i = 1; i <= daysDiff; i++) {
       lastWeekMetaInfo = { ...lastWeekMetaInfo, weekTotalPrinted: false };
-      const weekDay = formatDate(add(parseISO(from), { days: i - 1 }), 'eeee');
-      const nextDate = add(parseISO(from), { days: i });
-      const dateInIncomingFormat = add(parseISO(from), { days: i - 1 });
+      const weekDay = formatDate(getDateDaysAway(from, i - 1), 'eeee');
+      const nextDate = getDateDaysAway(from, i);
+      const dateInIncomingFormat = getDateDaysAway(from, i - 1);
       const formattedDate = formatDate(dateInIncomingFormat, 'yyyy-MM-dd');
       const key = getKey({ FullProductionCode, ShowName, EntryDate: formattedDate });
       const nextDayKey = getKey({ FullProductionCode, ShowName, EntryDate: formatDate(nextDate, 'yyyy-MM-dd') });
@@ -279,7 +296,7 @@ const handler = async (req, res) => {
           PencilNum,
         } = value || {};
         const { Location: nextDayLocation } = nextDayValue || {};
-        const formattedTime = TimeMins ? convertMinutesToHoursMins(Number(TimeMins)) : '';
+        const formattedTime = TimeMins ? timeFormatV2(Number(TimeMins)) : '';
         if (nextDayLocation !== Location && (!isCancelled || !isSuspended)) {
           time.push(Number(TimeMins));
           mileage.push(Number(Mileage) || 0);

@@ -525,7 +525,7 @@ export const getArrayOfDatesBetweenV2 = (
  * @param {string} dateFormat - The value of the format for the date.
  * @returns {UTCDate} Returns formatted string of the date.
  */
-export const formatDateV2 = (date: UTCDate | string | number, dateFormat: string): string => {
+export const formatDate = (date: UTCDate | string | number, dateFormat: string): string => {
   if (!date) {
     return null;
   }
@@ -1022,43 +1022,6 @@ export const convertTimeToTodayDateFormat = (time: string) => {
 
   const updatedDate = set(today, { hours, minutes, seconds: 0, milliseconds: 0 });
   return updatedDate;
-};
-
-// DEPRECATED
-type DateInput = Date | number | string;
-/**
- * Formats a date according to the specified format.
- *
- * @param {Date | number | string} date - The date to format.
- * @param {string} dateFormat - The format string.
- * @returns {string} The formatted date.
- */
-export const formatDate = (date: DateInput, dateFormat: string): string => {
-  let parsedDate: number | Date;
-
-  if (date instanceof Date) {
-    // If date is already a Date object, use it directly
-    parsedDate = date;
-  } else if (typeof date === 'number') {
-    // If date is a timestamp, convert it to a Date object
-    parsedDate = new Date(date);
-  } else if (typeof date === 'string') {
-    // If date is a string, try to parse it as an ISO string first
-    parsedDate = parseISO(date);
-
-    // If parsing as ISO fails, try to parse it using the default parser
-    if (!isValid(parsedDate)) {
-      parsedDate = new Date(date);
-    }
-  } else {
-    return '';
-  }
-
-  if (!isValid(parsedDate)) {
-    return '';
-  }
-
-  return format(parsedDate, dateFormat);
 };
 
 // ?

@@ -15,7 +15,7 @@ import axios from 'axios';
 import { BarredVenue } from 'pages/api/productions/venue/barringCheck';
 import { BookingWithVenueDTO } from 'interfaces';
 import { useWizard } from 'react-use-wizard';
-import { dateToSimple, formatDateV2 } from 'services/dateService';
+import { dateToSimple, formatDate } from 'services/dateService';
 import { MoveParams } from '.';
 import { productionJumpState } from 'state/booking/productionJumpState';
 
@@ -220,7 +220,7 @@ const MoveBookingView = ({
       </div>
       <Label
         text={`Currently scheduled to start on ${
-          bookingDetails.moveDate ? formatDateV2(bookingDetails.moveDate, 'dd/MM/yy') : ''
+          bookingDetails.moveDate ? formatDate(bookingDetails.moveDate, 'dd/MM/yy') : ''
         }`}
       />
       <div className="flex item-center gap-2">

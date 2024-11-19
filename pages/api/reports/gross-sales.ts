@@ -7,9 +7,15 @@ import { getExportedAtTitle } from 'utils/export';
 import { currencyCodeToSymbolMap } from 'config/Reports';
 import { calculateRemainingDaysInWeek, convertToPDF } from 'utils/report';
 import { BOOK_STATUS_CODES, SALES_TYPE_NAME } from 'types/MarketingTypes';
-import { calculateWeekNumber, formatDate, getDateObject, getDifferenceInDays } from 'services/dateService';
+import {
+  calculateWeekNumber,
+  formatDate,
+  getDateDaysAway,
+  getDateObject,
+  getDifferenceInDays,
+} from 'services/dateService';
 import { SCHEDULE_VIEW } from 'services/reports/schedule-report';
-import { add, parseISO } from 'date-fns';
+import { UTCDate } from '@date-fns/utc';
 
 type SALES_SUMMARY = {
   ProductionId: number;
@@ -109,20 +115,38 @@ const handler = async (req, res) => {
     if (!productionId) {
       throw new Error('Params are missing');
     }
-    const data = await prisma.salesSummaryView.findMany({
-      where: {
-        ProductionId: productionId,
-        SaleTypeName: SALES_TYPE_NAME.GENERAL_SALES,
-      },
-    });
-    const schedule = await prisma.scheduleView.findMany({
-      where: {
-        ProductionId: productionId,
-      },
-      orderBy: {
-        EntryDate: 'asc',
-      },
-    });
+    const data = await prisma.salesSummaryView
+      .findMany({
+        where: {
+          ProductionId: productionId,
+          SaleTypeName: SALES_TYPE_NAME.GENERAL_SALES,
+        },
+      })
+      .then((res) => {
+        return res.map((e) => ({
+          ...e,
+          EntryDate: new UTCDate(e.EntryDate),
+          ProductionStartDate: new UTCDate(e.ProductionStartDate),
+          ProductionEndDate: new UTCDate(e.ProductionEndDate),
+        }));
+      });
+    const schedule = await prisma.scheduleView
+      .findMany({
+        where: {
+          ProductionId: productionId,
+        },
+        orderBy: {
+          EntryDate: 'asc',
+        },
+      })
+      .then((res) => {
+        return res.map((e) => ({
+          ...e,
+          EntryDate: new UTCDate(e.EntryDate),
+          ProductionStartDate: new UTCDate(e.ProductionStartDate),
+          ProductionEndDate: new UTCDate(e.ProductionEndDate),
+        }));
+      });
     let filename = 'Gross Sales';
     const workbook = new ExcelJS.Workbook();
     const formattedData = data.map((x) => ({
@@ -209,9 +233,9 @@ const handler = async (req, res) => {
       r7.push('Weekly Costs');
     };
     for (let i = 1; i <= daysDiff; i++) {
-      const weekDay = formatDate(add(parseISO(fromDate?.toISOString()), { days: i - 1 }), 'eeee');
-      const dateInIncomingFormat = formatDate(add(parseISO(fromDate?.toISOString()), { days: i - 1 }), 'yyyy-MM-dd');
-      const nextDateInIncomingFormat = formatDate(add(parseISO(fromDate?.toISOString()), { days: i }), 'yyyy-MM-dd');
+      const weekDay = formatDate(getDateDaysAway(fromDate?.toISOString(), i - 1), 'eeee');
+      const dateInIncomingFormat = formatDate(getDateDaysAway(fromDate?.toISOString(), i - 1), 'yyyy-MM-dd');
+      const nextDateInIncomingFormat = formatDate(getDateDaysAway(fromDate?.toISOString(), i), 'yyyy-MM-dd');
       const date = formatDate(dateInIncomingFormat, 'dd/MM/yy');
       const weekNumber = calculateWeekNumber(fromDate, getDateObject(dateInIncomingFormat));
       if (i === 1 && weekDay !== 'Monday') {
