@@ -1,5 +1,5 @@
 import { mount } from 'cypress/react18';
-import TextArea, { TextInputProps } from '../../../components/core-ui-lib/TextArea';
+import TextArea from '../../../components/core-ui-lib/TextArea';
 import { createRef } from 'react';
 
 describe('TextArea Component', () => {
