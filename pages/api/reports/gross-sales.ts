@@ -105,8 +105,7 @@ const getTotalInPound = ({ totalOfCurrency, conversionRate }) => {
 const handler = async (req, res) => {
   try {
     const prisma = await getPrismaClient(req);
-    const timezoneOffset = parseInt(req.headers.timezoneoffset as string, 10) || 0;
-    const { productionId, format } = req.body || {};
+    const { productionId, format, exportedAt } = req.body || {};
     if (!productionId) {
       throw new Error('Params are missing');
     }
@@ -158,7 +157,7 @@ const handler = async (req, res) => {
     const { FullProductionCode = '', ShowName = '' } = schedule?.[0] || {};
     filename = `${FullProductionCode} ${ShowName} Gross Sales`;
     worksheet.addRow([`${filename}`]);
-    const exportedAtTitle = getExportedAtTitle(timezoneOffset);
+    const exportedAtTitle = getExportedAtTitle(exportedAt);
     worksheet.addRow([exportedAtTitle]);
 
     worksheet.addRow([]);

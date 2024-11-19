@@ -146,6 +146,7 @@ const GrossVenuesPromotorHoldsAndCompsModal = ({
           onChange={(value) => onChange('production', value as number)}
           options={productionsOptions}
           value={production}
+          isSearchable
         />
 
         {['holdsAndComps', 'promotorHolds'].includes(activeModal) && (
