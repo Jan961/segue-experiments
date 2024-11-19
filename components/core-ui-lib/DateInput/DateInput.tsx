@@ -6,7 +6,7 @@ import Label from '../Label';
 import { Portal } from 'react-overlays';
 import { format, isValid } from 'date-fns';
 
-interface DateInputProps {
+export interface DateInputProps {
   value?: string | Date;
   onChange: (value: Date) => void;
   inputClass?: string;

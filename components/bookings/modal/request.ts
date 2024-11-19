@@ -1,6 +1,6 @@
 import axios, { AxiosResponseHeaders } from 'axios';
 import moment from 'moment';
-import { getMonday, getTimezonOffset } from 'services/dateService';
+import { getMonday } from 'services/dateService';
 import { FilterState } from 'state/booking/filterState';
 
 export const downloadFromContent = (content: Blob, filename: string) => {
@@ -22,7 +22,7 @@ const getFileNameFromHeaders = (headers: AxiosResponseHeaders, defaultName: stri
   const contentDisposition = headers['content-disposition'];
   if (contentDisposition) {
     const match = contentDisposition.match(/filename="(.+)"/);
-    if (match && match[1]) {
+    if (match?.[1]) {
       suggestedName = match[1];
     }
   }
@@ -73,7 +73,7 @@ export const exportMasterplanReport = async (fromDate: string, toDate: string) =
     {
       fromDate: moment(getMonday(fromDate)),
       toDate: moment(new Date(toDate)),
-      timezoneOffset: getTimezonOffset(),
+      exportedAt: new Date().toISOString(),
     },
     { responseType: 'blob' },
   );
