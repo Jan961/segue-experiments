@@ -16,7 +16,7 @@ import { bookingStatusMap } from 'config/bookings';
 import { addBorderToAllCells } from 'utils/export';
 import { PerformanceInfo, SCHEDULE_VIEW, getSheduleReport } from 'services/reports/schedule-report';
 import { sum } from 'radash';
-import { timeFormatV2 } from 'services/dateService';
+import { timeFormat } from 'services/dateService';
 
 const makeRowBold = ({ worksheet, row }: { worksheet: any; row: number }) => {
   worksheet.getRow(row).font = { bold: true };
@@ -234,7 +234,7 @@ const handler = async (req, res) => {
           EntryStatusCode,
           EntryType = '',
         } = value;
-        const formattedTime = TimeMins ? timeFormatV2(Number(TimeMins)) : '';
+        const formattedTime = TimeMins ? timeFormat(Number(TimeMins)) : '';
         const performances = bookingIdPerformanceMap[EntryId];
         const performancesOnThisDay = performances?.filter?.((performance) =>
           moment(performance.performanceDate).isSame(dateInIncomingFormat, 'day'),
@@ -328,7 +328,7 @@ const handler = async (req, res) => {
       '',
       '',
       totalMileage.reduce((acc, m) => acc + Number(m || 0), 0),
-      timeFormatV2(sum(totalTime)),
+      timeFormat(sum(totalTime)),
     ]);
 
     rowNo++;

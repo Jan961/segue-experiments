@@ -19,7 +19,7 @@ import {
   formatUtcTime,
   getDateDaysAway,
   newDate,
-  timeFormatV2,
+  timeFormat,
 } from 'services/dateService';
 import { PerformanceInfo } from 'services/reports/schedule-report';
 import { sum } from 'radash';
@@ -294,7 +294,7 @@ const handler = async (req, res) => {
           PencilNum,
         } = value || {};
         const { Location: nextDayLocation } = nextDayValue || {};
-        const formattedTime = TimeMins ? timeFormatV2(Number(TimeMins)) : '';
+        const formattedTime = TimeMins ? timeFormat(Number(TimeMins)) : '';
         if (nextDayLocation !== Location && (!isCancelled || !isSuspended)) {
           time.push(Number(TimeMins));
           mileage.push(Number(Mileage) || 0);
@@ -361,7 +361,7 @@ const handler = async (req, res) => {
           '',
           ...blankPerformances,
           `Production Week ${value?.ProductionWeekNum || prevProductionWeekNum || ''}`,
-          timeFormatV2(sum(time)),
+          timeFormat(sum(time)),
           mileage.reduce((acc, m) => acc + Number(m || 0), 0),
         ]);
         totalTime = [...totalTime, ...time];
@@ -398,7 +398,7 @@ const handler = async (req, res) => {
         '',
         ...blankPerformances,
         `Production Week ${lastWeekMetaInfo?.prevProductionWeekNum || ''}`,
-        timeFormatV2(sum(time)),
+        timeFormat(sum(time)),
         mileage.reduce((acc, m) => acc + Number(m || 0), 0),
       ]);
       rowNo++;
@@ -415,7 +415,7 @@ const handler = async (req, res) => {
       '',
       '',
       ...blankPerformances,
-      timeFormatV2(sum(totalTime)),
+      timeFormat(sum(totalTime)),
       totalMileage.reduce((acc, m) => acc + Number(m || 0), 0),
     ]);
     rowNo++;

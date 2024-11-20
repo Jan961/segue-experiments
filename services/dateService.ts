@@ -398,7 +398,7 @@ export const addOneMonthV2 = (date: UTCDate | string | number, locale?: Locale):
  * @param {number} mins - The date of the week to get the Monday of.
  * @returns {string} Returns the monday date object on the week of the inputted date.
  */
-export const timeFormatV2 = (mins?: number): string => {
+export const timeFormat = (mins?: number): string => {
   if (!mins || mins < -1440 || mins > 1440) {
     return null;
   }
@@ -841,12 +841,6 @@ export const addOneMonth = (date: Date) => {
   const newDate = new Date(date);
   newDate.setMonth(newDate.getMonth() + 1);
   return newDate;
-};
-
-// DEPRECATED
-export const timeFormat = (mins?: number) => {
-  if (!mins) return '';
-  return `${Math.floor(mins / 60)}:${String(mins % 60).padStart(2, '0')}`;
 };
 
 // DEPRECATED
