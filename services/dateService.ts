@@ -652,13 +652,6 @@ export function formatDuration(
 }
 
 // DEPRECATED
-export const isValidDate = (date?: Date | string | number | null) => {
-  if (date === null || typeof date === 'boolean') return false;
-  const d = new Date(date);
-  return d instanceof Date && !isNaN(d.getTime());
-};
-
-// DEPRECATED
 export const getTimeFromDateAndTime = (inputDate: string | Date): string => {
   const date = new Date(inputDate);
 

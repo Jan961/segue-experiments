@@ -8,13 +8,12 @@ import Checkbox from 'components/core-ui-lib/Checkbox';
 import TextArea from 'components/core-ui-lib/TextArea/TextArea';
 import Button from 'components/core-ui-lib/Button';
 import { GlobalActivityDTO, VenueDTO } from 'interfaces';
-import { startOfDay } from 'date-fns';
+import { isValid, startOfDay } from 'date-fns';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import { hasGlobalActivityChanged } from '../utils';
 import { ConfDialogVariant } from 'components/core-ui-lib/ConfirmationDialog/ConfirmationDialog';
 import { globalModalVenueColDefs, styleProps } from '../table/tableConfig';
 import { Table } from 'components/core-ui-lib';
-import { isValidDate } from 'services/dateService';
 import axios from 'axios';
 import LoadingOverlay from 'components/core-ui-lib/LoadingOverlay';
 import { useRecoilValue } from 'recoil';
@@ -132,9 +131,9 @@ export default function GlobalActivityModal({
 
       setActName(data.Name);
       setActType(data.ActivityTypeId);
-      setActDate(isValidDate(data.Date) ? startOfDay(new Date(data.Date)) : null);
+      setActDate(isValid(data.Date) ? startOfDay(new Date(data.Date)) : null);
       setActFollowUp(data.FollowUpRequired);
-      setFollowUpDt(isValidDate(data.DueByDate) ? startOfDay(new Date(data.DueByDate)) : null);
+      setFollowUpDt(isValid(data.DueByDate) ? startOfDay(new Date(data.DueByDate)) : null);
       setCost(isNaN(data.Cost) ? '' : data.Cost.toFixed(2).toString());
       setActNotes(data.Notes);
       setActId(data.Id);
