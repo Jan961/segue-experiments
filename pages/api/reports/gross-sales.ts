@@ -112,7 +112,9 @@ const handler = async (req, res) => {
     const data = await prisma.salesSummaryView.findMany({
       where: {
         ProductionId: productionId,
-        SaleTypeName: SALES_TYPE_NAME.GENERAL_SALES,
+        SaleTypeName: {
+          in: [SALES_TYPE_NAME.GENERAL_SALES, SALES_TYPE_NAME.SCHOOL_SALES],
+        },
       },
     });
     const schedule = await prisma.scheduleView.findMany({
@@ -162,7 +164,17 @@ const handler = async (req, res) => {
 
     worksheet.addRow([]);
 
-    const map: { [key: string]: SALES_SUMMARY } = formattedData.reduce((acc, x) => ({ ...acc, [getKey(x)]: x }), {});
+    const map: { [key: string]: SALES_SUMMARY } = formattedData.reduce((acc, x) => {
+      const key = getKey(x);
+      const previousValue = acc[key];
+      return {
+        ...acc,
+        [key]: {
+          ...x,
+          Value: previousValue?.Value ? new Decimal(previousValue.Value).plus(x.Value).toNumber() : x.Value,
+        },
+      };
+    }, {});
     const scheduleMap: { [key: string]: SCHEDULE_VIEW } = formattedScheduleData.reduce(
       (acc, x) => ({ ...acc, [getKey(x)]: x }),
       {},
