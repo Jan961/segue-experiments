@@ -45,7 +45,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 
 import { styleHeader } from './masterplan';
 import { currencyCodeToSymbolMap } from 'config/Reports';
-import { convertToPDF } from 'utils/report';
+import { convertToPDF, sanitizeRowData } from 'utils/report';
 import { calculateWeekNumber, formatDate, getWeeksBetweenDates } from 'services/dateService';
 import { group, unique } from 'radash';
 import { addBorderToAllCells } from 'utils/export';
@@ -231,17 +231,19 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       CONSTANTS.CHANGE_VS,
       ...(isSeatsDataRequired ? [CONSTANTS.RUN_SEATS, CONSTANTS.RUN_SEATS, CONSTANTS.RUN_SALES] : []),
     ];
-    worksheet.addRow(columns);
-    worksheet.addRow([
-      'Week',
-      'Day',
-      'Date',
-      'Town',
-      'Venue',
-      ...headerWeekDates.map((week) => formatDate(week, 'dd/MM/yy')),
-      'Last Week',
-      ...(isSeatsDataRequired ? ['Sold', 'Capacity', 'vs Capacity'] : []),
-    ]);
+    worksheet.addRow(sanitizeRowData(columns));
+    worksheet.addRow(
+      sanitizeRowData([
+        'Week',
+        'Day',
+        'Date',
+        'Town',
+        'Venue',
+        ...headerWeekDates.map((week) => formatDate(week, 'dd/MM/yy')),
+        'Last Week',
+        ...(isSeatsDataRequired ? ['Sold', 'Capacity', 'vs Capacity'] : []),
+      ]),
+    );
     worksheet.addRow([]);
 
     const totalForWeeks: WeekAggregates = headerWeekNums.reduce((acc, x) => ({ ...acc, [x]: [] }), {});
@@ -357,7 +359,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         currVSPrevWeekValue,
         ...(seatsData?.Seats !== undefined ? [seatsData.Seats, seatsData.TotalCapacity, seatsData.Percentage] : []),
       ];
-      worksheet.addRow(rowData);
+      worksheet.addRow(sanitizeRowData(rowData));
       applyFormattingToRange({
         worksheet,
         startRow: row,
@@ -460,16 +462,18 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       }),
     );
     if (weekWiseDataInEuro.length) {
-      worksheet.addRow([
-        '',
-        '',
-        '',
-        '',
-        'Total Sales €',
-        ...weekWiseDataInEuro,
-        getChangeVsLastWeekValue(weekWiseDataInEuro),
-        ...seatsDataForEuro,
-      ]);
+      worksheet.addRow(
+        sanitizeRowData([
+          '',
+          '',
+          '',
+          '',
+          'Total Sales €',
+          ...weekWiseDataInEuro,
+          getChangeVsLastWeekValue(weekWiseDataInEuro),
+          ...seatsDataForEuro,
+        ]),
+      );
       applyFormattingToRange({
         worksheet,
         startRow: row,
@@ -494,17 +498,18 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         currencySymbol: VENUE_CURRENCY_SYMBOLS.POUND,
       }),
     );
-    worksheet.addRow([
-      '',
-      '',
-      '',
-      '',
-      'Total Sales £',
-      ...weekWiseDataInPound,
-      getChangeVsLastWeekValue(weekWiseDataInPound),
-      ...seatsDataForPound,
-    ]);
-
+    worksheet.addRow(
+      sanitizeRowData([
+        '',
+        '',
+        '',
+        '',
+        'Total Sales £',
+        ...weekWiseDataInPound,
+        getChangeVsLastWeekValue(weekWiseDataInPound),
+        ...seatsDataForPound,
+      ]),
+    );
     applyFormattingToRange({
       worksheet,
       startRow: row,
@@ -524,16 +529,18 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const weekWiseGrandTotalInPound = headerWeekNums.map((weekNum) =>
       getWeekWiseGrandTotalInPound({ totalForWeeks, setProductionWeekNum: weekNum }),
     );
-    worksheet.addRow([
-      '',
-      '',
-      '',
-      '',
-      'Grand Total £',
-      ...weekWiseGrandTotalInPound,
-      getChangeVsLastWeekValue(weekWiseGrandTotalInPound),
-      ...seatsDataForTotal,
-    ]);
+    worksheet.addRow(
+      sanitizeRowData([
+        '',
+        '',
+        '',
+        '',
+        'Grand Total £',
+        ...weekWiseGrandTotalInPound,
+        getChangeVsLastWeekValue(weekWiseGrandTotalInPound),
+        ...seatsDataForTotal,
+      ]),
+    );
     applyFormattingToRange({
       worksheet,
       startRow: row,
@@ -571,7 +578,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const WeeklyIncrease = weekWiseGrandTotalInPound.map((value: number, i: number) =>
       i === 0 ? 0 : value - weekWiseGrandTotalInPound[i - 1],
     );
-    worksheet.addRow(['', '', '', '', 'Weekly Increase £', ...WeeklyIncrease]);
+    worksheet.addRow(sanitizeRowData(['', '', '', '', 'Weekly Increase £', ...WeeklyIncrease]));
     applyFormattingToRange({
       worksheet,
       startRow: row,
@@ -584,7 +591,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const WeeklyIncreasePercent = weekWiseGrandTotalInPound.map((_: number, i: number) =>
       i === 0 ? 0 : WeeklyIncrease[i] / weekWiseGrandTotalInPound[i],
     );
-    worksheet.addRow(['', '', '', '', 'Weekly Increase %', ...WeeklyIncreasePercent]);
+    worksheet.addRow(sanitizeRowData(['', '', '', '', 'Weekly Increase %', ...WeeklyIncreasePercent]));
     applyFormattingToRange({
       worksheet,
       startRow: row,
