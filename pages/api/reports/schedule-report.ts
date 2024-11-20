@@ -155,15 +155,15 @@ const handler = async (req, res) => {
     const title = `${FullProductionCode} ${ShowName} Tour Schedule - ${formatDate(newDate(), 'DD.MM.YY')}`;
     let headerRowsLength = 4;
     worksheet.addRow([title]);
-    worksheet.addRow([`Exported: ${formatDate(newDate(), 'DD/MM/YY [at] HH:mm')} - Layout: Standard`]);
+    worksheet.addRow([`Exported: ${formatDate(newDate(), 'dd/MM/yy [at] HH:mm')} - Layout: Standard`]);
 
     if (from) {
-      worksheet.addRow([`Start Date: ${formatDate(formatedFromDate, 'YYYY-MM-DD')}`]);
+      worksheet.addRow([`Start Date: ${formatDate(formatedFromDate, 'yyyy-MM-dd')}`]);
       headerRowsLength++;
     }
 
     if (to) {
-      worksheet.addRow([`End Date: ${formatDate(formatedToDate, 'YYYY-MM-DD')}`]);
+      worksheet.addRow([`End Date: ${formatDate(formatedToDate, 'yyyy-MM-dd')}`]);
       headerRowsLength++;
     }
 
@@ -233,7 +233,7 @@ const handler = async (req, res) => {
         worksheet.addRow([
           FullProductionCode,
           weekDay.substring(0, 3),
-          formatDate(dateInIncomingFormat, 'DD/MM/YY'),
+          formatDate(dateInIncomingFormat, 'dd/MM/yy'),
           prevProductionWeekNum,
         ]);
         colorTextAndBGCell({
@@ -265,7 +265,7 @@ const handler = async (req, res) => {
         let row = [
           FullProductionCode,
           weekDay.substring(0, 3),
-          formatDate(dateInIncomingFormat, 'DD/MM/YY'),
+          formatDate(dateInIncomingFormat, 'dd/MM/yy'),
           ProductionWeekNum,
           EntryName || '',
         ];

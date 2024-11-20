@@ -40,7 +40,7 @@ const Filters = ({ onExportClick }: FiltersProps) => {
     setFilter({ ...filter, [e.target.id]: e.target.value });
   };
   const gotoToday = () => {
-    const dateToScrollTo = formatDate(newDate(), 'ddd DD/MM/YY');
+    const dateToScrollTo = formatDate(newDate(), 'EEE dd/MM/yy');
     if (todayOnSchedule) {
       setFilter({ ...filter, scrollToDate: dateToScrollTo });
     }

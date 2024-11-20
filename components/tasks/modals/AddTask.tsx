@@ -10,7 +10,6 @@ import PopupModal from 'components/core-ui-lib/PopupModal';
 import Select from 'components/core-ui-lib/Select';
 import TextArea from 'components/core-ui-lib/TextArea/TextArea';
 import TextInput from 'components/core-ui-lib/TextInput';
-import moment from 'moment';
 import { omit } from 'radash';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRecoilValue } from 'recoil';
@@ -20,7 +19,7 @@ import { isNullOrEmpty } from 'utils';
 import { getWeekOptions } from 'utils/taskDate';
 import { priorityOptions, generatePercentageOptions } from 'utils/tasks';
 import { productionJumpState } from 'state/booking/productionJumpState';
-import { addOneMonthV2, getDateDaysAway, newDate } from 'services/dateService';
+import { addOneMonthV2, formatDate, getDateDaysAway, newDate } from 'services/dateService';
 import { RecurringTasksPopup } from './RecurringTasksPopup';
 import { DeleteRecurringPopup } from './DeleteRecurringPopup';
 import { useRouter } from 'next/router';
@@ -232,7 +231,7 @@ const AddTask = ({
     if (id === 'Progress') {
       newInputs = {
         ...newInputs,
-        TaskCompletedDate: value === 100 ? moment.utc(new Date(), 'DD/MM/YY').toString() : null,
+        TaskCompletedDate: value === 100 ? formatDate(newDate(), 'dd/MM/yy').toString() : null,
       };
 
       setInputs(newInputs);

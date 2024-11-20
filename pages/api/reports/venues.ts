@@ -168,7 +168,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
 
     worksheet.addRow([`${filename}`]);
     const date = newDate();
-    worksheet.addRow([`Exported: ${formatDate(date, 'DD/MM/YY')} at ${dateTimeToTime(date)}`]);
+    worksheet.addRow([`Exported: ${formatDate(date, 'dd/MM/yy')} at ${dateTimeToTime(date)}`]);
     worksheet.addRow([
       'PRODUCTION',
       'SHOW',
@@ -201,17 +201,17 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     ]);
     worksheet.addRow([]);
     applySelectionFilter(bookings, selection)?.forEach((booking: BOOKING) => {
-      const ShowDate = formatDate(booking.FirstDate.getTime(), 'DD/MM/YY');
+      const ShowDate = formatDate(booking.FirstDate.getTime(), 'dd/MM/yy');
       const VenueCode = booking.VenueCode;
       const ShowTown = booking.VenueTown;
       const VenueName = booking.VenueName;
       const OnSale = getBooleanAsString(booking.TicketsOnSale);
-      const OnSaleDate = booking.OnSaleDate ? formatDate(booking.TicketsOnSaleFromDate.getTime(), 'DD/MM/YY') : '';
+      const OnSaleDate = booking.OnSaleDate ? formatDate(booking.TicketsOnSaleFromDate.getTime(), 'dd/MM/yy') : '';
       const MarketingPlan = getBooleanAsString(booking.MarketingPlanReceived);
       const ContactInfo = getBooleanAsString(booking.ContactInfoReceived);
       const PrintReqsReceived = getBooleanAsString(booking.PrintReqsReceived);
       const marketingCostsApprovalDate = booking.MarketingCostsApprovalDate
-        ? formatDate(booking.MarketingCostsApprovalDate.getTime(), 'DD/MM/YY')
+        ? formatDate(booking.MarketingCostsApprovalDate.getTime(), 'dd/MM/yy')
         : '';
       worksheet.addRow([
         booking.FullProductionCode,

@@ -586,7 +586,7 @@ export const compareDatesWithoutTime = (
 // DEPRECATED -- ARUN NEEDS CONSULTING
 export const formatDateWithTimezoneOffset = ({
   date,
-  dateFormat = 'DD/MM/YY',
+  dateFormat = 'dd/MM/yy',
   timezoneOffset,
 }: {
   date: string | Date;
@@ -753,8 +753,8 @@ export const getWeekDayLong = (dateToFormat: Date | string) => {
 // DEPRECATED
 export const formattedDateWithWeekDay = (dateToFormat: Date | string, weekDayFormat: 'Long' | 'Short') => {
   if (!dateToFormat) return '';
-  const shortFormat = 'ddd DD/MM/YY';
-  const longFormat = 'dddd DD/MM/YYYY';
+  const shortFormat = 'EEE dd/MM/yy';
+  const longFormat = 'EEEE dd/MM/yyyy';
   return moment(dateToFormat).format(weekDayFormat === 'Long' ? longFormat : shortFormat);
 };
 

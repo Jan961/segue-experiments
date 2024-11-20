@@ -135,7 +135,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       const productionCode = x.FullProductionCode || '';
       const venueCode = x.VenueCode || '';
       const venueName = x.VenueName || '';
-      const showDate = x.PerformanceDate ? formatDate(x.PerformanceDate, 'DD/MM/YY') : '';
+      const showDate = x.PerformanceDate ? formatDate(x.PerformanceDate, 'dd/MM/yy') : '';
       const showTime = x.PerformanceTime ? dateTimeToTime(x.PerformanceTime) : '';
       const availableSeats = x.AvailableCompSeats || 0;
       const availableNotes = x.AvailableCompNotes || '';

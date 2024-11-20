@@ -59,7 +59,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const row = worksheet.addRow([
       activity.Name || '',
       activityTypeMap.get(activity.ActivityTypeId) || '',
-      activity.Date ? formatDate(activity.Date, 'DD/MM/YY') : '',
+      activity.Date ? formatDate(activity.Date, 'dd/MM/yy') : '',
       activity.FollowUpRequired,
       activity.CompanyCost,
       activity.VenueCost,

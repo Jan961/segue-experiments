@@ -58,7 +58,7 @@ export const contractsRowsSelector = selector({
         ...rowData,
         week,
         dateTime: date,
-        date: date ? formatDate(date, 'ddd DD/MM/YY') : '',
+        date: date ? formatDate(date, 'EEE dd/MM/yy') : '',
         productionName: getProductionName(production),
         production: getProductionCode(production),
         productionId: ProductionId,
@@ -168,7 +168,7 @@ export const contractsRowsSelector = selector({
         const emptyRow = {
           ...contractsRow,
           week,
-          date: formatDate(date, 'ddd DD/MM/YY'),
+          date: formatDate(date, 'EEE dd/MM/yy'),
           dateTime: newDate(date).toISOString(),
           production: production ? getProductionCode(production) : '',
           productionId: production?.Id,

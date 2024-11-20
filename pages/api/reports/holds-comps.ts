@@ -256,7 +256,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         x.FullProductionCode,
         x.VenueCode,
         x.VenueName,
-        x.BookingFirstDate ? formatDate(x.BookingFirstDate, 'DD/MM/YY') : '',
+        x.BookingFirstDate ? formatDate(x.BookingFirstDate, 'dd/MM/yy') : '',
         '',
         '',
         'Capacity',
