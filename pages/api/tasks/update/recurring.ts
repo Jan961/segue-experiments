@@ -3,7 +3,7 @@ import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 
 import { generateRecurringProductionTasks, getNewTasksNum } from 'services/TaskService';
-import { calculateWeekNumber } from 'services/dateService';
+import { calculateWeekNumber, newDate } from 'services/dateService';
 import { isNullOrEmpty } from 'utils';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
@@ -41,7 +41,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       if (fieldDifference) {
         const productionDateBlock = result.Production.DateBlock;
 
-        const prodStartDate = new Date(
+        const prodStartDate = newDate(
           productionDateBlock.find((dateBlock) => dateBlock.Name === 'Production')?.StartDate,
         );
 

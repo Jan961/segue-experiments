@@ -583,17 +583,6 @@ export const compareDatesWithoutTime = (
   }
 };
 
-// DEPRECATED
-export function addDurationToDate(inputDate: Date, duration: number, add: boolean) {
-  const startingDate = new Date(inputDate.getTime());
-  if (add) {
-    startingDate.setDate(startingDate.getDate() + duration);
-  } else {
-    startingDate.setDate(startingDate.getDate() - duration);
-  }
-  return startingDate;
-}
-
 // DEPRECATED -- ARUN NEEDS CONSULTING
 export const formatDateWithTimezoneOffset = ({
   date,

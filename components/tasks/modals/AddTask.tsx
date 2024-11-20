@@ -20,10 +20,11 @@ import { isNullOrEmpty } from 'utils';
 import { getWeekOptions } from 'utils/taskDate';
 import { priorityOptions, generatePercentageOptions } from 'utils/tasks';
 import { productionJumpState } from 'state/booking/productionJumpState';
-import { addDurationToDate, addOneMonth } from 'services/dateService';
+import { addOneMonthV2, getDateDaysAway, newDate } from 'services/dateService';
 import { RecurringTasksPopup } from './RecurringTasksPopup';
 import { DeleteRecurringPopup } from './DeleteRecurringPopup';
 import { useRouter } from 'next/router';
+import { UTCDate } from '@date-fns/utc';
 
 interface AddTaskProps {
   visible: boolean;
@@ -242,11 +243,16 @@ const AddTask = ({
     setStatus({ ...status, submitted: false });
   };
 
-  const getNewTasksNum = (prodStartDate: Date, taskRepeatFromWeekNum, taskRepeatToWeekNum, repeatInterval): number => {
+  const getNewTasksNum = (
+    prodStartDate: UTCDate,
+    taskRepeatFromWeekNum,
+    taskRepeatToWeekNum,
+    repeatInterval,
+  ): number => {
     if (isNullOrEmpty(repeatInterval)) return 1;
 
-    let taskStartDate = addDurationToDate(prodStartDate, taskRepeatFromWeekNum * 7, true);
-    const taskEndDate = addDurationToDate(prodStartDate, taskRepeatToWeekNum * 7, true);
+    let taskStartDate = getDateDaysAway(prodStartDate, taskRepeatFromWeekNum * 7);
+    const taskEndDate = getDateDaysAway(prodStartDate, taskRepeatToWeekNum * 7);
 
     const multiplier = repeatInterval === 'biweekly' ? 2 : 1;
     let counter = 0;
@@ -254,9 +260,7 @@ const AddTask = ({
     while (taskStartDate <= taskEndDate) {
       counter++;
       taskStartDate =
-        repeatInterval === 'monthly'
-          ? addOneMonth(taskStartDate)
-          : addDurationToDate(taskStartDate, 7 * multiplier, true);
+        repeatInterval === 'monthly' ? addOneMonthV2(taskStartDate) : getDateDaysAway(taskStartDate, 7 * multiplier);
     }
 
     return counter;
@@ -306,14 +310,14 @@ const AddTask = ({
     }
 
     const previousTasks = getNewTasksNum(
-      new Date(production?.StartDate),
+      newDate(production?.StartDate),
       previousTaskInfo?.TaskRepeatFromWeekNum,
       previousTaskInfo?.TaskRepeatToWeekNum,
       previousTaskInfo?.RepeatInterval,
     );
 
     const updatedTasks = getNewTasksNum(
-      new Date(production?.StartDate),
+      newDate(production?.StartDate),
       updatedTaskInfo?.TaskRepeatFromWeekNum,
       updatedTaskInfo?.TaskRepeatToWeekNum,
       updatedTaskInfo?.RepeatInterval,
