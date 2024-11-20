@@ -46,9 +46,10 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { styleHeader } from './masterplan';
 import { currencyCodeToSymbolMap } from 'config/Reports';
 import { convertToPDF, sanitizeRowData } from 'utils/report';
-import { calculateWeekNumber, formatDate, getWeeksBetweenDates } from 'services/dateService';
+import { calculateWeekNumber, formatDate, getWeeksBetweenDates, newDate } from 'services/dateService';
 import { group, unique } from 'radash';
 import { addBorderToAllCells } from 'utils/export';
+import { UTCDate } from '@date-fns/utc';
 
 interface ProductionWeek {
   mondayDate: string;
@@ -116,10 +117,12 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   const { productionId, fromWeek, toWeek, isWeeklyReport, isSeatsDataRequired, format } = req.body || {};
   try {
     prisma = await getPrismaClient(req);
-    const bookings = await fetchProductionBookings(+productionId);
+    const bookings = await fetchProductionBookings(+productionId).then((res) =>
+      res.map((e) => ({ ...e, StartDate: new UTCDate(e.StartDate) })),
+    );
     const { StartDate, EndDate } = bookings?.[0] || {};
     const weeks: ProductionWeek[] = getWeeksBetweenDates(fromWeek, toWeek || EndDate).map((week) => ({
-      productionWeekNum: formatWeek(calculateWeekNumber(new Date(StartDate), new Date(week.mondayDate))),
+      productionWeekNum: formatWeek(calculateWeekNumber(StartDate, newDate(week.mondayDate))),
       ...week,
     }));
     const workbook = new ExcelJS.Workbook();

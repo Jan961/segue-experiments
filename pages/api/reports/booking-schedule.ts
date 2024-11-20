@@ -19,7 +19,6 @@ import {
   formatDate,
   formatUtcTime,
   getDateDaysAway,
-  getDateObject,
   newDate,
   timeFormatV2,
 } from 'services/dateService';
@@ -274,7 +273,7 @@ const handler = async (req, res) => {
       const isCancelled = value?.EntryStatusCode === 'X';
       const isSuspended = value?.EntryStatusCode === 'S';
       if (!value) {
-        const weekNumber = calculateWeekNumber(getDateObject(ProductionStartDate), dateInIncomingFormat);
+        const weekNumber = calculateWeekNumber(ProductionStartDate, dateInIncomingFormat);
         worksheet.addRow([weekDay.substring(0, 3), formatDate(dateInIncomingFormat, 'dd/MM/yy'), `${weekNumber}`]);
         colorTextAndBGCell({
           worksheet,

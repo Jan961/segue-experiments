@@ -355,7 +355,7 @@ export const formattedDateWithWeekDayV2 = (
  * @param {UTCDate | string | number} dateToNumber - The date to calculate to.
  * @returns {number} Returns the number of weeks passed.
  */
-export const calculateWeekNumberV2 = (
+export const calculateWeekNumber = (
   productionStart: UTCDate | string | number,
   dateToNumber: UTCDate | string | number,
 ): number => {
@@ -848,21 +848,6 @@ export const weeks = (showDate: string, firstShowDate: string): number => {
   }
 
   return week;
-};
-
-// DEPRECATED
-export const calculateWeekNumber = (productionStart: Date, dateToNumber: Date): number => {
-  const weekOneStart = startOfWeek(productionStart, { weekStartsOn: 1 });
-  let weekNumber = differenceInWeeks(dateToNumber, weekOneStart);
-
-  // Handle the week boundary condition
-  const adjustedStartDate = addWeeks(weekOneStart, weekNumber);
-  if (isBefore(dateToNumber, adjustedStartDate)) weekNumber -= 1;
-  if (isBefore(dateToNumber, weekOneStart)) weekNumber -= 1;
-
-  weekNumber += 1;
-
-  return weekNumber;
 };
 
 // DEPRECATED

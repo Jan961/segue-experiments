@@ -136,9 +136,11 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
               data: {
                 Interval: RepeatInterval,
                 FromWeekNum: TaskRepeatFromWeekNum,
-                FromWeekNumIsPostProduction: TaskRepeatFromWeekNum > calculateWeekNumber(prodStartDate, prodEndDate),
+                FromWeekNumIsPostProduction:
+                  TaskRepeatFromWeekNum > calculateWeekNumber(prodStartDate.getTime(), prodEndDate.getTime()),
                 ToWeekNum: TaskRepeatToWeekNum,
-                ToWeekNumIsPostProduction: TaskRepeatToWeekNum > calculateWeekNumber(prodStartDate, prodEndDate),
+                ToWeekNumIsPostProduction:
+                  TaskRepeatToWeekNum > calculateWeekNumber(prodStartDate.getTime(), prodEndDate.getTime()),
               },
             });
 
@@ -149,9 +151,11 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
             data: {
               Interval: RepeatInterval,
               FromWeekNum: TaskRepeatFromWeekNum,
-              FromWeekNumIsPostProduction: TaskRepeatFromWeekNum > calculateWeekNumber(prodStartDate, prodEndDate),
+              FromWeekNumIsPostProduction:
+                TaskRepeatFromWeekNum > calculateWeekNumber(prodStartDate.getTime(), prodEndDate.getTime()),
               ToWeekNum: TaskRepeatToWeekNum,
-              ToWeekNumIsPostProduction: TaskRepeatToWeekNum > calculateWeekNumber(prodStartDate, prodEndDate),
+              ToWeekNumIsPostProduction:
+                TaskRepeatToWeekNum > calculateWeekNumber(prodStartDate.getTime(), prodEndDate.getTime()),
             },
           });
 

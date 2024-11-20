@@ -3,7 +3,7 @@ import { styleProps, previewColumnDefs } from 'components/bookings/table/tableCo
 import { BookingItem, PreviewDataItem, TForm } from '../reducer';
 import { useRecoilValue } from 'recoil';
 import { rowsSelector } from 'state/booking/selectors/rowsSelector';
-import { calculateWeekNumber } from 'services/dateService';
+import { calculateWeekNumber, newDate } from 'services/dateService';
 import { addDays, subDays, parseISO, isWithinInterval } from 'date-fns';
 import { venueState } from 'state/booking/venueState';
 import { bookingStatusMap } from 'config/bookings';
@@ -173,7 +173,7 @@ export default function PreviewBookingDetails({
   const formatRowData = (data) => {
     const rowItems: PreviewDataItem[] = data.map((item: any) => {
       const calculateWeek = () => {
-        return calculateWeekNumber(new Date(production.StartDate), new Date(item.dateAsISOString));
+        return calculateWeekNumber(newDate(production.StartDate), newDate(item.dateAsISOString));
       };
       return {
         ...item,

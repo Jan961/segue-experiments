@@ -214,9 +214,9 @@ export const generateRecurringProductionTasks = async (
       Progress: parseInt(Progress) || 0,
       TaskAssignedToAccUserId,
       CompleteByIsPostProduction: CompleteByWeekNum > calculateWeekNumber(prodStartDate, prodBlock?.EndDate),
-      StartByWeekNum: calculateWeekNumber(prodStartDate, taskStartDate),
+      StartByWeekNum: calculateWeekNumber(prodStartDate, taskStartDate.getTime()),
       StartByIsPostProduction: StartByWeekNum > calculateWeekNumber(prodStartDate, prodBlock?.EndDate),
-      CompleteByWeekNum: calculateWeekNumber(prodStartDate, taskStartDate) + taskAllowance,
+      CompleteByWeekNum: calculateWeekNumber(prodStartDate, taskStartDate.getTime()) + taskAllowance,
       TaskCompletedDate,
       PRTId,
     });

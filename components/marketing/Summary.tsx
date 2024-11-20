@@ -1,4 +1,4 @@
-import { calculateWeekNumber, dateToSimple, getTimeFromDateAndTime } from 'services/dateService';
+import { calculateWeekNumber, dateToSimple, getTimeFromDateAndTime, newDate } from 'services/dateService';
 import axios from 'axios';
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import numeral from 'numeral';
@@ -67,8 +67,8 @@ const Summary = forwardRef<SummaryRef, SummaryProps>((props, ref) => {
   if (!summary) return null;
 
   const weekNo = calculateWeekNumber(
-    new Date(summary?.ProductionInfo?.StartDate),
-    new Date(summary?.ProductionInfo?.Date),
+    newDate(summary?.ProductionInfo?.StartDate),
+    newDate(summary?.ProductionInfo?.Date),
   );
 
   if (!summary?.Info) return null;

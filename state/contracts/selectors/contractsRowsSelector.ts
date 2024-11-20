@@ -7,7 +7,7 @@ import { productionJumpState } from '../../booking/productionJumpState';
 import { objectify } from 'radash';
 import moment from 'moment';
 import { contractsRow, contractsStatusMap } from 'config/contracts';
-import { calculateWeekNumber, getKey, getArrayOfDatesBetween } from 'services/dateService';
+import { calculateWeekNumber, getKey, getArrayOfDatesBetween, newDate } from 'services/dateService';
 import { contractsPerformanceState } from '../contractsPerformanceState';
 import ContractsHelper from 'utils/contracts';
 import { contractsDateBlockState } from '../contractsDateBlockState';
@@ -43,7 +43,7 @@ export const contractsRowsSelector = selector({
       const { ProductionId, PrimaryDateBlock } = data;
       const production = productionDict[ProductionId] || {};
       const rowData = transformer(data);
-      const week = calculateWeekNumber(new Date(PrimaryDateBlock?.StartDate), new Date(date));
+      const week = calculateWeekNumber(newDate(PrimaryDateBlock?.StartDate), newDate(date));
       const otherDayType = dayTypes.find(({ Id }) => Id === data.DateTypeId)?.Name;
       const getValueForDayType = (value, type) => {
         if (!value) {
@@ -165,7 +165,7 @@ export const contractsRowsSelector = selector({
         if (!production) {
           continue;
         }
-        const week = calculateWeekNumber(new Date(production?.StartDate), new Date(date)) || '';
+        const week = calculateWeekNumber(newDate(production?.StartDate), newDate(date)) || '';
         const emptyRow = {
           ...contractsRow,
           week,

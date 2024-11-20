@@ -93,8 +93,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       taskList = taskList.filter((task) => {
         const taskDueDate = weekNumToDateMap?.[task.CompleteByWeekNum] || '';
         return !(
-          (startDueDate && new Date(taskDueDate) < new Date(startDueDate)) ||
-          (endDueDate && new Date(taskDueDate) > new Date(endDueDate))
+          (startDueDate && newDate(taskDueDate) < newDate(startDueDate)) ||
+          (endDueDate && newDate(taskDueDate) > newDate(endDueDate))
         );
       });
       if (!taskList.length) continue;
@@ -104,7 +104,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       worksheet.addRow([]);
       rows += 3;
       productionRowList.push(rows - 1);
-      const currentWeekNum = calculateWeekNumber(StartDate, new Date());
+      const currentWeekNum = calculateWeekNumber(StartDate.getTime(), newDate());
 
       taskList
         .sort((a, b) => a.StartByWeekNum - b.StartByWeekNum)

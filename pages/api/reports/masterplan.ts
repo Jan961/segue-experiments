@@ -2,7 +2,7 @@ import ExcelJS from 'exceljs';
 import getPrismaClient from 'lib/prisma';
 import { differenceInDays } from 'date-fns';
 import { COLOR_HEXCODE, colorCell, colorTextAndBGCell, fillRowBGColorAndTextColor } from 'services/salesSummaryService';
-import { calculateWeekNumber, formatDate, getDateDaysAway } from 'services/dateService';
+import { calculateWeekNumber, formatDate, getDateDaysAway, newDate } from 'services/dateService';
 import { convertToPDF } from 'utils/report';
 import { getExportedAtTitle } from 'utils/export';
 import { UTCDate } from '@date-fns/utc';
@@ -188,7 +188,7 @@ const handler = async (req, res) => {
         if (!value) {
           return acc;
         }
-        const weekNo = calculateWeekNumber(new Date(value.ProductionStartDate), new Date(fromDate));
+        const weekNo = calculateWeekNumber(newDate(value.ProductionStartDate), newDate(fromDate));
         return {
           ...acc,
           [getShowAndProductionKey({ FullProductionCode, ShowName })]: weekNo,

@@ -7,13 +7,7 @@ import { getExportedAtTitle } from 'utils/export';
 import { currencyCodeToSymbolMap } from 'config/Reports';
 import { calculateRemainingDaysInWeek, convertToPDF } from 'utils/report';
 import { BOOK_STATUS_CODES, SALES_TYPE_NAME } from 'types/MarketingTypes';
-import {
-  calculateWeekNumber,
-  formatDate,
-  getDateDaysAway,
-  getDateObject,
-  getDifferenceInDays,
-} from 'services/dateService';
+import { calculateWeekNumber, formatDate, getDateDaysAway, getDifferenceInDays } from 'services/dateService';
 import { SCHEDULE_VIEW } from 'services/reports/schedule-report';
 import { UTCDate } from '@date-fns/utc';
 
@@ -237,7 +231,7 @@ const handler = async (req, res) => {
       const dateInIncomingFormat = formatDate(getDateDaysAway(fromDate?.toISOString(), i - 1), 'yyyy-MM-dd');
       const nextDateInIncomingFormat = formatDate(getDateDaysAway(fromDate?.toISOString(), i), 'yyyy-MM-dd');
       const date = formatDate(dateInIncomingFormat, 'dd/MM/yy');
-      const weekNumber = calculateWeekNumber(fromDate, getDateObject(dateInIncomingFormat));
+      const weekNumber = calculateWeekNumber(fromDate, dateInIncomingFormat);
       if (i === 1 && weekDay !== 'Monday') {
         // +2 is for including currentday and sunday
         addWeekDetails(weekNumber, colNo, calculateRemainingDaysInWeek(weekDay) + 2);
