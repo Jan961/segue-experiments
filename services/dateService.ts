@@ -459,7 +459,7 @@ export const getSundayV2 = (inputDate: UTCDate | string | number, locale?: Local
  * @param {Locale?} locale - The locale value of the inputted date.
  * @returns {string} Returns the date in the format yyyy-mm-dd.
  */
-export const toSqlV2 = (date: string | UTCDate | number, locale?: Locale): string => {
+export const toSql = (date: string | UTCDate | number, locale?: Locale): string => {
   if (!date) {
     return null;
   }
@@ -951,11 +951,6 @@ export const getNextMondayDateString = (date: string) => {
   const nextMondayDate = inputDate.add(daysUntilNextMonday, 'days');
   const nextMondayDateStr = nextMondayDate.toISOString();
   return nextMondayDateStr;
-};
-
-// DEPRECATED
-export const toSql = (date: string) => {
-  return new Date(date).toISOString()?.split?.('T')?.[0];
 };
 
 // DEPRECATED
