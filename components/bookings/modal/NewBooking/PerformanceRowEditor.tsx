@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import moment from 'moment';
 import { FormInputCheckbox } from 'components/global/forms/FormInputCheckbox';
 import { FormInputNumeric } from 'components/global/forms/FormInputNumeric';
 import { FormInputTime } from 'components/global/forms/FormInputTime';
+import { formatDate } from 'services/dateService';
 
 const PerformanceRowEditor = ({
   date,
@@ -30,7 +30,7 @@ const PerformanceRowEditor = ({
   return (
     <div className="grid grid-cols-12 text-primary-navy border-b border-primary-navy">
       <div className="col-span-6 border-r border-primary-navy px-2 text-sm font-normal flex items-center my-2">
-        {moment(date).format('dddd D MMMM YYYY')}
+        {formatDate(date, 'dddd D MMMM YYYY')}
       </div>
       <div className="col-span-2 border-r border-primary-navy flex items-center justify-center my-2">
         <FormInputCheckbox
@@ -43,7 +43,7 @@ const PerformanceRowEditor = ({
         <FormInputNumeric
           className="w-16"
           disabled={!hasPerformance}
-          name={'NumberOfPerformances'}
+          name="NumberOfPerformances"
           value={performanceCount}
           onChange={onPerformanceCountChange}
         />

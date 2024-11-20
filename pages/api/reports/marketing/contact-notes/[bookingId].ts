@@ -1,5 +1,4 @@
 import ExcelJS from 'exceljs';
-import moment from 'moment';
 import { getContactNotesByBookingId } from 'services/venueContactsService';
 import { bookingContactNoteMapper } from 'lib/mappers';
 import { COLOR_HEXCODE } from 'services/salesSummaryService';
@@ -9,6 +8,7 @@ import { convertToPDF } from 'utils/report';
 import { getAccountId, getEmailFromReq, getUsers } from 'services/userService';
 import { objectify } from 'radash';
 import { ALIGNMENT } from '../../masterplan';
+import { dateTimeToTime, formatDate } from 'services/dateService';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { bookingId, format } = req.query || {};
@@ -60,8 +60,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const actionedBy = `${FirstName || ''} ${LastName || ''}`;
     const row = worksheet.addRow([
       note.CoContactName,
-      moment(note.ContactDate).format('DD/MM/YY'),
-      moment(note.ContactDate).format('HH:mm'),
+      formatDate(note.ContactDate, 'DD/MM/YY'),
+      dateTimeToTime(note.ContactDate),
       actionedBy || '',
       note.Notes,
     ]);

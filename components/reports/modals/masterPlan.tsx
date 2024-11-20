@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import moment from 'moment';
 import { faStar } from '@fortawesome/free-solid-svg-icons';
-import { getMonday } from 'services/dateService';
+import { formatDate, getMondayV2, newDate } from 'services/dateService';
 import { SwitchBoardItem } from 'components/global/SwitchBoardItem';
 import { Spinner } from 'components/global/Spinner';
 import axios from 'axios';
@@ -27,7 +26,7 @@ export default function MasterPlan() {
       .get('/api/reports/booking/last')
       .then((data: any) => {
         setInputs({
-          fromDate: data.FirstDate?.substring?.(0, 10) || moment(new Date()).format('YYYY-MM-DD'),
+          fromDate: data.FirstDate?.substring?.(0, 10) || formatDate(newDate(), 'YYYY-MM-DD'),
           toDate: data?.data?.FirstDate?.substring?.(0, 10),
         });
       })
@@ -44,8 +43,8 @@ export default function MasterPlan() {
     fetch('/api/reports/masterplan', {
       method: 'POST',
       body: JSON.stringify({
-        fromDate: moment(getMonday(inputs.fromDate)).format('YYYY-MM-DD'),
-        toDate: moment(new Date(inputs.toDate)).format('YYYY-MM-DD'),
+        fromDate: formatDate(getMondayV2(inputs.fromDate), 'YYYY-MM-DD'),
+        toDate: formatDate(inputs.toDate, 'YYYY-MM-DD'),
       }),
     })
       .then(async (response) => {
@@ -116,7 +115,7 @@ export default function MasterPlan() {
           <div className="fixed z-50 inset-0 overflow-y-auto">
             <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
               <div className="fixed inset-0 transition-opacity" aria-hidden="true">
-                <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
+                <div className="absolute inset-0 bg-gray-500 opacity-75" />
               </div>
 
               <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">
@@ -150,7 +149,7 @@ export default function MasterPlan() {
                         viewBox="0 0 24 24"
                         stroke="currentColor"
                       >
-                        <path d="M6 18L18 6M6 6l12 12"></path>
+                        <path d="M6 18L18 6M6 6l12 12" />
                       </svg>
                     </button>
                   </div>
@@ -215,7 +214,7 @@ export default function MasterPlan() {
               </div>
             </div>
           </div>
-          <div className="opacity-25 fixed inset-0 z-40 bg-black"></div>
+          <div className="opacity-25 fixed inset-0 z-40 bg-black" />
         </>
       ) : null}
     </>

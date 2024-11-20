@@ -5,9 +5,8 @@ import { contractsOtherState } from '../contractsOtherState';
 import { contractsVenueState } from '../contractsVenueState';
 import { productionJumpState } from '../../booking/productionJumpState';
 import { objectify } from 'radash';
-import moment from 'moment';
 import { contractsRow, contractsStatusMap } from 'config/contracts';
-import { calculateWeekNumber, getKey, getArrayOfDatesBetween, newDate } from 'services/dateService';
+import { calculateWeekNumber, getKey, getArrayOfDatesBetween, newDate, formatDate } from 'services/dateService';
 import { contractsPerformanceState } from '../contractsPerformanceState';
 import ContractsHelper from 'utils/contracts';
 import { contractsDateBlockState } from '../contractsDateBlockState';
@@ -59,7 +58,7 @@ export const contractsRowsSelector = selector({
         ...rowData,
         week,
         dateTime: date,
-        date: date ? moment(date).format('ddd DD/MM/YY') : '',
+        date: date ? formatDate(date, 'ddd DD/MM/YY') : '',
         productionName: getProductionName(production),
         production: getProductionCode(production),
         productionId: ProductionId,
@@ -169,8 +168,8 @@ export const contractsRowsSelector = selector({
         const emptyRow = {
           ...contractsRow,
           week,
-          date: moment(date).format('ddd DD/MM/YY'),
-          dateTime: new Date(date).toISOString(),
+          date: formatDate(date, 'ddd DD/MM/YY'),
+          dateTime: newDate(date).toISOString(),
           production: production ? getProductionCode(production) : '',
           productionId: production?.Id,
           productionCode: production?.Code,

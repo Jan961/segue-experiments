@@ -1,5 +1,4 @@
 import ExcelJS from 'exceljs';
-import { format } from 'date-fns';
 import getPrismaClient from 'lib/prisma';
 import moment from 'moment';
 import {
@@ -42,7 +41,6 @@ import {
 } from 'types/SalesSummaryTypes';
 import { addWidthAsPerContent } from 'services/reportsService';
 import { NextApiRequest, NextApiResponse } from 'next';
-
 import { styleHeader } from './masterplan';
 import { currencyCodeToSymbolMap } from 'config/Reports';
 import { convertToPDF, sanitizeRowData } from 'utils/report';
@@ -93,7 +91,7 @@ const fetchProductionBookings = async (productionId: number): Promise<Production
   const summary = unique(data, (entry) => entry.EntryId)
     .map((entry) => ({
       ...entry,
-      Day: entry.BookingFirstDate ? format(new Date(entry.BookingFirstDate), 'EEEE') : '',
+      Day: entry.BookingFirstDate ? formatDate(entry.BookingFirstDate, 'EEEE') : '',
       Week: formatWeek(entry.ProductionWeekNum),
       Date: entry.EntryDate,
       VenueCurrencySymbol: currencyCodeToSymbolMap[entry.VenueCurrencyCode],
@@ -135,8 +133,8 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         ...(fromWeek &&
           toWeek && {
             SetProductionWeekDate: {
-              gte: new Date(fromWeek),
-              lte: new Date(toWeek),
+              gte: newDate(fromWeek),
+              lte: newDate(toWeek),
             },
           }),
       },
@@ -192,7 +190,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       Value: x.Value || 0,
       FormattedSetProductionWeekNum: formatWeek(x.SetProductionWeekNum),
       FormattedFinalFiguresValue: x.FinalFiguresValue || 0,
-      Day: x.BookingFirstDate ? moment(x.BookingFirstDate).format('dddd') : '',
+      Day: x.BookingFirstDate ? formatDate(x.BookingFirstDate, 'dddd') : '',
       Date: x.BookingFirstDate,
       Town: x.VenueTown,
       Venue: x.VenueName,

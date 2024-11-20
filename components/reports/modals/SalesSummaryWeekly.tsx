@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import moment from 'moment';
-import { dateToSimple, getDateDaysAgo, toISO } from 'services/dateService';
+import { dateToSimple, getDateDaysAgo } from 'services/dateService';
 import { faLineChart } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
 import { getCurrentMondayDate, range } from 'services/reportsService';
@@ -32,9 +31,10 @@ export default function SalesSummaryWeekly({ activeProductions }: Props) {
   };
 
   function formatShortYearDate(dateString) {
-    const dateMomentObject = moment(dateString) || moment(moment(dateString).format('DD/MM/YY'), 'DD/MM/YY'); // 1st argument - string, 2nd argument - format
-    const day = toISO(dateMomentObject as any).substring(0, 10);
-    return day; // new Date( dateMomentObject.toDate());
+    return dateToSimple(dateString);
+    // const dateMomentObject = moment(dateString) || moment(moment(dateString).format('DD/MM/YY'), 'DD/MM/YY'); // 1st argument - string, 2nd argument - format
+    // const day = toISO(dateMomentObject as any).substring(0, 10);
+    // return day; // new Date( dateMomentObject.toDate());
   }
 
   function handleOnSubmit(e) {
@@ -253,7 +253,7 @@ export default function SalesSummaryWeekly({ activeProductions }: Props) {
               </div>
             </div>
           </div>
-          <div className="opacity-25 fixed inset-0 z-40 bg-black"></div>
+          <div className="opacity-25 fixed inset-0 z-40 bg-black" />
         </>
       ) : null}
     </>

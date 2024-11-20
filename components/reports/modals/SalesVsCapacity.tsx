@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { dateToSimple, getDateDaysAgo, toISO } from 'services/dateService';
+import { dateToSimple, getDateDaysAgo } from 'services/dateService';
 import { faPercent } from '@fortawesome/free-solid-svg-icons';
-import moment from 'moment';
 import axios from 'axios';
 import { getCurrentMondayDate, range } from 'services/reportsService';
 import { SwitchBoardItem } from 'components/global/SwitchBoardItem';
@@ -32,9 +31,10 @@ export default function SalesVsCapacity({ activeProductions }: Props) {
   };
 
   function formatShortYearDate(dateString) {
-    const dateMomentObject = moment(dateString) || moment(moment(dateString).format('DD/MM/YY'), 'DD/MM/YY'); // 1st argument - string, 2nd argument - format
-    const day = toISO(dateMomentObject as any).substring(0, 10);
-    return day; // new Date( dateMomentObject.toDate());
+    return dateToSimple(dateString);
+    // const dateMomentObject = moment(dateString) || moment(moment(dateString).format('DD/MM/YY'), 'DD/MM/YY'); // 1st argument - string, 2nd argument - format
+    // const day = toISO(dateMomentObject as any).substring(0, 10);
+    // return day; // new Date( dateMomentObject.toDate());
   }
 
   const downloadReport = async () => {
@@ -151,7 +151,7 @@ export default function SalesVsCapacity({ activeProductions }: Props) {
           <div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none overflow-scroll p-10">
             <div className="relative w-auto my-6 mx-auto max-w-6xl">
               {/* content */}
-              <div className="px-4 border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none relative">
+              <div className="px-4 border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
                 {/* header */}
                 <div className="flex items-start justify-between p-5 border-b border-solid border-slate-200 rounded-t">
                   <h3 className="text-3xl font-semibold">Sales VS Capacity %</h3>
@@ -254,7 +254,7 @@ export default function SalesVsCapacity({ activeProductions }: Props) {
               </div>
             </div>
           </div>
-          <div className="opacity-25 fixed inset-0 z-40 bg-black"></div>
+          <div className="opacity-25 fixed inset-0 z-40 bg-black" />
         </>
       ) : null}
     </>

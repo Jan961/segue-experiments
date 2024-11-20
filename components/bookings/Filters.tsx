@@ -10,10 +10,10 @@ import { useMemo, useState } from 'react';
 import { filteredScheduleSelector } from 'state/booking/selectors/filteredScheduleSelector';
 import { allStatusOptions } from 'config/bookings';
 import { productionJumpState } from 'state/booking/productionJumpState';
-import moment from 'moment';
 import useMileageCalculator from 'hooks/useBookingMileageCalculator';
 import BookingsButtons from './BookingsButton';
 import { accessBookingsHome } from 'state/account/selectors/permissionSelector';
+import { formatDate, newDate } from 'services/dateService';
 
 interface FiltersProps {
   onExportClick?: (key: string) => void;
@@ -40,7 +40,7 @@ const Filters = ({ onExportClick }: FiltersProps) => {
     setFilter({ ...filter, [e.target.id]: e.target.value });
   };
   const gotoToday = () => {
-    const dateToScrollTo = moment(new Date()).format('ddd DD/MM/YY');
+    const dateToScrollTo = formatDate(newDate(), 'ddd DD/MM/YY');
     if (todayOnSchedule) {
       setFilter({ ...filter, scrollToDate: dateToScrollTo });
     }

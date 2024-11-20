@@ -1,7 +1,6 @@
 import getPrismaClient from 'lib/prisma';
 import { omit } from 'radash';
 import ExcelJS from 'exceljs';
-import moment from 'moment';
 import { COLOR_HEXCODE } from 'services/salesSummaryService';
 import { addWidthAsPerContent } from 'services/reportsService';
 import { NextApiRequest, NextApiResponse } from 'next';
@@ -10,6 +9,7 @@ import { ALIGNMENT } from './masterplan';
 import { marketingCostsStatusToLabelMap } from 'config/Reports';
 import { Booking } from 'prisma/generated/prisma-client';
 import { convertToPDF } from 'utils/report';
+import { dateTimeToTime, formatDate, newDate } from 'services/dateService';
 
 type BOOKING = Partial<Booking> & {
   IsOnSale: boolean;
@@ -167,8 +167,8 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     });
 
     worksheet.addRow([`${filename}`]);
-    const date = new Date();
-    worksheet.addRow([`Exported: ${moment(date).format('DD/MM/YY')} at ${moment(date).format('hh:mm')}`]);
+    const date = newDate();
+    worksheet.addRow([`Exported: ${formatDate(date, 'DD/MM/YY')} at ${dateTimeToTime(date)}`]);
     worksheet.addRow([
       'PRODUCTION',
       'SHOW',
@@ -201,17 +201,17 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     ]);
     worksheet.addRow([]);
     applySelectionFilter(bookings, selection)?.forEach((booking: BOOKING) => {
-      const ShowDate = moment(booking.FirstDate).format('DD/MM/YY');
+      const ShowDate = formatDate(booking.FirstDate.getTime(), 'DD/MM/YY');
       const VenueCode = booking.VenueCode;
       const ShowTown = booking.VenueTown;
       const VenueName = booking.VenueName;
       const OnSale = getBooleanAsString(booking.TicketsOnSale);
-      const OnSaleDate = booking.OnSaleDate ? moment(booking.TicketsOnSaleFromDate).format('DD/MM/YY') : '';
+      const OnSaleDate = booking.OnSaleDate ? formatDate(booking.TicketsOnSaleFromDate.getTime(), 'DD/MM/YY') : '';
       const MarketingPlan = getBooleanAsString(booking.MarketingPlanReceived);
       const ContactInfo = getBooleanAsString(booking.ContactInfoReceived);
       const PrintReqsReceived = getBooleanAsString(booking.PrintReqsReceived);
       const marketingCostsApprovalDate = booking.MarketingCostsApprovalDate
-        ? moment(booking.MarketingCostsApprovalDate).format('DD/MM/YY')
+        ? formatDate(booking.MarketingCostsApprovalDate.getTime(), 'DD/MM/YY')
         : '';
       worksheet.addRow([
         booking.FullProductionCode,

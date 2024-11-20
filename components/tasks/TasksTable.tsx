@@ -11,7 +11,7 @@ import { ProductionTaskDTO } from 'interfaces';
 import { useRouter } from 'next/router';
 import AddTask from './modals/AddTask';
 import { isNullOrEmpty } from 'utils';
-import { format, toZonedTime } from 'date-fns-tz';
+import { formatDate, newDate } from 'services/dateService';
 
 interface TasksTableProps {
   rowData?: any;
@@ -66,7 +66,7 @@ export default function TasksTable({
           progress < 100
             ? null
             : isNullOrEmpty(task.TaskCompletedDate)
-            ? format(toZonedTime(new Date(), 'UTC'), "EEE MMM dd yyyy HH:mm:ss 'GMT'XXX (zzzz)")
+            ? formatDate(newDate(), "EEE MMM dd yyyy HH:mm:ss 'GMT'XXX (zzzz)")
             : task.TaskCompletedDate,
       };
       const updatedRowData = rowData.map((row) => {

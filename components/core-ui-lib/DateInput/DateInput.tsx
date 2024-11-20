@@ -4,9 +4,9 @@ import TextInput from '../TextInput';
 import React, { createRef, forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import Label from '../Label';
 import { Portal } from 'react-overlays';
-import { format, isValid } from 'date-fns';
+import { isValid } from 'date-fns';
 import { UTCDate } from '@date-fns/utc';
-import { newDate, safeDateV2 } from 'services/dateService';
+import { formatDate, newDate, safeDateV2 } from 'services/dateService';
 
 export interface DateInputProps {
   value?: string | Date;
@@ -61,7 +61,7 @@ export default forwardRef<Ref, DateInputProps>(function DateInput(
         setInputValue(dateValue);
         setSelectedDate(safeDateV2(dateValue));
       } else {
-        setInputValue(format(dateValue, 'dd/MM/yy'));
+        setInputValue(formatDate(dateValue, 'dd/MM/yy'));
         setSelectedDate(safeDateV2(dateValue));
       }
     } else {
@@ -123,7 +123,7 @@ export default forwardRef<Ref, DateInputProps>(function DateInput(
         setSelectedDate(d);
       } else {
         if (value) {
-          setInputValue(format(d, 'dd/MM/yy'));
+          setInputValue(formatDate(d, 'dd/MM/yy'));
         } else {
           setInputValue('');
         }

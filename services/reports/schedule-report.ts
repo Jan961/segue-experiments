@@ -1,7 +1,9 @@
+import { UTCDate } from '@date-fns/utc';
 import { bookingStatusMap } from 'config/bookings';
 import getPrismaClient from 'lib/prisma';
 import moment from 'moment';
 import { NextApiRequest } from 'next';
+import { dateTimeToTime, formatDate, getDateDaysAway } from 'services/dateService';
 import { minutesInHHmmFormat } from 'services/salesSummaryService';
 
 export type SCHEDULE_VIEW = {
@@ -91,13 +93,21 @@ export const getSheduleReport = async ({ from, to, status, ProductionId }, req: 
   const bookingIdList: number[] =
     data.map((entry) => (entry.EntryType === 'Booking' ? entry.EntryId : null)).filter((id) => id) || [];
 
-  const performances = await prisma.performance.findMany({
-    where: {
-      BookingId: {
-        in: bookingIdList,
+  const performances = await prisma.performance
+    .findMany({
+      where: {
+        BookingId: {
+          in: bookingIdList,
+        },
       },
-    },
-  });
+    })
+    .then((res) =>
+      res.map((x) => ({
+        ...x,
+        Time: new UTCDate(x.Time),
+        Date: new UTCDate(x.Date),
+      })),
+    );
   performances.forEach((performance) => {
     const { Id, BookingId, Time, Date } = performance;
 
@@ -107,15 +117,15 @@ export const getSheduleReport = async ({ from, to, status, ProductionId }, req: 
 
     bookingIdPerformanceMap[BookingId].push({
       performanceId: Id,
-      performanceTime: Time ? moment.utc(Time).format('HH:mm') : null,
+      performanceTime: Time ? dateTimeToTime(Time) : null,
       performanceDate: Date ? Date.toISOString() : null,
     });
   });
   const formattedData = data.map((x) => ({
     ...x,
-    EntryDate: moment(x.EntryDate).format('YYYY-MM-DD'),
-    ProductionStartDate: moment(x.ProductionStartDate).format('YYYY-MM-DD'),
-    ProductionEndDate: moment(x.ProductionEndDate).format('YYYY-MM-DD'),
+    EntryDate: formatDate(x.EntryDate.getTime(), 'YYYY-MM-DD'),
+    ProductionStartDate: formatDate(x.ProductionStartDate.getTime(), 'YYYY-MM-DD'),
+    ProductionEndDate: formatDate(x.ProductionEndDate.getTime(), 'YYYY-MM-DD'),
   }));
   const { ShowName, FullProductionCode, ProductionStartDate, ProductionEndDate } = data[0];
   const map = formattedData.reduce((acc, x) => ({ ...acc, [getKey(x)]: x }), {});
@@ -134,9 +144,9 @@ export const getSheduleReport = async ({ from, to, status, ProductionId }, req: 
   const rows = [];
   for (let i = 1; i <= daysDiff; i++) {
     lastWeekMetaInfo = { ...lastWeekMetaInfo, weekTotalPrinted: false };
-    const weekDay = moment(moment(from || ProductionStartDate).add(i - 1, 'day')).format('dddd');
-    const dateInIncomingFormat = moment(moment(from || ProductionStartDate).add(i - 1, 'day'));
-    const key = getKey({ FullProductionCode, ShowName, EntryDate: dateInIncomingFormat.format('YYYY-MM-DD') });
+    const weekDay = formatDate(getDateDaysAway(from || ProductionStartDate, i - 1), 'dddd');
+    const dateInIncomingFormat = getDateDaysAway(from || ProductionStartDate, i - 1);
+    const key = getKey({ FullProductionCode, ShowName, EntryDate: dateInIncomingFormat });
     const value = map[key];
     const isOtherDay = [
       'Day Off',
@@ -151,7 +161,7 @@ export const getSheduleReport = async ({ from, to, status, ProductionId }, req: 
       rows.push({
         productionCode: FullProductionCode,
         day: weekDay.substring(0, 3),
-        date: dateInIncomingFormat.format('DD/MM/YY'),
+        date: dateInIncomingFormat,
         week: prevProductionWeekNum,
       });
     } else {
@@ -180,7 +190,7 @@ export const getSheduleReport = async ({ from, to, status, ProductionId }, req: 
       rows.push({
         productionCode: FullProductionCode,
         day: weekDay.substring(0, 3),
-        date: dateInIncomingFormat.format('DD/MM/YY'),
+        date: dateInIncomingFormat,
         week: ProductionWeekNum,
         venue: EntryName || '',
         isOtherDay,
