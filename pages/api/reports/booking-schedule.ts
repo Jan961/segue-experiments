@@ -15,7 +15,6 @@ import { bookingStatusMap } from 'config/bookings';
 import { parseISO, differenceInDays } from 'date-fns';
 import {
   calculateWeekNumber,
-  convertMinutesToHoursMins,
   formatDate,
   formatUtcTime,
   getDateDaysAway,
@@ -362,7 +361,7 @@ const handler = async (req, res) => {
           '',
           ...blankPerformances,
           `Production Week ${value?.ProductionWeekNum || prevProductionWeekNum || ''}`,
-          convertMinutesToHoursMins(sum(time)),
+          timeFormatV2(sum(time)),
           mileage.reduce((acc, m) => acc + Number(m || 0), 0),
         ]);
         totalTime = [...totalTime, ...time];
@@ -399,7 +398,7 @@ const handler = async (req, res) => {
         '',
         ...blankPerformances,
         `Production Week ${lastWeekMetaInfo?.prevProductionWeekNum || ''}`,
-        convertMinutesToHoursMins(sum(time)),
+        timeFormatV2(sum(time)),
         mileage.reduce((acc, m) => acc + Number(m || 0), 0),
       ]);
       rowNo++;
@@ -416,7 +415,7 @@ const handler = async (req, res) => {
       '',
       '',
       ...blankPerformances,
-      convertMinutesToHoursMins(sum(totalTime)),
+      timeFormatV2(sum(totalTime)),
       totalMileage.reduce((acc, m) => acc + Number(m || 0), 0),
     ]);
     rowNo++;

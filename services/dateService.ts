@@ -631,13 +631,6 @@ export const getTimezonOffset = () => {
 };
 
 // DEPRECATED
-export const convertMinutesToHoursMins = (timeInMins: number) => {
-  const hours = Math.floor(timeInMins / 60);
-  const minutes = timeInMins % 60;
-  return `${hours}:${minutes < 10 ? '0' : ''}${minutes}`;
-};
-
-// DEPRECATED
 export function formatDuration(
   duration: number,
   options?: {
