@@ -23,6 +23,7 @@ import { notify } from 'components/core-ui-lib';
 import GlobalActivityModal, { GlobalActivity } from '../modal/GlobalActivityModal';
 import axios from 'axios';
 import { accessMarketingHome } from 'state/account/selectors/permissionSelector';
+import { newDate } from 'services/dateService';
 
 interface ActivitiesTabProps {
   bookingId: string;
@@ -211,7 +212,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
         FollowUpRequired: data.followUpCheck,
         Name: data.actName,
         Notes: data.notes,
-        DueByDate: data.followUpCheck ? new Date(data.followUpDt) : null,
+        DueByDate: data.followUpCheck ? newDate(data.followUpDt) : null,
         Id: data.id,
         ProductionId: productionId,
         VenueIds: data.venueIds,
@@ -268,7 +269,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
           FollowUpRequired: data.followUpCheck,
           Name: data.actName,
           Notes: data.notes,
-          DueByDate: data.followUpCheck ? (!data.followUpDt ? null : new Date(data.followUpDt)) : null,
+          DueByDate: data.followUpCheck ? (!data.followUpDt ? null : newDate(data.followUpDt)) : null,
           Id: data.id,
         };
 

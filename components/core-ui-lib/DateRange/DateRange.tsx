@@ -3,10 +3,11 @@ import DateInput from '../DateInput';
 import Label from '../Label';
 import { set, isBefore } from 'date-fns';
 import classNames from 'classnames';
+import { UTCDate } from '@date-fns/utc';
 
 export type DateRangeValue = {
-  from: Date;
-  to: Date;
+  from: UTCDate;
+  to: UTCDate;
 };
 
 export type DateRangeError = {
@@ -21,8 +22,8 @@ interface DateRangeProps {
   label?: string;
   onChange: (v: DateRangeValue) => void;
   value?: DateRangeValue;
-  minDate?: Date;
-  maxDate?: Date;
+  minDate?: UTCDate;
+  maxDate?: UTCDate;
   labelClass?: string;
 }
 
@@ -69,7 +70,7 @@ export default function DateRange({
     setDateRange({ from: value.from, to: value.to });
   }, [value]);
 
-  const handleDateFromChange = (v: Date) => {
+  const handleDateFromChange = (v: UTCDate) => {
     console.log('From: ', v);
     const updatedDate = { ...dateRange, from: v };
     if (checkDateRangeValid(updatedDate.from, updatedDate.to)) {
@@ -81,7 +82,7 @@ export default function DateRange({
     }
   };
 
-  const handleDateToChange = (v: Date) => {
+  const handleDateToChange = (v: UTCDate) => {
     console.log('To: ', v);
     const updatedDate = { ...dateRange, to: v };
     if (checkDateRangeValid(updatedDate.from, updatedDate.to)) {

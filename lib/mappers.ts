@@ -50,6 +50,7 @@ import { ProductionWithDateblocks } from 'services/productionService';
 import { BookingsWithPerformances } from 'services/bookingService';
 import { dateTimeToTime, toISO } from 'services/dateService';
 import { getFileUrlFromLocation } from 'utils/fileUpload';
+import { UTCDate } from '@date-fns/utc';
 
 /*
 
@@ -432,6 +433,7 @@ export const dealMemoMapper = (dealMemo: DealMemoContractFormData) => {
 export const mapToProductionTaskDTO = (t: ProductionTask): ProductionTaskDTO => {
   return {
     ...t,
+    TaskCompletedDate: new UTCDate(t.TaskCompletedDate),
   };
 };
 

@@ -15,7 +15,7 @@ import axios from 'axios';
 import { BarredVenue } from 'pages/api/productions/venue/barringCheck';
 import { BookingWithVenueDTO } from 'interfaces';
 import { useWizard } from 'react-use-wizard';
-import { dateToSimple, formatDate } from 'services/dateService';
+import { dateToSimple, formatDate, newDate } from 'services/dateService';
 import { MoveParams } from '.';
 import { productionJumpState } from 'state/booking/productionJumpState';
 
@@ -230,8 +230,8 @@ const MoveBookingView = ({
           label="Date"
           onChange={handleDateChange}
           value={bookingDetails.moveDate}
-          minDate={parseISO(scheduleDate?.startDate)}
-          maxDate={parseISO(scheduleDate?.endDate)}
+          minDate={newDate(scheduleDate?.startDate)}
+          maxDate={newDate(scheduleDate?.endDate)}
         />
       </div>
       <div className="pt-8 w-full flex justify-end  items-center gap-3">

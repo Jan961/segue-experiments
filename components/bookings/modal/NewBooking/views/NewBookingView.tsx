@@ -19,7 +19,13 @@ import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import { BarredVenue } from 'pages/api/productions/venue/barringCheck';
 import Toggle from 'components/core-ui-lib/Toggle/Toggle';
 import Label from 'components/core-ui-lib/Label';
-import { areDatesSame, dateToSimple, formattedDateWithWeekDay, getArrayOfDatesBetween } from 'services/dateService';
+import {
+  areDatesSame,
+  dateToSimple,
+  formattedDateWithWeekDay,
+  getArrayOfDatesBetween,
+  newDate,
+} from 'services/dateService';
 import { debug } from 'utils/logging';
 import { isNullOrEmpty } from 'utils';
 import { accessBookingsHome } from 'state/account/selectors/permissionSelector';
@@ -184,9 +190,9 @@ const NewBookingView = ({
           label="Date"
           className=" bg-white my-2 w-fit"
           onChange={handleChange}
-          value={{ from: fromDate ? new Date(fromDate) : null, to: toDate ? new Date(toDate) : null }}
-          minDate={minDate ? new Date(minDate) : null}
-          maxDate={maxDate ? new Date(maxDate) : null}
+          value={{ from: fromDate ? newDate(fromDate) : null, to: toDate ? newDate(toDate) : null }}
+          minDate={minDate ? newDate(minDate) : null}
+          maxDate={maxDate ? newDate(maxDate) : null}
         />
         {!isDateTypeOnly && (
           <div className="flex items-center gap-2 my-1 justify-start">

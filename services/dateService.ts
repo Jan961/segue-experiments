@@ -610,18 +610,12 @@ export const formatDateWithTimezoneOffset = ({
   return moment(date).utcOffset(-timezoneOffset).format(dateFormat);
 };
 
-// DEPRECATED
+// DEPRECATED -- ARUN NEEDS CONSULTING
 export const getDateWithOffset = (date: Date) => {
   const timezoneOffset = getTimezonOffset();
   const dateWithOffset = addMinutes(date, -timezoneOffset);
 
   return dateWithOffset;
-};
-
-// DEPRECATED ->
-export const dateToTimeString = (dateStr) => {
-  const date = moment(dateStr);
-  return date.format('HH:mm');
 };
 
 // DEPRECATED

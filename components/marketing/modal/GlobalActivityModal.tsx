@@ -18,6 +18,7 @@ import axios from 'axios';
 import LoadingOverlay from 'components/core-ui-lib/LoadingOverlay';
 import { useRecoilValue } from 'recoil';
 import { accessMarketingHome } from 'state/account/selectors/permissionSelector';
+import { UTCDate } from '@date-fns/utc';
 
 export type ActivityModalVariant = 'add' | 'edit' | 'delete' | 'view';
 
@@ -64,9 +65,9 @@ export default function GlobalActivityModal({
   const [visible, setVisible] = useState<boolean>(show);
   const [actName, setActName] = useState<string>(null);
   const [actType, setActType] = useState<number>(null);
-  const [actDate, setActDate] = useState<Date>(null);
+  const [actDate, setActDate] = useState<UTCDate>(null);
   const [actFollowUp, setActFollowUp] = useState<boolean>(false);
-  const [followUpDt, setFollowUpDt] = useState<Date>();
+  const [followUpDt, setFollowUpDt] = useState<UTCDate>();
   const [cost, setCost] = useState<string>('');
   const [actNotes, setActNotes] = useState<string>();
   const [actId, setActId] = useState(null);
@@ -131,9 +132,9 @@ export default function GlobalActivityModal({
 
       setActName(data.Name);
       setActType(data.ActivityTypeId);
-      setActDate(isValid(data.Date) ? startOfDay(new Date(data.Date)) : null);
+      setActDate(isValid(data.Date) ? startOfDay(data.Date) : null);
       setActFollowUp(data.FollowUpRequired);
-      setFollowUpDt(isValid(data.DueByDate) ? startOfDay(new Date(data.DueByDate)) : null);
+      setFollowUpDt(isValid(data.DueByDate) ? startOfDay(data.DueByDate) : null);
       setCost(isNaN(data.Cost) ? '' : data.Cost.toFixed(2).toString());
       setActNotes(data.Notes);
       setActId(data.Id);
@@ -199,11 +200,11 @@ export default function GlobalActivityModal({
     let data: GlobalActivity = {
       ActivityTypeId: actType,
       Cost: parseFloat(cost),
-      Date: actDate === null ? null : startOfDay(new Date(actDate)),
+      Date: actDate === null ? null : startOfDay(actDate),
       FollowUpRequired: actFollowUp,
       Name: actName,
       Notes: actNotes,
-      DueByDate: actFollowUp ? startOfDay(new Date(followUpDt)) : null,
+      DueByDate: actFollowUp ? startOfDay(followUpDt) : null,
       ProductionId: productionId,
       VenueIds: selectedList,
     };
@@ -242,11 +243,11 @@ export default function GlobalActivityModal({
         ActivityTypeId: actType,
         ProductionId: productionId,
         Cost: parseFloat(cost),
-        Date: startOfDay(new Date(actDate)),
+        Date: startOfDay(actDate),
         FollowUpRequired: actFollowUp,
         Name: actName,
         Notes: actNotes,
-        DueByDate: actFollowUp ? startOfDay(new Date(followUpDt)) : null,
+        DueByDate: actFollowUp ? startOfDay(followUpDt) : null,
         VenueIds: selectedList,
       };
 
