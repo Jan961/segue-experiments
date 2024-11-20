@@ -385,23 +385,24 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
               });
             }
           }
+        } else if (compareDatesWithoutTime(booking.Date, headerWeekDates[i], '<')) {
+          totalObjToPush = {
+            Value: booking.FormattedFinalFiguresValue,
+            ConversionRate: booking.ConversionRate,
+            VenueCurrencySymbol: booking.VenueCurrencySymbol,
+          };
+          values.push(booking.FormattedFinalFiguresValue);
         } else {
-          if (compareDatesWithoutTime(booking.Date, headerWeekDates[i], '<')) {
-            totalObjToPush = {
-              Value: booking.FormattedFinalFiguresValue,
-              ConversionRate: booking.ConversionRate,
-              VenueCurrencySymbol: booking.VenueCurrencySymbol,
-            };
-            values.push(booking.FormattedFinalFiguresValue);
-          } else {
-            totalObjToPush = { Value: 0, ConversionRate: 0, VenueCurrencySymbol: booking.VenueCurrencySymbol };
-            values.push('');
-          }
+          totalObjToPush = { Value: 0, ConversionRate: 0, VenueCurrencySymbol: booking.VenueCurrencySymbol };
+          values.push('');
         }
 
         const finalValueToPushed: TotalForSheet = {
           ...totalObjToPush,
-          ConvertedValue: totalObjToPush.Value * totalObjToPush.ConversionRate,
+          ConvertedValue:
+            !isNaN(totalObjToPush.ConversionRate) && !isNaN(totalObjToPush.Value)
+              ? totalObjToPush.Value * totalObjToPush.ConversionRate
+              : 0,
         };
         totalForWeeks[headerWeekNums[i]].push(finalValueToPushed);
         totalRowWeekWise[headerWeekNums[i]].push(finalValueToPushed);
@@ -461,12 +462,11 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
             meta: { weekCols: variableColsLength + 1 },
           });
         } else {
+          if (isCancelled || isSuspended) continue;
           if (compareDatesWithoutTime(booking.Date, headerWeekDates[i], '<')) {
             colorCell({ worksheet, row, col, argbColor: COLOR_HEXCODE.BLUE });
-          } else if (!isSuspended && !isCancelled) {
-            colorCell({ worksheet, row, col, argbColor: COLOR_HEXCODE.RED });
           }
-          if (booking?.NotOnSaleDate && compareDatesWithoutTime(headerWeekDates[i], booking.NotOnSaleDate, '<')) {
+          if (booking?.NotOnSaleDate && compareDatesWithoutTime(headerWeekDates[i], booking.NotOnSaleDate, '<=')) {
             colorCell({ worksheet, row, col, argbColor: COLOR_HEXCODE.RED });
           }
         }
