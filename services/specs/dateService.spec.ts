@@ -16,7 +16,7 @@ import {
   getDateDaysAway,
   dateStringToPerformancePairV2,
   timeFormat,
-  simpleToDateDMYV2,
+  simpleToDateDMY,
   getArrayOfDatesBetween,
   Locale,
 } from '../dateService';
@@ -163,17 +163,17 @@ describe('simpleToDateDMY', () => {
   test('Should return a Date for a valid date string dd/mm/yy', () => {
     const input = '15/10/23';
     const expectedResult = new UTCDate('2023-10-15T00:00:00Z');
-    expect(simpleToDateDMYV2(input)).toStrictEqual(expectedResult);
+    expect(simpleToDateDMY(input)).toStrictEqual(expectedResult);
   });
 
   test('Should return null for null', () => {
     const input = null;
-    expect(simpleToDateDMYV2(input)).toBeNull();
+    expect(simpleToDateDMY(input)).toBeNull();
   });
 
   test('Should return null for empty string', () => {
     const input = '';
-    expect(simpleToDateDMYV2(input)).toBeNull();
+    expect(simpleToDateDMY(input)).toBeNull();
   });
 });
 
