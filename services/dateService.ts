@@ -234,7 +234,7 @@ export const simpleToDateMDY = (date: string): UTCDate => {
  * @param {string} date - The date string to parse in DMY format.
  * @returns {UTCDate} Returns a UTCDate object if the date string.
  */
-export const simpleToDateDMYV2 = (date: string): UTCDate => {
+export const simpleToDateDMY = (date: string): UTCDate => {
   if (!date) {
     return null;
   }
@@ -732,12 +732,6 @@ export const dateStringToPerformancePair = (dateString: string) => {
 export const simpleToDate = (stringToFormat: string): Date => {
   const parts = stringToFormat?.split?.('/');
   return new Date(Number(`20${parts[2]}`), Number(Number(parts[0]) - 1), Number(parts[1]));
-};
-
-// DEPRECATED
-export const simpleToDateDMY = (dateStr: string) => {
-  const [day, month, year] = dateStr.split('/').map(Number);
-  return new Date(year + 2000, month - 1, day);
 };
 
 // DEPRECATED
