@@ -424,7 +424,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         startColumn: worksheet.getColumn(arr.length).letter,
         endRow: row,
         endColumn: worksheet.getColumn(arr.length + values.length + 1).letter,
-        formatOptions: { numFmt: VenueCurrencySymbol + '#,##0.00' },
+        formatOptions: { numFmt: `${VenueCurrencySymbol || ''}#,##0.00` },
       });
       applyFormattingToRange({
         worksheet,
