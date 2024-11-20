@@ -25,7 +25,7 @@ describe('Toggle Component Tests', () => {
         <Toggle {...props} />
       </BaseComp>,
     );
-    cy.get('[data-testid="core-ui-lib-toggle"] span[aria-hidden="true"]').should('have.class', 'translate-x-0');
+    cy.get('[data-testid="core-ui-lib-toggle"]').should('have.attr', 'aria-checked', 'false');
   });
 
   it('is checked when "checked" prop is true', () => {
@@ -36,7 +36,7 @@ describe('Toggle Component Tests', () => {
         <Toggle {...props} />
       </BaseComp>,
     );
-    cy.get('[data-testid="core-ui-lib-toggle"] span[aria-hidden="true"]').should('have.class', 'translate-x-2');
+    cy.get('[data-testid="core-ui-lib-toggle"]').should('have.attr', 'aria-checked', 'true');
   });
 
   it('calls onChange with correct value when Wrapped', () => {
