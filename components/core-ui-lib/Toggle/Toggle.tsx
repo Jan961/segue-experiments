@@ -25,7 +25,7 @@ const Toggle = ({ label, onChange, name, checked, className, testId = 'core-ui-l
 
   return (
     <Switch
-      data-testid={testId || name}
+      data-testid={name || testId}
       name={name}
       checked={enabled}
       onChange={onToggle}
