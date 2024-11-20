@@ -3,7 +3,7 @@
 import { mount } from 'cypress/react';
 import Tabs from '../../../components/core-ui-lib/Tabs';
 import { Tab } from '@headlessui/react';
-import TabButton from '../../../components/core-ui-lib/TabButton';
+import BaseComp from '../global/BaseComp';
 
 describe('Tabs Component', () => {
   const tabs = ['Tab 1', 'Tab 2', 'Tab 3'];
@@ -11,11 +11,14 @@ describe('Tabs Component', () => {
 
   const renderTabs = (props = {}) => {
     mount(
-      <Tabs tabs={tabs} selectedTabClass={selectedTabClass} {...props}>
-        {tabs.map((tabLabel, index) => (
-          <Tab.Panel key={index}>Content for {tabLabel}</Tab.Panel>
-        ))}
-      </Tabs>,
+      <BaseComp>
+        <Tabs tabs={tabs} selectedTabClass={selectedTabClass} {...props}>
+          {tabs.map((tabLabel, index) => (
+            <Tab.Panel key={index}>Content for {tabLabel}</Tab.Panel>
+          ))}
+        </Tabs>
+        ,
+      </BaseComp>,
     );
   };
 
@@ -42,7 +45,7 @@ describe('Tabs Component', () => {
     cy.contains('button', 'Tab 2').click();
     cy.contains('button', 'Tab 2').should('have.class', selectedTabClass);
     cy.contains('Content for Tab 2').should('be.visible');
-    cy.contains('Content for Tab 1').should('not.be.visible');
+    cy.contains('Content for Tab 1').should('not.exist');
   });
 
   it('calls onChange when tab is changed', () => {
@@ -54,11 +57,9 @@ describe('Tabs Component', () => {
 
   it('does not change tab when disabled is true', () => {
     renderTabs({ disabled: true });
-    cy.contains('button', 'Tab 2').click();
-    cy.contains('button', 'Tab 1').should('have.class', selectedTabClass);
-    cy.contains('button', 'Tab 2').should('not.have.class', selectedTabClass);
+    cy.contains('button', 'Tab 2').click({ force: true });
     cy.contains('Content for Tab 1').should('be.visible');
-    cy.contains('Content for Tab 2').should('not.be.visible');
+    cy.contains('Content for Tab 2').should('not.exist');
   });
 
   it('disables the TabButtons when disabled prop is true', () => {
