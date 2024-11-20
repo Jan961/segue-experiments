@@ -15,7 +15,7 @@ import {
   getWeekDayV2,
   getDateDaysAway,
   dateStringToPerformancePairV2,
-  timeFormatV2,
+  timeFormat,
   simpleToDateDMYV2,
   getArrayOfDatesBetween,
   Locale,
@@ -338,7 +338,7 @@ describe.each([
   [1440, '24:00'],
 ])('timeFormat', (input, expected) => {
   test(`Expect ${input} to be ${expected}`, () => {
-    expect(timeFormatV2(input)).toStrictEqual(expected);
+    expect(timeFormat(input)).toStrictEqual(expected);
   });
 });
 
