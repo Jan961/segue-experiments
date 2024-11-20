@@ -13,14 +13,7 @@ import { convertToPDF } from 'utils/report';
 import { addBorderToAllCells } from 'utils/export';
 import { bookingStatusMap } from 'config/bookings';
 import { parseISO, differenceInDays } from 'date-fns';
-import {
-  calculateWeekNumber,
-  formatDate,
-  formatUtcTime,
-  getDateDaysAway,
-  newDate,
-  timeFormat,
-} from 'services/dateService';
+import { calculateWeekNumber, formatDate, getDateDaysAway, newDate, timeFormat } from 'services/dateService';
 import { PerformanceInfo } from 'services/reports/schedule-report';
 import { sum } from 'radash';
 import { getProductionWithContent } from 'services/productionService';
@@ -148,7 +141,7 @@ const handler = async (req, res) => {
         },
       })
       .then((res) => {
-        const r = res.map((e) => ({ ...e, Date: new UTCDate(e.Date) }));
+        const r = res.map((e) => ({ ...e, Date: new UTCDate(e.Date), Time: new UTCDate(e.Time) }));
         return r;
       });
 
@@ -162,7 +155,7 @@ const handler = async (req, res) => {
       }
       bookingIdPerformanceMap[key].push({
         performanceId: Id,
-        performanceTime: Time ? formatUtcTime(Time) : null,
+        performanceTime: Time || null,
         performanceDate: Date ? Date.toISOString() : null,
       });
       if (bookingIdPerformanceMap[key].length > maxNumOfPerformances) {

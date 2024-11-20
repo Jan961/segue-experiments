@@ -607,7 +607,7 @@ export const getDateWithOffset = (date: Date) => {
   return dateWithOffset;
 };
 
-// DEPRECATED
+// DEPRECATED -- ARUN NEEDS CONSULTING
 export const getTimezonOffset = () => {
   return new Date().getTimezoneOffset();
 };
@@ -646,19 +646,6 @@ export const getTimeFromDateAndTime = (inputDate: string | Date): string => {
   const minutes = String(date.getUTCMinutes()).padStart(2, '0');
 
   return `${hours}:${minutes}`;
-};
-
-// DEPRECATED
-export const formatUtcTime = (time) => {
-  // Convert time to a Date object
-  const date = new Date(time);
-
-  // Get the hours and minutes in UTC
-  const utcHours = date.getUTCHours();
-  const utcMinutes = date.getUTCMinutes();
-
-  // Format the UTC time as 'HH:mm'
-  return `${String(utcHours).padStart(2, '0')}:${String(utcMinutes).padStart(2, '0')}`;
 };
 
 // DEPRECATED
