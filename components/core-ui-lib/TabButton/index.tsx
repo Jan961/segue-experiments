@@ -1,3 +1,4 @@
-import TabButton from './TabButton';
+import TabButton, { ButtonVariant } from './TabButton';
 
 export default TabButton;
+export type { ButtonVariant };
