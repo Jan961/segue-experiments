@@ -30,7 +30,7 @@ const PerformanceRowEditor = ({
   return (
     <div className="grid grid-cols-12 text-primary-navy border-b border-primary-navy">
       <div className="col-span-6 border-r border-primary-navy px-2 text-sm font-normal flex items-center my-2">
-        {formatDate(date, 'dddd D MMMM YYYY')}
+        {formatDate(date, 'EEEE d MMMM yyyy')}
       </div>
       <div className="col-span-2 border-r border-primary-navy flex items-center justify-center my-2">
         <FormInputCheckbox

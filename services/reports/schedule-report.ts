@@ -123,9 +123,9 @@ export const getSheduleReport = async ({ from, to, status, ProductionId }, req: 
   });
   const formattedData = data.map((x) => ({
     ...x,
-    EntryDate: formatDate(x.EntryDate.getTime(), 'YYYY-MM-DD'),
-    ProductionStartDate: formatDate(x.ProductionStartDate.getTime(), 'YYYY-MM-DD'),
-    ProductionEndDate: formatDate(x.ProductionEndDate.getTime(), 'YYYY-MM-DD'),
+    EntryDate: formatDate(x.EntryDate.getTime(), 'yyyy-MM-dd'),
+    ProductionStartDate: formatDate(x.ProductionStartDate.getTime(), 'yyyy-MM-dd'),
+    ProductionEndDate: formatDate(x.ProductionEndDate.getTime(), 'yyyy-MM-dd'),
   }));
   const { ShowName, FullProductionCode, ProductionStartDate, ProductionEndDate } = data[0];
   const map = formattedData.reduce((acc, x) => ({ ...acc, [getKey(x)]: x }), {});

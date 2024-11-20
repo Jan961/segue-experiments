@@ -26,7 +26,7 @@ export default function MasterPlan() {
       .get('/api/reports/booking/last')
       .then((data: any) => {
         setInputs({
-          fromDate: data.FirstDate?.substring?.(0, 10) || formatDate(newDate(), 'YYYY-MM-DD'),
+          fromDate: data.FirstDate?.substring?.(0, 10) || formatDate(newDate(), 'yyy-MM-dd'),
           toDate: data?.data?.FirstDate?.substring?.(0, 10),
         });
       })
@@ -43,8 +43,8 @@ export default function MasterPlan() {
     fetch('/api/reports/masterplan', {
       method: 'POST',
       body: JSON.stringify({
-        fromDate: formatDate(getMondayV2(inputs.fromDate), 'YYYY-MM-DD'),
-        toDate: formatDate(inputs.toDate, 'YYYY-MM-DD'),
+        fromDate: formatDate(getMondayV2(inputs.fromDate), 'yyyy-MM-dd'),
+        toDate: formatDate(inputs.toDate, 'yyyy-MM-dd'),
       }),
     })
       .then(async (response) => {

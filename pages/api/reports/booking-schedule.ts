@@ -13,7 +13,15 @@ import { convertToPDF } from 'utils/report';
 import { addBorderToAllCells } from 'utils/export';
 import { bookingStatusMap } from 'config/bookings';
 import { parseISO, differenceInDays } from 'date-fns';
-import { calculateWeekNumber, formatDate, getDateDaysAway, newDate, timeFormat } from 'services/dateService';
+import {
+  calculateWeekNumber,
+  dateTimeToTime,
+  formatDate,
+  getDateDaysAway,
+  newDate,
+  safeDateV2,
+  timeFormat,
+} from 'services/dateService';
 import { PerformanceInfo } from 'services/reports/schedule-report';
 import { sum } from 'radash';
 import { getProductionWithContent } from 'services/productionService';
@@ -49,11 +57,11 @@ const addHeaderWithFilters = (worksheet, { title, from, to, status }) => {
   worksheet.addRow([title]);
   worksheet.addRow([]);
   if (from) {
-    worksheet.addRow([`Start Date: ${formatDate(from, 'yyyy-MM-dd')}`]);
+    worksheet.addRow([`Start Date: ${formatDate(safeDateV2(from), 'yyyy-MM-dd')}`]);
     headerRowsLength++;
   }
   if (to) {
-    worksheet.addRow([`End Date: ${formatDate(to, 'yyyy-MM-dd')}`]);
+    worksheet.addRow([`End Date: ${formatDate(safeDateV2(to), 'yyyy-MM-dd')}`]);
     headerRowsLength++;
   }
   if (status) {
@@ -90,8 +98,8 @@ const handler = async (req, res) => {
     res.status(400).json({ err: 'Prameters missing' });
   }
 
-  const formatedFromDate = new Date(from);
-  const formatedToDate = new Date(to);
+  const formatedFromDate = safeDateV2(from);
+  const formatedToDate = safeDateV2(to);
   try {
     const prisma = await getPrismaClient(req);
     // Construct the Prisma query
@@ -155,7 +163,7 @@ const handler = async (req, res) => {
       }
       bookingIdPerformanceMap[key].push({
         performanceId: Id,
-        performanceTime: Time || null,
+        performanceTime: dateTimeToTime(Time) || null,
         performanceDate: Date ? Date.toISOString() : null,
       });
       if (bookingIdPerformanceMap[key].length > maxNumOfPerformances) {

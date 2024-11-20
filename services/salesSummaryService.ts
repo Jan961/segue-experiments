@@ -454,7 +454,7 @@ export const makeTextBoldOfNRows = ({
 };
 
 export const getFileName = (worksheet): string =>
-  `${worksheet.getCell(1, 1).value} ${formatDate(newDate(), 'DD MM YYYY hh:mm:ss')}.xlsx`;
+  `${worksheet.getCell(1, 1).value} ${formatDate(newDate(), 'dd MM yyyy hh:mm:ss')}.xlsx`;
 
 export const getCurrencyWiseTotal = ({
   totalForWeeks,

@@ -760,8 +760,8 @@ export const formattedDateWithWeekDay = (dateToFormat: Date | string, weekDayFor
 
 // DEPRECATED
 export const weeks = (showDate: string, firstShowDate: string): number => {
-  const date = moment(showDate, 'YYYY-MM-DD');
-  const ProductionStartDate = moment(firstShowDate, 'YYYY-MM-DD');
+  const date = moment(showDate, 'yyyy-MM-dd');
+  const ProductionStartDate = moment(firstShowDate, 'yyyy-MM-dd');
   const diff = moment.duration(ProductionStartDate.diff(date));
 
   let week = Math.floor(diff.asWeeks());

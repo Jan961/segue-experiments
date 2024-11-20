@@ -131,9 +131,9 @@ const handler = async (req, res) => {
     const workbook = new ExcelJS.Workbook();
     const formattedData = data.map((x) => ({
       ...x,
-      EntryDate: formatDate(x.EntryDate, 'YYYY-MM-DD'),
-      ProductionStartDate: formatDate(x.ProductionStartDate, 'YYYY-MM-DD'),
-      ProductionEndDate: formatDate(x.ProductionEndDate, 'YYYY-MM-DD'),
+      EntryDate: formatDate(x.EntryDate, 'yyyy-MM-dd'),
+      ProductionStartDate: formatDate(x.ProductionStartDate, 'yyyy-MM-dd'),
+      ProductionEndDate: formatDate(x.ProductionEndDate, 'yyyy-MM-dd'),
     }));
 
     const worksheet = workbook.addWorksheet('Tour Schedule', {
@@ -152,7 +152,7 @@ const handler = async (req, res) => {
     }
 
     const { ShowName, FullProductionCode } = data[0];
-    const title = `${FullProductionCode} ${ShowName} Tour Schedule - ${formatDate(newDate(), 'DD.MM.YY')}`;
+    const title = `${FullProductionCode} ${ShowName} Tour Schedule - ${formatDate(newDate(), 'dd.MM.yy')}`;
     let headerRowsLength = 4;
     worksheet.addRow([title]);
     worksheet.addRow([`Exported: ${formatDate(newDate(), 'dd/MM/yy [at] HH:mm')} - Layout: Standard`]);
@@ -211,11 +211,11 @@ const handler = async (req, res) => {
       const weekDay = formatDate(getDateDaysAway(from, i - 1), 'dddd');
       const dateInIncomingFormat = getDateDaysAway(from, i - 1);
       const nextDateIncomingFormat = getDateDaysAway(from, i);
-      const key = getKey({ FullProductionCode, ShowName, EntryDate: formatDate(dateInIncomingFormat, 'YYYY-MM-DD') });
+      const key = getKey({ FullProductionCode, ShowName, EntryDate: formatDate(dateInIncomingFormat, 'yyyy-MM-dd') });
       const nextKey = getKey({
         FullProductionCode,
         ShowName,
-        EntryDate: formatDate(nextDateIncomingFormat, 'YYYY-MM-DD'),
+        EntryDate: formatDate(nextDateIncomingFormat, 'yyyy-MM-dd'),
       });
       const value: SCHEDULE_VIEW = map[key];
       const nextValue: SCHEDULE_VIEW = map[nextKey];
