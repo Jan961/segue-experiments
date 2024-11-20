@@ -63,9 +63,9 @@ describe('Toggle Component Tests', () => {
     }
 
     mount(<NoOnChangeWrapper />);
-    cy.get('[data-testid="core-ui-lib-toggle"] span[aria-hidden="true"]').should('have.class', 'translate-x-0');
+    cy.get('[data-testid="core-ui-lib-toggle"]').should('have.attr', 'aria-checked', 'false');
     cy.contains('Toggle Prop').click();
-    cy.get('[data-testid="core-ui-lib-toggle"] span[aria-hidden="true"]').should('have.class', 'translate-x-2');
+    cy.get('[data-testid="core-ui-lib-toggle"]').should('have.attr', 'aria-checked', 'true');
   });
 
   it('applies className prop', () => {
