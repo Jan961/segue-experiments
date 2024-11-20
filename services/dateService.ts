@@ -16,7 +16,6 @@ import {
 } from 'date-fns';
 import moment from 'moment';
 import { UTCDate } from '@date-fns/utc';
-import { toZonedTime } from 'date-fns-tz';
 
 // regex for date patterns
 export const DATE_PATTERNS = {
@@ -268,7 +267,7 @@ export const dateToSimple = (dateToFormat: UTCDate | string | number, locale?: L
  * @param {Locale} locale - The locale value of the inputted date.
  * @returns {string} Returns the time value of the inputted date.
  */
-export const dateTimeToTimeV2 = (date: string | UTCDate | number, locale?: Locale): string => {
+export const dateTimeToTime = (date: string | UTCDate | number, locale?: Locale): string => {
   if (!date) {
     return null;
   }
@@ -756,12 +755,6 @@ export const simpleToDate = (stringToFormat: string): Date => {
 export const simpleToDateDMY = (dateStr: string) => {
   const [day, month, year] = dateStr.split('/').map(Number);
   return new Date(year + 2000, month - 1, day);
-};
-
-// DEPRECATED
-export const dateTimeToTime = (dateToFormat: string) => {
-  const date = toZonedTime(dateToFormat, 'UTC');
-  return format(date, 'HH:mm');
 };
 
 // DEPRECATED

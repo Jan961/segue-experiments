@@ -5,7 +5,7 @@ import {
   newDate,
   calculateWeekNumber,
   safeDateV2,
-  dateTimeToTimeV2,
+  dateTimeToTime,
   addOneMonthV2,
   dateToSimple,
   formatShortDateUKV2,
@@ -208,34 +208,34 @@ describe('dateTimeToTime', () => {
   test('Should return correct time for a date time string', () => {
     const input = '2023-10-15T01:01:00.000Z';
     const output = '01:01';
-    expect(dateTimeToTimeV2(input)).toStrictEqual(output);
+    expect(dateTimeToTime(input)).toStrictEqual(output);
   });
 
   test('Should return correct time for a date time ISOString', () => {
     const input = new UTCDate('2023-10-15T01:01:00.000Z').toISOString();
     const output = '01:01';
-    expect(dateTimeToTimeV2(input)).toStrictEqual(output);
+    expect(dateTimeToTime(input)).toStrictEqual(output);
   });
 
   test('Should return correct time for a date', () => {
     const input = new UTCDate('2023-10-15T01:01:00.000Z');
     const output = '01:01';
-    expect(dateTimeToTimeV2(input)).toStrictEqual(output);
+    expect(dateTimeToTime(input)).toStrictEqual(output);
   });
 
   test('Should return null for invalid date input', () => {
     const input = 'RR Fail';
-    expect(dateTimeToTimeV2(input)).toBeNull();
+    expect(dateTimeToTime(input)).toBeNull();
   });
 
   test('Should return null for null', () => {
     const input = null;
-    expect(dateTimeToTimeV2(input)).toBeNull();
+    expect(dateTimeToTime(input)).toBeNull();
   });
 
   test('Should return null for empty string', () => {
     const input = '';
-    expect(dateTimeToTimeV2(input)).toBeNull();
+    expect(dateTimeToTime(input)).toBeNull();
   });
 });
 
