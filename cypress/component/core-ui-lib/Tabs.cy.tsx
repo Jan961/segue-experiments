@@ -13,9 +13,9 @@ describe('Tabs Component', () => {
     mount(
       <BaseComp>
         <Tabs tabs={tabs} selectedTabClass={selectedTabClass} {...props}>
-          {tabs.map((tabLabel, index) => (
-            <Tab.Panel key={index}>Content for {tabLabel}</Tab.Panel>
-          ))}
+          <Tab.Panel key={1}>Content for Tab 1</Tab.Panel>
+          <Tab.Panel key={2}>Content for Tab 2</Tab.Panel>
+          <Tab.Panel key={3}>Content for Tab 3</Tab.Panel>
         </Tabs>
         ,
       </BaseComp>,
@@ -24,7 +24,7 @@ describe('Tabs Component', () => {
 
   it('renders the correct number of tabs', () => {
     renderTabs();
-    cy.get('button').should('have.length', tabs.length);
+    cy.get('button').should('have.length', 3);
   });
 
   it('renders the tab labels correctly', () => {
