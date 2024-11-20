@@ -638,27 +638,6 @@ export const convertMinutesToHoursMins = (timeInMins: number) => {
 };
 
 // DEPRECATED
-export const getDateObject = (date: Date | number | string): Date | null => {
-  if (date instanceof Date) {
-    // If the input is already a Date object, return it
-    return date;
-  } else if (typeof date === 'number') {
-    // If the input is a timestamp (number), create a Date object from it
-    const newDate = new Date(date);
-    return isNaN(newDate.getTime()) ? null : newDate;
-  } else if (typeof date === 'string') {
-    // If the input is a string, attempt to parse it as a Date
-    const parsedDate = new Date(date);
-
-    // If the parsed date is invalid, return null
-    return isNaN(parsedDate.getTime()) ? null : parsedDate;
-  } else {
-    // If input type is not Date, number, or string, return null
-    return null;
-  }
-};
-
-// DEPRECATED
 export function formatDuration(
   duration: number,
   options?: {
