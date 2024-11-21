@@ -86,7 +86,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
       const venues = bookings.bookings.map((option) => {
         return {
           ...option.Venue,
-          date: new Date(option.Date),
+          date: newDate(option.Date),
         };
       });
 
@@ -122,9 +122,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
       setActTypeList(actTypes);
 
       if (data && Array.isArray(data.activities) && data.activities.length > 0 && Array.isArray(data.activityTypes)) {
-        const sortedActivities = data.activities.sort(
-          (a, b) => new Date(a.Date).getTime() - new Date(b.Date).getTime(),
-        );
+        const sortedActivities = data.activities.sort((a, b) => newDate(a.Date).getTime() - newDate(b.Date).getTime());
 
         const tempRows = sortedActivities.map((act) => ({
           actName: act.Name,
@@ -167,9 +165,9 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
         const tempGlobList = globalActivities.activities.map((act) => ({
           actName: act.Name,
           actType: globalActivities.activityTypes.find((type) => type.Id === act.ActivityTypeId)?.Name,
-          actDate: startOfDay(new Date(act.Date)),
+          actDate: startOfDay(newDate(act.Date)),
           followUpCheck: act.FollowUpRequired,
-          followUpDt: act.DueByDate === '' ? null : startOfDay(new Date(act.DueByDate)),
+          followUpDt: act.DueByDate === '' ? null : startOfDay(newDate(act.DueByDate)),
           cost: parseFloat(act.Cost) * conversionRate,
           id: act.Id,
           notes: act.Notes,
@@ -338,9 +336,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
           newRows[rowIndex] = updatedRow;
 
           // re sort the rows to ensure the new field is put in the correct place chronologically
-          const sortedActivities = newRows.sort(
-            (a, b) => new Date(a.actDate).getTime() - new Date(b.actDate).getTime(),
-          );
+          const sortedActivities = newRows.sort((a, b) => newDate(a.actDate).getTime() - newDate(b.actDate).getTime());
 
           calculateActivityTotals(sortedActivities);
           setActRowData(sortedActivities);
