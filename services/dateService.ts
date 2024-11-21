@@ -703,19 +703,6 @@ export const getWeeksBetweenDates = (startDate: string, endDate: string) => {
 };
 
 // DEPRECATED
-export const getNextMondayDateString = (date: string) => {
-  const inputDate = moment.utc(date);
-  if (!inputDate.isValid()) {
-    return '';
-  }
-
-  const daysUntilNextMonday = (7 - inputDate.day() + 1) % 7;
-  const nextMondayDate = inputDate.add(daysUntilNextMonday, 'days');
-  const nextMondayDateStr = nextMondayDate.toISOString();
-  return nextMondayDateStr;
-};
-
-// DEPRECATED
 export function getDuration(upTime: string, downTime: string): number {
   if (upTime === '' || downTime === '') {
     return 0;
