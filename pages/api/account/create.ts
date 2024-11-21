@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { createAccount, createAccountContact } from 'services/accountService';
+import { createAccount, createAccountContact, getAccountByName } from 'services/accountService';
 import { createClientDB } from 'services/dbService';
 import { sendAccountSetupEmail } from 'services/emailService';
 import {
@@ -12,6 +12,12 @@ import {
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
     const { account, signUpUrl } = req.body;
+    // check if an account already exists
+    const existingAccount = await getAccountByName(account.companyName);
+    if (existingAccount) {
+      res.status(400).json({ error: 'Account already exists' });
+      return;
+    }
     const organisationId = (Math.random() + 1).toString(36).substring(5);
     const mappedAccount = mapToAccountPrismaFields({ ...account, organisationId });
     const newAccount = await createAccount(mappedAccount);
