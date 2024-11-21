@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState, useRef } from 'react';
+import React, { Fragment, useEffect, useState, useRef, ReactNode } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { calibri } from 'lib/fonts';
 import Icon from '../Icon';
@@ -9,6 +9,7 @@ interface PopupModalProps {
   subtitle?: string;
   children?: React.ReactNode;
   show: boolean;
+  footerComponent?: ReactNode;
   onClose?: () => void;
   titleClass?: string;
   showCloseIcon?: boolean;
@@ -32,6 +33,7 @@ export default function PopupModal({
   closeOnOverlayClick = false,
   hasOverflow = true,
   testId = 'overlay',
+  footerComponent,
 }: PopupModalProps) {
   const [overlay, setOverlay] = useState<boolean>(false);
   const [isScrollbarVisible, setIsScrollbarVisible] = useState(false);
@@ -114,6 +116,10 @@ export default function PopupModal({
                 )}
 
                 <div className="overflow-y-auto mt-3 pr-3">{children}</div>
+
+                {footerComponent && (
+                  <div className="sticky bottom-0 mt-4 flex justify-end mr-3 space-x-3 bg-white">{footerComponent}</div>
+                )}
               </Dialog.Panel>
             </Transition.Child>
           </div>
