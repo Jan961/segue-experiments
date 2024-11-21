@@ -333,7 +333,7 @@ export const getWeekDayV2 = (
  * @param {Locale} locale - The locale value of the inputted date.
  * @returns {string} Returns a date string formatted either Long or Short depending on input.
  */
-export const formattedDateWithWeekDayV2 = (
+export const formattedDateWithWeekDay = (
   dateToFormat: UTCDate | string | number,
   weekDayFormat: 'Long' | 'Short',
   locale?: Locale,
@@ -748,14 +748,6 @@ export const getShortWeekFormat = (dateToFormat: Date | string) => {
 export const getWeekDayLong = (dateToFormat: Date | string) => {
   const date = safeDate(dateToFormat);
   return date.toLocaleDateString('en-US', { weekday: 'long' });
-};
-
-// DEPRECATED
-export const formattedDateWithWeekDay = (dateToFormat: Date | string, weekDayFormat: 'Long' | 'Short') => {
-  if (!dateToFormat) return '';
-  const shortFormat = 'ddd DD/MM/YY';
-  const longFormat = 'dddd DD/MM/YYYY';
-  return moment(dateToFormat).format(weekDayFormat === 'Long' ? longFormat : shortFormat);
 };
 
 // DEPRECATED

@@ -8,7 +8,7 @@ import {
   addOneMonthV2,
   dateToSimple,
   formatShortDateUKV2,
-  formattedDateWithWeekDayV2,
+  formattedDateWithWeekDay,
   getKey,
   getMondayV2,
   getWeekDayV2,
@@ -206,7 +206,7 @@ describe.each([
   [{ date: '15-10-24', format: 'Short', locale: 'UK' }, 'Tue 15/10/24'],
 ])('formattedDateWithDay', (input: { date; format: 'Long' | 'Short'; locale: Locale }, expected) => {
   test(`Expect '${input.date}'${input.locale ? ` in locale '${input.locale}'` : ''} to be '${expected}'`, () => {
-    const val = formattedDateWithWeekDayV2(input.date, input.format, input.locale);
+    const val = formattedDateWithWeekDay(input.date, input.format, input.locale);
     expect(val).toStrictEqual(expected);
   });
 });
