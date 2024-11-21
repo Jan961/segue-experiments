@@ -174,7 +174,7 @@ describe('UploadModal Component', () => {
     cy.get(`[data-testid="${defaultProps.testId}-upload-image"]`).click();
 
     // Attach a PDF file
-    const fileName = 'document.pdf';
+    const fileName = 'example_pdf.pdf';
     cy.fixture(fileName, 'base64').then((fileContent) => {
       cy.get('[data-testid="hidden-input"]').attachFile(
         {
@@ -195,7 +195,7 @@ describe('UploadModal Component', () => {
     });
 
     // Upload button should be disabled
-    cy.contains('Upload').should('be.disabled');
+    cy.get('button').contains('Upload').should('be.disabled');
   });
 
   it('disables Upload button when there are errors', () => {
@@ -205,7 +205,7 @@ describe('UploadModal Component', () => {
     cy.get(`[data-testid="${defaultProps.testId}-upload-image"]`).click();
 
     // Attach a file
-    const fileName = 'image.png';
+    const fileName = 'placeholder.png';
     cy.fixture(fileName, 'base64').then((fileContent) => {
       cy.get('[data-testid="hidden-input"]').attachFile(
         {
@@ -221,7 +221,7 @@ describe('UploadModal Component', () => {
     });
 
     // Upload button should be disabled
-    cy.contains('Upload').should('be.disabled');
+    cy.get('button').contains('Upload').should('be.disabled');
   });
 
   it('calls onSave when upload is clicked and there are no errors', () => {
@@ -233,7 +233,7 @@ describe('UploadModal Component', () => {
     cy.get(`[data-testid="${defaultProps.testId}-upload-image"]`).click();
 
     // Attach a valid image file
-    const fileName = 'image.png';
+    const fileName = 'placeholder.png';
     cy.fixture(fileName, 'base64').then((fileContent) => {
       cy.get('[data-testid="hidden-input"]').attachFile(
         {
@@ -249,7 +249,7 @@ describe('UploadModal Component', () => {
     });
 
     // Click the Upload button
-    cy.contains('Upload').click();
+    cy.get('button').contains('Upload').click();
 
     // Check that onSave was called
     cy.wrap(onSaveStub).should('have.been.called');
@@ -294,7 +294,7 @@ describe('UploadModal Component', () => {
     cy.get(`[data-testid="${defaultProps.testId}-upload-image"]`).click();
 
     // Attach a file
-    const fileName = 'image.png';
+    const fileName = 'placeholder.png';
     cy.fixture(fileName, 'base64').then((fileContent) => {
       cy.get('[data-testid="hidden-input"]').attachFile(
         {
@@ -337,7 +337,7 @@ describe('UploadModal Component', () => {
     // Now, upload a file
     cy.get(`[data-testid="${defaultProps.testId}-upload-image"]`).click();
 
-    const fileName = 'image.png';
+    const fileName = 'placeholder.png';
     cy.fixture(fileName, 'base64').then((fileContent) => {
       cy.get('[data-testid="hidden-input"]').attachFile(
         {
@@ -353,10 +353,10 @@ describe('UploadModal Component', () => {
     });
 
     // Button should now say 'Upload'
-    cy.contains('Upload').should('be.visible');
+    cy.get('button').contains('Upload').should('be.visible');
 
     // Simulate upload completion
-    cy.contains('Upload').click();
+    cy.get('button').contains('Upload').click();
     cy.wrap(onSaveStub).should('have.been.called');
 
     // Simulate the onProgress callback to indicate upload completion
