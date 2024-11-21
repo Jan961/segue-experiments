@@ -341,10 +341,10 @@ export const formattedDateWithWeekDayV2 = (
   if (!dateToFormat) {
     return null;
   }
-  const shortFormat = 'E..EEE dd/MM/yy';
+  const shortFormat = 'EEE dd/MM/yy';
   const longFormat = 'EEEE dd/MM/yyyy';
   const date = safeDateV2(dateToFormat, locale);
-  return format(date, weekDayFormat === 'Long' ? longFormat : shortFormat);
+  return isValid(date) ? format(date, weekDayFormat === 'Long' ? longFormat : shortFormat) : null;
 };
 
 /**

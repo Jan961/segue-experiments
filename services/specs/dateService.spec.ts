@@ -1,7 +1,6 @@
 import { UTCDate } from '@date-fns/utc';
 import {
   simpleToDateMDY,
-  formattedDateWithDay,
   newDate,
   calculateWeekNumber,
   safeDateV2,
@@ -194,12 +193,21 @@ describe.each([
   });
 });
 
-// --formattedDateWithDay()
-describe('formattedDateWithDay', () => {
-  test('', () => {
-    const input = new UTCDate('01/02/03');
-    const expectedResult = 'Thu/01/03';
-    expect(formattedDateWithDay(input)).toStrictEqual(expectedResult);
+describe.each([
+  [{ date: '10/15/24', format: 'Short' }, null],
+  [{ date: '10/15/24', format: 'Long' }, null],
+  [{ date: '15/10/24', format: 'Short' }, null],
+  [{ date: '15/10/24', format: 'Long' }, null],
+  [{ date: '10/15/24', format: 'Short', locale: 'US' }, 'Tue 15/10/24'],
+  [{ date: '10/15/24', format: 'Long', locale: 'US' }, 'Tuesday 15/10/2024'],
+  [{ date: '15/10/24', format: 'Short', locale: 'UK' }, 'Tue 15/10/24'],
+  [{ date: '15/10/24', format: 'Long', locale: 'UK' }, 'Tuesday 15/10/2024'],
+  [{ date: '10-15-24', format: 'Short', locale: 'US' }, 'Tue 15/10/24'],
+  [{ date: '15-10-24', format: 'Short', locale: 'UK' }, 'Tue 15/10/24'],
+])('formattedDateWithDay', (input: { date; format: 'Long' | 'Short'; locale: Locale }, expected) => {
+  test(`Expect '${input.date}'${input.locale ? ` in locale '${input.locale}'` : ''} to be '${expected}'`, () => {
+    const val = formattedDateWithWeekDayV2(input.date, input.format, input.locale);
+    expect(val).toStrictEqual(expected);
   });
 });
 
