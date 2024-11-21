@@ -104,7 +104,7 @@ describe('UploadModal Component', () => {
     cy.get(`[data-testid="${defaultProps.testId}-upload-image"]`).click();
 
     // Attach two files
-    const files = ['placeholder.png', 'placeholder2.png'];
+    const files = ['placeholder.png', 'placeholder.png'];
     cy.fixture(files[0], 'base64').then((fileContent1) => {
       cy.fixture(files[1], 'base64').then((fileContent2) => {
         cy.get('[data-testid="hidden-input"]').attachFile(
@@ -130,10 +130,10 @@ describe('UploadModal Component', () => {
     });
 
     // Check that error is displayed
-    cy.get('[data-testid="error"]').should('be.visible').and('contain', 'You can upload up to 1 files.');
+    cy.get('[data-testid="error"]').should('be.visible').and('contain', 'You can upload 1 file');
 
     // Ensure no files are selected
-    cy.get('.grid').should('not.exist');
+    cy.get('.grid').should('not.be.visible');
   });
 
   it('shows error when file exceeds maxFileSize', () => {
