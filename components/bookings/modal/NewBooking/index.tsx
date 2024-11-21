@@ -217,7 +217,6 @@ const AddBooking = ({ visible, onClose, startDate, endDate, bookingInfo, booking
             onSubmit={setBookingOnStore}
             formData={state.form}
             onClose={onClose}
-            productionCode={productionCode}
             venueOptions={venueOptions}
             updateModalTitle={updateModalTitle}
             onBarringCheckComplete={handleBarringCheckComplete}

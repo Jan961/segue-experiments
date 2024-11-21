@@ -91,8 +91,6 @@ export default function ConfirmationDialog({
     action ? onYesClick() : onNoClick();
   };
 
-  console.log('label No', typeof labelNo);
-
   return (
     <PopupModal testId={testId} show={visible} showCloseIcon={false} hasOverlay={hasOverlay}>
       <div data-testid="confirmation-dialog" className="p-2 flex flex-col gap-4">
