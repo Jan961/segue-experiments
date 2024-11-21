@@ -8,7 +8,6 @@ import {
   isSameDay,
   addMinutes,
   addMonths,
-  set,
   parseISO,
   differenceInDays,
   addDays,
@@ -767,15 +766,6 @@ export function getDuration(upTime: string, downTime: string): number {
 // DEPRECATED
 export const checkDateOverlap = (start1: Date, end1: Date, start2: Date, end2: Date): boolean => {
   return !((start1 < start2 && end1 < start2) || (start1 > end2 && end2 > end1));
-};
-
-// DEPRECATED
-export const convertTimeToTodayDateFormat = (time: string) => {
-  const today = new Date();
-  const [hours, minutes] = time.split(':').map(Number);
-
-  const updatedDate = set(today, { hours, minutes, seconds: 0, milliseconds: 0 });
-  return updatedDate;
 };
 
 // ?
