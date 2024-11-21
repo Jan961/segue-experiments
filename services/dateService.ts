@@ -741,15 +741,6 @@ export const getWeeksBetweenDates = (startDate: string, endDate: string) => {
 };
 
 // DEPRECATED
-export const getPreviousMonday = (date) => {
-  const dayOfWeek = date.getDay();
-  const difference = ((dayOfWeek + 6) % 7) + 7; // Calculate the difference to Monday
-  const previousMonday = new Date(date);
-  previousMonday.setDate(date.getDate() - difference);
-  return previousMonday;
-};
-
-// DEPRECATED
 export const getNextMondayDateString = (date: string) => {
   const inputDate = moment.utc(date);
   if (!inputDate.isValid()) {
