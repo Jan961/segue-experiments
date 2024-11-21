@@ -3,7 +3,7 @@ import { SpinIcon } from '../assets/svg';
 
 export type variant = 'xs' | 'sm' | 'md' | 'lg';
 
-interface LoaderProps {
+export interface LoaderProps {
   text?: string;
   variant?: variant;
   className?: string;
