@@ -279,11 +279,11 @@ export const dateTimeToTime = (date: string | UTCDate | number, locale?: Locale)
  * @param {UTCDate | string | number} date - The date to return ISO format of.
  * @returns {UTCDate | string | number} Returns the ISO formate of inputted date.
  */
-export const toISOV2 = (date: UTCDate | string | number): string => {
+export const toISO = (date: UTCDate | string | number, locale?: Locale): string => {
   if (!date) {
     return null;
   }
-  const d = safeDateV2(date);
+  const d = safeDateV2(date, locale);
   return d.toISOString();
 };
 
@@ -677,11 +677,6 @@ export const dateStringToPerformancePair = (dateString: string) => {
 export const simpleToDate = (stringToFormat: string): Date => {
   const parts = stringToFormat?.split?.('/');
   return new Date(Number(`20${parts[2]}`), Number(Number(parts[0]) - 1), Number(parts[1]));
-};
-
-// DEPRECATED
-export const toISO = (date: Date) => {
-  return date.toISOString();
 };
 
 // DEPRECATED
