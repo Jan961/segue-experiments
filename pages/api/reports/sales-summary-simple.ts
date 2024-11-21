@@ -1,6 +1,5 @@
 import ExcelJS from 'exceljs';
 import getPrismaClient from 'lib/prisma';
-import moment from 'moment';
 import {
   COLOR_HEXCODE,
   alignCellTextRight,
@@ -330,7 +329,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
             }
           }
         } else {
-          if (moment(booking.Date).valueOf() < moment(headerWeekDates[i]).valueOf()) {
+          if (booking.Date.getTime() < newDate(headerWeekDates[i]).getTime()) {
             totalObjToPush = {
               Value: booking.FormattedFinalFiguresValue,
               ConversionRate: booking.ConversionRate,
@@ -415,12 +414,12 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           }
         } else {
           if (booking?.BookingStatusCode === 'X') continue;
-          if (moment(booking.Date).valueOf() < moment(headerWeekDates[i]).valueOf()) {
+          if (booking.Date.getTime() < newDate(headerWeekDates[i]).getTime()) {
             colorCell({ worksheet, row, col, argbColor: COLOR_HEXCODE.BLUE });
           }
           if (
             booking?.NotOnSaleDate &&
-            moment(headerWeekDates[i]).valueOf() < moment(booking.NotOnSaleDate).valueOf()
+            newDate(headerWeekDates[i]).getTime() < newDate(booking.NotOnSaleDate).getTime()
           ) {
             colorCell({ worksheet, row, col, argbColor: COLOR_HEXCODE.RED });
           }

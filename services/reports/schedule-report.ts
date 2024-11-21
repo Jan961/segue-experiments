@@ -1,9 +1,8 @@
 import { UTCDate } from '@date-fns/utc';
 import { bookingStatusMap } from 'config/bookings';
 import getPrismaClient from 'lib/prisma';
-import moment from 'moment';
 import { NextApiRequest } from 'next';
-import { dateTimeToTime, formatDate, getDateDaysAway } from 'services/dateService';
+import { areDatesSame, dateTimeToTime, formatDate, getDateDaysAway, getDifferenceInDays } from 'services/dateService';
 import { minutesInHHmmFormat } from 'services/salesSummaryService';
 
 export type SCHEDULE_VIEW = {
@@ -129,7 +128,7 @@ export const getSheduleReport = async ({ from, to, status, ProductionId }, req: 
   }));
   const { ShowName, FullProductionCode, ProductionStartDate, ProductionEndDate } = data[0];
   const map = formattedData.reduce((acc, x) => ({ ...acc, [getKey(x)]: x }), {});
-  const daysDiff = moment(to || ProductionEndDate).diff(moment(from || ProductionStartDate), 'days');
+  const daysDiff = getDifferenceInDays(to || ProductionEndDate, from || ProductionStartDate);
   let prevProductionWeekNum = '';
   let lastWeekMetaInfo = {
     weekTotalPrinted: false,
@@ -180,7 +179,7 @@ export const getSheduleReport = async ({ from, to, status, ProductionId }, req: 
       const formattedTime = TimeMins ? minutesInHHmmFormat(Number(TimeMins)) : '';
       const performances = bookingIdPerformanceMap[EntryId];
       const performancesOnThisDay = performances?.filter?.((performance) =>
-        moment(performance.performanceDate).isSame(dateInIncomingFormat, 'day'),
+        areDatesSame(performance.performanceDate, dateInIncomingFormat),
       );
       time.push(formattedTime || '00:00');
       mileage.push(Number(Mileage) || 0);

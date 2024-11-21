@@ -1,7 +1,6 @@
 import { Performance } from 'prisma/generated/prisma-client';
 import ExcelJS from 'exceljs';
 import getPrismaClient from 'lib/prisma';
-import moment from 'moment';
 import {
   COLOR_HEXCODE,
   alignColumnTextHorizontally,
@@ -16,7 +15,15 @@ import { bookingStatusMap } from 'config/bookings';
 import { addBorderToAllCells } from 'utils/export';
 import { PerformanceInfo, SCHEDULE_VIEW, getSheduleReport } from 'services/reports/schedule-report';
 import { sum } from 'radash';
-import { dateTimeToTime, formatDate, getDateDaysAway, newDate, timeFormat } from 'services/dateService';
+import {
+  areDatesSame,
+  dateTimeToTime,
+  formatDate,
+  getDateDaysAway,
+  getDifferenceInDays,
+  newDate,
+  timeFormat,
+} from 'services/dateService';
 import { UTCDate } from '@date-fns/utc';
 
 const makeRowBold = ({ worksheet, row }: { worksheet: any; row: number }) => {
@@ -192,7 +199,7 @@ const handler = async (req, res) => {
     worksheet.addRow([]);
 
     const map: { [key: string]: SCHEDULE_VIEW } = formattedData.reduce((acc, x) => ({ ...acc, [getKey(x)]: x }), {});
-    const daysDiff = moment(to).diff(moment(from), 'days');
+    const daysDiff = getDifferenceInDays(to, from);
     let rowNo = 8;
     let prevProductionWeekNum = '';
     let lastWeekMetaInfo = {
@@ -259,7 +266,7 @@ const handler = async (req, res) => {
         const formattedTime = TimeMins ? timeFormat(Number(TimeMins)) : '';
         const performances = bookingIdPerformanceMap[EntryId];
         const performancesOnThisDay = performances?.filter?.((performance) =>
-          moment(performance.performanceDate).isSame(dateInIncomingFormat, 'day'),
+          areDatesSame(performance.performanceDate, dateInIncomingFormat),
         );
         prevProductionWeekNum = ProductionWeekNum ? String(ProductionWeekNum) : prevProductionWeekNum;
         let row = [

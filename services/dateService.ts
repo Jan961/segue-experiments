@@ -8,7 +8,6 @@ import {
   isSameDay,
   addMinutes,
   addMonths,
-  parseISO,
   differenceInDays,
   addDays,
 } from 'date-fns';
@@ -33,8 +32,8 @@ const disectTime = (time: string) => {
     return { h: 0, m: 0, s: 0 };
   }
   const t = time.split(':');
-  const s = t[2].includes('.') ? t[2].split('.') : t[2];
-  return { h: Number(t[0]), m: Number(t[1]), s: Number(s[0].includes('z') ? s[0].slice(0, 1) : s[0]) };
+  const s = t[2]?.includes('.') ? t[2].split('.') : t[2];
+  return { h: Number(t[0]), m: Number(t[1]), s: s ? Number(s[0].includes('z') ? s[0].slice(0, 1) : s[0]) : 0 };
 };
 
 /**
@@ -581,6 +580,87 @@ export const compareDatesWithoutTime = (
   }
 };
 
+/**
+ * Combine a date and a time into a dateTime.
+ *
+ * @param {UTCDate | string | number} date - The date to add a time to.
+ * @param {string} time - The time to add to the date.
+ * @param {Locale} locale - The locale of the inputted date.
+ * @returns {UTCDate} Returns the combined dateTime of the date and time input.
+ */
+export const getDateTime = (date: string | UTCDate | number, time: string, locale?: Locale) => {
+  if (!date || !time) {
+    return null;
+  }
+  const d = getKey(date, locale);
+  console.log(d);
+  const dSplit = d.split('-');
+  const tSplit = disectTime(time);
+  if (!dSplit) {
+    return null;
+  }
+  const res = new UTCDate(Number(dSplit[0]), Number(dSplit[1]) - 1, Number(dSplit[2]), tSplit.h, tSplit.m, tSplit.s);
+  return isValid(res) ? res : null;
+};
+
+/**
+ * Get the difference between dates by days.
+ *
+ * @param {UTCDate | string | number} fromDate - The date to start counting from.
+ * @param {UTCDate | string | number} toDate - The date to count to.
+ * @param {Locale} fromLocale - The locale of the first inputted date.
+ * @param {Locale} toLocale - The locale of the second inputted date.
+ * @returns {number} Returns the difference in days between the dates.
+ */
+export const getDifferenceInDays = (
+  fromDate: string | UTCDate | number,
+  toDate: string | UTCDate | number,
+  fromLocale?: Locale,
+  toLocale?: Locale,
+): number => {
+  if (!fromDate || !toDate) {
+    return null;
+  }
+
+  const fDate = safeDate(fromDate, fromLocale);
+  const tDate = safeDate(toDate, toLocale);
+
+  if (!isValid(fDate) || !isValid(tDate)) {
+    return null;
+  }
+
+  return differenceInDays(tDate, fDate);
+};
+
+/**
+ * Get the difference between dates by weeks.
+ *
+ * @param {UTCDate | string | number} fromDate - The date to start counting from.
+ * @param {UTCDate | string | number} toDate - The date to count to.
+ * @param {Locale} fromLocale - The locale of the first inputted date.
+ * @param {Locale} toLocale - The locale of the second inputted date.
+ * @returns {number} Returns the difference in weeks between the dates.
+ */
+export const getDifferenceInWeeks = (
+  fromDate: string | UTCDate | number,
+  toDate: string | UTCDate | number,
+  fromLocale?: Locale,
+  toLocale?: Locale,
+): number => {
+  if (!fromDate || !toDate) {
+    return null;
+  }
+
+  const fDate = safeDate(fromDate, fromLocale);
+  const tDate = safeDate(toDate, toLocale);
+
+  if (!isValid(fDate) || !isValid(tDate)) {
+    return null;
+  }
+
+  return differenceInWeeks(tDate, fDate);
+};
+
 // DEPRECATED -- ARUN NEEDS CONSULTING
 export const formatDateWithTimezoneOffset = ({
   date,
@@ -703,20 +783,4 @@ export function getDuration(upTime: string, downTime: string): number {
 // DEPRECATED
 export const checkDateOverlap = (start1: Date, end1: Date, start2: Date, end2: Date): boolean => {
   return !((start1 < start2 && end1 < start2) || (start1 > end2 && end2 > end1));
-};
-
-// ?
-export const getDifferenceInDays = (from: string, to: string): number => {
-  if (!from || !to) {
-    return NaN;
-  }
-
-  const fromDate = parseISO(from);
-  const toDate = parseISO(to);
-
-  if (!isValid(fromDate) || !isValid(toDate)) {
-    return NaN;
-  }
-
-  return differenceInDays(toDate, fromDate);
 };

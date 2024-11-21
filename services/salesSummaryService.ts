@@ -119,12 +119,10 @@ export const assignBackgroundColor = ({
     colorCell({ worksheet, row, col, argbColor: COLOR_HEXCODE.YELLOW });
   }
 
-  // if (moment(Date).valueOf() < (SetProductionWeekDate).valueOf()) {
   if (isBefore(simpleToDateMDY(Date), simpleToDateMDY(SetProductionWeekDate))) {
     colorCell({ worksheet, row, col, argbColor: COLOR_HEXCODE.BLUE });
   }
 
-  // if (NotOnSalesDate && moment(SetProductionWeekDate).valueOf() < moment(NotOnSalesDate).valueOf()) {
   if (NotOnSalesDate && isBefore(simpleToDateMDY(SetProductionWeekDate), simpleToDateMDY(NotOnSalesDate))) {
     colorCell({ worksheet, row, col, argbColor: COLOR_HEXCODE.RED });
   }

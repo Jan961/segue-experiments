@@ -6,12 +6,11 @@ import { useRecoilValue } from 'recoil';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import { exportSalesSummaryReport, fetchProductionWeek } from './request';
 import { transformToOptions } from 'utils';
-import { dateToSimple } from 'services/dateService';
+import { dateToSimple, getMonday, newDate } from 'services/dateService';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import { MAX_WEEK, MIN_WEEK, salesSummarySortOptions } from 'config/Reports';
 import Button from 'components/core-ui-lib/Button';
 import Label from 'components/core-ui-lib/Label';
-import { getCurrentMondayDate } from 'services/reportsService';
 import { notify } from 'components/core-ui-lib/Notifications';
 import { TextInput } from 'components/core-ui-lib';
 
@@ -48,7 +47,7 @@ const SalesSummaryReportModal = ({ visible, onClose, activeModal }: SalesSummary
   const title = useMemo(() => getModalTitle(activeModal), [activeModal]);
   const { production, productionWeek, numberOfWeeks, order } = formData;
   const updateProductionWeek = useCallback(() => {
-    const currentWeekMonday = getCurrentMondayDate();
+    const currentWeekMonday = getMonday(newDate());
     setFormData((data) => ({ ...data, productionWeek: currentWeekMonday }));
   }, []);
   const { data: weeks = [] } = useQuery({

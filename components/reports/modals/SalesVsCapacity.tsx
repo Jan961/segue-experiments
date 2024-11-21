@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { dateToSimple, getDateDaysAway } from 'services/dateService';
+import { dateToSimple, getDateDaysAway, getMonday, newDate } from 'services/dateService';
 import { faPercent } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
-import { getCurrentMondayDate, range } from 'services/reportsService';
+import { range } from 'services/reportsService';
 import { SwitchBoardItem } from 'components/global/SwitchBoardItem';
 import { Spinner } from 'components/global/Spinner';
 import { defaultStatus } from './SalesSummarySimple';
@@ -32,9 +32,6 @@ export default function SalesVsCapacity({ activeProductions }: Props) {
 
   function formatShortYearDate(dateString) {
     return dateToSimple(dateString);
-    // const dateMomentObject = moment(dateString) || moment(moment(dateString).format('DD/MM/YY'), 'DD/MM/YY'); // 1st argument - string, 2nd argument - format
-    // const day = toISO(dateMomentObject as any).substring(0, 10);
-    // return day; // new Date( dateMomentObject.toDate());
   }
 
   const downloadReport = async () => {
@@ -123,7 +120,7 @@ export default function SalesVsCapacity({ activeProductions }: Props) {
           setProductionWeeks([]);
           // Set production weeks with data
           setProductionWeeks(data || []);
-          const currentWeekMonday = getCurrentMondayDate();
+          const currentWeekMonday = getMonday(newDate());
           setInputs((prev) => ({ ...prev, ProductionWeek: currentWeekMonday }));
         })
         .finally(() => {
