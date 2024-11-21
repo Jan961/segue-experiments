@@ -16,7 +16,6 @@ import { checkDecimalStringFormat, isNull } from 'utils';
 import { useRecoilValue } from 'recoil';
 import { accessMarketingHome } from 'state/account/selectors/permissionSelector';
 import { UTCDate } from '@date-fns/utc';
-import { safeDate } from 'services/dateService';
 
 export type ActivityModalVariant = 'add' | 'edit' | 'delete';
 
@@ -76,7 +75,7 @@ export default function ActivityModal({
     } else if (variant === 'edit') {
       setActName(data.Name);
       setActType(data.ActivityTypeId);
-      setActDate(!safeDate(data.Date) ? null : startOfDay(safeDate(data.Date)));
+      setActDate(data.Date === null ? null : startOfDay(data.Date));
       setActFollowUp(data.FollowUpRequired);
       setFollowUpDt(!data.DueByDate ? null : startOfDay(data.DueByDate));
       setCompanyCost(data.CompanyCost.toString());
