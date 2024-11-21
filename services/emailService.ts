@@ -51,7 +51,7 @@ export const sendNewUserEmail = async (
 ) => {
   await sendEmail(emailAddress, NEW_USER_WELCOME_EMAIL, {
     companyname: companyName,
-    emailaddress: emailAddress,
+    username: emailAddress,
     password,
     weblink: signInUrl,
   });
