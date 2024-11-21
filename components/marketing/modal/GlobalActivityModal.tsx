@@ -8,7 +8,7 @@ import Checkbox from 'components/core-ui-lib/Checkbox';
 import TextArea from 'components/core-ui-lib/TextArea/TextArea';
 import Button from 'components/core-ui-lib/Button';
 import { GlobalActivityDTO, VenueDTO } from 'interfaces';
-import { isValid, startOfDay } from 'date-fns';
+import { isValid } from 'date-fns';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import { hasGlobalActivityChanged } from '../utils';
 import { ConfDialogVariant } from 'components/core-ui-lib/ConfirmationDialog/ConfirmationDialog';
@@ -19,6 +19,7 @@ import LoadingOverlay from 'components/core-ui-lib/LoadingOverlay';
 import { useRecoilValue } from 'recoil';
 import { accessMarketingHome } from 'state/account/selectors/permissionSelector';
 import { UTCDate } from '@date-fns/utc';
+import { safeDate } from 'services/dateService';
 
 export type ActivityModalVariant = 'add' | 'edit' | 'delete' | 'view';
 
@@ -132,9 +133,9 @@ export default function GlobalActivityModal({
 
       setActName(data.Name);
       setActType(data.ActivityTypeId);
-      setActDate(isValid(data.Date) ? startOfDay(data.Date) : null);
+      setActDate(isValid(data.Date) ? safeDate(data.Date) : null);
       setActFollowUp(data.FollowUpRequired);
-      setFollowUpDt(isValid(data.DueByDate) ? startOfDay(data.DueByDate) : null);
+      setFollowUpDt(isValid(data.DueByDate) ? safeDate(data.DueByDate) : null);
       setCost(isNaN(data.Cost) ? '' : data.Cost.toFixed(2).toString());
       setActNotes(data.Notes);
       setActId(data.Id);
@@ -200,11 +201,11 @@ export default function GlobalActivityModal({
     let data: GlobalActivity = {
       ActivityTypeId: actType,
       Cost: parseFloat(cost),
-      Date: actDate === null ? null : startOfDay(actDate),
+      Date: actDate === null ? null : safeDate(actDate),
       FollowUpRequired: actFollowUp,
       Name: actName,
       Notes: actNotes,
-      DueByDate: actFollowUp ? startOfDay(followUpDt) : null,
+      DueByDate: actFollowUp ? safeDate(followUpDt) : null,
       ProductionId: productionId,
       VenueIds: selectedList,
     };
@@ -243,11 +244,11 @@ export default function GlobalActivityModal({
         ActivityTypeId: actType,
         ProductionId: productionId,
         Cost: parseFloat(cost),
-        Date: startOfDay(actDate),
+        Date: safeDate(actDate),
         FollowUpRequired: actFollowUp,
         Name: actName,
         Notes: actNotes,
-        DueByDate: actFollowUp ? startOfDay(followUpDt) : null,
+        DueByDate: actFollowUp ? safeDate(followUpDt) : null,
         VenueIds: selectedList,
       };
 

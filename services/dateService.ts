@@ -386,7 +386,7 @@ export const addOneMonth = (date: UTCDate | string | number, locale?: Locale): U
     return null;
   }
   const newDate = safeDate(date, locale);
-  return addMonths(newDate, 1);
+  return safeDate(addMonths(newDate, 1).getTime());
 };
 
 /**
