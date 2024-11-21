@@ -711,23 +711,6 @@ export function formatDuration(
   }
 }
 
-// deprecated?
-export const dateToPicker = (dateToFormat: Date | string) => {
-  if (!dateToFormat) return '';
-
-  if (typeof dateToFormat === 'object') {
-    return dateToFormat.toISOString().slice(0, 10);
-  }
-
-  // Handle string values that represent incomplete dates
-  if (typeof dateToFormat === 'string') {
-    // Basic validation or manipulation if needed
-    return dateToFormat;
-  }
-
-  return dateToFormat;
-};
-
 // DEPRECATED
 export const todayToSimple = () => {
   const date = new Date();
