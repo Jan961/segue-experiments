@@ -11,6 +11,8 @@ export enum VENUE_CURRENCY_SYMBOLS {
 export enum SALES_TYPE_NAME {
   GENERAL_SALES = 'General Sales',
   GENERAL_RESERVATION = 'General Reservations',
+  SCHOOL_SALES = 'School Sales',
+  SCHOOL_RESERVATION = 'School Reservations',
 }
 
 export type TSalesView = {
