@@ -341,7 +341,7 @@ export const formattedDateWithWeekDayV2 = (
   if (!dateToFormat) {
     return null;
   }
-  const shortFormat = 'EEE dd/MM/yy';
+  const shortFormat = 'E..EEE dd/MM/yy';
   const longFormat = 'EEEE dd/MM/yyyy';
   const date = safeDateV2(dateToFormat, locale);
   return format(date, weekDayFormat === 'Long' ? longFormat : shortFormat);
@@ -686,7 +686,7 @@ export const dateToPicker = (dateToFormat: Date | string) => {
 // DEPRECATED
 export const formattedDateWithDay = (date: UTCDate) => {
   if (!date) return '';
-  const dateFormat = 'EEE/MM/yy';
+  const dateFormat = 'E..EEE/MM/yy';
   return format(date, dateFormat);
 };
 
@@ -753,8 +753,8 @@ export const getWeekDayLong = (dateToFormat: Date | string) => {
 // DEPRECATED
 export const formattedDateWithWeekDay = (dateToFormat: Date | string, weekDayFormat: 'Long' | 'Short') => {
   if (!dateToFormat) return '';
-  const shortFormat = 'EEE dd/MM/yy';
-  const longFormat = 'EEEE dd/MM/yyyy';
+  const shortFormat = 'ddd DD/MM/YY';
+  const longFormat = 'dddd DD/MM/YYYY';
   return moment(dateToFormat).format(weekDayFormat === 'Long' ? longFormat : shortFormat);
 };
 

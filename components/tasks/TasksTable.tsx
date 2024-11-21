@@ -66,7 +66,7 @@ export default function TasksTable({
           progress < 100
             ? null
             : isNullOrEmpty(task.TaskCompletedDate)
-            ? formatDate(newDate(), "EEE MMM dd yyyy HH:mm:ss 'GMT'XXX (zzzz)")
+            ? formatDate(newDate(), "E..EEE MMM dd yyyy HH:mm:ss 'GMT'XXX (zzzz)")
             : task.TaskCompletedDate,
       };
       const updatedRowData = rowData.map((row) => {
