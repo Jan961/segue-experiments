@@ -9,7 +9,7 @@ const webhookSecret = process.env.CLERK_WEBHOOK_SECRET || ``;
 const EMAIL_CREATED = 'email.created';
 
 const validateRequest = async (req: NextApiRequest) => {
-  const payloadString = await JSON.stringify(req.body);
+  const payloadString = JSON.stringify(req.body);
   const headers = req.headers;
   const svixHeaders = {
     'svix-id': headers['svix-id'].toString(),
