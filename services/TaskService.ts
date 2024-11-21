@@ -1,5 +1,5 @@
 import getPrismaClient from 'lib/prisma';
-import { addOneMonthV2, calculateWeekNumber, getDateDaysAway } from './dateService';
+import { addOneMonth, calculateWeekNumber, getDateDaysAway } from './dateService';
 import { sortTasksByDueAndAlpha } from 'utils/tasks';
 import { NextApiRequest } from 'next';
 import { UTCDate } from '@date-fns/utc';
@@ -223,7 +223,7 @@ export const generateRecurringProductionTasks = async (
     });
     maxTaskCode++;
     taskStartDate =
-      RepeatInterval === 'monthly' ? addOneMonthV2(taskStartDate) : getDateDaysAway(taskStartDate, 7 * multiplier);
+      RepeatInterval === 'monthly' ? addOneMonth(taskStartDate) : getDateDaysAway(taskStartDate, 7 * multiplier);
   }
   return tasksToCreate;
 };
@@ -242,7 +242,7 @@ export const getNewTasksNum = (
   while (taskStartDate <= taskEndDate) {
     counter++;
     taskStartDate =
-      repeatInterval === 'monthly' ? addOneMonthV2(taskStartDate) : getDateDaysAway(taskStartDate, 7 * multiplier);
+      repeatInterval === 'monthly' ? addOneMonth(taskStartDate) : getDateDaysAway(taskStartDate, 7 * multiplier);
   }
 
   return counter;

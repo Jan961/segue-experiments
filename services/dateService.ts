@@ -383,12 +383,12 @@ export const calculateWeekNumber = (
  * @param {Locale?} locale - The locale value of the inputted date.
  * @returns {UTCDate} Returns a date object 1 month after inputted date.
  */
-export const addOneMonthV2 = (date: UTCDate | string | number, locale?: Locale): UTCDate => {
+export const addOneMonth = (date: UTCDate | string | number, locale?: Locale): UTCDate => {
   if (!date) {
     return null;
   }
   const newDate = safeDateV2(date, locale);
-  return new UTCDate(addMonths(newDate, 1));
+  return addMonths(newDate, 1);
 };
 
 /**
@@ -769,13 +769,6 @@ export const formatTime = (timestamp) => {
   const today = new Date(timestamp);
   // const options = { hours: '2-digit', minutes: '2-digit', seconds: '2-digit' }
   return today.toLocaleTimeString();
-};
-
-// DEPRECATED
-export const addOneMonth = (date: Date) => {
-  const newDate = new Date(date);
-  newDate.setMonth(newDate.getMonth() + 1);
-  return newDate;
 };
 
 // DEPRECATED

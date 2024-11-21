@@ -19,7 +19,7 @@ import { isNullOrEmpty } from 'utils';
 import { getWeekOptions } from 'utils/taskDate';
 import { priorityOptions, generatePercentageOptions } from 'utils/tasks';
 import { productionJumpState } from 'state/booking/productionJumpState';
-import { addOneMonthV2, formatDate, getDateDaysAway, newDate } from 'services/dateService';
+import { addOneMonth, formatDate, getDateDaysAway, newDate } from 'services/dateService';
 import { RecurringTasksPopup } from './RecurringTasksPopup';
 import { DeleteRecurringPopup } from './DeleteRecurringPopup';
 import { useRouter } from 'next/router';
@@ -259,7 +259,7 @@ const AddTask = ({
     while (taskStartDate <= taskEndDate) {
       counter++;
       taskStartDate =
-        repeatInterval === 'monthly' ? addOneMonthV2(taskStartDate) : getDateDaysAway(taskStartDate, 7 * multiplier);
+        repeatInterval === 'monthly' ? addOneMonth(taskStartDate) : getDateDaysAway(taskStartDate, 7 * multiplier);
     }
 
     return counter;

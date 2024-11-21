@@ -5,7 +5,7 @@ import {
   calculateWeekNumber,
   safeDateV2,
   dateTimeToTime,
-  addOneMonthV2,
+  addOneMonth,
   dateToSimple,
   formatShortDateUKV2,
   formattedDateWithWeekDay,
@@ -327,7 +327,7 @@ describe.each([
   [{ date: new UTCDate('2024-10-15T14:30:20.000Z') }, new UTCDate('2024-11-15T14:30:20Z')],
 ])('addOneMonth', (input: { date; locale: Locale }, expected) => {
   test(`Expect ${input.date} add one month to be ${expected}`, () => {
-    expect(addOneMonthV2(input.date, input.locale)).toStrictEqual(expected);
+    expect(addOneMonth(input.date, input.locale)).toStrictEqual(expected);
   });
 });
 
