@@ -28,7 +28,6 @@ type AddBookingProps = {
   formData: TForm;
   dayTypeOptions: SelectOption[];
   venueOptions: SelectOption[];
-  productionCode: string;
   updateBookingConflicts: (bookingConflicts: BookingWithVenueDTO[]) => void;
   updateBarringConflicts: (barringConflicts: BarredVenue[]) => void;
   onBarringCheckComplete: (nextStep: string) => void;
@@ -43,7 +42,6 @@ const NewBookingView = ({
   onChange,
   onSubmit,
   formData,
-  productionCode,
   dayTypeOptions,
   venueOptions,
   updateBookingConflicts,
@@ -177,7 +175,6 @@ const NewBookingView = ({
   };
   return (
     <div className="w-[385px]">
-      <div className="text-primary-navy text-xl my-2 font-bold">{productionCode}</div>
       <form className="flex flex-col bg-primary-navy py-3 pl-4 pr-5 rounded-lg" onSubmit={handleOnSubmit}>
         <DateRange
           testId="cnb-date-range"
