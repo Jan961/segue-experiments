@@ -16,7 +16,6 @@ import { checkDecimalStringFormat, isNull } from 'utils';
 import { useRecoilValue } from 'recoil';
 import { accessMarketingHome } from 'state/account/selectors/permissionSelector';
 import { UTCDate } from '@date-fns/utc';
-import { safeDate } from 'services/dateService';
 
 export type ActivityModalVariant = 'add' | 'edit' | 'delete';
 
