@@ -424,514 +424,518 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
   };
 
   return (
-    <PopupModal show={visible} title={modalTitle} onClose={() => handleCancelForm(false)}>
-      <div className="h-[80vh] w-auto overflow-y-scroll flex">
-        <div className="h-[800px] flex">
-          <div className="flex flex-col gap-y-3">
-            <div className="w-[423px] rounded border-2 border-secondary mr-2 p-3 bg-primary-blue bg-opacity-15">
-              <div className="flex justify-between">
-                <div className="text-primary-input-text font-bold text-lg">Deal Memo</div>
-                <div className="flex gap-x-2">
-                  <Button
-                    className="w-32"
-                    variant="primary"
-                    text={dealMemoButtonText}
-                    onClick={handleEditDealMemo}
-                    disabled={
-                      (dealMemoButtonText === 'Create Deal Memo' && !createDealMemo) ||
-                      (dealMemoButtonText === 'Edit Deal Memo' && !editDealMemo) ||
-                      !editModal
-                    }
-                  />
-                  <Button
-                    className="w-32"
-                    variant="primary"
-                    text="Export to PDF"
-                    onClick={pdfExportDealMemo}
-                    sufixIconName="document-solid"
-                    disabled={!exportDealMemo || !editModal}
-                  />
-                </div>
-              </div>
-              <div>
-                <div className=" text-primary-input-text font-bold text-sm mt-1.5">Deal Memo Status</div>
-                <Select
-                  options={statusOptions}
-                  className="bg-primary-white w-full"
-                  placeholder="Select Deal Memo Status"
-                  onChange={(value) => editDealMemoData('Status', value)}
-                  value={dealMemoFormData.Status}
-                  isClearable
-                  isSearchable
-                  disabled={!editModal || !dealMemoCreated}
+    <PopupModal
+      show={visible}
+      title={modalTitle}
+      onClose={() => handleCancelForm(false)}
+      footerComponent={
+        <div className="w-full mt-4 flex justify-end items-center">
+          <Button onClick={() => handleCancelForm(false)} className="w-33" variant="secondary" text="Cancel" />
+          <Button onClick={handleFormData} className="ml-4 w-33" variant="primary" text="Save and Close" />
+        </div>
+      }
+    >
+      <div className="flex">
+        <div className="flex flex-col gap-y-3">
+          <div className="w-[423px] rounded border-2 border-secondary mr-2 p-3 bg-primary-blue bg-opacity-15">
+            <div className="flex justify-between">
+              <div className="text-primary-input-text font-bold text-lg">Deal Memo</div>
+              <div className="flex gap-x-2">
+                <Button
+                  className="w-32"
+                  variant="primary"
+                  text={dealMemoButtonText}
+                  onClick={handleEditDealMemo}
+                  disabled={
+                    (dealMemoButtonText === 'Create Deal Memo' && !createDealMemo) ||
+                    (dealMemoButtonText === 'Edit Deal Memo' && !editDealMemo) ||
+                    !editModal
+                  }
                 />
-
-                <div className=" text-primary-input-text font-bold text-sm mt-6">Completed By</div>
-                <Select
-                  onChange={(value) => editDealMemoData('CompletedBy', value)}
-                  value={dealMemoFormData.CompletedBy}
-                  className="bg-primary-white w-full"
-                  options={[...userList]}
-                  isClearable
-                  isSearchable
-                  placeholder="Select User"
-                  disabled={!editModal || !dealMemoCreated}
-                />
-
-                <div className=" text-primary-input-text font-bold text-sm mt-6">Approved By</div>
-                <Select
-                  onChange={(value) => editDealMemoData('ApprovedBy', value)}
-                  value={dealMemoFormData.ApprovedBy}
-                  className="bg-primary-white w-full"
-                  options={[...userList]}
-                  isClearable
-                  isSearchable
-                  placeholder="Select User"
-                  disabled={!editModal || !dealMemoCreated}
-                />
-                <div className="flex items-center mt-6 justify-between px-3 select-none">
-                  <div>
-                    <div className=" text-primary-input-text font-bold text-sm">Date Issued</div>
-                    <DateInput
-                      onChange={(value) =>
-                        value &&
-                        dealMemoFormData.DateIssued?.toString() !== toISO(value) &&
-                        editDealMemoData('DateIssued', value)
-                      }
-                      value={dealMemoFormData.DateIssued}
-                      disabled={!editModal || !dealMemoCreated}
-                    />
-                  </div>
-
-                  <div>
-                    <div className=" text-primary-input-text font-bold text-sm">Date Returned</div>
-                    <DateInput
-                      onChange={(value) =>
-                        value &&
-                        dealMemoFormData.DateReturned?.toString() !== toISO(value) &&
-                        editDealMemoData('DateReturned', value)
-                      }
-                      value={dealMemoFormData.DateReturned}
-                      disabled={!editModal || !dealMemoCreated}
-                    />
-                  </div>
-                </div>
-
-                <div className=" text-primary-input-text font-bold text-sm mt-6">Notes</div>
-                <TextArea
-                  onChange={(e) => editDealMemoData('Notes', e.target.value)}
-                  className="h-auto w-[400px]"
-                  value={dealMemoFormData.Notes}
-                  disabled={!editModal || !dealMemoCreated}
+                <Button
+                  className="w-32"
+                  variant="primary"
+                  text="Export to PDF"
+                  onClick={pdfExportDealMemo}
+                  sufixIconName="document-solid"
+                  disabled={!exportDealMemo || !editModal}
                 />
               </div>
             </div>
-            <div className="flex flex-col gap-y-2">
-              <div className="w-[423px] flex justify-end">
-                <Button
-                  onClick={() => setShowUploadModal(!showUploadModal)}
-                  className="mr-1 w-33"
-                  variant="primary"
-                  text="Add Attachments"
-                  disabled={!addAttachment || !editModal}
-                />
+            <div>
+              <div className=" text-primary-input-text font-bold text-sm mt-1.5">Deal Memo Status</div>
+              <Select
+                options={statusOptions}
+                className="bg-primary-white w-full"
+                placeholder="Select Deal Memo Status"
+                onChange={(value) => editDealMemoData('Status', value)}
+                value={dealMemoFormData.Status}
+                isClearable
+                isSearchable
+                disabled={!editModal || !dealMemoCreated}
+              />
+
+              <div className=" text-primary-input-text font-bold text-sm mt-6">Completed By</div>
+              <Select
+                onChange={(value) => editDealMemoData('CompletedBy', value)}
+                value={dealMemoFormData.CompletedBy}
+                className="bg-primary-white w-full"
+                options={[...userList]}
+                isClearable
+                isSearchable
+                placeholder="Select User"
+                disabled={!editModal || !dealMemoCreated}
+              />
+
+              <div className=" text-primary-input-text font-bold text-sm mt-6">Approved By</div>
+              <Select
+                onChange={(value) => editDealMemoData('ApprovedBy', value)}
+                value={dealMemoFormData.ApprovedBy}
+                className="bg-primary-white w-full"
+                options={[...userList]}
+                isClearable
+                isSearchable
+                placeholder="Select User"
+                disabled={!editModal || !dealMemoCreated}
+              />
+              <div className="flex items-center mt-6 justify-between px-3 select-none">
+                <div>
+                  <div className=" text-primary-input-text font-bold text-sm">Date Issued</div>
+                  <DateInput
+                    onChange={(value) =>
+                      value &&
+                      dealMemoFormData.DateIssued?.toString() !== toISO(value) &&
+                      editDealMemoData('DateIssued', value)
+                    }
+                    value={dealMemoFormData.DateIssued}
+                    disabled={!editModal || !dealMemoCreated}
+                  />
+                </div>
+
+                <div>
+                  <div className=" text-primary-input-text font-bold text-sm">Date Returned</div>
+                  <DateInput
+                    onChange={(value) =>
+                      value &&
+                      dealMemoFormData.DateReturned?.toString() !== toISO(value) &&
+                      editDealMemoData('DateReturned', value)
+                    }
+                    value={dealMemoFormData.DateReturned}
+                    disabled={!editModal || !dealMemoCreated}
+                  />
+                </div>
               </div>
-              <div className="w-[423px]">
-                <Table
-                  columnDefs={attachmentsColDefs(viewAttachments)}
-                  rowData={contractAttatchmentRows}
-                  styleProps={contractsStyleProps}
-                  testId="tableVenueAttach"
-                  tableHeight={335}
-                  onCellClicked={(e) => handleCellClicked(e)}
+
+              <div className=" text-primary-input-text font-bold text-sm mt-6">Notes</div>
+              <TextArea
+                onChange={(e) => editDealMemoData('Notes', e.target.value)}
+                className="h-auto w-[400px]"
+                value={dealMemoFormData.Notes}
+                disabled={!editModal || !dealMemoCreated}
+              />
+            </div>
+          </div>
+          <div className="flex flex-col gap-y-2">
+            <div className="w-[423px] flex justify-end">
+              <Button
+                onClick={() => setShowUploadModal(!showUploadModal)}
+                className="mr-1 w-33"
+                variant="primary"
+                text="Add Attachments"
+                disabled={!addAttachment || !editModal}
+              />
+            </div>
+            <div className="w-[423px]">
+              <Table
+                columnDefs={attachmentsColDefs(viewAttachments)}
+                rowData={contractAttatchmentRows}
+                styleProps={contractsStyleProps}
+                testId="tableVenueAttach"
+                tableHeight={335}
+                onCellClicked={(e) => handleCellClicked(e)}
+                gridOptions={{ suppressHorizontalScroll: true }}
+              />
+            </div>
+          </div>
+        </div>
+        <div className="w-[652px] h-[610px] max-h-[610px] overflow-y-auto rounded border-2 border-secondary ml-2 p-3 bg-primary-blue bg-opacity-15">
+          <div className="flex justify-between">
+            <div className=" text-primary-input-text font-bold text-lg">Venue Contract</div>
+            {/* 
+            NEEDS TO BE KEPT FOR NOW
+            EXPORT_VENUE_CONTRACT_DETAILS
+              <div className="flex mr-2">
+                <Button className="ml-4 w-33" variant="primary" text="Export to PDF" />
+              </div> */}
+          </div>
+          <div className="flex mt-2.5">
+            <div className="w-1/5">
+              <div className=" text-primary-input-text font-bold text-sm">Booking Status</div>
+            </div>
+            <div className="w-4/5">
+              <div className=" text-primary-input-text text-sm">{bookingStatusMap[formData.status]}</div>
+            </div>
+          </div>
+          <div className="flex mt-2.5">
+            <div className=" text-primary-input-text font-bold text-sm">Perf(s)</div>
+            <div className=" text-primary-input-text text-sm ml-5">{formData.performanceCount}</div>
+            <div className=" text-primary-input-text font-bold text-sm ml-4">Times</div>
+            <div>
+              {parseAndSortDates(formData.PerformanceTimes).map((dateTimeEntry, index) => {
+                return (
+                  <div key={index} className="text-primary-input-text  text-sm ml-4">
+                    {dateTimeEntry}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+          <div className="flex mt-2.5 items-center">
+            <div className="w-1/5">
+              <div className=" text-primary-input-text font-bold text-sm">Contract Status</div>
+            </div>
+            <div className="w-4/5 flex">
+              <Select
+                onChange={(value) => editContractModalData('StatusCode', value, 'contract')}
+                className="bg-primary-white w-full"
+                value={formData.StatusCode}
+                placeholder="Select Contract Status"
+                options={statusOptions}
+                isClearable
+                isSearchable
+                disabled={!editModal}
+              />
+            </div>
+          </div>
+          <div className="flex mt-2.5 items-center">
+            <div className="w-1/5">
+              <div className=" text-primary-input-text font-bold text-sm">Signed By Producer</div>
+            </div>
+            <div className="w-4/5 flex justify-between">
+              <Select
+                onChange={(value) => editContractModalData('SignedBy', value, 'contract')}
+                className="bg-primary-white w-52"
+                placeholder="Select User"
+                options={[...userList]}
+                isClearable
+                isSearchable
+                value={formData.SignedBy ? producerList[formData.SignedBy] : ''}
+                disabled={!editModal}
+              />
+
+              <div className="flex items-center">
+                <div className=" text-primary-input-text font-bold text-sm mr-2">Signed On</div>
+                <DateInput
+                  onChange={(value) => {
+                    value &&
+                      formData.SignedDate?.toString() !== toISO(value) &&
+                      editContractModalData('SignedDate', value, 'contract');
+                  }}
+                  position="!-left-24"
+                  value={formData.SignedDate}
+                  disabled={!editModal}
                 />
               </div>
             </div>
           </div>
-          <div className="w-[652px] h-fit rounded border-2 border-secondary ml-2 p-3 bg-primary-blue bg-opacity-15">
-            {/* 
-            NEEDS TO BE KEPT FOR NOW
-            EXPORT_VENUE_CONTRACT_DETAILS
-            <div className="flex justify-between">
-              <div className=" text-primary-input-text font-bold text-lg">Venue Contract</div>
-              <div className="flex mr-2">
-                <Button className="ml-4 w-33" variant="primary" text="Export to PDF" />
-              </div>
-            </div> */}
-            <div className="flex mt-2.5">
-              <div className="w-1/5">
-                <div className=" text-primary-input-text font-bold text-sm">Booking Status</div>
-              </div>
-              <div className="w-4/5">
-                <div className=" text-primary-input-text text-sm">{bookingStatusMap[formData.status]}</div>
-              </div>
+          <div className="flex mt-2.5 items-center">
+            <div className="w-1/5">
+              <div className=" text-primary-input-text font-bold text-sm">Returned to Venue</div>
             </div>
-            <div className="flex mt-2.5">
-              <div className=" text-primary-input-text font-bold text-sm">Perf(s)</div>
-              <div className=" text-primary-input-text text-sm ml-5">{formData.performanceCount}</div>
-              <div className=" text-primary-input-text font-bold text-sm ml-4">Times</div>
-              <div>
-                {parseAndSortDates(formData.PerformanceTimes).map((dateTimeEntry, index) => {
-                  return (
-                    <div key={index} className="text-primary-input-text  text-sm ml-4">
-                      {dateTimeEntry}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-            <div className="flex mt-2.5 items-center">
-              <div className="w-1/5">
-                <div className=" text-primary-input-text font-bold text-sm">Contract Status</div>
-              </div>
-              <div className="w-4/5 flex">
-                <Select
-                  onChange={(value) => editContractModalData('StatusCode', value, 'contract')}
-                  className="bg-primary-white w-full"
-                  value={formData.StatusCode}
-                  placeholder="Select Contract Status"
-                  options={statusOptions}
-                  isClearable
-                  isSearchable
-                  disabled={!editModal}
-                />
-              </div>
-            </div>
-            <div className="flex mt-2.5 items-center">
-              <div className="w-1/5">
-                <div className=" text-primary-input-text font-bold text-sm">Signed By Producer</div>
-              </div>
-              <div className="w-4/5 flex justify-between">
-                <Select
-                  onChange={(value) => editContractModalData('SignedBy', value, 'contract')}
-                  className="bg-primary-white w-52"
-                  placeholder="Select User"
-                  options={[...userList]}
-                  isClearable
-                  isSearchable
-                  value={formData.SignedBy ? producerList[formData.SignedBy] : ''}
-                  disabled={!editModal}
-                />
+            <div className="w-4/5 flex justify-between">
+              <DateInput
+                onChange={(value) => {
+                  value &&
+                    formData.ReturnDate?.toString() !== toISO(value) &&
+                    editContractModalData('ReturnDate', value, 'contract');
+                }}
+                value={formData.ReturnDate}
+                disabled={!editModal}
+              />
+              <div className="flex items-center">
+                <div className=" text-primary-input-text font-bold text-sm mr-2">Returned from Venue</div>
 
-                <div className="flex items-center">
-                  <div className=" text-primary-input-text font-bold text-sm mr-2">Signed On</div>
-                  <DateInput
-                    onChange={(value) => {
-                      value &&
-                        formData.SignedDate?.toString() !== toISO(value) &&
-                        editContractModalData('SignedDate', value, 'contract');
-                    }}
-                    position="!-left-24"
-                    value={formData.SignedDate}
-                    disabled={!editModal}
-                  />
-                </div>
-              </div>
-            </div>
-            <div className="flex mt-2.5 items-center">
-              <div className="w-1/5">
-                <div className=" text-primary-input-text font-bold text-sm">Returned to Venue</div>
-              </div>
-              <div className="w-4/5 flex justify-between">
                 <DateInput
                   onChange={(value) => {
                     value &&
-                      formData.ReturnDate?.toString() !== toISO(value) &&
-                      editContractModalData('ReturnDate', value, 'contract');
+                      formData.ReceivedBackDate?.toString() !== toISO(value) &&
+                      editContractModalData('ReceivedBackDate', value, 'contract');
                   }}
-                  value={formData.ReturnDate}
+                  value={formData.ReceivedBackDate}
+                  className="z-[1000]"
+                  position="!-left-24"
                   disabled={!editModal}
                 />
-                <div className="flex items-center">
-                  <div className=" text-primary-input-text font-bold text-sm mr-2">Returned from Venue</div>
-
-                  <DateInput
-                    onChange={(value) => {
-                      value &&
-                        formData.ReceivedBackDate?.toString() !== toISO(value) &&
-                        editContractModalData('ReceivedBackDate', value, 'contract');
-                    }}
-                    value={formData.ReceivedBackDate}
-                    className="z-[1000]"
-                    position="!-left-24"
-                    disabled={!editModal}
-                  />
-                </div>
               </div>
             </div>
-            <div className="flex mt-4 mb-4 items-center">
-              <div className="flex flex-1 items-center">
-                <div className=" text-primary-input-text font-bold text-sm mr-5">Bank Details Sent</div>
-                <Checkbox
-                  className="flex flex-row-reverse"
-                  labelClassName="!text-base"
-                  id="includeExcludedVenues"
+          </div>
+          <div className="flex mt-4 mb-4 items-center">
+            <div className="flex flex-1 items-center">
+              <div className=" text-primary-input-text font-bold text-sm mr-5">Bank Details Sent</div>
+              <Checkbox
+                className="flex flex-row-reverse"
+                labelClassName="!text-base"
+                id="includeExcludedVenues"
+                onChange={(e) => {
+                  editContractModalData('BankDetailsSent', e.target.value, 'contract');
+                }}
+                checked={formData.BankDetailsSent}
+                disabled={!editModal}
+              />
+            </div>
+            <div className="flex flex-1 items-center justify-center">
+              <div className=" text-primary-input-text font-bold text-sm mr-5">Tech Spec Sent</div>
+              <Checkbox
+                className="flex flex-row-reverse"
+                labelClassName="!text-base"
+                id="includeExcludedVenues"
+                onChange={(e) => {
+                  editContractModalData('TechSpecSent', e.target.value, 'contract');
+                }}
+                checked={formData.TechSpecSent}
+                disabled={!editModal}
+              />
+            </div>
+            <div className="flex flex-1 items-center justify-end">
+              <div className=" text-primary-input-text font-bold text-sm mr-5">PRS Certificate Sent</div>
+              <Checkbox
+                className="flex flex-row-reverse"
+                labelClassName="!text-base"
+                id="includeExcludedVenues"
+                onChange={(e) => {
+                  editContractModalData('PRSCertSent', e.target.value, 'contract');
+                }}
+                checked={formData.PRSCertSent}
+                disabled={!editModal}
+              />
+            </div>
+          </div>
+
+          <div className="flex mt-2.5 items-center">
+            <div className="w-1/5">
+              <div className=" text-primary-input-text font-bold text-sm">Deal Type</div>
+            </div>
+            <div className="w-4/5 flex">
+              <Select
+                onChange={(value) => editContractModalData('DealType', value, 'contract')}
+                className="bg-primary-white w-60"
+                value={formData.DealType ? formData.DealType : 'NULL'}
+                placeholder="Deal Type"
+                options={dealTypeOptions}
+                isClearable
+                isSearchable
+                disabled={!editModal}
+              />
+            </div>
+          </div>
+          <div className="flex mt-2.5 items-center">
+            <div className="w-1/5">
+              <div className=" text-primary-input-text font-bold text-sm">Details</div>
+            </div>
+            <div className="w-4/5">
+              <TextArea
+                className="mt-2.5 h-auto w-[498px]"
+                value={formData.DealNotes}
+                onChange={(value) => editContractModalData('DealNotes', value.target.value, 'booking')}
+                placeholder="Enter Deal Details"
+                disabled={!editModal}
+              />
+            </div>
+          </div>
+          <div className="flex mt-2.5 items-center">
+            <div className="w-1/5">
+              <div className=" text-primary-input-text font-bold text-sm">Gross Potential</div>
+            </div>
+            <div className="w-4/5 flex items-center justify-between">
+              <div className="flex  items-center">
+                <div className=" text-primary-input-text font-bold text-sm mr-1">{currency?.symbol}</div>
+                <TextInput
+                  type="number"
+                  className="w-[100px]"
+                  value={formData.GP}
                   onChange={(e) => {
-                    editContractModalData('BankDetailsSent', e.target.value, 'contract');
+                    if (checkDecimalStringFormat(e.target.value, 10, 2)) {
+                      editContractModalData('GP', e.target.value, 'contract');
+                    }
                   }}
-                  checked={formData.BankDetailsSent}
+                  onBlur={(e) => {
+                    editContractModalData('GP', formatDecimalOnBlur(e), 'contract');
+                  }}
                   disabled={!editModal}
                 />
               </div>
-              <div className="flex flex-1 items-center justify-center">
-                <div className=" text-primary-input-text font-bold text-sm mr-5">Tech Spec Sent</div>
-                <Checkbox
-                  className="flex flex-row-reverse"
-                  labelClassName="!text-base"
-                  id="includeExcludedVenues"
+              <div className="flex  items-center">
+                <div className=" text-primary-input-text font-bold text-sm mr-1">Royalty</div>
+                <TextInput
+                  testId="deal-royalty-percentage"
+                  className={classNames('w-[100px]', errors.royaltyPerc ? 'text-primary-red' : '')}
+                  value={formData.RoyaltyPercentage}
+                  type="number"
                   onChange={(e) => {
-                    editContractModalData('TechSpecSent', e.target.value, 'contract');
+                    if (parseFloat(e.target.value) < 0 || parseFloat(e.target.value) > 100) {
+                      setErrors({ ...errors, royaltyPerc: true });
+                    } else {
+                      setErrors({ ...errors, royaltyPerc: false });
+                    }
+
+                    editContractModalData('RoyaltyPercentage', e.target.value, 'contract');
                   }}
-                  checked={formData.TechSpecSent}
                   disabled={!editModal}
-                />
+                />{' '}
+                <div className=" text-primary-input-text font-bold text-sm ml-1">%</div>
               </div>
-              <div className="flex flex-1 items-center justify-end">
-                <div className=" text-primary-input-text font-bold text-sm mr-5">PRS Certificate Sent</div>
-                <Checkbox
-                  className="flex flex-row-reverse"
-                  labelClassName="!text-base"
-                  id="includeExcludedVenues"
+              <div className="flex  items-center">
+                <div className=" text-primary-input-text font-bold text-sm mr-1">Promoter</div>
+                <TextInput
+                  testId="deal-promoter-percentage"
+                  className={classNames('w-[100px]', errors.promoterPerc ? 'text-primary-red' : '')}
+                  value={formData.PromoterPercent}
+                  type="number"
                   onChange={(e) => {
-                    editContractModalData('PRSCertSent', e.target.value, 'contract');
+                    if (parseFloat(e.target.value) < 0 || parseFloat(e.target.value) > 100) {
+                      setErrors({ ...errors, promoterPerc: true });
+                    } else {
+                      setErrors({ ...errors, promoterPerc: false });
+                    }
+                    editContractModalData('PromoterPercent', e.target.value, 'contract');
                   }}
-                  checked={formData.PRSCertSent}
                   disabled={!editModal}
-                />
+                />{' '}
+                <div className=" text-primary-input-text font-bold text-sm ml-1">%</div>
               </div>
+            </div>{' '}
+          </div>
+          {(errors.royaltyPerc || errors.promoterPerc) && (
+            <div className="w-full flex items-center mt-2 text-primary-red ml-[124px]">
+              Percentage value must be between 0 and 100
             </div>
+          )}
+          <div className="flex mt-2.5 items-center">
+            <div className="w-1/5">
+              <div className=" text-primary-input-text font-bold text-sm">Ticket Pricing Notes</div>
+            </div>
+            <div className="w-4/5">
+              <TextArea
+                className="mt-2.5 h-auto w-[498px]"
+                value={formData.TicketPriceNotes}
+                onChange={(value) => editContractModalData('TicketPriceNotes', value.target.value, 'booking')}
+                placeholder="Enter Ticket Pricing Notes"
+                disabled={!editModal}
+              />
+            </div>
+          </div>
+          <div className="flex mt-2.5 items-center">
+            <div className="w-1/5">
+              <div className=" text-primary-input-text font-bold text-sm">Marketing Deal</div>
+            </div>
+            <div className="w-4/5">
+              <TextArea
+                className="mt-2.5 h-auto w-[498px]"
+                value={formData.MarketingDealNotes}
+                onChange={(value) => editContractModalData('MarketingDealNotes', value.target.value, 'booking')}
+                placeholder="Enter Marketing Deal"
+                disabled={!editModal}
+              />
+            </div>
+          </div>
+          <div className="flex mt-2.5 items-center">
+            <div className="w-1/5">
+              <div className=" text-primary-input-text font-bold text-sm">Crew Notes</div>
+            </div>
+            <div className="w-4/5">
+              <TextArea
+                className="mt-2.5 w-[498px] h-auto"
+                value={formData.CrewNotes}
+                onChange={(value) => editContractModalData('CrewNotes', value.target.value, 'booking')}
+                placeholder="Enter Crew Notes"
+                disabled={!editModal}
+              />
+            </div>
+          </div>
+          <div className="flex mt-2.5  ">
+            <div className="w-1/5">
+              <div className=" text-primary-input-text font-bold text-sm">Barring Clause</div>
+            </div>
+            <div className="w-4/5 flex gap-x-5">
+              <div className="flex">
+                <div className=" text-primary-input-text font-bold text-sm mr-2">Pre Show</div>
+                <div className=" text-primary-input-text  text-sm">
+                  {venue.BarringWeeksPre ? venue.BarringWeeksPre : '-'}
+                </div>
+              </div>
 
-            <div className="flex mt-2.5 items-center">
-              <div className="w-1/5">
-                <div className=" text-primary-input-text font-bold text-sm">Deal Type</div>
-              </div>
-              <div className="w-4/5 flex">
-                <Select
-                  onChange={(value) => editContractModalData('DealType', value, 'contract')}
-                  className="bg-primary-white w-60"
-                  value={formData.DealType ? formData.DealType : 'NULL'}
-                  placeholder="Deal Type"
-                  options={dealTypeOptions}
-                  isClearable
-                  isSearchable
-                  disabled={!editModal}
-                />
-              </div>
-            </div>
-            <div className="flex mt-2.5 items-center">
-              <div className="w-1/5">
-                <div className=" text-primary-input-text font-bold text-sm">Details</div>
-              </div>
-              <div className="w-4/5">
-                <TextArea
-                  className="mt-2.5 h-auto w-[498px]"
-                  value={formData.DealNotes}
-                  onChange={(value) => editContractModalData('DealNotes', value.target.value, 'booking')}
-                  placeholder="Enter Deal Details"
-                  disabled={!editModal}
-                />
-              </div>
-            </div>
-            <div className="flex mt-2.5 items-center">
-              <div className="w-1/5">
-                <div className=" text-primary-input-text font-bold text-sm">Gross Potential</div>
-              </div>
-              <div className="w-4/5 flex items-center justify-between">
-                <div className="flex  items-center">
-                  <div className=" text-primary-input-text font-bold text-sm mr-1">{currency?.symbol}</div>
-                  <TextInput
-                    type="number"
-                    className="w-[100px]"
-                    value={formData.GP}
-                    onChange={(e) => {
-                      if (checkDecimalStringFormat(e.target.value, 10, 2)) {
-                        editContractModalData('GP', e.target.value, 'contract');
-                      }
-                    }}
-                    onBlur={(e) => {
-                      editContractModalData('GP', formatDecimalOnBlur(e), 'contract');
-                    }}
-                    disabled={!editModal}
-                  />
-                </div>
-                <div className="flex  items-center">
-                  <div className=" text-primary-input-text font-bold text-sm mr-1">Royalty</div>
-                  <TextInput
-                    testId="deal-royalty-percentage"
-                    className={classNames('w-[100px]', errors.royaltyPerc ? 'text-primary-red' : '')}
-                    value={formData.RoyaltyPercentage}
-                    type="number"
-                    onChange={(e) => {
-                      if (parseFloat(e.target.value) < 0 || parseFloat(e.target.value) > 100) {
-                        setErrors({ ...errors, royaltyPerc: true });
-                      } else {
-                        setErrors({ ...errors, royaltyPerc: false });
-                      }
-
-                      editContractModalData('RoyaltyPercentage', e.target.value, 'contract');
-                    }}
-                    disabled={!editModal}
-                  />{' '}
-                  <div className=" text-primary-input-text font-bold text-sm ml-1">%</div>
-                </div>
-                <div className="flex  items-center">
-                  <div className=" text-primary-input-text font-bold text-sm mr-1">Promoter</div>
-                  <TextInput
-                    testId="deal-promoter-percentage"
-                    className={classNames('w-[100px]', errors.promoterPerc ? 'text-primary-red' : '')}
-                    value={formData.PromoterPercent}
-                    type="number"
-                    onChange={(e) => {
-                      if (parseFloat(e.target.value) < 0 || parseFloat(e.target.value) > 100) {
-                        setErrors({ ...errors, promoterPerc: true });
-                      } else {
-                        setErrors({ ...errors, promoterPerc: false });
-                      }
-                      editContractModalData('PromoterPercent', e.target.value, 'contract');
-                    }}
-                    disabled={!editModal}
-                  />{' '}
-                  <div className=" text-primary-input-text font-bold text-sm ml-1">%</div>
-                </div>
-              </div>{' '}
-            </div>
-            {(errors.royaltyPerc || errors.promoterPerc) && (
-              <div className="w-full flex items-center mt-2 text-primary-red ml-[124px]">
-                Percentage value must be between 0 and 100
-              </div>
-            )}
-            <div className="flex mt-2.5 items-center">
-              <div className="w-1/5">
-                <div className=" text-primary-input-text font-bold text-sm">Ticket Pricing Notes</div>
-              </div>
-              <div className="w-4/5">
-                <TextArea
-                  className="mt-2.5 h-auto w-[498px]"
-                  value={formData.TicketPriceNotes}
-                  onChange={(value) => editContractModalData('TicketPriceNotes', value.target.value, 'booking')}
-                  placeholder="Enter Ticket Pricing Notes"
-                  disabled={!editModal}
-                />
-              </div>
-            </div>
-            <div className="flex mt-2.5 items-center">
-              <div className="w-1/5">
-                <div className=" text-primary-input-text font-bold text-sm">Marketing Deal</div>
-              </div>
-              <div className="w-4/5">
-                <TextArea
-                  className="mt-2.5 h-auto w-[498px]"
-                  value={formData.MarketingDealNotes}
-                  onChange={(value) => editContractModalData('MarketingDealNotes', value.target.value, 'booking')}
-                  placeholder="Enter Marketing Deal"
-                  disabled={!editModal}
-                />
-              </div>
-            </div>
-            <div className="flex mt-2.5 items-center">
-              <div className="w-1/5">
-                <div className=" text-primary-input-text font-bold text-sm">Crew Notes</div>
-              </div>
-              <div className="w-4/5">
-                <TextArea
-                  className="mt-2.5 w-[498px] h-auto"
-                  value={formData.CrewNotes}
-                  onChange={(value) => editContractModalData('CrewNotes', value.target.value, 'booking')}
-                  placeholder="Enter Crew Notes"
-                  disabled={!editModal}
-                />
-              </div>
-            </div>
-            <div className="flex mt-2.5  ">
-              <div className="w-1/5">
-                <div className=" text-primary-input-text font-bold text-sm">Barring Clause</div>
-              </div>
-              <div className="w-4/5 flex gap-x-5">
-                <div className="flex">
-                  <div className=" text-primary-input-text font-bold text-sm mr-2">Pre Show</div>
-                  <div className=" text-primary-input-text  text-sm">
-                    {venue.BarringWeeksPre ? venue.BarringWeeksPre : '-'}
-                  </div>
-                </div>
-
-                <div className="flex ">
-                  <div className=" text-primary-input-text font-bold text-sm mr-2">Post Show</div>
-                  <div className=" text-primary-input-text  text-sm">
-                    {venue.BarringWeeksPost ? venue.BarringWeeksPost : '-'}
-                  </div>
-                </div>
-                <div className="flex ">
-                  <div className=" text-primary-input-text font-bold text-sm mr-2">Miles</div>
-                  <div className=" text-primary-input-text  text-sm">
-                    {venue.BarringMiles ? venue.BarringMiles : '-'}
-                  </div>
+              <div className="flex ">
+                <div className=" text-primary-input-text font-bold text-sm mr-2">Post Show</div>
+                <div className=" text-primary-input-text  text-sm">
+                  {venue.BarringWeeksPost ? venue.BarringWeeksPost : '-'}
                 </div>
               </div>
-            </div>
-            <div className="flex mt-2.5 items-center">
-              <div className="w-1/5">
-                <div className=" text-primary-input-text font-bold text-sm"> </div>
-              </div>
-              <div className="w-4/5 flex">
-                <div className=" text-primary-input-text font-bold text-sm mr-2">Venues</div>
-                <div className=" text-primary-input-text  text-sm ml-3">
-                  {barredVenues && barredVenues.length > 0
-                    ? barredVenues.map((venue) => {
-                        return <div key={venue.id}>{venue.venueName}</div>;
-                      })
-                    : '-'}
-                </div>
+              <div className="flex ">
+                <div className=" text-primary-input-text font-bold text-sm mr-2">Miles</div>
+                <div className=" text-primary-input-text  text-sm">{venue.BarringMiles ? venue.BarringMiles : '-'}</div>
               </div>
             </div>
-            <div className="flex mt-2.5 items-center">
-              <div className="w-1/5">
-                <div className=" text-primary-input-text font-bold text-sm">Exceptions</div>
-              </div>
-              <div className="w-4/5">
-                <TextArea
-                  className="mt-2.5 h-auto w-[498px]"
-                  value={formData.Exceptions}
-                  onChange={(value) => editContractModalData('Exceptions', value.target.value, 'contract')}
-                  placeholder="Enter Exceptions Notes"
-                  disabled={!editModal}
-                />
+          </div>
+          <div className="flex mt-2.5 items-center">
+            <div className="w-1/5">
+              <div className=" text-primary-input-text font-bold text-sm"> </div>
+            </div>
+            <div className="w-4/5 flex">
+              <div className=" text-primary-input-text font-bold text-sm mr-2">Venues</div>
+              <div className=" text-primary-input-text  text-sm ml-3">
+                {barredVenues && barredVenues.length > 0
+                  ? barredVenues.map((venue) => {
+                      return <div key={venue.id}>{venue.venueName}</div>;
+                    })
+                  : '-'}
               </div>
             </div>
-            <div className="flex mt-2.5 items-center">
-              <div className="w-1/5">
-                <div className=" text-primary-input-text font-bold text-sm">Contract Notes</div>
-              </div>
-              <div className="w-4/5">
-                <TextArea
-                  className="mt-2.5 h-auto w-[498px]"
-                  value={formData.Notes}
-                  onChange={(value) => editContractModalData('Notes', value.target.value, 'contract')}
-                  placeholder="Enter Contract Notes"
-                  disabled={!editModal}
-                />
-              </div>
+          </div>
+          <div className="flex mt-2.5 items-center">
+            <div className="w-1/5">
+              <div className=" text-primary-input-text font-bold text-sm">Exceptions</div>
             </div>
-            <div className="flex mt-2.5 items-center">
-              <div className="w-1/5">
-                <div className=" text-primary-input-text font-bold text-sm">Merchandise Notes</div>
-              </div>
-              <div className="w-4/5">
-                <TextArea
-                  className="mt-2.5 h-auto w-[498px]"
-                  value={formData.MerchandiseNotes}
-                  onChange={(value) => editContractModalData('MerchandiseNotes', value.target.value, 'booking')}
-                  placeholder="Enter Merchandise Notes"
-                  disabled={!editModal}
-                />
-              </div>
+            <div className="w-4/5">
+              <TextArea
+                className="mt-2.5 h-auto w-[498px]"
+                value={formData.Exceptions}
+                onChange={(value) => editContractModalData('Exceptions', value.target.value, 'contract')}
+                placeholder="Enter Exceptions Notes"
+                disabled={!editModal}
+              />
+            </div>
+          </div>
+          <div className="flex mt-2.5 items-center">
+            <div className="w-1/5">
+              <div className=" text-primary-input-text font-bold text-sm">Contract Notes</div>
+            </div>
+            <div className="w-4/5">
+              <TextArea
+                className="mt-2.5 h-auto w-[498px]"
+                value={formData.Notes}
+                onChange={(value) => editContractModalData('Notes', value.target.value, 'contract')}
+                placeholder="Enter Contract Notes"
+                disabled={!editModal}
+              />
+            </div>
+          </div>
+          <div className="flex mt-2.5 items-center">
+            <div className="w-1/5">
+              <div className=" text-primary-input-text font-bold text-sm">Merchandise Notes</div>
+            </div>
+            <div className="w-4/5">
+              <TextArea
+                className="mt-2.5 h-auto w-[498px]"
+                value={formData.MerchandiseNotes}
+                onChange={(value) => editContractModalData('MerchandiseNotes', value.target.value, 'booking')}
+                placeholder="Enter Merchandise Notes"
+                disabled={!editModal}
+              />
             </div>
           </div>
         </div>
       </div>
-      <div className="w-full mt-4 flex justify-end items-center">
-        <Button onClick={() => handleCancelForm(false)} className="w-33" variant="secondary" text="Cancel" />
-        <Button onClick={handleFormData} className="ml-4 w-33" variant="primary" text="Save and Close" />
-      </div>
+
       {showUploadModal && (
         <UploadModal
           visible={showUploadModal}

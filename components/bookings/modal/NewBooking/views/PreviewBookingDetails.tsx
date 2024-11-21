@@ -242,13 +242,14 @@ export default function PreviewBookingDetails({
   }, [originalRows, updatedRows]);
 
   return (
-    <div className="w-[700px] lg:w-[1386px] h-full  z-[999] flex flex-col ">
+    <div className="w-[700px] lg:w-[1386px] h-full  z-[999] flex flex-col">
       <Table
         testId="preview-booking-details"
         gridOptions={gridOptions}
         rowData={rows}
         columnDefs={previewColumnDefs}
         styleProps={styleProps}
+        tableHeight={650}
       />
     </div>
   );
