@@ -712,12 +712,6 @@ export const weeks = (showDate: string, firstShowDate: string): number => {
 };
 
 // DEPRECATED
-export const formatDateUK = (date) => {
-  const today = new Date(date);
-  return today.toLocaleDateString('en-GB');
-};
-
-// DEPRECATED
 export const formatShortDateUK = (date) => {
   return format(new Date(date), 'dd/MM/yy');
 };
