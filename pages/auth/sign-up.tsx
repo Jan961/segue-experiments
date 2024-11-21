@@ -38,7 +38,7 @@ const DEFAULT_ACCOUNT_DETAILS = {
 
 const SignUp = () => {
   const router = useRouter();
-  const { signIn, signOut, navigateToHome } = useAuth();
+  const { signIn, signOut, navigateToHome, getSignInUrl } = useAuth();
   const [isBusy, setIsBusy] = useState(false);
   const { isSignedIn, setUserPermissions } = usePermissions();
   const [error, setError] = useState('');
@@ -131,15 +131,15 @@ const SignUp = () => {
         password: accountDetails.password,
       });
       // Prepare email address verification
-      await result.prepareEmailAddressVerification({
+      const emailVerification = await result.prepareEmailAddressVerification({
         strategy: 'email_link',
         redirectUrl: `${window.location.origin}/sign-in`,
       });
-      return true;
+      console.log('emailVerification', emailVerification);
     } catch (err) {
       setError(err.errors[0].code);
       console.error('error', err.errors[0].longMessage);
-      return false;
+      throw err;
     }
   };
 
@@ -184,8 +184,13 @@ const SignUp = () => {
       // Authenticate the user within clerk first to check if we have a valid password
       await signIn(accountDetails.email, accountDetails.password);
 
+      const sigInUrl = getSignInUrl();
       // Create the user in our database
-      const { data } = await axios.post('/api/user/create-admin-user', { user: accountDetails, accountUserOnly: true });
+      const { data } = await axios.post('/api/user/create-admin-user', {
+        user: accountDetails,
+        sigInUrl,
+        accountUserOnly: true,
+      });
 
       setSignedInExistingUserDetails({ organisationId: data.organisationId, permissions: data.permissions });
     } catch (error: any) {
