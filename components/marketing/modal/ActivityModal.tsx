@@ -16,6 +16,7 @@ import { checkDecimalStringFormat, isNull } from 'utils';
 import { useRecoilValue } from 'recoil';
 import { accessMarketingHome } from 'state/account/selectors/permissionSelector';
 import { UTCDate } from '@date-fns/utc';
+import { safeDate } from 'services/dateService';
 
 export type ActivityModalVariant = 'add' | 'edit' | 'delete';
 
@@ -75,9 +76,9 @@ export default function ActivityModal({
     } else if (variant === 'edit') {
       setActName(data.Name);
       setActType(data.ActivityTypeId);
-      setActDate(!data.Date ? null : startOfDay(data.Date));
+      setActDate(!data.Date ? null : startOfDay(safeDate(data.Date)));
       setActFollowUp(data.FollowUpRequired);
-      setFollowUpDt(!data.DueByDate ? null : startOfDay(data.DueByDate));
+      setFollowUpDt(!data.DueByDate ? null : startOfDay(safeDate(data.DueByDate)));
       setCompanyCost(data.CompanyCost.toString());
       setVenueCost(data.VenueCost.toString());
       setActNotes(data.Notes);
@@ -97,11 +98,11 @@ export default function ActivityModal({
       BookingId: bookingId,
       CompanyCost: parseFloat(companyCost),
       VenueCost: parseFloat(venueCost),
-      Date: actDate === null ? null : startOfDay(actDate),
+      Date: actDate === null ? null : startOfDay(safeDate(actDate)),
       FollowUpRequired: actFollowUp,
       Name: actName,
       Notes: actNotes,
-      DueByDate: actFollowUp ? null : !followUpDt ? null : startOfDay(followUpDt),
+      DueByDate: actFollowUp ? null : !followUpDt ? null : startOfDay(safeDate(followUpDt)),
     };
 
     // only add iD if not adding
@@ -141,11 +142,11 @@ export default function ActivityModal({
         BookingId: bookingId,
         CompanyCost: parseFloat(companyCost),
         VenueCost: parseFloat(venueCost),
-        Date: !isNull(actDate) ? startOfDay(actDate) : null,
+        Date: !isNull(actDate) ? startOfDay(safeDate(actDate)) : null,
         FollowUpRequired: actFollowUp,
         Name: actName,
         Notes: actNotes,
-        DueByDate: actFollowUp ? (isNull(followUpDt) ? null : startOfDay(followUpDt)) : null,
+        DueByDate: actFollowUp ? (isNull(followUpDt) ? null : startOfDay(safeDate(followUpDt))) : null,
       };
 
       if (hasActivityChanged(data, changedRow)) {
