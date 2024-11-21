@@ -712,14 +712,6 @@ export const weeks = (showDate: string, firstShowDate: string): number => {
 };
 
 // DEPRECATED
-export const formatTime = (timestamp) => {
-  // This will ignre date
-  const today = new Date(timestamp);
-  // const options = { hours: '2-digit', minutes: '2-digit', seconds: '2-digit' }
-  return today.toLocaleTimeString();
-};
-
-// DEPRECATED
 export const formatDateUK = (date) => {
   const today = new Date(date);
   return today.toLocaleDateString('en-GB');
