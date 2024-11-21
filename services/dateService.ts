@@ -712,12 +712,6 @@ export const weeks = (showDate: string, firstShowDate: string): number => {
 };
 
 // DEPRECATED
-export const timeNow = () => {
-  const today = new Date();
-  return today.getHours().toFixed() + ':' + today.getMinutes().toFixed() + ':' + today.getSeconds().toFixed();
-};
-
-// DEPRECATED
 export const formatTime = (timestamp) => {
   // This will ignre date
   const today = new Date(timestamp);
