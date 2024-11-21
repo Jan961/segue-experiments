@@ -22,7 +22,7 @@ import {
   VenueContractFormData,
 } from 'interfaces';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
-import { formattedDateWithDay, newDate, toISO } from 'services/dateService';
+import { formattedDateWithWeekDay, newDate, toISO } from 'services/dateService';
 import { EditDealMemoContractModal } from './EditDealMemoContractModal';
 import { isNullOrEmpty, transformToOptions, checkDecimalStringFormat, formatDecimalOnBlur } from 'utils';
 import LoadingOverlay from 'components/core-ui-lib/LoadingOverlay';
@@ -212,11 +212,16 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
   useEffect(() => {
     const lastDate = lastDates.find((date) => date.BookingId === formData.Id)?.LastPerformanceDate;
     if (!lastDate) return;
-    const formattedLastDate = formattedDateWithDay(lastDate);
+    const formattedLastDate = formattedDateWithWeekDay(lastDate, 'Long');
     const lastPerformanceDate =
-      formattedLastDate === formattedDateWithDay(newDate(formData.FirstDate)) ? '' : `to ${formattedLastDate}`;
+      formattedLastDate === formattedDateWithWeekDay(newDate(formData.FirstDate), 'Short')
+        ? ''
+        : `to ${formattedLastDate}`;
     const title = `${selectedTableCell.contract.productionName.replace('- ', '')} | 
-    ${selectedTableCell.contract.venue} | ${formattedDateWithDay(newDate(formData.FirstDate))} ${lastPerformanceDate}`;
+    ${selectedTableCell.contract.venue} | ${formattedDateWithWeekDay(
+      newDate(formData.FirstDate),
+      'Short',
+    )} ${lastPerformanceDate}`;
     setModalTitle(title);
   }, [lastDates]);
 

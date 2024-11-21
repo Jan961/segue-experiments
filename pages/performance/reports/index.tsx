@@ -4,8 +4,7 @@ import { getReportsList } from 'services/performanceReports';
 import Layout from 'components/Layout';
 import { useCallback, useState } from 'react';
 import axios from 'axios';
-import { formatDate } from 'date-fns';
-import { dateTimeToTime } from 'services/dateService';
+import { dateTimeToTime, formattedDateWithWeekDay } from 'services/dateService';
 
 export default function Reports({ reports }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const [rows, setRows] = useState(reports);
@@ -65,7 +64,7 @@ export default function Reports({ reports }: InferGetServerSidePropsType<typeof 
                   <td className="px-4 py-2 border">{venue}</td>
                   <td className="px-4 py-2 border">{performanceId}</td>
                   <td className="px-4 py-2 border">
-                    {formatDate(performanceDate, 'eee dd/MM/yyyy')} at {dateTimeToTime(performanceTime)}
+                    {formattedDateWithWeekDay(performanceDate, 'Long')} at {dateTimeToTime(performanceTime)}
                   </td>
                   <td className="px-4 py-2 border">
                     <div className="flex gap-1">

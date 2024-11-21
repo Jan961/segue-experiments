@@ -12,7 +12,7 @@ import {
 import { getWeekNumsToDateMap } from 'utils/getDateFromWeekNum';
 import { group } from 'radash';
 import { makeRowTextBoldAndAllignLeft } from './promoter-holds';
-import { calculateWeekNumber, formatDate, formattedDateWithDay, newDate } from 'services/dateService';
+import { calculateWeekNumber, formatDate, formattedDateWithWeekDay, newDate } from 'services/dateService';
 import { COLOR_HEXCODE, colorTextAndBGCell } from 'services/salesSummaryService';
 import { addWidthAsPerContent, applyGradientFillToColumn } from 'services/reportsService';
 import { addBorderToAllCells } from 'utils/export';
@@ -120,9 +120,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
               `${fullProductionCode}-${Code}`,
               Name,
               startWeek || '',
-              formattedDateWithDay(weekNumToDateMap[StartByWeekNum]),
+              formattedDateWithWeekDay(weekNumToDateMap[StartByWeekNum], 'Short'),
               dueWeek || '',
-              formattedDateWithDay(weekNumToDateMap[CompleteByWeekNum]),
+              formattedDateWithWeekDay(weekNumToDateMap[CompleteByWeekNum], 'Short'),
               Progress,
               status,
               `${FirstName || ''} ${LastName || ''}`,

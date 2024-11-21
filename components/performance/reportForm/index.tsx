@@ -11,7 +11,7 @@ import { TextField } from './TextField';
 import { TimeRange } from './TimeRange';
 import { StyledTimeField } from './StyledTimeField';
 import { GetOutField } from './GetOutField';
-import { dateTimeToTime, formatDate, formatDuration, getDuration } from 'services/dateService';
+import { dateTimeToTime, formatDuration, formattedDateWithWeekDay, getDuration } from 'services/dateService';
 
 interface ReportFormProps {
   bookingId?: string;
@@ -203,7 +203,7 @@ const ReportForm = ({
             label="Performance Date"
             value={
               performanceDate !== undefined && isValid(performanceDate)
-                ? formatDate(performanceDate, 'eee dd/MM/yyyy')
+                ? formattedDateWithWeekDay(performanceDate, 'Long')
                 : ''
             }
             disabled

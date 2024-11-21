@@ -684,13 +684,6 @@ export const dateToPicker = (dateToFormat: Date | string) => {
 };
 
 // DEPRECATED
-export const formattedDateWithDay = (date: UTCDate) => {
-  if (!date) return '';
-  const dateFormat = 'E..EEE/MM/yy';
-  return format(date, dateFormat);
-};
-
-// DEPRECATED
 export const safeDate = (date: Date | string) => {
   if (typeof date === 'string') return new Date(date);
   return date;

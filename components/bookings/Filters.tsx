@@ -13,7 +13,7 @@ import { productionJumpState } from 'state/booking/productionJumpState';
 import useMileageCalculator from 'hooks/useBookingMileageCalculator';
 import BookingsButtons from './BookingsButton';
 import { accessBookingsHome } from 'state/account/selectors/permissionSelector';
-import { formatDate, newDate } from 'services/dateService';
+import { formattedDateWithWeekDay, newDate } from 'services/dateService';
 
 interface FiltersProps {
   onExportClick?: (key: string) => void;
@@ -40,7 +40,7 @@ const Filters = ({ onExportClick }: FiltersProps) => {
     setFilter({ ...filter, [e.target.id]: e.target.value });
   };
   const gotoToday = () => {
-    const dateToScrollTo = formatDate(newDate(), 'E..EEE dd/MM/yy');
+    const dateToScrollTo = formattedDateWithWeekDay(newDate(), 'Short');
     if (todayOnSchedule) {
       setFilter({ ...filter, scrollToDate: dateToScrollTo });
     }
