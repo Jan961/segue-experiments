@@ -116,7 +116,7 @@ export const PersonDetailsTab = ({
 
   return (
     <>
-      <div className={`${height} w-full py-5 ${className}`}>
+      <div className={`${height} w-full ${className}`}>
         <div className="text-xl text-primary-navy font-bold mb-3">Person Details</div>
         <PersonalDetails
           disabled={isPersonDetailsDisabled(departmentId)}
