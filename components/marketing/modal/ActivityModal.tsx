@@ -76,7 +76,7 @@ export default function ActivityModal({
     } else if (variant === 'edit') {
       setActName(data.Name);
       setActType(data.ActivityTypeId);
-      setActDate(!data.Date ? null : startOfDay(safeDate(data.Date)));
+      setActDate(!safeDate(data.Date) ? null : startOfDay(safeDate(data.Date)));
       setActFollowUp(data.FollowUpRequired);
       setFollowUpDt(!data.DueByDate ? null : startOfDay(data.DueByDate));
       setCompanyCost(data.CompanyCost.toString());
