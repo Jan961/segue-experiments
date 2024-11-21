@@ -131,11 +131,10 @@ const SignUp = () => {
         password: accountDetails.password,
       });
       // Prepare email address verification
-      const emailVerification = await result.prepareEmailAddressVerification({
+      await result.prepareEmailAddressVerification({
         strategy: 'email_link',
         redirectUrl: `${window.location.origin}/sign-in`,
       });
-      console.log('emailVerification', emailVerification);
     } catch (err) {
       setError(err.errors[0].code);
       console.error('error', err.errors[0].longMessage);

@@ -87,10 +87,6 @@ const NewAccount = ({
   const [loading, setLoading] = useState(false);
   const { getSignUpUrl } = useAuth();
 
-  if (!stripe) {
-    return <div>Loading...</div>;
-  }
-
   const handleSaveAccountDetails = async (onSaveSuccess: () => void) => {
     setLoading(true);
     try {
