@@ -300,7 +300,7 @@ describe.each([
   [{ date: null }, null],
 ])('formattedDateWithWeekDay', (input: { date; weekDayFormat: 'Long' | 'Short'; locale: Locale }, expected) => {
   test(`Expect ${input.date} to be ${expected}`, () => {
-    expect(formattedDateWithWeekDayV2(input.date, input.weekDayFormat, input.locale)).toStrictEqual(expected);
+    expect(formattedDateWithWeekDay(input.date, input.weekDayFormat, input.locale)).toStrictEqual(expected);
   });
 });
 
