@@ -102,6 +102,33 @@ const getTotalInPound = ({ totalOfCurrency, conversionRate }) => {
   return totalOfCurrency['£'] ? new Decimal(totalOfCurrency['£']).plus(finalValOfEuro).toNumber() : finalValOfEuro;
 };
 
+const findNextBookingDate = (
+  currentDate: string,
+  map: Record<string, SALES_SUMMARY>,
+  FullProductionCode: string,
+  ShowName: string,
+  maxDays = 30, // Safety limit to prevent infinite loop
+): string | null => {
+  let checkDate = currentDate;
+  let daysChecked = 0;
+
+  while (daysChecked < maxDays) {
+    // Move to next date
+    checkDate = formatDate(add(parseISO(checkDate), { days: 1 }), 'yyyy-MM-dd');
+    daysChecked++;
+
+    // Check if this date has a booking entry
+    const key = getKey({ FullProductionCode, ShowName, EntryDate: checkDate });
+    const entry = map[key];
+
+    if (entry?.EntryType === 'Booking') {
+      return checkDate;
+    }
+  }
+
+  return null; // No booking found in next 30 days
+};
+
 const handler = async (req, res) => {
   try {
     const prisma = await getPrismaClient(req);
@@ -224,6 +251,7 @@ const handler = async (req, res) => {
       const weekDay = formatDate(add(parseISO(fromDate?.toISOString()), { days: i - 1 }), 'eeee');
       const dateInIncomingFormat = formatDate(add(parseISO(fromDate?.toISOString()), { days: i - 1 }), 'yyyy-MM-dd');
       const nextDateInIncomingFormat = formatDate(add(parseISO(fromDate?.toISOString()), { days: i }), 'yyyy-MM-dd');
+      const nextBookingDate = findNextBookingDate(dateInIncomingFormat, map, FullProductionCode, ShowName);
       const date = formatDate(dateInIncomingFormat, 'dd/MM/yy');
       const weekNumber = calculateWeekNumber(fromDate, getDateObject(dateInIncomingFormat));
       if (i === 1 && weekDay !== 'Monday') {
@@ -252,7 +280,11 @@ const handler = async (req, res) => {
       const key = getKey({ FullProductionCode, ShowName, EntryDate: dateInIncomingFormat });
       const nextKey = getKey({ FullProductionCode, ShowName, EntryDate: nextDateInIncomingFormat });
       const value: SALES_SUMMARY = map[key];
-      const nextValue: SALES_SUMMARY = map[nextKey];
+      const nextValueR: SALES_SUMMARY = map[nextKey];
+      const nextValue: SALES_SUMMARY = nextBookingDate
+        ? map[getKey({ FullProductionCode, ShowName, EntryDate: nextBookingDate })]
+        : null;
+      console.log(nextValueR, nextValue);
       const scheduleValue: SCHEDULE_VIEW = scheduleMap[key];
       const statusCode = (value || scheduleValue)?.EntryStatusCode;
       const isCancelled = statusCode === 'X';
