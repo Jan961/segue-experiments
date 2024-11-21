@@ -3,7 +3,7 @@ import DefaultCellRenderer from 'components/core-ui-lib/Table/renderers/DefaultC
 import DefaultTextRenderer from 'components/core-ui-lib/Table/renderers/DefaultTextRenderer';
 import IconRowRenderer from 'components/global/salesTable/renderers/IconRowRenderer';
 import { tileColors } from 'config/global';
-import { getTimeFromDateAndTime } from 'services/dateService';
+import { dateTimeToTime, newDate } from 'services/dateService';
 import formatInputDate from 'utils/dateInputFormat';
 import TwoLineRenderer from './TwoLineRenderer';
 import ButtonRenderer from 'components/core-ui-lib/Table/renderers/ButtonRenderer';
@@ -151,7 +151,7 @@ export const contactNoteColDefs = (updateContactNote, userList) => [
     headerName: 'Time',
     field: 'ContactTime',
     cellRenderer: function (params) {
-      return getTimeFromDateAndTime(params.data.ContactDate);
+      return dateTimeToTime(params.data.ContactDate);
     },
     cellStyle: {
       paddingLeft: '8px',
@@ -294,9 +294,9 @@ export const attachmentsColDefs = [
     field: 'FileUploadedDateTime',
     cellRenderer: DefaultTextRenderer,
     cellRendererParams: function (params) {
-      const updDate = new Date(params.data.FileUploadedDateTime);
+      const updDate = newDate(params.data.FileUploadedDateTime);
       return {
-        value: formatInputDate(updDate) + ' ' + getTimeFromDateAndTime(updDate),
+        value: formatInputDate(updDate) + ' ' + dateTimeToTime(updDate),
       };
     },
     width: 150,
@@ -306,9 +306,9 @@ export const attachmentsColDefs = [
     field: 'FileDateTime',
     cellRenderer: DefaultTextRenderer,
     cellRendererParams: function (params) {
-      const fileDt = new Date(params.data.FileDateTime);
+      const fileDt = newDate(params.data.FileDateTime);
       return {
-        value: formatInputDate(fileDt) + ' ' + getTimeFromDateAndTime(fileDt),
+        value: formatInputDate(fileDt) + ' ' + dateTimeToTime(fileDt),
       };
     },
     width: 150,

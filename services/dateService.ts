@@ -634,21 +634,6 @@ export function formatDuration(
 }
 
 // DEPRECATED
-export const getTimeFromDateAndTime = (inputDate: string | Date): string => {
-  const date = new Date(inputDate);
-
-  // Check if the date is valid
-  if (isNaN(date.getTime())) {
-    return ''; // Return an empty string or handle the error as needed
-  }
-
-  const hours = String(date.getUTCHours()).padStart(2, '0');
-  const minutes = String(date.getUTCMinutes()).padStart(2, '0');
-
-  return `${hours}:${minutes}`;
-};
-
-// DEPRECATED
 export const getWeekDayShort = (dateToFormat: UTCDate | string) => {
   if (!dateToFormat) {
     return null;

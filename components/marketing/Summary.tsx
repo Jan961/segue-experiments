@@ -1,4 +1,4 @@
-import { calculateWeekNumber, dateToSimple, getTimeFromDateAndTime, newDate } from 'services/dateService';
+import { calculateWeekNumber, dateToSimple, dateTimeToTime, newDate } from 'services/dateService';
 import axios from 'axios';
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import numeral from 'numeral';
@@ -124,7 +124,7 @@ const Summary = forwardRef<SummaryRef, SummaryProps>((props, ref) => {
       const times: any = x[1];
       const data = {
         date: x[0],
-        time: times.map((item) => (item.Time === null ? 'TBC' : getTimeFromDateAndTime(item.Time))),
+        time: times.map((item) => (item.Time === null ? 'TBC' : dateTimeToTime(item.Time))),
       };
       processed.push(data);
     });

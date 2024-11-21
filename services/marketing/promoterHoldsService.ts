@@ -2,7 +2,7 @@ import { UTCDate } from '@date-fns/utc';
 import { performanceMapper } from 'lib/mappers';
 import getPrismaClient from 'lib/prisma';
 import { NextApiRequest } from 'next';
-import { dateToSimple, getTimeFromDateAndTime } from 'services/dateService';
+import { dateToSimple, dateTimeToTime } from 'services/dateService';
 import { isNull } from 'utils';
 
 export const getPerformanceCompAllocationsByBookingId = async (bookingId: number, req: NextApiRequest) => {
@@ -52,7 +52,7 @@ export const getPerformanceCompAllocationsByBookingId = async (bookingId: number
         allocations.push({
           ...ca,
           date: dateToSimple(p.Date),
-          time: isNull(p.Time) ? 'TBC' : getTimeFromDateAndTime(p.Time),
+          time: isNull(p.Time) ? 'TBC' : dateTimeToTime(p.Time),
         });
         totalAllocated += ca.Seats;
       }

@@ -5,7 +5,7 @@ import DateInput from 'components/core-ui-lib/DateInput';
 import TextArea from 'components/core-ui-lib/TextArea/TextArea';
 import Button from 'components/core-ui-lib/Button';
 import { BookingContactNoteDTO } from 'interfaces';
-import { getTimeFromDateAndTime, toISO } from 'services/dateService';
+import { dateTimeToTime, newDate, toISO } from 'services/dateService';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import { ConfDialogVariant } from 'components/core-ui-lib/ConfirmationDialog/ConfirmationDialog';
 import { hasContactNoteChanged } from '../utils';
@@ -66,14 +66,14 @@ export default function ContactNoteModal({
     if (variant === 'add') {
       setPersonContacted('');
       setDate(new Date());
-      setTime(getTimeFromDateAndTime(new Date()));
+      setTime(dateTimeToTime(newDate()));
       setActionedBy(null);
       setNotes('');
       setShowNameLengthError(false);
     } else if (variant === 'edit') {
       setPersonContacted(data.CoContactName);
       setDate(new Date(data.ContactDate));
-      setTime(getTimeFromDateAndTime(new Date(data.ContactDate)));
+      setTime(dateTimeToTime(newDate(data.ContactDate)));
       setActionedBy(data.ActionAccUserId);
       setNotes(data.Notes);
       setId(data.Id);

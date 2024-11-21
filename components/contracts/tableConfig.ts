@@ -5,7 +5,7 @@ import DateColumnRenderer from './table/DateColumnRenderer';
 import { tileColors } from 'config/global';
 import DefaultTextRenderer from 'components/core-ui-lib/Table/renderers/DefaultTextRenderer';
 import formatInputDate from 'utils/dateInputFormat';
-import { getTimeFromDateAndTime } from 'services/dateService';
+import { dateTimeToTime, newDate } from 'services/dateService';
 import ButtonRenderer from 'components/core-ui-lib/Table/renderers/ButtonRenderer';
 import IconRowRenderer from 'components/global/salesTable/renderers/IconRowRenderer';
 import SelectCellRenderer from 'components/core-ui-lib/Table/renderers/SelectCellRenderer';
@@ -289,9 +289,9 @@ export const attachmentsColDefs = (exportPdfPermission: boolean) => [
     field: 'FileUploadedDateTime',
     cellRenderer: DefaultTextRenderer,
     cellRendererParams: function (params) {
-      const updDate = new Date(params.data.FileUploadedDateTime);
+      const updDate = newDate(params.data.FileUploadedDateTime);
       return {
-        value: formatInputDate(updDate) + ' ' + getTimeFromDateAndTime(updDate),
+        value: formatInputDate(updDate) + ' ' + dateTimeToTime(updDate),
       };
     },
     width: 100,
