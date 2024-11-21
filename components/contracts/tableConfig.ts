@@ -1,4 +1,3 @@
-import ContractStatusCellRenderer from 'components/contracts/table/ContractStatusCellRenderer';
 import DefaultCellRenderer from '../bookings/table/DefaultCellRenderer';
 import VenueColumnRenderer from './table/VenueColumnRenderer';
 import DateColumnRenderer from './table/DateColumnRenderer';
@@ -9,7 +8,12 @@ import { dateTimeToTime, newDate } from 'services/dateService';
 import ButtonRenderer from 'components/core-ui-lib/Table/renderers/ButtonRenderer';
 import IconRowRenderer from 'components/global/salesTable/renderers/IconRowRenderer';
 import SelectCellRenderer from 'components/core-ui-lib/Table/renderers/SelectCellRenderer';
-import { companyContractStatusOptions, statusToBgColorMap } from 'config/contracts';
+import {
+  companyContractStatusOptions,
+  contractsStatusMap,
+  statusToBgColorMap,
+  venueContractStatusToStyleMap,
+} from 'config/contracts';
 import DateRenderer from 'components/core-ui-lib/Table/renderers/DateRenderer';
 import NotesRenderer from 'components/core-ui-lib/Table/renderers/NotesRenderer';
 import TextInputRenderer from 'components/core-ui-lib/Table/renderers/TextInputRenderer';
@@ -69,13 +73,34 @@ export const contractsColumnDefs = [
   { headerName: 'Town', field: 'town', cellRenderer: DefaultCellRenderer, minWidth: 80, flex: 1 },
   { headerName: 'Capacity', field: 'capacity', cellRenderer: DefaultCellRenderer, width: 90 },
   { headerName: 'No. of Perfs', field: 'performanceCount', cellRenderer: DefaultCellRenderer, width: 90 },
-  { headerName: 'Deal Memo Status', field: 'dealMemoStatus', cellRenderer: ContractStatusCellRenderer, width: 180 },
+  {
+    headerName: 'Deal Memo Status',
+    field: 'dealMemoStatus',
+    cellRenderer: DefaultCellRenderer,
+    width: 180,
+    valueGetter: (params) => contractsStatusMap[params?.data?.dealMemoStatus],
+    cellStyle: function (params) {
+      const { dealMemoStatus } = params.data;
+      return {
+        backgroundColor: 'white',
+        ...(venueContractStatusToStyleMap[dealMemoStatus] || {}),
+      };
+    },
+  },
   {
     headerName: 'Contract Status',
     field: 'contractStatus',
-    cellRenderer: ContractStatusCellRenderer,
+    cellRenderer: DefaultCellRenderer,
     resizable: false,
     width: 180,
+    valueGetter: (params) => contractsStatusMap[params?.data?.contractStatus],
+    cellStyle: function (params) {
+      const { contractStatus } = params.data;
+      return {
+        backgroundColor: 'white',
+        ...(venueContractStatusToStyleMap[contractStatus] || {}),
+      };
+    },
   },
 ];
 
