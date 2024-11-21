@@ -5,7 +5,7 @@ import Select from 'components/core-ui-lib/Select';
 import { mapBookingsToProductionOptions } from 'mappers/productionCodeMapper';
 import { bookingJumpState } from 'state/marketing/bookingJumpState';
 import { ProductionJumpMenu } from 'components/global/nav/ProductionJumpMenu';
-import { getWeekDayShort, DATE_PATTERNS } from 'services/dateService';
+import { getWeekDay, DATE_PATTERNS } from 'services/dateService';
 import formatInputDate from 'utils/dateInputFormat';
 import { currencyState } from 'state/global/currencyState';
 import axios from 'axios';
@@ -65,7 +65,7 @@ const FinalEntryFilters = () => {
     const optWithRun = initialOptions.map((option) => {
       const lastDate = lastDates.find((x) => x.BookingId === parseInt(option.value));
       if (lastDate !== undefined) {
-        const endDateDay = getWeekDayShort(lastDate.LastPerformanceDate);
+        const endDateDay = getWeekDay(lastDate.LastPerformanceDate, 'short');
         const endDateStr = formatInputDate(lastDate.LastPerformanceDate);
         if (option.date === endDateStr) {
           return option;

@@ -634,15 +634,6 @@ export function formatDuration(
 }
 
 // DEPRECATED
-export const getWeekDayShort = (dateToFormat: UTCDate | string) => {
-  if (!dateToFormat) {
-    return null;
-  }
-  const date = safeDate(dateToFormat);
-  return date.toLocaleDateString('UTC', { weekday: 'short' });
-};
-
-// DEPRECATED
 export const getDateDaysAgo = (date: UTCDate | string, days: number): UTCDate => {
   if (!date) {
     return null;
