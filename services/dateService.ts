@@ -697,20 +697,6 @@ export const getShortWeekFormat = (dateToFormat: Date | string) => {
 };
 
 // DEPRECATED
-export const weeks = (showDate: string, firstShowDate: string): number => {
-  const date = moment(showDate, 'yyyy-MM-dd');
-  const ProductionStartDate = moment(firstShowDate, 'yyyy-MM-dd');
-  const diff = moment.duration(ProductionStartDate.diff(date));
-
-  let week = Math.floor(diff.asWeeks());
-  if (week >= 0) {
-    week = week + 1;
-  }
-
-  return week;
-};
-
-// DEPRECATED
 export const formatShortDateUK = (date) => {
   return format(new Date(date), 'dd/MM/yy');
 };
