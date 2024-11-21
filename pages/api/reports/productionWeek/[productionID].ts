@@ -1,6 +1,6 @@
 import getPrismaClient from 'lib/prisma';
 import moment from 'moment';
-import { calculateWeekNumber, getDateDaysAgo, getWeeksBetweenDates, newDate } from 'services/dateService';
+import { calculateWeekNumber, getDateDaysAway, getWeeksBetweenDates, newDate } from 'services/dateService';
 
 type ProductionWeek = {
   productionWeekNum: string;
@@ -19,7 +19,7 @@ export default async function handle(req, res) {
       },
     });
     const { StartDate, EndDate } = productionDateBlock;
-    const weekminus99 = getDateDaysAgo(StartDate.toISOString(), -7 * 99);
+    const weekminus99 = getDateDaysAway(StartDate.toISOString(), -7 * 99);
     const endWeek = moment(EndDate).add(1, 'week').set('hour', 0).toISOString();
     const weeks: ProductionWeek[] = getWeeksBetweenDates(weekminus99.toISOString(), endWeek).map((week) => ({
       productionWeekNum: calculateWeekNumber(StartDate.toISOString(), newDate(week.mondayDate)),

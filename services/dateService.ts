@@ -7,7 +7,6 @@ import {
   format,
   isSameDay,
   addMinutes,
-  subDays,
   addMonths,
   set,
   parseISO,
@@ -293,7 +292,7 @@ export const toISOV2 = (date: UTCDate | string | number): string => {
  * Return a date with x days difference.
  *
  * @param {UTCDate | string | number} date - The date to format.
- * @param {number} days - The number of days between the dates.
+ * @param {number} days - The number of days between the dates. Can be a negative value.
  * @param {Locale} locale - The locale value of the inputted date.
  * @returns {UTCDate} Returns the date x days away from the inputted date.
  */
@@ -632,15 +631,6 @@ export function formatDuration(
     return '';
   }
 }
-
-// DEPRECATED
-export const getDateDaysAgo = (date: UTCDate | string, days: number): UTCDate => {
-  if (!date) {
-    return null;
-  }
-  const d = safeDate(date);
-  return new UTCDate(subDays(d, days));
-};
 
 // deprecated?
 export const dateToPicker = (dateToFormat: Date | string) => {

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { dateToSimple, getDateDaysAgo } from 'services/dateService';
+import { dateToSimple, getDateDaysAway } from 'services/dateService';
 import { faLineChart } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
 import { getCurrentMondayDate, range } from 'services/reportsService';
@@ -42,7 +42,7 @@ export default function SalesSummaryWeekly({ activeProductions }: Props) {
     setStatus((prevStatus) => ({ ...prevStatus, submitting: true }));
     const selectedProduction = activeProductions.find((production) => production.Id === parseInt(inputs.Production));
     const toWeek = formatShortYearDate(inputs.ProductionWeek);
-    const fromWeek = formatShortYearDate(getDateDaysAgo(toWeek, inputs.numberOfWeeks * 7));
+    const fromWeek = formatShortYearDate(getDateDaysAway(toWeek, -inputs.numberOfWeeks * 7));
     setLoading(true);
     fetch('/api/reports/sales-summary-simple', {
       method: 'POST',
