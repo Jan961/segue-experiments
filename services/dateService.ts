@@ -313,7 +313,7 @@ export const getDateDaysAway = (date: UTCDate | string | number, days: number, l
  * @param {Locale} locale - The locale value of the inputted date.
  * @returns {string} Returns the day string formatted either Long or Short depending on input.
  */
-export const getWeekDayV2 = (
+export const getWeekDay = (
   dateToFormat: UTCDate | string | number,
   format: 'long' | 'short',
   locale?: Locale,
@@ -708,12 +708,6 @@ export const toISO = (date: Date) => {
 export const getDateDaysInFuture = (date, daysToSubtract) => {
   date = new Date(date);
   return moment(date, 'dd/mm/yyyy').add(daysToSubtract, 'days');
-};
-
-// DEPRECATED
-export const getWeekDay = (dateToFormat: Date | string) => {
-  const date = safeDate(dateToFormat);
-  return date.toLocaleDateString('en-US', { weekday: 'long' });
 };
 
 // DEPRECATED

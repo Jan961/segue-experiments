@@ -11,7 +11,7 @@ import {
   formattedDateWithWeekDay,
   getKey,
   getMonday,
-  getWeekDayV2,
+  getWeekDay,
   getDateDaysAway,
   dateStringToPerformancePairV2,
   timeFormat,
@@ -279,8 +279,8 @@ describe.each([
   [{ date: '15-10-24T14:30:20.000Z', format: 'short', locale: 'UK' }, 'Tue'],
   [{ date: null }, null],
 ])('getWeekDay', (input: { date; format: 'long' | 'short'; locale: Locale }, expected) => {
-  test(`Expect ${input.date} to be ${expected}`, () => {
-    expect(getWeekDayV2(input.date, input.format, input.locale)).toStrictEqual(expected);
+  test(`Expect ${input.date} in format ${input.format} to be ${expected}`, () => {
+    expect(getWeekDay(input.date, input.format, input.locale)).toStrictEqual(expected);
   });
 });
 
