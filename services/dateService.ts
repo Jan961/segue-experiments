@@ -737,11 +737,6 @@ export const formatShortDateUK = (date) => {
 };
 
 // DEPRECATED
-export const quickISO = (DateString: string) => {
-  return new Date(DateString);
-};
-
-// DEPRECATED
 export const formDate = (DateString: string) => {
   const formDateString = DateString.toString();
   return formDateString.substring(0, 10);
