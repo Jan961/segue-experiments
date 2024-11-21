@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { faStar } from '@fortawesome/free-solid-svg-icons';
-import { formatDate, getMondayV2, newDate } from 'services/dateService';
+import { formatDate, getMonday, newDate } from 'services/dateService';
 import { SwitchBoardItem } from 'components/global/SwitchBoardItem';
 import { Spinner } from 'components/global/Spinner';
 import axios from 'axios';
@@ -43,7 +43,7 @@ export default function MasterPlan() {
     fetch('/api/reports/masterplan', {
       method: 'POST',
       body: JSON.stringify({
-        fromDate: formatDate(getMondayV2(inputs.fromDate), 'yyyy-MM-dd'),
+        fromDate: formatDate(getMonday(inputs.fromDate), 'yyyy-MM-dd'),
         toDate: formatDate(inputs.toDate, 'yyyy-MM-dd'),
       }),
     })

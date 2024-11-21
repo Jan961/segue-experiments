@@ -10,7 +10,7 @@ import {
   formatShortDateUKV2,
   formattedDateWithWeekDay,
   getKey,
-  getMondayV2,
+  getMonday,
   getWeekDayV2,
   getDateDaysAway,
   dateStringToPerformancePairV2,
@@ -393,7 +393,7 @@ describe.each([
   [{ date: null }, null],
 ])('getMonday', (input: { date; locale: Locale }, expected) => {
   test(`Expect ${input.date} to be ${expected}`, () => {
-    expect(getMondayV2(input.date, input.locale)).toStrictEqual(expected);
+    expect(getMonday(input.date, input.locale)).toStrictEqual(expected);
   });
 });
 

@@ -5,7 +5,7 @@ import { useRecoilState, useRecoilValue } from 'recoil';
 import { bookingJumpState } from 'state/marketing/bookingJumpState';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import { SelectOption } from '../MarketingHome';
-import { getDateDaysAway, getMondayV2, newDate, toISO } from 'services/dateService';
+import { getDateDaysAway, getMonday, newDate, toISO } from 'services/dateService';
 import { formatDecimalOnBlur, formatDecimalValue, isNullOrEmpty, isNullOrUndefined } from 'utils';
 import { Spinner } from 'components/global/Spinner';
 import { currencyState } from 'state/global/currencyState';
@@ -327,7 +327,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
 
       const frequency = await getSalesFrequency();
       const duration = frequency === 'W' ? 7 : 1;
-      let salesDate = frequency === 'W' ? getMondayV2(inputDate) : inputDate;
+      let salesDate = frequency === 'W' ? getMonday(inputDate) : inputDate;
 
       if (previous) salesDate = getDateDaysAway(salesDate, duration);
 
