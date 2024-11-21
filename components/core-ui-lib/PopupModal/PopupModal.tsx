@@ -9,8 +9,7 @@ interface PopupModalProps {
   subtitle?: string;
   children?: React.ReactNode;
   show: boolean;
-  btnRowHandlers?: Array<() => void>;
-  btnRowComponent?: ReactNode;
+  footerComponent?: ReactNode;
   onClose?: () => void;
   titleClass?: string;
   showCloseIcon?: boolean;
@@ -34,8 +33,7 @@ export default function PopupModal({
   closeOnOverlayClick = false,
   hasOverflow = true,
   testId = 'overlay',
-  btnRowComponent,
-  btnRowHandlers = [],
+  footerComponent,
 }: PopupModalProps) {
   const [overlay, setOverlay] = useState<boolean>(false);
   const [isScrollbarVisible, setIsScrollbarVisible] = useState(false);
@@ -63,25 +61,6 @@ export default function PopupModal({
     if (closeOnOverlayClick) {
       onClose();
     }
-  };
-
-  const renderBtnRowWithHandlers = () => {
-    if (!btnRowComponent) return null;
-
-    // Clone each child to attach click handlers
-    const buttonsWithHandlers = React.Children.map(btnRowComponent, (child, index) => {
-      if (React.isValidElement<HTMLButtonElement>(child)) {
-        const onClickHandler = btnRowHandlers[index];
-        return React.cloneElement(child as React.ReactElement, {
-          onClick: () => {
-            if (onClickHandler) onClickHandler();
-          },
-        });
-      }
-      return child; // Return child as-is if it's not a valid React element
-    });
-
-    return <div className="border-t border-gray-200 mt-4 flex justify-end space-x-3">{buttonsWithHandlers}</div>;
   };
 
   return (
@@ -138,7 +117,9 @@ export default function PopupModal({
 
                 <div className="overflow-y-auto mt-3 pr-3">{children}</div>
 
-                {renderBtnRowWithHandlers()}
+                {footerComponent && (
+                  <div className="sticky bottom-0 mt-4 flex justify-end mr-3 space-x-3 bg-white">{footerComponent}</div>
+                )}
               </Dialog.Panel>
             </Transition.Child>
           </div>
