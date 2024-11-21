@@ -774,20 +774,6 @@ export function getDuration(upTime: string, downTime: string): number {
 }
 
 // DEPRECATED
-export const convertLocalDateToUTC = (date: Date) => {
-  return new Date(
-    Date.UTC(
-      date.getFullYear(),
-      date.getMonth(),
-      date.getDate(),
-      date.getHours(),
-      date.getMinutes(),
-      date.getSeconds(),
-    ),
-  );
-};
-
-// DEPRECATED
 export const checkDateOverlap = (start1: Date, end1: Date, start2: Date, end2: Date): boolean => {
   return !((start1 < start2 && end1 < start2) || (start1 > end2 && end2 > end1));
 };
