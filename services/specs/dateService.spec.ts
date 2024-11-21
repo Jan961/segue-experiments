@@ -3,7 +3,7 @@ import {
   simpleToDateMDY,
   newDate,
   calculateWeekNumber,
-  safeDateV2,
+  safeDate,
   dateTimeToTime,
   addOneMonth,
   dateToSimple,
@@ -101,7 +101,7 @@ describe.each([
   [{ date: '77 Fail' }, null],
 ])('safeDate', (input: { date; locale?: Locale }, expected) => {
   test(`Expect ${input.date === '' ? 'empty string' : input.date} to be ${expected}`, () => {
-    const val = safeDateV2(input.date, input.locale);
+    const val = safeDate(input.date, input.locale);
     expect(val ? val.toISOString() : val).toStrictEqual(expected);
   });
 });

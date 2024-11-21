@@ -165,7 +165,7 @@ const getUTCFromUSDateString = (date: string) => {
  * @param {string | UTCDate | number} date - The date to be parsed.
  * @returns {UTCDate} Returns a UTCDate object of the given date.
  */
-export const safeDateV2 = (date: UTCDate | string | number, locale?: Locale): UTCDate => {
+export const safeDate = (date: UTCDate | string | number, locale?: Locale): UTCDate => {
   if (!date) {
     return newDate();
   }
@@ -190,7 +190,7 @@ export const getKey = (date: string | UTCDate | number, locale?: Locale): string
   if (!date) {
     return null;
   }
-  const d = safeDateV2(date, locale);
+  const d = safeDate(date, locale);
   return d ? d.toISOString().split('T')[0] : null;
 };
 
@@ -204,8 +204,8 @@ export const dateStringToPerformancePairV2 = (dateString: string, locale?: Local
   const timePart = split[1];
 
   const defaultDatePart = '1970-01-01';
-  const time = safeDateV2(`${defaultDatePart}T${timePart}Z`, locale);
-  const date = safeDateV2(`${datePart}`, locale);
+  const time = safeDate(`${defaultDatePart}T${timePart}Z`, locale);
+  const date = safeDate(`${datePart}`, locale);
 
   return {
     Time: isValid(time) ? time : null,
@@ -248,7 +248,7 @@ export const simpleToDateDMY = (date: string): UTCDate => {
  */
 export const dateToSimple = (dateToFormat: UTCDate | string | number, locale?: Locale): string => {
   if (!dateToFormat) return null;
-  const date = safeDateV2(dateToFormat, locale);
+  const date = safeDate(dateToFormat, locale);
   const options: Intl.DateTimeFormatOptions = {
     year: '2-digit',
     day: '2-digit',
@@ -269,7 +269,7 @@ export const dateTimeToTime = (date: string | UTCDate | number, locale?: Locale)
   if (!date) {
     return null;
   }
-  const newDate = safeDateV2(date, locale);
+  const newDate = safeDate(date, locale);
   return isValid(newDate) ? format(newDate, 'HH:mm') : null;
 };
 
@@ -283,7 +283,7 @@ export const toISO = (date: UTCDate | string | number, locale?: Locale): string 
   if (!date) {
     return null;
   }
-  const d = safeDateV2(date, locale);
+  const d = safeDate(date, locale);
   return d.toISOString();
 };
 
@@ -299,7 +299,7 @@ export const getDateDaysAway = (date: UTCDate | string | number, days: number, l
   if (!date) {
     return null;
   }
-  const d = safeDateV2(date, locale);
+  const d = safeDate(date, locale);
   return new UTCDate(addDays(d, days));
 };
 
@@ -319,7 +319,7 @@ export const getWeekDay = (
   if (!dateToFormat) {
     return null;
   }
-  const date = safeDateV2(dateToFormat, locale);
+  const date = safeDate(dateToFormat, locale);
   return date.toLocaleDateString('UTC', { weekday: format });
 };
 
@@ -341,7 +341,7 @@ export const formattedDateWithWeekDay = (
   }
   const shortFormat = 'EEE dd/MM/yy';
   const longFormat = 'EEEE dd/MM/yyyy';
-  const date = safeDateV2(dateToFormat, locale);
+  const date = safeDate(dateToFormat, locale);
   return isValid(date) ? format(date, weekDayFormat === 'Long' ? longFormat : shortFormat) : null;
 };
 
@@ -359,8 +359,8 @@ export const calculateWeekNumber = (
   if (!productionStart || !dateToNumber) {
     return null;
   }
-  const d1 = safeDateV2(productionStart);
-  const d2 = safeDateV2(dateToNumber);
+  const d1 = safeDate(productionStart);
+  const d2 = safeDate(dateToNumber);
   const weekOneStart = startOfWeek(d1, { weekStartsOn: 1 });
   let weekNumber = differenceInWeeks(d2, weekOneStart);
 
@@ -385,7 +385,7 @@ export const addOneMonth = (date: UTCDate | string | number, locale?: Locale): U
   if (!date) {
     return null;
   }
-  const newDate = safeDateV2(date, locale);
+  const newDate = safeDate(date, locale);
   return addMonths(newDate, 1);
 };
 
@@ -413,7 +413,7 @@ export const formatShortDateUKV2 = (date: UTCDate | string | number, locale?: Lo
   if (!date) {
     return null;
   }
-  const newDate = safeDateV2(date, locale);
+  const newDate = safeDate(date, locale);
   return format(newDate, 'dd/MM/yy');
 };
 
@@ -428,7 +428,7 @@ export const getMonday = (inputDate: UTCDate | string | number, locale?: Locale)
   if (!inputDate) {
     return null;
   }
-  const currentDateObj = safeDateV2(inputDate, locale);
+  const currentDateObj = safeDate(inputDate, locale);
   currentDateObj.setDate(currentDateObj.getDate() - ((currentDateObj.getDay() + 6) % 7));
   return currentDateObj;
 };
@@ -444,7 +444,7 @@ export const getSunday = (inputDate: UTCDate | string | number, locale?: Locale)
   if (!inputDate) {
     return null;
   }
-  const currentDate = safeDateV2(inputDate, locale);
+  const currentDate = safeDate(inputDate, locale);
   const res = getDateDaysAway(getMonday(currentDate), 6);
   return res;
 };
@@ -460,7 +460,7 @@ export const toSql = (date: string | UTCDate | number, locale?: Locale): string 
   if (!date) {
     return null;
   }
-  const d = safeDateV2(date, locale);
+  const d = safeDate(date, locale);
   return getKey(d);
 };
 
@@ -507,8 +507,8 @@ export const getArrayOfDatesBetween = (
     return [];
   }
   const arr: string[] = [];
-  const startDate = safeDateV2(start, startLocale);
-  const endDate = safeDateV2(end, endLocale);
+  const startDate = safeDate(start, startLocale);
+  const endDate = safeDate(end, endLocale);
   for (let dt = startDate; dt <= endDate; dt = getDateDaysAway(dt, 1)) {
     arr.push(dt.toISOString());
   }
@@ -526,7 +526,7 @@ export const formatDate = (date: UTCDate | string | number, dateFormat: string):
   if (!date) {
     return null;
   }
-  const newDate = safeDateV2(date);
+  const newDate = safeDate(date);
   return format(newDate, dateFormat);
 };
 
@@ -541,7 +541,7 @@ export const areDatesSame = (date1: UTCDate | string | number, date2: UTCDate | 
   if (!date1 || !date2) {
     return null;
   }
-  return isSameDay(safeDateV2(date1), safeDateV2(date2));
+  return isSameDay(safeDate(date1), safeDate(date2));
 };
 
 type ComparisonOperator = '<' | '<=' | '>' | '>=' | '==' | '!=';
@@ -560,8 +560,8 @@ export const compareDatesWithoutTime = (
   date2: UTCDate | string | number,
   operator: ComparisonOperator,
 ): boolean => {
-  const d1 = safeDateV2(date1);
-  const d2 = safeDateV2(date2);
+  const d1 = safeDate(date1);
+  const d2 = safeDate(date2);
 
   switch (operator) {
     case '<':
@@ -646,12 +646,6 @@ export const dateToPicker = (dateToFormat: Date | string) => {
   }
 
   return dateToFormat;
-};
-
-// DEPRECATED
-export const safeDate = (date: Date | string) => {
-  if (typeof date === 'string') return new Date(date);
-  return date;
 };
 
 // DEPRECATED

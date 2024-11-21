@@ -19,7 +19,7 @@ import {
   formatDate,
   getDateDaysAway,
   newDate,
-  safeDateV2,
+  safeDate,
   timeFormat,
 } from 'services/dateService';
 import { PerformanceInfo } from 'services/reports/schedule-report';
@@ -57,11 +57,11 @@ const addHeaderWithFilters = (worksheet, { title, from, to, status }) => {
   worksheet.addRow([title]);
   worksheet.addRow([]);
   if (from) {
-    worksheet.addRow([`Start Date: ${formatDate(safeDateV2(from), 'yyyy-MM-dd')}`]);
+    worksheet.addRow([`Start Date: ${formatDate(safeDate(from), 'yyyy-MM-dd')}`]);
     headerRowsLength++;
   }
   if (to) {
-    worksheet.addRow([`End Date: ${formatDate(safeDateV2(to), 'yyyy-MM-dd')}`]);
+    worksheet.addRow([`End Date: ${formatDate(safeDate(to), 'yyyy-MM-dd')}`]);
     headerRowsLength++;
   }
   if (status) {
@@ -98,8 +98,8 @@ const handler = async (req, res) => {
     res.status(400).json({ err: 'Prameters missing' });
   }
 
-  const formatedFromDate = safeDateV2(from);
-  const formatedToDate = safeDateV2(to);
+  const formatedFromDate = safeDate(from);
+  const formatedToDate = safeDate(to);
   try {
     const prisma = await getPrismaClient(req);
     // Construct the Prisma query
