@@ -250,7 +250,6 @@ const handler = async (req, res) => {
     for (let i = 1; i <= daysDiff; i++) {
       const weekDay = formatDate(add(parseISO(fromDate?.toISOString()), { days: i - 1 }), 'eeee');
       const dateInIncomingFormat = formatDate(add(parseISO(fromDate?.toISOString()), { days: i - 1 }), 'yyyy-MM-dd');
-      const nextDateInIncomingFormat = formatDate(add(parseISO(fromDate?.toISOString()), { days: i }), 'yyyy-MM-dd');
       const nextBookingDate = findNextBookingDate(dateInIncomingFormat, map, FullProductionCode, ShowName);
       const date = formatDate(dateInIncomingFormat, 'dd/MM/yy');
       const weekNumber = calculateWeekNumber(fromDate, getDateObject(dateInIncomingFormat));
@@ -278,13 +277,10 @@ const handler = async (req, res) => {
       }
 
       const key = getKey({ FullProductionCode, ShowName, EntryDate: dateInIncomingFormat });
-      const nextKey = getKey({ FullProductionCode, ShowName, EntryDate: nextDateInIncomingFormat });
       const value: SALES_SUMMARY = map[key];
-      const nextValueR: SALES_SUMMARY = map[nextKey];
       const nextValue: SALES_SUMMARY = nextBookingDate
         ? map[getKey({ FullProductionCode, ShowName, EntryDate: nextBookingDate })]
         : null;
-      console.log(nextValueR, nextValue);
       const scheduleValue: SCHEDULE_VIEW = scheduleMap[key];
       const statusCode = (value || scheduleValue)?.EntryStatusCode;
       const isCancelled = statusCode === 'X';
