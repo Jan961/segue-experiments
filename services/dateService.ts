@@ -685,12 +685,6 @@ export const toISO = (date: Date) => {
 };
 
 // DEPRECATED
-export const getDateDaysInFuture = (date, daysToSubtract) => {
-  date = new Date(date);
-  return moment(date, 'dd/mm/yyyy').add(daysToSubtract, 'days');
-};
-
-// DEPRECATED
 export const getShortWeekFormat = (dateToFormat: Date | string) => {
   const weekdayName = moment(dateToFormat).format('ddd');
   return weekdayName;
