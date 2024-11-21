@@ -13,7 +13,7 @@ import {
   getMonday,
   getWeekDay,
   getDateDaysAway,
-  dateStringToPerformancePairV2,
+  dateStringToPerformancePair,
   timeFormat,
   simpleToDateDMY,
   getArrayOfDatesBetween,
@@ -124,12 +124,12 @@ describe.each([
 describe('dateStringToPerformancePair', () => {
   test('Should return null for null', () => {
     const input = null;
-    expect(dateStringToPerformancePairV2(input)).toBeNull();
+    expect(dateStringToPerformancePair(input)).toBeNull();
   });
 
   test('Should return null for empty string', () => {
     const input = '';
-    expect(dateStringToPerformancePairV2(input)).toBeNull();
+    expect(dateStringToPerformancePair(input)).toBeNull();
   });
 });
 

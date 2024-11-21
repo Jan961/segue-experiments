@@ -195,7 +195,7 @@ export const getKey = (date: string | UTCDate | number, locale?: Locale): string
 };
 
 // return ?
-export const dateStringToPerformancePairV2 = (dateString: string, locale?: Locale) => {
+export const dateStringToPerformancePair = (dateString: string, locale?: Locale) => {
   if (!dateString) {
     return null;
   }
@@ -652,19 +652,6 @@ export const dateToPicker = (dateToFormat: Date | string) => {
 export const todayToSimple = () => {
   const date = new Date();
   return date.toDateString();
-};
-
-// DEPRECATED
-export const dateStringToPerformancePair = (dateString: string) => {
-  const datePart = dateString.split('T')[0];
-  const timePart = dateString.split('T')[1];
-
-  const defaultDatePart = '1970-01-01';
-
-  return {
-    Time: new Date(`${defaultDatePart}T${timePart}Z`),
-    Date: new Date(`${datePart}`),
-  };
 };
 
 // DEPRECATED
