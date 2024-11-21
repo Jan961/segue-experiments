@@ -315,9 +315,7 @@ describe('UploadModal Component', () => {
     });
 
     // Click on delete button for the file
-    cy.get('.grid').within(() => {
-      cy.contains(fileName).parent().find('[data-testid="delete-button"]').click();
-    });
+    cy.get('[data-testid="close-icon"]').click();
 
     // Check that the FileCard is removed
     cy.get('.grid').should('not.contain', fileName);
@@ -371,11 +369,76 @@ describe('UploadModal Component', () => {
     cy.contains('OK').should('be.visible');
 
     // Simulate file deletion
-    cy.get('.grid').within(() => {
-      cy.contains(fileName).parent().find('[data-testid="delete-button"]').click();
-    });
+    cy.get('[data-testid="close-icon"]').click();
 
     // Button should now say 'OK' again
     cy.contains('OK').should('be.visible');
+  });
+
+  it.only('displays without scrollbar for two files', () => {
+    setup(defaultProps);
+
+    // Click on the upload area
+    cy.get(`[data-testid="${defaultProps.testId}-upload-image"]`).click();
+
+    // Attach two files
+    const files = ['placeholder.png', 'placeholder.png'];
+    cy.fixture(files[0], 'base64').then((fileContent1) => {
+      cy.fixture(files[1], 'base64').then((fileContent2) => {
+        cy.get('[data-testid="hidden-input"]').attachFile(
+          [
+            {
+              fileContent: fileContent1,
+              fileName: files[0],
+              mimeType: 'image/png',
+              encoding: 'base64',
+            },
+            {
+              fileContent: fileContent2,
+              fileName: files[1],
+              mimeType: 'image/png',
+              encoding: 'base64',
+            },
+          ],
+          {
+            force: true,
+          },
+        );
+      });
+    });
+
+    // Check that the FileCard is displayed
+    cy.get('.grid').within(() => {
+      cy.contains(files[0]).should('be.visible');
+      cy.contains(files[1]).should('be.visible');
+    });
+
+    cy.get('[data-testid="core-ui-lib-upload-model-info"]')
+      .parent()
+      .should(($el) => {
+        const el = $el[0];
+        expect(el.scrollHeight).to.equal(el.clientHeight);
+      });
+
+    let initialPosition;
+
+    cy.get('your-element-selector').then(($el) => {
+      initialPosition = $el[0].getBoundingClientRect();
+    });
+
+    // Perform the action that may change the element's position
+    cy.get('button').click();
+
+    // Optionally wait for animations or transitions to complete
+    cy.wait(500);
+
+    // Capture the new position
+    cy.get('your-element-selector').then(($el) => {
+      const newPosition = $el[0].getBoundingClientRect();
+
+      // Compare positions
+      expect(newPosition.top).to.not.equal(initialPosition.top);
+      expect(newPosition.left).to.not.equal(initialPosition.left);
+    });
   });
 });
