@@ -88,7 +88,11 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
   try {
     const prisma = await getPrismaClient(req);
-    const params = req.body as GapSuggestionUnbalancedProps & { filteredVenueIds: number[]; prodCode: string };
+    const params = req.body as GapSuggestionUnbalancedProps & {
+      filteredVenueIds: number[];
+      prodCode: string;
+      exportedAt: string;
+    };
     const filename = `Venue Gap Suggestions ${params.prodCode || ''} ${formatDate(new Date(), 'dd.MM.yy')}`;
     // Get the gap suggestions data
     const result = await calculateGapSuggestions(prisma, omit(params, ['filteredVenueIds']));
@@ -123,7 +127,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     titleRow.alignment = { vertical: 'middle', horizontal: 'center' };
 
     // Add exported at row
-    const exportedAtRow = worksheet.addRow([getExportedAtTitle()]);
+    const exportedAtRow = worksheet.addRow([getExportedAtTitle(params.exportedAt)]);
     exportedAtRow.height = 25;
     exportedAtRow.font = {
       bold: true,

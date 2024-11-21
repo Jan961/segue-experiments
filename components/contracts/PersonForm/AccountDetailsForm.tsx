@@ -20,9 +20,10 @@ interface Props {
   accountType: string;
   countryOptionList: SelectOption[];
   onChange: (data: Partial<BankAccount>) => void;
+  disabled?: boolean;
 }
 
-const SalaryDetailsForm = ({ details, countryOptionList, onChange, accountType = 'Salary' }: Props) => {
+const SalaryDetailsForm = ({ details, countryOptionList, onChange, accountType = 'Salary', disabled }: Props) => {
   const [formData, setFormData] = useState<BankAccount>({ ...defaultBankAccount, ...details });
   const { paidTo, accountName, accountNumber, sortCode, swift, iban, country } = formData;
   const handleChange = useCallback(
@@ -45,6 +46,7 @@ const SalaryDetailsForm = ({ details, countryOptionList, onChange, accountType =
             value={paidTo}
             options={salaryPaidToOptions}
             direction={Direction.HORIZONTAL}
+            disabled={disabled}
           />
         </div>
       </div>
@@ -57,6 +59,7 @@ const SalaryDetailsForm = ({ details, countryOptionList, onChange, accountType =
             className=" text-primary-input-text font-bold w-full max-w-96"
             onChange={(e) => handleChange('accountName', e.target.value)}
             value={accountName}
+            disabled={disabled}
           />
         </div>
       </div>
@@ -69,6 +72,7 @@ const SalaryDetailsForm = ({ details, countryOptionList, onChange, accountType =
             className=" text-primary-input-text font-bold w-full max-w-96"
             onChange={(e) => handleChange('sortCode', e.target.value)}
             value={sortCode}
+            disabled={disabled}
           />
         </div>
       </div>
@@ -82,6 +86,7 @@ const SalaryDetailsForm = ({ details, countryOptionList, onChange, accountType =
             onChange={(e) => handleChange('accountNumber', e.target.value)}
             value={accountNumber}
             max={8}
+            disabled={disabled}
           />
         </div>
       </div>
@@ -95,6 +100,7 @@ const SalaryDetailsForm = ({ details, countryOptionList, onChange, accountType =
             onChange={(e) => handleChange('swift', e.target.value)}
             value={swift}
             max={11}
+            disabled={disabled}
           />
         </div>
       </div>
@@ -108,6 +114,7 @@ const SalaryDetailsForm = ({ details, countryOptionList, onChange, accountType =
             onChange={(e) => handleChange('iban', e.target.value)}
             value={iban}
             max={34}
+            disabled={disabled}
           />
         </div>
       </div>
@@ -123,6 +130,7 @@ const SalaryDetailsForm = ({ details, countryOptionList, onChange, accountType =
             value={country}
             isSearchable
             isClearable
+            disabled={disabled}
           />
         </div>
       </div>
