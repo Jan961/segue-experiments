@@ -18,6 +18,7 @@ import {
   simpleToDateDMY,
   getArrayOfDatesBetween,
   Locale,
+  getSunday,
 } from '../dateService';
 
 // --default()
@@ -393,6 +394,30 @@ describe.each([
 ])('getMonday', (input: { date; locale: Locale }, expected) => {
   test(`Expect ${input.date} to be ${expected}`, () => {
     expect(getMondayV2(input.date, input.locale)).toStrictEqual(expected);
+  });
+});
+
+// --getSunday
+describe.each([
+  [{ date: '2024-10-15' }, new UTCDate('2024-10-13')],
+  [{ date: '10-15-24', locale: 'US' }, new UTCDate('2024-10-13')],
+  [{ date: '15-10-24', locale: 'UK' }, new UTCDate('2024-10-13')],
+  [{ date: '2024-10-15T14:30:20.000Z' }, new UTCDate('2024-10-13T14:30:20.000Z')],
+  [{ date: '10-15-24T14:30:20.000Z', locale: 'US' }, new UTCDate('2024-10-13T14:30:20.000Z')],
+  [{ date: '15-10-24T14:30:20.000Z', locale: 'UK' }, new UTCDate('2024-10-13T14:30:20.000Z')],
+  [{ date: '2024-10-15' }, new UTCDate('2024-10-13')],
+  [{ date: '10-15-24', locale: 'US' }, new UTCDate('2024-10-13')],
+  [{ date: '15-10-24', locale: 'UK' }, new UTCDate('2024-10-13')],
+  [{ date: '2024-10-15T14:30:20.000Z' }, new UTCDate('2024-10-13T14:30:20.000Z')],
+  [{ date: '10-15-24T14:30:20.000Z', locale: 'US' }, new UTCDate('2024-10-13T14:30:20.000Z')],
+  [{ date: '15-10-24T14:30:20.000Z', locale: 'UK' }, new UTCDate('2024-10-13T14:30:20.000Z')],
+  [{ date: '2024-10-15' }, new UTCDate('2024-10-13')],
+  [{ date: new UTCDate('2024-10-15T14:30:20.000Z') }, new UTCDate('2024-10-13T14:30:20.000Z')],
+  [{ date: new UTCDate('2024-10-15') }, new UTCDate('2024-10-13')],
+  [{ date: null }, null],
+])('getSunday', (input: { date; locale: Locale }, expected) => {
+  test(`Expect ${input.date} to be ${expected}`, () => {
+    expect(getSunday(input.date, input.locale)).toStrictEqual(expected);
   });
 });
 

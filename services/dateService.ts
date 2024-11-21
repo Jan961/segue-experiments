@@ -442,12 +442,12 @@ export const getMondayV2 = (inputDate: UTCDate | string | number, locale?: Local
  * @param {Locale?} locale - The locale value of the inputted date.
  * @returns {UTCDate} Returns the Sunday date object on the week of the inputted date.
  */
-export const getSundayV2 = (inputDate: UTCDate | string | number, locale?: Locale): UTCDate => {
+export const getSunday = (inputDate: UTCDate | string | number, locale?: Locale): UTCDate => {
   if (!inputDate) {
     return null;
   }
   const currentDate = safeDateV2(inputDate, locale);
-  const res = getDateDaysAway(getMondayV2(currentDate), -1);
+  const res = getDateDaysAway(getMondayV2(currentDate), 6);
   return res;
 };
 
@@ -793,13 +793,6 @@ export const formatShortDateUK = (date) => {
 export const getMonday = (inputDate) => {
   const currentDateObj = new Date(inputDate);
   currentDateObj.setDate(currentDateObj.getDate() - ((currentDateObj.getDay() + 6) % 7));
-  return currentDateObj;
-};
-
-// DEPRECATED
-export const getSunday = (inputDate) => {
-  const currentDateObj = new Date(inputDate);
-  currentDateObj.setDate(currentDateObj.getDate() - ((currentDateObj.getDay() + 7) % 7) + 1);
   return currentDateObj;
 };
 
