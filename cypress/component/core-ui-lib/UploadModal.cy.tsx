@@ -143,7 +143,7 @@ describe('UploadModal Component', () => {
     cy.get(`[data-testid="${defaultProps.testId}-upload-image"]`).click();
 
     // Attach a file
-    const fileName = 'image.png';
+    const fileName = 'placeholder.png';
     cy.fixture(fileName, 'base64').then((fileContent) => {
       cy.get('[data-testid="hidden-input"]').attachFile(
         {
@@ -164,7 +164,7 @@ describe('UploadModal Component', () => {
     });
 
     // Upload button should be disabled
-    cy.contains('Upload').should('be.disabled');
+    cy.get('button').contains('Upload').should('be.disabled');
   });
 
   it('shows error when file is of invalid format', () => {
