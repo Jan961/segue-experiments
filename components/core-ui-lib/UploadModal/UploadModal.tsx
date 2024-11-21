@@ -142,7 +142,6 @@ const UploadModal: React.FC<UploadModalProps> = ({
     }
 
     for (const file of Array.from(files)) {
-      console.log('file size: ', file?.size);
       if (maxFileSize && file?.size > maxFileSize) {
         errorMessages[file?.name] = 'This file is too big. Please upload a smaller file.';
       }
