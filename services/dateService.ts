@@ -717,12 +717,6 @@ export const getShortWeekFormat = (dateToFormat: Date | string) => {
 };
 
 // DEPRECATED
-export const getWeekDayLong = (dateToFormat: Date | string) => {
-  const date = safeDate(dateToFormat);
-  return date.toLocaleDateString('en-US', { weekday: 'long' });
-};
-
-// DEPRECATED
 export const weeks = (showDate: string, firstShowDate: string): number => {
   const date = moment(showDate, 'yyyy-MM-dd');
   const ProductionStartDate = moment(firstShowDate, 'yyyy-MM-dd');
