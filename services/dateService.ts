@@ -716,12 +716,6 @@ export const formatShortDateUK = (date) => {
 };
 
 // DEPRECATED
-export const formDate = (DateString: string) => {
-  const formDateString = DateString.toString();
-  return formDateString.substring(0, 10);
-};
-
-// DEPRECATED
 export const getWeeksBetweenDates = (startDate: string, endDate: string) => {
   const currentSunday = moment.utc(startDate).startOf('isoWeek').subtract(1, 'day').set('hour', 0);
   const end = moment.utc(endDate);
