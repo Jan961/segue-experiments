@@ -2,7 +2,7 @@
 
 import { mount } from 'cypress/react18';
 import UploadModal from '../../../components/core-ui-lib/UploadModal';
-import { UploadModalProps } from '../../../components/core-ui-lib/UploadModal';
+import { UploadModalProps } from '../../../components/core-ui-lib/UploadModal/interface';
 import 'cypress-file-upload';
 import BaseComp from '../global/BaseComp';
 
@@ -255,9 +255,8 @@ describe('UploadModal Component', () => {
     cy.wrap(onSaveStub).should('have.been.called');
 
     // Simulate upload completion by calling onSave's callback
-    // Assuming onSave accepts (files, onProgress, onError, onUploadingImage)
     cy.then(() => {
-      const [files, onProgress, onError, onUploadingImage] = onSaveStub.getCall(0).args;
+      const [files, onProgress] = onSaveStub.getCall(0).args;
 
       // Simulate progress completion
       files.forEach((file) => {
