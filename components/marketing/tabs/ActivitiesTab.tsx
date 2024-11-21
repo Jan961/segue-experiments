@@ -129,9 +129,9 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
         const tempRows = sortedActivities.map((act) => ({
           actName: act.Name,
           actType: actTypes.find((type) => type.value === act.ActivityTypeId)?.text,
-          actDate: !act.Date ? null : startOfDay(new Date(act.Date)),
+          actDate: !act.Date ? null : startOfDay(newDate(act.Date)),
           followUpCheck: act.FollowUpRequired,
-          followUpDt: !act.DueByDate ? null : startOfDay(new Date(act.DueByDate)),
+          followUpDt: !act.DueByDate ? null : startOfDay(newDate(act.DueByDate)),
           companyCost: act.CompanyCost,
           venueCost: act.VenueCost,
           notes: act.Notes,
@@ -310,7 +310,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
 
         // re sort the rows to ensure the new field is put in the correct place chronologically
         const sortedActivities = activityData.sort(
-          (a, b) => new Date(a.actDate).getTime() - new Date(b.actDate).getTime(),
+          (a, b) => newDate(a.actDate).getTime() - newDate(b.actDate).getTime(),
         );
 
         setActRowData(sortedActivities);
