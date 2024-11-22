@@ -5,6 +5,7 @@ import { populateDOCX } from '../docx-template/populateDOCX';
 import { TemplateFormRowPopulated } from 'components/company-contracts/types';
 import { IPerson, IScheduleDay } from 'components/contracts/types';
 import { ProductionDTO } from 'interfaces';
+import { getFastHostServerUrl } from 'utils';
 
 interface PreviewTabProps {
   templateFile: File;
@@ -42,7 +43,9 @@ export const PreviewTab = ({
       convertFormData.append('token', String(tokenresponse.data.token));
       convertFormData.append('file', populatedDOCX);
 
-      const response = await axios.post(process.env.NEXT_PUBLIC_DOC_TO_PDF_BASE_URL, convertFormData, {
+      const docToPdfEndpoint = getFastHostServerUrl('/convertDocxToPDF');
+
+      const response = await axios.post(docToPdfEndpoint, convertFormData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

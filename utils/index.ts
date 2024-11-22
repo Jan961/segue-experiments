@@ -272,8 +272,13 @@ export const replaceTemplateString = (template, data, prefix = '{', suffix = '}'
 };
 
 export const getFastHostServerUrl = (endpoint: string) => {
-  const currEnvironment: string = process.env.DEPLOYMENT_ENV;
-  const baseUrl: string = process.env.FASTHOST_BASE_URL;
+  const currEnvironment: string = isUndefined(process.env.DEPLOYMENT_ENV)
+    ? process.env.NEXT_PUBLIC_DEPLOYMENT_ENV
+    : process.env.DEPLOYMENT_ENV;
+
+  const baseUrl: string = isUndefined(process.env.FASTHOST_BASE_URL)
+    ? process.env.NEXT_PUBLIC_FASTHOST_BASE_URL
+    : process.env.FASTHOST_BASE_URL;
 
   // if either DEPLOYMENT_ENV or FASTHOST_BASE_URL are undefined return an error
   if (isUndefined(currEnvironment) || isUndefined(baseUrl)) {

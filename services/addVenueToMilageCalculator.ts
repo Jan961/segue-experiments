@@ -1,5 +1,6 @@
 import { UiTransformedVenue } from 'utils/venue';
 import axios from 'axios';
+import { getFastHostServerUrl } from 'utils';
 
 export const addVenueToMilageCalculator = async (venueInfo: UiTransformedVenue) => {
   const {
@@ -12,7 +13,9 @@ export const addVenueToMilageCalculator = async (venueInfo: UiTransformedVenue) 
     primaryCoordinates,
   } = venueInfo;
 
-  await axios.post(process.env.EUROPE_ROUTING_SERVER_BASE_URL, [
+  const endpoint = getFastHostServerUrl('/addVenue');
+
+  await axios.post(endpoint, [
     {
       VenueAddress1: primaryAddress1,
       VenueAddress2: primaryAddress2,
