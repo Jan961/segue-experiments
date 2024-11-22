@@ -2,17 +2,19 @@
 
 import { mount } from 'cypress/react';
 import PasswordInput from '../../../components/core-ui-lib/PasswordInput';
+import { useState } from 'react';
 
 describe('PasswordInput Component', () => {
+  const value = 'password';
+
   it('renders correctly with default props', () => {
     mount(<PasswordInput />);
-    cy.get('[data-testid="password-input"]').should('exist');
     cy.get('[data-testid="password-input"]').should('have.attr', 'type', 'password');
     cy.get('[data-testid="password-input-icon"]').should('exist');
   });
 
   it('toggles password visibility when icon is clicked', () => {
-    mount(<PasswordInput />);
+    mount(<PasswordInput value={value} />);
     // Initially, the password should be hidden
     cy.get('[data-testid="password-input"]').should('have.attr', 'type', 'password');
 
@@ -26,7 +28,7 @@ describe('PasswordInput Component', () => {
   });
 
   it('does not toggle visibility when disabled', () => {
-    mount(<PasswordInput disabled />);
+    mount(<PasswordInput value={value} disabled />);
     cy.get('[data-testid="password-input"]').should('be.disabled');
     cy.get('[data-testid="password-input"]').should('have.attr', 'type', 'password');
 
