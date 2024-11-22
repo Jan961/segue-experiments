@@ -1,6 +1,7 @@
+import { UTCDate } from '@date-fns/utc';
 import getPrismaClient from 'lib/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { checkDateOverlap } from 'services/dateService';
+import { checkDateOverlap, newDate } from 'services/dateService';
 import { getDateFromWeekNumber } from 'utils/barring';
 
 export type BarredVenue = {
@@ -37,8 +38,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
   try {
     const prisma = await getPrismaClient(req);
-    const givenStartDate = new Date(startDate);
-    const givenEndDate = new Date(endDate);
+    const givenStartDate = newDate(startDate);
+    const givenEndDate = newDate(endDate);
     // uv stands for user venue, The venue the user selected to do a barring check for
     const uv = await prisma.venue.findUnique({
       where: { Id: VenueId },
@@ -116,7 +117,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         endDate &&
         bvBarringStartDate &&
         bvBarringEndDate &&
-        checkDateOverlap(givenStartDate, givenEndDate, new Date(bvBarringStartDate), new Date(bvBarringEndDate));
+        // checkDateOverlap(givenStartDate, givenEndDate, new Date(bvBarringStartDate), new Date(bvBarringEndDate));
+        checkDateOverlap(
+          { fromDate: givenStartDate, toDate: givenEndDate },
+          { fromDate: bvBarringStartDate, toDate: bvBarringEndDate },
+        );
       const bvBarredDistanceCheck =
         bvBarringPeriodOverlap && distance !== null && bvBarringMiles && distance?.lte(bvBarringMiles);
       const bvBarredVenueCheck = bvBarringPeriodOverlap && bvBarredVenueList.includes(uv.Id);
@@ -132,10 +137,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         uvBarringStartDate &&
         FirstDate &&
         checkDateOverlap(
-          new Date(uvBarringStartDate),
-          new Date(uvBarringEndDate),
-          new Date(FirstDate),
-          new Date(FirstDate),
+          { fromDate: uvBarringStartDate, toDate: uvBarringEndDate },
+          { fromDate: new UTCDate(FirstDate), toDate: new UTCDate(FirstDate) },
         );
       const uvBarredDistanceCheck =
         uvBarringPeriodOverlap && distance !== null && uvBarringMiles && distance?.lte(uvBarringMiles);

@@ -757,7 +757,42 @@ export function getDuration(upTime: string, downTime: string): number {
   return diff;
 }
 
-// DEPRECATED
-export const checkDateOverlap = (start1: Date, end1: Date, start2: Date, end2: Date): boolean => {
-  return !((start1 < start2 && end1 < start2) || (start1 > end2 && end2 > end1));
+/**
+ *  Check if 2 date ranges overlap.
+ *
+ * @param {{ fromDate: UTCDate | string | number, toDate: UTCDate | string | number, fromDateLocale?: Locale, toDateLocale?: Locale }} dateRange1 - The first date range with the optional input date locales.
+ * @param {{ fromDate: UTCDate | string | number, toDate: UTCDate | string | number, fromDateLocale?: Locale, toDateLocale?: Locale }} dateRange2 - The second date range with the optional input date locales.
+ * @returns {boolean} Returns true if the dates are overlapping else return false.
+ */
+export const checkDateOverlap = (
+  dateRange1: {
+    fromDate: UTCDate | string | number;
+    toDate: UTCDate | string | number;
+    fromDateLocale?: Locale;
+    toDateLocale?: Locale;
+  },
+  dateRange2: {
+    fromDate: UTCDate | string | number;
+    toDate: UTCDate | string | number;
+    fromDateLocale?: Locale;
+    toDateLocale?: Locale;
+  },
+): boolean => {
+  if (!dateRange1.fromDate || !dateRange1.toDate || !dateRange2.fromDate || !dateRange2.toDate) {
+    return null;
+  }
+
+  const startFromDate = safeDate(dateRange1.fromDate, dateRange1.fromDateLocale);
+  const startToDate = safeDate(dateRange1.toDate, dateRange1.toDateLocale);
+  const endFromDate = safeDate(dateRange2.fromDate, dateRange2.fromDateLocale);
+  const endToDate = safeDate(dateRange2.toDate, dateRange2.toDateLocale);
+
+  if (!isValid(startFromDate) || !isValid(startToDate) || !isValid(endFromDate) || !isValid(endToDate)) {
+    return null;
+  }
+
+  return !(
+    (startFromDate < startToDate && endFromDate < startToDate) ||
+    (startFromDate > endToDate && endToDate > endFromDate)
+  );
 };

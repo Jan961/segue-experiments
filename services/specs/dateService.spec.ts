@@ -22,6 +22,7 @@ import {
   getDateTime,
   getDifferenceInDays,
   getDifferenceInWeeks,
+  // checkDateOverlap,
 } from '../dateService';
 
 // --default()
@@ -477,3 +478,17 @@ describe.each([
     );
   });
 });
+
+// // --checkDateOverlap
+// describe.each([
+//   [{dateRange1: {fromDate: '2024-10-15', toDate: '2024-10-20'}, dateRange2: {fromDate: '2024-10-10', toDate: '2024-10-14'}}, false],
+//   [{dateRange1: {fromDate: '2024-10-15', toDate: '2024-10-20'}, dateRange2: {fromDate: '2024-10-10', toDate: '2024-10-15'}}, true],
+//   [{dateRange1: {fromDate: '2024-10-15', toDate: '2024-10-20'}, dateRange2: {fromDate: '2024-10-10', toDate: '2024-10-16'}}, true],
+//   [{dateRange1: {fromDate: '2024-10-10', toDate: '2024-10-14'}, dateRange2: {fromDate: '2024-10-15', toDate: '2024-10-20'}}, false],
+//   [{dateRange1: {fromDate: '2024-10-10', toDate: '2024-10-15'}, dateRange2: {fromDate: '2024-10-15', toDate: '2024-10-20'}}, true],
+//   [{dateRange1: {fromDate: '2024-10-10', toDate: '2024-10-16'}, dateRange2: {fromDate: '2024-10-15', toDate: '2024-10-20'}}, true],
+// ])('checkDateOverlap', (input, expected) => {
+//   test(`Expect (${input.dateRange1.fromDate}, ${input.dateRange1.toDate}) and (${input.dateRange2.fromDate}, ${input.dateRange2.toDate}) to be ${expected}`, () => {
+//     expect(checkDateOverlap(input.dateRange1, input.dateRange2)).toStrictEqual(expected);
+//   })
+// })

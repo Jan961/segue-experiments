@@ -3,8 +3,8 @@ import { styleProps, previewColumnDefs } from 'components/bookings/table/tableCo
 import { BookingItem, PreviewDataItem, TForm } from '../reducer';
 import { useRecoilValue } from 'recoil';
 import { rowsSelector } from 'state/booking/selectors/rowsSelector';
-import { calculateWeekNumber, newDate } from 'services/dateService';
-import { addDays, subDays, parseISO, isWithinInterval } from 'date-fns';
+import { calculateWeekNumber, getDateDaysAway, newDate, safeDate } from 'services/dateService';
+import { parseISO, isWithinInterval } from 'date-fns';
 import { venueState } from 'state/booking/venueState';
 import { bookingStatusMap } from 'config/bookings';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
@@ -196,12 +196,12 @@ export default function PreviewBookingDetails({
 
     const fromDate = data[0].dateAsISOString;
     const toDate = data.length > 1 ? data[data.length - 1].dateAsISOString : fromDate;
-    const fromDateAsDate = parseISO(fromDate);
-    const toDateAsDate = parseISO(toDate);
-    const pastStartDate = subDays(fromDateAsDate, 6);
-    const toStartDate = subDays(fromDateAsDate, 1);
-    const toDateSet = addDays(toDateAsDate, 1);
-    const futureEndDate = addDays(toDateAsDate, 7);
+    const fromDateAsDate = safeDate(fromDate);
+    const toDateAsDate = safeDate(toDate);
+    const pastStartDate = getDateDaysAway(fromDateAsDate, -6);
+    const toStartDate = getDateDaysAway(fromDateAsDate, -1);
+    const toDateSet = getDateDaysAway(toDateAsDate, 1);
+    const futureEndDate = getDateDaysAway(toDateAsDate, 7);
 
     // Remove any existing bookings being edited that are also present in rowSelector to avoid duplicates
     const editedRowsIds = rowItems.map(({ item }) => item.id);
