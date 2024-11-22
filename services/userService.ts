@@ -116,10 +116,10 @@ export const getAccountIdFromReq = async (req: any) => {
   return getAccountId(email);
 };
 
-export const getOrganisationIdFromReq = async (req: any) => {
+export const getOrganisationIdFromReq = async (req: any): Promise<string> => {
   const { userId } = getAuth(req);
   const user = await clerkClient.users.getUser(userId);
-  return user?.unsafeMetadata?.organisationId;
+  return user?.unsafeMetadata?.organisationId as string;
 };
 
 export const getUserId = async (email: string) => {
