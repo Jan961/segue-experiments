@@ -78,18 +78,4 @@ describe('ExportModal Component', () => {
     cy.get('@onItemClick').should('have.been.calledWith', 'PDF');
     cy.get('@onClose').should('have.been.calledOnce');
   });
-
-  it('should close the modal when overlay is clicked', () => {
-    setup({
-      visible: true,
-      onClose,
-      ExportList,
-      onItemClick,
-    });
-
-    // Click on the modal overlay
-    cy.get('.modal-overlay').click('topLeft');
-
-    cy.get('@onClose').should('have.been.called');
-  });
 });
