@@ -121,25 +121,6 @@ const createExcelFromData = (data, bookingInfo, productionName, venueAndDate) =>
             cell.numFmt = symbol + '#,##0.00';
           }
         }
-        if (item.SetNotOnSale) {
-          cell.fill = {
-            type: 'pattern',
-            pattern: 'solid',
-            fgColor: { argb: COLOR_HEXCODE.RED },
-          };
-        } else if (item.SetBrochureReleased) {
-          cell.fill = {
-            type: 'pattern',
-            pattern: 'solid',
-            fgColor: { argb: COLOR_HEXCODE.YELLOW },
-          };
-        } else if (item.SetSingleSeats) {
-          cell.fill = {
-            type: 'pattern',
-            pattern: 'solid',
-            fgColor: { argb: COLOR_HEXCODE.DARK_GREEN },
-          };
-        }
       }
     });
   });

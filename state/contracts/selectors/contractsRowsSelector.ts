@@ -6,7 +6,7 @@ import { contractsVenueState } from '../contractsVenueState';
 import { productionJumpState } from '../../booking/productionJumpState';
 import { objectify } from 'radash';
 import moment from 'moment';
-import { contractsRow, contractsStatusMap } from 'config/contracts';
+import { contractsRow } from 'config/contracts';
 import { calculateWeekNumber, getKey, getArrayOfDatesBetween } from 'services/dateService';
 import { contractsPerformanceState } from '../contractsPerformanceState';
 import ContractsHelper from 'utils/contracts';
@@ -67,7 +67,7 @@ export const contractsRowsSelector = selector({
         bookingStatus: data?.StatusCode,
         status: data?.StatusCode,
         venue: getValueForDayType(rowData.venue, type),
-        contractStatus: contractData[rowData.Id] ? contractsStatusMap[contractData[rowData.Id].StatusCode] : '',
+        contractStatus: contractData[rowData.Id] ? contractData[rowData.Id].StatusCode : '',
         dealMemoStatus: dealMemoStatus[rowData.Id] ? dealMemoStatus[rowData.Id.toString()].Status : '',
         SignedDate: contractData[rowData.Id] ? contractData[rowData.Id].SignedDate : '',
         SignedBy: contractData[rowData.Id] ? contractData[rowData.Id].SignedBy : '',

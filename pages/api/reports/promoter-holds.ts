@@ -1,35 +1,14 @@
-import { Prisma } from 'prisma/generated/prisma-client';
 import ExcelJS from 'exceljs';
 import getPrismaClient from 'lib/prisma';
 import moment from 'moment';
 import { NextApiRequest, NextApiResponse } from 'next';
+import { PromoterHoldsView } from 'prisma/generated/prisma-client';
 import { all } from 'radash';
-import { toSql } from 'services/dateService';
 import { getProductionWithContent } from 'services/productionService';
 import { addWidthAsPerContent } from 'services/reportsService';
 import { COLOR_HEXCODE } from 'services/salesSummaryService';
 import { getExportedAtTitle } from 'utils/export';
 import { convertToPDF } from 'utils/report';
-
-type TPromoter = {
-  ProductionId: number;
-  FullProductionCode: string;
-  VenueCode: string;
-  VenueName: string;
-  BookingId: number;
-  PerformanceDate: string;
-  PerformanceTime: string;
-  AvailableCompSeats: number | null;
-  AvailableCompNotes: string | null;
-  CompAllocationSeats: number | null;
-  CompAllocationTicketHolderName: string | null;
-  CompAllocationSeatsAllocated: number | null;
-  CompAllocationTicketHolderEmail: string | null;
-  CompAllocationComments: string | null;
-  CompAllocationRequestedBy: string | null;
-  CompAllocationArrangedBy: string | null;
-  CompAllocationVenueConfirmationNotes: string | null;
-};
 
 interface ICellAlignment {
   horizontal?: string;
@@ -89,28 +68,32 @@ type ProductionDetails = {
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
     const prisma = await getPrismaClient(req);
-    const timezoneOffset = parseInt(req.headers.timezoneoffset as string, 10) || 0;
-    let { productionCode = '', fromDate, toDate, venue, productionId, format } = req.body || {};
+    const { productionCode = '', fromDate, toDate, venue, productionId, format, exportedAt } = req.body || {};
 
     const workbook = new ExcelJS.Workbook();
-
-    const conditions: Prisma.Sql[] = [];
+    const whereQuery: { ProductionId?: string; VenueCode?: string; PerformanceDate?: { gte: Date; lte: Date } } = {};
     if (productionId) {
-      conditions.push(Prisma.sql`ProductionId = ${productionId}`);
+      whereQuery.ProductionId = productionId;
     }
     if (venue) {
-      conditions.push(Prisma.sql`VenueCode = ${venue}`);
+      whereQuery.VenueCode = venue;
     }
     if (fromDate && toDate) {
-      fromDate = toSql(fromDate);
-      toDate = toSql(toDate);
-      conditions.push(Prisma.sql`PerformanceDate BETWEEN ${fromDate} AND ${toDate}`);
+      whereQuery.PerformanceDate = {
+        gte: new Date(fromDate),
+        lte: new Date(toDate),
+      };
     }
-    const where: Prisma.Sql = conditions.length ? Prisma.sql` where ${Prisma.join(conditions, ' and ')}` : Prisma.empty;
-    const [data, productionDetails] = await all([
-      prisma.$queryRaw<TPromoter[]>`select * FROM PromoterHoldsView ${where} order by PerformanceDate;`,
-      getProductionWithContent(productionId, req),
-    ]);
+    const getPromoterHolds = prisma.promoterHoldsView.findMany({
+      where: {
+        ...whereQuery,
+        ProductionId: Number(productionId),
+      },
+      orderBy: {
+        PerformanceDate: 'asc',
+      },
+    });
+    const [data, productionDetails] = await all([getPromoterHolds, getProductionWithContent(productionId, req)]);
     const showName = (productionDetails as ProductionDetails)?.Show?.Name || '';
     const filename = `${productionCode} ${showName} Promoter Holds`;
     const worksheet = workbook.addWorksheet('Promoter Holds', {
@@ -119,7 +102,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     });
 
     worksheet.addRow(['PROMOTER HOLDS']);
-    const exportedAtTitle = getExportedAtTitle(timezoneOffset);
+    const exportedAtTitle = getExportedAtTitle(exportedAt);
     worksheet.addRow([exportedAtTitle]);
     worksheet.addRow(['PRODUCTION', 'VENUE', '', 'SHOW', '', 'AVAILABLE', '', 'ALLOCATED', '']);
     worksheet.addRow([
@@ -140,7 +123,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       'VENUE CONFIRMATION',
     ]);
 
-    (data as TPromoter[]).forEach((x) => {
+    (data as PromoterHoldsView[]).forEach((x) => {
       const productionCode = x.FullProductionCode || '';
       const venueCode = x.VenueCode || '';
       const venueName = x.VenueName || '';

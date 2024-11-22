@@ -49,6 +49,7 @@ export default function HoldsComps({ activeProductions }: Props) {
         toDate: inputs.dateTo,
         venue: inputs.venue,
         bookingStatus: inputs.status,
+        exportedAt: new Date().toISOString(),
       }),
     })
       .then(async (response) => {
@@ -205,7 +206,7 @@ export default function HoldsComps({ activeProductions }: Props) {
                       name="venue"
                       onChange={handleOnChange}
                     >
-                      <option key={'all'} value={null}>
+                      <option key="all" value={null}>
                         All
                       </option>
                       {venues.map((venue) => (
@@ -226,13 +227,13 @@ export default function HoldsComps({ activeProductions }: Props) {
                       name="status"
                       onChange={handleOnChange}
                     >
-                      <option key={'all'} value={null}>
+                      <option key="all" value={null}>
                         All
                       </option>
-                      <option key={'C'} value={'C'}>
+                      <option key="C" value="C">
                         Confirmed
                       </option>
-                      <option key={'U'} value={'U'}>
+                      <option key="U" value="U">
                         Unconfirmed
                       </option>
                     </select>
@@ -259,7 +260,7 @@ export default function HoldsComps({ activeProductions }: Props) {
               </div>
             </div>
           </div>
-          <div className="opacity-25 fixed inset-0 z-40 bg-black"></div>
+          <div className="opacity-25 fixed inset-0 z-40 bg-black" />
         </>
       ) : null}
     </>

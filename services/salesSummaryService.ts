@@ -14,7 +14,7 @@ import {
   WeekAggregates,
 } from 'types/SalesSummaryTypes';
 import { format, formatDuration, intervalToDuration, isBefore } from 'date-fns';
-import { formatDate, simpleToDate } from './dateService';
+import { formatDate, getDateObject, simpleToDate } from './dateService';
 
 export enum COLOR_HEXCODE {
   PURPLE = 'ff7030a0',
@@ -118,12 +118,10 @@ export const assignBackgroundColor = ({
     colorCell({ worksheet, row, col, argbColor: COLOR_HEXCODE.YELLOW });
   }
 
-  // if (moment(Date).valueOf() < (SetProductionWeekDate).valueOf()) {
-  if (isBefore(simpleToDate(Date), simpleToDate(SetProductionWeekDate))) {
+  if (isBefore(getDateObject(Date), getDateObject(SetProductionWeekDate))) {
     colorCell({ worksheet, row, col, argbColor: COLOR_HEXCODE.BLUE });
   }
 
-  // if (NotOnSalesDate && moment(SetProductionWeekDate).valueOf() < moment(NotOnSalesDate).valueOf()) {
   if (NotOnSalesDate && isBefore(simpleToDate(SetProductionWeekDate), simpleToDate(NotOnSalesDate))) {
     colorCell({ worksheet, row, col, argbColor: COLOR_HEXCODE.RED });
   }

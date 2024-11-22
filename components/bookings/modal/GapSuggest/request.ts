@@ -24,7 +24,7 @@ export const exportGapSuggestions = async (
 ) => {
   const response = await axios.post(
     '/api/reports/booking/gap-suggestion',
-    { ...payload, filteredVenueIds, prodCode },
+    { ...payload, filteredVenueIds, prodCode, exportedAt: new Date().toISOString() },
     { responseType: 'blob' },
   );
 

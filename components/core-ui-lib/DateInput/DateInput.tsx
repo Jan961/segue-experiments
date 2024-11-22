@@ -7,7 +7,7 @@ import { Portal } from 'react-overlays';
 import { format, isValid } from 'date-fns';
 import { formatDate } from 'services/dateService';
 
-interface DateInputProps {
+export interface DateInputProps {
   value?: string | Date;
   onChange: (value: Date) => void;
   inputClass?: string;
