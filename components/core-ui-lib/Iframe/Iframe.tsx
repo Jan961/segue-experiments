@@ -3,12 +3,13 @@ import classNames from 'classnames';
 import { Spinner } from 'components/global/Spinner';
 import { formatUrl } from 'utils/formatUrl';
 
-type Variant = 'xs' | 'sm' | 'md' | 'lg';
+export type Variant = 'xs' | 'sm' | 'md' | 'lg';
 
-interface IframeProps {
+export interface IframeProps {
   src: string;
   variant?: Variant;
   className?: string;
+  testId?: string;
 }
 
 const IFRAME_SIZES = {
@@ -18,7 +19,7 @@ const IFRAME_SIZES = {
   lg: 'w-[544px] h-[306px]',
 };
 
-const Iframe = ({ src, variant = 'sm', className = '' }: IframeProps) => {
+const Iframe = ({ src, variant = 'sm', className = '', testId = 'iframe' }: IframeProps) => {
   const [isLoading, setIsLoading] = useState(true);
   const baseClass = `border-0 ${IFRAME_SIZES[variant]}`;
 
@@ -45,6 +46,7 @@ const Iframe = ({ src, variant = 'sm', className = '' }: IframeProps) => {
     <div
       className={classNames(`${baseClass} overflow-hidden relative ${className}`)}
       onClick={() => window.open(formattedUrl, '_blank')}
+      data-testid={testId}
     >
       {isLoading && (
         <div className="absolute top-0 left-0 right-0 bottom-0 flex items-center justify-center">

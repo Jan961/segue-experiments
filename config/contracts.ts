@@ -61,20 +61,38 @@ export const sellerOptions = [
   { text: 'VENUE', value: 'Venue' },
 ];
 
+export enum CONTRACT_STATUS {
+  RECEIVED_NOT_RETURNED = 'RNR',
+  RECEIVED_QUESTIONS_RAISED = 'RQR',
+  PRODUCER_SIGNED_AND_RETURNED = 'SAR',
+  COUNTERSIGNED_AND_FILED = 'CSF',
+  NONE = 'NONE',
+}
+
 export const contractsStatusMap = {
-  RNR: 'Received, Not Returned',
-  RQR: 'Received, Questions Raised',
-  SAR: 'Producer Signed and Returned',
-  CSF: 'Countersigned and Filed',
-  NONE: 'None',
+  [CONTRACT_STATUS.RECEIVED_NOT_RETURNED]: 'Received, Not Returned',
+  [CONTRACT_STATUS.RECEIVED_QUESTIONS_RAISED]: 'Received, Questions Raised',
+  [CONTRACT_STATUS.PRODUCER_SIGNED_AND_RETURNED]: 'Producer Signed and Returned',
+  [CONTRACT_STATUS.COUNTERSIGNED_AND_FILED]: 'Countersigned and Filed',
+  [CONTRACT_STATUS.NONE]: 'None',
 };
 
-export const contractsKeyStatusMap = {
-  'Received Not Returned': 'CSAR',
-  'Received, Questions Raised': 'U',
-  'Producer Signed, Returned to Venue': 'X',
-  'Countersigned and Filed': 'CSAF',
-  None: 'NONE',
+export const venueContractStatusToStyleMap = {
+  [CONTRACT_STATUS.RECEIVED_NOT_RETURNED]: {
+    backgroundColor: '#FFE606',
+  },
+  [CONTRACT_STATUS.RECEIVED_QUESTIONS_RAISED]: {
+    backgroundColor: '#D41818',
+    color: '#FFFFFF',
+  },
+  [CONTRACT_STATUS.PRODUCER_SIGNED_AND_RETURNED]: {
+    backgroundColor: '#E94580',
+    color: '#FFFFFF',
+  },
+  [CONTRACT_STATUS.COUNTERSIGNED_AND_FILED]: {
+    backgroundColor: '#10841C',
+    color: '#FFFFFF',
+  },
 };
 
 export const contractDealTypeMap = {
