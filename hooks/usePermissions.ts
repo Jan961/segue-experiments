@@ -33,14 +33,14 @@ const usePermissions = () => {
   const setUserPermissions = async (organisationId: string, permissions: string[]) => {
     try {
       if (isSignedIn) {
-        user.update({
+        await user.update({
           unsafeMetadata: {
             organisationId,
             permissions,
           },
         });
 
-        setPermissionsState({
+        await setPermissionsState({
           permissions,
           accountId: organisationId,
         });
