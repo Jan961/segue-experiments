@@ -712,12 +712,6 @@ export function formatDuration(
 }
 
 // DEPRECATED
-export const todayToSimple = () => {
-  const date = new Date();
-  return date.toDateString();
-};
-
-// DEPRECATED
 export const simpleToDate = (stringToFormat: string): Date => {
   const parts = stringToFormat?.split?.('/');
   return new Date(Number(`20${parts[2]}`), Number(Number(parts[0]) - 1), Number(parts[1]));
