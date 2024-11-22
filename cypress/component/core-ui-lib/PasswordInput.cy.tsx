@@ -2,7 +2,6 @@
 
 import { mount } from 'cypress/react';
 import PasswordInput from '../../../components/core-ui-lib/PasswordInput';
-import { useState } from 'react';
 
 describe('PasswordInput Component', () => {
   const value = 'password';
