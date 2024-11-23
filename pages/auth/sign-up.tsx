@@ -3,6 +3,7 @@ import { Button, Icon, Label, PasswordInput, TextInput, Tooltip } from 'componen
 import { useRouter } from 'next/router';
 import * as yup from 'yup';
 import React, { useEffect, useState } from 'react';
+import Head from 'next/head';
 import {
   PASSWORD_INCORRECT,
   INVALID_EMAIL_OR_COMPANY_NAME,
@@ -38,7 +39,7 @@ const DEFAULT_ACCOUNT_DETAILS = {
 
 const SignUp = () => {
   const router = useRouter();
-  const { signIn, signOut, navigateToHome } = useAuth();
+  const { signIn, signOut, navigateToHome, getSignInUrl } = useAuth();
   const [isBusy, setIsBusy] = useState(false);
   const { isSignedIn, setUserPermissions } = usePermissions();
   const [error, setError] = useState('');
@@ -133,13 +134,12 @@ const SignUp = () => {
       // Prepare email address verification
       await result.prepareEmailAddressVerification({
         strategy: 'email_link',
-        redirectUrl: `${window.location.origin}/sign-in`,
+        redirectUrl: getSignInUrl(),
       });
-      return true;
     } catch (err) {
       setError(err.errors[0].code);
       console.error('error', err.errors[0].longMessage);
-      return false;
+      throw err;
     }
   };
 
@@ -184,8 +184,13 @@ const SignUp = () => {
       // Authenticate the user within clerk first to check if we have a valid password
       await signIn(accountDetails.email, accountDetails.password);
 
+      const sigInUrl = getSignInUrl();
       // Create the user in our database
-      const { data } = await axios.post('/api/user/create-admin-user', { user: accountDetails, accountUserOnly: true });
+      const { data } = await axios.post('/api/user/create-admin-user', {
+        user: accountDetails,
+        sigInUrl,
+        accountUserOnly: true,
+      });
 
       setSignedInExistingUserDetails({ organisationId: data.organisationId, permissions: data.permissions });
     } catch (error: any) {
@@ -248,6 +253,12 @@ const SignUp = () => {
 
   return (
     <div className={`${calibri.variable} font-calibri background-gradient flex flex-col py-20  px-6`}>
+      <Head>
+        <title>Sign Up | Segue</title>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+        <link rel="icon" href="/segue/segue_mini_icon.png" type="image/png" />
+      </Head>
       <Image className="mx-auto mb-2" height={160} width={310} src="/segue/segue_logo_full.png" alt="Segue" />
       <h1 className="my-4 text-2xl font-bold text-center text-primary-input-text">Setup New Account</h1>
       <div className="text-center text-primary-input-text w-[580px] mx-auto">
