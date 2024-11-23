@@ -133,13 +133,15 @@ export const processVenueRelations = (
     endVenueRelations.map((relation) => [relation.VenueId, { Mileage: relation.Mileage, Mins: relation.Mins }]),
   );
 
-  return startVenueRelations.map((startRelation) => ({
-    VenueId: startRelation.VenueId,
-    MileageFromStart: startRelation.Mileage,
-    MileageFromEnd: endVenueRelationsMap.get(startRelation.VenueId).Mileage,
-    MinsFromStart: startRelation.Mins,
-    MinsFromEnd: endVenueRelationsMap.get(startRelation.VenueId).Mins,
-  }));
+  return startVenueRelations
+    .filter((startRelation) => endVenueRelationsMap.has(startRelation.VenueId))
+    .map((startRelation) => ({
+      VenueId: startRelation.VenueId,
+      MileageFromStart: startRelation.Mileage,
+      MileageFromEnd: endVenueRelationsMap.get(startRelation.VenueId).Mileage,
+      MinsFromStart: startRelation.Mins,
+      MinsFromEnd: endVenueRelationsMap.get(startRelation.VenueId).Mins,
+    }));
 };
 
 export const enrichVenueData = async (
@@ -208,8 +210,5 @@ export const enrichVenueData = async (
         Name,
       };
     })
-    .filter(
-      (venue) =>
-        venue && venue.Capacity >= filters.MinSeats && (filters.MaxSeats === 0 || venue.Capacity <= filters.MaxSeats),
-    );
+    .filter((venue) => venue && venue.Capacity >= filters.MinSeats && venue.Capacity <= filters.MaxSeats);
 };
