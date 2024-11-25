@@ -43,7 +43,14 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { styleHeader } from './masterplan';
 import { currencyCodeToSymbolMap } from 'config/Reports';
 import { convertToPDF, sanitizeRowData } from 'utils/report';
-import { calculateWeekNumber, formatDate, getWeeksBetweenDates, newDate } from 'services/dateService';
+import {
+  calculateWeekNumber,
+  compareDatesWithoutTime,
+  formatDate,
+  getKey,
+  getWeeksBetweenDates,
+  newDate,
+} from 'services/dateService';
 import { group, unique } from 'radash';
 import { addBorderToAllCells } from 'utils/export';
 import { UTCDate } from '@date-fns/utc';
@@ -56,18 +63,18 @@ interface ProductionWeek {
 interface ProductionSummary {
   FullProductionCode: string;
   ProductionWeekNum: number;
-  StartDate: Date;
-  EndDate: Date;
+  StartDate: UTCDate;
+  EndDate: UTCDate;
   Venue: string;
   Town: string;
   VenueCurrencyCode: string;
   VenueCurrencySymbol: VENUE_CURRENCY_SYMBOLS;
   BookingId: number;
-  BookingFirstDate: Date;
+  BookingFirstDate: UTCDate;
   BookingStatusCode: BOOK_STATUS_CODES;
   Week: string;
   Day: string;
-  Date: Date;
+  Date: UTCDate;
   ConversionRate: number;
   Value: number;
   FormattedFinalFiguresValue: number;
@@ -103,7 +110,7 @@ const fetchProductionBookings = async (productionId: number): Promise<Production
       EndDate: entry.ProductionEndDate,
       BookingFirstDate: entry.EntryDate,
     }))
-    .sort((a, b) => new Date(a.BookingFirstDate).getTime() - new Date(b.BookingFirstDate).getTime());
+    .sort((a, b) => a.BookingFirstDate - b.BookingFirstDate);
   return summary;
 };
 
@@ -193,9 +200,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       Date: x.BookingFirstDate,
       Town: x.VenueTown,
       Venue: x.VenueName,
-      SetProductionWeekDate: x.SetProductionWeekDate
-        ? new Date(x.SetProductionWeekDate)?.toISOString()?.split('T')?.[0]
-        : '',
+      SetProductionWeekDate: x.SetProductionWeekDate ? getKey(newDate(x.SetProductionWeekDate)) : '',
     }));
     const bookingSalesByWeek = group(
       finalFormattedValues,
@@ -329,6 +334,8 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
             }
           }
         } else {
+          console.log('b1D', booking.Date);
+          console.log('hd', headerWeekDates[i]);
           if (booking.Date.getTime() < newDate(headerWeekDates[i]).getTime()) {
             totalObjToPush = {
               Value: booking.FormattedFinalFiguresValue,
@@ -414,12 +421,14 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           }
         } else {
           if (booking?.BookingStatusCode === 'X') continue;
-          if (booking.Date.getTime() < newDate(headerWeekDates[i]).getTime()) {
+          console.log('b2D', booking.Date);
+          console.log('hd2', headerWeekDates[i]);
+          if (compareDatesWithoutTime(booking.Date, newDate(headerWeekDates[i]), '<')) {
             colorCell({ worksheet, row, col, argbColor: COLOR_HEXCODE.BLUE });
           }
           if (
             booking?.NotOnSaleDate &&
-            newDate(headerWeekDates[i]).getTime() < newDate(booking.NotOnSaleDate).getTime()
+            compareDatesWithoutTime(newDate(headerWeekDates[i]), newDate(booking.NotOnSaleDate), '<')
           ) {
             colorCell({ worksheet, row, col, argbColor: COLOR_HEXCODE.RED });
           }
