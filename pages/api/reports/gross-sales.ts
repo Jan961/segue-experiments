@@ -5,7 +5,7 @@ import { COLOR_HEXCODE } from 'services/salesSummaryService';
 import { ALIGNMENT, alignCellText, styleHeader } from './masterplan';
 import { getExportedAtTitle } from 'utils/export';
 import { currencyCodeToSymbolMap } from 'config/Reports';
-import { convertToPDF } from 'utils/report';
+import { calculateRemainingDaysInWeek, convertToPDF } from 'utils/report';
 import { BOOK_STATUS_CODES, SALES_TYPE_NAME } from 'types/MarketingTypes';
 import { calculateWeekNumber, formatDate, getDateObject, getDifferenceInDays } from 'services/dateService';
 import { SCHEDULE_VIEW } from 'services/reports/schedule-report';
@@ -102,6 +102,33 @@ const getTotalInPound = ({ totalOfCurrency, conversionRate }) => {
   return totalOfCurrency['£'] ? new Decimal(totalOfCurrency['£']).plus(finalValOfEuro).toNumber() : finalValOfEuro;
 };
 
+const findNextBookingDate = (
+  currentDate: string,
+  map: Record<string, SALES_SUMMARY>,
+  FullProductionCode: string,
+  ShowName: string,
+  maxDays = 30, // Safety limit to prevent infinite loop
+): string | null => {
+  let checkDate = currentDate;
+  let daysChecked = 0;
+
+  while (daysChecked < maxDays) {
+    // Move to next date
+    checkDate = formatDate(add(parseISO(checkDate), { days: 1 }), 'yyyy-MM-dd');
+    daysChecked++;
+
+    // Check if this date has a booking entry
+    const key = getKey({ FullProductionCode, ShowName, EntryDate: checkDate });
+    const entry = map[key];
+
+    if (entry?.EntryType === 'Booking') {
+      return checkDate;
+    }
+  }
+
+  return null; // No booking found in next 30 days
+};
+
 const handler = async (req, res) => {
   try {
     const prisma = await getPrismaClient(req);
@@ -112,7 +139,9 @@ const handler = async (req, res) => {
     const data = await prisma.salesSummaryView.findMany({
       where: {
         ProductionId: productionId,
-        SaleTypeName: SALES_TYPE_NAME.GENERAL_SALES,
+        SaleTypeName: {
+          in: [SALES_TYPE_NAME.GENERAL_SALES, SALES_TYPE_NAME.SCHOOL_SALES],
+        },
       },
     });
     const schedule = await prisma.scheduleView.findMany({
@@ -144,7 +173,7 @@ const handler = async (req, res) => {
       pageSetup: { fitToPage: true, fitToHeight: 5, fitToWidth: 7 },
     });
 
-    if (!formattedData?.length) {
+    if (!schedule?.length) {
       res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
       res.setHeader('Content-Disposition', `attachment; filename="${filename}.xlsx"`);
 
@@ -154,7 +183,7 @@ const handler = async (req, res) => {
       return;
     }
 
-    const { FullProductionCode = '', ShowName = '' } = data?.[0] || {};
+    const { FullProductionCode = '', ShowName = '' } = schedule?.[0] || {};
     filename = `${FullProductionCode} ${ShowName} Gross Sales`;
     worksheet.addRow([`${filename}`]);
     const exportedAtTitle = getExportedAtTitle(exportedAt);
@@ -162,17 +191,27 @@ const handler = async (req, res) => {
 
     worksheet.addRow([]);
 
-    const map: { [key: string]: SALES_SUMMARY } = formattedData.reduce((acc, x) => ({ ...acc, [getKey(x)]: x }), {});
+    const map: { [key: string]: SALES_SUMMARY } = formattedData.reduce((acc, x) => {
+      const key = getKey(x);
+      const previousValue = acc[key];
+      return {
+        ...acc,
+        [key]: {
+          ...x,
+          Value: previousValue?.Value ? new Decimal(previousValue.Value).plus(x.Value).toNumber() : x.Value,
+        },
+      };
+    }, {});
     const scheduleMap: { [key: string]: SCHEDULE_VIEW } = formattedScheduleData.reduce(
       (acc, x) => ({ ...acc, [getKey(x)]: x }),
       {},
     );
-    const { ProductionStartDate: fromDate, ProductionEndDate: toDate } = data[0];
+    const { ProductionStartDate: fromDate, ProductionEndDate: toDate } = schedule?.[0] || {};
 
-    const daysDiff = getDifferenceInDays(fromDate?.toISOString(), toDate?.toISOString());
+    // +1 is for including the endDate
+    const daysDiff = getDifferenceInDays(fromDate?.toISOString(), toDate?.toISOString()) + 1;
 
     let colNo = 1;
-    let weekPending = false;
     let conversionRate = 0;
 
     const r4: string[] = [];
@@ -191,28 +230,40 @@ const handler = async (req, res) => {
     }[] = [];
     const totalOfCurrency: { [key: string]: number } = { '£': 0, '€': 0 };
     const weekStartList = [];
-    for (let i = 1; i <= daysDiff || weekPending; i++) {
-      weekPending = true;
+    const addWeekDetails = (weekNumber: number, colNo: number, padding = 7) => {
+      r4.push(`Week ${weekNumber}`);
+      r5.push('');
+      r6.push('');
+      r8.push('');
+      r9.push('');
+
+      weekStartList.push(colNo);
+
+      mergeRowCol.push({ row: [7, 8], col: [colNo, colNo] });
+      mergeRowCol.push({
+        row: [4, 4],
+        col: [colNo, colNo + padding],
+      });
+
+      r7.push('Weekly Costs');
+    };
+    for (let i = 1; i <= daysDiff; i++) {
       const weekDay = formatDate(add(parseISO(fromDate?.toISOString()), { days: i - 1 }), 'eeee');
       const dateInIncomingFormat = formatDate(add(parseISO(fromDate?.toISOString()), { days: i - 1 }), 'yyyy-MM-dd');
-      const nextDateInIncomingFormat = formatDate(add(parseISO(fromDate?.toISOString()), { days: i }), 'yyyy-MM-dd');
+      const nextBookingDate = findNextBookingDate(dateInIncomingFormat, map, FullProductionCode, ShowName);
       const date = formatDate(dateInIncomingFormat, 'dd/MM/yy');
       const weekNumber = calculateWeekNumber(fromDate, getDateObject(dateInIncomingFormat));
+      if (i === 1 && weekDay !== 'Monday') {
+        // +2 is for including currentday and sunday
+        addWeekDetails(weekNumber, colNo, calculateRemainingDaysInWeek(weekDay) + 2);
+        colNo++;
+      }
       if (weekDay === 'Monday') {
         if (i > 1 && i < 7) {
           mergeRowCol.push({ row: [4, 4], col: [1, colNo - 1] });
         }
-        const remainingDays = daysDiff - i + 1;
-        r4.push(`Week ${weekNumber}`);
-        r5.push('');
-        r6.push('');
-        r8.push('');
-        r9.push('');
-        weekStartList.push(colNo);
-        mergeRowCol.push({ row: [7, 8], col: [colNo, colNo] });
-        // +1 for weekly costs column
-        mergeRowCol.push({ row: [4, 4], col: [colNo, Math.min(colNo + 7, colNo + remainingDays + 1)] });
-        r7.push('Weekly Costs');
+        const remainingDays = daysDiff - i;
+        addWeekDetails(weekNumber, colNo, remainingDays < 5 ? remainingDays + 1 : 7);
         colNo++;
       }
 
@@ -226,9 +277,10 @@ const handler = async (req, res) => {
       }
 
       const key = getKey({ FullProductionCode, ShowName, EntryDate: dateInIncomingFormat });
-      const nextKey = getKey({ FullProductionCode, ShowName, EntryDate: nextDateInIncomingFormat });
       const value: SALES_SUMMARY = map[key];
-      const nextValue: SALES_SUMMARY = map[nextKey];
+      const nextValue: SALES_SUMMARY = nextBookingDate
+        ? map[getKey({ FullProductionCode, ShowName, EntryDate: nextBookingDate })]
+        : null;
       const scheduleValue: SCHEDULE_VIEW = scheduleMap[key];
       const statusCode = (value || scheduleValue)?.EntryStatusCode;
       const isCancelled = statusCode === 'X';
@@ -300,9 +352,6 @@ const handler = async (req, res) => {
         });
       }
 
-      if (i % 7 === 0) {
-        weekPending = false;
-      }
       colNo++;
     }
     weekStartList.push(colNo);
@@ -353,7 +402,11 @@ const handler = async (req, res) => {
 
     mergeRowCol.forEach((ele) => {
       const { row, col } = ele;
-      worksheet.mergeCells(row[0], col[0], row[1], col[1]);
+      try {
+        worksheet.mergeCells(row[0], col[0], row[1], col[1]);
+      } catch (e) {
+        console.log(e?.message || 'Merging cells failed');
+      }
     });
 
     const numberOfColumns = worksheet.columnCount;

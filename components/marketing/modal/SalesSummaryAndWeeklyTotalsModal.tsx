@@ -47,12 +47,14 @@ const SalesSummaryReportModal = ({ visible, onClose, activeModal }: SalesSummary
   const [loading, setLoading] = useState(false);
   const title = useMemo(() => getModalTitle(activeModal), [activeModal]);
   const { production, productionWeek, numberOfWeeks, order } = formData;
-  const updateProductionWeek = useCallback(() => {
-    const currentWeekMonday = getCurrentMondayDate();
-    setFormData((data) => ({ ...data, productionWeek: currentWeekMonday }));
-  }, []);
+  const updateProductionWeek = useCallback(
+    (week) => {
+      setFormData((data) => ({ ...data, productionWeek: week }));
+    },
+    [setFormData],
+  );
   const { data: weeks = [] } = useQuery({
-    queryKey: ['productionWeeks' + production],
+    queryKey: ['productionWeeks', production],
     queryFn: async () => {
       if (!production) return;
       const productionWeekPromise = fetchProductionWeek(production);
@@ -62,9 +64,16 @@ const SalesSummaryReportModal = ({ visible, onClose, activeModal }: SalesSummary
         error: 'Error fetching production weeks',
       });
       const result = await productionWeekPromise;
-      updateProductionWeek();
+      const currentWeekMonday = getCurrentMondayDate();
+      console.log('currentWeekMonday', currentWeekMonday);
+      const currentWeekExists = result.findIndex((week) => week.mondayDate === currentWeekMonday);
+      if (currentWeekExists !== -1) {
+        updateProductionWeek(currentWeekMonday);
+      }
       return result;
     },
+    refetchOnWindowFocus: false,
+    enabled: !!production,
   });
 
   const prodweekOptions: SelectOption[] = useMemo(
@@ -89,7 +98,7 @@ const SalesSummaryReportModal = ({ visible, onClose, activeModal }: SalesSummary
 
   const onChange = useCallback(
     (key: string, value: string | number) => {
-      setFormData((data) => ({ ...data, [key]: value }));
+      setFormData((data) => ({ ...data, [key]: value, ...(key === 'production' && { productionWeek: null }) }));
     },
     [setFormData],
   );
@@ -173,9 +182,9 @@ const SalesSummaryReportModal = ({ visible, onClose, activeModal }: SalesSummary
             sufixIconName="excel"
             iconProps={{ className: 'h-4 w-3' }}
             text="Export to Excel"
-            disabled={loading}
+            disabled={loading || !productionWeek}
           />
-          <Button
+          {/* <Button
             onClick={() => onExport('pdf')}
             className="float-right px-4 font-normal w-33 text-center"
             variant="primary"
@@ -183,7 +192,7 @@ const SalesSummaryReportModal = ({ visible, onClose, activeModal }: SalesSummary
             iconProps={{ className: 'h-4 w-3' }}
             text="Export to PDF"
             disabled={loading}
-          />
+          /> */}
         </div>
       </form>
     </PopupModal>
