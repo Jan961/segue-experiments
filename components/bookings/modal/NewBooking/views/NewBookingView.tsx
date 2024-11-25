@@ -22,12 +22,12 @@ import Label from 'components/core-ui-lib/Label';
 import { areDatesSame, dateToSimple, formattedDateWithWeekDay, getArrayOfDatesBetween } from 'services/dateService';
 import { debug } from 'utils/logging';
 import { isNullOrEmpty } from 'utils';
+import { accessBookingsHome } from 'state/account/selectors/permissionSelector';
 
 type AddBookingProps = {
   formData: TForm;
   dayTypeOptions: SelectOption[];
   venueOptions: SelectOption[];
-  productionCode: string;
   updateBookingConflicts: (bookingConflicts: BookingWithVenueDTO[]) => void;
   updateBarringConflicts: (barringConflicts: BarredVenue[]) => void;
   onBarringCheckComplete: (nextStep: string) => void;
@@ -42,7 +42,6 @@ const NewBookingView = ({
   onChange,
   onSubmit,
   formData,
-  productionCode,
   dayTypeOptions,
   venueOptions,
   updateBookingConflicts,
@@ -51,7 +50,7 @@ const NewBookingView = ({
   updateModalTitle,
 }: AddBookingProps) => {
   const { goToStep } = useWizard();
-
+  const permissions = useRecoilValue(accessBookingsHome);
   const currentProduction = useRecoilValue(currentProductionSelector);
   const scheduleRange = useRecoilValue(dateBlockSelector);
   const [stage, setStage] = useState<number>(0);
@@ -176,7 +175,6 @@ const NewBookingView = ({
   };
   return (
     <div className="w-[385px]">
-      <div className="text-primary-navy text-xl my-2 font-bold">{productionCode}</div>
       <form className="flex flex-col bg-primary-navy py-3 pl-4 pr-5 rounded-lg" onSubmit={handleOnSubmit}>
         <DateRange
           testId="cnb-date-range"
@@ -287,7 +285,9 @@ const NewBookingView = ({
         >
           <Button
             onClick={handleCheckMileageClick}
-            disabled={!venueId || !fromDate || !toDate || isDateTypeOnly}
+            disabled={
+              !permissions.includes('ACCESS_MILEAGE_CHECK') || !venueId || !fromDate || !toDate || isDateTypeOnly
+            }
             className="px-6"
             text="Check Mileage"
           />

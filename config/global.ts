@@ -75,6 +75,8 @@ export const emailRegex = /^[\w-\\.]+@([\w-]+\.)+[\w-]{2,4}$/;
 
 export const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
-export const NEW_ACCOUNT_CONFIRMATION_EMAIL_TEMPLATE = 'Confirm New Account';
-export const NEW_USER_CONFIRMATION_EMAIL_TEMPLATE = 'Confirm New User';
-export const SEND_ACCOUNT_PIN_TEMPLATE = 'Send Account Pin';
+export const NEW_ACCOUNT_WELCOME_EMAIL = 'NEW_ACCOUNT_WELCOME_EMAIL';
+export const NEW_USER_VERIFY_EMAIL = 'NEW_USER_VERIFY_EMAIL';
+export const NEW_ACCOUNT_SETUP_EMAIL = 'NEW_ACCOUNT_SETUP_EMAIL';
+export const NEW_USER_WELCOME_EMAIL = 'NEW_USER_WELCOME_EMAIL';
+export const NEW_USER_PIN_EMAIL = 'NEW_USER_PIN_EMAIL';

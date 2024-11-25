@@ -1340,7 +1340,7 @@ view BookingDateDiffView {
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view BookingHoldCompsView {
-  FullProductionCode String?  @db.VarChar(20)
+  FullProductionCode String   @db.VarChar(20)
   VenueCode          String   @db.VarChar(6)
   VenueName          String   @db.VarChar(255)
   VenueSeats         Float?
@@ -1353,7 +1353,7 @@ view BookingHoldCompsView {
   SoldSeats          Decimal? @db.Decimal(32, 0)
   ReservedSeats      Decimal? @db.Decimal(32, 0)
 
-  @@ignore
+  @@id([FullProductionCode, VenueCode, Code])
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
@@ -1364,8 +1364,8 @@ view PromoterHoldsView {
   VenueCode                            String    @db.VarChar(6)
   VenueName                            String    @db.VarChar(255)
   BookingId                            Int       @default(0)
-  PerformanceDate                      DateTime? @db.Date
-  PerformanceTime                      DateTime? @db.Time(0)
+  PerformanceDate                      DateTime  @db.Date
+  PerformanceTime                      DateTime  @db.Time(0)
   AvailableCompSeats                   Int?      @default(1) @db.TinyInt
   AvailableCompNotes                   String?   @db.LongText
   CompAllocationSeats                  Int?      @default(1) @db.TinyInt
@@ -1377,7 +1377,7 @@ view PromoterHoldsView {
   CompAllocationArrangedBy             String?   @db.VarChar(101)
   CompAllocationVenueConfirmationNotes String?   @db.VarChar(100)
 
-  @@ignore
+  @@id([ProductionId, BookingId, PerformanceDate, PerformanceTime])
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
@@ -1537,7 +1537,7 @@ view SalesView {
   SetSingleSeats              Boolean?  @default(dbgenerated("(b'0')")) @db.Bit(1)
   SetBrochureReleased         Boolean?  @default(dbgenerated("(b'0')")) @db.Bit(1)
   SetIsCopy                   Boolean?  @default(dbgenerated("(b'0')")) @db.Bit(1)
-  SaleTypeName                String    @db.VarChar(45)
+  SaleTypeName                String   @db.VarChar(45)
   Seats                       Decimal?  @db.Decimal(32, 0)
   Value                       Decimal?  @db.Decimal(32, 2)
   TotalCapacity               Float?
@@ -1567,7 +1567,6 @@ view BookingSelectionView {
   @@id([BookingId, VenueId, ProductionId])
 }
 
-/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view SalesSummaryView {
   ProductionId               Int       @default(0)
   FullProductionCode         String?   @db.VarChar(20)

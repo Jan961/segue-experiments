@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react';
 import { DateInput, Icon, Select, TextInput } from 'components/core-ui-lib';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
+import { CustomOption } from 'components/core-ui-lib/Table/renderers/SelectCellRenderer';
 import { workTypeOptions } from 'config/contracts';
 import { insertAtPos, removeAtPos, replaceAtPos } from 'utils';
 import { IOtherWorkType, IPersonDetails } from '../types';
@@ -17,12 +18,12 @@ export const defaultPersonDetails = {
   mobileNumber: '',
   passportName: '',
   passportNumber: '',
-  hasUKWorkPermit: false,
+  hasUKWorkPermit: null,
   passportExpiryDate: null,
   postcode: '',
   checkedBy: null,
   country: null,
-  isFEURequired: false,
+  isFEURequired: null,
   workType: [],
   advisoryNotes: '',
   generalNotes: '',
@@ -32,6 +33,7 @@ export const defaultPersonDetails = {
 };
 
 interface PersonalDetailsProps {
+  disabled: boolean;
   countryOptionList: SelectOption[];
   booleanOptions: SelectOption[];
   userOptionList: SelectOption[];
@@ -40,6 +42,7 @@ interface PersonalDetailsProps {
 }
 
 const PersonalDetails = ({
+  disabled,
   countryOptionList,
   booleanOptions,
   userOptionList,
@@ -69,7 +72,7 @@ const PersonalDetails = ({
     advisoryNotes,
     generalNotes,
     healthDetails,
-    otherWorkTypes,
+    otherWorkTypes = [{ name: '' }],
     notes,
   } = formData;
   const handleChange = useCallback(
@@ -80,6 +83,14 @@ const PersonalDetails = ({
     },
     [onChange, setFormData, formData, details],
   );
+  const handleAddRemoveOtherWorkType = (position: number) => {
+    handleChange(
+      'otherWorkTypes',
+      position === otherWorkTypes?.length - 1
+        ? (insertAtPos(otherWorkTypes, { name: '' }, position + 1) as IOtherWorkType[])
+        : (removeAtPos(otherWorkTypes, position) as string[]),
+    );
+  };
   return (
     <>
       <div className="grid grid-cols-2 gap-x-4">
@@ -93,6 +104,7 @@ const PersonalDetails = ({
                 className="text-primary-input-text font-bold w-full max-w-96"
                 onChange={(event) => handleChange('firstName', event.target.value)}
                 value={firstName}
+                disabled={disabled}
               />
             </div>
           </div>
@@ -105,6 +117,7 @@ const PersonalDetails = ({
                 className="text-primary-input-text font-bold w-full max-w-96"
                 onChange={(event) => handleChange('lastName', event.target.value)}
                 value={lastName}
+                disabled={disabled}
               />
             </div>
           </div>
@@ -117,6 +130,7 @@ const PersonalDetails = ({
                 className="text-primary-input-text font-bold w-full max-w-96"
                 onChange={(event) => handleChange('address1', event.target.value)}
                 value={address1}
+                disabled={disabled}
               />
               <TextInput
                 testId="person-address-2"
@@ -124,6 +138,7 @@ const PersonalDetails = ({
                 className="text-primary-input-text font-bold w-full mt-2 max-w-96"
                 onChange={(event) => handleChange('address2', event.target.value)}
                 value={address2}
+                disabled={disabled}
               />
               <TextInput
                 testId="person-address-3"
@@ -131,6 +146,7 @@ const PersonalDetails = ({
                 className="text-primary-input-text font-bold w-full mt-2 max-w-96"
                 onChange={(event) => handleChange('address3', event.target.value)}
                 value={address3}
+                disabled={disabled}
               />
             </div>
           </div>
@@ -143,6 +159,7 @@ const PersonalDetails = ({
                 className=" text-primary-input-text font-bold w-full max-w-96"
                 onChange={(event) => handleChange('town', event.target.value)}
                 value={town}
+                disabled={disabled}
               />
             </div>
           </div>
@@ -155,6 +172,7 @@ const PersonalDetails = ({
                 className=" text-primary-input-text font-bold w-full max-w-96"
                 onChange={(event) => handleChange('postcode', event.target.value)}
                 value={postcode}
+                disabled={disabled}
               />
             </div>
           </div>
@@ -170,13 +188,14 @@ const PersonalDetails = ({
                 value={country}
                 isClearable
                 isSearchable
+                disabled={disabled}
               />
             </div>
           </div>
         </div>
 
         <div className="flex flex-col gap-2">
-          <div className="flex items-center">
+          <div className="flex items-start gap-4">
             <div className="text-primary-input-text font-bold w-44">Email Address</div>
             <div className="grow">
               <TextInput
@@ -185,10 +204,11 @@ const PersonalDetails = ({
                 className="text-primary-input-text font-bold w-full max-w-96"
                 onChange={(event) => handleChange('email', event.target.value)}
                 value={email}
+                disabled={disabled}
               />
             </div>
           </div>
-          <div className="flex items-center">
+          <div className="flex items-start gap-4">
             <div className="text-primary-input-text font-bold w-44">Landline Number</div>
             <div className="grow">
               <TextInput
@@ -197,10 +217,11 @@ const PersonalDetails = ({
                 className="text-primary-input-text font-bold w-full max-w-96"
                 onChange={(event) => handleChange('landline', event.target.value)}
                 value={landline}
+                disabled={disabled}
               />
             </div>
           </div>
-          <div className="flex items-center">
+          <div className="flex items-start gap-4">
             <div className="text-primary-input-text font-bold w-44">Mobile Number</div>
             <div className="grow">
               <TextInput
@@ -209,10 +230,11 @@ const PersonalDetails = ({
                 className="text-primary-input-text font-bold w-full max-w-96"
                 onChange={(event) => handleChange('mobileNumber', event.target.value)}
                 value={mobileNumber}
+                disabled={disabled}
               />
             </div>
           </div>
-          <div className="flex items-center">
+          <div className="flex items-start gap-4">
             <div className="text-primary-input-text font-bold w-44">Full Name as it appears on Passport</div>
             <div className="max-w-96">
               <TextInput
@@ -221,10 +243,11 @@ const PersonalDetails = ({
                 className="text-primary-input-text font-bold w-full max-w-96"
                 onChange={(event) => handleChange('passportName', event.target.value)}
                 value={passportName}
+                disabled={disabled}
               />
             </div>
           </div>
-          <div className="flex items-center">
+          <div className="flex items-start gap-4">
             <div className="text-primary-input-text font-bold w-44">Passport Number</div>
             <div className="max-w-96">
               <TextInput
@@ -233,16 +256,18 @@ const PersonalDetails = ({
                 className="text-primary-input-text font-bold w-full max-w-96"
                 onChange={(event) => handleChange('passportNumber', event.target.value)}
                 value={passportNumber}
+                disabled={disabled}
               />
             </div>
           </div>
-          <div className="flex items-center">
+          <div className="flex items-center gap-4">
             <div className="text-primary-input-text font-bold w-44">Passport Expiry Date</div>
             <div className="max-w-96 flex items-center">
               <DateInput
                 testId="person-passport-expiry-date"
                 onChange={(value) => handleChange('passportExpiryDate', value?.toISOString?.() || '')}
                 value={passportExpiryDate}
+                disabled={disabled}
               />
               <div className="text-xs text-primary-input-text font-bold ml-4">
                 (<span className="underline">NOTE:</span> Expiry date is 10 years from{' '}
@@ -250,7 +275,7 @@ const PersonalDetails = ({
               </div>
             </div>
           </div>
-          <div className="flex items-center">
+          <div className="flex items-center gap-4">
             <div className="text-primary-input-text font-bold w-44">Eligible to Work in the UK</div>
             <div className="max-w-96  flex items-center">
               <Select
@@ -258,40 +283,44 @@ const PersonalDetails = ({
                 onChange={(value) => handleChange('hasUKWorkPermit', value as string)}
                 value={hasUKWorkPermit}
                 className="bg-primary-white w-40"
-                placeholder="YES/NO."
+                placeholder="YES/NO"
                 options={booleanOptions}
                 isClearable
                 isSearchable
+                disabled={disabled}
               />
-              <div className="text-primary-input-text font-bold ml-2 mr-2 w-20">Checked</div>
-              <div className="grow">
-                <Select
-                  testId="person-checked-by"
-                  onChange={(value) => handleChange('checkedBy', value as number)}
-                  value={checkedBy}
-                  className="bg-primary-white w-full"
-                  placeholder="Please select..."
-                  options={userOptionList}
-                  isClearable
-                  isSearchable
-                />
-              </div>
             </div>
           </div>
-          <div className="flex items-center">
-            <div className="text-primary-input-text font-bold w-44">
+          <div className="flex items-center gap-4">
+            <div className="text-primary-input-text font-bold  w-44">Checked</div>
+            <div className="max-w-96 grow flex items-center">
+              <Select
+                testId="person-checked-by"
+                onChange={(value) => handleChange('checkedBy', value as number)}
+                value={checkedBy}
+                className="bg-primary-white w-full"
+                placeholder="Please select..."
+                options={userOptionList}
+                isClearable
+                isSearchable
+              />
+            </div>
+          </div>
+          <div className="flex items-center gap-4 justify-between w-full">
+            <div className="text-primary-input-text font-bold ">
               Is FEU (Foreign Entertainer Union) permission required
             </div>
-            <div className="grow ">
+            <div className="grow float-right">
               <Select
                 testId="person-is-feu-required"
                 onChange={(value) => handleChange('isFEURequired', value as string)}
                 value={isFEURequired}
                 className="bg-primary-white w-40 mr-3 max-w-96"
-                placeholder="Please select.."
+                placeholder="YES/NO"
                 options={booleanOptions}
                 isClearable
                 isSearchable
+                disabled={disabled}
               />
             </div>
           </div>
@@ -307,6 +336,7 @@ const PersonalDetails = ({
             placeholder="Notes"
             onChange={(event) => handleChange('generalNotes', event.target.value)}
             value={generalNotes}
+            disabled={disabled}
           />
         </div>
       </div>
@@ -319,6 +349,7 @@ const PersonalDetails = ({
             placeholder="Notes"
             onChange={(event) => handleChange('healthDetails', event.target.value)}
             value={healthDetails}
+            disabled={disabled}
           />
         </div>
       </div>
@@ -332,6 +363,7 @@ const PersonalDetails = ({
             placeholder="Notes"
             onChange={(event) => handleChange('advisoryNotes', event.target.value)}
             value={advisoryNotes}
+            disabled={disabled}
           />
         </div>
       </div>
@@ -346,9 +378,11 @@ const PersonalDetails = ({
               className="bg-primary-white w-full max-w-96"
               placeholder="Please select.."
               options={workTypeOptions}
+              renderOption={(option) => <CustomOption option={option} isMulti={true} />}
               isMulti
               isClearable
               isSearchable
+              disabled={disabled}
             />
             {otherWorkTypes.map((otherWorkType: IOtherWorkType, i) => (
               <div key={i} className="flex items-center gap-2 w-full">
@@ -368,28 +402,12 @@ const PersonalDetails = ({
                   }
                   placeholder="Other Type of Work"
                   value={otherWorkType.name}
+                  disabled={disabled}
                 />
-                {i === 0 && (
-                  <div
-                    className="cursor-pointer"
-                    onClick={() =>
-                      handleChange(
-                        'otherWorkTypes',
-                        insertAtPos(otherWorkTypes, { name: '' }, i + 1) as IOtherWorkType[],
-                      )
-                    }
-                  >
-                    <Icon iconName="plus-circle-solid" />
-                  </div>
-                )}
-                {i > 0 && (
-                  <div
-                    className="cursor-pointer"
-                    onClick={() => handleChange('otherWorkTypes', removeAtPos(otherWorkTypes, i) as string[])}
-                  >
-                    <Icon iconName="minus-circle-solid" />
-                  </div>
-                )}
+                <div className="cursor-pointer" onClick={() => handleAddRemoveOtherWorkType(i)}>
+                  <Icon iconName={i === otherWorkTypes?.length - 1 ? 'plus-circle-solid' : 'minus-circle-solid'} />
+                </div>
+                {/* )} */}
               </div>
             ))}
 
@@ -399,6 +417,7 @@ const PersonalDetails = ({
               onChange={(event) => handleChange('notes', event.target.value)}
               value={notes}
               placeholder="Notes Field"
+              disabled={disabled}
             />
           </div>
         </div>

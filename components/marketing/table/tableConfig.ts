@@ -13,7 +13,12 @@ import SelectRenderer from 'components/core-ui-lib/Table/renderers/SelectRendere
 
 export const styleProps = { headerColor: tileColors.marketing };
 
-export const activityColDefs = (updateActivity, currencySymbol) => [
+export const activityColDefs = (
+  updateActivity: (type: string, data: any) => void,
+  currencySymbol: string,
+  editPermission: boolean,
+  deletePermission: boolean,
+) => [
   {
     headerName: 'Activity Name',
     field: 'actName',
@@ -106,12 +111,14 @@ export const activityColDefs = (updateActivity, currencySymbol) => [
         {
           name: 'edit',
           table: 'activity',
-          onClick: () => updateActivity('edit', params.data),
+          onClick: () => (editPermission ? updateActivity('edit', params.data) : null),
+          color: editPermission ? '#617293' : '#ddd',
         },
         {
           name: 'delete',
           table: 'activity',
-          onClick: () => updateActivity('delete', params.data),
+          onClick: () => (deletePermission ? updateActivity('delete', params.data) : null),
+          color: deletePermission ? '#617293' : '#ddd',
         },
       ],
     }),
@@ -229,16 +236,10 @@ export const allocSeatsColDefs = [
     headerName: 'Name / Email of Person Receiving Tickets',
     field: 'name_email',
     cellRenderer: TwoLineRenderer,
-    cellRendererParams: (params) => {
-      return {
-        value: params.data.TicketHolderName + '\n' + params.data.TicketHolderEmail,
-      };
-    },
     cellStyle: {
       marginLeft: '4px',
     },
     wrapText: true,
-    autoHeight: true,
     width: 200,
   },
   {
@@ -433,7 +434,12 @@ export const updateWarningColDefs = (type) => {
   return colDefs;
 };
 
-export const globalActivityColDefs = (updateActivity, currencySymbol) => [
+export const globalActivityColDefs = (
+  updateActivity: (type: string, data: any) => void,
+  currencySymbol: string,
+  editPermission: boolean,
+  deletePermission: boolean,
+) => [
   {
     headerName: 'Id',
     field: 'id',
@@ -523,11 +529,15 @@ export const globalActivityColDefs = (updateActivity, currencySymbol) => [
       iconList: [
         {
           name: 'edit',
-          onClick: () => updateActivity('edit', params.data),
+          table: 'activity',
+          onClick: () => (editPermission ? updateActivity('edit', params.data) : null),
+          color: editPermission ? '#617293' : '#ddd',
         },
         {
           name: 'delete',
-          onClick: () => updateActivity('delete', params.data),
+          table: 'activity',
+          onClick: () => (deletePermission ? updateActivity('delete', params.data) : null),
+          color: deletePermission ? '#617293' : '#ddd',
         },
       ],
     }),
@@ -601,7 +611,11 @@ export const globalModalVenueColDefs = (weekList, selectVenue, selectMultiVenue,
   return colDefs;
 };
 
-export const globalActivityTabColDefs = (showGlobalActivity, currencySymbol) => [
+export const globalActivityTabColDefs = (
+  showGlobalActivity: (data: any) => void,
+  currencySymbol: string,
+  accessInfoPermission: boolean,
+) => [
   {
     headerName: 'Activity Name',
     field: 'actName',
@@ -672,7 +686,8 @@ export const globalActivityTabColDefs = (showGlobalActivity, currencySymbol) => 
       iconList: [
         {
           name: 'info-circle-solid',
-          onClick: () => showGlobalActivity(params.data),
+          onClick: () => (accessInfoPermission ? showGlobalActivity(params.data) : null),
+          color: accessInfoPermission ? '#617293' : '#ddd',
         },
       ],
     }),

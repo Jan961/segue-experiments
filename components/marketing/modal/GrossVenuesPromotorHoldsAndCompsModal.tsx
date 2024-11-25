@@ -69,7 +69,7 @@ const GrossVenuesPromotorHoldsAndCompsModal = ({
     return options;
   }, [productions]);
   const { data: venues = [] } = useQuery({
-    queryKey: ['productionWeeks' + production],
+    queryKey: ['productionWeeks', production],
     queryFn: () => {
       if (!production || !['promotorHolds', 'holdsAndComps'].includes(activeModal)) return;
       const productionVenuesPromise = fetchProductionVenues(production);
@@ -80,6 +80,8 @@ const GrossVenuesPromotorHoldsAndCompsModal = ({
       });
       return productionVenuesPromise;
     },
+    refetchOnWindowFocus: false,
+    enabled: !!production,
   });
 
   const prodVenuesOptions: SelectOption[] = useMemo(() => {
@@ -146,6 +148,7 @@ const GrossVenuesPromotorHoldsAndCompsModal = ({
           onChange={(value) => onChange('production', value as number)}
           options={productionsOptions}
           value={production}
+          isSearchable
         />
 
         {['holdsAndComps', 'promotorHolds'].includes(activeModal) && (
@@ -206,7 +209,7 @@ const GrossVenuesPromotorHoldsAndCompsModal = ({
             disabled={loading}
             onClick={() => onExport('excel')}
           />
-          <Button
+          {/* <Button
             onClick={() => onExport('pdf')}
             className="float-right px-4 font-normal w-33 text-center"
             variant="primary"
@@ -214,7 +217,7 @@ const GrossVenuesPromotorHoldsAndCompsModal = ({
             iconProps={{ className: 'h-4 w-3' }}
             text="Export to PDF"
             disabled={loading}
-          />
+          /> */}
         </div>
       </form>
     </PopupModal>

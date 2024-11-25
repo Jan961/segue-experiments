@@ -17,6 +17,7 @@ import ExportModal from 'components/core-ui-lib/ExportModal';
 import { exportToExcel, exportToPDF } from 'utils/export';
 import axios from 'axios';
 import { venueHistoryOptionsSelector } from 'state/booking/selectors/venueHistoryOptionsSelector';
+import { accessBookingsHome } from 'state/account/selectors/permissionSelector';
 
 interface VenueHistoryProps {
   visible: boolean;
@@ -34,6 +35,7 @@ const TableWrapper = styled.div<TableWrapperProps>`
 `;
 
 export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) => {
+  const permissions = useRecoilValue(accessBookingsHome);
   const [showVenueSelectModal, setShowVenueSelect] = useState<boolean>(visible);
   const [showCompSelectModal, setShowCompSelect] = useState<boolean>(false);
   const [showResultsModal, setShowResults] = useState<boolean>(false);
@@ -191,6 +193,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
       setShowCompSelect(false);
       setShowVenueSelect(true);
     } else if (type === 'venue') {
+      setVenueDesc('');
       setVenueSelectView('select');
     }
   };
@@ -235,12 +238,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
   };
   return (
     <div>
-      <PopupModal
-        show={showVenueSelectModal}
-        title="Venue History"
-        titleClass="text-xl text-primary-navy font-bold"
-        onClose={handleModalCancel}
-      >
+      <PopupModal show={showVenueSelectModal} title="Venue History" onClose={handleModalCancel}>
         <div className="w-[417px] p-2">
           {venueSelectView === 'select' ? (
             <div className="flex flex-col">
@@ -285,10 +283,9 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
         titleClass="text-xl text-primary-navy font-bold -mt-2"
         onClose={handleModalCancel}
         hasOverlay={showSalesSnapshot}
+        subtitle={venueDesc}
       >
-        <div className="w-[920px] h-auto">
-          <div className="text-xl text-primary-navy font-bold mb-4">{venueDesc}</div>
-
+        <div className="w-[920px]">
           {showCompSelectModal && (
             <SalesTable
               salesTableRef={salesTableRef}
@@ -321,10 +318,9 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
         title="Venue History"
         titleClass="text-xl text-primary-navy font-bold -mt-2"
         onClose={handleModalCancel}
+        subtitle={venueDesc}
       >
         <TableWrapper multiplier={selectedBookings.length}>
-          <div className="text-xl text-primary-navy font-bold mb-4">{venueDesc}</div>
-
           {showResultsModal && (
             <SalesTable
               salesTableRef={salesTableRef}
@@ -333,6 +329,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
               module="bookings"
               variant="salesComparison"
               data={salesCompData}
+              tableHeight={650}
             />
           )}
         </TableWrapper>
@@ -351,6 +348,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
             text="Export"
             iconProps={{ className: 'h-4 w-3' }}
             sufixIconName="excel"
+            disabled={!permissions.includes('EXPORT_VENUE_HISTORY')}
           />
           <Button className="ml-4 w-32 mr-1" variant="primary" text="Close" onClick={handleModalCancel} />
         </div>
@@ -379,10 +377,9 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
         titleClass="text-xl text-primary-navy font-bold -mt-2"
         onClose={handleModalCancel}
         hasOverlay={false}
+        subtitle={venueDesc}
       >
         <div className="w-auto h-auto">
-          <div className="text-xl text-primary-navy font-bold mb-4">{venueDesc}</div>
-
           <SalesTable
             salesTableRef={salesTableRef}
             containerHeight="h-auto"
@@ -399,6 +396,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
               text="Export"
               iconProps={{ className: 'h-4 w-3' }}
               sufixIconName="excel"
+              disabled={!permissions.includes('EXPORT_VENUE_HISTORY')}
             />
             <Button className="w-32" variant="primary" text="Close" onClick={() => setShowSalesSnapshot(false)} />
           </div>

@@ -1,4 +1,13 @@
-import { getNextMondayDateString, getTimeFromDateAndTime, addDurationToDate, isValidDate } from '../dateService';
+import {
+  getNextMondayDateString,
+  getTimeFromDateAndTime,
+  addDurationToDate,
+  isValidDate,
+  compareDatesWithoutTime,
+  getDateWithOffset,
+  getDifferenceInDays,
+} from '../dateService';
+import { parse } from 'date-fns';
 
 // ----------------- getNextMondayDateString -----------------
 describe('getNextMondayDateString Utility Function', () => {
@@ -160,5 +169,165 @@ describe('isValidDate', () => {
 
   test('returns true for date object as a string', () => {
     expect(isValidDate(new Date().toString())).toBe(true);
+  });
+});
+
+// ----------------- compare dates -----------------
+describe('compareDatesWithoutTime', () => {
+  test('should return true when date1 < date2', () => {
+    expect(compareDatesWithoutTime('2023-01-01', '2023-01-02', '<')).toBe(true);
+  });
+
+  test('should return false when date1 >= date2 with operator "<"', () => {
+    expect(compareDatesWithoutTime('2023-01-02', '2023-01-01', '<')).toBe(false);
+  });
+
+  test('should return true when date1 <= date2 with the same date', () => {
+    expect(compareDatesWithoutTime('2023-01-01', '2023-01-01', '<=')).toBe(true);
+  });
+
+  test('should return true when date1 > date2', () => {
+    expect(compareDatesWithoutTime('2023-01-02', '2023-01-01', '>')).toBe(true);
+  });
+
+  test('should return false when date1 <= date2 with operator ">"', () => {
+    expect(compareDatesWithoutTime('2023-01-01', '2023-01-02', '>')).toBe(false);
+  });
+
+  test('should return true when date1 >= date2 with the same date', () => {
+    expect(compareDatesWithoutTime('2023-01-01', '2023-01-01', '>=')).toBe(true);
+  });
+
+  test('should return true when date1 == date2', () => {
+    expect(compareDatesWithoutTime('2023-01-01', '2023-01-01', '==')).toBe(true);
+  });
+
+  test('should return false when date1 != date2 with same date', () => {
+    expect(compareDatesWithoutTime('2023-01-01', '2023-01-01', '!=')).toBe(false);
+  });
+
+  test('should return true when date1 != date2 with different dates', () => {
+    expect(compareDatesWithoutTime('2023-01-01', '2023-01-02', '!=')).toBe(true);
+  });
+
+  test('should work correctly with Date objects as inputs', () => {
+    expect(compareDatesWithoutTime(new Date('2023-01-01'), new Date('2023-01-02'), '<')).toBe(true);
+  });
+
+  test('should work correctly with numeric timestamps as inputs', () => {
+    const date1 = new Date('2023-01-01').getTime();
+    const date2 = new Date('2023-01-02').getTime();
+    expect(compareDatesWithoutTime(date1, date2, '<')).toBe(true);
+  });
+
+  test('should normalize time correctly and only compare dates', () => {
+    const date1 = new Date('2023-01-01T12:00:00');
+    const date2 = new Date('2023-01-01T08:00:00');
+    expect(compareDatesWithoutTime(date1, date2, '==')).toBe(true);
+  });
+});
+
+// ----------------- getDateWithOffset -----------------
+describe('getDateWithOffset', () => {
+  test('should return a correctly formatted date with offset', () => {
+    const inputDate = new Date('2024-10-31T12:00:00Z');
+    const result = getDateWithOffset(inputDate);
+
+    // Use date string as expected output to ensure we match format
+    const expectedDateString = 'October 31st 2024, 12:00:00 PM';
+    const expectedDate = parse(expectedDateString, 'MMMM do yyyy, h:mm:ss a', new Date());
+
+    expect(result.toDateString()).toBe(expectedDate.toDateString());
+  });
+
+  test('should handle an invalid date input gracefully', () => {
+    const invalidDate = new Date('Invalid Date');
+    const result = getDateWithOffset(invalidDate);
+
+    expect(result.toString()).toBe('Invalid Date');
+  });
+
+  test('should return the same date when timezone offset is zero', () => {
+    const inputDate = new Date('2024-10-31T12:00:00Z');
+    const result = getDateWithOffset(inputDate);
+
+    expect(result.toDateString()).toBe(inputDate.toDateString());
+  });
+
+  test('should correctly parse a known date string back into a Date object', () => {
+    const inputDate = new Date('2024-10-31T14:00:00Z');
+    const result = getDateWithOffset(inputDate);
+
+    // Adjust expectation to align with specific date-time results
+    const expectedParsedDateString = 'October 31st 2024, 2:00:00 PM';
+    const parsedDate = parse(expectedParsedDateString, 'MMMM do yyyy, h:mm:ss a', new Date());
+
+    expect(result.toISOString()).toBe(parsedDate.toISOString());
+  });
+});
+
+// ----------------- getDifferenceInDays -----------------
+describe('getDifferenceInDays', () => {
+  test('should return the correct number of days between two valid dates', () => {
+    const from = '2023-10-01';
+    const to = '2023-10-10';
+    const result = getDifferenceInDays(from, to);
+    expect(result).toBe(9);
+  });
+
+  test('should return 0 when the dates are the same', () => {
+    const from = '2023-10-10';
+    const to = '2023-10-10';
+    const result = getDifferenceInDays(from, to);
+    expect(result).toBe(0);
+  });
+
+  test('should return a negative number when from date is later than to date', () => {
+    const from = '2023-10-10';
+    const to = '2023-10-01';
+    const result = getDifferenceInDays(from, to);
+    expect(result).toBe(-9);
+  });
+
+  test('should return NaN if one of the dates is invalid', () => {
+    const from = 'invalid-date';
+    const to = '2023-10-01';
+    const result = getDifferenceInDays(from, to);
+    expect(result).toBeNaN();
+  });
+
+  test('should return NaN if the input strings are empty', () => {
+    const from = '';
+    const to = '';
+    const result = getDifferenceInDays(from, to);
+    expect(result).toBeNaN();
+  });
+
+  test('should return NaN if "to" date is invalid', () => {
+    const from = '2023-10-01';
+    const to = 'invalid-date';
+    const result = getDifferenceInDays(from, to);
+    expect(result).toBeNaN();
+  });
+
+  test('should return -1 if to date is one day before from date', () => {
+    const from = '2023-10-10';
+    const to = '2023-10-09';
+    const result = getDifferenceInDays(from, to);
+    expect(result).toBe(-1);
+  });
+
+  test('should return NaN if either "from" or "to" is null', () => {
+    const from = null;
+    const to = '2023-10-10';
+    const result = getDifferenceInDays(from, to);
+    expect(result).toBeNaN();
+  });
+
+  test('should return NaN if either "from" or "to" is undefined', () => {
+    const from = undefined;
+    const to = '2023-10-10';
+    const result = getDifferenceInDays(from, to);
+    expect(result).toBeNaN();
   });
 });

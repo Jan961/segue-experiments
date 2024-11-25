@@ -33,7 +33,6 @@ import {
   defaultDemoCall,
   filterPrice,
   parseAndSortDates,
-  formatDecimalOnBlur,
   timeToDateTime,
   dtToTime,
   formatDecimalFields,
@@ -43,13 +42,14 @@ import {
   defaultTechProvision,
 } from '../utils';
 import { dealMemoInitialState } from 'state/contracts/contractsFilterState';
-import { convertTimeToTodayDateFormat, dateToTimeString } from 'services/dateService';
+import { dateToTimeString, getDateWithOffset } from 'services/dateService';
 import StandardSeatKillsTable, { SeatKillRow } from '../table/StandardSeatKillsTable';
-import LoadingOverlay from 'components/shows/LoadingOverlay';
+import LoadingOverlay from 'components/core-ui-lib/LoadingOverlay';
 import { CustomOption } from 'components/core-ui-lib/Table/renderers/SelectCellRenderer';
 import { trasformVenueAddress } from 'utils/venue';
 import { accountContactState } from 'state/contracts/accountContactState';
 import {
+  formatDecimalOnBlur,
   formatDecimalValue,
   formatPercentageValue,
   isNull,
@@ -60,33 +60,32 @@ import {
 import { currencyState } from 'state/global/currencyState';
 import { decimalRegex, stringRegex } from 'utils/regexUtils';
 import { dealMemoExport } from 'pages/api/deal-memo/export';
+import { UserAcc } from './EditVenueContractModal';
+import { accessVenueContracts } from 'state/account/selectors/permissionSelector';
 
 export interface PriceState {
   default: Array<DealMemoPriceType>;
   custom: Array<DealMemoPriceType>;
 }
 
-export type UserAcc = {
-  email: string;
-  accountUserId: number;
-};
-
 export const EditDealMemoContractModal = ({
   visible,
   onCloseDemoForm,
-  productionJumpState,
+  currentProduction,
   selectedTableCell,
   demoModalData,
   venueData,
   dealHoldType,
+  userAccList,
 }: {
   visible: boolean;
   onCloseDemoForm: () => void;
-  productionJumpState: Partial<ProductionDTO>;
+  currentProduction: Partial<ProductionDTO>;
   selectedTableCell: AddEditContractsState;
   demoModalData: Partial<DealMemoContractFormData>;
   venueData;
   dealHoldType: Array<DealMemoHoldType>;
+  userAccList: Array<UserAcc>;
 }) => {
   const [formData, setFormData] = useRecoilState(dealMemoInitialState);
   const [dealMemoPriceData, setDealMemoPriceData] = useState<PriceState>({ default: [], custom: [] });
@@ -101,7 +100,10 @@ export const EditDealMemoContractModal = ({
   const currency = useRecoilValue(currencyState);
   const accountContacts = useRecoilValue(accountContactState);
   const [showSubmitError, setShowSubmitError] = useState<boolean>(false);
-  const [userAccList, setUserAccList] = useState<Array<UserAcc>>([]);
+
+  const permissions = useRecoilValue(accessVenueContracts);
+  const canEdit = permissions.includes('EDIT_DEAL_MEMO');
+  const canExport = permissions.includes('EXPORT_DEAL_MEMO');
 
   const [errors, setErrors] = useState({
     ROTTPercentage: false,
@@ -203,16 +205,24 @@ export const EditDealMemoContractModal = ({
 
     setDealMemoTechProvision(processedTechProvision);
 
+    // get techArrivalTime with time offset
+    const techArrivalTime = getDateWithOffset(new Date());
+    if (isNullOrUndefined(demoModalData.TechArrivalTime)) {
+      techArrivalTime.setHours(9);
+    } else {
+      const timeArrive = new Date(demoModalData.TechArrivalTime);
+      techArrivalTime.setHours(timeArrive.getHours());
+      techArrivalTime.setMinutes(timeArrive.getMinutes());
+    }
+
     setFormData({
       ...demoModalData,
       DateIssued: isUndefined(demoModalData.DateIssued) ? new Date() : demoModalData.DateIssued,
-      TechArrivalTime: isUndefined(demoModalData.TechArrivalTime)
-        ? convertTimeToTodayDateFormat('09:00')
-        : demoModalData.TechArrivalTime,
+      TechArrivalTime: techArrivalTime,
       TechArrivalDate: isUndefined(demoModalData.TechArrivalDate)
         ? new Date(selectedTableCell.contract.dateTime)
         : demoModalData.TechArrivalDate,
-      RunningTime: timeToDateTime(productionJumpState.RunningTime),
+      RunningTime: timeToDateTime(currentProduction.RunningTime),
       PrintDelUseVenueAddress: isUndefined(demoModalData.PrintDelUseVenueAddress)
         ? true
         : demoModalData.PrintDelUseVenueAddress,
@@ -237,14 +247,6 @@ export const EditDealMemoContractModal = ({
       })),
     [users],
   );
-
-  useEffect(() => {
-    const userAccList = Object.values(users).map(({ AccUserId, Email = '' }) => ({
-      accountUserId: AccUserId,
-      email: Email || '',
-    }));
-    setUserAccList(userAccList);
-  }, [users]);
 
   useEffect(() => {
     const data = [...dealMemoTechProvision];
@@ -298,7 +300,7 @@ export const EditDealMemoContractModal = ({
     setDealMemoTechProvision(techProvisionData);
   };
 
-  const saveDemoModalData = async () => {
+  const submitForm = async (exportForm: boolean) => {
     // if errors array has any error set to true - show submission error and return
     // create a single array if error statuses
     const { callData, ...errorList } = errors;
@@ -317,6 +319,19 @@ export const EditDealMemoContractModal = ({
       ...formatDecimalFields(formData, 'float'),
       DealMemoPrice: dealMemoPriceData,
     };
+
+    // run the export process if the exportForm is true
+    exportForm &&
+      dealMemoExport({
+        bookingId: selectedTableCell.contract.Id.toString(),
+        dealMemoData,
+        production: currentProduction,
+        contract: selectedTableCell.contract,
+        venue: venueData,
+        accContacts: accountContacts,
+        users: userAccList,
+        fileType: 'docx',
+      });
 
     try {
       await axios.post(`/api/deal-memo/update/${selectedTableCell.contract.Id}`, {
@@ -521,8 +536,10 @@ export const EditDealMemoContractModal = ({
     const { hrs, min } = times[key];
 
     if (hrs && min) {
-      const timeStr = `${hrs}:${min}`;
-      const datetime = convertTimeToTodayDateFormat(timeStr);
+      const datetime = getDateWithOffset(new Date());
+      datetime.setHours(hrs);
+      datetime.setMinutes(min);
+
       editDemoModalData(key, datetime, 'dealMemo');
     }
   };
@@ -592,7 +609,7 @@ export const EditDealMemoContractModal = ({
                 <TextInput
                   className="w-full text-primary-input-text font-bold"
                   disabled
-                  value={productionJumpState.ShowName}
+                  value={currentProduction.ShowName}
                   testId="show-name-in-deal-memo"
                 />
               </div>
@@ -620,12 +637,13 @@ export const EditDealMemoContractModal = ({
                   editDemoModalData('DateIssued', value, 'dealMemo');
                 }}
                 value={formData.DateIssued}
+                disabled={!canEdit}
               />
             </div>
           </div>
           <div className="text-primary-input-text mt-4">
             Please read this carefully to ensure it reflects the terms as agreed between{' '}
-            {`${productionJumpState.ProductionCompany ? productionJumpState.ProductionCompany.ProdCoName : ''}`} and{' '}
+            {`${currentProduction.ProductionCompany ? currentProduction.ProductionCompany.ProdCoName : ''}`} and{' '}
             {`${selectedTableCell.contract.venue}`}.
             <br />
             Please note that any terms not specifically mentioned here are still to be negotiated. If you have any
@@ -643,13 +661,14 @@ export const EditDealMemoContractModal = ({
                 isClearable
                 isSearchable
                 value={formData.AccContId}
+                disabled={!canEdit}
               />
               ASAP
             </span>
           </div>
           <div className="text-primary-input-text mt-4">
             If we have requested anything that incurs a cost, it must be agreed with
-            {` ${productionJumpState.ProductionCompany ? productionJumpState.ProductionCompany.ProdCoName : ''} `}
+            {` ${currentProduction.ProductionCompany ? currentProduction.ProductionCompany.ProdCoName : ''} `}
             prior to our arrival. No extras will be paid without a pre-authorisation
             {` (this includes internet access).`} Unless otherwise agreed, all staff calls will be scheduled within the
             contractual allowance - if you foresee any overtime, please advise immediately.
@@ -670,6 +689,7 @@ export const EditDealMemoContractModal = ({
                 isClearable
                 isSearchable
                 value={formData.CompAccContId}
+                disabled={!canEdit}
               />
             </div>
           </div>
@@ -712,7 +732,7 @@ export const EditDealMemoContractModal = ({
                 testId="performance-show-title"
                 className="w-[400px] text-primary-input-text font-bold"
                 disabled
-                value={productionJumpState.ShowName}
+                value={currentProduction.ShowName}
               />
               <div className="text-primary-input-text font-bold ml-8 mr-4"> No. of Performances</div>
               <TextInput
@@ -746,12 +766,7 @@ export const EditDealMemoContractModal = ({
               />
               <div className=" text-primary-input-text font-bold ml-8 mr-4">Notes</div>
 
-              <TextInput
-                testId="runningNote"
-                className="w-[55vw]"
-                disabled
-                value={productionJumpState.RunningTimeNote}
-              />
+              <TextInput testId="runningNote" className="w-[55vw]" disabled value={currentProduction.RunningTimeNote} />
             </div>
           </div>
           <div className="flex mt-4">
@@ -763,6 +778,7 @@ export const EditDealMemoContractModal = ({
                   className="w-full h-auto"
                   value={formData.PrePostShowEvents}
                   onChange={(value) => editDemoModalData('PrePostShowEvents', value.target.value, 'dealMemo')}
+                  disabled={!canEdit}
                 />
               </div>
             </div>
@@ -773,7 +789,7 @@ export const EditDealMemoContractModal = ({
               <TimeInput
                 className="w-fit h-[31px] [&>input]:!h-[25px] [&>input]:!w-11 !justify-center shadow-input-shadow"
                 value={formData && formData.VenueCurfewTime ? dateToTimeString(formData.VenueCurfewTime) : null}
-                disabled={disableDate}
+                disabled={disableDate || !canEdit}
                 onInput={(event) => handleTimeInput(event, 'VenueCurfewTime')}
                 onBlur={() => handleTimeBlur('VenueCurfewTime')}
                 onChange={() => null}
@@ -786,6 +802,7 @@ export const EditDealMemoContractModal = ({
                 className="w-[55vw]"
                 value={formData.PerformanceNotes}
                 onChange={(value) => editDemoModalData('PerformanceNotes', value.target.value, 'dealMemo')}
+                disabled={!canEdit}
               />
             </div>
           </div>
@@ -828,7 +845,7 @@ export const EditDealMemoContractModal = ({
                 placeholder={vcSelectPlaceholder()}
                 isClearable
                 isSearchable
-                disabled={venueUserList.length === 0}
+                disabled={venueUserList.length === 0 || !canEdit}
                 value={formData.ProgrammerVenueContactId}
                 testId="select-venue-programmer"
               />
@@ -888,6 +905,7 @@ export const EditDealMemoContractModal = ({
                   onBlur={(value) => {
                     editDemoModalData('ROTTPercentage', formatPercentageValue(value.target.value), 'dealMemo');
                   }}
+                  disabled={!canEdit}
                 />
                 <div className=" text-primary-input-text font-bold ml-2">%</div>
                 <div className=" text-primary-input-text font-bold ml-12 mr-4">PRS</div>
@@ -899,6 +917,7 @@ export const EditDealMemoContractModal = ({
                   onBlur={(value) => {
                     editDemoModalData('PRSPercentage', formatPercentageValue(value.target.value), 'dealMemo');
                   }}
+                  disabled={!canEdit}
                 />
                 <div className=" text-primary-input-text font-bold ml-2">%</div>
               </div>
@@ -928,6 +947,7 @@ export const EditDealMemoContractModal = ({
                 isClearable
                 value={formData.Guarantee}
                 testId="select-deal-guarantee"
+                disabled={!canEdit}
               />
               <div className="text-primary-input-text font-bold ml-[5.8%] mr-3">{currency.symbol}</div>
 
@@ -941,7 +961,7 @@ export const EditDealMemoContractModal = ({
                   editDemoModalData('GuaranteeAmount', formatDecimalOnBlur(value), 'dealMemo');
                 }}
                 placeholder="00.00"
-                disabled={!formData.Guarantee}
+                disabled={!formData.Guarantee || !canEdit}
               />
             </div>
           </div>
@@ -959,6 +979,7 @@ export const EditDealMemoContractModal = ({
                 isSearchable
                 value={formData.HasCalls}
                 testId="select-deal-call"
+                disabled={!canEdit}
               />
               <div>
                 {dealCall.map((call, index) => {
@@ -978,7 +999,7 @@ export const EditDealMemoContractModal = ({
                         options={callOptions}
                         isClearable
                         isSearchable
-                        disabled={!formData.HasCalls}
+                        disabled={!formData.HasCalls || !canEdit}
                         testId="select-deal-first-call"
                       />
 
@@ -992,7 +1013,7 @@ export const EditDealMemoContractModal = ({
                         options={callValueOptions}
                         isClearable
                         isSearchable
-                        disabled={!formData.HasCalls}
+                        disabled={!formData.HasCalls || !canEdit}
                         testId="select-deal-first-call-type"
                       />
 
@@ -1012,7 +1033,12 @@ export const EditDealMemoContractModal = ({
                         )}
                         value={dealCall[index].DMCValue === 0 ? '0' : dealCall[index].DMCValue}
                         placeholder={dealCall[index].DMCType === 'v' ? '00.00' : ''}
-                        disabled={!formData.HasCalls || !dealCall[index].DMCType || !dealCall[index].DMCPromoterOrVenue}
+                        disabled={
+                          !formData.HasCalls ||
+                          !dealCall[index].DMCType ||
+                          !dealCall[index].DMCPromoterOrVenue ||
+                          canEdit
+                        }
                         onBlur={(value) => {
                           if (dealCall[index].DMCType === 'v') {
                             editDemoCallModalData('DMCValue', formatDecimalOnBlur(value), index);
@@ -1084,6 +1110,7 @@ export const EditDealMemoContractModal = ({
                   editDemoModalData('PromoterSplitPercentage', formatPercentageValue(value.target.value), 'dealMemo');
                   validateDealSplit();
                 }}
+                disabled={!canEdit}
               />
 
               <div className="text-primary-input-text font-bold ml-2 mr-2">%</div>
@@ -1101,6 +1128,7 @@ export const EditDealMemoContractModal = ({
                   editDemoModalData('VenueSplitPercentage', formatPercentageValue(value.target.value), 'dealMemo');
                   validateDealSplit();
                 }}
+                disabled={!canEdit}
               />
               <div className="text-primary-input-text font-bold ml-2 mr-2">%</div>
             </div>
@@ -1139,12 +1167,14 @@ export const EditDealMemoContractModal = ({
                     }}
                     onChange={(value) => editDemoModalData(inputData[1], value.target.value, 'dealMemo')}
                     pattern={/^\d*(\.\d*)?$/}
+                    disabled={!canEdit}
                   />
                   <TextInput
                     testId={`${inputData[2]}-text`}
                     className="w-[54vw]"
                     value={formData[inputData[2]]}
                     onChange={(value) => editDemoModalData(inputData[2], value.target.value, 'dealMemo')}
+                    disabled={!canEdit}
                   />
                 </div>
               </div>
@@ -1160,7 +1190,7 @@ export const EditDealMemoContractModal = ({
                 className={classNames('bg-primary-white w-full', venueUserList.length === 0 && 'font-normal')}
                 placeholder={vcSelectPlaceholder()}
                 options={venueUserList}
-                disabled={venueUserList.length === 0}
+                disabled={venueUserList.length === 0 || !canEdit}
                 isClearable
                 isSearchable
                 value={formData.BOMVenueContactId}
@@ -1209,6 +1239,7 @@ export const EditDealMemoContractModal = ({
                   editDemoModalData('OnSaleDate', value, 'dealMemo');
                 }}
                 value={formData.OnSaleDate}
+                disabled={!canEdit}
               />
             </div>
           </div>
@@ -1220,7 +1251,7 @@ export const EditDealMemoContractModal = ({
                 className={classNames('bg-primary-white w-full', venueUserList.length === 0 && 'font-normal')}
                 placeholder={vcSelectPlaceholder()}
                 options={venueUserList}
-                disabled={venueUserList.length === 0}
+                disabled={venueUserList.length === 0 || !canEdit}
                 isClearable
                 isSearchable
                 value={formData.SettlementVenueContactId}
@@ -1293,6 +1324,7 @@ export const EditDealMemoContractModal = ({
                   }
                   editDemoModalData('SellableSeats', parseFloat(value.target.value), 'dealMemo');
                 }}
+                disabled={!canEdit}
               />
 
               {errors.sellCapacity && (
@@ -1335,6 +1367,7 @@ export const EditDealMemoContractModal = ({
                     }
                     currency={currency.symbol}
                     holdTypeList={holdTypeData}
+                    disabled={!canEdit}
                   />
                 </div>
               </div>
@@ -1346,6 +1379,7 @@ export const EditDealMemoContractModal = ({
                   value={formData.SeatKillNotes}
                   placeholder="Notes Field"
                   onChange={(value) => editDemoModalData('SeatKillNotes', value.target.value, 'dealMemo')}
+                  disabled={!canEdit}
                 />
               </div>
             </div>
@@ -1390,6 +1424,7 @@ export const EditDealMemoContractModal = ({
                         )
                       }
                       value={defaultPriceObj ? defaultPriceObj.DMPNumTickets : ''}
+                      disabled={!canEdit}
                     />
                   </div>
 
@@ -1417,6 +1452,7 @@ export const EditDealMemoContractModal = ({
                           : defaultPriceObj.DMPTicketPrice
                         : ''
                     }
+                    disabled={!canEdit}
                   />
 
                   <TextInput
@@ -1426,6 +1462,7 @@ export const EditDealMemoContractModal = ({
                       editDealMemoPrice(inputData.DMPTicketName, value.target.value, 'DMPNotes', 'default')
                     }
                     value={defaultPriceObj && defaultPriceObj.DMPNotes}
+                    disabled={!canEdit}
                   />
                 </div>
               </div>
@@ -1444,6 +1481,7 @@ export const EditDealMemoContractModal = ({
                     className="w-auto"
                     value={customPriceObj ? customPriceObj.DMPTicketName : ''}
                     onChange={(value) => editDealMemoPrice('', value.target.value, 'DMPTicketName', 'custom', index)}
+                    disabled={!canEdit}
                   />
                 </div>
                 <div className="w-4/5 flex">
@@ -1456,6 +1494,7 @@ export const EditDealMemoContractModal = ({
                         editDealMemoPrice('', parseFloat(value.target.value), 'DMPNumTickets', 'custom', index)
                       }
                       value={customPriceObj ? customPriceObj.DMPNumTickets : ''}
+                      disabled={!canEdit}
                     />
                   </div>
 
@@ -1472,6 +1511,7 @@ export const EditDealMemoContractModal = ({
                     value={
                       customPriceObj ? (customPriceObj.DMPTicketPrice === 0 ? '' : customPriceObj.DMPTicketPrice) : ''
                     }
+                    disabled={!canEdit}
                   />
                   <TextInput
                     testId="custom-ticket-notes"
@@ -1479,27 +1519,32 @@ export const EditDealMemoContractModal = ({
                       'ml-8',
                       dealMemoPriceData.custom.length === index + 1 && dealMemoPriceData.custom.length > 1
                         ? 'w-[35vw]' // Two icons present
-                        : 'w-[698px]', // Only one icon present
+                        : canEdit
+                        ? 'w-[698px]' // Only one icon present
+                        : 'w-[38vw]', // Unable to edit
                     )}
                     onChange={(value) => editDealMemoPrice('', value.target.value, 'DMPNotes', 'custom', index)}
                     value={customPriceObj && customPriceObj.DMPNotes}
+                    disabled={!canEdit}
                   />
 
-                  <div className="items-center flex-col">
-                    <div className="flex flex-row ml-2 justify-between w-12">
-                      {dealMemoPriceData.custom.length === index + 1 && (
-                        <Icon iconName="plus-circle-solid" onClick={() => addRemoveCustomPrice('add')} variant="lg" />
-                      )}
+                  {canEdit && (
+                    <div className="items-center flex-col">
+                      <div className="flex flex-row ml-2 justify-between w-12">
+                        {dealMemoPriceData.custom.length === index + 1 && (
+                          <Icon iconName="plus-circle-solid" onClick={() => addRemoveCustomPrice('add')} variant="lg" />
+                        )}
 
-                      {dealMemoPriceData.custom.length > 1 && (
-                        <Icon
-                          iconName="minus-circle-solid"
-                          onClick={() => addRemoveCustomPrice('delete', index)}
-                          variant="lg"
-                        />
-                      )}
+                        {dealMemoPriceData.custom.length > 1 && (
+                          <Icon
+                            iconName="minus-circle-solid"
+                            onClick={() => addRemoveCustomPrice('delete', index)}
+                            variant="lg"
+                          />
+                        )}
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               </div>
             );
@@ -1516,6 +1561,7 @@ export const EditDealMemoContractModal = ({
                   value={formData.RestorationLevy}
                   onChange={(value) => editDemoModalData('RestorationLevy', value.target.value, 'dealMemo')}
                   onBlur={(value) => editDemoModalData('RestorationLevy', formatDecimalOnBlur(value), 'dealMemo')}
+                  disabled={!canEdit}
                 />
               </div>
 
@@ -1529,8 +1575,9 @@ export const EditDealMemoContractModal = ({
                   className="w-auto"
                   pattern={/^\d*(\.\d*)?$/}
                   value={formData.BookingFees}
-                  onChange={(value) => editDemoModalData('BookingFees', parseFloat(value.target.value), 'dealMemo')}
+                  onChange={(value) => editDemoModalData('BookingFees', value.target.value, 'dealMemo')}
                   onBlur={(value) => editDemoModalData('BookingFees', formatDecimalOnBlur(value), 'dealMemo')}
+                  disabled={!canEdit}
                 />
                 <div className="text-primary-input-text font-bold ml-[100px] mr-2">Credit Card Commission</div>
                 <TextInput
@@ -1541,6 +1588,7 @@ export const EditDealMemoContractModal = ({
                   onBlur={(value) =>
                     editDemoModalData('CCCommissionPercent', formatPercentageValue(value.target.value), 'dealMemo')
                   }
+                  disabled={!canEdit}
                 />
                 <div className="text-primary-input-text font-bold ml-2">%</div>
               </div>
@@ -1565,6 +1613,7 @@ export const EditDealMemoContractModal = ({
                 isSearchable
                 value={formData.TxnChargeOption}
                 testId="select-transaction-charges-type"
+                disabled={!canEdit}
               />
               <div className="text-primary-input-text font-bold ml-16 mr-2">{currency.symbol}</div>
               <TextInput
@@ -1574,6 +1623,7 @@ export const EditDealMemoContractModal = ({
                 value={formData.TxnChargeAmount}
                 onChange={(value) => editDemoModalData('TxnChargeAmount', value.target.value, 'dealMemo')}
                 onBlur={(value) => editDemoModalData('TxnChargeAmount', formatDecimalOnBlur(value), 'dealMemo')}
+                disabled={!canEdit}
               />
             </div>
           </div>
@@ -1586,6 +1636,7 @@ export const EditDealMemoContractModal = ({
                   className="w-full"
                   value={formData.AgreedDiscounts}
                   onChange={(value) => editDemoModalData('AgreedDiscounts', value.target.value, 'dealMemo')}
+                  disabled={!canEdit}
                 />
               </div>
             </div>
@@ -1594,7 +1645,7 @@ export const EditDealMemoContractModal = ({
             <div className="w-1/5"> </div>
             <div className="w-4/5 flex text-primary-input-text mb-2">
               No other discounts without written agreement from{' '}
-              {`${productionJumpState.ProductionCompany ? productionJumpState.ProductionCompany.ProdCoName : ''}`}
+              {`${currentProduction.ProductionCompany ? currentProduction.ProductionCompany.ProdCoName : ''}`}
             </div>
           </div>
           {[
@@ -1629,6 +1680,7 @@ export const EditDealMemoContractModal = ({
                         'dealMemo',
                       )
                     }
+                    disabled={!canEdit}
                   />
                 </div>
               </div>
@@ -1648,6 +1700,7 @@ export const EditDealMemoContractModal = ({
                 className="w-full"
                 value={formData.AgeNotes}
                 onChange={(value) => editDemoModalData('AgeNotes', value.target.value, 'dealMemo')}
+                disabled={!canEdit}
               />
             </div>
           </div>
@@ -1657,7 +1710,7 @@ export const EditDealMemoContractModal = ({
               <TextInput
                 testId="sales-report-frequency"
                 className="w-[20vw]"
-                value={productionJumpState.SalesFrequency === 'W' ? 'Weekly' : 'Daily'}
+                value={currentProduction.SalesFrequency === 'W' ? 'Weekly' : 'Daily'}
                 disabled={true}
               />
               <div className=" text-primary-input-text font-bold ml-20 mr-4">If Weekly, on</div>
@@ -1669,7 +1722,7 @@ export const EditDealMemoContractModal = ({
                 isClearable
                 isSearchable
                 value={formData.SalesDayNum}
-                disabled={productionJumpState.SalesFrequency !== 'W'}
+                disabled={currentProduction.SalesFrequency !== 'W' || !canEdit}
                 testId="select-day-for-sales-frequency"
               />
             </div>
@@ -1680,7 +1733,7 @@ export const EditDealMemoContractModal = ({
               <TextInput
                 testId="sales-frequency-report-sent-to"
                 className="w-full"
-                value={productionJumpState.SalesEmail || ''}
+                value={currentProduction.SalesEmail || ''}
                 placeholder="Add to Production Details"
                 disabled
               />
@@ -1700,6 +1753,7 @@ export const EditDealMemoContractModal = ({
                 renderOption={(option) => <CustomOption option={option} isMulti={true} />}
                 value={formData.SendTo}
                 testId="please-select-asignee"
+                disabled={!canEdit}
               />
             </div>
           </div>
@@ -1711,7 +1765,7 @@ export const EditDealMemoContractModal = ({
               <Select
                 onChange={(value) => editDemoModalData('MMVenueContactId', value, 'dealMemo')}
                 options={[...venueUserList]}
-                disabled={venueUserList.length === 0}
+                disabled={venueUserList.length === 0 || !canEdit}
                 className={classNames('bg-primary-white w-full', venueUserList.length === 0 && 'font-normal')}
                 placeholder={vcSelectPlaceholder()}
                 isClearable
@@ -1762,6 +1816,7 @@ export const EditDealMemoContractModal = ({
                 }}
                 value={formData.BrochureDeadline}
                 testId="marketing-broucher-deadline"
+                disabled={!canEdit}
               />
               <div className="text-primary-input-text font-bold ml-20 mr-4">Final Proof by</div>
 
@@ -1771,6 +1826,7 @@ export const EditDealMemoContractModal = ({
                 }}
                 value={formData.FinalProofBy}
                 testId="marketing-final-proof-date"
+                disabled={!canEdit}
               />
             </div>
           </div>
@@ -1782,6 +1838,7 @@ export const EditDealMemoContractModal = ({
                 value={formData.PrintReqs}
                 onChange={(value) => editDemoModalData('PrintReqs', value.target.value, 'dealMemo')}
                 testId="print-requirements-notes"
+                disabled={!canEdit}
               />
             </div>
           </div>
@@ -1799,6 +1856,7 @@ export const EditDealMemoContractModal = ({
                   checked={formData.PrintDelUseVenueAddress}
                   label="Same as Venue Address"
                   testId="same-as-venue-adress-checkbox"
+                  disabled={!canEdit}
                 />
               </div>
 
@@ -1806,7 +1864,7 @@ export const EditDealMemoContractModal = ({
                 <TextInput
                   testId="marketing-delivery-address"
                   className="w-3/4"
-                  disabled={formData.PrintDelUseVenueAddress}
+                  disabled={formData.PrintDelUseVenueAddress || !canEdit}
                   value={formData.PrintDelVenueAddressLine}
                   onChange={(value) => editDemoModalData('PrintDelVenueAddressLine', value.target.value, 'dealMemo')}
                 />
@@ -1825,6 +1883,7 @@ export const EditDealMemoContractModal = ({
                 value={formData.LocalMarketingBudget}
                 onChange={(value) => editDemoModalData('LocalMarketingBudget', value.target.value, 'dealMemo')}
                 onBlur={(value) => editDemoModalData('LocalMarketingBudget', formatDecimalOnBlur(value), 'dealMemo')}
+                disabled={!canEdit}
               />
               <div className="text-primary-input-text font-bold ml-[132px]">Local Marketing Contra</div>
               <div className="text-primary-input-text font-bold mr-2 ml-4">{currency.symbol}</div>
@@ -1836,6 +1895,7 @@ export const EditDealMemoContractModal = ({
                 value={formData.LocalMarketingContra}
                 onChange={(value) => editDemoModalData('LocalMarketingContra', value.target.value, 'dealMemo')}
                 onBlur={(value) => editDemoModalData('LocalMarketingContra', formatDecimalOnBlur(value), 'dealMemo')}
+                disabled={!canEdit}
               />
             </div>
           </div>
@@ -1843,7 +1903,7 @@ export const EditDealMemoContractModal = ({
             <div className="w-1/5"> </div>
             <div className="w-4/5 flex text-primary-input-text text-sm">
               Any expenditure needs pre-approval from{' '}
-              {`${productionJumpState.ProductionCompany ? productionJumpState.ProductionCompany.ProdCoName : ''}`}
+              {`${currentProduction.ProductionCompany ? currentProduction.ProductionCompany.ProdCoName : ''}`}
             </div>
           </div>
           <hr className="bg-primary h-[3px] mt-2 mb-4" />
@@ -1860,6 +1920,7 @@ export const EditDealMemoContractModal = ({
                 isClearable
                 isSearchable
                 testId="select-seller-production-or-venue"
+                disabled={!canEdit}
               />
             </div>
           </div>
@@ -1880,6 +1941,7 @@ export const EditDealMemoContractModal = ({
                 checked={formData.SellProgrammes}
                 label="Programmes"
                 testId="programmes-checkbox"
+                disabled={!canEdit}
               />
 
               <Checkbox
@@ -1896,12 +1958,13 @@ export const EditDealMemoContractModal = ({
                 checked={formData.SellMerch}
                 label="Merchandise"
                 testId="merchandise-checkbox"
+                disabled={!canEdit}
               />
 
               <TextInput
                 className="w-[48vw] ml-2"
                 value={formData.MerchNotes}
-                disabled={!formData.SellMerch}
+                disabled={!formData.SellMerch || !canEdit}
                 onChange={(value) => editDemoModalData('MerchNotes', value.target.value, 'dealMemo')}
                 testId="items-to-be-sold-notes"
               />
@@ -1915,7 +1978,7 @@ export const EditDealMemoContractModal = ({
                 testId="venue-commission-for-programmes"
                 className={classNames('w-[150px]', errors.SellProgCommPercent ? 'text-primary-red' : '')}
                 value={formData.SellProgCommPercent === 0 ? '0' : formData.SellProgCommPercent}
-                disabled={!formData.SellProgrammes}
+                disabled={!formData.SellProgrammes || !canEdit}
                 onChange={(value) => handlePercentChange('SellProgCommPercent', value.target.value)}
                 onBlur={(value) =>
                   editDemoModalData('SellProgCommPercent', formatPercentageValue(value.target.value), 'dealMemo')
@@ -1927,7 +1990,7 @@ export const EditDealMemoContractModal = ({
                 testId="venue-commission-for-merchandise"
                 className={classNames('w-[150px]', errors.SellMerchCommPercent ? 'text-primary-red' : '')}
                 value={formData.SellMerchCommPercent === 0 ? '0' : formData.SellMerchCommPercent}
-                disabled={!formData.SellMerch}
+                disabled={!formData.SellMerch || !canEdit}
                 onChange={(value) => handlePercentChange('SellMerchCommPercent', value.target.value)}
                 onBlur={(value) =>
                   editDemoModalData('SellMerchCommPercent', formatPercentageValue(value.target.value), 'dealMemo')
@@ -1944,6 +2007,7 @@ export const EditDealMemoContractModal = ({
                 value={formData.SellPitchFee}
                 onChange={(value) => editDemoModalData('SellPitchFee', value.target.value, 'dealMemo')}
                 onBlur={(value) => editDemoModalData('SellPitchFee', formatDecimalOnBlur(value), 'dealMemo')}
+                disabled={!canEdit}
               />
             </div>
           </div>
@@ -1962,7 +2026,7 @@ export const EditDealMemoContractModal = ({
               <Select
                 onChange={(value) => editDemoModalData('TechVenueContactId', value, 'dealMemo')}
                 options={[...venueUserList]}
-                disabled={venueUserList.length === 0}
+                disabled={venueUserList.length === 0 || !canEdit}
                 className={classNames('bg-primary-white w-full', venueUserList.length === 0 && 'font-normal')}
                 placeholder={vcSelectPlaceholder()}
                 isClearable
@@ -2017,12 +2081,13 @@ export const EditDealMemoContractModal = ({
                 }}
                 value={formData.TechArrivalDate}
                 testId="company-arrival-date"
+                disabled={!canEdit}
               />
               <div className="ml-4 w-[100px]" data-testid="company-arrival-time">
                 <TimeInput
                   className="w-fit h-[31px] [&>input]:!h-[25px] [&>input]:!w-11 !justify-center shadow-input-shadow ml-2"
                   value={formData && formData.TechArrivalTime ? dateToTimeString(formData.TechArrivalTime) : null}
-                  disabled={disableDate}
+                  disabled={disableDate || !canEdit}
                   onInput={(event) => handleTimeInput(event, 'TechArrivalTime')}
                   onBlur={() => handleTimeBlur('TechArrivalTime')}
                   onChange={() => null}
@@ -2077,6 +2142,7 @@ export const EditDealMemoContractModal = ({
                       onChange={(value) =>
                         editTechProvisionModalData('DMTechVenue', value.target.value, inputData.DMTechName)
                       }
+                      disabled={!canEdit}
                     />
                   </div>
                   <div className="w-2/4 ml-2">
@@ -2087,6 +2153,7 @@ export const EditDealMemoContractModal = ({
                       onChange={(value) =>
                         editTechProvisionModalData('DMTechCompany', value.target.value, inputData.DMTechName)
                       }
+                      disabled={!canEdit}
                     />
                   </div>
                 </div>
@@ -2104,6 +2171,7 @@ export const EditDealMemoContractModal = ({
                   className="w-full"
                   value={formData.DressingRooms}
                   onChange={(value) => editDemoModalData('DressingRooms', value.target.value, 'dealMemo')}
+                  disabled={!canEdit}
                 />
               </div>
             </div>
@@ -2119,6 +2187,7 @@ export const EditDealMemoContractModal = ({
                 onChange={(value) => editDemoModalData('NumFacilitiesLaundry', value.target.checked, 'dealMemo')}
                 checked={formData.NumFacilitiesLaundry}
                 testId="washer-checkbox"
+                disabled={!canEdit}
               />
               <div className="text-primary-input-text font-bold mr-2 ml-6">Dryer</div>
 
@@ -2129,6 +2198,7 @@ export const EditDealMemoContractModal = ({
                 onChange={(value) => editDemoModalData('NumFacilitiesDrier', value.target.checked, 'dealMemo')}
                 checked={formData.NumFacilitiesDrier}
                 testId="dryer-checkbox"
+                disabled={!canEdit}
               />
               <div className="text-primary-input-text font-bold mr-2 ml-6">Laundry Room</div>
 
@@ -2139,6 +2209,7 @@ export const EditDealMemoContractModal = ({
                 onChange={(value) => editDemoModalData('NumFacilitiesLaundryRoom', value.target.checked, 'dealMemo')}
                 checked={formData.NumFacilitiesLaundryRoom}
                 testId="laundry-room-checkbox"
+                disabled={!canEdit}
               />
               <div className="w-3/5 ml-8">
                 <TextInput
@@ -2146,6 +2217,7 @@ export const EditDealMemoContractModal = ({
                   className="w-full"
                   value={formData.NumFacilitiesNotes}
                   onChange={(value) => editDemoModalData('NumFacilitiesNotes', value.target.value, 'dealMemo')}
+                  disabled={!canEdit}
                 />
               </div>
             </div>
@@ -2159,6 +2231,7 @@ export const EditDealMemoContractModal = ({
                   className="w-full"
                   value={formData.NumCateringNotes}
                   onChange={(value) => editDemoModalData('NumCateringNotes', value.target.value, 'dealMemo')}
+                  disabled={!canEdit}
                 />
               </div>
             </div>
@@ -2174,6 +2247,7 @@ export const EditDealMemoContractModal = ({
                   className="w-full"
                   value={formData.BarringClause}
                   onChange={(value) => editDemoModalData('BarringClause', value.target.value, 'dealMemo')}
+                  disabled={!canEdit}
                 />
               </div>
             </div>
@@ -2200,6 +2274,7 @@ export const EditDealMemoContractModal = ({
                 isClearable
                 value={formData.AdvancePaymentRequired}
                 testId="select-advance-payment-yes-or-no"
+                disabled={!canEdit}
               />
               <div className=" text-primary-input-text font-bold ml-20">
                 If Yes, Amount<span className="ml-2 mr-2">{currency.symbol}</span>
@@ -2212,7 +2287,7 @@ export const EditDealMemoContractModal = ({
                 pattern={/^\d*(\.\d*)?$/}
                 onChange={(value) => editDemoModalData('AdvancePaymentAmount', value.target.value, 'dealMemo')}
                 onBlur={(value) => editDemoModalData('AdvancePaymentAmount', formatDecimalOnBlur(value), 'dealMemo')}
-                disabled={!formData.AdvancePaymentRequired}
+                disabled={!formData.AdvancePaymentRequired || !canEdit}
               />
               <div className=" text-primary-input-text font-bold ml-20 mr-2"> Date Payment to be Made</div>
 
@@ -2221,7 +2296,7 @@ export const EditDealMemoContractModal = ({
                   editDemoModalData('AdvancePaymentDueBy', value, 'dealMemo');
                 }}
                 value={formData.AdvancePaymentDueBy}
-                disabled={!formData.AdvancePaymentRequired}
+                disabled={!formData.AdvancePaymentRequired || !canEdit}
                 testId="advance-payment-date-to-be-made"
               />
             </div>
@@ -2245,6 +2320,7 @@ export const EditDealMemoContractModal = ({
                 }}
                 checked={formData.SettlementSameDay}
                 testId="payment-same-day-checkbox"
+                disabled={!canEdit}
               />
               <div className=" text-primary-input-text font-bold ml-4 mr-2">or within</div>
 
@@ -2253,7 +2329,7 @@ export const EditDealMemoContractModal = ({
                 className="w-full"
                 value={formData.SettlementDays}
                 onChange={(value) => editDemoModalData('SettlementDays', parseFloat(value.target.value), 'dealMemo')}
-                disabled={formData.SettlementSameDay}
+                disabled={formData.SettlementSameDay || !canEdit}
               />
 
               <div className=" text-primary-input-text font-bold ml-2">days</div>
@@ -2261,7 +2337,7 @@ export const EditDealMemoContractModal = ({
           </div>
           <div className="flex items-center mt-4">
             <div className="w-1/5 text-primary-input-text font-bold">
-              {productionJumpState.ProductionCompany ? productionJumpState.ProductionCompany.ProdCoName : ''} VAT No.
+              {currentProduction.ProductionCompany ? currentProduction.ProductionCompany.ProdCoName : ''} VAT No.
             </div>
             <div className="w-4/5 flex">
               <div className="w-full">
@@ -2269,8 +2345,8 @@ export const EditDealMemoContractModal = ({
                   testId="vat-no"
                   className="w-full"
                   value={
-                    productionJumpState.ProductionCompany
-                      ? productionJumpState.ProductionCompany.ProdCoVATCode
+                    currentProduction.ProductionCompany
+                      ? currentProduction.ProductionCompany.ProdCoVATCode
                       : 'To add a VAT number, please contact your system administrator'
                   }
                   disabled
@@ -2288,6 +2364,7 @@ export const EditDealMemoContractModal = ({
                 value={formData.ContractClause}
                 onChange={(value) => editDemoModalData('ContractClause', value.target.value, 'dealMemo')}
                 testId="clauses-notes"
+                disabled={!canEdit}
               />
             </div>
           </div>
@@ -2304,30 +2381,21 @@ export const EditDealMemoContractModal = ({
           <div className="flex justify-end items-center">
             <Button onClick={() => handleCancelForm(false)} className="w-33" variant="secondary" text="Cancel" />
             <Button
-              onClick={() =>
-                dealMemoExport({
-                  bookingId: selectedTableCell.contract.Id.toString(),
-                  dealMemoData: formData,
-                  production: productionJumpState,
-                  contract: selectedTableCell.contract,
-                  venue: venueData,
-                  accContacts: accountContacts,
-                  users: userAccList,
-                })
-              }
+              onClick={() => submitForm(false)}
               className="ml-4 w-28"
-              variant="primary"
-              text="Export"
-              iconProps={{ className: 'h-4 w-3' }}
-              sufixIconName="excel"
-              testId="deal-memo-export"
-            />
-            <Button
-              onClick={() => saveDemoModalData()}
-              className="ml-4 w-33"
               variant="primary"
               text="Save and Close"
               testId="deal-memo-save-and-close"
+            />
+            <Button
+              onClick={() => submitForm(true)}
+              className="ml-4 w-44"
+              variant="primary"
+              text="Save, Close and Export"
+              testId="deal-memo-save-close-and-export"
+              iconProps={{ className: 'h-4 w-3' }}
+              sufixIconName="document-solid"
+              disabled={!canExport}
             />
           </div>
         </div>

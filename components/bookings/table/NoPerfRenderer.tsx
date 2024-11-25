@@ -16,28 +16,31 @@ const NoPerfRenderer = ({ eGridCell, value, setValue, data, api, node }: ICellRe
   };
 
   useEffect(() => {
+    if (data.perf && (value === 0 || value === null)) {
+      handleChange(1);
+    }
     if (!data.perf) {
-      setValue(null);
       setNoOfPerfs('');
       updateRowHeight(ROW_HEIGHT + MARGIN);
-    } else if (value > 0) {
+    } else {
+      setNoOfPerfs(`${value}`);
       updateRowHeight(value * ROW_HEIGHT + MARGIN);
     }
     setIsDisabled(!data.perf);
-  }, [data.perf, value]);
+  }, [data, value]);
 
   const handleChange = (newValue) => {
     // changed the param name from event to newValue as this function in fact handles event.target.value
-
     if (isNullOrUndefined(newValue)) {
       setNoOfPerfs('');
       setValue(0);
       updateRowHeight(ROW_HEIGHT + MARGIN);
-      node.setData({ ...data, noOfPerfs: 0 });
+      node.setData({ ...data, noPerf: 0 });
     } else {
       newValue = Math.min(9, Math.max(1, parseInt(newValue, 10))).toString();
       const intValue = parseInt(newValue);
       if (!isNaN(intValue) && intValue > 0) {
+        data.noPerf = intValue;
         setNoOfPerfs(newValue);
         setValue(intValue);
         updateRowHeight(intValue > 1 ? intValue * ROW_HEIGHT + MARGIN : ROW_HEIGHT + MARGIN);

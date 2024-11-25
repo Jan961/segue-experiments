@@ -16,7 +16,9 @@ import { globalModalVenueColDefs, styleProps } from '../table/tableConfig';
 import { Table } from 'components/core-ui-lib';
 import { isValidDate } from 'services/dateService';
 import axios from 'axios';
-import LoadingOverlay from 'components/shows/LoadingOverlay';
+import LoadingOverlay from 'components/core-ui-lib/LoadingOverlay';
+import { useRecoilValue } from 'recoil';
+import { accessMarketingHome } from 'state/account/selectors/permissionSelector';
 
 export type ActivityModalVariant = 'add' | 'edit' | 'delete' | 'view';
 
@@ -59,6 +61,7 @@ export default function GlobalActivityModal({
   venues = [],
   tourWeeks,
 }: Partial<ActivityModalProps>) {
+  const permissions = useRecoilValue(accessMarketingHome);
   const [visible, setVisible] = useState<boolean>(show);
   const [actName, setActName] = useState<string>(null);
   const [actType, setActType] = useState<number>(null);
@@ -74,6 +77,7 @@ export default function GlobalActivityModal({
   const [venueColDefs, setVenueColDefs] = useState([]);
   const [selectedList, setSelectedList] = useState([]);
   const [loadingVisible, setLoadingVisible] = useState<boolean>(false);
+  const canEditGlobActivity = permissions.includes('EDIT_GLOBAL_ACTIVITY');
 
   const venueList = useMemo(() => {
     if (venues.length === 0) {
@@ -269,10 +273,15 @@ export default function GlobalActivityModal({
 
   return (
     <div>
-      <PopupModal show={visible} onClose={() => handleConfirm('close')} showCloseIcon={true} hasOverlay={showConfirm}>
+      <PopupModal
+        show={visible}
+        onClose={() => handleConfirm('close')}
+        showCloseIcon={true}
+        hasOverlay={showConfirm}
+        title={titleOptions[variant]}
+      >
         {loadingVisible && <LoadingOverlay />}
         <div className={`h-[${variant === 'view' ? 400 : 780}px] w-[450px]`}>
-          <div className="text-xl text-primary-navy font-bold mb-4">{titleOptions[variant]}</div>
           <div className="text-base font-bold text-primary-input-text">Activity Name</div>
           <TextInput
             className="w-full mb-4"
@@ -280,7 +289,7 @@ export default function GlobalActivityModal({
             id="activityName"
             value={actName}
             onChange={(event) => setActName(event.target.value)}
-            disabled={variant === 'view'}
+            disabled={variant === 'view' || !canEditGlobActivity}
           />
 
           <Select
@@ -292,7 +301,7 @@ export default function GlobalActivityModal({
             isClearable
             isSearchable
             label="Type"
-            disabled={variant === 'view'}
+            disabled={variant === 'view' || !canEditGlobActivity}
             variant={variant === 'view' ? 'transparent' : 'colored'}
           />
 
@@ -306,7 +315,7 @@ export default function GlobalActivityModal({
                 label="Date"
                 inputClass="!border-0 !shadow-none"
                 labelClassName="text-primary-input-text"
-                disabled={variant === 'view'}
+                disabled={variant === 'view' || !canEditGlobActivity}
               />
             </div>
 
@@ -319,7 +328,7 @@ export default function GlobalActivityModal({
                 name="followUpRequired"
                 checked={actFollowUp}
                 onChange={(e) => setActFollowUp(e.target.checked)}
-                disabled={variant === 'view'}
+                disabled={variant === 'view' || !canEditGlobActivity}
               />
             </div>
           </div>
@@ -335,7 +344,7 @@ export default function GlobalActivityModal({
                   label="Date"
                   inputClass="!border-0 !shadow-none"
                   labelClassName="text-primary-input-text"
-                  disabled={variant === 'view'}
+                  disabled={variant === 'view' || !canEditGlobActivity}
                 />
               </div>
             </div>
@@ -356,7 +365,7 @@ export default function GlobalActivityModal({
                   id="cost"
                   value={cost}
                   onChange={(event) => setCostValue(event.target.value)}
-                  disabled={variant === 'view'}
+                  disabled={variant === 'view' || !canEditGlobActivity}
                 />
               </div>
             </div>
@@ -368,7 +377,7 @@ export default function GlobalActivityModal({
             value={actNotes}
             placeholder="Notes Field"
             onChange={(e) => setActNotes(e.target.value)}
-            disabled={variant === 'view'}
+            disabled={variant === 'view' || !canEditGlobActivity}
             defaultDisabled={false}
           />
 
@@ -380,7 +389,7 @@ export default function GlobalActivityModal({
 
           <div className="flex flex-row mt-5">
             <div className="w-[450px]">
-              <Table columnDefs={venueColDefs} rowData={venueList} styleProps={styleProps} tableHeight={300} />
+              <Table columnDefs={venueColDefs} rowData={venueList} styleProps={styleProps} tableHeight={265} />
             </div>
           </div>
 
@@ -401,7 +410,13 @@ export default function GlobalActivityModal({
                 variant="secondary"
                 text="Cancel"
               />
-              <Button className="ml-4 w-[132px] mr-1" variant="primary" text="Save and Close" onClick={handleSave} />
+              <Button
+                className="ml-4 w-[132px] mr-1"
+                variant="primary"
+                text="Save and Close"
+                onClick={handleSave}
+                disabled={!canEditGlobActivity}
+              />
             </div>
           )}
         </div>

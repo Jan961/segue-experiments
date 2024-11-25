@@ -5,33 +5,26 @@ import Select from 'components/core-ui-lib/Select/Select';
 import classNames from 'classnames';
 import TextArea from 'components/core-ui-lib/TextArea/TextArea';
 import Button from 'components/core-ui-lib/Button';
-import { PerformanceDTO } from 'interfaces';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import { ConfDialogVariant } from 'components/core-ui-lib/ConfirmationDialog/ConfirmationDialog';
 import { useRecoilValue } from 'recoil';
 import { userState } from 'state/account/userState';
-import useAxios from 'hooks/useAxios';
 import formatInputDate from 'utils/dateInputFormat';
 import { getTimeFromDateAndTime } from 'services/dateService';
 import { hasAllocSeatsChanged } from '../utils';
 import { isNullOrEmpty } from 'utils';
 import FormError from 'components/core-ui-lib/FormError';
 import { Label } from 'components/core-ui-lib';
+import { decRegexLeadingZero } from 'utils/regexUtils';
+import { PerformanceType } from '../tabs/PromoterHoldsTab';
 
 interface AllocatedModalProps {
   show: boolean;
   onCancel: () => void;
   onSave: (data, perfId, type: string) => void;
-  bookingId: number;
+  performances: Array<PerformanceType>;
   data?: any;
   type: string;
-}
-
-interface PerformanceType {
-  text: string;
-  value: number;
-  date: string;
-  time: string;
 }
 
 interface FormInterface {
@@ -39,7 +32,7 @@ interface FormInterface {
   custName: string;
   email: string;
   numSeatsReq: number;
-  seatNumList: number;
+  seatNumList: string;
   requestBy: string;
   comments: string;
   arrangedBy: number;
@@ -50,14 +43,11 @@ export default function AllocatedSeatsModal({
   show = false,
   onCancel,
   onSave,
-  bookingId,
+  performances = [],
   data,
   type,
 }: Partial<AllocatedModalProps>) {
-  const { fetchData } = useAxios();
-
   const [visible, setVisible] = useState<boolean>(show);
-  const [perfList, setPerfList] = useState<PerformanceType[]>([]);
   const [userList, setUserList] = useState<{ value: number; text: string }[]>([]);
   const users = useRecoilValue(userState);
   const [form, setForm] = useState<FormInterface>({
@@ -65,7 +55,7 @@ export default function AllocatedSeatsModal({
     custName: '',
     email: '',
     numSeatsReq: null,
-    seatNumList: 0,
+    seatNumList: '',
     requestBy: '',
     comments: '',
     arrangedBy: null,
@@ -92,7 +82,7 @@ export default function AllocatedSeatsModal({
     setUserList(userTempList);
 
     if (type === 'edit') {
-      const perf = perfList.find(
+      const perf = performances.find(
         (perfRec) => formatInputDate(perfRec.date) === data.date && getTimeFromDateAndTime(perfRec.date) === data.time,
       );
 
@@ -105,7 +95,7 @@ export default function AllocatedSeatsModal({
         requestBy: data.RequestedBy,
         comments: data.Comments,
         arrangedBy: null,
-        venueConfNotes: data.VenuteConfirmationNotes,
+        venueConfNotes: data.VenueConfirmationNotes,
       });
       setAllocId(data.Id);
 
@@ -132,7 +122,7 @@ export default function AllocatedSeatsModal({
       return;
     }
 
-    const perf = perfList.find((perfRec) => perfRec.value === form.perfSelected);
+    const perf = performances.find((perfRec) => perfRec.value === form.perfSelected);
     let data = {
       ArrangedByAccUserId: form.arrangedBy,
       Comments: form.comments,
@@ -174,7 +164,7 @@ export default function AllocatedSeatsModal({
   // Confirmation popup cancel handling
   const handleConfCancel = () => {
     if (confVariant === 'delete') {
-      const perf = perfList.find((perfRec) => perfRec.value === form.perfSelected);
+      const perf = performances.find((perfRec) => perfRec.value === form.perfSelected);
       const data = {
         ArrangedBy: userList.find((user) => user.value === form.arrangedBy).text,
         Comments: form.comments,
@@ -211,7 +201,7 @@ export default function AllocatedSeatsModal({
       custName: '',
       email: '',
       numSeatsReq: null,
-      seatNumList: 0,
+      seatNumList: '',
       requestBy: '',
       comments: '',
       arrangedBy: null,
@@ -253,7 +243,7 @@ export default function AllocatedSeatsModal({
         onCancel();
       }
     } else if (type === 'edit') {
-      const perf = perfList.find((perfRec) => perfRec.value === form.perfSelected);
+      const perf = performances.find((perfRec) => perfRec.value === form.perfSelected);
       const updatedRec = {
         ArrangedBy: userList.find((user) => user.value === form.arrangedBy).text,
         Comments: form.comments,
@@ -283,39 +273,6 @@ export default function AllocatedSeatsModal({
     }
   };
 
-  // Get performance list
-  const getPerformanceList = async (bookingId: number) => {
-    try {
-      const data = await fetchData({
-        url: '/api/performances/read/' + bookingId,
-        method: 'POST',
-      });
-
-      if (typeof data === 'object') {
-        const perfList = data as Array<PerformanceDTO>;
-        const optionList: PerformanceType[] = [];
-        perfList.forEach((perf) => {
-          optionList.push({
-            text: formatInputDate(perf.Date) + ' | ' + perf.Time.substring(0, 5),
-            value: perf.Id,
-            date: perf.Date,
-            time: perf.Time.substring(0, 5),
-          });
-        });
-
-        setPerfList(optionList);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  useEffect(() => {
-    if (bookingId !== null && bookingId !== undefined) {
-      getPerformanceList(bookingId);
-    }
-  }, [bookingId]);
-
   // Update state of the form popup when show var is changed
   useEffect(() => {
     if (show) {
@@ -326,16 +283,21 @@ export default function AllocatedSeatsModal({
 
   return (
     <div>
-      <PopupModal show={visible} onClose={() => handleClose('close')} showCloseIcon={true} hasOverlay={showConfirm}>
+      <PopupModal
+        show={visible}
+        onClose={() => handleClose('close')}
+        showCloseIcon={true}
+        hasOverlay={showConfirm}
+        title="Allocated Seats"
+      >
         <div className="h-[552px] w-[448px]">
-          <div className="text-xl text-primary-navy font-bold mb-4 -mt-3">Allocated Seats</div>
           <div className="flex flex-row">
             <Label text="Performance" required className={labelClass} />
             <div className="flex flex-col w-2/3 mb-2">
               <Select
                 testId="perf-date-or-time"
-                className="w-full"
-                options={perfList}
+                className={classNames('w-full', errors.performance ? '' : 'mb-4')}
+                options={performances}
                 value={form.perfSelected}
                 onChange={(e) => handleChange({ target: { name: 'perfSelected', value: e } })}
                 placeholder="Select Date/Time"
@@ -379,9 +341,9 @@ export default function AllocatedSeatsModal({
 
           <div className="flex flex-row">
             <Label text="Number of Seats Required" required className={labelClass} />
-            <div className="flex flex-col w-2/3 mb-2">
+            <div className={classNames('flex flex-col w-2/3')}>
               <TextInput
-                className="w-full"
+                className={classNames('w-full', errors.numberOfSeats ? '' : 'mb-4')}
                 testId="no-of-seats"
                 placeholder="Enter No. Seats"
                 id="seatsRequired"
@@ -389,7 +351,7 @@ export default function AllocatedSeatsModal({
                 value={form.numSeatsReq}
                 onChange={handleChange}
                 error={errors.numberOfSeats ? 'Seat number required' : ''}
-                type="number"
+                pattern={decRegexLeadingZero}
               />
               {errors.numberOfSeats && <FormError error="This is a Required Field" className="mt-2 ml-2" />}
             </div>
@@ -406,7 +368,6 @@ export default function AllocatedSeatsModal({
                 name="seatNumList"
                 value={form.seatNumList}
                 onChange={handleChange}
-                type="number"
               />
             </div>
           </div>
@@ -445,7 +406,7 @@ export default function AllocatedSeatsModal({
             <Label text="Arranged By" required className={labelClass} />
             <div className="flex flex-col w-2/3 mb-2">
               <Select
-                className={classNames('w-full text-primary-input-text')}
+                className={classNames('w-full text-primary-input-text', errors.arrangedBy ? '' : 'mb-4')}
                 testId="select-user"
                 options={userList}
                 value={form.arrangedBy}
@@ -460,10 +421,10 @@ export default function AllocatedSeatsModal({
           </div>
 
           <div className="flex flex-row">
-            <Label text={'Venue' + '\n' + 'Confirmation' + '\n' + 'notes'} className={labelClass} />
-            <div className="flex flex-col">
+            <Label text={'Venue \n Confirmation \n Notes'} className={labelClass} />
+            <div className="flex flex-col w-2/3">
               <TextArea
-                className="w-[300px] h-[80px]"
+                className="w-full h-[80px] mb-4"
                 testId="venue-confirmation-notes"
                 value={form.venueConfNotes}
                 placeholder="Notes Field"
@@ -476,10 +437,22 @@ export default function AllocatedSeatsModal({
             <FormError error="Please ensure you fill in the required fields" className="mt-4 -mb-2 float-right" />
           )}
 
-          <div className="flex flex-row mt-5 pb-5 float-right">
-            <Button className="w-32" variant="secondary" text="Cancel" onClick={() => handleConfirm('cancel')} />
-            <Button className="ml-4 w-32" onClick={() => handleConfirm('delete')} variant="tertiary" text="Delete" />
-            <Button className="ml-4 w-32" variant="primary" text="Save and Close" onClick={handleSave} />
+          <div className="float-right flex flex-row mt-5">
+            <Button
+              className="ml-4 w-32 flex float-left"
+              variant="secondary"
+              text="Cancel"
+              onClick={() => handleConfirm('cancel')}
+            />
+            {type !== 'new' && (
+              <Button className="ml-4 w-32" onClick={() => handleConfirm('delete')} variant="tertiary" text="Delete" />
+            )}
+            <Button
+              className="ml-4 w-32 flex float-right"
+              variant="primary"
+              text="Save and Close"
+              onClick={handleSave}
+            />
           </div>
         </div>
       </PopupModal>

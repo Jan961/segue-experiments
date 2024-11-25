@@ -60,3 +60,9 @@ coverage
 #prisma
 prisma/views/
 prisma/generated/
+
+#dev tools directory for custom dev tools
+devTools/
+
+#storybook
+storybook-static/

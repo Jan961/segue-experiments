@@ -12,7 +12,7 @@ import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import { CustomOption } from 'components/core-ui-lib/Table/renderers/SelectCellRenderer';
 import classNames from 'classnames';
 import axios from 'axios';
-import { SEND_ACCOUNT_PIN_TEMPLATE } from 'config/global';
+import { NEW_USER_PIN_EMAIL } from 'config/global';
 import { notify } from 'components/core-ui-lib/Notifications';
 
 type UserDetails = {
@@ -206,11 +206,11 @@ const AdEditUser = ({
 
   const saveUser = async () => {
     const permissions = flattenHierarchicalOptions(userDetails.permissions)
-      .filter(({ checked }) => checked)
+      .filter(({ checked, isPartiallySelected }) => checked || isPartiallySelected)
       .map(({ id }) => id);
 
     const selectedProductions = userDetails.productions.filter(({ checked }) => checked).map(({ id }) => id);
-    const payload = { ...userDetails, permissions, productions: selectedProductions };
+    const payload = { ...userDetails, permissions, productions: selectedProductions, accountPIN };
     const success = selectedUser ? await updateUser(payload) : await createUser(payload);
     if (!success) {
       return;
@@ -253,9 +253,10 @@ const AdEditUser = ({
     try {
       await axios.post('/api/email/send', {
         to: selectedUser.email,
-        templateName: SEND_ACCOUNT_PIN_TEMPLATE,
-        data: { pin: accountPIN },
+        templateName: NEW_USER_PIN_EMAIL,
+        data: { AccountPin: accountPIN },
       });
+      notify.success("PIN Sent to user's Email");
     } catch (err) {
       console.error(err);
       notify.error('Error sending email with account pin');
@@ -413,6 +414,13 @@ const AdEditUser = ({
               </div>
             </div>
             <FormError error={error} className="my-2 flex justify-end" variant="md" />
+            {!error && Object.values(validationErrors).length > 0 && (
+              <FormError
+                error="Please ensure you complete all highlighted fields"
+                className="my-2 flex justify-end"
+                variant="md"
+              />
+            )}
             <div className="flex justify-end gap-4 mt-2">
               <Button onClick={handleModalClose} variant="secondary" testId="cancel-edited-user-info">
                 Cancel

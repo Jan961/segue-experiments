@@ -17,12 +17,16 @@ import { otherState } from 'state/booking/otherState';
 import { currentProductionSelector } from 'state/booking/selectors/currentProductionSelector';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import useComponentMountStatus from 'hooks/useComponentMountStatus';
+import { accessBookingsHome } from 'state/account/selectors/permissionSelector';
+import { ColDef } from 'ag-grid-enterprise';
+
 interface BookingsTableProps {
   rowData?: any;
   tableRef?: any;
 }
 
 export default function BookingsTable({ rowData, tableRef }: BookingsTableProps) {
+  const permissions = useRecoilValue(accessBookingsHome);
   const router = useRouter();
   const [filter, setFilter] = useRecoilState(filterState);
   const [bookings, setBookings] = useRecoilState(bookingState);
@@ -37,7 +41,8 @@ export default function BookingsTable({ rowData, tableRef }: BookingsTableProps)
   const [showConfirmationModal, setShowConfirmationModal] = useState<boolean>(false);
   const [bookingInfo, setBookingInfo] = useState(null);
   const isMounted = useComponentMountStatus();
-  const bookingColumDefs = useMemo(() => (isMounted ? columnDefs : []), [isMounted]);
+  const canAccessNotes = useMemo(() => permissions && permissions.includes('ACCESS_BOOKING_NOTES'), [permissions]);
+  const bookingColumDefs = useMemo(() => (isMounted ? columnDefs(canAccessNotes) : []), [isMounted, canAccessNotes]);
 
   const gridOptions = {
     suppressColumnVirtualisation: false,
@@ -55,32 +60,40 @@ export default function BookingsTable({ rowData, tableRef }: BookingsTableProps)
   };
 
   const handleCellClick = (e) => {
-    if (e.column.colId === 'note' && e.data.venue && !isNullOrEmpty(e.data.dayType)) {
+    if (
+      e.column.colId === 'note' &&
+      canAccessNotes &&
+      permissions.includes('EDIT_BOOKING_NOTES') &&
+      e.data.venue &&
+      !isNullOrEmpty(e.data.dayType)
+    ) {
       setProductionItem(e.data);
       setShowModal(true);
     }
   };
 
   const handleRowDoubleClicked = (e: RowDoubleClickedEvent) => {
-    if (!currentProduction) {
-      setShowConfirmationModal(true);
-      return;
-    }
-    const { data } = e;
-    setBookingInfo(data);
-    if (!data.Id) {
-      setShowAddEditBookingModal({
-        visible: true,
-        startDate: e.data.dateTime,
-        endDate: e.data.dateTime,
-      });
-    } else {
-      setShowAddEditBookingModal({
-        visible: true,
-        startDate: data.dateTime,
-        endDate: data.dateTime,
-        booking: data,
-      });
+    if (['CREATE_NEW_BOOKING', 'EDIT_BOOKING_DETAILS'].some((perm) => permissions.includes(perm))) {
+      if (!currentProduction) {
+        setShowConfirmationModal(true);
+        return;
+      }
+      const { data } = e;
+      setBookingInfo(data);
+      if (!data.Id && permissions.includes('CREATE_NEW_BOOKING')) {
+        setShowAddEditBookingModal({
+          visible: true,
+          startDate: e.data.dateTime,
+          endDate: e.data.dateTime,
+        });
+      } else if (permissions.includes('EDIT_BOOKING_DETAILS')) {
+        setShowAddEditBookingModal({
+          visible: true,
+          startDate: data.dateTime,
+          endDate: data.dateTime,
+          booking: data,
+        });
+      }
     }
   };
 
@@ -136,7 +149,7 @@ export default function BookingsTable({ rowData, tableRef }: BookingsTableProps)
   };
 
   if (bookingColumDefs.length > 0) {
-    bookingColumDefs[0].sortable = currentProduction === undefined;
+    (bookingColumDefs[0] as ColDef).sortable = currentProduction === undefined;
   }
   return (
     <>

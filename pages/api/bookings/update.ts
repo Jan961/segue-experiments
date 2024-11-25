@@ -4,9 +4,9 @@ import {
   createNewBooking,
   createNewRehearsal,
   createOtherBooking,
-  deleteBookingById,
   deleteGetInFitUpById,
   deleteOtherById,
+  deletePerformancesForBooking,
   deleteRehearsalById,
   updateBooking,
   updateGetInFitUp,
@@ -16,6 +16,7 @@ import {
 
 import { BookingItem } from 'components/bookings/modal/NewBooking/reducer';
 import {
+  getBookingType,
   mapExistingBookingToPrismaFields,
   mapNewBookingToPrismaFields,
   mapNewOtherTypeToPrismaFields,
@@ -63,20 +64,15 @@ const formatNewBookingToPrisma = (booking: BookingItem) => {
   return mapNewOtherTypeToPrismaFields(booking);
 };
 
-const getBookngType = (booking: BookingItem) => {
-  if (booking.isBooking) {
-    return 'booking';
-  } else if (booking.isRehearsal) {
-    return 'rehearsal';
-  } else if (booking.isGetInFitUp) {
-    return 'getInFitUp';
-  }
-  return 'other';
-};
-
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
     const { original, updated } = req.body;
+
+    // This API only deals with a single type of booking and hence the original array is expected to have a single item (the Bookings table row being edited)
+    if (original?.length !== 1) {
+      throw new Error('Original array is expected to have a single item');
+    }
+    const originalItem = original[0];
     const prisma = await getPrismaClient(req);
     const rowsMap = {
       booking: { rowsToInsert: [], rowsToUpdate: [], rowsToDelete: [] },
@@ -86,29 +82,39 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     };
     // Check if this is a straight forward update or a delete-insert
     const acc: typeof rowsMap = updated.reduce((acc, booking: BookingItem) => {
-      const originalBooking = original.find(({ id }) => id === booking.id) as BookingItem;
-      const originalType = originalBooking ? getBookngType(originalBooking) : null;
-      const updatedType = getBookngType(booking);
-
-      if (!booking.id) {
-        acc[updatedType].rowsToInsert.push(formatNewBookingToPrisma(booking));
+      const shouldUpdateBooking = originalItem.isBooking && booking.isBooking;
+      if (shouldUpdateBooking) {
+        acc.booking.rowsToUpdate.push(formatExistingBookingToPrisma({ ...booking, id: originalItem.id }));
       } else {
-        const canUpdate =
-          originalBooking.isBooking === booking.isBooking &&
-          originalBooking.isRehearsal === booking.isRehearsal &&
-          originalBooking.isGetInFitUp === booking.isGetInFitUp;
-        if (canUpdate) {
-          acc[updatedType].rowsToUpdate.push(formatExistingBookingToPrisma(booking));
-        } else {
-          acc[originalType].rowsToDelete.push(originalBooking);
+        const editedItem = original.find(({ id }) => id === booking.id) as BookingItem;
+        const originalType = editedItem ? getBookingType(editedItem) : null;
+        const updatedType = getBookingType(booking);
+
+        if (!booking.id) {
           acc[updatedType].rowsToInsert.push(formatNewBookingToPrisma(booking));
+        } else {
+          const canUpdate =
+            editedItem.isBooking === booking.isBooking &&
+            editedItem.isRehearsal === booking.isRehearsal &&
+            editedItem.isGetInFitUp === booking.isGetInFitUp;
+          if (canUpdate) {
+            acc[updatedType].rowsToUpdate.push(formatExistingBookingToPrisma(booking));
+          } else {
+            acc[originalType].rowsToDelete.push(editedItem);
+            acc[updatedType].rowsToInsert.push(formatNewBookingToPrisma(booking));
+          }
         }
       }
       return acc;
     }, rowsMap);
 
-    const promises = [];
+    // check if the original item needs deleting
+    if (!updated.find(({ id }) => id === originalItem.id)) {
+      const type = getBookingType(originalItem);
+      acc[type].rowsToDelete.push(originalItem);
+    }
 
+    const promises = [];
     for (const bookingType of Object.entries(acc)) {
       const [model, { rowsToInsert, rowsToUpdate, rowsToDelete }] = bookingType;
 
@@ -146,7 +152,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       rowsToDelete.forEach((rowToDelete) => {
         switch (model) {
           case 'booking':
-            promises.push(deleteBookingById(rowToDelete.id, prisma));
+            promises.push(deletePerformancesForBooking(rowToDelete.id, prisma));
             break;
           case 'rehearsal':
             promises.push(deleteRehearsalById(rowToDelete.id, prisma));

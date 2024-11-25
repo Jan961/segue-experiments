@@ -3,7 +3,7 @@ export const RUN_OF_DATES_DAY_TYPE_FILTERS = [...DAY_TYPE_FILTERS, 'Day Off'];
 
 export const getVenueForDayType = (dayTypeOptions, dayType) => {
   const selectedDayTypeOption = dayTypeOptions.find(({ value }) => dayType === value);
-  if (selectedDayTypeOption && !DAY_TYPE_FILTERS.includes(selectedDayTypeOption.text)) {
+  if (selectedDayTypeOption) {
     return selectedDayTypeOption.text;
   }
   return '';

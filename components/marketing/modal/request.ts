@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { downloadFromContent } from 'components/bookings/modal/request';
-import moment from 'moment';
+import { sub } from 'date-fns';
+import { getDateObject } from 'services/dateService';
 
 type ProductionWeek = {
   Id: number;
@@ -29,12 +30,10 @@ export const exportSalesSummaryReport = async ({
   format = 'excel',
 }) => {
   const toWeek = productionWeek?.split('T')?.[0];
-  const fromWeek = moment(productionWeek)
-    .subtract(numberOfWeeks - 1, 'weeks')
-    .toISOString()
-    ?.split('T')?.[0];
+  const fromWeek = sub(getDateObject(toWeek), { weeks: numberOfWeeks })?.toISOString?.()?.split('T')?.[0];
   const payload = {
     productionId: parseInt(production, 10),
+    exportedAt: new Date().toISOString(),
     fromWeek,
     toWeek,
     isWeeklyReport,
@@ -50,7 +49,7 @@ export const exportSalesSummaryReport = async ({
     const contentDisposition = response.headers['content-disposition'];
     if (contentDisposition) {
       const match = contentDisposition.match(/filename="(.+)"/);
-      if (match && match[1]) {
+      if (match?.[1]) {
         suggestedName = match[1];
       }
     }
@@ -76,6 +75,7 @@ export const exportPromoterHoldsReport = async ({
 }: any) => {
   const payload = {
     productionId: parseInt(production, 10),
+    exportedAt: new Date().toISOString(),
     productionCode,
     fromDate,
     toDate,
@@ -92,7 +92,7 @@ export const exportPromoterHoldsReport = async ({
     const contentDisposition = response.headers['content-disposition'];
     if (contentDisposition) {
       const match = contentDisposition.match(/filename="(.+)"/);
-      if (match && match[1]) {
+      if (match?.[1]) {
         suggestedName = match[1];
       }
     }
@@ -113,6 +113,7 @@ export const exportProductionGrossSales = async ({ production, format }) => {
   const payload = {
     productionId: parseInt(production, 10),
     format,
+    exportedAt: new Date().toISOString(),
   };
   const response = await axios.post('/api/reports/gross-sales', payload, { responseType: 'blob' });
 
@@ -123,7 +124,7 @@ export const exportProductionGrossSales = async ({ production, format }) => {
     const contentDisposition = response.headers['content-disposition'];
     if (contentDisposition) {
       const match = contentDisposition.match(/filename="(.+)"/);
-      if (match && match[1]) {
+      if (match?.[1]) {
         suggestedName = match[1];
       }
     }
@@ -143,6 +144,7 @@ export const exportProductionGrossSales = async ({ production, format }) => {
 export const exportHoldsComps = async ({ production, productionCode, venue, fromDate, toDate, status, format }) => {
   const payload = {
     productionId: parseInt(production, 10),
+    exportedAt: new Date().toISOString(),
     productionCode,
     venue,
     fromDate,
@@ -159,7 +161,7 @@ export const exportHoldsComps = async ({ production, productionCode, venue, from
     const contentDisposition = response.headers['content-disposition'];
     if (contentDisposition) {
       const match = contentDisposition.match(/filename="(.+)"/);
-      if (match && match[1]) {
+      if (match?.[1]) {
         suggestedName = match[1];
       }
     }
@@ -193,7 +195,7 @@ export const exportSelectedVenues = async ({ production, productionCode, showId,
     const contentDisposition = response.headers['content-disposition'];
     if (contentDisposition) {
       const match = contentDisposition.match(/filename="(.+)"/);
-      if (match && match[1]) {
+      if (match?.[1]) {
         suggestedName = match[1];
       }
     }

@@ -52,7 +52,7 @@ const ArchSalesDialog = ({
   const { bookings } = useRecoilValue(bookingJumpState);
   const [prodCompData, setProdCompData] = useState<Array<BookingSelection>>([]);
   const [subTitle, setSubTitle] = useState<string>('');
-  const [conditionType, setConditionType] = useState('');
+  const [conditionType, setConditionType] = useState(null);
   const [selectedCondition, setSelectedCondition] = useState(null);
   const [venueList, setVenueList] = useState<Array<SelectOption>>([]);
   const [townList, setTownList] = useState<Array<SelectOption>>([]);
@@ -195,7 +195,7 @@ const ArchSalesDialog = ({
 
   useEffect(() => {
     setVisible(show);
-    setConditionType('');
+    setConditionType(null);
     setSelectedCondition(null);
   }, [show]);
 
@@ -225,14 +225,13 @@ const ArchSalesDialog = ({
       title={title[variant]}
       titleClass={classNames('text-xl text-primary-navy font-bold -mt-2', variant === 'both' ? 'w-48' : '')}
       onClose={handleModalCancel}
+      subtitle={variant === 'both' ? '' : subTitle}
     >
       <div className="w-[340px] h-auto">
-        {variant !== 'both' && <div className="text-xl text-primary-navy font-bold mb-4">{subTitle}</div>}
-
         {variant === 'both' ? (
           <div>
             <Select
-              className={classNames('my-2 w-full !border-0 text-primary-navy')}
+              className={classNames('my-2 w-full text-primary-navy')}
               options={bothOptions}
               value={conditionType}
               onChange={(value) => setConditionType(value?.toString() || null)}
@@ -242,13 +241,13 @@ const ArchSalesDialog = ({
             />
 
             <Select
-              className={classNames('my-2 w-full !border-0 text-primary-navy')}
-              options={conditionType === '' ? [] : conditionType === 'Venue' ? venueList : townList}
+              className={classNames('my-2 w-full text-primary-navy')}
+              options={conditionType === null ? [] : conditionType === 'Venue' ? venueList : townList}
               isClearable
               isSearchable
               value={selectedCondition}
               onChange={(value) => getBookingSelection(value)}
-              placeholder={conditionType === '' ? '' : 'Please select a ' + conditionType}
+              placeholder={conditionType === null ? '' : 'Please select a ' + conditionType}
               disabled={conditionType === ''}
             />
 

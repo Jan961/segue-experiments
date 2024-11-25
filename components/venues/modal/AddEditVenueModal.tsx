@@ -20,6 +20,8 @@ import useAxiosCancelToken from 'hooks/useCancelToken';
 import { isNullOrEmpty } from 'utils';
 import { headlessUploadMultiple } from 'requests/upload';
 import { AddressPopup } from './AddressPopup';
+import { useRecoilValue } from 'recoil';
+import { accessBookingsHome } from 'state/account/selectors/permissionSelector';
 
 interface AddEditVenueModalProps {
   visible: boolean;
@@ -42,6 +44,7 @@ export default function AddEditVenueModal({
   fetchVenues,
   setIsLoading,
 }: AddEditVenueModalProps) {
+  const permissions = useRecoilValue(accessBookingsHome);
   const [formData, setFormData] = useState({ ...initialVenueState, ...(venue || {}) });
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const hasErrors = useMemo(() => Object.values(validationErrors).some((x) => x), [validationErrors]);
@@ -343,7 +346,7 @@ export default function AddEditVenueModal({
                 className="w-32"
               />
               <Button
-                disabled={!venue?.id || isDeleting || isSaving}
+                disabled={!permissions.includes('UPDATE_VENUE') || !venue?.id || isDeleting || isSaving}
                 onClick={toggleDeleteConfirmation}
                 variant="tertiary"
                 text={isDeleting ? 'Deleting Venue...' : 'Delete Venue'}
@@ -353,7 +356,7 @@ export default function AddEditVenueModal({
               </Button>
               <Button
                 testId="add-venues-save-and-close-btn"
-                disabled={isSaving || isDeleting}
+                disabled={!permissions.includes('EDIT_VENUE_DETAILS') || isSaving || isDeleting}
                 text={isSaving ? 'Saving...' : 'Save and Close'}
                 className="w-32 mb-4"
                 onClick={handleSaveAndClose}

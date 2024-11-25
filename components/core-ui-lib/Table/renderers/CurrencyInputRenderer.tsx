@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import BaseCellRenderer from './BaseCellRenderer';
 import { TextInputProps } from 'components/core-ui-lib/TextInput/TextInput';
 import TextInput from 'components/core-ui-lib/TextInput';
-import { formatDecimalOnBlur } from 'components/contracts/utils';
+import { formatDecimalOnBlur } from 'utils';
 
 interface TextInputRendererProps extends TextInputProps {
   eGridCell: HTMLElement;

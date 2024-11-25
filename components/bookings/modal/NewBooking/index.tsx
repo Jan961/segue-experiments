@@ -205,6 +205,7 @@ const AddBooking = ({ visible, onClose, startDate, endDate, bookingInfo, booking
       title={state.modalTitle}
       panelClass="relative"
       hasOverlay={hasOverlay}
+      subtitle={productionCode}
     >
       <Wizard wrapper={<AnimatePresence initial={false} mode="wait" />}>
         {!editBooking && (
@@ -216,7 +217,6 @@ const AddBooking = ({ visible, onClose, startDate, endDate, bookingInfo, booking
             onSubmit={setBookingOnStore}
             formData={state.form}
             onClose={onClose}
-            productionCode={productionCode}
             venueOptions={venueOptions}
             updateModalTitle={updateModalTitle}
             onBarringCheckComplete={handleBarringCheckComplete}

@@ -1,5 +1,4 @@
 import Decimal from 'decimal.js';
-import moment from 'moment';
 import * as ExcelJS from 'exceljs';
 import {
   BOOK_STATUS_CODES,
@@ -14,6 +13,9 @@ import {
   WeekAggregateSeatsDetailCurrencyWise,
   WeekAggregates,
 } from 'types/SalesSummaryTypes';
+import { format, formatDuration, intervalToDuration, isBefore } from 'date-fns';
+import { formatDate, getDateObject, simpleToDate } from './dateService';
+import { sum } from 'radash';
 
 export enum COLOR_HEXCODE {
   PURPLE = 'ff7030a0',
@@ -34,6 +36,7 @@ export enum COLOR_HEXCODE {
   TASK_RED = 'ffd41818',
   TASK_YELLOW = 'ffffbe43',
   TASK_AMBER = 'ffea8439',
+  LIGHT_BROWN = 'ffffcc99',
 }
 
 export const formatWeek = (num: number): string => `Week ${num}`;
@@ -56,9 +59,9 @@ export const getMapKeyForValue = (
   }: Pick<TRequiredFieldsFinalFormat, 'FormattedSetProductionWeekNum' | 'SetProductionWeekDate'>,
 ): string => `${Week} | ${Town} | ${Venue} | ${setProductionWeekNumVar} | ${setProductionWeekDateVar}`;
 
-export const convertDateFormat = (date) => {
-  const parsedDate = moment(date, 'DD-MM-YYYY');
-  return parsedDate.format('DD/MM/YY');
+export const convertDateFormat = (date: Date) => {
+  const parsedDate = formatDate(date, 'dd/MM/yy');
+  return parsedDate;
 };
 
 export const getAggregateKey = ({
@@ -116,14 +119,14 @@ export const assignBackgroundColor = ({
     colorCell({ worksheet, row, col, argbColor: COLOR_HEXCODE.YELLOW });
   }
 
-  if (moment(Date).valueOf() < moment(SetProductionWeekDate).valueOf()) {
+  if (isBefore(getDateObject(Date), getDateObject(SetProductionWeekDate))) {
     colorCell({ worksheet, row, col, argbColor: COLOR_HEXCODE.BLUE });
   }
 
-  if (NotOnSalesDate && moment(SetProductionWeekDate).valueOf() < moment(NotOnSalesDate).valueOf()) {
+  if (NotOnSalesDate && isBefore(simpleToDate(SetProductionWeekDate), simpleToDate(NotOnSalesDate))) {
     colorCell({ worksheet, row, col, argbColor: COLOR_HEXCODE.RED });
   }
-  if (BookingStatusCode === BOOK_STATUS_CODES.X) {
+  if (BookingStatusCode === BOOK_STATUS_CODES.X || BookingStatusCode === BOOK_STATUS_CODES.S) {
     const startPoint = 6;
     for (let i = 0; i < weekCols; i++) {
       colorTextAndBGCell({
@@ -449,7 +452,7 @@ export const makeTextBoldOfNRows = ({
 };
 
 export const getFileName = (worksheet): string =>
-  `${worksheet.getCell(1, 1).value} ${moment().format('DD MM YYYY hh:mm:ss')}.xlsx`;
+  `${worksheet.getCell(1, 1).value} ${format(new Date(), 'DD MM YYYY hh:mm:ss')}.xlsx`;
 
 export const getCurrencyWiseTotal = ({
   totalForWeeks,
@@ -492,7 +495,7 @@ export const getChangeVsLastWeekValue = (weeksDataArray: number[]): number => {
     if (isNaN(val)) {
       return 0;
     }
-    return val > 0 ? val : -1 * val;
+    return val >= 0 ? val : -1 * val;
     // `${prefix}${val > 0 ? val : -1 * (val)}`
     // } else {
     // This case should not occur
@@ -524,12 +527,10 @@ export const getWeekWiseGrandTotalInPound = ({
 
   if (!arr?.length) {
     return 0;
-    // '£0'
   }
 
-  const finalValue = arr.map((x) => x.ConvertedValue).reduce((acc, x) => acc.plus(x), new Decimal(0));
-  return finalValue?.toNumber?.();
-  // `£${formatNumberWithNDecimal(finalValue, 2)}`
+  const finalValue = sum(arr, (val) => (isNaN(val.ConvertedValue) ? 0 : val.ConvertedValue));
+  return finalValue;
 };
 
 export const getSeatsColumnForWeekTotal = ({
@@ -540,7 +541,7 @@ export const getSeatsColumnForWeekTotal = ({
   totalCurrencyWiseSeatsMapping: WeekAggregateSeatsDetail;
 }): number[] => {
   const arr: WeekAggregateSeatsDetailCurrencyWise[] = totalCurrencyWiseSeatsMapping[currencySymbol];
-  if (!arr || !arr?.length) {
+  if (!arr?.length) {
     return [];
   }
 
@@ -558,11 +559,11 @@ export const getSeatsDataForTotal = ({
   seatsDataForEuro: number[];
   seatsDataForPound: number[];
 }): number[] => {
-  if (!seatsDataForEuro || !seatsDataForEuro?.length) {
+  if (!seatsDataForEuro?.length) {
     return seatsDataForPound;
   }
 
-  if (!seatsDataForPound || !seatsDataForPound?.length) {
+  if (!seatsDataForPound?.length) {
     return seatsDataForEuro;
   }
 
@@ -641,7 +642,9 @@ export const topAndBottomBorder = ({
 };
 
 export const minutesInHHmmFormat = (min: number) => {
-  return moment.utc(moment.duration(min, 'minutes').asMilliseconds()).format('HH:mm');
+  const duration = intervalToDuration({ start: 0, end: min * 1000 * 60 });
+  return formatDuration(duration, { format: ['hours', 'minutes'] });
+  // return moment.utc(moment.duration(min, 'minutes').asMilliseconds()).format('HH:mm');
 };
 export const makeColumnTextBold = ({ worksheet, colAsChar }: { worksheet: any; colAsChar: string }) => {
   worksheet.getColumn(colAsChar).eachCell((cell) => {
@@ -650,20 +653,21 @@ export const makeColumnTextBold = ({ worksheet, colAsChar }: { worksheet: any; c
 };
 
 export const salesReportName = ({ isWeeklyReport, isSeatsDataRequired, data }): string => {
+  let reportName = `Sales Summary`;
   if (isSeatsDataRequired) {
-    return `Sales Summary Vs Capacity`;
+    reportName = `Sales Summary Vs Capacity`;
   }
 
   if (isWeeklyReport) {
-    return `Sales Summary Weekly`;
+    reportName = `Sales Summary Weekly`;
   }
 
   if (data.length) {
     const { ShowName, FullProductionCode } = data[0];
-    return `${FullProductionCode} ${ShowName} Sales Summary`;
+    return `${FullProductionCode} ${ShowName} ${reportName}`;
   }
 
-  return `Sales Summary`;
+  return reportName;
 };
 
 export const applyFormattingToRange = ({
