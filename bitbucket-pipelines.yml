@@ -69,7 +69,7 @@ pipelines:
                 TO: jan@segue360.co.uk
                 HOST: 'smtp.gmail.com'
                 SUBJECT: '${ALERT_TYPE}: Segue Integration Tests for ${BITBUCKET_BRANCH}'
-                BODY_HTML: 'cypress-tests/create-email-report.html'
+                BODY_HTML: 'cypress-tests/email-report.html'
                 ATTACHMENTS: 'cypress-tests/full-report.zip'
           artifacts:
             - cypress-tests/cypress/reports/**
