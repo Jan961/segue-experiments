@@ -8,18 +8,18 @@ pipelines:
 
   custom:
     cypress:
-      - step:
-          name: "Build and Push Docker Image"
-          script:
-            - docker info
-            - docker build -t jan961/cypress-segue:myimage .
-            - docker login -u jan961 -p aQtZ9icpLhpR4hG
-            - docker  push jan961/cypress-segue:myimage
+#      - step:
+#          name: "Build and Push Docker Image"
+#          script:
+#            - docker info
+#            - docker build -t jan961/cypress-segue:myimage .
+#            - docker login -u jan961 -p aQtZ9icpLhpR4hG
+#            - docker  push jan961/cypress-segue:myimage
 
       - step:
           size: 4x
           name: "Run Cypress Tests"
-          image: jan961/cypress-segue:myimage
+          image: cypress/included:latest
           caches:
             - node
             - cypress
