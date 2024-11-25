@@ -2,17 +2,22 @@ ARG NODE_VERSION='18.20.4'
 ARG CHROME_VERSION='130.0.6723.69-1'
 
 FROM cypress/factory
-RUN apt-get update
-RUN apt-get install -y libreoffice
-RUN apt-get install -y openssl
+RUN apt-get update \
+&& apt-get install -y libreoffice \
+&& apt-get install -y openssl \
+&& npm install --global pm2
+
 
 # Set working directory
 WORKDIR /usr/app
-RUN npm install cypress --save-dev
-RUN npx cypress install
+## Expose the listening port
+EXPOSE 3000
 
-# Install PM2 globally
-RUN npm install --global pm2
+
+#RUN npm install cypress --save-dev
+#RUN npx cypress install
+
+
 
 # Copy package.json and package-lock.json before other files
 # Utilise Docker cache to save re-installing dependencies if unchanged
