@@ -1,26 +1,20 @@
 image: atlassian/default-image:2
+
+
 options:
-    docker: true
-    size: 2x
-
-definitions:
-
-  caches:
-    node: ~/.npm
-    cypress: ~/.cache
-    nextcache: .next/cache
-
-
+  docker: true
+  size: 4x
 pipelines:
+
   custom:
     cypress:
-#      - step:
-#          name: "Build and Push Docker Image"
-#          script:
-#            - docker info
-#            - docker build -t jan961/cypress-segue:myimage .
-#            - docker login -u jan961 -p $DOCKER_PASSWORD
-#            - docker  push jan961/cypress-segue:myimage
+      #      - step:
+      #          name: "Build and Push Docker Image"
+      #          script:
+      #            - docker info
+      #            - docker build -t jan961/cypress-segue:myimage .
+      #            - docker login -u jan961 -p $DOCKER_PASSWORD
+      #            - docker  push jan961/cypress-segue:myimage
 
       - step:
           size: 4x
@@ -61,9 +55,9 @@ pipelines:
                 echo "Tests failed but continuing with report generation"
               fi
             - ALERT_TYPE="success"
-            - if [[ $BITBUCKET_EXIT_CODE -ne 0 ]]; then 
-                ALERT_TYPE="error";
-                echo "Tests failed but continuing with report generation";
+            - if [[ $BITBUCKET_EXIT_CODE -ne 0 ]]; then
+              ALERT_TYPE="error";
+              echo "Tests failed but continuing with report generation";
               fi
             - pipe: atlassian/email-notify:0.13.2
               variables:
@@ -80,23 +74,39 @@ pipelines:
             - cypress-tests/cypress/cypress/reports/mocha/test-report.html
             - cypress-tests/mochawesome-report
             - cypress-tests/full-report.zip
+
+
   default:
-      - step:
-          name: Build and Test
-          image: node:18.20.4
-          variables:
-            NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: $NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
-            CLERK_SECRET_KEY: $CLERK_SECRET_KEY
-            WEB_APP_URI: $CYPRESS_BASE_URL
-          caches:
-            - node
-          script:
-            - npm install
-            - npm run test:ci
-            - npm run build
-      - step:
-          name: SonarQube Analysis
-          image: node:18.20.4
-          script:
-            - pipe: sonarsource/sonarcloud-scan:2.0.0
-            - pipe: sonarsource/sonarcloud-quality-gate:0.1.6
+    - step:
+        name: Build and Test
+        image: node:18.20.4
+        variables:
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: $NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+          CLERK_SECRET_KEY: $CLERK_SECRET_KEY
+          WEB_APP_URI: $CYPRESS_BASE_URL
+        caches:
+          - node
+        script:
+          - npm install
+          - npm run test:ci
+          - npm run build
+    - step:
+        name: SonarQube Analysis
+        image: node:18.20.4
+        script:
+          - pipe: sonarsource/sonarcloud-scan:2.0.0
+          - pipe: sonarsource/sonarcloud-quality-gate:0.1.6
+definitions:
+  caches:
+    npm: ~/.npm
+    cypress: ~/.cache
+    nextcache: ~/.next/cache
+  services:
+    docker:
+      memory: 4096
+
+
+
+
+
+
