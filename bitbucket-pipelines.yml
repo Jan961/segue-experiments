@@ -27,7 +27,7 @@ pipelines:
           timeout:
           script:
             - npm install -g npm@9.6.7
-            - echo "NPM version is $(npm -v)"
+            - echo "NPM version is ${npm -v}"
             -  apt-get install -y zip
             - npm install
             - npm install start-server-and-test
@@ -43,10 +43,15 @@ pipelines:
             - npx start-server-and-test "npm run start" http://localhost:3000 "npm --prefix cypress-tests/cypress run cy:alltests"
             # - npm run cy:permissions --browser chrome
             - cd cypress-tests/cypress
+            - echo "Merging reports"
             - npx mochawesome-merge cypress/results/*.json -o output.json
+            - if [ -e output.json ]; then echo "filename output.json exists"; else echo "output.json does not exist"; fi
             - npx marge output.json
+            - if [ -e mochawesome-report/output.html ]; then echo "mochawesome-report/output.html exists"; else echo "mochawesome-report/output.html does not exist"; fi
             - node create-email-report
-            - zip -r full-report.zip mochawsome-report/
+            - if [ -e email-report.html ]; then echo "email-report.html exists"; else echo "email-report.html does not exist"; fi
+            - zip -r full-report.zip mochawesome-report/
+            - if [ -e full-report.zip ]; then echo " full-report.zip exists"; else echo "full-report.zip does not exist"; fi
           after-script:
 
             # Set alert type based on test results
