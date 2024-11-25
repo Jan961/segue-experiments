@@ -16,7 +16,6 @@ const usePermissions = () => {
   const menuItems = useMemo(() => getMenuItems(getStrings), [getStrings]);
 
   useEffect(() => {
-    console.log('User Permissions:', permissionState, user);
     if (isSignedIn && permissionState?.permissions.length !== 0 && permissionState?.accountId !== '') {
       // Updates User permissions in the Recoil state when the user is updated from the Clerk context
       setPermissionsState({
@@ -51,7 +50,7 @@ const usePermissions = () => {
           },
         });
 
-        await setPermissionsState({
+        setPermissionsState({
           permissions,
           accountId: organisationId,
         });
