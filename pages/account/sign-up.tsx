@@ -16,7 +16,7 @@ import { getCountriesAsSelectOptions, getCurrenciesAsSelectOptions } from 'servi
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import LoadingOverlay from 'components/core-ui-lib/LoadingOverlay';
 import useAuth from 'hooks/useAuth';
-import Layout from 'components/Layout';
+import Head from 'next/head';
 
 export const getServerSideProps: GetServerSideProps = async () => {
   const planColors = ['#41a29a', '#0093c0', '#7b568d'];
@@ -113,30 +113,34 @@ const NewAccount = ({
   };
 
   return (
-    <Layout title="New Account | Segue" flush>
-      <div className={`${calibri.variable} font-calibri background-gradient flex flex-col py-20  px-6`}>
-        <Image className="mx-auto mb-2" height={160} width={310} src="/segue/segue_logo_full.png" alt="Segue" />
-        <Wizard>
-          <AccountDetailsForm
-            currencies={currencies}
-            countries={countries}
-            accountDetails={accountDetails}
-            onChange={setAccountDetails}
-            onSave={handleSaveAccountDetails}
-            error={error}
-          />
-          {/* Subscription plans and Payment details have been temporarily disabled */}
-          {false && <SubscriptionPlans plans={plans} onSubmit={seSubscriptionDetails} />}
-          {false && (
-            <Elements stripe={stripe}>
-              <PaymentDetailsForm accountDetails={accountDetails} plan={subcriptionDetails} />
-            </Elements>
-          )}
-          <AccountConfirmation />
-        </Wizard>
-        {loading && <LoadingOverlay />}
-      </div>
-    </Layout>
+    <div className={`${calibri.variable} font-calibri background-gradient flex flex-col py-20  px-6`}>
+      <Head>
+        <title>New Account | Segue</title>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+        <link rel="icon" href="/segue/segue_mini_icon.png" type="image/png" />
+      </Head>
+      <Image className="mx-auto mb-2" height={160} width={310} src="/segue/segue_logo_full.png" alt="Segue" />
+      <Wizard>
+        <AccountDetailsForm
+          currencies={currencies}
+          countries={countries}
+          accountDetails={accountDetails}
+          onChange={setAccountDetails}
+          onSave={handleSaveAccountDetails}
+          error={error}
+        />
+        {/* Subscription plans and Payment details have been temporarily disabled */}
+        {false && <SubscriptionPlans plans={plans} onSubmit={seSubscriptionDetails} />}
+        {false && (
+          <Elements stripe={stripe}>
+            <PaymentDetailsForm accountDetails={accountDetails} plan={subcriptionDetails} />
+          </Elements>
+        )}
+        <AccountConfirmation />
+      </Wizard>
+      {loading && <LoadingOverlay />}
+    </div>
   );
 };
 
