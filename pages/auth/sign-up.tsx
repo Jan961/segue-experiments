@@ -23,6 +23,7 @@ import useAuth from 'hooks/useAuth';
 import usePermissions from 'hooks/usePermissions';
 import { isNullOrEmpty } from 'utils';
 import LoadingOverlay from '../../components/core-ui-lib/LoadingOverlay';
+import useNavigation from 'hooks/useNavigation';
 
 const DEFAULT_ACCOUNT_DETAILS = {
   firstName: '',
@@ -39,7 +40,8 @@ const DEFAULT_ACCOUNT_DETAILS = {
 
 const SignUp = () => {
   const router = useRouter();
-  const { signIn, signOut, navigateToHome, getSignInUrl } = useAuth();
+  const { signIn, signOut } = useAuth();
+  const { navigateToHome, navigateToSignIn, getSignInUrl } = useNavigation();
   const [isBusy, setIsBusy] = useState(false);
   const { isSignedIn, setUserPermissions } = usePermissions();
   const [error, setError] = useState('');
@@ -68,10 +70,19 @@ const SignUp = () => {
         companyName: accountDetails.companyName,
         email: accountDetails.email,
       });
-      if (data.accountUserExists) {
-        router.push('/auth/sign-in');
+      return data;
+    } catch (err) {
+      setError(err.errors[0].message);
+    }
+  };
+
+  const processExistingUser = async () => {
+    try {
+      const userResponse = await verifyUserExits();
+      if (userResponse.accountUserExists) {
+        navigateToSignIn();
       } else {
-        setAccountDetails((prev) => ({ ...prev, firstName: data.firstName, lastName: data.lastName }));
+        setAccountDetails((prev) => ({ ...prev, firstName: userResponse.firstName, lastName: userResponse.lastName }));
         setAuthMode('existingUser');
       }
     } catch (err) {
@@ -95,9 +106,8 @@ const SignUp = () => {
         return;
       }
       setAccountDetails((prev) => ({ ...prev, accountId: data.id }));
-      // Check if user already registered with Clerk. The create method will error if the user already exists
+      // Check if user already registered with Clerk. The signIn method will error if the user already exists
       await signIn(accountDetails.email, 'dummy_password');
-      return true;
     } catch (error) {
       if (error instanceof yup.ValidationError) {
         const formattedErrors = error.inner.reduce((acc, err) => {
@@ -111,10 +121,17 @@ const SignUp = () => {
         const errorCode = error?.errors[0]?.code;
 
         if (errorCode === EMAIL_NOT_FOUND) {
+          // check if the user exists in our database. This can happen when a user has already signed up but not yet verified email with clerk
+          // Show error  to prevent them from signing up again
+          const userResponse = await verifyUserExits();
+          if (userResponse.accountUserExists) {
+            setError('An error occurred, please contact Segue support');
+            return;
+          }
           setAuthMode('newUser');
         } else if (errorCode === PASSWORD_INCORRECT || errorCode === INVALID_VERIFICATION_STRATEGY) {
           // 'User already registeredwith clerk. Verify if they have a pin registered'
-          verifyUserExits();
+          processExistingUser();
         } else if (errorCode === SESSION_ALREADY_EXISTS) {
           setShowLogout(true);
           setError('Please log out of the current session and try again');
@@ -447,7 +464,7 @@ const SignUp = () => {
         )}
         {error && (
           <div className="flex gap-3 items-center mt-5">
-            <AuthError error={error} className="items-end" />
+            <AuthError error={error} className=" min-w--32 items-end" />
             {showLogout && <Button variant="secondary" text="Logout" onClick={handleLogout} />}
           </div>
         )}
