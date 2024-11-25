@@ -94,10 +94,11 @@ const fetchProductionBookings = async (productionId: number): Promise<Production
       EntryDate: 'asc',
     },
   });
+  // console.log('data', data);
   const summary = unique(data, (entry) => entry.EntryId)
     .map((entry) => ({
       ...entry,
-      Day: entry.BookingFirstDate ? formatDate(entry.BookingFirstDate, 'EEEE') : '',
+      Day: entry.BookingFirstDate ? formatDate(entry.BookingFirstDate, 'E') : 'HELP 2',
       Week: formatWeek(entry.ProductionWeekNum),
       Date: entry.EntryDate,
       VenueCurrencySymbol: currencyCodeToSymbolMap[entry.VenueCurrencyCode],
@@ -189,19 +190,21 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           SetProductionWeekNum,
         }),
       );
-    const finalFormattedValues: TRequiredFieldsFinalFormat[] = jsonArray.map((x: TRequiredFields) => ({
+    // console.log('arr', jsonArray);
+    const finalFormattedValues = jsonArray.map((x) => ({
       ...x,
       Week: formatWeek(x.BookingProductionWeekNum),
       FormattedValue: x.Value ? `${x.VenueCurrencySymbol}${x.Value}` : '',
       Value: x.Value || 0,
       FormattedSetProductionWeekNum: formatWeek(x.SetProductionWeekNum),
       FormattedFinalFiguresValue: x.FinalFiguresValue || 0,
-      Day: x.BookingFirstDate ? formatDate(x.BookingFirstDate, 'dddd') : '',
+      Day: x.BookingFirstDate ? formatDate(x.BookingFirstDate, 'E') : 'HELP',
       Date: x.BookingFirstDate,
       Town: x.VenueTown,
       Venue: x.VenueName,
       SetProductionWeekDate: x.SetProductionWeekDate ? getKey(newDate(x.SetProductionWeekDate)) : '',
     }));
+
     const bookingSalesByWeek = group(
       finalFormattedValues,
       (value) => `${value.BookingId} ${value.SetProductionWeekDate}`,
@@ -334,8 +337,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
             }
           }
         } else {
-          console.log('b1D', booking.Date);
-          console.log('hd', headerWeekDates[i]);
           if (booking.Date.getTime() < newDate(headerWeekDates[i]).getTime()) {
             totalObjToPush = {
               Value: booking.FormattedFinalFiguresValue,
@@ -421,8 +422,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           }
         } else {
           if (booking?.BookingStatusCode === 'X') continue;
-          console.log('b2D', booking.Date);
-          console.log('hd2', headerWeekDates[i]);
           if (compareDatesWithoutTime(booking.Date, newDate(headerWeekDates[i]), '<')) {
             colorCell({ worksheet, row, col, argbColor: COLOR_HEXCODE.BLUE });
           }
