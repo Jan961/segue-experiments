@@ -2,13 +2,14 @@ interface ProgressBarProps {
   backgroundColor?: string;
   fillColor?: string;
   progress: number;
+  className?: string;
 }
 
-const ProgressBar = ({ backgroundColor, fillColor, progress }: ProgressBarProps) => {
+const ProgressBar = ({ backgroundColor, fillColor, progress, className }: ProgressBarProps) => {
   const clippedWidth = Math.max(Math.min(100, progress), 0);
 
   return (
-    <div className="w-full flex flex-row overflow-hidden" data-testid="progress-bar">
+    <div className={`w-full flex flex-row overflow-hidden ${className}`} data-testid="progress-bar">
       <div
         className={`w-full rounded-full h-3 ${backgroundColor ? '' : 'bg-gray-300'}`}
         style={backgroundColor ? { backgroundColor } : undefined}
