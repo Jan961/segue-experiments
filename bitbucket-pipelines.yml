@@ -42,10 +42,10 @@ pipelines:
             - cd ../..
             - npx start-server-and-test "npm run start" http://localhost:3000 "npm --prefix cypress-tests/cypress run cy:alltests"
             # - npm run cy:permissions --browser chrome
-            - cd cypress-tests
-            - npx mochawesome-merge cypress/reports/.jsons/*.json -o output.json
+            - cd cypress-tests/cypress
+            - npx mochawesome-merge cypress/results/*.json -o output.json
             - npx marge output.json
-            - node node create-email-report
+            - node create-email-report
             - zip -r full-report.zip mochawsome-report/
           after-script:
 
@@ -69,13 +69,13 @@ pipelines:
                 TO: jan@segue360.co.uk
                 HOST: 'smtp.gmail.com'
                 SUBJECT: '${ALERT_TYPE}: Segue Integration Tests for ${BITBUCKET_BRANCH}'
-                BODY_HTML: 'cypress-tests/email-report.html'
-                ATTACHMENTS: 'cypress-tests/full-report.zip'
+                BODY_HTML: 'cypress-tests/cypress/email-report.html'
+                ATTACHMENTS: 'cypress-tests/cypress/full-report.zip'
           artifacts:
-            - cypress-tests/cypress/reports/**
-            - cypress-tests/cypress/cypress/reports/mocha/test-report.html
-            - cypress-tests/mochawesome-report
-            - cypress-tests/full-report.zip
+            - cypress-tests/cypress/cypress/results/**
+            - cypress-tests/cypress/mochawesome-report
+            - cypress-tests/cypress/full-report.zip
+            - cypress-tests/cypress/email-report.html
 
 
   default:
