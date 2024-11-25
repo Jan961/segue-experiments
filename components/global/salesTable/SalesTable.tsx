@@ -2,12 +2,11 @@ import classNames from 'classnames';
 import Table from 'components/core-ui-lib/Table';
 import { tileColors } from 'config/global';
 import { useEffect, useState } from 'react';
-import formatInputDate from 'utils/dateInputFormat';
 import { prodCompArchColDefs, prodComparisionColDefs, salesColDefs } from './tableConfig';
 import salesComparison, { SalesComp } from './utils/salesComparision';
 import { SalesSnapshot, BookingSelection } from 'types/MarketingTypes';
 import axios from 'axios';
-import { formatDate } from 'services/dateService';
+import { dateToSimple, formatDate, newDate } from 'services/dateService';
 
 export type SalesTableVariant = 'prodComparision' | 'salesSnapshot' | 'salesComparison' | 'venue' | 'prodCompArch';
 
@@ -86,7 +85,7 @@ export default function SalesTable({
       processedBookings.push({
         bookingId: booking.BookingId,
         prodName: production.ShowCode + production.Code + ' ' + production.ShowName,
-        firstPerfDt: formatInputDate(booking.BookingFirstDate),
+        firstPerfDt: dateToSimple(booking.BookingFirstDate),
         numPerfs: booking.PerformanceCount,
         prodWks: booking.ProductionLengthWeeks,
         prodCode: booking.FullProductionCode,
@@ -145,10 +144,10 @@ export default function SalesTable({
     setRowData((prevSales) =>
       prevSales.map((s) => {
         if (!value) {
-          const isOnSale = new Date(s.weekOf) < new Date(sale.weekOf);
+          const isOnSale = newDate(s.weekOf) < newDate(sale.weekOf);
           return { ...s, [key]: isOnSale };
         } else {
-          const isNotOnSale = new Date(s.weekOf) <= new Date(sale.weekOf);
+          const isNotOnSale = newDate(s.weekOf) <= newDate(sale.weekOf);
           return isNotOnSale ? { ...s, [key]: value } : s;
         }
       }),
@@ -162,8 +161,8 @@ export default function SalesTable({
     setRowData((prevSales) =>
       prevSales.map((s) => {
         // Use date comparison that includes the start of the date (midnight) for both dates being compared
-        const currentSaleDate = new Date(s.weekOf);
-        const targetSaleDate = new Date(sale.weekOf);
+        const currentSaleDate = newDate(s.weekOf);
+        const targetSaleDate = newDate(sale.weekOf);
         currentSaleDate.setHours(0, 0, 0, 0);
         targetSaleDate.setHours(0, 0, 0, 0);
 

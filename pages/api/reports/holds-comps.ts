@@ -9,7 +9,8 @@ import { COLOR_HEXCODE } from 'services/salesSummaryService';
 
 import { getExportedAtTitle } from 'utils/export';
 import { convertToPDF } from 'utils/report';
-import { formatDate } from 'services/dateService';
+import { formatDate, newDate } from 'services/dateService';
+import { UTCDate } from '@date-fns/utc';
 
 enum HOLD_OR_COMP {
   HOLD = 'Hold',
@@ -194,7 +195,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const whereQuery: {
       FullProductionCode?: string;
       VenueCode?: string;
-      BookingFirstDate?: { gte: Date; lte: Date };
+      BookingFirstDate?: { gte: UTCDate; lte: UTCDate };
       BookingStatusCode?: string;
     } = {};
     if (productionCode) {
@@ -204,7 +205,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       whereQuery.VenueCode = venue;
     }
     if (fromDate && toDate) {
-      whereQuery.BookingFirstDate = { gte: new Date(fromDate), lte: new Date(toDate) };
+      whereQuery.BookingFirstDate = { gte: newDate(fromDate), lte: newDate(toDate) };
     }
     if (status) {
       whereQuery.BookingStatusCode = status;

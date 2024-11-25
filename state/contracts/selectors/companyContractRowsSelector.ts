@@ -3,6 +3,7 @@ import { contractListState } from '../contractsListState';
 import { contractsFilterState } from '../contractsFilterState';
 import { compareStrings } from 'utils';
 import { companyContractStatusOrder } from 'config/contracts';
+import { newDate } from 'services/dateService';
 
 export const companyContractSelector = selector({
   key: 'companyContractSelector',
@@ -20,8 +21,8 @@ export const companyContractSelector = selector({
           compareStrings(contract.lastName, contractText) ||
           compareStrings(contract.role, contractText)) &&
         (department === -1 || department === contract.departmentId) &&
-        (!endDate || new Date(contract.dateIssued) <= endDate) &&
-        (!startDate || new Date(contract.dateIssued) >= startDate) &&
+        (!endDate || newDate(contract.dateIssued) <= endDate) &&
+        (!startDate || newDate(contract.dateIssued) >= startDate) &&
         (status === 'all' || status === contract.contractStatus)
       );
     });

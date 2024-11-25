@@ -2,6 +2,7 @@ import { loggingService } from 'services/loggingService';
 import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { GlobalActivity } from 'components/marketing/modal/GlobalActivityModal';
+import { safeDate } from 'services/dateService';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -25,7 +26,7 @@ async function updateGlobalBookingActivity(prisma, data: GlobalActivity) {
   await prisma.globalBookingActivity.update({
     where: { Id: data.Id },
     data: {
-      Date: new Date(data.Date),
+      Date: safeDate(data.Date),
       Name: data.Name,
       ActivityType: { connect: { Id: data.ActivityTypeId } },
       Cost: data.Cost,

@@ -3,6 +3,7 @@ import { faUser } from '@fortawesome/free-solid-svg-icons';
 import { SwitchBoardItem } from 'components/global/SwitchBoardItem';
 import { Spinner } from 'components/global/Spinner';
 import { defaultStatus } from './SalesSummarySimple';
+import { newDate } from 'services/dateService';
 
 type Props = {
   activeProductions: any[];
@@ -47,7 +48,7 @@ export default function PromotorHolds({ activeProductions }: Props) {
         fromDate: inputs.dateFrom,
         toDate: inputs.dateTo,
         venue: inputs.venue,
-        exportedAt: new Date().toISOString(),
+        exportedAt: newDate().toISOString(),
       }),
     })
       .then(async (response) => {
@@ -140,7 +141,7 @@ export default function PromotorHolds({ activeProductions }: Props) {
           <div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none overflow-scroll">
             <div className="relative w-auto my-6 mx-auto max-w-6xl">
               {/* content */}
-              <div className="px-4 border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none relative">
+              <div className="px-4 border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
                 {/* header */}
                 <div className="flex items-start justify-between p-5 border-b border-solid border-slate-200 rounded-t">
                   <h3 className="text-3xl font-semibold">Promoter Holds</h3>

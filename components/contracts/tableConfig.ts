@@ -3,8 +3,7 @@ import VenueColumnRenderer from './table/VenueColumnRenderer';
 import DateColumnRenderer from './table/DateColumnRenderer';
 import { tileColors } from 'config/global';
 import DefaultTextRenderer from 'components/core-ui-lib/Table/renderers/DefaultTextRenderer';
-import formatInputDate from 'utils/dateInputFormat';
-import { dateTimeToTime, newDate } from 'services/dateService';
+import { dateTimeToTime, dateToSimple, newDate } from 'services/dateService';
 import ButtonRenderer from 'components/core-ui-lib/Table/renderers/ButtonRenderer';
 import IconRowRenderer from 'components/global/salesTable/renderers/IconRowRenderer';
 import SelectCellRenderer from 'components/core-ui-lib/Table/renderers/SelectCellRenderer';
@@ -316,7 +315,7 @@ export const attachmentsColDefs = (exportPdfPermission: boolean) => [
     cellRendererParams: function (params) {
       const updDate = newDate(params.data.FileUploadedDateTime);
       return {
-        value: formatInputDate(updDate) + ' ' + dateTimeToTime(updDate),
+        value: dateToSimple(updDate) + ' ' + dateTimeToTime(updDate),
       };
     },
     width: 100,

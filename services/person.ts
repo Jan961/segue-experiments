@@ -6,6 +6,7 @@ import { upsertAddress } from './address';
 import { pick } from 'radash';
 import { isNullOrEmpty } from 'utils';
 import { NextApiRequest } from 'next';
+import { newDate } from './dateService';
 
 export const addressFields = ['address1', 'address2', 'address3', 'postcode', 'town', 'country'];
 export const organisationFields = ['name', 'website'];
@@ -117,7 +118,7 @@ export const upsertPerson = async (personDetails, salaryAccountDetails, expenseA
     PersonMobile: mobileNumber,
     PersonPhone: landline,
     PersonAddressId: updatedAddress.AddressId,
-    PersonLastModified: new Date(),
+    PersonLastModified: newDate(),
   };
 
   // Handle salary account details

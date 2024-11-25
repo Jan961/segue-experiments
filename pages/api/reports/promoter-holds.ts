@@ -71,7 +71,8 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const { productionCode = '', fromDate, toDate, venue, productionId, format, exportedAt } = req.body || {};
 
     const workbook = new ExcelJS.Workbook();
-    const whereQuery: { ProductionId?: string; VenueCode?: string; PerformanceDate?: { gte: Date; lte: Date } } = {};
+    const whereQuery: { ProductionId?: string; VenueCode?: string; PerformanceDate?: { gte: UTCDate; lte: UTCDate } } =
+      {};
     if (productionId) {
       whereQuery.ProductionId = productionId;
     }

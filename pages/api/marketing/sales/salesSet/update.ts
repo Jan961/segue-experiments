@@ -1,5 +1,6 @@
 import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
+import { newDate } from 'services/dateService';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -9,7 +10,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const updatedSaleSet = await prisma.salesSet.updateMany({
       where: {
         SetBookingId: BookingId,
-        SetSalesFiguresDate: new Date(SalesFigureDate),
+        SetSalesFiguresDate: newDate(SalesFigureDate),
       },
       data: updatedData,
     });

@@ -1,5 +1,6 @@
 import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
+import { newDate } from 'services/dateService';
 
 let prisma = null;
 
@@ -24,7 +25,7 @@ async function setNotOnSale(BookingId: string, SalesFigureDate: string, updatedD
     where: {
       SetBookingId: BookingId,
       SetSalesFiguresDate: {
-        lte: new Date(SalesFigureDate),
+        lte: newDate(SalesFigureDate),
       },
     },
     data: updatedData,
@@ -37,7 +38,7 @@ async function removeNotOnSale(BookingId: string, SalesFigureDate: string, updat
     where: {
       SetBookingId: BookingId,
       SetSalesFiguresDate: {
-        gte: new Date(SalesFigureDate),
+        gte: newDate(SalesFigureDate),
       },
       SetNotOnSale: true,
     },

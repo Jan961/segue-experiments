@@ -102,8 +102,8 @@ const handler = async (req, res) => {
     const formatedFromDateString = formatDate(fromDate, 'yyyy-MM-dd');
     const formatedToDateString = formatDate(toDate, 'yyyy-MM-dd');
     // Convert the formatted date strings back to Date objects
-    const formatedFromDate = new Date(formatedFromDateString);
-    const formatedToDate = new Date(formatedToDateString);
+    const formatedFromDate = newDate(formatedFromDateString);
+    const formatedToDate = newDate(formatedToDateString);
 
     if (!fromDate || !toDate || isNaN(formatedFromDate.getTime()) || isNaN(formatedToDate.getTime())) {
       throw new Error('Params are missing or invalid dates provided');
@@ -128,6 +128,7 @@ const handler = async (req, res) => {
           EntryDate: new UTCDate(e.EntryDate),
           ProductionStartDate: new UTCDate(e.ProductionStartDate),
           ProductionEndDate: new UTCDate(e.ProductionEndDate),
+          RehearsalStartDate: new UTCDate(e.RehearsalStartDate),
         }));
       });
 
@@ -221,11 +222,11 @@ const handler = async (req, res) => {
       isBold: true,
     });
 
-    const daysDiff = differenceInDays(new Date(toDate), new Date(fromDate));
+    const daysDiff = differenceInDays(newDate(toDate), newDate(fromDate));
 
     const minRehearsalStartTimeInEpoch = data.reduce((acc, x) => {
-      if (x.RehearsalStartDate && new Date(x.RehearsalStartDate).getTime() < acc) {
-        acc = new Date(x.RehearsalStartDate).getTime();
+      if (x.RehearsalStartDate && x.RehearsalStartDate.getTime() < acc) {
+        acc = x.RehearsalStartDate.getTime();
       }
       return acc;
     }, Infinity);
@@ -247,7 +248,7 @@ const handler = async (req, res) => {
       worksheet.addRow([weekDay, date, ...values]);
       rowNo++;
 
-      if (weekDay === 'Monday' && new Date(dateInIncomingFormat).getTime() >= minRehearsalStartTimeInEpoch) {
+      if (weekDay === 'Monday' && newDate(dateInIncomingFormat).getTime() >= minRehearsalStartTimeInEpoch) {
         colorCell({ worksheet, row: rowNo + 1, col: 1, argbColor: COLOR_HEXCODE.CREAM });
         colorCell({ worksheet, row: rowNo + 1, col: 2, argbColor: COLOR_HEXCODE.CREAM });
       }

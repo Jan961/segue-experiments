@@ -24,6 +24,7 @@ import GlobalActivityModal, { GlobalActivity } from '../modal/GlobalActivityModa
 import axios from 'axios';
 import { accessMarketingHome } from 'state/account/selectors/permissionSelector';
 import { newDate } from 'services/dateService';
+import { UTCDate } from '@date-fns/utc';
 
 interface ActivitiesTabProps {
   bookingId: string;
@@ -52,10 +53,10 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
   const [globalActRow, setGlobalActRow] = useState<GlobalActivityDTO>();
   const [actModalVariant, setActModalVariant] = useState<ActivityModalVariant>();
   const [approvalStatus, setApprovalStatus] = useState<string>();
-  const [changeDate, setChangeDate] = useState<Date>();
+  const [changeDate, setChangeDate] = useState<UTCDate>();
   const [changeNotes, setChangeNotes] = useState<string>();
   const [onSaleCheck, setOnSaleCheck] = useState<boolean>(false);
-  const [onSaleFromDt, setOnSaleFromDt] = useState<Date>(null);
+  const [onSaleFromDt, setOnSaleFromDt] = useState<UTCDate>(null);
   const [marketingPlansCheck, setMarketingPlansCheck] = useState<boolean>(false);
   const [printReqCheck, setPrintReqCheck] = useState<boolean>(false);
   const [contactInfoCheck, setContactInfoCheck] = useState<boolean>(false);

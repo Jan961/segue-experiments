@@ -1,6 +1,7 @@
 import classNames from 'classnames';
 import { IFileData } from 'interfaces';
 import React from 'react';
+import { newDate } from 'services/dateService';
 
 interface FileUploadProps {
   fileData: IFileData;
@@ -8,7 +9,7 @@ interface FileUploadProps {
   setFileData: (value: any) => void;
 }
 
-const FileUploadButton: React.FC<FileUploadProps> = ({ fileData, disabled = false, setFileData }) => {
+const FileUploadButton: React.FC<FileUploadProps> = ({ disabled = false, setFileData }) => {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
 
@@ -16,7 +17,7 @@ const FileUploadButton: React.FC<FileUploadProps> = ({ fileData, disabled = fals
       const reader = new FileReader();
       reader.readAsArrayBuffer(file);
       reader.onload = () => {
-        const fileDT = new Date();
+        const fileDT = newDate();
         const fileContent = new Uint8Array(reader.result as ArrayBuffer);
         setFileData({
           description: '',

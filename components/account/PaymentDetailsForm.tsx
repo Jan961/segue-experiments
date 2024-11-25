@@ -18,6 +18,7 @@ import { notify } from 'components/core-ui-lib/Notifications';
 import { useRecoilValue } from 'recoil';
 import { globalState } from 'state/global/globalState';
 import { Checkbox } from 'components/core-ui-lib';
+import { newDate } from 'services/dateService';
 
 const baseClass = `w-full block bg-primary-white p-1.5 h-[1.9375rem] !border text-sm shadow-input-shadow text-primary-input-text rounded-md outline-none focus:ring-2 focus:ring-primary-input-text ring-inset border-primary-border`;
 
@@ -57,7 +58,7 @@ const PaymentDetailsForm = ({ plan, accountDetails }: PaymentDetailsFormProps) =
   const createSubscription = async () => {
     try {
       // Create a subscription in the DB
-      const today = new Date();
+      const today = newDate();
       await axios.post('/api/subscription/create', {
         planId: plan.planId,
         accountId: accountDetails.accountId,

@@ -2,6 +2,7 @@ import axios from 'axios';
 import { BarredVenue } from 'pages/api/productions/venue/barringCheck';
 import { downloadFromContent } from '../request';
 import { GapSuggestionUnbalancedProps } from 'services/booking/gapSuggestion/types';
+import { newDate } from 'services/dateService';
 
 type BarringCheckPayload = {
   productionId: number;
@@ -24,7 +25,7 @@ export const exportGapSuggestions = async (
 ) => {
   const response = await axios.post(
     '/api/reports/booking/gap-suggestion',
-    { ...payload, filteredVenueIds, prodCode, exportedAt: new Date().toISOString() },
+    { ...payload, filteredVenueIds, prodCode, exportedAt: newDate().toISOString() },
     { responseType: 'blob' },
   );
 

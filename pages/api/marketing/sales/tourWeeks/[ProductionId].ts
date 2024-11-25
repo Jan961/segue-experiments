@@ -3,6 +3,7 @@ import { startOfDay } from 'date-fns';
 import getPrismaClient from 'lib/prisma';
 import master from 'lib/prisma_master';
 import {
+  dateToSimple,
   getArrayOfDatesBetween,
   getDateDaysAway,
   getMonday,
@@ -10,7 +11,6 @@ import {
   newDate,
 } from 'services/dateService';
 import { getAccountIdFromReq } from 'services/userService';
-import formatInputDate from 'utils/dateInputFormat';
 
 export default async function handle(req, res) {
   try {
@@ -74,13 +74,13 @@ export default async function handle(req, res) {
         const dates = getArrayOfDatesBetween(weekStart, weekEnd.toString());
         dates.forEach((date) => {
           let obj = {
-            text: weekNo.toString() + ' ' + formatInputDate(date),
+            text: weekNo.toString() + ' ' + dateToSimple(date),
             value: date,
             selected: false,
             weekNo,
           };
 
-          if (startOfDay(new Date(date)).getTime() === startOfDay(new Date()).getTime()) {
+          if (startOfDay(newDate(date)).getTime() === startOfDay(newDate()).getTime()) {
             obj = { ...obj, selected: true };
           }
 
@@ -90,7 +90,7 @@ export default async function handle(req, res) {
         // for weekly sales
       } else if (salesFrequency === 'W') {
         let obj = {
-          text: weekNo.toString() + ' ' + formatInputDate(weekStart) + ' - ' + formatInputDate(weekEnd),
+          text: weekNo.toString() + ' ' + dateToSimple(weekStart) + ' - ' + dateToSimple(weekEnd),
           value: weekStart,
           selected: false,
           weekNo,
@@ -98,8 +98,8 @@ export default async function handle(req, res) {
 
         // if current date is between the week start/end, add selected true
         // this will inform the dropdown to select this value
-        const todayEpoch = new Date().getTime();
-        if (new Date(weekStart).getTime() <= todayEpoch && new Date(weekEnd).getTime() >= todayEpoch) {
+        const todayEpoch = newDate().getTime();
+        if (weekStart.getTime() <= todayEpoch && weekEnd.getTime() >= todayEpoch) {
           obj = { ...obj, selected: true };
         }
         result.push(obj);

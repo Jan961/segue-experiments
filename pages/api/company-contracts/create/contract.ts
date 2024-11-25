@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import getPrismaClient from 'lib/prisma';
 import { CompanyContractStatus } from 'config/contracts';
 import { contractSchemaCreate } from 'validators/contracts';
+import { newDate } from 'services/dateService';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -21,7 +22,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           RoleName: role,
           ContractStatus: CompanyContractStatus.NotYetIssued,
           ACCScheduleJSON: JSON.stringify(accScheduleJson),
-          DateIssued: new Date(),
+          DateIssued: newDate(),
           ACCDepartment: {
             connect: { ACCDeptId: department },
           },

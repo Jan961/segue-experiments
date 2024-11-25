@@ -26,6 +26,7 @@ import axios from 'axios';
 import { nanoid } from 'nanoid';
 import { isNullOrEmpty } from 'utils';
 import { BookingRow } from 'types/BookingTypes';
+import { newDate } from 'services/dateService';
 
 interface AddBookingProps {
   visible: boolean;
@@ -112,7 +113,7 @@ const AddBooking = ({ visible, onClose, startDate, endDate, bookingInfo, booking
       // Check for run of dates
       const runOfDates = bookings
         .filter(({ runTag }) => runTag === booking.runTag)
-        .sort((a, b) => new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime());
+        .sort((a, b) => newDate(a.dateTime).getTime() - newDate(b.dateTime).getTime());
       if (runOfDates.length > 1) {
         onFormDataChange({ isRunOfDates: true });
       }

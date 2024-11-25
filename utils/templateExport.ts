@@ -1,4 +1,4 @@
-import formatInputDate from './dateInputFormat';
+import { dateToSimple, newDate } from 'services/dateService';
 import { formatDecimalValue, isNullOrUndefined } from 'utils';
 /**
  *
@@ -40,12 +40,12 @@ export const formatTemplateObj = (templateData: any) => {
 
         // Apply transformations for specific keys
         if (key.startsWith('DT_')) {
-          return [key, formatInputDate(value)];
+          return [key, dateToSimple(value.toString())];
         } else if (key.startsWith('TM_LONG_')) {
-          const tmLongDt = new Date(value.toString());
+          const tmLongDt = newDate(value.toString());
           return [key, `${tmLongDt.getHours()} hour(s) ${tmLongDt.getMinutes()} minutes`];
         } else if (key.startsWith('TM_')) {
-          const tmDt = new Date(value.toString());
+          const tmDt = newDate(value.toString());
           return [
             key,
             `${tmDt.getHours().toString().padStart(2, '0')}:${tmDt.getMinutes().toString().padStart(2, '0')}`,

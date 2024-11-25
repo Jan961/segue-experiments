@@ -2,7 +2,7 @@ import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
 import { pdfStandardColors } from 'config/global';
 import { ExcelExportParams, ExcelRow } from 'ag-grid-enterprise';
-import { formatDate } from 'services/dateService';
+import { formatDate, newDate } from 'services/dateService';
 import { COLOR_HEXCODE } from 'services/salesSummaryService';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
@@ -134,7 +134,7 @@ export const exportToPDF = (tableRef, styles = {}) => {
 };
 
 export const dateToReadableFormat = (isoDate) => {
-  const date = new Date(isoDate);
+  const date = newDate(isoDate);
   const options: any = { day: 'numeric', month: 'long', year: 'numeric' };
   const formattedDate = date.toLocaleDateString('en-GB', options);
 

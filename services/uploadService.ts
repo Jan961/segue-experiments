@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { FileDTO } from 'interfaces';
 import config from 'config';
 import { File } from 'prisma/generated/prisma-client';
+import { newDate } from './dateService';
 
 const bulkFileUpload = async (path, files, userId) => {
   const metadataList: FileDTO[] = [];
@@ -25,7 +26,7 @@ const bulkFileUpload = async (path, files, userId) => {
       imageUrl: `${config.cloudFrontDomain}/${response?.Key}`,
       mediaType: file.mimetype,
       uploadUserId: userId,
-      uploadDateTime: new Date().toISOString(),
+      uploadDateTime: newDate().toISOString(),
     };
 
     metadataList.push(data);
@@ -52,7 +53,7 @@ const singleFileUpload = async (path, file, userId) => {
     imageUrl: `${config.cloudFrontDomain}/${response?.Key}`,
     mediaType: file.mimetype,
     uploadUserId: userId,
-    uploadDateTime: new Date().toISOString(),
+    uploadDateTime: newDate().toISOString(),
   };
 
   return data;
@@ -73,7 +74,7 @@ const transformForPrisma = (data: FileDTO) => {
     MediaType: data.mediaType,
     Location: data.location,
     UploadUserId: data.uploadUserId,
-    UploadDateTime: new Date(data.uploadDateTime),
+    UploadDateTime: newDate(data.uploadDateTime),
   };
 };
 

@@ -2,7 +2,7 @@ import { dateBlockMapper } from 'lib/mappers';
 import { NextApiRequest } from 'next';
 import { ParsedUrlQuery } from 'querystring';
 // import { pick } from 'radash';
-import { dateTimeToTime } from 'services/dateService';
+import { dateTimeToTime, newDate } from 'services/dateService';
 import { getAllProductions, getAllProductionRegions } from 'services/productionService';
 import { ProductionJump } from 'state/booking/productionJumpState';
 
@@ -49,7 +49,7 @@ export const getProductionJumpState = async (ctx, path: string): Promise<Product
         if (a.IsArchived !== b.IsArchived) {
           return a.IsArchived ? 1 : -1;
         }
-        return new Date(a.StartDate).valueOf() > new Date(b.StartDate).valueOf();
+        return newDate(a.StartDate).valueOf() > newDate(b.StartDate).valueOf();
       }),
     selected: selectedProduction?.Id || null,
     includeArchived: selectedProduction?.IsArchived || false,

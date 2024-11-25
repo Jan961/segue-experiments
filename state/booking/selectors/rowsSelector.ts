@@ -98,7 +98,7 @@ export const rowsSelector = selector({
     Object.values(bookings).forEach((b) => {
       const performancesGroup = b.PerformanceIds.reduce((performancesByDate, performanceId) => {
         const performance = performanceDict[performanceId];
-        const performanceDate = new Date(getKey(performance.Date)).toISOString();
+        const performanceDate = newDate(getKey(performance.Date)).toISOString();
         if (performancesByDate[performanceDate]) {
           performancesByDate[performanceDate].push(performanceId);
         } else {

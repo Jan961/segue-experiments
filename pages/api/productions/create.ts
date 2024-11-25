@@ -4,6 +4,8 @@ import * as yup from 'yup';
 import getPrismaClient from 'lib/prisma';
 import { isNullOrUndefined } from 'utils';
 import { productionSchema } from 'validators/production';
+import { UTCDate } from '@date-fns/utc';
+import { newDate } from 'services/dateService';
 
 const processRunningTm = (strTime) => {
   if (isNullOrUndefined(strTime)) {
@@ -11,7 +13,7 @@ const processRunningTm = (strTime) => {
   }
 
   const [hours, minutes] = strTime.split(':');
-  return new Date(Date.UTC(1970, 0, 1, hours, minutes));
+  return newDate(UTCDate.UTC(1970, 0, 1, hours, minutes));
 };
 
 const mapToPrismaFields = ({
@@ -78,8 +80,8 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         DateBlock: {
           create: production.DateBlock.map((dateBlock) => ({
             Name: dateBlock.Name,
-            StartDate: new Date(dateBlock.StartDate),
-            EndDate: new Date(dateBlock.EndDate),
+            StartDate: newDate(dateBlock.StartDate),
+            EndDate: newDate(dateBlock.EndDate),
             IsPrimary: dateBlock.IsPrimary,
           })),
         },

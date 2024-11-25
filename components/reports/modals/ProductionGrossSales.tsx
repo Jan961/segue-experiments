@@ -3,6 +3,7 @@ import { faChartBar } from '@fortawesome/free-solid-svg-icons';
 import { SwitchBoardItem } from 'components/global/SwitchBoardItem';
 import { Spinner } from 'components/global/Spinner';
 import { defaultStatus } from './SalesSummarySimple';
+import { newDate } from 'services/dateService';
 
 type Props = {
   activeProductions: any[];
@@ -20,7 +21,7 @@ export default function SelectedVenues({ activeProductions }: Props) {
       method: 'POST',
       body: JSON.stringify({
         productionId: parseInt(inputs.Production, 10),
-        exportedAt: new Date().toISOString(),
+        exportedAt: newDate().toISOString(),
       }),
     })
       .then(async (response) => {

@@ -2,13 +2,13 @@ import ExcelJS from 'exceljs';
 import { isArray } from 'radash';
 import { COLOR_HEXCODE } from 'services/salesSummaryService';
 import { convertToPDF } from 'utils/report';
-import formatInputDate from 'utils/dateInputFormat';
 import { ALIGNMENT } from '../masterplan';
 import { addWidthAsPerContent } from 'services/reportsService';
 import getPrismaClient from 'lib/prisma';
 import { getCurrencyFromBookingId } from 'services/venueCurrencyService';
 import { getArchivedSalesList } from 'services/marketing/archivedSales';
 import { addBorderToAllCells } from 'utils/export';
+import { dateToSimple } from 'services/dateService';
 
 const createExcelFromData = (data, bookingInfo, productionName, venueAndDate) => {
   const workbook = new ExcelJS.Workbook();
@@ -79,7 +79,7 @@ const createExcelFromData = (data, bookingInfo, productionName, venueAndDate) =>
     const currencySymbols = [];
     bookingIds.forEach((bookingId) => {
       const bookingData = item.data.find((d) => d.BookingId === bookingId) || {};
-      rowData.push(bookingData.SetSalesFiguresDate ? formatInputDate(bookingData.SetSalesFiguresDate) : '');
+      rowData.push(bookingData.SetSalesFiguresDate ? dateToSimple(bookingData.SetSalesFiguresDate) : '');
       rowData.push(bookingData.Seats?.toNumber?.() || '-');
       rowData.push(bookingData.Value?.toNumber?.() || '-');
       currencySymbols.push(bookingData.currencySymbol);

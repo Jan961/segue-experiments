@@ -4,6 +4,7 @@ import { contractsFilterState } from 'state/contracts/contractsFilterState';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import { contractsRowsSelector } from 'state/contracts/selectors/contractsRowsSelector';
 import fuseFilter from '../utils/fuseFilter';
+import { newDate } from 'services/dateService';
 /*
  * Hook responsible for returning filtered and sorted Bookings
  */
@@ -23,8 +24,8 @@ const useContractsFilter = () => {
       }
       return (
         (selected === -1 || productionId === selected) &&
-        (!filter.endDate || new Date(dateTime) <= filter.endDate) &&
-        (!filter.startDate || new Date(dateTime) >= filter.startDate) &&
+        (!filter.endDate || newDate(dateTime) <= filter.endDate) &&
+        (!filter.startDate || newDate(dateTime) >= filter.startDate) &&
         (!filter.contractStatusDropDown ||
           filter.contractStatusDropDown === 'all' ||
           contractStatus === filter.contractStatusDropDown) &&
@@ -37,7 +38,7 @@ const useContractsFilter = () => {
       filteredRowList = fuseFilter(filteredRowList, filter.contractText, ['contractStatus', 'venue', 'town']);
 
     return filteredRowList.sort((a, b) => {
-      return new Date(a.dateTime).valueOf() - new Date(b.dateTime).valueOf();
+      return newDate(a.dateTime).valueOf() - newDate(b.dateTime).valueOf();
     });
   }, [
     productions,

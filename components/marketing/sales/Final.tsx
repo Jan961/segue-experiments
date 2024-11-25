@@ -9,6 +9,7 @@ import { currentUserState } from 'state/marketing/currentUserState';
 import { TourResponse } from './Entry';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import axios from 'axios';
+import { newDate } from 'services/dateService';
 
 interface SalesFigure {
   seatsReserved: string;
@@ -133,7 +134,7 @@ const Final = () => {
       }
 
       const data = {
-        salesDate: new Date(),
+        salesDate: newDate(),
         bookingId: bookings.selected,
         user: currentUser,
         schools: hasSchoolsSales

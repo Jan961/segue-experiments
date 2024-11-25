@@ -3,6 +3,7 @@ import { bookingMapper, performanceMapper } from 'lib/mappers';
 import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { changeBookingDate } from 'services/bookingService';
+import { newDate } from 'services/dateService';
 
 export interface UpdateDateParams {
   date: string;
@@ -19,7 +20,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
 
   try {
     const prisma = await getPrismaClient(req);
-    const result = await changeBookingDate(bookingId, new Date(date), prisma);
+    const result = await changeBookingDate(bookingId, newDate(date), prisma);
 
     const response: UpdateDateResponse = {
       bookings: [bookingMapper(result)],

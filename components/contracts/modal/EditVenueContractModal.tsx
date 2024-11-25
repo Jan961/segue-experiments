@@ -373,7 +373,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
       ...files.map((file) => {
         return {
           FileOriginalFilename: file.name,
-          FileUploadedDateTime: new Date(),
+          FileUploadedDateTime: newDate(),
           FileURL: URL.createObjectURL(file.file),
           FileUploaded: false,
         };

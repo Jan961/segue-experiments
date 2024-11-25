@@ -4,13 +4,14 @@ import { Booking } from 'prisma/generated/prisma-client';
 import { bookingMapperWithVenue } from 'lib/mappers';
 import { BookingWithVenueDTO } from 'interfaces';
 import { getDateTypeFromId } from 'services/dayTypeService';
+import { newDate, safeDate } from 'services/dateService';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
     const prisma = await getPrismaClient(req);
     const { productionId, runTag } = req.body;
-    const fromDate = new Date(req.body?.fromDate);
-    const toDate = new Date(req.body?.toDate);
+    const fromDate = newDate(req.body?.fromDate);
+    const toDate = newDate(req.body?.toDate);
 
     const conflictList = [];
     const performanceBookings: Booking[] = await prisma.booking.findMany({
@@ -88,7 +89,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
 
     const conflicts: BookingWithVenueDTO[] = performanceBookings
       .map(bookingMapperWithVenue)
-      .sort((a, b) => new Date(a.Date).valueOf() - new Date(b.Date).valueOf());
+      .sort((a, b) => safeDate(a.Date).valueOf() - safeDate(b.Date).valueOf());
     res.status(200).json([...conflicts, ...conflictList]);
   } catch (e) {
     console.log(e);

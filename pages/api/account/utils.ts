@@ -1,4 +1,5 @@
 import { Account } from 'prisma/generated/prisma-master';
+import { newDate } from 'services/dateService';
 
 export const mapAccountFromPrismaFields = (account: Account) => {
   return {
@@ -34,7 +35,7 @@ export const mapToAccountPrismaFields = (account: any) => {
     AccountAddressCountry: account.country,
     AccountOrganisationId: account.organisationId,
     AccountTermsAgreedBy: account.email,
-    AccountTermsAgreedDate: new Date(),
+    AccountTermsAgreedDate: newDate(),
     // Dummy default PIN
     AccountPIN: 'XXXXX',
   };

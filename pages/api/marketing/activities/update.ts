@@ -2,6 +2,7 @@ import { loggingService } from 'services/loggingService';
 import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { ActivityDTO } from 'interfaces';
+import { safeDate } from 'services/dateService';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -13,7 +14,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         Id: data.Id,
       },
       data: {
-        Date: new Date(data.Date),
+        Date: safeDate(data.Date),
         Name: data.Name,
         ActivityType: {
           connect: {

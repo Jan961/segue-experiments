@@ -1,5 +1,5 @@
 import { group } from 'radash';
-import { getKey } from 'services/dateService';
+import { getKey, newDate } from 'services/dateService';
 import { DistanceStop } from 'services/venueService';
 import { BookingState } from 'state/booking/bookingState';
 import { type PerformanceState } from 'state/booking/performanceState';
@@ -12,11 +12,11 @@ export const getStops = (bookingDict: BookingState, performanceDict: Performance
   return Object.keys(bookingsByProduction).reduce((map, productionId) => {
     const grouped = bookingsByProduction[productionId]?.reduce(
       (acc, { VenueId, Date: BookingDate, PerformanceIds, StatusCode }) => {
-        let lastPerformanceDate = new Date(BookingDate);
+        let lastPerformanceDate = newDate(BookingDate);
         PerformanceIds.forEach((performanceId: number) => {
           const performanceDate = getKey(performanceDict[performanceId]?.Date);
-          if (performanceDate && new Date(performanceDate) > lastPerformanceDate) {
-            lastPerformanceDate = new Date(performanceDate);
+          if (performanceDate && newDate(performanceDate) > lastPerformanceDate) {
+            lastPerformanceDate = newDate(performanceDate);
           }
         });
         BookingDate = lastPerformanceDate?.toISOString();
@@ -28,7 +28,7 @@ export const getStops = (bookingDict: BookingState, performanceDict: Performance
       {},
     );
     const stops = Object.entries(grouped).map(([Date, Ids]): DistanceStop => ({ Date, Ids: Ids as number[] }));
-    const sortedStops = stops.sort((a, b) => new Date(a.Date).getTime() - new Date(b.Date).getTime());
+    const sortedStops = stops.sort((a, b) => newDate(a.Date).getTime() - newDate(b.Date).getTime());
     map[productionId] = sortedStops;
     return map;
   }, {});

@@ -1,6 +1,6 @@
 import { SelectOption } from 'components/global/forms/FormInputSelect';
 import { isThisWeek } from 'date-fns';
-import { formatShortDateUK } from 'services/dateService';
+import { formatShortDateUK, newDate } from 'services/dateService';
 
 export default function getTaskDateStatusColor(date: string, progress: number) {
   if (progress === 100) {
@@ -8,8 +8,8 @@ export default function getTaskDateStatusColor(date: string, progress: number) {
   }
 
   if (date) {
-    const dueDate = new Date(date);
-    const today = new Date();
+    const dueDate = newDate(date);
+    const today = newDate();
     if (isThisWeek(dueDate)) {
       return '#EA8439';
     } else if (dueDate < today) {
@@ -45,15 +45,15 @@ export const getWeekOptions = (production, isMasterTask: boolean, appendDate: bo
   const eotNumber = 26;
   const numWeeksInDropDown = 260;
   if (!isMasterTask && production) {
-    const startDate = new Date(production?.StartDate);
-    const endDate = new Date(production?.EndDate);
+    const startDate = newDate(production?.StartDate);
+    const endDate = newDate(production?.EndDate);
     const millisecondsPerWeek = 7 * 24 * 60 * 60 * 1000;
 
     const numTourWeeks: number =
       Math.ceil((endDate.getTime() - startDate.getTime()) / millisecondsPerWeek) || -eotNumber;
     return Array.from(Array(numWeeksInDropDown + numTourWeeks + eotNumber).keys()).map((x) => {
       const week = x - numWeeksInDropDown;
-      const weeklyDate = new Date(startDate.getTime() + week * millisecondsPerWeek);
+      const weeklyDate = newDate(startDate.getTime() + week * millisecondsPerWeek);
       if (week < 0) {
         return formatWeekOption(week, appendDate ? formatShortDateUK(weeklyDate) : '');
       } else if (week >= 0 && week < numTourWeeks) {

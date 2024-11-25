@@ -20,7 +20,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         CompleteByWeekNum: task.CompleteByWeekNum,
         StartByIsPostProduction: task.StartByIsPostProduction,
         CompleteByIsPostProduction: task.CompleteByIsPostProduction,
-        TaskCompletedDate: !isNullOrEmpty(task?.TaskCompletedDate) ? new Date(task?.TaskCompletedDate) : null,
+        TaskCompletedDate: !isNullOrEmpty(task?.TaskCompletedDate) ? task?.TaskCompletedDate : null,
         ProductionId: task.ProductionId,
         TaskAssignedToAccUserId: task.TaskAssignedToAccUserId,
       };
@@ -38,7 +38,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           CompleteByWeekNum: task.CompleteByWeekNum,
           StartByIsPostProduction: task.StartByIsPostProduction,
           CompleteByIsPostProduction: task.CompleteByIsPostProduction,
-          TaskCompletedDate: !isNullOrEmpty(task?.TaskCompletedDate) ? new Date(task?.TaskCompletedDate) : null,
+          TaskCompletedDate: !isNullOrEmpty(task?.TaskCompletedDate) ? task?.TaskCompletedDate : null,
           ...(task.ProductionId && {
             Production: {
               connect: {

@@ -2,6 +2,7 @@ import { SelectOption } from 'components/global/forms/FormInputSelect';
 import { TasksFilterType } from 'state/tasks/tasksFilterState';
 import { ProductionsWithTasks } from 'state/tasks/productionState';
 import { isNullOrEmpty } from './index';
+import { UTCDate } from '@date-fns/utc';
 
 export const priorityOptions: SelectOption[] = [
   { text: 'Immediate', value: 1 },
@@ -53,10 +54,10 @@ export const applyTaskFilters = (
         matches = false;
       }
       const taskDueDate = productionWithTasks.weekNumToDateMap?.[task.CompleteByWeekNum];
-      if (filters.startDueDate && new Date(taskDueDate) < new Date(filters.startDueDate)) {
+      if (filters.startDueDate && new UTCDate(taskDueDate) < new UTCDate(filters.startDueDate)) {
         matches = false;
       }
-      if (filters.endDueDate && new Date(taskDueDate) > new Date(filters.endDueDate)) {
+      if (filters.endDueDate && new UTCDate(taskDueDate) > new UTCDate(filters.endDueDate)) {
         matches = false;
       }
       if (filters.assignee && task.TaskAssignedToAccUserId !== filters.assignee) {

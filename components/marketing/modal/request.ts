@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { downloadFromContent } from 'components/bookings/modal/request';
-import { getDateDaysAway, getKey } from 'services/dateService';
+import { getDateDaysAway, getKey, newDate } from 'services/dateService';
 
 type ProductionWeek = {
   Id: number;
@@ -32,7 +32,7 @@ export const exportSalesSummaryReport = async ({
   const fromWeek = getKey(getDateDaysAway(productionWeek, -(numberOfWeeks - 1) * 7));
   const payload = {
     productionId: parseInt(production, 10),
-    exportedAt: new Date().toISOString(),
+    exportedAt: newDate().toISOString(),
     fromWeek,
     toWeek,
     isWeeklyReport,
@@ -74,7 +74,7 @@ export const exportPromoterHoldsReport = async ({
 }: any) => {
   const payload = {
     productionId: parseInt(production, 10),
-    exportedAt: new Date().toISOString(),
+    exportedAt: newDate().toISOString(),
     productionCode,
     fromDate,
     toDate,
@@ -112,7 +112,7 @@ export const exportProductionGrossSales = async ({ production, format }) => {
   const payload = {
     productionId: parseInt(production, 10),
     format,
-    exportedAt: new Date().toISOString(),
+    exportedAt: newDate().toISOString(),
   };
   const response = await axios.post('/api/reports/gross-sales', payload, { responseType: 'blob' });
 
@@ -143,7 +143,7 @@ export const exportProductionGrossSales = async ({ production, format }) => {
 export const exportHoldsComps = async ({ production, productionCode, venue, fromDate, toDate, status, format }) => {
   const payload = {
     productionId: parseInt(production, 10),
-    exportedAt: new Date().toISOString(),
+    exportedAt: newDate().toISOString(),
     productionCode,
     venue,
     fromDate,

@@ -114,7 +114,7 @@ describe.each([
 describe.each([
   [{ date: '2023-05-23T14:30:00.000Z' }, '2023-05-23'],
   [{ date: '2023-05-23' }, '2023-05-23'],
-  [{ date: new Date('2023-05-23').toISOString() }, '2023-05-23'],
+  [{ date: newDate('2023-05-23').toISOString() }, '2023-05-23'],
   [{ date: 'RR fail' }, null],
   [{ date: null }, null],
   [{ date: '' }, null],

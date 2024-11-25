@@ -16,6 +16,7 @@ import { getAccountIdFromReq, getUsersWithPermissions } from 'services/userServi
 import { getAccountPIN } from 'services/accountService';
 import { accessAdminHome } from 'state/account/selectors/permissionSelector';
 import { useRecoilValue } from 'recoil';
+import { newDate } from 'services/dateService';
 
 const getTableGridOptions = (uniqueKey: string, config = {}) => ({
   ...config,
@@ -300,7 +301,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       if (a.isArchived !== b.isArchived) {
         return a.isArchived ? 1 : -1;
       }
-      return new Date(b.startDate).getTime() - new Date(a.startDate).getTime();
+      return newDate(b.startDate).getTime() - newDate(a.startDate).getTime();
     });
 
   return {

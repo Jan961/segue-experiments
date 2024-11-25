@@ -125,9 +125,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
         const bookingData = data as Array<BookingSelection>;
 
         // Sort data by BookingFirstDate in descending order (newest production to oldest)
-        const sortedData = bookingData.sort(
-          (a, b) => new Date(b.BookingFirstDate).getTime() - new Date(a.BookingFirstDate).getTime(),
-        );
+        const sortedData = bookingData.sort((a, b) => b.BookingFirstDate.getTime() - a.BookingFirstDate.getTime());
 
         setProdCompData(sortedData);
         toggleModal('prodComparision');

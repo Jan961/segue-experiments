@@ -8,6 +8,7 @@ import { userState } from 'state/account/userState';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import { isNullOrEmpty } from 'utils';
 import fuseFilter from 'utils/fuseFilter';
+import { newDate } from 'services/dateService';
 
 const generateOptions = (weekData) => {
   return Object.entries(weekData).map(([key]) => ({
@@ -17,8 +18,8 @@ const generateOptions = (weekData) => {
 };
 
 export const getStatusBool = (taskStatus: string, filterStatus: string, taskDueDate: string) => {
-  const dueDate = new Date(taskDueDate);
-  const today = new Date();
+  const dueDate = newDate(taskDueDate);
+  const today = newDate();
   switch (filterStatus) {
     case 'inProgress':
     case 'complete':
@@ -88,8 +89,8 @@ const useTasksFilter = () => {
           Tasks: productionTasks
             .filter(({ TaskAssignedToAccUserId, CompleteDate, Status }) => {
               return (
-                (!filters.endDueDate || new Date(CompleteDate) <= new Date(filters.endDueDate)) &&
-                (!filters.startDueDate || new Date(CompleteDate) >= new Date(filters.startDueDate)) &&
+                (!filters.endDueDate || newDate(CompleteDate) <= filters.endDueDate) &&
+                (!filters.startDueDate || newDate(CompleteDate) >= filters.startDueDate) &&
                 (!filters.status || filters.status === 'all' || getStatusBool(Status, filters.status, CompleteDate)) &&
                 (filters.assignee === -1 || TaskAssignedToAccUserId === filters.assignee)
               );

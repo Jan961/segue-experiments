@@ -1,5 +1,6 @@
 import { render, fireEvent, screen } from '@testing-library/react';
 import DateInput from './DateInput';
+import { newDate } from 'services/dateService';
 
 describe('DateInput Component', () => {
   const handleChange = jest.fn();
@@ -18,8 +19,8 @@ describe('DateInput Component', () => {
   test('renders with provided props', () => {
     const inputClass = 'custom-input';
     const error = 'Invalid date';
-    const minDate = new Date('2022-01-01');
-    const maxDate = new Date('2022-12-31');
+    const minDate = newDate('2022-01-01');
+    const maxDate = newDate('2022-12-31');
     const placeholder = 'Select date';
     const position = '';
 

@@ -1,11 +1,12 @@
 import { render, screen } from '@testing-library/react';
 import DateRange from './DateRange';
+import { newDate } from 'services/dateService';
 
 describe('DateRange Component', () => {
   const handleChange = jest.fn();
   const value = {
-    from: new Date('2024-02-11'),
-    to: new Date('2024-02-15'),
+    from: newDate('2024-02-11'),
+    to: newDate('2024-02-15'),
   };
 
   test('renders with default props', () => {

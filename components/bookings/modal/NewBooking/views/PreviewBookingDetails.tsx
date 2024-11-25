@@ -14,6 +14,7 @@ import { DistanceParams } from 'distance';
 import axios from 'axios';
 import { formatRowsForMultipeBookingsAtSameVenue, formatRowsForPencilledBookings } from 'components/bookings/utils';
 import { isNullOrEmpty } from 'utils';
+import { UTCDate } from '@date-fns/utc';
 
 const gridOptions = {
   getRowStyle: (params) => {
@@ -123,7 +124,7 @@ export default function PreviewBookingDetails({
     }
   };
 
-  const filterBookingsByDateRange = (bookings = [], startDate: Date, endDate: Date) => {
+  const filterBookingsByDateRange = (bookings = [], startDate: UTCDate, endDate: UTCDate) => {
     const filteredBookings = [];
     bookings.forEach((booking) => {
       const bookingDate = parseISO(booking.dateTime);

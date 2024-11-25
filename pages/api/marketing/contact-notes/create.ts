@@ -2,6 +2,7 @@ import { loggingService } from 'services/loggingService';
 import getPrismaClient from 'lib/prisma';
 import { BookingContactNoteDTO } from 'interfaces';
 import { NextApiRequest, NextApiResponse } from 'next';
+import { safeDate } from 'services/dateService';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -12,7 +13,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       data: {
         BookingId: bcn.BookingId,
         Notes: bcn.Notes,
-        ContactDate: bcn.ContactDate ? new Date(bcn.ContactDate) : null,
+        ContactDate: bcn.ContactDate ? safeDate(bcn.ContactDate) : null,
         CoContactName: bcn.CoContactName,
         ActionAccUserId: bcn.ActionAccUserId,
       },
