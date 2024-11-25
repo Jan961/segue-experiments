@@ -94,6 +94,7 @@ const fetchProductionBookings = async (productionId: number): Promise<Production
       EntryDate: 'asc',
     },
   });
+  // console.log('data', data);
   const summary = unique(data, (entry) => entry.EntryId)
     .map((entry) => ({
       ...entry,
@@ -189,6 +190,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           SetProductionWeekNum,
         }),
       );
+    // console.log('arr', jsonArray);
     const finalFormattedValues = jsonArray.map((x) => ({
       ...x,
       Week: formatWeek(x.BookingProductionWeekNum),
@@ -196,7 +198,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       Value: x.Value || 0,
       FormattedSetProductionWeekNum: formatWeek(x.SetProductionWeekNum),
       FormattedFinalFiguresValue: x.FinalFiguresValue || 0,
-      Day: x.BookingFirstDate ? formatDate(x.BookingFirstDate, 'E') : 'HALP',
+      Day: x.BookingFirstDate ? formatDate(x.BookingFirstDate, 'E') : 'HELP',
       Date: x.BookingFirstDate,
       Town: x.VenueTown,
       Venue: x.VenueName,
