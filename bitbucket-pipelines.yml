@@ -33,13 +33,13 @@ pipelines:
             - npm install start-server-and-test
             - echo $TEST_APP_ENV | base64 --decode --ignore-garbage > .env
             - cat .env
+            - npm run build
             - mkdir cypress-tests && cd cypress-tests
             - git clone git@bitbucket.org:segue-team/cypress.git && cd cypress
             - git checkout staging
             - npm install
             - npx cypress install
             - cd ../..
-            - npm run build
             - npx start-server-and-test "npm run start" http://localhost:3000 "npm --prefix cypress-tests/cypress run cy:alltests"
             # - npm run cy:permissions --browser chrome
             - cd cypress-tests
