@@ -52,7 +52,7 @@ export const GapPanel = ({ finish, setGapVenueIds }: GapPanelProps) => {
   const bookingDict = useRecoilValue(bookingState);
   const [results, setResults] = useState<GapSuggestionResponse>(null);
   const [refreshing, setRefreshing] = useState(false);
-  const [sliderActive, setSlidersActive] = useState(false);
+  const [sliderActive, setSliderActive] = useState(false);
   const { nextBookings, prevBookings } = findPrevAndNextBookings(bookingDict, selectedDate, selectedDate);
   const startVIds = prevBookings.map((id) => bookingDict[id].VenueId);
   const endVIds = nextBookings.map((id) => bookingDict[id].VenueId);
@@ -201,7 +201,7 @@ export const GapPanel = ({ finish, setGapVenueIds }: GapPanelProps) => {
             <ToggleButton
               active={!sliderActive}
               onClick={() => {
-                setSlidersActive(!sliderActive);
+                setSliderActive(!sliderActive);
               }}
               className="rounded-r-none border-r-0"
               icon={faCalculator}
@@ -209,7 +209,7 @@ export const GapPanel = ({ finish, setGapVenueIds }: GapPanelProps) => {
             <ToggleButton
               active={sliderActive}
               onClick={() => {
-                setSlidersActive(!sliderActive);
+                setSliderActive(!sliderActive);
               }}
               className="rounded-l-none"
               icon={faSliders}

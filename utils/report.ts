@@ -1,8 +1,9 @@
+import { NextApiResponse } from 'next';
 import libre from 'libreoffice-convert';
 import util from 'util';
-import { NextApiResponse } from 'next';
 import ExcelJS from 'exceljs';
-import { differenceInDays, endOfWeek, parse } from 'date-fns';
+import { addDays, differenceInDays, eachWeekOfInterval, endOfWeek, parse } from 'date-fns';
+import { formatDate, getDateObject } from 'services/dateService';
 
 export const convertToPDF = async (workbook) => {
   const excelbuffer = await workbook.xlsx.writeBuffer();
@@ -64,4 +65,34 @@ export const calculateRemainingDaysInWeek = (day: string) => {
 
   // Calculate the remaining days in the week
   return differenceInDays(endOfCurrentWeek, currentDate);
+};
+
+/**
+ * Get all Sundays and Mondays for each week between two dates.
+ *
+ * @param {string} startDate - The start date in string format (e.g., '2024-01-01').
+ * @param {string} endDate - The end date in string format (e.g., '2024-01-31').
+ * @returns {Array<{ sunday: string, monday: string }>} - An array of objects containing Sunday and Monday dates for each week.
+ */
+export const getWeeksBetweenDates = (
+  startDate: string,
+  endDate: string,
+): Array<{ sundayDate: string; mondayDate: string }> => {
+  // Parse input dates into Date objects
+  const start = getDateObject(startDate);
+  const end = getDateObject(endDate);
+
+  // Get the start of each week between startDate and endDate
+  const weeks = eachWeekOfInterval({ start, end }, { weekStartsOn: 0 }); // weekStartsOn: 0 (Sunday)
+
+  // Map each week to its Sunday and Monday
+  return weeks.map((weekStart) => {
+    const sundayDate = weekStart;
+    const mondayDate = addDays(weekStart, 1); // Add 1 day to Sunday to get Monday
+
+    return {
+      sundayDate: formatDate(sundayDate, 'yyyy-MM-dd'),
+      mondayDate: formatDate(mondayDate, 'yyyy-MM-dd'),
+    };
+  });
 };
