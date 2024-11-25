@@ -13,7 +13,7 @@ pipelines:
           script:
             - docker info
             - docker build -t jan961/cypress-segue:myimage .
-            - docker login -u jan961 -p fghgFg55.fgD
+            - docker login -u jan961 -p aQtZ9icpLhpR4hG
             - docker  push jan961/cypress-segue:myimage
 
       - step:

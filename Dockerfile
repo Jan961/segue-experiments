@@ -5,6 +5,7 @@ FROM cypress/factory
 RUN apt-get update \
 && apt-get install -y libreoffice \
 && apt-get install -y openssl \
+&& apt-get clean \
 && npm install --global pm2
 
 
