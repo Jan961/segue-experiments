@@ -19,7 +19,7 @@ pipelines:
       - step:
           size: 4x
           name: "Run Cypress Tests"
-          image: cypress/included:latest
+          image: node:18.20.4
           caches:
             - node
             - cypress
@@ -28,7 +28,7 @@ pipelines:
           script:
             - npm install -g npm@9.6.7
             - echo "NPM version is $(npm -v)"
-            - apt-get install -y zip
+             #apt-get install -y zip
             - npm install
             - npm install start-server-and-test
             - echo $TEST_APP_ENV | base64 --decode --ignore-garbage > .env
@@ -37,6 +37,7 @@ pipelines:
             - git clone git@bitbucket.org:segue-team/cypress.git && cd cypress
             - git checkout staging
             - npm install
+            - npx cypress install
             - cd ../..
             - npm run build
             - npx start-server-and-test "npm run start" http://localhost:3000 "npm --prefix cypress-tests/cypress run cy:alltests"
