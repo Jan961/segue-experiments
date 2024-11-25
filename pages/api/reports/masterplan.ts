@@ -49,17 +49,19 @@ export const styleHeader = ({
   row,
   numberOfColumns,
   bgColor = COLOR_HEXCODE.DARK_ORANGE,
+  alignment = { horizontal: ALIGNMENT.CENTER },
 }: {
   worksheet: any;
   row: number;
   numberOfColumns?: number;
   bgColor?: COLOR_HEXCODE;
+  alignment?: { horizontal?: ALIGNMENT; vertical?: ALIGNMENT };
 }) => {
   const totalColumns = numberOfColumns ?? worksheet.columnCount;
   for (let col = 1; col <= totalColumns; col++) {
     const cell = worksheet.getCell(row, col);
     cell.font = { bold: true, color: { argb: COLOR_HEXCODE.WHITE } };
-    cell.alignment = { horizontal: ALIGNMENT.CENTER };
+    cell.alignment = alignment;
     cell.fill = {
       type: 'pattern',
       pattern: 'solid',

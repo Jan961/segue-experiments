@@ -7,7 +7,7 @@ import { getExportedAtTitle } from 'utils/export';
 import { currencyCodeToSymbolMap } from 'config/Reports';
 import { calculateRemainingDaysInWeek, convertToPDF } from 'utils/report';
 import { BOOK_STATUS_CODES, SALES_TYPE_NAME } from 'types/MarketingTypes';
-import { calculateWeekNumber, formatDate, getDateDaysAway, getDifferenceInDays } from 'services/dateService';
+import { calculateWeekNumber, formatDate, getDateDaysAway, getDifferenceInDays, newDate } from 'services/dateService';
 import { SCHEDULE_VIEW } from 'services/reports/schedule-report';
 import { UTCDate } from '@date-fns/utc';
 
@@ -102,6 +102,33 @@ const getTotalInPound = ({ totalOfCurrency, conversionRate }) => {
   return totalOfCurrency['£'] ? new Decimal(totalOfCurrency['£']).plus(finalValOfEuro).toNumber() : finalValOfEuro;
 };
 
+const findNextBookingDate = (
+  currentDate: string,
+  map: Record<string, SALES_SUMMARY>,
+  FullProductionCode: string,
+  ShowName: string,
+  maxDays = 30, // Safety limit to prevent infinite loop
+): string | null => {
+  let checkDate = currentDate;
+  let daysChecked = 0;
+
+  while (daysChecked < maxDays) {
+    // Move to next date
+    checkDate = formatDate(getDateDaysAway(newDate(checkDate), 1), 'yyyy-MM-dd');
+    daysChecked++;
+
+    // Check if this date has a booking entry
+    const key = getKey({ FullProductionCode, ShowName, EntryDate: checkDate });
+    const entry = map[key];
+
+    if (entry?.EntryType === 'Booking') {
+      return checkDate;
+    }
+  }
+
+  return null; // No booking found in next 30 days
+};
+
 const handler = async (req, res) => {
   try {
     const prisma = await getPrismaClient(req);
@@ -113,17 +140,19 @@ const handler = async (req, res) => {
       .findMany({
         where: {
           ProductionId: productionId,
-          SaleTypeName: SALES_TYPE_NAME.GENERAL_SALES,
+          SaleTypeName: {
+            in: [SALES_TYPE_NAME.GENERAL_SALES, SALES_TYPE_NAME.SCHOOL_SALES],
+          },
         },
       })
-      .then((res) => {
-        return res.map((e) => ({
-          ...e,
-          EntryDate: new UTCDate(e.EntryDate),
-          ProductionStartDate: new UTCDate(e.ProductionStartDate),
-          ProductionEndDate: new UTCDate(e.ProductionEndDate),
-        }));
-      });
+      .then((res) =>
+        res.map((x) => ({
+          ...x,
+          EntryDate: new UTCDate(x.EntryDate),
+          ProductionStartDate: new UTCDate(x.ProductionStartDate),
+          ProductionEndDate: new UTCDate(x.ProductionEndDate),
+        })),
+      );
     const schedule = await prisma.scheduleView
       .findMany({
         where: {
@@ -133,14 +162,14 @@ const handler = async (req, res) => {
           EntryDate: 'asc',
         },
       })
-      .then((res) => {
-        return res.map((e) => ({
-          ...e,
-          EntryDate: new UTCDate(e.EntryDate),
-          ProductionStartDate: new UTCDate(e.ProductionStartDate),
-          ProductionEndDate: new UTCDate(e.ProductionEndDate),
-        }));
-      });
+      .then((res) =>
+        res.map((x) => ({
+          ...x,
+          EntryDate: new UTCDate(x.EntryDate),
+          ProductionStartDate: new UTCDate(x.ProductionStartDate),
+          ProductionEndDate: new UTCDate(x.ProductionEndDate),
+        })),
+      );
     let filename = 'Gross Sales';
     const workbook = new ExcelJS.Workbook();
     const formattedData = data.map((x) => ({
@@ -180,7 +209,17 @@ const handler = async (req, res) => {
 
     worksheet.addRow([]);
 
-    const map: { [key: string]: SALES_SUMMARY } = formattedData.reduce((acc, x) => ({ ...acc, [getKey(x)]: x }), {});
+    const map: { [key: string]: SALES_SUMMARY } = formattedData.reduce((acc, x) => {
+      const key = getKey(x);
+      const previousValue = acc[key];
+      return {
+        ...acc,
+        [key]: {
+          ...x,
+          Value: previousValue?.Value ? new Decimal(previousValue.Value).plus(x.Value).toNumber() : x.Value,
+        },
+      };
+    }, {});
     const scheduleMap: { [key: string]: SCHEDULE_VIEW } = formattedScheduleData.reduce(
       (acc, x) => ({ ...acc, [getKey(x)]: x }),
       {},
@@ -188,7 +227,7 @@ const handler = async (req, res) => {
     const { ProductionStartDate: fromDate, ProductionEndDate: toDate } = schedule?.[0] || {};
 
     // +1 is for including the endDate
-    const daysDiff = getDifferenceInDays(fromDate?.toISOString(), toDate?.toISOString()) + 1;
+    const daysDiff = getDifferenceInDays(fromDate, toDate) + 1;
 
     let colNo = 1;
     let conversionRate = 0;
@@ -227,9 +266,9 @@ const handler = async (req, res) => {
       r7.push('Weekly Costs');
     };
     for (let i = 1; i <= daysDiff; i++) {
-      const weekDay = formatDate(getDateDaysAway(fromDate?.toISOString(), i - 1), 'eeee');
-      const dateInIncomingFormat = formatDate(getDateDaysAway(fromDate?.toISOString(), i - 1), 'yyyy-MM-dd');
-      const nextDateInIncomingFormat = formatDate(getDateDaysAway(fromDate?.toISOString(), i), 'yyyy-MM-dd');
+      const weekDay = formatDate(getDateDaysAway(fromDate, i - 1), 'eeee');
+      const dateInIncomingFormat = formatDate(getDateDaysAway(fromDate, i - 1), 'yyyy-MM-dd');
+      const nextBookingDate = findNextBookingDate(dateInIncomingFormat, map, FullProductionCode, ShowName);
       const date = formatDate(dateInIncomingFormat, 'dd/MM/yy');
       const weekNumber = calculateWeekNumber(fromDate, dateInIncomingFormat);
       if (i === 1 && weekDay !== 'Monday') {
@@ -256,9 +295,10 @@ const handler = async (req, res) => {
       }
 
       const key = getKey({ FullProductionCode, ShowName, EntryDate: dateInIncomingFormat });
-      const nextKey = getKey({ FullProductionCode, ShowName, EntryDate: nextDateInIncomingFormat });
       const value: SALES_SUMMARY = map[key];
-      const nextValue: SALES_SUMMARY = map[nextKey];
+      const nextValue: SALES_SUMMARY = nextBookingDate
+        ? map[getKey({ FullProductionCode, ShowName, EntryDate: nextBookingDate })]
+        : null;
       const scheduleValue: SCHEDULE_VIEW = scheduleMap[key];
       const statusCode = (value || scheduleValue)?.EntryStatusCode;
       const isCancelled = statusCode === 'X';

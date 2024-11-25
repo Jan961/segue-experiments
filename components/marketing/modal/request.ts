@@ -32,6 +32,7 @@ export const exportSalesSummaryReport = async ({
   const fromWeek = getKey(getDateDaysAway(productionWeek, -(numberOfWeeks - 1) * 7));
   const payload = {
     productionId: parseInt(production, 10),
+    exportedAt: new Date().toISOString(),
     fromWeek,
     toWeek,
     isWeeklyReport,

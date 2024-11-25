@@ -356,7 +356,7 @@ export default function AddEditVenueModal({
               </Button>
               <Button
                 testId="add-venues-save-and-close-btn"
-                disabled={!permissions.includes('EDIT_VENUE_DETAILS') || !venue?.id || isSaving || isDeleting}
+                disabled={!permissions.includes('EDIT_VENUE_DETAILS') || isSaving || isDeleting}
                 text={isSaving ? 'Saving...' : 'Save and Close'}
                 className="w-32 mb-4"
                 onClick={handleSaveAndClose}
