@@ -33,6 +33,9 @@ export const loginSchema = yup.object().shape({
 export const accountLoginSchema = yup.object().shape({
   pin: yup
     .number()
+    .transform((cv, ov) => {
+      return ov === '' ? undefined : cv;
+    })
     .required('PIN is a required field')
     .test({
       name: 'validatePin',
