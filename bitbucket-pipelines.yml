@@ -45,6 +45,7 @@ pipelines:
             - cd cypress-tests
             - npx mochawesome-merge cypress/reports/.jsons/*.json -o output.json
             - npx marge output.json
+            - node node create-email-report
             - zip -r full-report.zip mochawsome-report/
           after-script:
 
@@ -68,7 +69,7 @@ pipelines:
                 TO: jan@segue360.co.uk
                 HOST: 'smtp.gmail.com'
                 SUBJECT: '${ALERT_TYPE}: Segue Integration Tests for ${BITBUCKET_BRANCH}'
-                BODY_HTML: 'cypress/reports/mocha/test-report.html'
+                BODY_HTML: 'cypress-tests/create-email-report.html'
                 ATTACHMENTS: 'cypress-tests/full-report.zip'
           artifacts:
             - cypress-tests/cypress/reports/**
