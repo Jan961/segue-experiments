@@ -136,7 +136,7 @@ export const getUserId = async (email: string) => {
 };
 
 export const getClerkUserByEmailAddress = async (emailAddress: string) => {
-  const clerkUsers = await clerkClient.users.getUserList();
+  const clerkUsers = await clerkClient.users.getUserList({ emailAddress: [emailAddress] });
   const user = clerkUsers.find((user) => user.emailAddresses[0].emailAddress === emailAddress);
   return user;
 };

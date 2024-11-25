@@ -39,7 +39,6 @@
     }
   },
   "dependencies": {
-    "@clerk/clerk-sdk-node": "^5.0.68",
     "@clerk/nextjs": "^4.23.3",
     "@devexpress/dx-react-grid": "^4.0.3",
     "@fortawesome/fontawesome-svg-core": "^6.2.0",

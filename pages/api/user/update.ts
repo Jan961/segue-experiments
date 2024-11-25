@@ -1,8 +1,8 @@
-import { clerkClient } from 'lib/clerk';
+import { clerkClient } from '@clerk/nextjs';
 import prismaMaster from 'lib/prisma_master';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { replaceProudctionPermissions, replaceUserPermissions } from 'services/permissionService';
-import { getOrganisationIdFromReq, getUserPermisisons } from 'services/userService';
+import { getClerkUserByEmailAddress, getOrganisationIdFromReq, getUserPermisisons } from 'services/userService';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -20,8 +20,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         return;
       }
     }
-    const users = await clerkClient.users.getUserList({ emailAddress: [userDetails.email] });
-    const user = users.data.find((user) => user.unsafeMetadata.organisationId === accountId) || { id: null };
+    const user = await getClerkUserByEmailAddress(userDetails.email);
     const updatedUSer = await prismaMaster.user.update({
       data: {
         UserFirstName: userDetails.firstName,
@@ -46,7 +45,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     });
     await replaceUserPermissions(userDetails.accountUserId, userDetails.permissions);
     await replaceProudctionPermissions(userDetails.accountUserId, userDetails.productions, req);
-    if (user?.id) {
+    if (user?.unsafeMetadata?.organisationId === accountId) {
       const permissions = await getUserPermisisons(userDetails.email, accountId);
       await clerkClient.users.updateUserMetadata(user.id, {
         unsafeMetadata: { permissions, organisationId: accountId },
