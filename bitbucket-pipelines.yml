@@ -1,6 +1,6 @@
 options:
-  docker: true
-  size: 4x
+    docker: true
+    size: 2x
 
 definitions:
   caches:
@@ -24,8 +24,8 @@ pipelines:
 
       - step:
           name: "Run Cypress Tests"
-          services:
-            - docker
+          size: 4x
+          docker: true
           image: jan961/cypress-segue:myimage
           caches:
             - node
