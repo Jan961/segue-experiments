@@ -9,7 +9,7 @@ import { UTCDate } from '@date-fns/utc';
 import { formatDate, newDate, safeDate } from 'services/dateService';
 
 export interface DateInputProps {
-  value?: string | UTCDate;
+  value?: string | Date;
   onChange: (value: UTCDate) => void;
   inputClass?: string;
   error?: string;

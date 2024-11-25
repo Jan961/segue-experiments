@@ -9,7 +9,6 @@ import Checkbox from 'components/core-ui-lib/Checkbox';
 import DateInput from 'components/core-ui-lib/DateInput';
 import { marketingGraphOptions } from 'config/Reports';
 import ProductionSelector from 'components/productions/ProductionSelector';
-import { newDate } from 'services/dateService';
 
 interface SalesSummaryReportModalProps {
   visible: boolean;
@@ -22,7 +21,7 @@ const defaultFormData = {
   finalFigures: false,
   production1: null,
   production2: null,
-  salesFigureDate: newDate(),
+  salesFigureDate: new Date(),
 };
 const SalesSummaryReportModal = ({ visible, onClose }: SalesSummaryReportModalProps) => {
   const { productions } = useRecoilValue(productionJumpState);

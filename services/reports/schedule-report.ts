@@ -2,14 +2,7 @@ import { UTCDate } from '@date-fns/utc';
 import { bookingStatusMap } from 'config/bookings';
 import getPrismaClient from 'lib/prisma';
 import { NextApiRequest } from 'next';
-import {
-  areDatesSame,
-  dateTimeToTime,
-  formatDate,
-  getDateDaysAway,
-  getDifferenceInDays,
-  newDate,
-} from 'services/dateService';
+import { areDatesSame, dateTimeToTime, formatDate, getDateDaysAway, getDifferenceInDays } from 'services/dateService';
 import { minutesInHHmmFormat } from 'services/salesSummaryService';
 
 export type SCHEDULE_VIEW = {
@@ -66,8 +59,8 @@ const getKey = ({ FullProductionCode, ShowName, EntryDate }) => `${FullProductio
 
 export const getSheduleReport = async ({ from, to, status, ProductionId }, req: NextApiRequest) => {
   const prisma = await getPrismaClient(req);
-  const formatedFromDate = newDate(from);
-  const formatedToDate = newDate(to);
+  const formatedFromDate = new Date(from);
+  const formatedToDate = new Date(to);
   const data = await prisma.scheduleView.findMany({
     where: {
       AND: [

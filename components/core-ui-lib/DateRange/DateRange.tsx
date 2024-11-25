@@ -50,7 +50,7 @@ export default function DateRange({
   const [errors, setErrors] = useState<DateRangeError>({ fromError: '', toError: '' });
   const formattedMinDate = setDateWithoutTime(minDate);
   const formattedMaxDate = setDateWithoutTime(maxDate);
-  const checkDateRangeValid = (from: UTCDate, to: UTCDate) => {
+  const checkDateRangeValid = (from: Date, to: Date) => {
     const formattedFromDate = setDateWithoutTime(from);
     const formattedToDate = setDateWithoutTime(to);
 

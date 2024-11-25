@@ -13,7 +13,6 @@ import { exportExcelReport } from 'components/bookings/modal/request';
 import { notify } from 'components/core-ui-lib';
 import { bookingJumpState } from 'state/marketing/bookingJumpState';
 import axios from 'axios';
-import { newDate } from 'services/dateService';
 
 interface ContactNotesTabProps {
   bookingId: string;
@@ -76,7 +75,7 @@ const ContactNotesTab = forwardRef<ContactNoteTabRef, ContactNotesTabProps>((pro
 
       // re sort the rows to ensure the new field is put in the correct place chronologically
       const sortedContactNotes = conNoteData.sort(
-        (a, b) => newDate(b.ContactDate).getTime() - newDate(a.ContactDate).getTime(),
+        (a, b) => new Date(b.ContactDate).getTime() - new Date(a.ContactDate).getTime(),
       );
 
       setContactNoteRows(sortedContactNotes);
@@ -89,7 +88,7 @@ const ContactNotesTab = forwardRef<ContactNoteTabRef, ContactNotesTabProps>((pro
       newRows[rowIndex] = data;
 
       const sortedContactNotes = newRows.sort(
-        (a, b) => newDate(b.ContactDate).getTime() - newDate(a.ContactDate).getTime(),
+        (a, b) => new Date(b.ContactDate).getTime() - new Date(a.ContactDate).getTime(),
       );
 
       setContactNoteRows(sortedContactNotes);

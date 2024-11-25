@@ -13,7 +13,7 @@ import { productionJumpState } from 'state/booking/productionJumpState';
 import useMileageCalculator from 'hooks/useBookingMileageCalculator';
 import BookingsButtons from './BookingsButton';
 import { accessBookingsHome } from 'state/account/selectors/permissionSelector';
-import { formattedDateWithWeekDay, getKey, newDate } from 'services/dateService';
+import { formattedDateWithWeekDay, newDate } from 'services/dateService';
 
 interface FiltersProps {
   onExportClick?: (key: string) => void;
@@ -27,7 +27,7 @@ const Filters = ({ onExportClick }: FiltersProps) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { loading: isMileageLoading } = useMileageCalculator();
   const [showProductionSummary, setShowProductionSummary] = useState(false);
-  const todayKey = useMemo(() => getKey(newDate()), []);
+  const todayKey = useMemo(() => new Date().toISOString().substring(0, 10), []);
   const todayOnSchedule = useMemo(
     () =>
       schedule.Sections.map((x) => x.Dates)

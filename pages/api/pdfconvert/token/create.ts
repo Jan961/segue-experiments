@@ -1,4 +1,3 @@
-import { UTCDate } from '@date-fns/utc';
 import jwt from 'jsonwebtoken';
 
 export default function handler(req, res) {
@@ -8,8 +7,8 @@ export default function handler(req, res) {
 
   if (req.method === 'POST') {
     const payload = {
-      iat: Math.floor(UTCDate.now() / 1000),
-      exp: Math.floor(UTCDate.now() / 1000) + EXPIRE_IN,
+      iat: Math.floor(Date.now() / 1000),
+      exp: Math.floor(Date.now() / 1000) + EXPIRE_IN,
     };
 
     const token = jwt.sign(payload, secretKey);

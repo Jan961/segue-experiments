@@ -9,7 +9,7 @@ interface MasterPlanReportModalProps {
   onClose: () => void;
 }
 const MasterPlanReportModal: React.FC<MasterPlanReportModalProps> = ({ visible, onClose, endDate }) => {
-  const [formData, setFormData] = useState(() => ({ fromDate: newDate()?.toISOString(), toDate: endDate }));
+  const [formData, setFormData] = useState(() => ({ fromDate: new Date()?.toISOString(), toDate: endDate }));
   const { fromDate, toDate } = formData;
 
   const onChange = useCallback(

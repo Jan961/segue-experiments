@@ -45,7 +45,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           productionDateBlock.find((dateBlock) => dateBlock.Name === 'Production')?.StartDate,
         );
 
-        const prodEndDate = newDate(productionDateBlock.find((dateBlock) => dateBlock.Name === 'Production')?.EndDate);
+        const prodEndDate = new Date(productionDateBlock.find((dateBlock) => dateBlock.Name === 'Production')?.EndDate);
 
         const numTasksByCalc = getNewTasksNum(
           prodStartDate,
@@ -190,7 +190,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
             CompleteByWeekNum: task.CompleteByWeekNum,
             StartByIsPostProduction: task.StartByIsPostProduction,
             CompleteByIsPostProduction: task.CompleteByIsPostProduction,
-            TaskCompletedDate: task?.TaskCompletedDate || null,
+            TaskCompletedDate: new Date(task?.TaskCompletedDate) || null,
             ...(task.ProductionId && {
               Production: {
                 connect: {

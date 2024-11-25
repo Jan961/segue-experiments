@@ -1,6 +1,5 @@
 import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { newDate } from 'services/dateService';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -12,7 +11,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       where: {
         SetBookingId: BookingId,
         SetSalesFiguresDate: {
-          gte: newDate(SalesFigureDate),
+          gte: new Date(SalesFigureDate),
         },
       },
       data: updatedData,

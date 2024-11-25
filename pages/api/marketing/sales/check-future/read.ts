@@ -1,6 +1,5 @@
 import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { newDate } from 'services/dateService';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -13,7 +12,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         where: {
           SetBookingId: req.body.bookingId,
           SetSalesFiguresDate: {
-            gt: newDate(req.body.saleDate), // Use "greater than" for the date comparison
+            gt: new Date(req.body.saleDate), // Use "greater than" for the date comparison
           },
           SetHold: {
             some: {
@@ -24,14 +23,14 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       });
 
       result = data
-        .sort((a, b) => newDate(a.SetSalesFiguresDate).getTime() - newDate(b.SetSalesFiguresDate).getTime())
+        .sort((a, b) => new Date(a.SetSalesFiguresDate).getTime() - new Date(b.SetSalesFiguresDate).getTime())
         .filter((element, index, array) => index === 0 || element.SetHoldSeats === array[0].SetHoldSeats);
     } else {
       data = await prisma.salesSet.findMany({
         where: {
           SetBookingId: req.body.bookingId,
           SetSalesFiguresDate: {
-            gt: newDate(req.body.saleDate),
+            gt: new Date(req.body.saleDate),
           },
           SetComp: {
             some: {
@@ -42,7 +41,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       });
 
       result = data
-        .sort((a, b) => newDate(a.SetSalesFiguresDate).getTime() - newDate(b.SetSalesFiguresDate).getTime())
+        .sort((a, b) => new Date(a.SetSalesFiguresDate).getTime() - new Date(b.SetSalesFiguresDate).getTime())
         .filter((element, index, array) => index === 0 || element.SetCompSeats === array[0].SetCompSeats);
     }
 

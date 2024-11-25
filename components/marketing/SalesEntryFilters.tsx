@@ -7,7 +7,8 @@ import { bookingJumpState } from 'state/marketing/bookingJumpState';
 import { ProductionJumpMenu } from 'components/global/nav/ProductionJumpMenu';
 import useAxios from 'hooks/useAxios';
 import { SelectOption } from './MarketingHome';
-import { getWeekDay, DATE_PATTERNS, dateToSimple, newDate } from 'services/dateService';
+import { getWeekDay, DATE_PATTERNS } from 'services/dateService';
+import formatInputDate from 'utils/dateInputFormat';
 import { currencyState } from 'state/global/currencyState';
 import axios from 'axios';
 
@@ -100,7 +101,7 @@ const SalesEntryFilters: React.FC<Props> = ({ onDateChanged }) => {
       const lastDate = lastDates.find((x) => x.BookingId === parseInt(option.value));
       if (lastDate !== undefined) {
         const endDateDay = getWeekDay(lastDate.LastPerformanceDate, 'short');
-        const endDateStr = dateToSimple(lastDate.LastPerformanceDate);
+        const endDateStr = formatInputDate(lastDate.LastPerformanceDate);
         if (option.date === endDateStr) {
           return option;
         } else {
@@ -114,7 +115,7 @@ const SalesEntryFilters: React.FC<Props> = ({ onDateChanged }) => {
       }
     });
 
-    optWithRun.sort((a, b) => newDate(a.date).getTime() - newDate(b.date).getTime());
+    optWithRun.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
     return optWithRun;
   }, [bookings.bookings, lastDates]);
 

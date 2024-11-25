@@ -1,7 +1,6 @@
 import { loggingService } from 'services/loggingService';
 import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { newDate } from 'services/dateService';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -10,15 +9,15 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
 
     const newGlobalBookingActivity = await prisma.globalBookingActivity.create({
       data: {
-        Date: data.Date ? newDate(data.Date) : null,
+        Date: data.Date ? new Date(data.Date) : null,
         Name: data.Name,
         ActivityType: {
           connect: {
             Id: data.ActivityTypeId,
           },
         },
-        CreatedDT: newDate(),
-        DueByDate: data.DueByDate ? newDate(data.DueByDate) : null,
+        CreatedDT: new Date(),
+        DueByDate: data.DueByDate ? new Date(data.DueByDate) : null,
         Notes: data.Notes,
         ProductionId: data.ProductionId,
         Cost: data.Cost,

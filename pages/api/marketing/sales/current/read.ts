@@ -1,39 +1,36 @@
-import { UTCDate } from '@date-fns/utc';
 import getPrismaClient from 'lib/prisma';
-import { getKey, newDate } from 'services/dateService';
+
+// date-fns startOfDay not applicable for this use case
+const removeTime = (inputDate: Date) => {
+  const date = new Date(inputDate);
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0, 0);
+};
 
 export default async function handle(req, res) {
   try {
     const prisma = await getPrismaClient(req);
     const bookingId = parseInt(req.body.bookingId);
-    let salesDate = newDate(req.body.salesDate);
+    let salesDate = new Date(req.body.salesDate);
 
     const salesFrequency = req.body.frequency;
     let dateField = salesFrequency === 'W' ? 'SetProductionWeekDate' : 'SetSalesFiguresDate';
 
-    const data = await prisma.salesView
-      .findMany({
-        where: {
-          BookingId: bookingId,
-          SaleTypeName: {
-            not: '',
-          },
+    const data = await prisma.salesView.findMany({
+      where: {
+        BookingId: bookingId,
+        SaleTypeName: {
+          not: '',
         },
-        select: {
-          SaleTypeName: true,
-          Seats: true,
-          Value: true,
-          SetSalesFiguresDate: true,
-          SetProductionWeekDate: true,
-          SetId: true,
-        },
-      })
-      .then((res) =>
-        res.map((x) => ({
-          ...x,
-          SetProductionWeekDate: new UTCDate(x.SetProductionWeekDate),
-        })),
-      );
+      },
+      select: {
+        SaleTypeName: true,
+        Seats: true,
+        Value: true,
+        SetSalesFiguresDate: true,
+        SetProductionWeekDate: true,
+        SetId: true,
+      },
+    });
 
     if (data.length === 0) {
       res.status(200).json({});
@@ -42,15 +39,15 @@ export default async function handle(req, res) {
 
     // if sale date is null, final sales entry is making the request, set the sales date to the last date entry
     if (req.body.salesDate === null) {
-      const sortedData = data.sort((a, b) => b.SetProductionWeekDate.getTime() - a.SetProductionWeekDate.getTime());
+      const sortedData = data.sort(
+        (a, b) => new Date(b.SetProductionWeekDate).getTime() - new Date(a.SetProductionWeekDate).getTime(),
+      );
 
-      salesDate = sortedData[0].SetProductionWeekDate;
+      salesDate = new Date(sortedData[0].SetProductionWeekDate);
       dateField = 'SetProductionWeekDate';
     }
 
-    const filtered = data.filter(
-      (sale) => newDate(getKey(sale[dateField])).getTime() === newDate(getKey(salesDate)).getTime(),
-    );
+    const filtered = data.filter((sale) => removeTime(sale[dateField]).getTime() === removeTime(salesDate).getTime());
 
     if (filtered.length > 0) {
       const schoolReservations = filtered.find((sale) => sale.SaleTypeName === 'School Reservations');

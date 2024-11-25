@@ -2,8 +2,8 @@ import { loggingService } from 'services/loggingService';
 import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { ActivityDTO } from 'interfaces';
-import { newDate, safeDate } from 'services/dateService';
-import { UTCDate } from '@date-fns/utc';
+
+import { convertDate } from 'lib/mappers';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -12,15 +12,15 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
 
     const result = await prisma.bookingActivity.create({
       data: {
-        Date: data.Date ? safeDate(data.Date) : null,
+        Date: data.Date ? new Date(data.Date) : null,
         Name: data.Name,
         ActivityType: {
           connect: {
             Id: data.ActivityTypeId,
           },
         },
-        CreatedDT: newDate(),
-        DueByDate: data.DueByDate ? safeDate(data.DueByDate) : null,
+        CreatedDT: new Date(),
+        DueByDate: data.DueByDate ? new Date(data.DueByDate) : null,
         Notes: data.Notes,
         Booking: {
           connect: {
@@ -36,13 +36,13 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const formattedResult = {
       Id: result.Id,
       BookingId: result.BookingId,
-      Date: new UTCDate(result.Date),
+      Date: convertDate(result.Date),
       Name: result.Name,
       ActivityTypeId: result.ActivityTypeId,
       CompanyCost: Number(result.CompanyCost),
       VenueCost: Number(result.VenueCost),
       FollowUpRequired: result.FollowUpRequired,
-      DueByDate: new UTCDate(result.DueByDate),
+      DueByDate: convertDate(result.DueByDate),
       Notes: result.Notes,
     };
 

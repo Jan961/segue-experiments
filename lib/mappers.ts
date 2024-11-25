@@ -48,7 +48,7 @@ import {
 import { ShowWithProductions } from 'services/showService';
 import { ProductionWithDateblocks } from 'services/productionService';
 import { BookingsWithPerformances } from 'services/bookingService';
-import { dateTimeToTime } from 'services/dateService';
+import { dateTimeToTime, toISO } from 'services/dateService';
 import { getFileUrlFromLocation } from 'utils/fileUpload';
 import { UTCDate } from '@date-fns/utc';
 
@@ -67,11 +67,11 @@ We also have full control of types here so we can get type safety to child objec
 
 */
 
-// // This is so we can change the implimentation if needed. We had some issues with timezone.
-// export const convertDate = (date: Date) => {
-//   if (date) return toISO(date.getTime());
-//   return '';
-// };
+// This is so we can change the implimentation if needed. We had some issues with timezone.
+export const convertDate = (date: Date) => {
+  if (date) return toISO(date.getTime());
+  return '';
+};
 
 const convertToString = (data: any) => {
   if (data) return data.toString();
@@ -92,15 +92,15 @@ export const showProductionMapper = (s: ShowWithProductions): ProductionDTO[] =>
 
 export const dateBlockMapper = (db: DateBlock): DateBlockDTO => ({
   Id: db.Id,
-  StartDate: new UTCDate(db.StartDate).toISOString(),
-  EndDate: new UTCDate(db.EndDate).toISOString(),
+  StartDate: convertDate(db.StartDate),
+  EndDate: convertDate(db.EndDate),
   Name: db.Name,
   IsPrimary: db.IsPrimary,
 });
 
 export const rehearsalMapper = (r: Rehearsal): RehearsalDTO => ({
   Id: r.Id,
-  Date: new UTCDate(r.Date).toISOString(),
+  Date: convertDate(r.Date),
   VenueId: r.VenueId,
   Town: r.Town,
   StatusCode: r.StatusCode,
@@ -111,7 +111,7 @@ export const rehearsalMapper = (r: Rehearsal): RehearsalDTO => ({
 });
 
 export const bookingMapper = (b: BookingsWithPerformances): BookingDTO => ({
-  Date: new UTCDate(b.FirstDate).toISOString(),
+  Date: convertDate(b.FirstDate),
   Id: b.Id,
   VenueId: b.VenueId,
   StatusCode: b.StatusCode as any,
@@ -122,12 +122,12 @@ export const bookingMapper = (b: BookingsWithPerformances): BookingDTO => ({
   RunTag: b.RunTag,
   LandingPageURL: b.LandingPageURL,
   TicketsOnSale: b.TicketsOnSale,
-  TicketsOnSaleFromDate: new UTCDate(b.TicketsOnSaleFromDate).toISOString(),
+  TicketsOnSaleFromDate: convertDate(b.TicketsOnSaleFromDate),
   MarketingPlanReceived: b.MarketingPlanReceived,
   PrintReqsReceived: b.PrintReqsReceived,
   ContactInfoReceived: b.ContactInfoReceived,
   MarketingCostsStatus: b.MarketingCostsStatus,
-  MarketingCostsApprovalDate: new UTCDate(b.MarketingCostsApprovalDate).toISOString(),
+  MarketingCostsApprovalDate: convertDate(b.MarketingCostsApprovalDate),
   MarketingCostsNotes: b.MarketingCostsNotes,
   BookingCompNotes: b.CompNotes,
   BookingHoldNotes: b.HoldNotes,
@@ -163,7 +163,7 @@ export const performanceMapper = (p: PerformanceType): PerformanceDTO => {
 
 export const otherMapper = (o: Other): OtherDTO => ({
   Id: o.Id,
-  Date: new UTCDate(o.Date).toISOString(),
+  Date: convertDate(o.Date),
   DateTypeId: o.DateTypeId,
   PencilNum: o.PencilNum,
   StatusCode: o.StatusCode as StatusCode,
@@ -172,7 +172,7 @@ export const otherMapper = (o: Other): OtherDTO => ({
 });
 
 export const getInFitUpMapper = (gifu: GetInFitUp): GetInFitUpDTO => ({
-  Date: new UTCDate(gifu.Date).toISOString(),
+  Date: convertDate(gifu.Date),
   Id: gifu.Id,
   VenueId: gifu.VenueId,
   StatusCode: gifu.StatusCode as StatusCode,
@@ -254,25 +254,25 @@ export const venueContactMapper = (vc: VenueContact): VenueContactDTO => ({
 export const activityMapper = (a: BookingActivity): ActivityDTO => ({
   Id: a.Id,
   BookingId: a.BookingId,
-  Date: new UTCDate(a.Date),
+  Date: convertDate(a.Date),
   Name: a.Name,
   ActivityTypeId: a.ActivityTypeId,
   CompanyCost: Number(a.CompanyCost),
   VenueCost: Number(a.VenueCost),
   FollowUpRequired: a.FollowUpRequired,
-  DueByDate: new UTCDate(a.DueByDate),
+  DueByDate: convertDate(a.DueByDate),
   Notes: a.Notes,
 });
 
 export const globalActivityMapper = (a: GlobalBookingActivity): GlobalActivityDTO => ({
   Id: a.Id,
   ProductionId: a.ProductionId,
-  Date: new UTCDate(a.Date),
+  Date: convertDate(a.Date),
   Name: a.Name,
   ActivityTypeId: a.ActivityTypeId,
   Cost: Number(a.Cost),
   FollowUpRequired: a.FollowUpRequired,
-  DueByDate: new UTCDate(a.DueByDate),
+  DueByDate: convertDate(a.DueByDate),
   Notes: a.Notes,
 });
 
@@ -280,7 +280,7 @@ export const bookingContactNoteMapper = (a: BookingContactNotes): BookingContact
   Id: a.Id,
   BookingId: a.BookingId,
   CoContactName: a.CoContactName,
-  ContactDate: new UTCDate(a.ContactDate).toISOString(),
+  ContactDate: convertDate(a.ContactDate),
   Notes: a.Notes,
   ActionAccUserId: a.ActionAccUserId,
 });
@@ -290,14 +290,14 @@ export const contractStatusmapper = (status: ContractStatusType) => {
     return {
       BookingId: status.BookingId ? status.BookingId : '',
       StatusCode: status.StatusCode,
-      SignedDate: status.SignedDate,
+      SignedDate: convertDate(status.SignedDate),
       SignedBy: status.SignedBy,
-      ReturnDate: status.ReturnDate,
+      ReturnDate: convertDate(status.ReturnDate),
       CheckedBy: status.CheckedBy,
       RoyaltyPercentage: convertToString(status.RoyaltyPercentage),
       DealType: status.DealType,
       ContractNotes: status.Notes,
-      ReceivedBackDate: status.ReceivedBackDate,
+      ReceivedBackDate: convertDate(status.ReceivedBackDate),
       Exceptions: status.Exceptions,
       BankDetailsSent: status.BankDetailsSent,
       TechSpecSent: status.TechSpecSent,
@@ -313,11 +313,11 @@ export const contractBookingStatusmapper = (status: ContractBookingStatusType) =
   return {
     DateBlockId: status.DateBlockId,
     VenueId: status.VenueId,
-    FirstDate: status.FirstDate,
+    FirstDate: convertDate(status.FirstDate),
     StatusCode: status.StatusCode,
     PencilNum: status.PencilNum,
     LandingPageURL: status.LandingPageURL,
-    TicketsOnSaleFromDate: status.TicketsOnSaleFromDate,
+    TicketsOnSaleFromDate: convertDate(status.TicketsOnSaleFromDate),
     TicketsOnSale: status.TicketsOnSale,
     MarketingPlanReceived: status.MarketingPlanReceived,
     ContactInfoReceived: status.ContactInfoReceived,
@@ -335,7 +335,7 @@ export const contractBookingStatusmapper = (status: ContractBookingStatusType) =
     CastRateTicketsArranged: status.CastRateTicketsArranged,
     RunTag: status.RunTag,
     MarketingCostsStatus: status.MarketingCostsStatus,
-    MarketingCostsApprovalDate: status.MarketingCostsApprovalDate,
+    MarketingCostsApprovalDate: convertDate(status.MarketingCostsApprovalDate),
     MarketingCostsNotes: status.MarketingCostsNotes,
   };
 };
@@ -345,13 +345,13 @@ export const dealMemoMapper = (dealMemo: DealMemoContractFormData) => {
     Id: dealMemo.Id,
     BookingId: dealMemo.BookingId,
     AccContId: dealMemo.AccContId,
-    RunningTime: dealMemo.RunningTime,
-    DateIssued: dealMemo.DateIssued,
+    RunningTime: convertDate(dealMemo.RunningTime),
+    DateIssued: convertDate(dealMemo.DateIssued),
     VatCode: dealMemo.VatCode,
     RunningTimeNotes: dealMemo.RunningTimeNotes,
     PrePostShowEvents: dealMemo.PrePostShowEvents,
     DressingRooms: dealMemo.DressingRooms,
-    VenueCurfewTime: dealMemo.VenueCurfewTime,
+    VenueCurfewTime: convertDate(dealMemo.VenueCurfewTime),
     PerformanceNotes: dealMemo.PerformanceNotes,
     ProgrammerVenueContactId: dealMemo.ProgrammerVenueContactId,
     ROTTPercentage: dealMemo.ROTTPercentage,
@@ -368,7 +368,7 @@ export const dealMemoMapper = (dealMemo: DealMemoContractFormData) => {
     AgreedContraItems: dealMemo.AgreedContraItems,
     AgreedContraItemsNotes: dealMemo.AgreedContraItemsNotes,
     BOMVenueContactId: dealMemo.BOMVenueContactId,
-    OnSaleDate: dealMemo.OnSaleDate,
+    OnSaleDate: convertDate(dealMemo.OnSaleDate),
     SettlementVenueContactId: dealMemo.SettlementVenueContactId,
     SellableSeats: dealMemo.SellableSeats,
     MixerDeskPosition: dealMemo.MixerDeskPosition,
@@ -386,8 +386,8 @@ export const dealMemoMapper = (dealMemo: DealMemoContractFormData) => {
     AgeNotes: dealMemo.AgeNotes,
     SalesDayNum: dealMemo.SalesDayNum,
     MMVenueContactId: dealMemo.MMVenueContactId,
-    BrochureDeadline: dealMemo.BrochureDeadline,
-    FinalProofBy: dealMemo.FinalProofBy,
+    BrochureDeadline: convertDate(dealMemo.BrochureDeadline),
+    FinalProofBy: convertDate(dealMemo.FinalProofBy),
     PrintReqs: dealMemo.PrintReqs,
     LocalMarketingBudget: dealMemo.LocalMarketingBudget,
     LocalMarketingContra: dealMemo.LocalMarketingContra,
@@ -401,8 +401,8 @@ export const dealMemoMapper = (dealMemo: DealMemoContractFormData) => {
     SellMerchCommPercent: dealMemo.SellMerchCommPercent,
     SellPitchFee: dealMemo.SellPitchFee,
     TechVenueContactId: dealMemo.TechVenueContactId,
-    TechArrivalDate: dealMemo.TechArrivalDate,
-    TechArrivalTime: dealMemo.TechArrivalTime,
+    TechArrivalDate: convertDate(dealMemo.TechArrivalDate),
+    TechArrivalTime: convertDate(dealMemo.TechArrivalTime),
     NumFacilitiesLaundry: dealMemo.NumFacilitiesLaundry,
     NumFacilitiesDrier: dealMemo.NumFacilitiesDrier,
     NumFacilitiesLaundryRoom: dealMemo.NumFacilitiesLaundryRoom,
@@ -411,7 +411,7 @@ export const dealMemoMapper = (dealMemo: DealMemoContractFormData) => {
     BarringClause: dealMemo.BarringClause,
     AdvancePaymentRequired: dealMemo.AdvancePaymentRequired,
     AdvancePaymentAmount: dealMemo.AdvancePaymentAmount,
-    AdvancePaymentDueBy: dealMemo.AdvancePaymentDueBy,
+    AdvancePaymentDueBy: convertDate(dealMemo.AdvancePaymentDueBy),
     SettlementDays: dealMemo.SettlementDays,
     ContractClause: dealMemo.ContractClause,
     DealMemoPrice: dealMemo.DealMemoPrice,
@@ -421,7 +421,7 @@ export const dealMemoMapper = (dealMemo: DealMemoContractFormData) => {
     Status: dealMemo.Status,
     CompletedBy: dealMemo.CompletedBy,
     ApprovedBy: dealMemo.ApprovedBy,
-    DateReturned: dealMemo.DateReturned,
+    DateReturned: convertDate(dealMemo.DateReturned),
     Notes: dealMemo.Notes,
     CompAccContId: dealMemo.CompAccContId,
     SendTo: dealMemo.SendTo,

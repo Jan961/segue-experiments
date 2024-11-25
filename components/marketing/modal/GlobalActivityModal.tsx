@@ -19,12 +19,12 @@ import LoadingOverlay from 'components/core-ui-lib/LoadingOverlay';
 import { useRecoilValue } from 'recoil';
 import { accessMarketingHome } from 'state/account/selectors/permissionSelector';
 import { UTCDate } from '@date-fns/utc';
-import { newDate, safeDate } from 'services/dateService';
+import { safeDate } from 'services/dateService';
 
 export type ActivityModalVariant = 'add' | 'edit' | 'delete' | 'view';
 
 interface Venue extends VenueDTO {
-  date: UTCDate;
+  date: Date;
 }
 
 export interface GlobalActivity extends GlobalActivityDTO {
@@ -102,7 +102,7 @@ export default function GlobalActivityModal({
       });
     }
 
-    const sortedVenues = tempVenueList.sort((a, b) => newDate(a.date).getTime() - newDate(b.date).getTime());
+    const sortedVenues = tempVenueList.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
     return sortedVenues;
   }, [venues, selectedList]);
@@ -169,10 +169,10 @@ export default function GlobalActivityModal({
 
   const multiVenueSelect = (value) => {
     setSelectedList([]);
-    const compareToEpoch = newDate(value).getTime();
+    const compareToEpoch = new Date(value).getTime();
     const tempSelectedIndexList = [];
     venueList.forEach((venue) => {
-      if (newDate(venue.date).getTime() >= compareToEpoch) {
+      if (new Date(venue.date).getTime() >= compareToEpoch) {
         tempSelectedIndexList.push(venue.Id);
       }
     });

@@ -1,6 +1,5 @@
 import { ActivityDTO, BookingContactNoteDTO } from 'interfaces';
 import { GlobalActivity } from '../modal/GlobalActivityModal';
-import { newDate, safeDate } from 'services/dateService';
 
 export const hasActivityChanged = (oldActivity: ActivityDTO, newActivity: ActivityDTO): boolean => {
   // List all keys to be compared
@@ -15,7 +14,7 @@ export const hasActivityChanged = (oldActivity: ActivityDTO, newActivity: Activi
     // handle dates differently
     if (key === 'Date' || key === 'DueByDate') {
       // check for change
-      if (safeDate(oldActivity[key]).getTime() !== safeDate(newActivity[key]).getTime()) {
+      if (new Date(oldActivity[key]).getTime() !== new Date(newActivity[key]).getTime()) {
         return true;
       }
       // else any other field
@@ -45,7 +44,7 @@ export const hasContactNoteChanged = (
     // handle dates differently
     if (key === 'ContactDate') {
       // check for change
-      if (newDate(oldConNote[key]).getTime() !== newDate(newConNote[key]).getTime()) {
+      if (new Date(oldConNote[key]).getTime() !== new Date(newConNote[key]).getTime()) {
         return true;
       }
       // else any other field
@@ -83,7 +82,7 @@ export const reverseDate = (inputDt: string) => {
   }
 
   const reversedDateStr = inputDt.split('/').reverse().join('/');
-  const date = newDate(reversedDateStr);
+  const date = new Date(reversedDateStr);
 
   return date;
 };
@@ -101,7 +100,7 @@ export const hasGlobalActivityChanged = (oldActivity: GlobalActivity, newActivit
     // handle dates differently
     if (key === 'Date' || key === 'DueByDate') {
       // check for change
-      if (safeDate(oldActivity[key]).getTime() !== safeDate(newActivity[key]).getTime()) {
+      if (new Date(oldActivity[key]).getTime() !== new Date(newActivity[key]).getTime()) {
         return true;
       }
     } else if (key === 'VenueIds') {

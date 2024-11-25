@@ -1,6 +1,5 @@
 import * as Yup from 'yup';
 import { isAfter, isEqual } from 'date-fns';
-import { newDate } from 'services/dateService';
 
 export const formSchema = Yup.object({
   actOneUpTime: Yup.string()
@@ -8,27 +7,27 @@ export const formSchema = Yup.object({
     .test('is-greater', 'Act one UP time should be equal or greater than performance time', function (value) {
       const { performanceTime } = this.parent as { performanceTime: string };
       return (
-        isEqual(newDate(`2023-01-01 ${value ?? '00:00'}`), newDate(`2023-01-01 ${performanceTime}`)) ||
-        isAfter(newDate(`2023-01-01 ${value ?? '00:00'}`), newDate(`2023-01-01 ${performanceTime}`))
+        isEqual(new Date(`2023-01-01 ${value ?? '00:00'}`), new Date(`2023-01-01 ${performanceTime}`)) ||
+        isAfter(new Date(`2023-01-01 ${value ?? '00:00'}`), new Date(`2023-01-01 ${performanceTime}`))
       );
     }),
   actOneDownTime: Yup.string()
     .required('Act one DOWN time cannot be empty')
     .test('is-greater', 'Act one DOWN time should be greater than Act one UP time', function (value) {
       const { actOneUpTime } = this.parent as { actOneUpTime: string };
-      return isAfter(newDate(`2023-01-01 ${value ?? '00:00'}`), newDate(`2023-01-01 ${actOneUpTime}`));
+      return isAfter(new Date(`2023-01-01 ${value ?? '00:00'}`), new Date(`2023-01-01 ${actOneUpTime}`));
     }),
   intervalDownTime: Yup.string()
     .required('Interval DOWN time cannot be empty')
     .test('is-greater', 'Interval DOWN time should be greater than Act one DOWN time', function (value) {
       const { actOneDownTime } = this.parent as { actOneDownTime: string };
-      return isAfter(newDate(`2023-01-01 ${value ?? '00:00'}`), newDate(`2023-01-01 ${actOneDownTime}`));
+      return isAfter(new Date(`2023-01-01 ${value ?? '00:00'}`), new Date(`2023-01-01 ${actOneDownTime}`));
     }),
   actTwoDownTime: Yup.string()
     .required('Act two DOWN time cannot be empty')
     .test('is-greater', 'Act two DOWN time should be greater than Act two UP time', function (value) {
       const { intervalDownTime } = this.parent as { intervalDownTime: string };
-      return isAfter(newDate(`2023-01-01 ${value ?? '00:00'}`), newDate(`2023-01-01 ${intervalDownTime}`));
+      return isAfter(new Date(`2023-01-01 ${value ?? '00:00'}`), new Date(`2023-01-01 ${intervalDownTime}`));
     }),
   // getOutTime: Yup.string()
   //   .required('Get out time cannot be empty')

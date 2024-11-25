@@ -1,5 +1,5 @@
 import { BookingDTO } from 'interfaces';
-import { newDate } from 'services/dateService';
+import { getKey } from 'services/dateService';
 
 export const findClosestBooking = (bookings: Record<number, BookingDTO>, specifiedDate: string) => {
   let closestDate = '1970-01-01'; // Allow initial comparisons
@@ -31,12 +31,12 @@ export const findPreviosAndNextBookings = (bookings: any, startDate: string, end
   let minDiffBefore = Infinity;
   let minDiffAfter = Infinity;
 
-  const start = newDate(startDate).getTime();
-  const end = newDate(endDate).getTime();
+  const start = new Date(getKey(startDate)).getTime();
+  const end = new Date(getKey(endDate)).getTime();
 
   for (const booking of bookings) {
     if (!booking.venueId) continue;
-    const bookingDate = newDate(booking.dateTime).getTime();
+    const bookingDate = new Date(getKey(booking.dateTime)).getTime();
     if (bookingDate < start && bookingDate !== start) {
       const diff = start - bookingDate;
       if (diff < minDiffBefore) {
@@ -56,11 +56,11 @@ export const findPreviosAndNextBookings = (bookings: any, startDate: string, end
 
 export const hasContinuosGap = (bookingDict: Record<string, BookingDTO>, startDate: string, endDate: string) => {
   let hasGap = true;
-  const start = newDate(startDate);
-  const end = newDate(endDate);
+  const start = new Date(getKey(startDate));
+  const end = new Date(getKey(endDate));
   for (const bookingId in bookingDict) {
     const booking = bookingDict[bookingId];
-    const bookingDate = newDate(booking.Date);
+    const bookingDate = new Date(getKey(booking.Date));
     if (bookingDate >= start && bookingDate <= end && booking.Id) {
       console.log(`Booking ${booking?.Id} ${booking?.Date} is already in the booking`);
       hasGap = false;

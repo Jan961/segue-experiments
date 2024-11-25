@@ -3,8 +3,6 @@ import getPrismaClient from 'lib/prisma';
 import * as yup from 'yup';
 import { isNullOrUndefined, isUndefined } from 'utils';
 import { productionSchema } from 'validators/production';
-import { UTCDate } from '@date-fns/utc';
-import { newDate } from 'services/dateService';
 
 let prisma = null;
 
@@ -28,7 +26,7 @@ const prepareUpdateData = async ({
   if (!isUndefined(runningTime)) {
     if (runningTime) {
       const [hours, minutes] = runningTime.split(':');
-      updateData.RunningTime = newDate(UTCDate.UTC(1970, 0, 1, hours, minutes));
+      updateData.RunningTime = new Date(Date.UTC(1970, 0, 1, hours, minutes));
     } else {
       updateData.RunningTime = null;
     }
@@ -86,16 +84,16 @@ const prepareUpdateData = async ({
       updateMany: existingDateBlocks.map((db) => ({
         where: { Id: db.id, ProductionId: id },
         data: {
-          StartDate: newDate(db.startDate),
-          EndDate: newDate(db.endDate),
+          StartDate: new Date(db.startDate),
+          EndDate: new Date(db.endDate),
           Name: db.name,
           IsPrimary: db.isPrimary,
         },
       })),
       // Create new DateBlocks. This has to come last (otherwise deleteMany will remove)
       create: newDateBlocks.map((db) => ({
-        StartDate: newDate(db.startDate),
-        EndDate: newDate(db.endDate),
+        StartDate: new Date(db.startDate),
+        EndDate: new Date(db.endDate),
         Name: db.name,
         IsPrimary: db.isPrimary,
       })),

@@ -6,8 +6,6 @@ import { checkDateValid, getPerformanceTime } from 'utils/getTimeFromDateTime';
 import { NextApiRequest } from 'next';
 import getPrismaClient from 'lib/prisma';
 import { activityMapper } from 'lib/mappers';
-import { newDate } from './dateService';
-import { UTCDate } from '@date-fns/utc';
 
 export type NewPerformance = {
   Date: string;
@@ -73,7 +71,7 @@ export const updateBooking = async (booking: NewBooking, tx) => {
       updatedPerformances = await tx.performance.createMany({
         data: booking.Performances.map((p: NewPerformance) => ({
           BookingId: booking.Id,
-          Date: newDate(p.Date),
+          Date: new Date(p.Date),
           Time: getPerformanceTime(p),
         })),
       });
@@ -169,7 +167,7 @@ export const deleteOtherById = async (id: number, tx) => {
   });
 };
 
-export const createBooking = (VenueId: number, FirstDate: UTCDate, DateBlockId: number, prisma) => {
+export const createBooking = (VenueId: number, FirstDate: Date, DateBlockId: number, prisma) => {
   return prisma.booking.create({
     data: {
       FirstDate,
@@ -225,7 +223,7 @@ export const getSaleableBookings = async (ProductionId: number, req: NextApiRequ
   });
 };
 
-export const changeBookingDate = async (Id: number, FirstDate: UTCDate, prisma) => {
+export const changeBookingDate = async (Id: number, FirstDate: Date, prisma) => {
   const booking = await prisma.booking.findUnique({
     where: {
       Id,
@@ -276,7 +274,7 @@ export const createNewBooking = (
 ) => {
   const performanceData = Performances.map((p: NewPerformance) => {
     return {
-      Date: newDate(p.Date),
+      Date: new Date(p.Date),
       Time: checkDateValid(getPerformanceTime(p)),
     };
   });
@@ -286,7 +284,7 @@ export const createNewBooking = (
       PencilNum,
       StatusCode,
       RunTag,
-      FirstDate: newDate(BookingDate),
+      FirstDate: new Date(BookingDate),
       DateBlock: {
         connect: {
           Id: DateBlockId,
@@ -334,7 +332,7 @@ export const createNewRehearsal = (
       StatusCode,
       RunTag,
       PencilNum,
-      Date: newDate(BookingDate),
+      Date: new Date(BookingDate),
       DateBlock: {
         connect: {
           Id: DateBlockId,
@@ -365,7 +363,7 @@ export const createGetInFitUp = (
       Notes,
       PencilNum,
       RunTag,
-      Date: newDate(BookingDate),
+      Date: new Date(BookingDate),
       DateBlock: {
         connect: {
           Id: DateBlockId,
@@ -396,7 +394,7 @@ export const createOtherBooking = (
       StatusCode,
       PencilNum,
       RunTag,
-      Date: newDate(BookingDate),
+      Date: new Date(BookingDate),
       DateBlock: {
         connect: {
           Id: DateBlockId,

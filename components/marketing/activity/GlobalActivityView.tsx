@@ -14,8 +14,6 @@ import fuseFilter from 'utils/fuseFilter';
 import { isNullOrEmpty } from 'utils';
 import axios from 'axios';
 import { accessMarketingHome } from 'state/account/selectors/permissionSelector';
-import { newDate, safeDate } from 'services/dateService';
-import { UTCDate } from '@date-fns/utc';
 
 type GlobalActivitiesResponse = {
   activities: GlobalActivity[];
@@ -53,7 +51,7 @@ const GlobalActivityView = () => {
       const venues = bookings.bookings.map((option) => {
         return {
           ...option.Venue,
-          date: newDate(option.Date),
+          date: new Date(option.Date),
         };
       });
 
@@ -191,7 +189,7 @@ const GlobalActivityView = () => {
           return {
             actName: activity.Name,
             actType: globalActivities.activityTypes.find((type) => type.value === activity.ActivityTypeId).text,
-            actDate: new UTCDate(startOfDay(safeDate(activity.Date))),
+            actDate: startOfDay(new Date(activity.Date)),
             followUpCheck: activity.FollowUpRequired,
             cost: activity.Cost,
             notes: activity.Notes,
@@ -200,7 +198,9 @@ const GlobalActivityView = () => {
           };
         });
 
-        const sortedActivities = globalRows.sort((a, b) => a.actDate.getTime() - b.actDate.getTime());
+        const sortedActivities = globalRows.sort(
+          (a, b) => new Date(a.actDate).getTime() - new Date(b.actDate).getTime(),
+        );
 
         setRowData(sortedActivities);
         setAllRows(sortedActivities);
@@ -235,9 +235,9 @@ const GlobalActivityView = () => {
     if (filter.startDate && filter.endDate) {
       if (!isNullOrEmpty(filter.startDate) && !isNullOrEmpty(filter.endDate)) {
         filterRows = filterRows.filter((gba) => {
-          const actDateTime = newDate(gba.actDate).getTime();
-          const startDateTime = safeDate(filter.startDate).getTime();
-          const endDateTime = safeDate(filter.endDate).getTime();
+          const actDateTime = new Date(gba.actDate).getTime();
+          const startDateTime = new Date(filter.startDate).getTime();
+          const endDateTime = new Date(filter.endDate).getTime();
 
           return actDateTime >= startDateTime && actDateTime <= endDateTime;
         });

@@ -59,7 +59,7 @@ export const sanitizeRowData = (rowData: any[]) => {
  */
 export const calculateRemainingDaysInWeek = (day: string) => {
   // Parse the given day to a date (assumes the current week)
-  const currentDate = parse(day, 'eeee', newDate());
+  const currentDate = parse(day, 'eeee', new Date());
 
   // Get the end of the week (assuming the week ends on Sunday)
   const endOfCurrentWeek = endOfWeek(currentDate, { weekStartsOn: 0 });

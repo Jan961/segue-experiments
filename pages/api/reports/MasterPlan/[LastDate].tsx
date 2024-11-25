@@ -1,6 +1,5 @@
 import tempfile from 'tempfile';
 import Excel from 'exceljs/dist/es5/exceljs.browser';
-import { UTCDate } from '@date-fns/utc';
 
 export default async function handle(req, res) {
   try {
@@ -12,8 +11,8 @@ export default async function handle(req, res) {
       { header: 'Name', key: 'name', width: 32 },
       { header: 'D.O.B.', key: 'DOB', width: 10 },
     ];
-    worksheet.addRow({ id: 1, name: 'John Doe', dob: new UTCDate(1970, 1, 1) });
-    worksheet.addRow({ id: 2, name: 'Jane Doe', dob: new UTCDate(1965, 1, 7) });
+    worksheet.addRow({ id: 1, name: 'John Doe', dob: new Date(1970, 1, 1) });
+    worksheet.addRow({ id: 2, name: 'Jane Doe', dob: new Date(1965, 1, 7) });
 
     const tempFilePath = tempfile('.xlsx');
     workbook.xlsx.writeFile(tempFilePath, '.').then(function () {

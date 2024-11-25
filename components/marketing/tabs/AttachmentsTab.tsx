@@ -8,7 +8,6 @@ import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import { Spinner } from 'components/global/Spinner';
 import { attachmentMimeTypes } from 'components/core-ui-lib/UploadModal/interface';
 import { getFileUrl } from 'lib/s3';
-import { newDate } from 'services/dateService';
 
 interface AttachmentsTabProps {
   bookingId: string;
@@ -72,11 +71,11 @@ const AttachmentsTab = forwardRef<AttachmentsTabRef, AttachmentsTabProps>((props
 
       const fileRec = {
         FileBookingBookingId: parseInt(bookingIdVal),
-        FileDateTime: newDate(),
+        FileDateTime: new Date(),
         FileDescription: attachType,
         FileOriginalFilename: response.data.originalFilename,
         FileURL: getFileUrl(response.data.location),
-        FileUploadedDateTime: newDate(),
+        FileUploadedDateTime: new Date(),
       };
 
       // update in the database

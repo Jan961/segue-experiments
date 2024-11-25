@@ -1,7 +1,6 @@
 import { bookingMapper } from 'lib/mappers';
 import getPrismaClient from 'lib/prisma';
 import { createBooking } from 'services/bookingService';
-import { newDate } from 'services/dateService';
 import { loggingService } from 'services/loggingService';
 
 export interface CreateBookingsParams {
@@ -15,7 +14,7 @@ export default async function handle(req, res) {
     const data = req.body as CreateBookingsParams;
     const { DateBlockId, VenueId } = data;
     const prisma = await getPrismaClient(req);
-    const created = await createBooking(VenueId, newDate(data.Date), DateBlockId, prisma);
+    const created = await createBooking(VenueId, new Date(data.Date), DateBlockId, prisma);
     res.status(200).json(bookingMapper(created));
   } catch (e) {
     console.log(e);

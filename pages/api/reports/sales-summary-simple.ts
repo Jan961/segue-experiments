@@ -94,7 +94,6 @@ const fetchProductionBookings = async (productionId: number): Promise<Production
       EntryDate: 'asc',
     },
   });
-  // console.log('data', data);
   const summary = unique(data, (entry) => entry.EntryId)
     .map((entry) => ({
       ...entry,

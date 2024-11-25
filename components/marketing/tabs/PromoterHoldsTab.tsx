@@ -6,6 +6,7 @@ import Checkbox from 'components/core-ui-lib/Checkbox';
 import Table from 'components/core-ui-lib/Table';
 import { allocSeatsColDefs, styleProps } from '../table/tableConfig';
 import TextArea from 'components/core-ui-lib/TextArea/TextArea';
+import formatInputDate from 'utils/dateInputFormat';
 import Icon from 'components/core-ui-lib/Icon';
 import { bookingJumpState } from 'state/marketing/bookingJumpState';
 import { useRecoilValue } from 'recoil';
@@ -16,7 +17,7 @@ import { exportExcelReport } from 'components/bookings/modal/request';
 import { notify } from 'components/core-ui-lib';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import axios from 'axios';
-import { dateTimeToTime, dateToSimple } from 'services/dateService';
+import { dateTimeToTime } from 'services/dateService';
 import { PerformanceDTO } from 'interfaces';
 
 interface PromotorHoldsTabProps {
@@ -203,7 +204,7 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
         perfList.forEach((perf) => {
           const perfTime = isNull(perf.Time) ? 'TBC' : perf.Time.substring(0, 5);
           optionList.push({
-            text: dateToSimple(perf.Date) + ' | ' + perfTime,
+            text: formatInputDate(perf.Date) + ' | ' + perfTime,
             value: perf.Id,
             date: perf.Date,
             time: perfTime,
@@ -303,7 +304,7 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
 
           <div className="my-5">
             {holdList.map((holdRec, index) => {
-              const date = dateToSimple(holdRec.info.Date);
+              const date = formatInputDate(holdRec.info.Date);
               const time = isNullOrEmpty(holdRec.info.Time) ? '-' : dateTimeToTime(holdRec.info.Date);
 
               return (

@@ -1,7 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import getPrismaClient from 'lib/prisma';
 import { getInFitUpMapper } from 'lib/mappers';
-import { newDate } from 'services/dateService';
 
 export interface CreateGifuParams {
   DateBlockId: number;
@@ -19,7 +18,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const result = await prisma.getInFitUp.create({
       data: {
         RunTag: gifu.RunTag,
-        Date: newDate(gifu.Date),
+        Date: new Date(gifu.Date),
         DateBlock: {
           connect: {
             Id: DateBlockId,

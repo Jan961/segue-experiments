@@ -1,7 +1,6 @@
 import { format } from 'date-fns';
 import ReactPDF from '@react-pdf/renderer';
 import Report from './reportPDF/Report';
-import { newDate } from './dateService';
 
 function formatDuration(duration, options = {}) {
   const { h = 'h', m = 'm' } = options;
@@ -29,8 +28,8 @@ export async function generateReport(report) {
     actTwoDuration: formatDuration(report.actTwoDuration),
     intervalDuration: formatDuration(report.intervalDuration),
     getOutDuration: formatDuration(report.getOutDuration),
-    performanceDate: format(newDate(report.performanceDate), 'eee dd/MM/yyyy'),
-    performanceTime: format(newDate(report.performanceTime), 'HH:mm'),
+    performanceDate: format(new Date(report.performanceDate), 'eee dd/MM/yyyy'),
+    performanceTime: format(new Date(report.performanceTime), 'HH:mm'),
   };
   return await ReactPDF.renderToStream(<Report reportData={reportData} />);
 }

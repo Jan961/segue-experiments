@@ -536,7 +536,7 @@ export const EditDealMemoContractModal = ({
     const { hrs, min } = times[key];
 
     if (hrs && min) {
-      const datetime = getDateWithOffset(newDate());
+      const datetime = getDateWithOffset(new Date());
       datetime.setHours(hrs);
       datetime.setMinutes(min);
 

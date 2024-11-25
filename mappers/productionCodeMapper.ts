@@ -1,5 +1,6 @@
 import { UTCDate } from '@date-fns/utc';
-import { dateToSimple, getWeekDay } from 'services/dateService';
+import { getWeekDay } from 'services/dateService';
+import formatInputDate from 'utils/dateInputFormat';
 
 export const mapBookingsToProductionOptions = (bookings) => {
   if (!bookings || bookings.length === 0) {
@@ -10,7 +11,7 @@ export const mapBookingsToProductionOptions = (bookings) => {
     .map((b) => {
       const date = new UTCDate(b.Date);
       const weekday = getWeekDay(date, 'short').toUpperCase();
-      const ukDate = dateToSimple(date);
+      const ukDate = formatInputDate(date);
       return {
         text: `${b.Venue.Code} ${b.Venue.Name} | ${weekday} ${ukDate} (${b.StatusCode})`,
         value: `${b.Id}`,

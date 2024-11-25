@@ -1,7 +1,7 @@
 import DefaultCellRenderer from 'components/core-ui-lib/Table/renderers/DefaultCellRenderer';
 import { SalesComparison } from 'types/MarketingTypes';
+import formatInputDate from 'utils/dateInputFormat';
 import { tileColors } from 'config/global';
-import { dateToSimple } from 'services/dateService';
 
 export type SelectedBooking = {
   bookingId: string;
@@ -122,7 +122,7 @@ const salesComparison = async (data: SalesComp) => {
           ).prodCode;
           const seats = bookSale.Seats === null ? 0 : bookSale.Seats;
           const value = bookSale.ValueWithCurrencySymbol === '' ? 'No Sales' : bookSale.ValueWithCurrencySymbol;
-          const date = bookSale.SetSalesFiguresDate === '' ? '-' : dateToSimple(bookSale.SetSalesFiguresDate);
+          const date = bookSale.SetSalesFiguresDate === '' ? '-' : formatInputDate(bookSale.SetSalesFiguresDate);
           obj = {
             ...obj,
             [prodCode + '_seats']: seats,

@@ -9,8 +9,9 @@ import Iframe from 'components/core-ui-lib/Iframe';
 import { mapBookingsToProductionOptions } from 'mappers/productionCodeMapper';
 import { bookingJumpState } from 'state/marketing/bookingJumpState';
 import MarketingButtons from './MarketingButtons';
+import formatInputDate from 'utils/dateInputFormat';
 import { reverseDate } from './utils';
-import { DATE_PATTERNS, dateToSimple, getWeekDay, newDate } from 'services/dateService';
+import { DATE_PATTERNS, getWeekDay } from 'services/dateService';
 import { currencyState } from 'state/global/currencyState';
 import axios from 'axios';
 import { LastPerfDate } from 'types/MarketingTypes';
@@ -27,7 +28,7 @@ const Filters = () => {
   const { selected: productionId } = useRecoilValue(productionJumpState);
   const [bookings, setBooking] = useRecoilState(bookingJumpState);
   const [, setCurrency] = useRecoilState(currencyState);
-  const today = dateToSimple(newDate());
+  const today = formatInputDate(new Date());
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [selectedValue, setSelectedValue] = useState(null);
   const [venueName, setVenueName] = useState('');
@@ -45,7 +46,7 @@ const Filters = () => {
       const lastDate = lastDates?.find((x) => x.BookingId === parseInt(option.value));
       if (lastDate !== undefined) {
         const endDateDay = getWeekDay(lastDate.LastPerformanceDate, 'short');
-        const endDateStr = dateToSimple(lastDate.LastPerformanceDate);
+        const endDateStr = formatInputDate(lastDate.LastPerformanceDate);
         if (option.date === endDateStr) {
           return option;
         } else {
@@ -59,7 +60,7 @@ const Filters = () => {
       }
     });
 
-    optWithRun.sort((a, b) => newDate(a.date).getTime() - newDate(b.date).getTime());
+    optWithRun.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
     return optWithRun;
   }, [bookings.bookings, lastDates]);
 

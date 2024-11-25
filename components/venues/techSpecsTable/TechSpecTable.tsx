@@ -8,7 +8,6 @@ import axios from 'axios';
 import { isNullOrEmpty } from 'utils';
 import { accessBookingsHome } from 'state/account/selectors/permissionSelector';
 import { useRecoilValue } from 'recoil';
-import { newDate } from 'services/dateService';
 
 interface TechSpecTableProps {
   venueId: number;
@@ -44,7 +43,7 @@ export const TechSpecTable = ({ venueId, setFilesToSend, setFilesToDelete }: Tec
       if (file?.fileId > maxFileId && isNullOrEmpty(file?.imageUrl)) maxFileId = file.fileId;
     });
     const newRowData = files.map((file) => {
-      return { ...file, fileId: maxFileId++, uploadDateTime: newDate().toISOString() };
+      return { ...file, fileId: maxFileId++, uploadDateTime: new Date().toISOString() };
     });
     setRowData((prevRowData) => [...newRowData, ...prevRowData]);
     setFilesToUpload((prevFilesList) => [...newRowData, ...prevFilesList]);

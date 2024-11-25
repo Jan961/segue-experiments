@@ -1,8 +1,9 @@
 import { Time } from 'components/core-ui-lib/TimeInput/TimeInput';
 import { startOfDay } from 'date-fns';
 import { pick } from 'radash';
-import { getShortWeekFormat, newDate, simpleToDate } from 'services/dateService';
+import { getShortWeekFormat, newDate } from 'services/dateService';
 import { formatDecimalValue, isNullOrEmpty, isNullOrUndefined, isUndefined } from 'utils';
+import formatInputDate from 'utils/dateInputFormat';
 import { PriceState } from './modal/EditDealMemoContractModal';
 import { UTCDate } from '@date-fns/utc';
 
@@ -203,7 +204,7 @@ export const parseAndSortDates = (arr: string[]): Array<string> => {
   // if the entry has a time pre-pended - remove this and use the datetime in JS date format
   const parsedEntries = arr.map((show) => {
     const [time, date] = show.split('? ');
-    return { time, date: newDate(date) };
+    return { time, date: new Date(date) };
   });
 
   // Sort dates in ascending order
@@ -225,14 +226,14 @@ export const parseAndSortDates = (arr: string[]): Array<string> => {
   const dayArray: string[] = [];
   Object.entries(groupedByDate).forEach(([dateKey, times]) => {
     const epochTime = parseInt(dateKey);
-    const date = newDate(epochTime);
-    dayArray.push(`${getShortWeekFormat(date)} ${simpleToDate(date.toISOString())} ${times.join('; ')}`);
+    const date = new Date(epochTime);
+    dayArray.push(`${getShortWeekFormat(date)} ${formatInputDate(date)} ${times.join('; ')}`);
   });
 
   return dayArray;
 };
 
-export const dtToTime = (datetime: UTCDate): Time => {
+export const dtToTime = (datetime: Date): Time => {
   if (datetime === null) {
     return null;
   }

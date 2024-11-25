@@ -1,4 +1,3 @@
-import { UTCDate } from '@date-fns/utc';
 import { Actions, INITIAL_STATE } from 'config/AddBooking';
 import { BookingWithVenueDTO } from 'interfaces';
 import { debug } from 'utils/logging';
@@ -32,7 +31,7 @@ export type BarredVenue = {
 
 export type BookingItem = {
   id?: string;
-  date: string | UTCDate;
+  date: string | Date;
   dateBlockId: number;
   dateAsISOString: string;
   perf: boolean;
@@ -52,7 +51,7 @@ export type BookingItem = {
 
 export type PreviewDataItem = {
   production: string;
-  date: string | UTCDate;
+  date: string | Date;
   week: number;
   venue: string;
   town: string;

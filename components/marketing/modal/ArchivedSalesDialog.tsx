@@ -133,7 +133,7 @@ const ArchSalesDialog = ({
 
         // Sort data by BookingFirstDate in descending order (newest production to oldest)
         const sortedData = excludeCurrentProduction.sort(
-          (a, b) => b.BookingFirstDate.getTime() - a.BookingFirstDate.getTime(),
+          (a, b) => new Date(b.BookingFirstDate).getTime() - new Date(a.BookingFirstDate).getTime(),
         );
 
         setProdCompData(sortedData);

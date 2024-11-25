@@ -1,4 +1,3 @@
-import { UTCDate } from '@date-fns/utc';
 import {
   BookingDTO,
   DateBlockDTO,
@@ -8,7 +7,6 @@ import {
   ProductionDTO,
   RehearsalDTO,
 } from 'interfaces';
-import { newDate, safeDate } from 'services/dateService';
 import { VenueState } from 'state/booking/venueState';
 
 type BookingHelperArgType = {
@@ -119,9 +117,9 @@ class BookingHelper {
     return { start: minStartDate, end: maxEndDate };
   }
 
-  getProductionByDate(dateBlocks: DateBlockDTO[] = [], date: string | UTCDate = '') {
-    date = safeDate(date);
-    const db = dateBlocks?.find((block) => newDate(block.StartDate) <= date && newDate(block.EndDate) >= date);
+  getProductionByDate(dateBlocks: DateBlockDTO[] = [], date: string | Date = '') {
+    date = new Date(date);
+    const db = dateBlocks?.find((block) => new Date(block.StartDate) <= date && new Date(block.EndDate) >= date);
     return this.productionDict?.[db?.ProductionId];
   }
 }

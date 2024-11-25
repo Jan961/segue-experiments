@@ -1,4 +1,3 @@
-import { newDate } from 'services/dateService';
 import { isNullOrUndefined, isUndefined } from 'utils';
 
 export type FieldMapping = {
@@ -21,7 +20,7 @@ export const prepareQuery = <T>(details: T, fieldMappings: FieldMapping[], isCre
     const hasValue = isCreate ? !isNullOrUndefined(value) : !isUndefined(value);
     if (hasValue) {
       if (isDate) {
-        updateData[updateKey] = value ? newDate(value as string) : null;
+        updateData[updateKey] = value ? new Date(value as string) : null;
       } else if (isSetArray && arrayKey) {
         updateData[updateKey] = {
           set: (value as any[]).map((item) => ({

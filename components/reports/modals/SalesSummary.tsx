@@ -34,8 +34,8 @@ export default function SalesSummary({ activeProductions }: Props) {
       ProductionWeek: null,
       numberOfWeeks: null,
       order: null,
-      productionStartDate: newDate(),
-      productionEndDate: newDate(),
+      productionStartDate: new Date(),
+      productionEndDate: new Date(),
     });
     setProductionWeeks([]);
     setShowModal(false);

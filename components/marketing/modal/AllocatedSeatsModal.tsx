@@ -9,7 +9,8 @@ import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import { ConfDialogVariant } from 'components/core-ui-lib/ConfirmationDialog/ConfirmationDialog';
 import { useRecoilValue } from 'recoil';
 import { userState } from 'state/account/userState';
-import { dateTimeToTime, dateToSimple } from 'services/dateService';
+import formatInputDate from 'utils/dateInputFormat';
+import { dateTimeToTime } from 'services/dateService';
 import { hasAllocSeatsChanged } from '../utils';
 import { isNullOrEmpty } from 'utils';
 import FormError from 'components/core-ui-lib/FormError';
@@ -82,7 +83,7 @@ export default function AllocatedSeatsModal({
 
     if (type === 'edit') {
       const perf = performances.find(
-        (perfRec) => dateToSimple(perfRec.date) === data.date && dateTimeToTime(perfRec.date) === data.time,
+        (perfRec) => formatInputDate(perfRec.date) === data.date && dateTimeToTime(perfRec.date) === data.time,
       );
 
       setForm({
@@ -131,7 +132,7 @@ export default function AllocatedSeatsModal({
       TicketHolderEmail: form.email,
       TicketHolderName: form.custName,
       VenueConfirmationNotes: form.venueConfNotes,
-      date: dateToSimple(perf.date),
+      date: formatInputDate(perf.date),
       time: perf.time,
       Id: null,
     };
@@ -173,7 +174,7 @@ export default function AllocatedSeatsModal({
         TicketHolderEmail: form.email,
         TicketHolderName: form.custName,
         VenueConfirmationNotes: form.venueConfNotes,
-        date: dateToSimple(perf.date),
+        date: formatInputDate(perf.date),
         time: perf.time,
         Id: allocId,
       };
@@ -252,7 +253,7 @@ export default function AllocatedSeatsModal({
         TicketHolderEmail: form.email,
         TicketHolderName: form.custName,
         VenueConfirmationNotes: form.venueConfNotes,
-        date: dateToSimple(perf.date),
+        date: formatInputDate(perf.date),
         time: perf.time,
       };
 

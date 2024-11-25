@@ -4,7 +4,8 @@ import TextInput from 'components/core-ui-lib/TextInput';
 import TextArea from 'components/core-ui-lib/TextArea/TextArea';
 import Button from 'components/core-ui-lib/Button';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
-import { dateTimeToTime, dateToSimple, newDate } from 'services/dateService';
+import formatInputDate from 'utils/dateInputFormat';
+import { dateTimeToTime, newDate } from 'services/dateService';
 import { UpdateAvailableSeatsParams } from 'pages/api/marketing/available-seats/update';
 import { ConfDialogVariant } from 'components/core-ui-lib/ConfirmationDialog/ConfirmationDialog';
 import { days } from 'config/global';
@@ -40,7 +41,7 @@ export default function AvailableSeatsModal({
   const initForm = () => {
     const dt = data.info.Date !== null ? newDate(data.info.Date) : newDate();
     setTime(dateTimeToTime(dt));
-    setDate(dateToSimple(dt));
+    setDate(formatInputDate(dt));
     setAllocated(data.totalAllocated);
     setAvailable(data.totalAvailable.toString());
     setDayName(days[dt.getDay()]);

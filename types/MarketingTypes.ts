@@ -1,5 +1,3 @@
-import { UTCDate } from '@date-fns/utc';
-
 export enum BOOK_STATUS_CODES {
   C = 'C',
   X = 'X',
@@ -97,7 +95,7 @@ export type SalesSnapshot = {
 export type BookingSelection = {
   BookingId: number;
   BookingStatusCode: string;
-  BookingFirstDate: UTCDate;
+  BookingFirstDate: Date;
   VenueId: number;
   VenueCode: string;
   VenueMainAddressTown: string;

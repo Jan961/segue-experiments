@@ -1,4 +1,3 @@
-import { UTCDate } from '@date-fns/utc';
 import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { unique } from 'radash';
@@ -34,16 +33,9 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       }
     }
 
-    const data: BookingSelection[] = await prisma.bookingSelectionView
-      .findMany({
-        where: conditions,
-      })
-      .then((res) =>
-        res.map((x) => ({
-          ...x,
-          BookingFirstDate: new UTCDate(x.BookingFirstDate),
-        })),
-      );
+    const data: BookingSelection[] = await prisma.bookingSelectionView.findMany({
+      where: conditions,
+    });
 
     const results = [];
     const uniqueIds = {};

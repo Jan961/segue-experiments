@@ -1,17 +1,16 @@
 import getPrismaClient from 'lib/prisma';
-import { newDate } from 'services/dateService';
 
 export default async function handle(req, res) {
   const ProductionId = req.query.ProductionId;
-  const FromWeek = newDate(req.query.FromWeek); // Selected week
-  const ToWeek = newDate(req.query.ToWeek); // Selected week -  number of weeks
+  const FromWeek = new Date(req.query.FromWeek); // Selected week
+  const ToWeek = new Date(req.query.ToWeek); // Selected week -  number of weeks
   let FromProductionDate = null;
   if (req.query.FromProductionDate !== 'Null' || req.query.FromProductionDate !== 'null') {
-    FromProductionDate = newDate(req.query.FromProductionDate);
+    FromProductionDate = new Date(req.query.FromProductionDate);
   }
   let ToProductionDate = null;
   if (req.query.ToProductionDate !== 'Null' || req.query.ToProductionDate !== 'Null') {
-    ToProductionDate = newDate(req.query.ToProductionDate);
+    ToProductionDate = new Date(req.query.ToProductionDate);
   }
   try {
     const prisma = await getPrismaClient(req);

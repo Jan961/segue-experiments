@@ -3,7 +3,8 @@ import DefaultCellRenderer from 'components/core-ui-lib/Table/renderers/DefaultC
 import DefaultTextRenderer from 'components/core-ui-lib/Table/renderers/DefaultTextRenderer';
 import IconRowRenderer from 'components/global/salesTable/renderers/IconRowRenderer';
 import { tileColors } from 'config/global';
-import { dateTimeToTime, dateToSimple, newDate } from 'services/dateService';
+import { dateTimeToTime, newDate } from 'services/dateService';
+import formatInputDate from 'utils/dateInputFormat';
 import TwoLineRenderer from './TwoLineRenderer';
 import ButtonRenderer from 'components/core-ui-lib/Table/renderers/ButtonRenderer';
 import SalesValueInputRenderer from './SalesValueInputRenderer';
@@ -35,7 +36,7 @@ export const activityColDefs = (
     headerName: 'Date',
     field: 'actDate',
     cellRenderer: function (params) {
-      return isValid(params.data.actDate) ? dateToSimple(params.data.actDate) : '';
+      return isValid(params.data.actDate) ? formatInputDate(params.data.actDate) : '';
     },
     cellStyle: {
       paddingLeft: '8px',
@@ -97,7 +98,7 @@ export const activityColDefs = (
     headerName: 'Due By Date',
     field: 'followUpDt',
     cellRenderer: function (params) {
-      return isValid(params.data.followUpDt) ? dateToSimple(params.data.followUpDt) : '';
+      return isValid(params.data.followUpDt) ? formatInputDate(params.data.followUpDt) : '';
     },
     width: 100,
     hide: true,
@@ -138,7 +139,7 @@ export const contactNoteColDefs = (updateContactNote, userList) => [
     headerName: 'Date',
     field: 'ContactDate',
     cellRenderer: function (params) {
-      return isValid(params.data.ContactDate) ? dateToSimple(params.data.ContactDate) : '';
+      return isValid(params.data.ContactDate) ? formatInputDate(params.data.ContactDate) : '';
     },
     cellStyle: {
       paddingLeft: '8px',
@@ -295,7 +296,7 @@ export const attachmentsColDefs = [
     cellRendererParams: function (params) {
       const updDate = newDate(params.data.FileUploadedDateTime);
       return {
-        value: dateToSimple(updDate) + ' ' + dateTimeToTime(updDate),
+        value: formatInputDate(updDate) + ' ' + dateTimeToTime(updDate),
       };
     },
     width: 150,
@@ -307,7 +308,7 @@ export const attachmentsColDefs = [
     cellRendererParams: function (params) {
       const fileDt = newDate(params.data.FileDateTime);
       return {
-        value: dateToSimple(fileDt) + ' ' + dateTimeToTime(fileDt),
+        value: formatInputDate(fileDt) + ' ' + dateTimeToTime(fileDt),
       };
     },
     width: 150,
@@ -407,7 +408,7 @@ export const updateWarningColDefs = (type) => {
       cellRenderer: DefaultTextRenderer,
       cellRendererParams: (params) => {
         return {
-          value: dateToSimple(params.data.date),
+          value: formatInputDate(params.data.date),
         };
       },
       width: 185,
@@ -463,7 +464,7 @@ export const globalActivityColDefs = (
     headerName: 'Date',
     field: 'actDate',
     cellRenderer: (params) => {
-      return isValid(params.data.actDate) ? dateToSimple(params.data.actDate) : '';
+      return isValid(params.data.actDate) ? formatInputDate(params.data.actDate) : '';
     },
     cellStyle: {
       paddingLeft: '8px',
@@ -516,7 +517,7 @@ export const globalActivityColDefs = (
     headerName: 'Due By Date',
     field: 'followUpDt',
     cellRenderer: (params) => {
-      return isValid(params.data.followUpDt) ? dateToSimple(params.data.followUpDt) : ' ';
+      return isValid(params.data.followUpDt) ? formatInputDate(params.data.followUpDt) : ' ';
     },
     width: 100,
     hide: true,
@@ -632,7 +633,7 @@ export const globalActivityTabColDefs = (
     headerName: 'Date',
     field: 'actDate',
     cellRenderer: function (params) {
-      return isValid(params.data.actDate) ? dateToSimple(params.data.actDate) : '';
+      return isValid(params.data.actDate) ? formatInputDate(params.data.actDate) : '';
     },
     cellStyle: {
       paddingLeft: '8px',

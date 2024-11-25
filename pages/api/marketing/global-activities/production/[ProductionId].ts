@@ -1,8 +1,8 @@
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import { GlobalActivityDTO } from 'interfaces';
+import { convertDate } from 'lib/mappers';
 import getPrismaClient from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { dateToSimple } from 'services/dateService';
 
 export type GlobalActivitiesResponse = {
   activities: GlobalActivityDTO[];
@@ -57,12 +57,12 @@ const getActivitiesByProductionId = async (ProductionId) => {
 const fieldsMapper = (original) => ({
   Id: original.Id,
   ProductionId: original.ProductionId,
-  Date: dateToSimple(original.Date),
+  Date: convertDate(original.Date),
   Name: original.Name,
   ActivityTypeId: original.ActivityTypeId,
   Cost: Number(original.Cost),
   FollowUpRequired: original.FollowUpRequired,
-  DueByDate: dateToSimple(original.DueByDate),
+  DueByDate: convertDate(original.DueByDate),
   Notes: original.Notes,
   VenueIds: original.VenueIds === null ? null : original.VenueIds.split(',').map(Number),
 });

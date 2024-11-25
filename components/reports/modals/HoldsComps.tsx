@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { faUsers } from '@fortawesome/free-solid-svg-icons';
 import { SwitchBoardItem } from 'components/global/SwitchBoardItem';
 import { Spinner } from 'components/global/Spinner';
-import { newDate } from 'services/dateService';
 
 type Props = {
   activeProductions: any[];
@@ -50,7 +49,7 @@ export default function HoldsComps({ activeProductions }: Props) {
         toDate: inputs.dateTo,
         venue: inputs.venue,
         bookingStatus: inputs.status,
-        exportedAt: newDate().toISOString(),
+        exportedAt: new Date().toISOString(),
       }),
     })
       .then(async (response) => {

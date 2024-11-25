@@ -1,6 +1,6 @@
 import ExcelJS from 'exceljs';
 import { VenueMinimalDTO } from 'interfaces';
-import { dateToSimple, newDate, simpleToDateDMY } from 'services/dateService';
+import { dateToSimple, simpleToDateDMY } from 'services/dateService';
 import {
   SpreadsheetRow,
   SpreadsheetIssues,
@@ -185,7 +185,7 @@ const updateValidateSpreadsheetData = (
 
   const createNewSale = () => {
     return {
-      salesDate: newDate(currentRow.salesDate),
+      salesDate: new Date(currentRow.salesDate),
       salesType: currentRow.salesType,
       seats: currentRow.seats,
       value: currentRow.value,
@@ -198,10 +198,10 @@ const updateValidateSpreadsheetData = (
 
   const createNewBooking = () => {
     return {
-      bookingDate: newDate(currentRow.bookingDate),
+      bookingDate: new Date(currentRow.bookingDate),
       finalSalesDate:
         typeof currentRow.isFinal === 'string' && currentRow.isFinal.toUpperCase() === 'Y'
-          ? newDate(currentRow.salesDate)
+          ? new Date(currentRow.salesDate)
           : null,
       bookingFirstRow: row,
       sales: [createNewSale()],
@@ -224,7 +224,7 @@ const updateValidateSpreadsheetData = (
     return { detailsColumnMessage, rowWarningOccurred, rowErrorOccurred, currentRowBooking: null };
   }
 
-  const booking = venue.bookings.find((b) => b.bookingDate.getTime() === newDate(currentBookingDate).getTime());
+  const booking = venue.bookings.find((b) => b.bookingDate.getTime() === new Date(currentBookingDate).getTime());
 
   if (!booking) {
     if (currentBookingDate) {
@@ -234,7 +234,7 @@ const updateValidateSpreadsheetData = (
   }
 
   const sale = booking.sales.find(
-    (s) => s.salesDate.getTime() === newDate(currentRow.salesDate).getTime() && s.salesType === currentRow.salesType,
+    (s) => s.salesDate.getTime() === new Date(currentRow.salesDate).getTime() && s.salesType === currentRow.salesType,
   );
 
   if (sale) {
@@ -307,7 +307,7 @@ const validateBookingDate = (currentRow: SpreadsheetRow, currentBookingDate, pro
   const productionDates = prodDateRange.split('-');
   const prodStartDate = simpleToDateDMY(productionDates[0]);
   const prodEndDate = simpleToDateDMY(productionDates[1]);
-  const rowDate = newDate(currentRow.bookingDate);
+  const rowDate = new Date(currentRow.bookingDate);
 
   if (!currentBookingDate && currentRow.venueCode) {
     returnString += '| ERROR - Must specify a valid Booking Date for a Venue Code';
@@ -411,12 +411,12 @@ const validateIsFinal = (currentRow: SpreadsheetRow, booking) => {
     if (
       currentRow.isFinal.toUpperCase() === 'Y' &&
       booking.finalSalesDate &&
-      booking.finalSalesDate.getTime() !== newDate(currentRow.salesDate).getTime()
+      booking.finalSalesDate.getTime() !== new Date(currentRow.salesDate).getTime()
     ) {
       returnString += ' | ERROR - Cannot have more than one Is Final Date for a Booking';
       errorOccurred = true;
     } else if (currentRow.isFinal.toUpperCase() === 'Y') {
-      booking.finalSalesDate = newDate(currentRow.salesDate);
+      booking.finalSalesDate = new Date(currentRow.salesDate);
     }
   }
 

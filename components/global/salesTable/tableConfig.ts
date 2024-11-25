@@ -2,16 +2,16 @@ import getNumericalOptions from 'utils/getNumericalOptions';
 import SelectOrderRenderer from './renderers/SelectOrderRenderer';
 import ButtonSalesRenderer from './renderers/ButtonSalesRenderer';
 import DefaultCellRenderer from 'components/core-ui-lib/Table/renderers/DefaultCellRenderer';
+import formatInputDate from 'utils/dateInputFormat';
 import IconRowRenderer from './renderers/IconRowRenderer';
 import { isNullOrEmpty } from 'utils';
-import { dateToSimple, newDate } from 'services/dateService';
 
 const reverseDate = (inputDt) => {
-  return newDate(inputDt.split('/').reverse().join('/')).getTime();
+  return new Date(inputDt.split('/').reverse().join('/')).getTime();
 };
 const getCellColor = (data, ignoreMonday, school) => {
-  const saleDt = reverseDate(dateToSimple(data.weekOf));
-  const isMonday = newDate(saleDt).getDay() === 1;
+  const saleDt = reverseDate(formatInputDate(data.weekOf));
+  const isMonday = new Date(saleDt).getDay() === 1;
   const showMondayBorder = isMonday && !ignoreMonday;
 
   if (data.isBrochureReleased) {
@@ -251,7 +251,7 @@ export const salesColDefs = (schoolDataAvail, isMarketing, booking, setSalesActi
       headerName: 'Date',
       field: 'weekOf',
       cellRenderer: function (params) {
-        return dateToSimple(params.data.weekOf);
+        return formatInputDate(params.data.weekOf);
       },
       cellStyle: (params) => {
         return {
