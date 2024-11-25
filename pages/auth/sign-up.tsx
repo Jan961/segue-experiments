@@ -464,7 +464,7 @@ const SignUp = () => {
         )}
         {error && (
           <div className="flex gap-3 items-center mt-5">
-            <AuthError error={error} className=" min-w--32 items-end" />
+            <AuthError error={error} className="items-end" />
             {showLogout && <Button variant="secondary" text="Logout" onClick={handleLogout} />}
           </div>
         )}
