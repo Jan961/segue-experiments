@@ -1,15 +1,15 @@
+image: atlassian/default-image:2
 options:
     docker: true
     size: 2x
 
 definitions:
+
   caches:
-    npm: ~/.npm
+    node: ~/.npm
     cypress: ~/.cache
     nextcache: .next/cache
-#  services:
-#    docker:
-#      memory: 4096
+
 
 pipelines:
   custom:
@@ -23,9 +23,8 @@ pipelines:
 #            - docker  push jan961/cypress-segue:myimage
 
       - step:
-          name: "Run Cypress Tests"
           size: 4x
-          docker: true
+          name: "Run Cypress Tests"
           image: jan961/cypress-segue:myimage
           caches:
             - node
