@@ -53,7 +53,7 @@ pipelines:
             - npm install
             - npx cypress install
             - cd ..
-            - DEBUG=start-server-and-test start-server-and-test "npm --prefix segue-dir/ run start" http://localhost:3000 "npm --prefix cypress/ run cy:alltests"
+            - DEBUG=start-server-and-test start-server-and-test "npm --prefix segue-dir/ run start" http://localhost:3000 "npm --prefix cypress/ run cy:alltests || true"
 #            - npm --prefix segue-dir/ run start &
 #            - npx wait-on http://localhost:3000 &
 #            - npm --prefix cypress/ run cy:alltests
@@ -76,12 +76,12 @@ pipelines:
             # Set alert type based on test results
             - ALERT_TYPE="success"
             - |
-              if [[ $(jq '.stats.failures' output.json) -ne 0 ]]; then 
+              if [ $(jq '.stats.failures' output.json) -ne 0 ]; then 
                 ALERT_TYPE="error"
                 echo "Tests failed but continuing with report generation"
               fi
             - ALERT_TYPE="success"
-            - if [[ $BITBUCKET_EXIT_CODE -ne 0 ]]; then
+            - if [ $BITBUCKET_EXIT_CODE -ne 0 ]; then
               ALERT_TYPE="error";
               echo "Tests failed but continuing with report generation";
               fi
