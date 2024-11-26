@@ -54,7 +54,7 @@ const useAuth = () => {
   };
 
   const navigateToHome = () => {
-    router.push('/');
+    router.push(currentUrl);
   };
 
   return { signIn, signOut, navigateToHome, getSignInUrl, getSignUpUrl };
