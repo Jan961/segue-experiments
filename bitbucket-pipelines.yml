@@ -76,10 +76,11 @@ pipelines:
                 BODY_HTML: 'cypress-tests/cypress/email-report.html'
                 ATTACHMENTS: 'cypress-tests/cypress/full-report.zip'
           artifacts:
-            - cypress-tests/cypress/cypress/results/**
             - cypress-tests/cypress/mochawesome-report
             - cypress-tests/cypress/full-report.zip
             - cypress-tests/cypress/email-report.html
+            - cypress-tests/cypress/cypress/results/**
+            - cypress-tests/cypress/cypress/screenshots/**
 
 
   default:
