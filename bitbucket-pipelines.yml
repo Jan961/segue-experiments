@@ -26,7 +26,6 @@ pipelines:
             - nextcache
           timeout:
           script:
-            - set +e
             - echo "Current directory is $(pwd)"
             - ls
             # Downgrade npm
@@ -55,14 +54,7 @@ pipelines:
             - npx cypress install
             - cd ..
             - DEBUG=start-server-and-test start-server-and-test "npm --prefix segue-dir/ run start" http://localhost:3000 "npm --prefix cypress/ run cy:alltests || true"
-            - EXIT_CODE=$?
-            - echo "Cypress exited with code $EXIT_CODE"
 
-
-            - if [ $EXIT_CODE -ne 0 ]; then
-                ALERT_TYPE="error"; else
-                ALERT_TYPE="success"; 
-              fi
 #            - npm --prefix segue-dir/ run start &
 #            - npx wait-on http://localhost:3000 &
 #            - npm --prefix cypress/ run cy:alltests
@@ -80,8 +72,6 @@ pipelines:
             # Zip the full report directory
             - zip -r full-report.zip mochawesome-report/
             - if [ -e full-report.zip ]; then echo " full-report.zip exists"; else echo "full-report.zip does not exist"; fi
-          after-script:
-
             # Use pre-built Atlassian email-notify pipe with the variables as below to send email with test results
             - pipe: atlassian/email-notify:0.13.2
               variables:
@@ -90,7 +80,7 @@ pipelines:
                 FROM: $SMTP_USERNAME
                 TO: jan@segue360.co.uk
                 HOST: 'smtp.gmail.com'
-                SUBJECT: '${ALERT_TYPE}: Segue Integration Tests for ${BITBUCKET_BRANCH}'
+                SUBJECT: "Segue Integration Tests for ${BITBUCKET_BRANCH}'
                 BODY_HTML: 'cypress/email-report.html'
                 ATTACHMENTS: 'cypress/full-report.zip'
           artifacts:
