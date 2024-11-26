@@ -26,31 +26,34 @@ pipelines:
             - nextcache
           timeout:
           script:
+            - echo "Current directory is $((pwd))"
+            - mkdir ../segue-dir
+            - cp -r . ../segue-dir
+            - ls ../
             - npm install -g npm@9.6.7
-            -  apt-get install -y zip
-            - npm install
             - npm install start-server-and-test
+            -  apt-get install -y zip
+            -  cd /segue-dir &&  npm install
             - echo $TEST_APP_ENV | base64 --decode --ignore-garbage > .env
             - cat .env
             - npm run build
-            - mkdir cypress-tests && cd cypress-tests
+            - cd ..
             - git clone git@bitbucket.org:segue-team/cypress.git && cd cypress
             - git checkout staging
             - npm install
             - npx cypress install
-            - cd ../..
-            - npx start-server-and-test "npm run start" http://localhost:3000 "npm --prefix cypress-tests/cypress run cy:alltests"
-            # - npm run cy:permissions --browser chrome
-            - cd cypress-tests/cypress
+            - cd ..
+            - npx start-server-and-test "npm --prefix segue-dir/ run start" http://localhost:3000 "npm --prefix cypress/ run cy:alltests"
+            - cd cypress
             - echo "Merging reports"
             - npx mochawesome-merge cypress/results/*.json -o output.json
-            - if [ -e output.json ]; then echo "filename output.json exists"; else echo "output.json does not exist"; fi
+            - if [[ -e output.json ]]; then echo "filename output.json exists"; else echo "output.json does not exist"; fi
             - npx marge output.json
-            - if [ -e mochawesome-report/output.html ]; then echo "mochawesome-report/output.html exists"; else echo "mochawesome-report/output.html does not exist"; fi
+            - if [[ -e mochawesome-report/output.html ]]; then echo "mochawesome-report/output.html exists"; else echo "mochawesome-report/output.html does not exist"; fi
             - node create-email-report
-            - if [ -e email-report.html ]; then echo "email-report.html exists"; else echo "email-report.html does not exist"; fi
+            - if [[ -e email-report.html ]]; then echo "email-report.html exists"; else echo "email-report.html does not exist"; fi
             - zip -r full-report.zip mochawesome-report/
-            - if [ -e full-report.zip ]; then echo " full-report.zip exists"; else echo "full-report.zip does not exist"; fi
+            - if [[ -e full-report.zip ]]; then echo " full-report.zip exists"; else echo "full-report.zip does not exist"; fi
           after-script:
 
             # Set alert type based on test results
