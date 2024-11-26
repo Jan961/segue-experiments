@@ -54,7 +54,7 @@ pipelines:
             - npm install
             - npx cypress install
             - cd ..
-            - $ DEBUG=start-server-and-test start-server-and-test "npm --prefix segue/ run start" http://localhost:3000 "npm --prefix cypress/ run cy:alltests"
+            - DEBUG=start-server-and-test start-server-and-test "npm --prefix segue/ run start" http://localhost:3000 "npm --prefix cypress/ run cy:alltests"
 #            - npm --prefix segue-dir/ run start &
 #            - npx wait-on http://localhost:3000 &
 #            - npm --prefix cypress/ run cy:alltests
