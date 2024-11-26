@@ -28,15 +28,19 @@ pipelines:
           script:
             - echo "Current directory is $((pwd))"
             - ls
-            # Copy the contents of the current directory (all of Segue) to the segue-dir directory
-            - mkdir segue-dir
-            - mv . ./segue-dir
-            - echo "Contents of the base dir is $((ls))"
-            - echo "Contents of the segue-dir is $((ls segue-dir))"
+            # Downgrade npm
             - npm install -g npm@9.6.7
-            # Get the start-server-and-test utility that will keep the server running while tests are run
+             # Get the start-server-and-test utility that will keep the server running while tests are run
             - npm install start-server-and-test
-            -  apt-get install -y zip
+            - apt-get install -y zip
+            - mkdir segue-dir
+            # enable pattern matching in bash
+            - shopt -s extglob
+            # Copy the contents of the current directory (all of Segue) to the segue-dir directory
+            - mv !(segue-dir) segue-dir/
+            - echo "The contents of the current woring directory are $((ls))"
+            - echo "Contents of the segue-dir is $((ls segue-dir))"
+            - echo " The contents of the segue-dir are $((ls segue-dir))"
             -  cd /segue-dir &&  npm install
             - echo $TEST_APP_ENV | base64 --decode --ignore-garbage > .env
             - cat .env
