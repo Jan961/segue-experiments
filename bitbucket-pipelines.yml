@@ -53,8 +53,8 @@ pipelines:
             - npm install
             - npx cypress install
             - cd ..
-            - npm npm --prefix segue-dir/ run start &
-            - npx wait-on http://localhost:3000
+            - npm --prefix segue-dir/ run start &
+            - npx wait-on http://localhost:3000 &
             - npm --prefix cypress/ run cy:alltests"
             - cd cypress
             - echo "Merging reports"
