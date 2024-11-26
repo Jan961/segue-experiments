@@ -32,7 +32,7 @@ pipelines:
             # Downgrade npm
             - npm install -g npm@9.6.7
              # Get the start-server-and-test utility that will keep the server running while tests are run
-            - npm install start-server-and-test
+            - npm install -g start-server-and-test
             - apt-get update && apt-get install -y zip
             - mkdir segue-dir
             # enable pattern matching in bash
