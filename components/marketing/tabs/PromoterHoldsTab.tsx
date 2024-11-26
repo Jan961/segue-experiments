@@ -87,8 +87,6 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
     try {
       const { data: promData } = await axios.get(`/api/marketing/promoter-holds/${bookingId}`);
 
-      console.log(promData);
-
       if ((promData.allocations && Array.isArray(promData.allocations)) || Array.isArray(promData.holds)) {
         setHoldList(promData.holds);
         setAllocRows(
