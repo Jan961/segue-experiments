@@ -79,16 +79,17 @@ pipelines:
             - zip -r full-report.zip mochawesome-report/
             - if [ -e full-report.zip ]; then echo " full-report.zip exists"; else echo "full-report.zip does not exist"; fi
             # Use pre-built Atlassian email-notify pipe with the variables as below to send email with test results
-            - pipe: atlassian/email-notify:0.13.2
-              variables:
-                USERNAME: $SMTP_USERNAME
-                PASSWORD: $SMTP_PASSWORD
-                FROM: $SMTP_USERNAME
-                TO: jan@segue360.co.uk
-                HOST: 'smtp.gmail.com'
-                SUBJECT: '${ALERT_TYPE}: Segue Integration Tests for ${BITBUCKET_BRANCH}'
-                BODY_HTML: 'cypress/email-report.html'
-                ATTACHMENTS: 'cypress/full-report.zip'
+          after-script:
+              - pipe: atlassian/email-notify:0.13.2
+                variables:
+                  USERNAME: $SMTP_USERNAME
+                  PASSWORD: $SMTP_PASSWORD
+                  FROM: $SMTP_USERNAME
+                  TO: jan@segue360.co.uk
+                  HOST: 'smtp.gmail.com'
+                  SUBJECT: '${ALERT_TYPE}: Segue Integration Tests for ${BITBUCKET_BRANCH}'
+                  BODY_HTML: 'cypress/email-report.html'
+                  ATTACHMENTS: 'cypress/full-report.zip'
           artifacts:
             - cypress/mochawesome-report
             - cypress/full-report.zip
