@@ -27,7 +27,6 @@ pipelines:
           timeout:
           script:
             - echo "Current directory is $(pwd)"
-            - $ DEBUG=start-server-and-test
             - ls
             # Downgrade npm
             - npm install -g npm@9.6.7
