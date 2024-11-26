@@ -744,34 +744,34 @@ describe('getFastHostServerUrl', () => {
     expect(result).toBe('https://barringclause.co.uk/staging/api/addVenue');
   });
 
-  // it('should return undefined and log an error if FASTHOST_BASE_URL is not defined', () => {
-  //   delete process.env.FASTHOST_BASE_URL;
-  //   process.env.DEPLOYMENT_ENV = 'prod';
-  //   const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-  //   const endpoint = '/convertDocxToPDF';
+  it('should return undefined and log an error if FASTHOST_BASE_URL is not defined', () => {
+    delete process.env.FASTHOST_BASE_URL;
+    process.env.DEPLOYMENT_ENV = 'prod';
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
+    const endpoint = '/convertDocxToPDF';
 
-  //   const result = getFastHostServerUrl(endpoint);
+    const result = getFastHostServerUrl(endpoint);
 
-  //   expect(result).toBeUndefined();
-  //   expect(consoleSpy).toHaveBeenCalledWith(
-  //     'either DEPLOYMENT_ENV or FASTHOST_BASE_URL is not set in the environment variables'
-  //   );
+    expect(result).toBeUndefined();
+    expect(consoleSpy).toHaveBeenCalledWith(
+      'either DEPLOYMENT_ENV or FASTHOST_BASE_URL is not set in the environment variables',
+    );
 
-  //   consoleSpy.mockRestore();
-  // });
+    consoleSpy.mockRestore();
+  });
 
-  // it('should return undefined and log an error if DEPLOYMENT_ENV is not defined', () => {
-  //   delete process.env.DEPLOYMENT_ENV;
-  //   const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-  //   const endpoint = '/convertDocxToPDF';
+  it('should return undefined and log an error if DEPLOYMENT_ENV is not defined', () => {
+    delete process.env.DEPLOYMENT_ENV;
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
+    const endpoint = '/convertDocxToPDF';
 
-  //   const result = getFastHostServerUrl(endpoint);
+    const result = getFastHostServerUrl(endpoint);
 
-  //   expect(result).toBeUndefined();
-  //   expect(consoleSpy).toHaveBeenCalledWith(
-  //     'either DEPLOYMENT_ENV or FASTHOST_BASE_URL is not set in the environment variables'
-  //   );
+    expect(result).toBeUndefined();
+    expect(consoleSpy).toHaveBeenCalledWith(
+      'either DEPLOYMENT_ENV or FASTHOST_BASE_URL is not set in the environment variables',
+    );
 
-  //   consoleSpy.mockRestore();
-  // });
+    consoleSpy.mockRestore();
+  });
 });
