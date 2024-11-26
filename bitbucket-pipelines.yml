@@ -19,7 +19,7 @@ pipelines:
       - step:
           size: 4x
           name: "Run Cypress Tests"
-          image: jan961/cypress-segue:myimage
+          image: jan961/cypress-segue:myimage # get the docker image from DockerHub
           caches:
             - node
             - cypress
@@ -27,10 +27,14 @@ pipelines:
           timeout:
           script:
             - echo "Current directory is $((pwd))"
-            - mkdir ../segue-dir
-            - cp -r . ../segue-dir
-            - ls ../
+            - ls
+            # Copy the contents of the current directory (all of Segue) to the segue-dir directory
+            - mkdir segue-dir
+            - mv . ./segue-dir
+            - echo "Contents of the base dir is $((ls))"
+            - echo "Contents of the segue-dir is $((ls segue-dir))"
             - npm install -g npm@9.6.7
+            # Get the start-server-and-test utility that will keep the server running while tests are run
             - npm install start-server-and-test
             -  apt-get install -y zip
             -  cd /segue-dir &&  npm install
@@ -38,6 +42,7 @@ pipelines:
             - cat .env
             - npm run build
             - cd ..
+            # Clone the Cypress repository into a dir at the same level as Segue
             - git clone git@bitbucket.org:segue-team/cypress.git && cd cypress
             - git checkout staging
             - npm install
@@ -46,12 +51,16 @@ pipelines:
             - npx start-server-and-test "npm --prefix segue-dir/ run start" http://localhost:3000 "npm --prefix cypress/ run cy:alltests"
             - cd cypress
             - echo "Merging reports"
+            # Merge reports from different spec files
             - npx mochawesome-merge cypress/results/*.json -o output.json
             - if [[ -e output.json ]]; then echo "filename output.json exists"; else echo "output.json does not exist"; fi
+            # Generate HTML report from merged JSON
             - npx marge output.json
             - if [[ -e mochawesome-report/output.html ]]; then echo "mochawesome-report/output.html exists"; else echo "mochawesome-report/output.html does not exist"; fi
+            # Generate email report template HTML file that will form the body of the email
             - node create-email-report
             - if [[ -e email-report.html ]]; then echo "email-report.html exists"; else echo "email-report.html does not exist"; fi
+            # Zip the full report directory
             - zip -r full-report.zip mochawesome-report/
             - if [[ -e full-report.zip ]]; then echo " full-report.zip exists"; else echo "full-report.zip does not exist"; fi
           after-script:
@@ -68,6 +77,7 @@ pipelines:
               ALERT_TYPE="error";
               echo "Tests failed but continuing with report generation";
               fi
+            # Use pre-built Atlassian email-notify pipe with the variables as below to send email with test results
             - pipe: atlassian/email-notify:0.13.2
               variables:
                 USERNAME: $SMTP_USERNAME
