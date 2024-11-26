@@ -27,7 +27,6 @@ pipelines:
           timeout:
           script:
             - echo "Current directory is $(pwd)"
-            - echo "Current shell  $0"
             - ls
             # Downgrade npm
             - npm install -g npm@9.6.7
@@ -37,6 +36,8 @@ pipelines:
             - mkdir segue-dir
             # enable pattern matching in bash
             - shopt -s extglob
+            # include hidden files such as .git (which here is apparently needed for husky)
+            - shopt -s dotglob
             # Copy the contents of the current directory (all of Segue) to the segue-dir directory
             - mv !(segue-dir) segue-dir/
             - echo "The contents of the current working directory are $(ls)"
