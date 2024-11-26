@@ -283,7 +283,7 @@ export const allocSeatsColDefs = [
 export const attachmentsColDefs = [
   {
     headerName: 'Title',
-    field: 'FileOriginalFilename',
+    field: 'OriginalFilename',
     editable: true,
     cellRenderer: DefaultTextRenderer,
     width: 600,
@@ -293,7 +293,7 @@ export const attachmentsColDefs = [
     field: 'FileUploadedDateTime',
     cellRenderer: DefaultTextRenderer,
     cellRendererParams: function (params) {
-      const updDate = new Date(params.data.FileUploadedDateTime);
+      const updDate = new Date(params.data.UploadDateTime);
       return {
         value: formatInputDate(updDate) + ' ' + getTimeFromDateAndTime(updDate),
       };
@@ -305,7 +305,7 @@ export const attachmentsColDefs = [
     field: 'FileDateTime',
     cellRenderer: DefaultTextRenderer,
     cellRendererParams: function (params) {
-      const fileDt = new Date(params.data.FileDateTime);
+      const fileDt = new Date(params.data.UploadDateTime);
       return {
         value: formatInputDate(fileDt) + ' ' + getTimeFromDateAndTime(fileDt),
       };

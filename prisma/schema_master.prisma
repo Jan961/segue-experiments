@@ -116,16 +116,18 @@ model DBSetting {
 }
 
 model File {
-  FileId               Int                 @id @default(autoincrement())
-  FileOriginalFilename String              @db.VarChar(200)
-  FileMediaType        String?             @db.VarChar(200)
-  FileLocation         String              @db.VarChar(512)
-  FileUploadDateTime   DateTime            @db.DateTime(0)
-  FileUploadAccUserId  Int
-  FileSizeBytes        BigInt?
-  Account              Account[]
-  AccountUser          AccountUser         @relation(fields: [FileUploadAccUserId], references: [AccUserId], map: "User_AttachedFile")
-  ProductionCompany    ProductionCompany[]
+  FileId                   Int                 @id @default(autoincrement())
+  FileOriginalFilename     String              @db.VarChar(200)
+  FileMediaType            String?             @db.VarChar(200)
+  FileLocation             String              @db.VarChar(512)
+  FileUploadDateTime       DateTime            @db.DateTime(0)
+  FileUploadAccUserId      Int
+  FileSizeBytes            BigInt?
+  FileCreatedDateTime      DateTime            @db.DateTime(0)
+  FileLastModifiedDateTime DateTime            @db.DateTime(0)
+  Account                  Account[]
+  AccountUser              AccountUser         @relation(fields: [FileUploadAccUserId], references: [AccUserId], map: "User_AttachedFile")
+  ProductionCompany        ProductionCompany[]
 
   @@index([FileUploadAccUserId], map: "User_AttachedFile")
 }
@@ -219,6 +221,14 @@ model Country {
   Currency            Currency? @relation(fields: [CountryCurrencyCode], references: [CurrencyCode], onDelete: Restrict, map: "Master_Currency_Country")
 
   @@index([CountryCurrencyCode], map: "Master_Currency_Country")
+}
+
+model PermissionTest {
+  PermissionId                 Int    @id @default(autoincrement())
+  PermissionParentPermissionId Int?
+  PermissionName               String @db.VarChar(50)
+  PermissionDescription        String @db.LongText
+  PermissionSeqNo              Int?   @db.TinyInt
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
