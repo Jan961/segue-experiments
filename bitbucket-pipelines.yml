@@ -26,6 +26,7 @@ pipelines:
             - nextcache
           timeout:
           script:
+            - set +e
             - echo "Current directory is $(pwd)"
             - ls
             # Downgrade npm
@@ -53,8 +54,13 @@ pipelines:
             - npm install
             - npx cypress install
             - cd ..
-            - DEBUG=start-server-and-test start-server-and-test "npm --prefix segue-dir/ run start" http://localhost:3000 "npm --prefix cypress/ run cy:alltests || true"
-
+            - DEBUG=start-server-and-test start-server-and-test "npm --prefix segue-dir/ run start" http://localhost:3000 "npm --prefix cypress/ run cy:alltests"
+            - EXIT_CODE=$?
+            - echo "Cypress exited with code $EXIT_CODE"
+            - if [ $EXIT_CODE -ne 0 ]; then
+                ALERT_TYPE="error"; else
+                ALERT_TYPE="success"; 
+              fi
 #            - npm --prefix segue-dir/ run start &
 #            - npx wait-on http://localhost:3000 &
 #            - npm --prefix cypress/ run cy:alltests
@@ -80,7 +86,7 @@ pipelines:
                 FROM: $SMTP_USERNAME
                 TO: jan@segue360.co.uk
                 HOST: 'smtp.gmail.com'
-                SUBJECT: "Segue Integration Tests for ${BITBUCKET_BRANCH}'
+                SUBJECT: '${ALERT_TYPE}: Segue Integration Tests for ${BITBUCKET_BRANCH}'
                 BODY_HTML: 'cypress/email-report.html'
                 ATTACHMENTS: 'cypress/full-report.zip'
           artifacts:
