@@ -27,6 +27,7 @@ pipelines:
           timeout:
           script:
             - echo "Current directory is $(pwd)"
+            - $ DEBUG=start-server-and-test
             - ls
             # Downgrade npm
             - npm install -g npm@9.6.7
@@ -53,9 +54,10 @@ pipelines:
             - npm install
             - npx cypress install
             - cd ..
-            - npm --prefix segue-dir/ run start &
-            - npx wait-on http://localhost:3000 &
-            - npm --prefix cypress/ run cy:alltests
+            - $ DEBUG=start-server-and-test start-server-and-test "npm --prefix segue/ run start" http://localhost:3000 "npm --prefix cypress/ run cy:alltests"
+#            - npm --prefix segue-dir/ run start &
+#            - npx wait-on http://localhost:3000 &
+#            - npm --prefix cypress/ run cy:alltests
             - cd cypress
             - echo "Merging reports"
             # Merge reports from different spec files
