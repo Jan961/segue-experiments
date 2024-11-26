@@ -53,7 +53,9 @@ pipelines:
             - npm install
             - npx cypress install
             - cd ..
-            - npx start-server-and-test "npm --prefix segue-dir/ run start" http://localhost:3000 "npm --prefix cypress/ run cy:alltests"
+            - npm npm --prefix segue-dir/ run start &
+            - npx wait-on http://localhost:3000
+            - npm --prefix cypress/ run cy:alltests"
             - cd cypress
             - echo "Merging reports"
             # Merge reports from different spec files
