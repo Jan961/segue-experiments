@@ -46,7 +46,6 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
   const [bookingIdVal, setBookingIdVal] = useState(null);
   const [allocatedRow, setAllocatedRow] = useState(null);
   const [dataAvailable, setDataAvailable] = useState<boolean>(false);
-  const [tableHeight, setTableHeight] = useState(100);
   const [allocType, setAllocType] = useState('new');
   const textAreaRef = useRef(null);
   const bookings = useRecoilValue(bookingJumpState);
@@ -57,8 +56,9 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
 
   const gridOptions = {
     getRowId: (data) => {
-      return data.data.date + '-' + data.data.time;
+      return data.data.Id;
     },
+    suppressHorizontalScroll: true,
   };
 
   useImperativeHandle(ref, () => ({
@@ -87,6 +87,8 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
     try {
       const { data: promData } = await axios.get(`/api/marketing/promoter-holds/${bookingId}`);
 
+      console.log(promData);
+
       if ((promData.allocations && Array.isArray(promData.allocations)) || Array.isArray(promData.holds)) {
         setHoldList(promData.holds);
         setAllocRows(
@@ -99,9 +101,6 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
             };
           }),
         );
-
-        // process the available seats data
-        setTableHeight(120 * promData.allocations.length);
 
         setIsLoading(false);
       }
@@ -370,7 +369,7 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
             rowData={allocRows}
             styleProps={styleProps}
             columnDefs={allocSeatsColDefs}
-            tableHeight={tableHeight}
+            tableHeight={440}
             onRowDoubleClicked={triggerEdit}
             testId="tableAllocSeats"
           />
