@@ -127,13 +127,11 @@ const SalesEntryFilters: React.FC<Props> = ({ onDateChanged }) => {
   }, [productionId]);
 
   useEffect(() => {
-    try {
+    if (Array.isArray(tourWeeks) && tourWeeks.length > 0) {
       const selectedTourIndex = tourWeeks.findIndex((week) => week.selected === true);
       if (selectedTourIndex !== -1) {
         setSelectedTourWeek(tourWeeks[selectedTourIndex].value);
       }
-    } catch (error) {
-      console.log(error);
     }
   }, [tourWeeks]);
 
@@ -157,7 +155,7 @@ const SalesEntryFilters: React.FC<Props> = ({ onDateChanged }) => {
             </div>
 
             <Select
-              onChange={(tourWeek) => setTourWeek(tourWeek.toString())}
+              onChange={setTourWeek}
               value={selectedTourWeek}
               disabled={!productionId}
               placeholder="Select Sales Week"
