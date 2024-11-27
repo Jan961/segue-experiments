@@ -329,7 +329,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
       const duration = frequency === 'W' ? 7 : 1;
       let salesDate = frequency === 'W' ? getMonday(inputDate) : inputDate;
 
-      if (previous) salesDate = getDateDaysAway(salesDate, duration);
+      if (previous) salesDate = getDateDaysAway(salesDate, -duration);
 
       const salesResponse = await axios.post('/api/marketing/sales/current/read', {
         bookingId,
