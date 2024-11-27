@@ -71,7 +71,6 @@ export default function DateRange({
   }, [value]);
 
   const handleDateFromChange = (v: UTCDate) => {
-    console.log('From: ', v);
     const updatedDate = { ...dateRange, from: v };
     if (checkDateRangeValid(updatedDate.from, updatedDate.to)) {
       setDateRange(updatedDate);
@@ -83,7 +82,6 @@ export default function DateRange({
   };
 
   const handleDateToChange = (v: UTCDate) => {
-    console.log('To: ', v);
     const updatedDate = { ...dateRange, to: v };
     if (checkDateRangeValid(updatedDate.from, updatedDate.to)) {
       setDateRange(updatedDate);

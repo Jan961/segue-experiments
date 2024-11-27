@@ -117,7 +117,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         endDate &&
         bvBarringStartDate &&
         bvBarringEndDate &&
-        // checkDateOverlap(givenStartDate, givenEndDate, new Date(bvBarringStartDate), new Date(bvBarringEndDate));
         checkDateOverlap(
           { fromDate: givenStartDate, toDate: givenEndDate },
           { fromDate: bvBarringStartDate, toDate: bvBarringEndDate },
