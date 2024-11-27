@@ -1,5 +1,6 @@
 import ExcelJS from 'exceljs';
 import getPrismaClient from 'lib/prisma';
+import { Performance } from 'prisma/generated/prisma-client';
 import {
   COLOR_HEXCODE,
   colorCell,
@@ -12,20 +13,18 @@ import { makeRowTextBoldAndAllignLeft } from './promoter-holds';
 import { convertToPDF } from 'utils/report';
 import { addBorderToAllCells } from 'utils/export';
 import { bookingStatusMap } from 'config/bookings';
-import { parseISO, differenceInDays } from 'date-fns';
+import { add, parseISO, differenceInDays } from 'date-fns';
 import {
   calculateWeekNumber,
   dateTimeToTime,
   formatDate,
   getDateDaysAway,
   newDate,
-  safeDate,
   timeFormat,
 } from 'services/dateService';
 import { PerformanceInfo } from 'services/reports/schedule-report';
 import { sum } from 'radash';
 import { getProductionWithContent } from 'services/productionService';
-import { UTCDate } from '@date-fns/utc';
 
 type SCHEDULE_VIEW = {
   ProductionId: number;
@@ -57,11 +56,11 @@ const addHeaderWithFilters = (worksheet, { title, from, to, status }) => {
   worksheet.addRow([title]);
   worksheet.addRow([]);
   if (from) {
-    worksheet.addRow([`Start Date: ${formatDate(safeDate(from), 'yyyy-MM-dd')}`]);
+    worksheet.addRow([`Start Date: ${formatDate(from, 'yyyy-MM-dd')}`]);
     headerRowsLength++;
   }
   if (to) {
-    worksheet.addRow([`End Date: ${formatDate(safeDate(to), 'yyyy-MM-dd')}`]);
+    worksheet.addRow([`End Date: ${formatDate(to, 'yyyy-MM-dd')}`]);
     headerRowsLength++;
   }
   if (status) {
@@ -98,72 +97,58 @@ const handler = async (req, res) => {
     res.status(400).json({ err: 'Prameters missing' });
   }
 
-  const formatedFromDate = safeDate(from);
-  const formatedToDate = safeDate(to);
+  const formatedFromDate = new Date(from);
+  const formatedToDate = new Date(to);
   try {
     const prisma = await getPrismaClient(req);
     // Construct the Prisma query
-    const data = await prisma.scheduleView
-      .findMany({
-        where: {
-          AND: [
-            {
-              EntryDate: {
-                gte: formatedFromDate,
-                lte: formatedToDate,
-              },
+    const data = await prisma.scheduleView.findMany({
+      where: {
+        AND: [
+          {
+            EntryDate: {
+              gte: formatedFromDate,
+              lte: formatedToDate,
             },
-            {
-              ProductionId,
-            },
-            status && status !== 'all'
-              ? {
-                  EntryStatusCode: status,
-                }
-              : {},
-          ],
-        },
-        orderBy: {
-          EntryDate: 'asc',
-        },
-      })
-      .then((res) => {
-        return res.map((e) => ({
-          ...e,
-          EntryDate: new UTCDate(e.EntryDate),
-          ProductionStartDate: new UTCDate(e.ProductionStartDate),
-          ProductionEndDate: new UTCDate(e.ProductionEndDate),
-        }));
-      });
+          },
+          {
+            ProductionId,
+          },
+          status && status !== 'all'
+            ? {
+                EntryStatusCode: status,
+              }
+            : {},
+        ],
+      },
+      orderBy: {
+        EntryDate: 'asc',
+      },
+    });
 
     const bookingIdPerformanceMap: Record<number, PerformanceInfo[]> = {};
     const bookingIdList: number[] =
       data.map((entry) => (entry.EntryType === 'Booking' ? entry.EntryId : null)).filter((id) => id) || [];
 
-    const performances = await prisma.performance
-      .findMany({
-        where: {
-          BookingId: {
-            in: bookingIdList,
-          },
+    const performances: Performance[] = await prisma.performance.findMany({
+      where: {
+        BookingId: {
+          in: bookingIdList,
         },
-      })
-      .then((res) => {
-        const r = res.map((e) => ({ ...e, Date: new UTCDate(e.Date), Time: new UTCDate(e.Time) }));
-        return r;
-      });
+      },
+    });
 
     let maxNumOfPerformances = 0;
     performances.forEach((performance) => {
       const { Id, BookingId, Time, Date } = performance;
-      const formattedDate = formatDate(Date, 'yyyy-MM-dd');
+      const formattedDate = formatDate(Date.getTime(), 'yyyy-MM-dd');
       const key = `${BookingId}/${formattedDate}`;
       if (!bookingIdPerformanceMap[key]) {
         bookingIdPerformanceMap[key] = [];
       }
       bookingIdPerformanceMap[key].push({
         performanceId: Id,
-        performanceTime: dateTimeToTime(Time) || null,
+        performanceTime: Time ? dateTimeToTime(Time.getTime()) : null,
         performanceDate: Date ? Date.toISOString() : null,
       });
       if (bookingIdPerformanceMap[key].length > maxNumOfPerformances) {
@@ -174,9 +159,9 @@ const handler = async (req, res) => {
     const workbook = new ExcelJS.Workbook();
     const formattedData = data.map((x) => ({
       ...x,
-      EntryDate: formatDate(x.EntryDate, 'yyyy-MM-dd'),
-      ProductionStartDate: formatDate(x.ProductionStartDate, 'yyyy-MM-dd'),
-      ProductionEndDate: formatDate(x.ProductionEndDate, 'yyyy-MM-dd'),
+      EntryDate: formatDate(x.EntryDate.getTime(), 'yyyy-MM-dd'),
+      ProductionStartDate: formatDate(x.ProductionStartDate.getTime(), 'yyyy-MM-dd'),
+      ProductionEndDate: formatDate(x.ProductionEndDate.getTime(), 'yyyy-MM-dd'),
     }));
 
     const worksheet = workbook.addWorksheet('Travel Summary', {
@@ -255,11 +240,15 @@ const handler = async (req, res) => {
     for (let i = 1; i <= daysDiff; i++) {
       lastWeekMetaInfo = { ...lastWeekMetaInfo, weekTotalPrinted: false };
       const weekDay = formatDate(getDateDaysAway(from, i - 1), 'eeee');
-      const nextDate = getDateDaysAway(from, i);
-      const dateInIncomingFormat = getDateDaysAway(from, i - 1);
-      const formattedDate = formatDate(dateInIncomingFormat, 'yyyy-MM-dd');
+      const nextDate = add(parseISO(from), { days: i });
+      const dateInIncomingFormat = add(parseISO(from), { days: i - 1 });
+      const formattedDate = formatDate(dateInIncomingFormat.getTime(), 'yyyy-MM-dd');
       const key = getKey({ FullProductionCode, ShowName, EntryDate: formattedDate });
-      const nextDayKey = getKey({ FullProductionCode, ShowName, EntryDate: formatDate(nextDate, 'yyyy-MM-dd') });
+      const nextDayKey = getKey({
+        FullProductionCode,
+        ShowName,
+        EntryDate: formatDate(nextDate.getTime(), 'yyyy-MM-dd'),
+      });
       const value: SCHEDULE_VIEW = map[key];
       const nextDayValue: SCHEDULE_VIEW = map[nextDayKey];
       const isOtherDay = [
@@ -273,8 +262,12 @@ const handler = async (req, res) => {
       const isCancelled = value?.EntryStatusCode === 'X';
       const isSuspended = value?.EntryStatusCode === 'S';
       if (!value) {
-        const weekNumber = calculateWeekNumber(ProductionStartDate, dateInIncomingFormat);
-        worksheet.addRow([weekDay.substring(0, 3), formatDate(dateInIncomingFormat, 'dd/MM/yy'), `${weekNumber}`]);
+        const weekNumber = calculateWeekNumber(newDate(ProductionStartDate.getTime()), dateInIncomingFormat.getTime());
+        worksheet.addRow([
+          weekDay.substring(0, 3),
+          formatDate(dateInIncomingFormat.getTime(), 'dd/MM/yy'),
+          `${weekNumber}`,
+        ]);
         colorTextAndBGCell({
           worksheet,
           row: rowNo + 1,
@@ -304,7 +297,7 @@ const handler = async (req, res) => {
         const dayType = isOtherDay ? EntryType : !isCancelled || !isSuspended ? 'Performance' : '';
         let row: (string | number)[] = [
           weekDay.substring(0, 3),
-          formatDate(dateInIncomingFormat, 'dd/MM/yy'),
+          formatDate(dateInIncomingFormat.getTime(), 'dd/MM/yy'),
           `${ProductionWeekNum}`,
           EntryName || '',
           Location || '',

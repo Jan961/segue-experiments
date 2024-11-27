@@ -42,7 +42,7 @@ import {
   defaultTechProvision,
 } from '../utils';
 import { dealMemoInitialState } from 'state/contracts/contractsFilterState';
-import { dateTimeToTime, getDateWithOffset, newDate } from 'services/dateService';
+import { dateTimeToTime, disectTime, getDateWithOffset, newDate, safeDate } from 'services/dateService';
 import StandardSeatKillsTable, { SeatKillRow } from '../table/StandardSeatKillsTable';
 import LoadingOverlay from 'components/core-ui-lib/LoadingOverlay';
 import { CustomOption } from 'components/core-ui-lib/Table/renderers/SelectCellRenderer';
@@ -210,9 +210,10 @@ export const EditDealMemoContractModal = ({
     if (isNullOrUndefined(demoModalData.TechArrivalTime)) {
       techArrivalTime.setHours(9);
     } else {
-      const timeArrive = demoModalData.TechArrivalTime;
-      techArrivalTime.setHours(timeArrive.getHours());
-      techArrivalTime.setMinutes(timeArrive.getMinutes());
+      const timeArrive = safeDate(demoModalData.TechArrivalTime).toISOString();
+      const time = disectTime(timeArrive.split('T')[1]);
+      techArrivalTime.setHours(time.h);
+      techArrivalTime.setMinutes(time.m);
     }
 
     setFormData({

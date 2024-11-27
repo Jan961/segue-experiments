@@ -35,10 +35,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       await prisma.$queryRaw`SELECT * from ProductionSummaryView where ProductionId=${ProductionId}`;
     const production = productionView?.[0];
     const prodCode = data?.[0]?.FullProductionCode;
-    const productionEndDate = newDate(production.ProductionEndDate);
-    const rehearsalStartDate = newDate(production.RehearsalStartDate);
-    const numberOfWeeks = getDifferenceInWeeks(productionEndDate, rehearsalStartDate);
-    const numberOfDays = getDifferenceInDays(productionEndDate, rehearsalStartDate) + 1;
+    const productionEndDate = newDate(production.ProductionEndDate.getTime());
+    const rehearsalStartDate = newDate(production.RehearsalStartDate.getTime());
+    const numberOfWeeks = getDifferenceInWeeks(rehearsalStartDate, productionEndDate);
+    const numberOfDays = getDifferenceInDays(rehearsalStartDate, productionEndDate) + 1;
     const workingDays = numberOfDays - numberOfWeeks;
     const pencilledBookings = sum(
       productionSummary

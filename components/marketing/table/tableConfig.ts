@@ -36,7 +36,7 @@ export const activityColDefs = (
     headerName: 'Date',
     field: 'actDate',
     cellRenderer: function (params) {
-      return isValid(params.data.actDate) ? formatInputDate(params.data.actDate) : '';
+      return params.data.actDate ? formatInputDate(params.data.actDate) : '';
     },
     cellStyle: {
       paddingLeft: '8px',
@@ -139,7 +139,7 @@ export const contactNoteColDefs = (updateContactNote, userList) => [
     headerName: 'Date',
     field: 'ContactDate',
     cellRenderer: function (params) {
-      return isValid(params.data.ContactDate) ? formatInputDate(params.data.ContactDate) : '';
+      return params.data.ContactDate ? formatInputDate(params.data.ContactDate) : '';
     },
     cellStyle: {
       paddingLeft: '8px',

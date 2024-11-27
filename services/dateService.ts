@@ -27,7 +27,13 @@ const YEAR_CONSTANT = 2000;
 export type Locale = 'UK' | 'US';
 
 // Disect the time string into hours, minutes and seconds
-const disectTime = (time: string) => {
+/**
+ * Return a time in hours, minutes and seconds.
+ *
+ * @param {string} time - A time string in the format HH:mm:ss
+ * @returns {{h: number, m: number, s: number}} Returns a the hours, minutes and seconds of a time string
+ */
+export const disectTime = (time: string): { h: number; m: number; s: number } => {
   if (!time) {
     return { h: 0, m: 0, s: 0 };
   }
@@ -389,6 +395,26 @@ export const addOneMonth = (date: UTCDate | string | number, locale?: Locale): U
 };
 
 /**
+ * Returns a time string fomatted HH:mm from a dateTime
+ *
+ * @param {UTCDate | string | number} date - The date to add 1 month to.
+ * @param {Locale?} locale - The locale value of the inputted date.
+ * @returns {string} Returns a time string in format HH:mm
+ */
+export const getTimeFormattedFromDateTime = (date: number | UTCDate | string, locale?: Locale): string => {
+  if (!date) {
+    return null;
+  }
+  const d = safeDate(date, locale);
+  if (!isValid(d)) {
+    return null;
+  }
+  const t = d.toISOString().split('T');
+  const ft = disectTime(t[1]);
+  return `${ft.h.toString().padStart(2, '0')}:${ft.m.toString().padStart(2, '0')}`;
+};
+
+/**
  * Format a given number into 'HH:mm'.
  *
  * @param {number} mins - The date of the week to get the Monday of.
@@ -593,7 +619,6 @@ export const getDateTime = (date: string | UTCDate | number, time: string, local
     return null;
   }
   const d = getKey(date, locale);
-  console.log(d);
   const dSplit = d.split('-');
   const tSplit = disectTime(time);
   if (!dSplit) {
@@ -604,7 +629,8 @@ export const getDateTime = (date: string | UTCDate | number, time: string, local
 };
 
 /**
- * Get the difference between dates by days.
+ * Get the difference between dates by days.#
+ * Subtract toDate - fromDate.
  *
  * @param {UTCDate | string | number} fromDate - The date to start counting from.
  * @param {UTCDate | string | number} toDate - The date to count to.

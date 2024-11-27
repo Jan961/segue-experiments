@@ -120,7 +120,7 @@ export const assignBackgroundColor = ({
     colorCell({ worksheet, row, col, argbColor: COLOR_HEXCODE.YELLOW });
   }
 
-  if (isBefore(simpleToDateMDY(Date), simpleToDateMDY(SetProductionWeekDate))) {
+  if (isBefore(newDate(Date), simpleToDateMDY(SetProductionWeekDate))) {
     colorCell({ worksheet, row, col, argbColor: COLOR_HEXCODE.BLUE });
   }
 

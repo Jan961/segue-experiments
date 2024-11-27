@@ -122,7 +122,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
       setActTypeList(actTypes);
 
       if (data && Array.isArray(data.activities) && data.activities.length > 0 && Array.isArray(data.activityTypes)) {
-        const sortedActivities = data.activities.sort((a, b) => newDate(a.Date).getTime() - newDate(b.Date).getTime());
+        const sortedActivities = data.activities.sort((a, b) => a.Date - b.Date);
 
         const tempRows = sortedActivities.map((act) => ({
           actName: act.Name,
@@ -307,9 +307,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
         const activityData = [...actRowData, newRow];
 
         // re sort the rows to ensure the new field is put in the correct place chronologically
-        const sortedActivities = activityData.sort(
-          (a, b) => newDate(a.actDate).getTime() - newDate(b.actDate).getTime(),
-        );
+        const sortedActivities = activityData.sort((a, b) => a.actDate - b.actDate);
 
         setActRowData(sortedActivities);
         calculateActivityTotals(sortedActivities);
@@ -336,7 +334,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
           newRows[rowIndex] = updatedRow;
 
           // re sort the rows to ensure the new field is put in the correct place chronologically
-          const sortedActivities = newRows.sort((a, b) => newDate(a.actDate).getTime() - newDate(b.actDate).getTime());
+          const sortedActivities = newRows.sort((a, b) => a.actDate - b.actDate);
 
           calculateActivityTotals(sortedActivities);
           setActRowData(sortedActivities);

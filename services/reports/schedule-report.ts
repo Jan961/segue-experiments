@@ -128,7 +128,7 @@ export const getSheduleReport = async ({ from, to, status, ProductionId }, req: 
   }));
   const { ShowName, FullProductionCode, ProductionStartDate, ProductionEndDate } = data[0];
   const map = formattedData.reduce((acc, x) => ({ ...acc, [getKey(x)]: x }), {});
-  const daysDiff = getDifferenceInDays(to || ProductionEndDate, from || ProductionStartDate);
+  const daysDiff = getDifferenceInDays(from || ProductionStartDate, to || ProductionEndDate);
   let prevProductionWeekNum = '';
   let lastWeekMetaInfo = {
     weekTotalPrinted: false,
@@ -144,7 +144,7 @@ export const getSheduleReport = async ({ from, to, status, ProductionId }, req: 
   for (let i = 1; i <= daysDiff; i++) {
     lastWeekMetaInfo = { ...lastWeekMetaInfo, weekTotalPrinted: false };
     const weekDay = formatDate(getDateDaysAway(from || ProductionStartDate, i - 1), 'dddd');
-    const dateInIncomingFormat = getDateDaysAway(from || ProductionStartDate, i - 1);
+    const dateInIncomingFormat = formatDate(getDateDaysAway(from || ProductionStartDate, i - 1), 'yyy-MM-dd');
     const key = getKey({ FullProductionCode, ShowName, EntryDate: dateInIncomingFormat });
     const value = map[key];
     const isOtherDay = [

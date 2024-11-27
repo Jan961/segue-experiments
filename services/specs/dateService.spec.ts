@@ -460,6 +460,8 @@ describe.each([
   [{ fromDate: '2024-10-15', toDate: '2024-10-20' }, 5],
   [{ fromDate: '15/10/24', toDate: '2024-10-20', fromLocale: 'UK' }, 5],
   [{ fromDate: '15/10/24', toDate: '10/20/24', fromLocale: 'UK', toLocale: 'US' }, 5],
+  [{ fromDate: '2024-10-15', toDate: '2024-10-30' }, 15],
+  [{ fromDate: '2024-10-15', toDate: '2024-10-29' }, 14],
 ])('getDifferenceInDays', (input: { fromDate; toDate; fromLocale: Locale; toLocale: Locale }, expected) => {
   test(`Expect ${input.fromDate} to ${input.toDate} to be ${expected}`, () => {
     expect(getDifferenceInDays(input.fromDate, input.toDate, input.fromLocale, input.toLocale)).toStrictEqual(expected);
@@ -471,6 +473,8 @@ describe.each([
   [{ fromDate: '2024-10-15', toDate: '2024-10-30' }, 2],
   [{ fromDate: '15/10/24', toDate: '2024-10-30', fromLocale: 'UK' }, 2],
   [{ fromDate: '15/10/24', toDate: '10/30/24', fromLocale: 'UK', toLocale: 'US' }, 2],
+  [{ fromDate: '2024-11-13', toDate: '2024-11-30' }, 2],
+  [{ fromDate: '2024-10-15', toDate: '2024-10-29' }, 2],
 ])('getDifferenceInWeeks', (input: { fromDate; toDate; fromLocale: Locale; toLocale: Locale }, expected) => {
   test(`Expect ${input.fromDate} to ${input.toDate} to be ${expected}`, () => {
     expect(getDifferenceInWeeks(input.fromDate, input.toDate, input.fromLocale, input.toLocale)).toStrictEqual(

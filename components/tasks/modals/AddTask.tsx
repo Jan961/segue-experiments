@@ -75,7 +75,7 @@ const DEFAULT_MASTER_TASK: Partial<MasterTask> & {
   Progress: 0,
   DueDate: '',
   ProductionId: 0,
-  TaskCompletedDate: '',
+  TaskCompletedDate: null,
 };
 
 const AddTask = ({

@@ -15,16 +15,8 @@ import { bookingStatusMap } from 'config/bookings';
 import { addBorderToAllCells } from 'utils/export';
 import { PerformanceInfo, SCHEDULE_VIEW, getSheduleReport } from 'services/reports/schedule-report';
 import { sum } from 'radash';
-import {
-  areDatesSame,
-  dateTimeToTime,
-  formatDate,
-  getDateDaysAway,
-  getDifferenceInDays,
-  newDate,
-  timeFormat,
-} from 'services/dateService';
-import { UTCDate } from '@date-fns/utc';
+import { formatDate, getDateDaysAway, getTimeFormattedFromDateTime, newDate, timeFormat } from 'services/dateService';
+import { differenceInDays, isSameDay } from 'date-fns';
 
 const makeRowBold = ({ worksheet, row }: { worksheet: any; row: number }) => {
   worksheet.getRow(row).font = { bold: true };
@@ -56,70 +48,53 @@ const handler = async (req, res) => {
       return;
     }
 
-    const formatedFromDate = newDate(from);
-    const formatedToDate = newDate(to);
+    const formatedFromDate = new Date(from);
+    const formatedToDate = new Date(to);
 
     if (!ProductionId) {
       throw new Error('Params are missing');
     }
 
     // Construct the Prisma query
-    const data = await prisma.scheduleView
-      .findMany({
-        where: {
-          AND: [
-            from && to
-              ? {
-                  EntryDate: {
-                    gte: formatedFromDate,
-                    lte: formatedToDate,
-                  },
-                }
-              : {},
-            ProductionId
-              ? {
-                  ProductionId,
-                }
-              : {},
-            status && status !== 'all'
-              ? {
-                  EntryStatusCode: status,
-                }
-              : {},
-          ],
-        },
-        orderBy: {
-          EntryDate: 'asc',
-        },
-      })
-      .then((res) =>
-        res.map((x) => ({
-          ...x,
-          EntryDate: new UTCDate(x.EntryDate),
-          ProductionStartDate: new UTCDate(x.ProductionStartDate),
-          ProductionEndDate: new UTCDate(x.ProductionEndDate),
-        })),
-      );
+    const data = await prisma.scheduleView.findMany({
+      where: {
+        AND: [
+          from && to
+            ? {
+                EntryDate: {
+                  gte: formatedFromDate,
+                  lte: formatedToDate,
+                },
+              }
+            : {},
+          ProductionId
+            ? {
+                ProductionId,
+              }
+            : {},
+          status && status !== 'all'
+            ? {
+                EntryStatusCode: status,
+              }
+            : {},
+        ],
+      },
+      orderBy: {
+        EntryDate: 'asc',
+      },
+    });
 
     const bookingIdPerformanceMap: Record<number, PerformanceInfo[]> = {};
     const bookingIdList: number[] =
       data.map((entry) => (entry.EntryType === 'Booking' ? entry.EntryId : null)).filter((id) => id) || [];
 
-    const performances: Performance[] = await prisma.performance
-      .findMany({
-        where: {
-          BookingId: {
-            in: bookingIdList,
-          },
+    const performances: Performance[] = await prisma.performance.findMany({
+      where: {
+        BookingId: {
+          in: bookingIdList,
         },
-      })
-      .then((res) =>
-        res.map((x) => ({
-          ...x,
-          Time: new UTCDate(x.Time),
-          Date: new UTCDate(x.Date),
-        })),
-      );
+      },
+    });
 
     performances.forEach((performance) => {
       const { Id, BookingId, Time, Date } = performance;
@@ -130,7 +105,7 @@ const handler = async (req, res) => {
 
       bookingIdPerformanceMap[BookingId].push({
         performanceId: Id,
-        performanceTime: Time ? dateTimeToTime(Time.toISOString()) : null,
+        performanceTime: Time ? getTimeFormattedFromDateTime(Time.getTime()) : null,
         performanceDate: Date ? Date.toISOString() : null,
       });
     });
@@ -138,9 +113,9 @@ const handler = async (req, res) => {
     const workbook = new ExcelJS.Workbook();
     const formattedData = data.map((x) => ({
       ...x,
-      EntryDate: formatDate(x.EntryDate, 'yyyy-MM-dd'),
-      ProductionStartDate: formatDate(x.ProductionStartDate, 'yyyy-MM-dd'),
-      ProductionEndDate: formatDate(x.ProductionEndDate, 'yyyy-MM-dd'),
+      EntryDate: formatDate(x.EntryDate.getTime(), 'yyyy-MM-dd'),
+      ProductionStartDate: formatDate(x.ProductionStartDate.getTime(), 'yyyy-MM-dd'),
+      ProductionEndDate: formatDate(x.ProductionEndDate.getTime(), 'yyyy-MM-dd'),
     }));
 
     const worksheet = workbook.addWorksheet('Tour Schedule', {
@@ -162,15 +137,15 @@ const handler = async (req, res) => {
     const title = `${FullProductionCode} ${ShowName} Tour Schedule - ${formatDate(newDate(), 'dd.MM.yy')}`;
     let headerRowsLength = 4;
     worksheet.addRow([title]);
-    worksheet.addRow([`Exported: ${formatDate(newDate(), 'dd/MM/yy [at] HH:mm')} - Layout: Standard`]);
+    worksheet.addRow([`Exported: ${formatDate(newDate(), 'dd/MM/yy H:mm')} - Layout: Standard`]);
 
     if (from) {
-      worksheet.addRow([`Start Date: ${formatDate(formatedFromDate, 'yyyy-MM-dd')}`]);
+      worksheet.addRow([`Start Date: ${formatDate(formatedFromDate.getTime(), 'yyyy-MM-dd')}`]);
       headerRowsLength++;
     }
 
     if (to) {
-      worksheet.addRow([`End Date: ${formatDate(formatedToDate, 'yyyy-MM-dd')}`]);
+      worksheet.addRow([`End Date: ${formatDate(formatedToDate.getTime(), 'yyyy-MM-dd')}`]);
       headerRowsLength++;
     }
 
@@ -190,7 +165,7 @@ const handler = async (req, res) => {
       'DAY TYPE',
       'STATUS',
       'CAPACITY',
-      '/DAY',
+      'DAY',
       'TIME',
       'TIME',
       'MILES',
@@ -199,7 +174,7 @@ const handler = async (req, res) => {
     worksheet.addRow([]);
 
     const map: { [key: string]: SCHEDULE_VIEW } = formattedData.reduce((acc, x) => ({ ...acc, [getKey(x)]: x }), {});
-    const daysDiff = getDifferenceInDays(to, from);
+    const daysDiff = differenceInDays(to, from); // tt
     let rowNo = 8;
     let prevProductionWeekNum = '';
     let lastWeekMetaInfo = {
@@ -215,7 +190,7 @@ const handler = async (req, res) => {
 
     for (let i = 1; i <= daysDiff; i++) {
       lastWeekMetaInfo = { ...lastWeekMetaInfo, weekTotalPrinted: false };
-      const weekDay = formatDate(getDateDaysAway(from, i - 1), 'dddd');
+      const weekDay = formatDate(getDateDaysAway(from, i - 1), 'eeee');
       const dateInIncomingFormat = getDateDaysAway(from, i - 1);
       const nextDateIncomingFormat = getDateDaysAway(from, i);
       const key = getKey({ FullProductionCode, ShowName, EntryDate: formatDate(dateInIncomingFormat, 'yyyy-MM-dd') });
@@ -266,7 +241,7 @@ const handler = async (req, res) => {
         const formattedTime = TimeMins ? timeFormat(Number(TimeMins)) : '';
         const performances = bookingIdPerformanceMap[EntryId];
         const performancesOnThisDay = performances?.filter?.((performance) =>
-          areDatesSame(performance.performanceDate, dateInIncomingFormat),
+          isSameDay(newDate(performance.performanceDate).getTime(), dateInIncomingFormat),
         );
         prevProductionWeekNum = ProductionWeekNum ? String(ProductionWeekNum) : prevProductionWeekNum;
         let row = [
