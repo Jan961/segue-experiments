@@ -1,10 +1,12 @@
 import { SwitchBoardItem } from 'components/global/SwitchBoardItem';
+import { SwitchBoardSkeletonGrid } from 'components/global/SwitchBoardItemSkeletonLoader';
 import useStrings from 'hooks/useStrings';
 import { useRecoilValue } from 'recoil';
-import { accessHome } from 'state/account/selectors/permissionSelector';
+import { accessHome, isPermissionsInitialised } from 'state/account/selectors/permissionSelector';
 
 export const Switchboard = () => {
   const permissions = useRecoilValue(accessHome);
+  const isInitialised = useRecoilValue(isPermissionsInitialised);
   const getStrings = useStrings();
 
   const links = [
@@ -72,6 +74,9 @@ export const Switchboard = () => {
     },
   ];
 
+  if (!isInitialised) {
+    return <SwitchBoardSkeletonGrid count={5} />;
+  }
   return (
     <ul
       data-testid="dashboard-tiles"
