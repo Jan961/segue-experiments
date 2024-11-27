@@ -3,7 +3,7 @@ image: atlassian/default-image:2
 
 options:
   docker: true
-  size: 4x
+  size: 2x
 pipelines:
 
   custom:
@@ -56,12 +56,12 @@ pipelines:
             - npm install
             - npx cypress install
             - cd ..
-            - set +e # Disable exit on error - cypress exists with non-zero code if even one tests fails
+            - set +e # Disable exit on error - cypress breaks if any of the tests fail
             - DEBUG=start-server-and-test start-server-and-test "npm --prefix segue-dir/ run start" http://localhost:3000 "npm --prefix cypress/ run cy:alltests"
             - EXIT_CODE=$?
             - echo "Cypress exited with code $EXIT_CODE"
             - if [ $EXIT_CODE -ne 0 ]; then
-                ALERT_TYPE="error"; else
+                ALERT_TYPE="fail"; else
                 ALERT_TYPE="success"; 
               fi
             - set -e # Re-enable exit on error for the rest of the script
