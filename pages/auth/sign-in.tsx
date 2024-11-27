@@ -2,7 +2,7 @@ import { Button, Icon, Label, PasswordInput, Select, TextInput, Tooltip } from '
 import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 import { calibri } from 'lib/fonts';
-import { useSignIn, useUser } from '@clerk/nextjs';
+import { useSession, useSignIn, useUser } from '@clerk/nextjs';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import axios from 'axios';
@@ -21,7 +21,8 @@ const SignIn = () => {
   const { setUserPermissions } = usePermissions();
   const { isLoaded, signIn, setActive } = useSignIn();
   const { signOut, navigateToHome } = useAuth();
-  const { user } = useUser();
+  const { isSignedIn, user } = useUser();
+  const { session } = useSession();
   const [isBusy, setIsBusy] = useState(false);
   const [error, setError] = useState('');
   const [validationError, setValidationError] = useState(null);
@@ -29,12 +30,14 @@ const SignIn = () => {
   const [accounts, setAccounts] = useState([]);
   const router = useRouter();
   const sessionId = useRef(null);
+
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loginDetails, setLoginDetails] = useState({
     email: '',
     password: '',
     company: '',
     pin: '',
+    permissions: [],
   });
 
   const handleLoginDetailsChange = (e) => {
@@ -90,7 +93,7 @@ const SignIn = () => {
           const formattedErrors = error.inner.reduce((acc, err) => {
             return {
               ...acc,
-              [err.path]: acc[err.path] ? [...acc[err.path], err.errors[0]] : [err.errors[0]],
+              [err.path]: acc[err.path] ? [...acc[err.path], err.message[0]] : [err.message[0]],
             };
           }, {});
           setValidationError(formattedErrors);
@@ -135,10 +138,11 @@ const SignIn = () => {
         organisationId: loginDetails.company,
       });
       if (data.isValid) {
-        await setActive({ session: sessionId.current, organization: loginDetails.company });
+        if (!session) {
+          await setActive({ session: sessionId.current });
+        }
         const permissions = data.permissions;
-        setUserPermissions(loginDetails.company, permissions);
-        navigateToHome();
+        setLoginDetails((prev) => ({ ...prev, permissions }));
       } else {
         setError('Invalid Pin');
       }
@@ -147,7 +151,7 @@ const SignIn = () => {
         const formattedErrors = error.inner.reduce((acc, err) => {
           return {
             ...acc,
-            [err.path]: acc[err.path] ? [...acc[err.path], err.errors[0]] : [err.errors[0]],
+            [err.path]: acc[err.path] ? [...acc[err.path], err.message[0]] : [err.message[0]],
           };
         }, {});
         setValidationError(formattedErrors);
@@ -166,12 +170,23 @@ const SignIn = () => {
       await signOut();
       setShowLogout(false);
       setIsAuthenticated(false);
-      setLoginDetails({ email: '', password: '', company: '', pin: '' });
+      setLoginDetails({ email: '', password: '', company: '', pin: '', permissions: [] });
       router.replace(router.asPath);
     } catch (err) {
       console.error(err);
     }
   };
+
+  useEffect(() => {
+    const setDataForSignedInUser = async (organisationId, permissions) => {
+      await setUserPermissions(organisationId, permissions);
+      navigateToHome();
+    };
+
+    if (isSignedIn && loginDetails.company && !isNullOrEmpty(loginDetails.permissions)) {
+      setDataForSignedInUser(loginDetails.company, loginDetails.permissions);
+    }
+  }, [isSignedIn, loginDetails]);
 
   useEffect(() => {
     if (router?.query.selectAccount && user) {

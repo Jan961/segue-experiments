@@ -12,7 +12,7 @@ import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import { CustomOption } from 'components/core-ui-lib/Table/renderers/SelectCellRenderer';
 import classNames from 'classnames';
 import axios from 'axios';
-import { SEND_ACCOUNT_PIN_TEMPLATE } from 'config/global';
+import { NEW_USER_PIN_EMAIL } from 'config/global';
 import { notify } from 'components/core-ui-lib/Notifications';
 
 type UserDetails = {
@@ -253,7 +253,7 @@ const AdEditUser = ({
     try {
       await axios.post('/api/email/send', {
         to: selectedUser.email,
-        templateName: SEND_ACCOUNT_PIN_TEMPLATE,
+        templateName: NEW_USER_PIN_EMAIL,
         data: { AccountPin: accountPIN },
       });
       notify.success("PIN Sent to user's Email");

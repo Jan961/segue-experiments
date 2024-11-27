@@ -15,6 +15,8 @@ import { notify } from 'components/core-ui-lib';
 import { getCountriesAsSelectOptions, getCurrenciesAsSelectOptions } from 'services/globalService';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import LoadingOverlay from 'components/core-ui-lib/LoadingOverlay';
+import useAuth from 'hooks/useAuth';
+import Head from 'next/head';
 
 export const getServerSideProps: GetServerSideProps = async () => {
   const planColors = ['#41a29a', '#0093c0', '#7b568d'];
@@ -70,6 +72,7 @@ const DEFAULT_ACCOUNT_DETAILS = {
 };
 export type AccountDetails = typeof DEFAULT_ACCOUNT_DETAILS;
 const ACCOUNT_CREATION_FAILED_ERROR = 'Error creating new account';
+
 const NewAccount = ({
   plans,
   currencies = [],
@@ -80,23 +83,29 @@ const NewAccount = ({
   currencies: SelectOption[];
   countries: SelectOption[];
 }) => {
+  const [error, setError] = useState('');
   const stripe = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
   const [accountDetails, setAccountDetails] = useState<Account>(DEFAULT_ACCOUNT_DETAILS);
   const [subcriptionDetails, seSubscriptionDetails] = useState<Plan>(null);
   const [loading, setLoading] = useState(false);
+  const { getSignUpUrl } = useAuth();
 
   const handleSaveAccountDetails = async (onSaveSuccess: () => void) => {
+    setError('');
     setLoading(true);
     try {
-      const { data } = await axios.post(
-        `/api/account/${accountDetails.accountId ? 'update' : 'create'}`,
-        accountDetails,
-      );
+      const signUpUrl = getSignUpUrl();
+      const { data } = await axios.post(`/api/account/${accountDetails.accountId ? 'update' : 'create'}`, {
+        account: accountDetails,
+        signUpUrl,
+      });
       setAccountDetails(data);
 
       onSaveSuccess();
     } catch (error) {
-      console.error(error);
+      if (error?.response?.status === 400) {
+        setError(error.response?.data?.error);
+      }
       notify.error(ACCOUNT_CREATION_FAILED_ERROR);
     } finally {
       setLoading(false);
@@ -105,6 +114,12 @@ const NewAccount = ({
 
   return (
     <div className={`${calibri.variable} font-calibri background-gradient flex flex-col py-20  px-6`}>
+      <Head>
+        <title>New Account | Segue</title>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+        <link rel="icon" href="/segue/segue_mini_icon.png" type="image/png" />
+      </Head>
       <Image className="mx-auto mb-2" height={160} width={310} src="/segue/segue_logo_full.png" alt="Segue" />
       <Wizard>
         <AccountDetailsForm
@@ -113,6 +128,7 @@ const NewAccount = ({
           accountDetails={accountDetails}
           onChange={setAccountDetails}
           onSave={handleSaveAccountDetails}
+          error={error}
         />
         {/* Subscription plans and Payment details have been temporarily disabled */}
         {false && <SubscriptionPlans plans={plans} onSubmit={seSubscriptionDetails} />}
