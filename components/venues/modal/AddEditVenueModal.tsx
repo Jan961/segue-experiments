@@ -103,14 +103,14 @@ export default function AddEditVenueModal({
         const addressUrl = `${process.env.NEXT_PUBLIC_ADDRESS_LOOKUP_URL_START}${query}${process.env.NEXT_PUBLIC_ADDRESS_LOOKUP_URL_END}`;
         const response = await fetch(addressUrl, { method: 'GET' });
         const result = await response.json();
-        const { primaryWhat3Words } = formData;
+        const { what3WordsEntrance } = formData;
         if (result.length === 0) {
           //  address failed then they entered what3words
-          if (primaryWhat3Words !== '' && addressAttempted) {
-            if (primaryWhat3Words.split('.').length === 3) {
+          if (what3WordsEntrance !== '' && addressAttempted) {
+            if (what3WordsEntrance.split('.').length === 3) {
               const wordsResponse = await axios.get('/api/address/check-what-three-words', {
                 params: {
-                  searchTerm: primaryWhat3Words,
+                  searchTerm: what3WordsEntrance,
                 },
               });
               const { status, data } = wordsResponse;
@@ -122,9 +122,9 @@ export default function AddEditVenueModal({
               setAddressAttempted(false);
               setShowAddressMessage('UsingWhat3Words');
             }
-          } else if (primaryWhat3Words === '' && addressAttempted) {
+          } else if (what3WordsEntrance === '' && addressAttempted) {
             setShowAddressMessage('NotUsingWhat3Words');
-          } else if (primaryWhat3Words !== '') {
+          } else if (what3WordsEntrance !== '') {
             // request server to check if the what3words is valid, if so then confirm usage
           } else {
             setShowAddressMessage('NotFound');

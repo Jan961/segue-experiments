@@ -54,7 +54,6 @@ model Booking {
   DateBlock                  DateBlock             @relation(fields: [DateBlockId], references: [Id], onDelete: Cascade, map: "DateBlock_Booking")
   Venue                      Venue                 @relation(fields: [VenueId], references: [Id], map: "Venue_Booking")
   BookingActivity            BookingActivity[]
-  BookingAttachedFile        BookingAttachedFile[]
   BookingContactNotes        BookingContactNotes[]
   BookingFile                BookingFile[]
   Contract                   Contract?
@@ -167,6 +166,7 @@ model Venue {
   FamilyId                                                  Int?                         @map("VenueVenueFamilyId")
   AddressStageDoorW3W                                       String?                      @map("VenueAddressStageDoorW3W") @db.VarChar(70)
   AddressLoadingW3W                                         String?                      @map("VenueAddressLoadingW3W") @db.VarChar(70)
+  AddressEntranceW3W                                        String?                      @map("VenueAddressEntranceW3W") @db.VarChar(70)
   ACCContract                                               ACCContract[]
   BookedVenueHistory                                        BookedVenueHistory[]
   Booking                                                   Booking[]
@@ -453,20 +453,6 @@ model SetHold {
   @@unique([SetHoldId, SetHoldHoldTypeId], map: "SetHold_SetHoldType_unique")
   @@index([SetHoldHoldTypeId], map: "HoldType_SetHold")
   @@index([SetHoldSetId], map: "SalesSet_SetHold_idx")
-}
-
-model BookingAttachedFile {
-  FileId               Int      @id @default(autoincrement())
-  FileBookingBookingId Int
-  FileDescription      String   @db.VarChar(100)
-  FileOriginalFilename String   @db.VarChar(100)
-  FileDateTime         DateTime @db.DateTime(0)
-  FileUploadedDateTime DateTime @db.DateTime(0)
-  FileContent          Bytes?
-  FileURL              String?  @db.VarChar(255)
-  Booking              Booking  @relation(fields: [FileBookingBookingId], references: [Id], onDelete: Cascade, map: "Booking_BookingAttachedFile")
-
-  @@index([FileBookingBookingId], map: "Booking_BookingAttachedFile")
 }
 
 model VenueAddress {
@@ -804,6 +790,7 @@ model File {
   UploadUserId     Int              @map("FileUploadUserId")
   SizeBytes        BigInt?          @map("FileSizeBytes")
   ACCContract      ACCContract[]
+  BookingFile      BookingFile[]
   Production       Production[]
   ProductionFile   ProductionFile[]
   Template         Template[]
@@ -1201,9 +1188,11 @@ model BookingFile {
   BookingFileFileId      Int
   BookingFileType        String? @db.VarChar(20)
   BookingFileDescription String? @db.VarChar(80)
+  File                   File    @relation(fields: [BookingFileFileId], references: [Id], onDelete: Cascade, map: "BookingFile_ibfk_1")
   Booking                Booking @relation(fields: [BookingFileBookingId], references: [Id], onDelete: Cascade, map: "Booking_BookingFile")
 
   @@index([BookingFileBookingId], map: "Booking_BookingFile")
+  @@index([BookingFileFileId], map: "BookingFileFileId")
 }
 
 model VenueVenue {
@@ -1526,7 +1515,7 @@ view SalesView {
   SetSingleSeats              Boolean?  @default(dbgenerated("(b'0')")) @db.Bit(1)
   SetBrochureReleased         Boolean?  @default(dbgenerated("(b'0')")) @db.Bit(1)
   SetIsCopy                   Boolean?  @default(dbgenerated("(b'0')")) @db.Bit(1)
-  SaleTypeName                String   @db.VarChar(45)
+  SaleTypeName                String    @db.VarChar(45)
   Seats                       Decimal?  @db.Decimal(32, 0)
   Value                       Decimal?  @db.Decimal(32, 2)
   TotalCapacity               Float?
@@ -1606,4 +1595,43 @@ view VenueVenueTravelView {
   TimeMins Int? @map("VVTimeMins") @db.UnsignedSmallInt
 
   @@id([Venue1Id, Venue2Id])
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view ProductionSummarySubView {
+  ProductionId                Int      @default(0)
+  DateTypeAffectsAvailability Boolean? @db.Bit(1)
+  DateTypeId                  Int?
+  DateTypeSeqNo               Decimal? @db.Decimal(3, 0)
+  Item                        String   @default("") @db.VarChar(30)
+  StatusCode                  String   @default("") @db.Char(1)
+  Count                       BigInt   @default(0)
+
+  @@ignore
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view BarringSubView {
+  VenueId       Int    @default(0)
+  BarredVenueId Int    @default(0)
+  BarType       String @default("") @db.VarChar(7)
+
+  @@ignore
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view ScheduledDatesSubView {
+  DateBlockId Int      @default(0)
+  EntryId     Int      @default(0)
+  EntryDate   DateTime @default(dbgenerated("('0000-00-00')")) @db.Date
+  EntrySource String   @default("") @db.VarChar(13)
+  EntryName   String?  @db.VarChar(255)
+  TownName    String?  @db.VarChar(50)
+  StatusCode  String   @default("") @db.Char(1)
+  PencilNum   Int?
+  VenueSeats  Float?
+  Mileage     Decimal? @db.Decimal(5, 0)
+  TimeMins    Decimal? @db.Decimal(5, 0)
+
+  @@ignore
 }
