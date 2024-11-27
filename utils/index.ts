@@ -271,7 +271,7 @@ export const replaceTemplateString = (template, data, prefix = '{', suffix = '}'
   });
 };
 
-export const getFastHostServerUrl = (endpoint: string) => {
+export const getSegueMicroServiceUrl = (endpoint: string) => {
   const currEnvironment: string = isUndefined(process.env.DEPLOYMENT_ENV)
     ? process.env.NEXT_PUBLIC_DEPLOYMENT_ENV
     : process.env.DEPLOYMENT_ENV;
