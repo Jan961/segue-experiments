@@ -11,7 +11,7 @@ RUN apt-get update \
 && apt-get install -y libreoffice \
 && apt-get install -y openssl \
 && apt-get clean \
-&& npm install --global pm2 --ignore-scripts
+&& npm install --global --ignore-scripts pm2
 
 
 # Set working directory
