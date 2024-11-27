@@ -56,7 +56,7 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
 
   const gridOptions = {
     getRowId: (data) => {
-      return data.data.Id;
+      return data?.data?.Id;
     },
     suppressHorizontalScroll: true,
   };
