@@ -88,7 +88,7 @@ pipelines:
                 HOST: 'smtp.gmail.com'
                 SUBJECT: '${ALERT_TYPE}: Segue Integration Tests for ${BITBUCKET_BRANCH}'
                 BODY_HTML: 'email-report.html'
-                ATTACHMENTS: 'full-report.zip'
+#                ATTACHMENTS: 'full-report.zip'
                 DEBUG: 'true'
           artifacts:
             - cypress/mochawesome-report
