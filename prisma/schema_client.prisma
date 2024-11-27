@@ -179,8 +179,8 @@ model Venue {
   VenueBarredVenue_VenueBarredVenue_VBVVenueIdToVenue       VenueBarredVenue[]           @relation("VenueBarredVenue_VBVVenueIdToVenue")
   VenueContact                                              VenueContact[]
   VenueFile                                                 VenueFile[]
-  VenueVenue_VenueVenue_VVVenue1IdToVenue                   VenueVenue[]                 @relation("VenueVenue_VVVenue1IdToVenue")
-  VenueVenue_VenueVenue_VVVenue2IdToVenue                   VenueVenue[]                 @relation("VenueVenue_VVVenue2IdToVenue")
+  VenueVenue1                                               VenueVenue[]                 @relation("VenueVenue_VVVenue1IdToVenue")
+  VenueVenue2                                               VenueVenue[]                 @relation("VenueVenue_VVVenue2IdToVenue")
 
   @@index([FamilyId], map: "Venue_VenueFamily")
 }
@@ -1196,16 +1196,16 @@ model BookingFile {
 }
 
 model VenueVenue {
-  VVVenue1Id                         Int
-  VVVenue2Id                         Int
-  VVMileage                          Decimal @db.Decimal(5, 1)
-  VVTimeMins                         Int?
-  Venue_VenueVenue_VVVenue1IdToVenue Venue   @relation("VenueVenue_VVVenue1IdToVenue", fields: [VVVenue1Id], references: [Id], onDelete: Cascade, map: "Venue_VenueVenue1")
-  Venue_VenueVenue_VVVenue2IdToVenue Venue   @relation("VenueVenue_VVVenue2IdToVenue", fields: [VVVenue2Id], references: [Id], onDelete: Cascade, map: "Venue_VenueVenue2")
+  Venue1Id Int     @map("VVVenue1Id")
+  Venue2Id Int     @map("VVVenue2Id")
+  Mileage  Decimal @map("VVMileage") @db.Decimal(5, 1)
+  TimeMins Int?    @map("VVTimeMins")
+  Venue1   Venue   @relation("VenueVenue_VVVenue1IdToVenue", fields: [Venue1Id], references: [Id], onDelete: Cascade, map: "Venue_VenueVenue1")
+  Venue2   Venue   @relation("VenueVenue_VVVenue2IdToVenue", fields: [Venue2Id], references: [Id], onDelete: Cascade, map: "Venue_VenueVenue2")
 
-  @@id([VVVenue1Id, VVVenue2Id])
-  @@index([VVVenue1Id], map: "Venue_VenueVenue1_idx")
-  @@index([VVVenue2Id], map: "Venue_VenueVenue2_idx")
+  @@id([Venue1Id, Venue2Id])
+  @@index([Venue1Id], map: "Venue_VenueVenue1_idx")
+  @@index([Venue2Id], map: "Venue_VenueVenue2_idx")
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
