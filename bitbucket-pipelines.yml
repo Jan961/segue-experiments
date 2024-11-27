@@ -52,7 +52,7 @@ pipelines:
             - cd ..
             # Clone the Cypress repository into a dir at the same level as Segue
             - git clone git@bitbucket.org:segue-team/cypress.git && cd cypress
-             #git checkout staging
+            - git checkout staging
             - npm install
             - npx cypress install
             - cd ..
