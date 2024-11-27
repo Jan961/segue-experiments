@@ -2,6 +2,11 @@ ARG NODE_VERSION='18.20.4'
 ARG CHROME_VERSION='130.0.6723.69-1'
 
 FROM cypress/factory
+
+RUN addgroup -S nonroot \
+    && adduser -S nonroot -G nonroot
+
+USER nonroot
 RUN apt-get update \
 && apt-get install -y libreoffice \
 && apt-get install -y openssl \
