@@ -1,11 +1,12 @@
+import { UTCDate } from '@date-fns/utc';
 import { atom } from 'recoil';
 
 export type TasksFilterType = {
   production?: number;
   taskText?: string;
   status?: string;
-  startDueDate?: Date;
-  endDueDate?: Date;
+  startDueDate?: UTCDate;
+  endDueDate?: UTCDate;
   assignee?: number;
 };
 

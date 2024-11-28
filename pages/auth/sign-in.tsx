@@ -16,11 +16,13 @@ import { PIN_REGEX, SESSION_ALREADY_EXISTS } from 'utils/authUtils';
 import usePermissions from 'hooks/usePermissions';
 import useAuth from 'hooks/useAuth';
 import LoadingOverlay from 'components/core-ui-lib/LoadingOverlay';
+import useNavigation from 'hooks/useNavigation';
 
 const SignIn = () => {
   const { setUserPermissions } = usePermissions();
+  const { navigateToHome } = useNavigation();
   const { isLoaded, signIn, setActive } = useSignIn();
-  const { signOut, navigateToHome } = useAuth();
+  const { signOut } = useAuth();
   const { isSignedIn, user } = useUser();
   const { session } = useSession();
   const [isBusy, setIsBusy] = useState(false);
@@ -93,7 +95,7 @@ const SignIn = () => {
           const formattedErrors = error.inner.reduce((acc, err) => {
             return {
               ...acc,
-              [err.path]: acc[err.path] ? [...acc[err.path], err.errors[0]] : [err.errors[0]],
+              [err.path]: acc[err.path] ? [...acc[err.path], err.message[0]] : [err.message[0]],
             };
           }, {});
           setValidationError(formattedErrors);
@@ -151,7 +153,7 @@ const SignIn = () => {
         const formattedErrors = error.inner.reduce((acc, err) => {
           return {
             ...acc,
-            [err.path]: acc[err.path] ? [...acc[err.path], err.errors[0]] : [err.errors[0]],
+            [err.path]: acc[err.path] ? [...acc[err.path], err.message[0]] : [err.message[0]],
           };
         }, {});
         setValidationError(formattedErrors);

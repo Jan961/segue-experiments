@@ -4,18 +4,12 @@ import LoadingOverlay from '../core-ui-lib/LoadingOverlay';
 import { useRouter } from 'next/router';
 import axios from 'axios';
 import usePermissions from 'hooks/usePermissions';
-
-const publicPaths = [
-  '/account/sign-up',
-  '/access-denied',
-  '/auth/sign-in',
-  '/auth/sign-up',
-  '/auth/password-reset',
-  '/auth/user-created',
-];
+import { PUBLIC_PATH_URLS } from 'config/auth';
+import useNavigation from 'hooks/useNavigation';
 
 const PermissionsProvider = ({ children }: { children: React.ReactNode }) => {
   const { isSignedIn, user } = useUser();
+  const { navigateToSignIn } = useNavigation();
   const { setUserPermissions } = usePermissions();
   const router = useRouter();
 
@@ -29,17 +23,17 @@ const PermissionsProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   useEffect(() => {
-    if (!publicPaths.includes(router.pathname) && isSignedIn) {
+    if (!PUBLIC_PATH_URLS.includes(router.pathname) && isSignedIn) {
       const organisationId = user.unsafeMetadata.organisationId as string;
       if (!organisationId) {
-        router.push('/auth/sign-in');
+        navigateToSignIn();
       } else {
         fetchPermissions(organisationId);
       }
     }
   }, [isSignedIn]);
 
-  if (publicPaths.includes(router.pathname)) {
+  if (PUBLIC_PATH_URLS.includes(router.pathname)) {
     return <>{children}</>;
   }
 
