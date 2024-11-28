@@ -72,11 +72,13 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         const Code = (await getMaxProductionTaskCode(ProductionId, req)) + index + 1;
         const taskCompleteBys = {
           StartByIsPostProduction:
-            task.StartByWeekNum < 0 ? false : task.StartByWeekNum > calculateWeekNumber(prodStartDate, prodEndDate),
+            task.StartByWeekNum < 0
+              ? false
+              : task.StartByWeekNum > calculateWeekNumber(prodStartDate.getTime(), prodEndDate.getTime()),
           CompleteByIsPostProduction:
             task.CompleteByWeekNum < 0
               ? false
-              : task.CompleteByWeekNum > calculateWeekNumber(prodStartDate, prodEndDate),
+              : task.CompleteByWeekNum > calculateWeekNumber(prodStartDate.getTime(), prodEndDate.getTime()),
         };
         const filteredTask = omit(task, [
           'Id',
