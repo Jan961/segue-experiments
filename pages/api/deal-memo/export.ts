@@ -7,7 +7,7 @@ import { createResolver } from 'easy-template-x-angular-expressions';
 import { DealMemoHoldType, ProductionDTO } from 'interfaces';
 import {
   formatDecimalValue,
-  getFastHostServerUrl,
+  getSegueMicroServiceUrl,
   isNullOrEmpty,
   isNullOrUndefined,
   isUndefined,
@@ -124,7 +124,7 @@ const prepareFile = async (processedData, fileType: ExportType) => {
         convertFormData.append('token', String(tokenresponse.data.token));
         convertFormData.append('file', docx);
 
-        const docToPdfEndpoint = getFastHostServerUrl('/convertDocxToPDF');
+        const docToPdfEndpoint = getSegueMicroServiceUrl('/convertDocxToPDF');
 
         const response = await axios.post(docToPdfEndpoint, convertFormData, {
           headers: {

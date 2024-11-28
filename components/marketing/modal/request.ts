@@ -1,7 +1,6 @@
 import axios from 'axios';
 import { downloadFromContent } from 'components/bookings/modal/request';
-import { sub } from 'date-fns';
-import { getDateObject } from 'services/dateService';
+import { getDateDaysAway, getKey } from 'services/dateService';
 
 type ProductionWeek = {
   Id: number;
@@ -30,7 +29,7 @@ export const exportSalesSummaryReport = async ({
   format = 'excel',
 }) => {
   const toWeek = productionWeek?.split('T')?.[0];
-  const fromWeek = sub(getDateObject(toWeek), { weeks: numberOfWeeks })?.toISOString?.()?.split('T')?.[0];
+  const fromWeek = getKey(getDateDaysAway(productionWeek, -(numberOfWeeks - 1) * 7));
   const payload = {
     productionId: parseInt(production, 10),
     exportedAt: new Date().toISOString(),

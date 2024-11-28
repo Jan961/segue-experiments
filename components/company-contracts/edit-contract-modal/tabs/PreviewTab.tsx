@@ -5,7 +5,7 @@ import { populateDOCX } from '../docx-template/populateDOCX';
 import { TemplateFormRowPopulated } from 'components/company-contracts/types';
 import { IPerson, IScheduleDay } from 'components/contracts/types';
 import { ProductionDTO } from 'interfaces';
-import { getFastHostServerUrl } from 'utils';
+import { getSegueMicroServiceUrl } from 'utils';
 
 interface PreviewTabProps {
   templateFile: File;
@@ -43,7 +43,7 @@ export const PreviewTab = ({
       convertFormData.append('token', String(tokenresponse.data.token));
       convertFormData.append('file', populatedDOCX);
 
-      const docToPdfEndpoint = getFastHostServerUrl('/convertDocxToPDF');
+      const docToPdfEndpoint = getSegueMicroServiceUrl('/convertDocxToPDF');
 
       const response = await axios.post(docToPdfEndpoint, convertFormData, {
         headers: {

@@ -19,7 +19,7 @@ import {
   flattenHierarchicalOptions,
   tidyString,
   replaceTemplateString,
-  getFastHostServerUrl,
+  getSegueMicroServiceUrl,
 } from 'utils';
 
 describe('Tests for utility functions', () => {
@@ -687,8 +687,8 @@ describe('replaceTemplateString', () => {
   });
 });
 
-// ------------------------ getFastHostServerUrl ------------------------
-describe('getFastHostServerUrl', () => {
+// ------------------------ getSegueMicroServiceUrl ------------------------
+describe('getSegueMicroServiceUrl', () => {
   const originalEnv = process.env;
 
   beforeEach(() => {
@@ -705,42 +705,42 @@ describe('getFastHostServerUrl', () => {
   it('should return the correct URL for production environment', () => {
     process.env.DEPLOYMENT_ENV = 'prod';
     const endpoint = '/convertDocxToPDF';
-    const result = getFastHostServerUrl(endpoint);
+    const result = getSegueMicroServiceUrl(endpoint);
     expect(result).toBe('https://barringclause.co.uk/api/convertDocxToPDF');
   });
 
   it('should return the correct URL for development environment', () => {
     process.env.DEPLOYMENT_ENV = 'dev';
     const endpoint = '/convertDocxToPDF';
-    const result = getFastHostServerUrl(endpoint);
+    const result = getSegueMicroServiceUrl(endpoint);
     expect(result).toBe('https://barringclause.co.uk/dev/api/convertDocxToPDF');
   });
 
   it('should return the correct URL for staging environment', () => {
     process.env.DEPLOYMENT_ENV = 'staging';
     const endpoint = '/convertDocxToPDF';
-    const result = getFastHostServerUrl(endpoint);
+    const result = getSegueMicroServiceUrl(endpoint);
     expect(result).toBe('https://barringclause.co.uk/staging/api/convertDocxToPDF');
   });
 
   it('should handle a different endpoint for production', () => {
     process.env.DEPLOYMENT_ENV = 'prod';
     const endpoint = '/addVenue';
-    const result = getFastHostServerUrl(endpoint);
+    const result = getSegueMicroServiceUrl(endpoint);
     expect(result).toBe('https://barringclause.co.uk/api/addVenue');
   });
 
   it('should handle a different endpoint for development', () => {
     process.env.DEPLOYMENT_ENV = 'dev';
     const endpoint = '/addVenue';
-    const result = getFastHostServerUrl(endpoint);
+    const result = getSegueMicroServiceUrl(endpoint);
     expect(result).toBe('https://barringclause.co.uk/dev/api/addVenue');
   });
 
   it('should handle a different endpoint for staging', () => {
     process.env.DEPLOYMENT_ENV = 'staging';
     const endpoint = '/addVenue';
-    const result = getFastHostServerUrl(endpoint);
+    const result = getSegueMicroServiceUrl(endpoint);
     expect(result).toBe('https://barringclause.co.uk/staging/api/addVenue');
   });
 
@@ -750,7 +750,7 @@ describe('getFastHostServerUrl', () => {
     const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
     const endpoint = '/convertDocxToPDF';
 
-    const result = getFastHostServerUrl(endpoint);
+    const result = getSegueMicroServiceUrl(endpoint);
 
     expect(result).toBeUndefined();
     expect(consoleSpy).toHaveBeenCalledWith(
@@ -765,7 +765,7 @@ describe('getFastHostServerUrl', () => {
     const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
     const endpoint = '/convertDocxToPDF';
 
-    const result = getFastHostServerUrl(endpoint);
+    const result = getSegueMicroServiceUrl(endpoint);
 
     expect(result).toBeUndefined();
     expect(consoleSpy).toHaveBeenCalledWith(

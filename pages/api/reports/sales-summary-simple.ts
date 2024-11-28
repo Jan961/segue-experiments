@@ -44,7 +44,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { ALIGNMENT, styleHeader } from './masterplan';
 import { currencyCodeToSymbolMap } from 'config/Reports';
 import { convertToPDF, getWeeksBetweenDates, sanitizeRowData } from 'utils/report';
-import { calculateWeekNumber, compareDatesWithoutTime, formatDate } from 'services/dateService';
+import { calculateWeekNumber, compareDatesWithoutTime, formatDate, getKey } from 'services/dateService';
 import { group, unique } from 'radash';
 import { addBorderToAllCells, getExportedAtTitle } from 'utils/export';
 import { SalesSummaryView, ScheduleView } from 'prisma/generated/prisma-client';
@@ -91,7 +91,7 @@ const transformSummaryRow = ({
   EntryName = '',
   Location = '',
 }) => ({
-  Day: EntryDate ? formatDate(new Date(EntryDate), 'eeee') : '',
+  Day: EntryDate ? formatDate(new Date(EntryDate).getTime(), 'eeee') : '',
   Week: formatWeek(ProductionWeekNum),
   Date: EntryDate,
   Town: Location,
@@ -130,7 +130,7 @@ const getGeneralSalesSummary = async (productionId: number) => {
   return data.reduce((summaryMap, salesSet) => {
     const key = getScheduleKey({
       FullProductionCode: salesSet.FullProductionCode,
-      BookingFirstDate: formatDate(salesSet.EntryDate, 'yyyy-MM-dd'),
+      BookingFirstDate: formatDate(salesSet.EntryDate.getTime(), 'yyyy-MM-dd'),
     });
     return {
       ...summaryMap,
@@ -150,7 +150,7 @@ const fetchProductionBookings = async (productionId: number): Promise<Production
     .map((entry) => {
       const key = getScheduleKey({
         FullProductionCode: entry.FullProductionCode,
-        BookingFirstDate: formatDate(entry.EntryDate, 'yyyy-MM-dd'),
+        BookingFirstDate: formatDate(entry.EntryDate.getTime(), 'yyyy-MM-dd'),
       });
       const sales = salesData[key] || {};
       return {
@@ -170,7 +170,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const bookings = await fetchProductionBookings(+productionId);
     const { StartDate, EndDate } = bookings?.[0] || {};
     const weeks: ProductionWeek[] = getWeeksBetweenDates(fromWeek, toWeek || EndDate).map((week) => {
-      const weekNum = calculateWeekNumber(new Date(StartDate), new Date(week.mondayDate));
+      const weekNum = calculateWeekNumber(new Date(StartDate).getTime(), new Date(week.mondayDate).getTime());
       return {
         weekNum,
         productionWeekNum: formatWeek(weekNum),
@@ -247,9 +247,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       Date: x.BookingFirstDate,
       Town: x.VenueTown,
       Venue: x.VenueName,
-      SetProductionWeekDate: x.SetProductionWeekDate
-        ? new Date(x.SetProductionWeekDate)?.toISOString()?.split('T')?.[0]
-        : '',
+      SetProductionWeekDate: x.SetProductionWeekDate ? getKey(x.SetProductionWeekDate) : '',
     }));
     const bookingSalesByWeek = group(
       finalFormattedValues,
@@ -385,7 +383,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
               });
             }
           }
-        } else if (compareDatesWithoutTime(booking.Date, headerWeekDates[i], '<')) {
+        } else if (compareDatesWithoutTime(booking.Date.getTime(), headerWeekDates[i], '<')) {
           totalObjToPush = {
             Value: booking.FormattedFinalFiguresValue,
             ConversionRate: booking.ConversionRate,
@@ -463,7 +461,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           });
         } else {
           if (isCancelled || isSuspended) continue;
-          if (compareDatesWithoutTime(booking.Date, headerWeekDates[i], '<')) {
+          if (compareDatesWithoutTime(booking.Date.getTime(), headerWeekDates[i], '<')) {
             colorCell({ worksheet, row, col, argbColor: COLOR_HEXCODE.BLUE });
           }
           if (booking?.NotOnSaleDate && compareDatesWithoutTime(headerWeekDates[i], booking.NotOnSaleDate, '<=')) {

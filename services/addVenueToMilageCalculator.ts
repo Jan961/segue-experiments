@@ -1,6 +1,6 @@
 import { UiTransformedVenue } from 'utils/venue';
 import axios from 'axios';
-import { getFastHostServerUrl } from 'utils';
+import { getSegueMicroServiceUrl } from 'utils';
 
 export const addVenueToMilageCalculator = async (venueInfo: UiTransformedVenue) => {
   const {
@@ -13,7 +13,7 @@ export const addVenueToMilageCalculator = async (venueInfo: UiTransformedVenue) 
     primaryCoordinates,
   } = venueInfo;
 
-  const endpoint = getFastHostServerUrl('/addVenue');
+  const endpoint = getSegueMicroServiceUrl('/addVenue');
 
   await axios.post(endpoint, [
     {

@@ -1,6 +1,6 @@
 import React from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { format } from 'date-fns';
+import { isValid } from 'date-fns';
 import { yupResolver } from '@hookform/resolvers/yup';
 import axios from 'axios';
 import { formSchema } from './formYupValidation';
@@ -11,7 +11,7 @@ import { TextField } from './TextField';
 import { TimeRange } from './TimeRange';
 import { StyledTimeField } from './StyledTimeField';
 import { GetOutField } from './GetOutField';
-import { isValidDate, formatDuration, getDuration } from 'services/dateService';
+import { dateTimeToTime, formatDuration, formattedDateWithWeekDay, getDuration } from 'services/dateService';
 
 interface ReportFormProps {
   bookingId?: string;
@@ -31,7 +31,7 @@ const ReportForm = ({
   const { venue, town, performanceDate, performanceTime, csm, lighting, asm } = reportData ?? {};
 
   const formatPerformanceTime =
-    performanceTime !== undefined && isValidDate(performanceTime) ? format(new Date(performanceTime), 'HH:mm') : '';
+    performanceTime !== undefined && isValid(performanceTime) ? dateTimeToTime(performanceTime) : '';
   const {
     register,
     handleSubmit,
@@ -202,19 +202,15 @@ const ReportForm = ({
           <TextField
             label="Performance Date"
             value={
-              performanceDate !== undefined && isValidDate(performanceDate)
-                ? format(new Date(performanceDate), 'eee dd/MM/yyyy')
+              performanceDate !== undefined && isValid(performanceDate)
+                ? formattedDateWithWeekDay(performanceDate, 'Long')
                 : ''
             }
             disabled
           />
           <TextField
             label="Performance Time"
-            value={
-              performanceTime !== undefined && isValidDate(performanceTime)
-                ? format(new Date(performanceTime), 'HH:mm')
-                : ''
-            }
+            value={performanceTime !== undefined && isValid(performanceTime) ? dateTimeToTime(performanceTime) : ''}
             disabled
           />
           <TextField
