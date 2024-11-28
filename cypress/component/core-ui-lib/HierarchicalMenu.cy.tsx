@@ -159,5 +159,37 @@ describe('HierarchicalMenu Component', () => {
     cy.contains('Option 1').next().click();
     cy.contains('Option 1-1').next().click();
     cy.contains('Option 1-1-1').should('be.visible');
+
+    const labels = ['Option 1', 'Option 1-1', 'Option 1-1-1'];
+    cy.contains('Option 1')
+      .parent()
+      .parent()
+      .then(($parent) => {
+        const parentRect = $parent[0].getBoundingClientRect();
+
+        const elements = ['Option 1', 'Option 1-1', 'Option 1-1-1'];
+
+        elements.forEach((el) => {
+          it(`should ensure that "${el}" is not overflowing its parent`, () => {
+            // Select the element by its text content
+            cy.contains(el).then(($child) => {
+              // Get the parent element
+              cy.wrap($child)
+                .should('not.be.undefined')
+                .parent()
+                .then(($parent) => {
+                  const parentRect = $parent[0].getBoundingClientRect();
+                  const childRect = $child[0].getBoundingClientRect();
+
+                  // Assert that the child's edges are within the parent's edges
+                  expect(childRect.top).to.be.at.least(parentRect.top);
+                  expect(childRect.left).to.be.at.least(parentRect.left);
+                  expect(childRect.bottom).to.be.at.most(parentRect.bottom);
+                  expect(childRect.right).to.be.at.most(parentRect.right);
+                });
+            });
+          });
+        });
+      });
   });
 });
