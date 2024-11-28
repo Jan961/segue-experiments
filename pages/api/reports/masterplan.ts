@@ -1,10 +1,11 @@
 import ExcelJS from 'exceljs';
 import getPrismaClient from 'lib/prisma';
-import { add, parseISO, differenceInDays } from 'date-fns';
+import { differenceInDays } from 'date-fns';
 import { COLOR_HEXCODE, colorCell, colorTextAndBGCell, fillRowBGColorAndTextColor } from 'services/salesSummaryService';
-import { calculateWeekNumber, formatDate } from 'services/dateService';
+import { calculateWeekNumber, formatDate, getDateDaysAway, newDate } from 'services/dateService';
 import { convertToPDF } from 'utils/report';
 import { getExportedAtTitle } from 'utils/export';
+import { UTCDate } from '@date-fns/utc';
 
 type SCHEDULE_VIEW = {
   ProductionId: number;
@@ -109,17 +110,26 @@ const handler = async (req, res) => {
     }
 
     // Construct the Prisma query
-    const data = await prisma.scheduleView.findMany({
-      where: {
-        EntryDate: {
-          gte: formatedFromDate,
-          lte: formatedToDate,
+    const data = await prisma.scheduleView
+      .findMany({
+        where: {
+          EntryDate: {
+            gte: formatedFromDate,
+            lte: formatedToDate,
+          },
         },
-      },
-      orderBy: {
-        EntryDate: 'asc',
-      },
-    });
+        orderBy: {
+          EntryDate: 'asc',
+        },
+      })
+      .then((res) => {
+        return res.map((e) => ({
+          ...e,
+          EntryDate: new UTCDate(e.EntryDate),
+          ProductionStartDate: new UTCDate(e.ProductionStartDate),
+          ProductionEndDate: new UTCDate(e.ProductionEndDate),
+        }));
+      });
 
     const workbook = new ExcelJS.Workbook();
     const formattedData = data.map((x) => ({
@@ -180,7 +190,7 @@ const handler = async (req, res) => {
         if (!value) {
           return acc;
         }
-        const weekNo = calculateWeekNumber(new Date(value.ProductionStartDate), new Date(fromDate));
+        const weekNo = calculateWeekNumber(newDate(value.ProductionStartDate), newDate(fromDate));
         return {
           ...acc,
           [getShowAndProductionKey({ FullProductionCode, ShowName })]: weekNo,
@@ -222,8 +232,8 @@ const handler = async (req, res) => {
 
     let rowNo = 6;
     for (let i = 1; i <= daysDiff; i++) {
-      const weekDay = formatDate(add(parseISO(fromDate), { days: i - 1 }), 'eeee');
-      const dateInIncomingFormat = formatDate(add(new Date(fromDate), { days: i - 1 }), 'yyyy-MM-dd');
+      const weekDay = formatDate(getDateDaysAway(fromDate, i - 1), 'eeee');
+      const dateInIncomingFormat = formatDate(getDateDaysAway(fromDate, i - 1), 'yyyy-MM-dd');
       const date = formatDate(dateInIncomingFormat, 'dd/MM/yy');
       const values: string[] = distinctShowNames.map(({ FullProductionCode, ShowName }) => {
         const key = getKey({ FullProductionCode, ShowName, EntryDate: dateInIncomingFormat });

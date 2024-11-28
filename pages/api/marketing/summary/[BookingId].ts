@@ -2,7 +2,7 @@ import getPrismaClient from 'lib/prisma';
 import master from 'lib/prisma_master';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { PerformanceDTO } from 'interfaces';
-import { calculateWeekNumber } from 'services/dateService';
+import { calculateWeekNumber, newDate } from 'services/dateService';
 import { group } from 'radash';
 import { loggingService } from 'services/loggingService';
 import { getCurrencyCodeFromCountryId } from 'services/venueCurrencyService';
@@ -183,7 +183,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const totalSeats = Capacity * NumberOfPerformances;
     const grossProfit = avgTicketPrice === 0 ? 0 : avgTicketPrice * totalSeats;
     const seatsSalePercentage = (Number(seatsSoldTotal) / totalSeats) * 100;
-    const currentProductionWeekNum = calculateWeekNumber(new Date(), new Date(booking.FirstDate));
+    const currentProductionWeekNum = calculateWeekNumber(newDate(), newDate(booking.FirstDate));
 
     const result: SummaryResponseDTO = {
       Performances: performances,

@@ -2,12 +2,12 @@ import { AccountUser, User } from 'prisma/generated/prisma-master';
 import { objectify } from 'radash';
 import master from 'lib/prisma_master';
 import ExcelJS from 'exceljs';
-import { format } from 'date-fns';
 import { addWidthAsPerContent } from 'services/reportsService';
 import { COLOR_HEXCODE } from 'services/salesSummaryService';
 import { addBorderToAllCells } from 'utils/export';
 import { makeRowTextBoldAndAllignLeft } from 'pages/api/reports/promoter-holds';
 import { DateBlock } from 'prisma/generated/prisma-client';
+import { formatDate, newDate } from 'services/dateService';
 
 type Task = {
   Name: string;
@@ -29,7 +29,7 @@ type Task = {
   };
 };
 
-export const getExportedDate = () => format(new Date(), "dd/MM/yy 'at' HH:mm");
+export const getExportedDate = () => formatDate(newDate(), "dd/MM/yy 'at' HH:mm");
 export const getTaskStatusFromProgress = (progress: number) => {
   if (progress === 0) {
     return 'To Do';

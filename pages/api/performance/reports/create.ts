@@ -1,16 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import getPrismaClient from 'lib/prisma';
-import { dateStringToPerformancePair } from 'services/dateService';
+import { dateStringToPerformancePair, getDateTime } from 'services/dateService';
 import { Report } from 'types/report';
-import moment from 'moment';
-
-const getDateTime = (date: Date, time: string) => {
-  const [hours, minutes] = time.split(':');
-  return moment
-    .utc(date)
-    .set({ hour: parseInt(hours, 10), minute: parseInt(minutes, 10) })
-    .toDate();
-};
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {

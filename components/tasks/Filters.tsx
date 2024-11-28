@@ -11,6 +11,7 @@ import GlobalToolbar from 'components/toolbar';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import TaskReports from './modals/TaskReports';
 import { useEffect, useState } from 'react';
+import { UTCDate } from '@date-fns/utc';
 
 interface FiltersProps {
   usersList: SelectOption[];
@@ -24,7 +25,7 @@ const Filters = ({ usersList, handleShowTask }: FiltersProps) => {
     setFilter({ ...filter, [e.target.id]: e.target.value });
   };
 
-  const onDateChange = (change: { from: Date; to: Date }) => {
+  const onDateChange = (change: { from: UTCDate; to: UTCDate }) => {
     const { from: startDueDate, to: endDueDate } = change;
     setFilter({ ...filter, startDueDate, endDueDate });
   };
