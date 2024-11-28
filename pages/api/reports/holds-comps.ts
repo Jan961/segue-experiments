@@ -1,7 +1,6 @@
 import { BookingHoldCompsView } from 'prisma/generated/prisma-client';
 import ExcelJS from 'exceljs';
 import getPrismaClient from 'lib/prisma';
-import moment from 'moment';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { all } from 'radash';
 import { getProductionWithContent } from 'services/productionService';
@@ -10,6 +9,7 @@ import { COLOR_HEXCODE } from 'services/salesSummaryService';
 
 import { getExportedAtTitle } from 'utils/export';
 import { convertToPDF } from 'utils/report';
+import { formatDate } from 'services/dateService';
 
 enum HOLD_OR_COMP {
   HOLD = 'Hold',
@@ -256,7 +256,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         x.FullProductionCode,
         x.VenueCode,
         x.VenueName,
-        x.BookingFirstDate ? moment(x.BookingFirstDate).format('DD/MM/YY') : '',
+        x.BookingFirstDate ? formatDate(x.BookingFirstDate, 'dd/MM/yy') : '',
         '',
         '',
         'Capacity',

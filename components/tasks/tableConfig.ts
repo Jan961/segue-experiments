@@ -3,13 +3,13 @@ import NotesRenderer from 'components/tasks/NotesRenderer';
 import SelectCellRenderer from 'components/core-ui-lib/Table/renderers/SelectCellRenderer';
 import { tileColors } from 'config/global';
 import { TaskStatusLabelMap } from 'config/tasks';
-import { format } from 'date-fns';
 import getTaskDateStatusColor, { getWeekOptions } from 'utils/taskDate';
 import { calculateTaskStatus, generatePercentageOptions } from 'utils/tasks';
 import IconRenderer from 'components/bookings/table/IconRenderer';
 import MasterTaskNameRenderer from './modals/renderers/MasterTaskNameRenderer';
 import ButtonRenderer from '../core-ui-lib/Table/renderers/ButtonRenderer';
 import { isNullOrEmpty } from 'utils';
+import { formatDate } from 'services/dateService';
 
 export const styleProps = { headerColor: tileColors.tasks };
 
@@ -71,7 +71,7 @@ export const getColumnDefs = (usersList = [], production) => {
       field: 'StartDate',
       cellRenderer: DefaultCellRenderer,
       valueGetter: function (params) {
-        return params?.data?.StartDate && format(params?.data?.StartDate, 'dd/MM/yy');
+        return params?.data?.StartDate && formatDate(params?.data?.StartDate, 'dd/MM/yy');
       },
       width: 120,
       minWidth: 120,
@@ -103,7 +103,7 @@ export const getColumnDefs = (usersList = [], production) => {
         overflow: 'visible',
       },
       valueGetter: function (params) {
-        return params?.data?.CompleteDate && format(params.data.CompleteDate, 'dd/MM/yy');
+        return params?.data?.CompleteDate && formatDate(params.data.CompleteDate, 'dd/MM/yy');
       },
       width: 120,
       minWidth: 120,

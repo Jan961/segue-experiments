@@ -8,13 +8,14 @@ import Checkbox from 'components/core-ui-lib/Checkbox';
 import TextArea from 'components/core-ui-lib/TextArea/TextArea';
 import Button from 'components/core-ui-lib/Button';
 import { ActivityDTO } from 'interfaces';
-import { startOfDay } from 'date-fns';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import { hasActivityChanged } from '../utils';
 import { ConfDialogVariant } from 'components/core-ui-lib/ConfirmationDialog/ConfirmationDialog';
 import { checkDecimalStringFormat, isNull } from 'utils';
 import { useRecoilValue } from 'recoil';
 import { accessMarketingHome } from 'state/account/selectors/permissionSelector';
+import { UTCDate } from '@date-fns/utc';
+import { safeDate } from 'services/dateService';
 
 export type ActivityModalVariant = 'add' | 'edit' | 'delete';
 
@@ -48,9 +49,9 @@ export default function ActivityModal({
   const [visible, setVisible] = useState<boolean>(show);
   const [actName, setActName] = useState<string>(null);
   const [actType, setActType] = useState<number>(null);
-  const [actDate, setActDate] = useState<Date>(null);
+  const [actDate, setActDate] = useState<UTCDate>(null);
   const [actFollowUp, setActFollowUp] = useState<boolean>(false);
-  const [followUpDt, setFollowUpDt] = useState<Date>(null);
+  const [followUpDt, setFollowUpDt] = useState<UTCDate>(null);
   const [companyCost, setCompanyCost] = useState<string>();
   const [venueCost, setVenueCost] = useState<string>();
   const [actNotes, setActNotes] = useState<string>();
@@ -74,9 +75,9 @@ export default function ActivityModal({
     } else if (variant === 'edit') {
       setActName(data.Name);
       setActType(data.ActivityTypeId);
-      setActDate(!data.Date ? null : startOfDay(new Date(data.Date)));
+      setActDate(!data.Date ? null : safeDate(data.Date));
       setActFollowUp(data.FollowUpRequired);
-      setFollowUpDt(!data.DueByDate ? null : startOfDay(new Date(data.DueByDate)));
+      setFollowUpDt(!data.DueByDate ? null : safeDate(data.DueByDate));
       setCompanyCost(data.CompanyCost.toString());
       setVenueCost(data.VenueCost.toString());
       setActNotes(data.Notes);
@@ -96,11 +97,11 @@ export default function ActivityModal({
       BookingId: bookingId,
       CompanyCost: parseFloat(companyCost),
       VenueCost: parseFloat(venueCost),
-      Date: actDate === null ? null : startOfDay(new Date(actDate)),
+      Date: actDate === null ? null : actDate,
       FollowUpRequired: actFollowUp,
       Name: actName,
       Notes: actNotes,
-      DueByDate: actFollowUp ? null : !followUpDt ? null : startOfDay(new Date(followUpDt)),
+      DueByDate: actFollowUp ? null : !followUpDt ? null : followUpDt,
     };
 
     // only add iD if not adding
@@ -140,11 +141,11 @@ export default function ActivityModal({
         BookingId: bookingId,
         CompanyCost: parseFloat(companyCost),
         VenueCost: parseFloat(venueCost),
-        Date: !isNull(actDate) ? startOfDay(new Date(actDate)) : null,
+        Date: !isNull(actDate) ? actDate : null,
         FollowUpRequired: actFollowUp,
         Name: actName,
         Notes: actNotes,
-        DueByDate: actFollowUp ? (isNull(followUpDt) ? null : startOfDay(new Date(followUpDt))) : null,
+        DueByDate: actFollowUp ? (isNull(followUpDt) ? null : followUpDt) : null,
       };
 
       if (hasActivityChanged(data, changedRow)) {
