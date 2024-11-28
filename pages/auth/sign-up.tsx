@@ -168,8 +168,10 @@ const SignUp = () => {
       // Create the user within clerk
       await createNewUserWithClerk();
 
+      const signInUrl = getSignInUrl();
+
       // Create the user in our database
-      await axios.post('/api/user/create-admin-user', { user: accountDetails, accountUserOnly: false });
+      await axios.post('/api/user/create-admin-user', { signInUrl, user: accountDetails, accountUserOnly: false });
 
       router.push('/auth/user-created');
     } catch (error: any) {
@@ -202,6 +204,7 @@ const SignUp = () => {
       await signIn(accountDetails.email, accountDetails.password);
 
       const signInUrl = getSignInUrl();
+
       // Create the user in our database
       const { data } = await axios.post('/api/user/create-admin-user', {
         user: accountDetails,
