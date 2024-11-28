@@ -3,12 +3,13 @@ import { useEffect } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { contractsFilterState, intialContractsFilterState } from 'state/contracts/contractsFilterState';
 import { productionJumpState } from 'state/booking/productionJumpState';
+import { UTCDate } from '@date-fns/utc';
 
 export default function ContractsDateFilter() {
   const { selected: productionId } = useRecoilValue(productionJumpState);
   const [filter, setFilter] = useRecoilState(contractsFilterState);
   const { startDate, endDate } = filter || {};
-  const onChange = (change: { from: Date; to: Date }) => {
+  const onChange = (change: { from: UTCDate; to: UTCDate }) => {
     const { from: startDate, to: endDate } = change;
     setFilter({ ...filter, startDate, endDate });
   };
