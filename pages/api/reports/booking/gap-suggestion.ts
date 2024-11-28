@@ -4,7 +4,7 @@ import getPrismaClient from 'lib/prisma';
 import { GapSuggestionUnbalancedProps, VenueWithDistance } from 'services/booking/gapSuggestion/types';
 import { calculateGapSuggestions } from 'services/booking/gapSuggestion';
 import { addBorderToAllCells, getExportedAtTitle } from 'utils/export';
-import { formatDate } from 'services/dateService';
+import { formatDate, newDate } from 'services/dateService';
 import { COLOR_HEXCODE } from 'services/salesSummaryService';
 import { formatMinutes } from 'utils/booking';
 import { addWidthAsPerContent } from 'services/reportsService';
@@ -93,7 +93,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       prodCode: string;
       exportedAt: string;
     };
-    const filename = `Venue Gap Suggestions ${params.prodCode || ''} ${formatDate(new Date(), 'dd.MM.yy')}`;
+    const filename = `Venue Gap Suggestions ${params.prodCode || ''} ${formatDate(newDate(), 'dd.MM.yy')}`;
     // Get the gap suggestions data
     const result = await calculateGapSuggestions(prisma, omit(params, ['filteredVenueIds']));
     // Get all venue contacts at once

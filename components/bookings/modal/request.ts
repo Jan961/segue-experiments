@@ -1,6 +1,5 @@
 import axios, { AxiosResponseHeaders } from 'axios';
-import moment from 'moment';
-import { getMonday } from 'services/dateService';
+import { getMonday, newDate } from 'services/dateService';
 import { FilterState } from 'state/booking/filterState';
 
 export const downloadFromContent = (content: Blob, filename: string) => {
@@ -71,9 +70,9 @@ export const exportMasterplanReport = async (fromDate: string, toDate: string) =
   const response = await axios.post(
     '/api/reports/masterplan',
     {
-      fromDate: moment(getMonday(fromDate)),
-      toDate: moment(new Date(toDate)),
-      exportedAt: new Date().toISOString(),
+      fromDate: getMonday(fromDate),
+      toDate: newDate(toDate),
+      exportedAt: newDate().toISOString(),
     },
     { responseType: 'blob' },
   );

@@ -7,9 +7,14 @@ import { otherState } from '../otherState';
 import { venueState } from '../venueState';
 import { productionJumpState } from '../productionJumpState';
 import { objectify } from 'radash';
-import moment from 'moment';
 import { bookingRow, bookingStatusMap } from 'config/bookings';
-import { calculateWeekNumber, getKey, getArrayOfDatesBetween } from 'services/dateService';
+import {
+  calculateWeekNumber,
+  getKey,
+  getArrayOfDatesBetween,
+  newDate,
+  formattedDateWithWeekDay,
+} from 'services/dateService';
 import { performanceState } from '../performanceState';
 import BookingHelper from 'utils/booking';
 import { dateBlockState } from '../dateBlockState';
@@ -50,7 +55,7 @@ export const rowsSelector = selector({
       const { ProductionId, PrimaryDateBlock } = data;
       const production = productionDict[ProductionId] || {};
       const rowData = transformer(data);
-      const week = calculateWeekNumber(new Date(PrimaryDateBlock?.StartDate), new Date(date));
+      const week = calculateWeekNumber(newDate(PrimaryDateBlock?.StartDate), newDate(date));
       const otherDayType = dayTypes.find(({ Id }) => Id === data.DateTypeId)?.Name;
       const getValueForDayType = (value, type) => {
         if (!value) {
@@ -67,7 +72,7 @@ export const rowsSelector = selector({
         ...rowData,
         week,
         dateTime: date,
-        date: date ? moment(date).format('ddd DD/MM/YY') : '',
+        date: date ? formattedDateWithWeekDay(date, 'Short') : '',
         productionName: getProductionName(production),
         production: getProductionCode(production),
         productionId: ProductionId,
@@ -117,12 +122,12 @@ export const rowsSelector = selector({
         if (!production) {
           continue;
         }
-        const week = calculateWeekNumber(new Date(production?.StartDate), new Date(date)) || '';
+        const week = calculateWeekNumber(newDate(production?.StartDate), newDate(date)) || '';
         const emptyRow = {
           ...bookingRow,
           week,
-          date: moment(date).format('ddd DD/MM/YY'),
-          dateTime: new Date(date).toISOString(),
+          date: formattedDateWithWeekDay(date, 'Short'),
+          dateTime: newDate(date).toISOString(),
           production: production ? getProductionCode(production) : '',
           productionId: production?.Id,
           productionCode: production?.Code,
