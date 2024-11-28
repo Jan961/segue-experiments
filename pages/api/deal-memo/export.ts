@@ -5,7 +5,15 @@ import { days } from 'config/global';
 import { TemplateHandler } from 'easy-template-x';
 import { createResolver } from 'easy-template-x-angular-expressions';
 import { DealMemoHoldType, ProductionDTO } from 'interfaces';
-import { formatDecimalValue, isNullOrEmpty, isNullOrUndefined, isUndefined, numberToOrdinal, tidyString } from 'utils';
+import {
+  formatDecimalValue,
+  getSegueMicroServiceUrl,
+  isNullOrEmpty,
+  isNullOrUndefined,
+  isUndefined,
+  numberToOrdinal,
+  tidyString,
+} from 'utils';
 import { formatTemplateObj } from 'utils/templateExport';
 
 type ExportType = 'pdf' | 'docx';
@@ -116,7 +124,9 @@ const prepareFile = async (processedData, fileType: ExportType) => {
         convertFormData.append('token', String(tokenresponse.data.token));
         convertFormData.append('file', docx);
 
-        const response = await axios.post(process.env.NEXT_PUBLIC_DOC_TO_PDF_BASE_URL, convertFormData, {
+        const docToPdfEndpoint = getSegueMicroServiceUrl('/convertDocxToPDF');
+
+        const response = await axios.post(docToPdfEndpoint, convertFormData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },

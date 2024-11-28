@@ -1,14 +1,15 @@
 import { atom } from 'recoil';
 import { DealMemoContractFormData } from '../../interfaces/index';
+import { UTCDate } from '@date-fns/utc';
 export type TContractsFilterState = {
   contractText?: string;
   status?: string;
-  startDate?: Date;
-  endDate?: Date;
+  startDate?: UTCDate;
+  endDate?: UTCDate;
   person?: number;
   department?: number;
-  scheduleStartDate?: Date;
-  scheduleEndDate?: Date;
+  scheduleStartDate?: UTCDate;
+  scheduleEndDate?: UTCDate;
   dealMemoStatusDropDown?: string;
   contractStatusDropDown?: string;
   scrollToDate?: string;

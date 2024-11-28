@@ -11,7 +11,7 @@ import { bookingJumpState } from 'state/marketing/bookingJumpState';
 import MarketingButtons from './MarketingButtons';
 import formatInputDate from 'utils/dateInputFormat';
 import { reverseDate } from './utils';
-import { DATE_PATTERN, getWeekDayShort } from 'services/dateService';
+import { DATE_PATTERNS, getWeekDay } from 'services/dateService';
 import { currencyState } from 'state/global/currencyState';
 import axios from 'axios';
 import { LastPerfDate } from 'types/MarketingTypes';
@@ -45,14 +45,14 @@ const Filters = () => {
     const optWithRun = initialOptions.map((option) => {
       const lastDate = lastDates?.find((x) => x.BookingId === parseInt(option.value));
       if (lastDate !== undefined) {
-        const endDateDay = getWeekDayShort(lastDate.LastPerformanceDate);
+        const endDateDay = getWeekDay(lastDate.LastPerformanceDate, 'short');
         const endDateStr = formatInputDate(lastDate.LastPerformanceDate);
         if (option.date === endDateStr) {
           return option;
         } else {
           return {
             ...option,
-            text: option.text.replace(DATE_PATTERN, `$1 to ${endDateDay.toUpperCase() + ' ' + endDateStr}`),
+            text: option.text.replace(DATE_PATTERNS.shortSlash, `$1 to ${endDateDay.toUpperCase() + ' ' + endDateStr}`),
           };
         }
       } else {

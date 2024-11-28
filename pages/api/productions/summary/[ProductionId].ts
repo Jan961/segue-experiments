@@ -1,7 +1,7 @@
 import getPrismaClient from 'lib/prisma';
-import moment from 'moment';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { group, objectify, sum } from 'radash';
+import { getDifferenceInDays, getDifferenceInWeeks, newDate } from 'services/dateService';
 
 type ScheduleView = {
   RehearsalStartDate: string;
@@ -33,13 +33,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       await prisma.$queryRaw`SELECT * from ProductionPerformanceSummaryView where ProductionId=${ProductionId}`;
     const productionSummary: any[] =
       await prisma.$queryRaw`SELECT * from ProductionSummaryView where ProductionId=${ProductionId}`;
-    // const productionStartDate = moment(data?.[0]?.ProductionStartDate)
     const production = productionView?.[0];
     const prodCode = data?.[0]?.FullProductionCode;
-    const productionEndDate = moment(production.ProductionEndDate);
-    const rehearsalStartDate = moment(production.RehearsalStartDate);
-    const numberOfWeeks = productionEndDate.diff(rehearsalStartDate, 'weeks');
-    const numberOfDays = productionEndDate.diff(rehearsalStartDate, 'days') + 1;
+    const productionEndDate = newDate(production.ProductionEndDate.getTime());
+    const rehearsalStartDate = newDate(production.RehearsalStartDate.getTime());
+    const numberOfWeeks = getDifferenceInWeeks(rehearsalStartDate, productionEndDate);
+    const numberOfDays = getDifferenceInDays(rehearsalStartDate, productionEndDate) + 1;
     const workingDays = numberOfDays - numberOfWeeks;
     const pencilledBookings = sum(
       productionSummary
