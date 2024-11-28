@@ -1,7 +1,6 @@
 // import NoPerfRenderEditor from 'components/bookings/table/NoPerfRenderEditor';
 import { newBookingColumnDefs, styleProps } from 'components/bookings/table/tableConfig';
 import Button from 'components/core-ui-lib/Button';
-import { addDays, parseISO, subDays } from 'date-fns';
 import Table from 'components/core-ui-lib/Table';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useWizard } from 'react-use-wizard';
@@ -12,7 +11,7 @@ import { ColDef } from 'ag-grid-community';
 import { getStepIndex } from 'config/AddBooking';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import { ConfDialogVariant } from 'components/core-ui-lib/ConfirmationDialog/ConfirmationDialog';
-import { dateToSimple, formattedDateWithWeekDay, toISO } from 'services/dateService';
+import { dateToSimple, formattedDateWithWeekDay, getDateDaysAway, newDate } from 'services/dateService';
 import { BookingWithVenueDTO, ProductionDTO } from 'interfaces';
 import { venueState } from 'state/booking/venueState';
 import { useRecoilValue } from 'recoil';
@@ -99,7 +98,7 @@ export default function NewBookingDetailsView({
       initRows[0].data.isRunOfDates = true;
     }
     const rowDate =
-      direction === 'before' ? subDays(parseISO(data.dateAsISOString), 1) : addDays(parseISO(data.dateAsISOString), 1);
+      direction === 'before' ? getDateDaysAway(data.dateAsISOString, -1) : getDateDaysAway(data.dateAsISOString, 1);
     const date = formattedDateWithWeekDay(rowDate, 'Short');
     const dateAsISOString = rowDate.toISOString();
     const rowToAdd = { ...data, noPerf: null, times: '', date, dateAsISOString, id: null, isRunOfDates: true };
@@ -129,8 +128,8 @@ export default function NewBookingDetailsView({
       const isRehearsal = dayTypeOption && dayTypeOption.text === 'Rehearsal';
       const isGetInFitUp = dayTypeOption && dayTypeOption.text === 'Get in / Fit Up';
 
-      let startDate = new Date(fromDate);
-      const endDate = new Date(toDate);
+      let startDate = newDate(fromDate);
+      const endDate = newDate(toDate);
       const dates = [];
       while (startDate <= endDate) {
         const formattedDate = `${startDate.toLocaleDateString('en-US', {
@@ -145,7 +144,7 @@ export default function NewBookingDetailsView({
         const dateObject = {
           dateBlockId,
           date: reorderedDate,
-          dateAsISOString: toISO(startDate),
+          dateAsISOString: startDate,
           perf: isPerformance,
           dayType: dateType,
           venue: venueId,
@@ -162,7 +161,7 @@ export default function NewBookingDetailsView({
 
         dates.push(dateObject);
         // Increment currentDate by one day for the next iteration
-        startDate = addDays(startDate, 1);
+        startDate = getDateDaysAway(startDate, 1);
       }
 
       setBookingData(dates);

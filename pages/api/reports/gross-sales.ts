@@ -7,9 +7,9 @@ import { getExportedAtTitle } from 'utils/export';
 import { currencyCodeToSymbolMap } from 'config/Reports';
 import { calculateRemainingDaysInWeek, convertToPDF } from 'utils/report';
 import { BOOK_STATUS_CODES, SALES_TYPE_NAME } from 'types/MarketingTypes';
-import { calculateWeekNumber, formatDate, getDateObject, getDifferenceInDays } from 'services/dateService';
+import { calculateWeekNumber, formatDate, getDateDaysAway, getDifferenceInDays, newDate } from 'services/dateService';
 import { SCHEDULE_VIEW } from 'services/reports/schedule-report';
-import { add, parseISO } from 'date-fns';
+import { UTCDate } from '@date-fns/utc';
 
 type SALES_SUMMARY = {
   ProductionId: number;
@@ -114,7 +114,7 @@ const findNextBookingDate = (
 
   while (daysChecked < maxDays) {
     // Move to next date
-    checkDate = formatDate(add(parseISO(checkDate), { days: 1 }), 'yyyy-MM-dd');
+    checkDate = formatDate(getDateDaysAway(newDate(checkDate), 1), 'yyyy-MM-dd');
     daysChecked++;
 
     // Check if this date has a booking entry
@@ -136,22 +136,40 @@ const handler = async (req, res) => {
     if (!productionId) {
       throw new Error('Params are missing');
     }
-    const data = await prisma.salesSummaryView.findMany({
-      where: {
-        ProductionId: productionId,
-        SaleTypeName: {
-          in: [SALES_TYPE_NAME.GENERAL_SALES, SALES_TYPE_NAME.SCHOOL_SALES],
+    const data = await prisma.salesSummaryView
+      .findMany({
+        where: {
+          ProductionId: productionId,
+          SaleTypeName: {
+            in: [SALES_TYPE_NAME.GENERAL_SALES, SALES_TYPE_NAME.SCHOOL_SALES],
+          },
         },
-      },
-    });
-    const schedule = await prisma.scheduleView.findMany({
-      where: {
-        ProductionId: productionId,
-      },
-      orderBy: {
-        EntryDate: 'asc',
-      },
-    });
+      })
+      .then((res) =>
+        res.map((x) => ({
+          ...x,
+          EntryDate: new UTCDate(x.EntryDate),
+          ProductionStartDate: new UTCDate(x.ProductionStartDate),
+          ProductionEndDate: new UTCDate(x.ProductionEndDate),
+        })),
+      );
+    const schedule = await prisma.scheduleView
+      .findMany({
+        where: {
+          ProductionId: productionId,
+        },
+        orderBy: {
+          EntryDate: 'asc',
+        },
+      })
+      .then((res) =>
+        res.map((x) => ({
+          ...x,
+          EntryDate: new UTCDate(x.EntryDate),
+          ProductionStartDate: new UTCDate(x.ProductionStartDate),
+          ProductionEndDate: new UTCDate(x.ProductionEndDate),
+        })),
+      );
     let filename = 'Gross Sales';
     const workbook = new ExcelJS.Workbook();
     const formattedData = data.map((x) => ({
@@ -209,7 +227,7 @@ const handler = async (req, res) => {
     const { ProductionStartDate: fromDate, ProductionEndDate: toDate } = schedule?.[0] || {};
 
     // +1 is for including the endDate
-    const daysDiff = getDifferenceInDays(fromDate?.toISOString(), toDate?.toISOString()) + 1;
+    const daysDiff = getDifferenceInDays(fromDate, toDate) + 1;
 
     let colNo = 1;
     let conversionRate = 0;
@@ -248,11 +266,11 @@ const handler = async (req, res) => {
       r7.push('Weekly Costs');
     };
     for (let i = 1; i <= daysDiff; i++) {
-      const weekDay = formatDate(add(parseISO(fromDate?.toISOString()), { days: i - 1 }), 'eeee');
-      const dateInIncomingFormat = formatDate(add(parseISO(fromDate?.toISOString()), { days: i - 1 }), 'yyyy-MM-dd');
+      const weekDay = formatDate(getDateDaysAway(fromDate, i - 1), 'eeee');
+      const dateInIncomingFormat = formatDate(getDateDaysAway(fromDate, i - 1), 'yyyy-MM-dd');
       const nextBookingDate = findNextBookingDate(dateInIncomingFormat, map, FullProductionCode, ShowName);
       const date = formatDate(dateInIncomingFormat, 'dd/MM/yy');
-      const weekNumber = calculateWeekNumber(fromDate, getDateObject(dateInIncomingFormat));
+      const weekNumber = calculateWeekNumber(fromDate, dateInIncomingFormat);
       if (i === 1 && weekDay !== 'Monday') {
         // +2 is for including currentday and sunday
         addWeekDetails(weekNumber, colNo, calculateRemainingDaysInWeek(weekDay) + 2);

@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
 import DateRange from './DateRange';
+import { newDate } from 'services/dateService';
 
 const meta: Meta<typeof DateRange> = {
   component: DateRange,
@@ -14,7 +15,7 @@ export const Primary: Story = {
     className: 'w-fit',
     label: 'Date',
     onChange: () => null,
-    value: { from: new Date(), to: new Date() },
+    value: { from: newDate(), to: newDate() },
     disabled: false,
   },
 };
@@ -24,7 +25,7 @@ export const Disabled: Story = {
     className: 'w-fit',
     label: 'Date',
     onChange: () => null,
-    value: { from: new Date(), to: new Date() },
+    value: { from: newDate(), to: newDate() },
     disabled: true,
   },
 };

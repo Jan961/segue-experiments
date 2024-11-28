@@ -5,8 +5,7 @@ import axios from 'axios';
 import ReportForm from '../reportForm';
 import { PerformanceInfo } from 'types/performanceInfo';
 import { CustomSelect } from './CustomSelect';
-import { dateToSimple } from 'services/dateService';
-import { format } from 'date-fns';
+import { dateToSimple, formatDate } from 'services/dateService';
 import Link from 'next/link';
 import { Production } from 'prisma/generated/prisma-client';
 
@@ -147,7 +146,7 @@ function ReportWrapper({ children, productions }: ReportWrapperProps) {
               disabled={bookingId === ''}
               options={performances?.map(({ Id, Date: performanceDate }) => (
                 <option key={Id} value={Id}>
-                  {format(new Date(performanceDate), 'PPPppp')}
+                  {formatDate(performanceDate, 'PPPppp')}
                 </option>
               ))}
               isLoading={isLoadingPerformances}
