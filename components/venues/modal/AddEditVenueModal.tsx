@@ -106,7 +106,7 @@ export default function AddEditVenueModal({
         const { what3WordsEntrance } = formData;
         // If coords not found from address input
         if (result.length === 0) {
-          //  Address failed initially then they entered what3words
+          // Address failed initially then they entered what3words
           if (what3WordsEntrance !== '' && addressAttempted) {
             if (what3WordsEntrance.split('.').length === 3) {
               const wordsResponse = await axios.get('/api/address/check-what-three-words', {
@@ -124,7 +124,7 @@ export default function AddEditVenueModal({
               setShowAddressMessage('UsingWhat3Words');
             }
           }
-          //  Address failed and no value was entered for what 3 words
+          // Address failed and no value was entered for what 3 words
           else if (what3WordsEntrance === '' && addressAttempted) {
             setShowAddressMessage('NotUsingWhat3Words');
           } else {
