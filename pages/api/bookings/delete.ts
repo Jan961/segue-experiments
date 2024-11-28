@@ -27,7 +27,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const deletedIds: number[] = [];
     await Promise.all(
       bookings.map(async (booking) => {
-        console.log(deletedIds);
         if (booking.isRehearsal && !deletedIds.includes(booking.id)) {
           deletedIds.push(booking.id);
           await deleteRehearsalById(booking.id, prisma);
