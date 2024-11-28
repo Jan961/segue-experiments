@@ -24,23 +24,20 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   try {
     const bookings: Booking[] = req.body;
     const prisma = await getPrismaClient(req);
-    const deletedIds = new Set<number>();
     await Promise.all(
-      bookings.map(async (booking) => {
-        if (booking.isRehearsal && !deletedIds.has(booking.id)) {
-          deletedIds.add(booking.id);
-          await deleteRehearsalById(booking.id, prisma);
-        } else if (booking.isBooking && !deletedIds.has(booking.id)) {
-          deletedIds.add(booking.id);
-          await deleteBookingById(booking.id, prisma);
-        } else if (booking.isGetInFitUp && !deletedIds.has(booking.id)) {
-          deletedIds.add(booking.id);
-          await deleteGetInFitUpById(booking.id, prisma);
-        } else if (!deletedIds.has(booking.id)) {
-          deletedIds.add(booking.id);
-          await deleteOtherById(booking.id, prisma);
-        }
-      }),
+      bookings
+        .filter((obj, index, self) => index === self.findIndex((o) => o.id === obj.id))
+        .map(async (booking) => {
+          if (booking.isRehearsal) {
+            await deleteRehearsalById(booking.id, prisma);
+          } else if (booking.isBooking) {
+            await deleteBookingById(booking.id, prisma);
+          } else if (booking.isGetInFitUp) {
+            await deleteGetInFitUpById(booking.id, prisma);
+          } else {
+            await deleteOtherById(booking.id, prisma);
+          }
+        }),
     );
     return res.status(200).json('success');
   } catch (e) {
