@@ -1,9 +1,9 @@
+import { UTCDate } from '@date-fns/utc';
 import ExcelJS from 'exceljs';
 import getPrismaClient from 'lib/prisma';
-import moment from 'moment';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { PromoterHoldsView } from 'prisma/generated/prisma-client';
 import { all } from 'radash';
+import { dateTimeToTime, formatDate, newDate } from 'services/dateService';
 import { getProductionWithContent } from 'services/productionService';
 import { addWidthAsPerContent } from 'services/reportsService';
 import { COLOR_HEXCODE } from 'services/salesSummaryService';
@@ -80,19 +80,27 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     }
     if (fromDate && toDate) {
       whereQuery.PerformanceDate = {
-        gte: new Date(fromDate),
-        lte: new Date(toDate),
+        gte: newDate(fromDate),
+        lte: newDate(toDate),
       };
     }
-    const getPromoterHolds = prisma.promoterHoldsView.findMany({
-      where: {
-        ...whereQuery,
-        ProductionId: Number(productionId),
-      },
-      orderBy: {
-        PerformanceDate: 'asc',
-      },
-    });
+    const getPromoterHolds = prisma.promoterHoldsView
+      .findMany({
+        where: {
+          ...whereQuery,
+          ProductionId: Number(productionId),
+        },
+        orderBy: {
+          PerformanceDate: 'asc',
+        },
+      })
+      .then((res) =>
+        res.map((x) => ({
+          ...x,
+          PerformanceDate: new UTCDate(x.PerformanceDate),
+          PerformanceTime: new UTCDate(x.PerformanceTime),
+        })),
+      );
     const [data, productionDetails] = await all([getPromoterHolds, getProductionWithContent(productionId, req)]);
     const showName = (productionDetails as ProductionDetails)?.Show?.Name || '';
     const filename = `${productionCode} ${showName} Promoter Holds`;
@@ -123,12 +131,12 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       'VENUE CONFIRMATION',
     ]);
 
-    (data as PromoterHoldsView[]).forEach((x) => {
+    (data as any[]).forEach((x) => {
       const productionCode = x.FullProductionCode || '';
       const venueCode = x.VenueCode || '';
       const venueName = x.VenueName || '';
-      const showDate = x.PerformanceDate ? moment(x.PerformanceDate).format('DD/MM/YY') : '';
-      const showTime = x.PerformanceTime ? moment(x.PerformanceTime).format('hh:mm') : '';
+      const showDate = x.PerformanceDate ? formatDate(x.PerformanceDate, 'dd/MM/yy') : '';
+      const showTime = x.PerformanceTime ? dateTimeToTime(x.PerformanceTime) : '';
       const availableSeats = x.AvailableCompSeats || 0;
       const availableNotes = x.AvailableCompNotes || '';
       const allocatedSeats = x.CompAllocationSeats || 0;
