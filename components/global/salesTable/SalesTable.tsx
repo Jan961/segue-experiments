@@ -6,8 +6,8 @@ import formatInputDate from 'utils/dateInputFormat';
 import { prodCompArchColDefs, prodComparisionColDefs, salesColDefs } from './tableConfig';
 import salesComparison, { SalesComp } from './utils/salesComparision';
 import { SalesSnapshot, BookingSelection } from 'types/MarketingTypes';
-import { format, parseISO } from 'date-fns';
 import axios from 'axios';
+import { formatDate } from 'services/dateService';
 
 export type SalesTableVariant = 'prodComparision' | 'salesSnapshot' | 'salesComparison' | 'venue' | 'prodCompArch';
 
@@ -138,7 +138,7 @@ export default function SalesTable({
   };
 
   const onIsNotOnSaleChange = (key: string, value: boolean, sale: SalesSnapshot, selected: string) => {
-    updateSaleSet('updateNotOnSale', selected, sale.weekOf ? format(parseISO(sale.weekOf), 'yyyy-MM-dd') : null, {
+    updateSaleSet('updateNotOnSale', selected, sale.weekOf ? formatDate(sale.weekOf, 'yyyy-MM-dd') : null, {
       [key.replace('is', 'Set')]: value,
     });
 
@@ -156,7 +156,7 @@ export default function SalesTable({
   };
 
   const onSingleSeatChange = (key: string, value: boolean, sale: SalesSnapshot, selected: string) => {
-    updateSaleSet('updateSingleSeats', selected, sale.weekOf ? format(parseISO(sale.weekOf), 'yyyy-MM-dd') : null, {
+    updateSaleSet('updateSingleSeats', selected, sale.weekOf ? formatDate(sale.weekOf, 'yyyy-MM-dd') : null, {
       [key.replace('is', 'Set')]: value,
     });
     setRowData((prevSales) =>
@@ -174,7 +174,7 @@ export default function SalesTable({
   };
 
   const onBrochureReleasedChange = (key: string, value: boolean, sale: SalesSnapshot, selected: string) => {
-    updateSaleSet('update', selected, sale.weekOf ? format(parseISO(sale.weekOf), 'yyyy-MM-dd') : null, {
+    updateSaleSet('update', selected, sale.weekOf ? formatDate(sale.weekOf, 'yyyy-MM-dd') : null, {
       [key.replace('is', 'Set')]: value,
     });
     setRowData((prevSales) =>

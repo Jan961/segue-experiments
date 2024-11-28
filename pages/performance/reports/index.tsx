@@ -1,21 +1,10 @@
 import Link from 'next/link';
-import { format } from 'date-fns';
 import { GetServerSideProps, InferGetServerSidePropsType, NextApiRequest } from 'next';
 import { getReportsList } from 'services/performanceReports';
 import Layout from 'components/Layout';
 import { useCallback, useState } from 'react';
 import axios from 'axios';
-
-// interface Report {
-//   id: string;
-//   reportNumber: string;
-//   venue: string;
-//   performanceId: string;
-//   performanceDate: string;
-//   performanceTime: string;
-//   createdAt: string;
-//   showName: string;
-// }
+import { dateTimeToTime, formattedDateWithWeekDay } from 'services/dateService';
 
 export default function Reports({ reports }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const [rows, setRows] = useState(reports);
@@ -71,13 +60,11 @@ export default function Reports({ reports }: InferGetServerSidePropsType<typeof 
               {rows?.map(({ id, reportNumber, venue, performanceId, performanceDate, performanceTime, showName }) => (
                 <tr key={id} className="border-b border-gray-200 hover:bg-gray-100">
                   <td className="px-4 py-2 border">{reportNumber}</td>
-                  {/* <td className="px-4 py-2 border">{format(new Date(createdAt), 'dd/MM/yyyy HH:mm')}</td> */}
                   <td className="px-4 py-2 border">{showName}</td>
                   <td className="px-4 py-2 border">{venue}</td>
                   <td className="px-4 py-2 border">{performanceId}</td>
                   <td className="px-4 py-2 border">
-                    {format(new Date(performanceDate), 'eee dd/MM/yyyy')} at{' '}
-                    {format(new Date(performanceTime), 'HH:mm')}
+                    {formattedDateWithWeekDay(performanceDate, 'Long')} at {dateTimeToTime(performanceTime)}
                   </td>
                   <td className="px-4 py-2 border">
                     <div className="flex gap-1">

@@ -26,7 +26,6 @@ export const getProductionJumpState = async (ctx, path: string): Promise<Product
         if (db) {
           db = dateBlockMapper(db);
         }
-
         return {
           Id: t.Id,
           Code: t.Code,
