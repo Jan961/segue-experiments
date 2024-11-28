@@ -18,10 +18,11 @@ const usePermissions = () => {
   useEffect(() => {
     if (isSignedIn && permissionState?.permissions.length !== 0 && permissionState?.accountId !== '') {
       // Updates User permissions in the Recoil state when the user is updated from the Clerk context
-      setPermissionsState({
+      setPermissionsState((currentVal) => ({
+        ...(currentVal ?? {}),
         permissions: (user.unsafeMetadata?.permissions as string[]) || permissionState?.permissions || [],
         accountId: (user.unsafeMetadata?.organisationId as string) || permissionState?.accountId || '',
-      });
+      }));
     }
   }, [user]);
 
@@ -53,6 +54,7 @@ const usePermissions = () => {
         setPermissionsState({
           permissions,
           accountId: organisationId,
+          isInitialised: true,
         });
         const updatedmenuItems = applyPermissionsToMenuItems(menuItems, permissions);
         setGlobalState((prev) => ({ ...prev, menuItems: updatedmenuItems }));

@@ -8,7 +8,7 @@ interface FileUploadProps {
   setFileData: (value: any) => void;
 }
 
-const FileUploadButton: React.FC<FileUploadProps> = ({ fileData, disabled = false, setFileData }) => {
+const FileUploadButton: React.FC<FileUploadProps> = ({ disabled = false, setFileData }) => {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
 

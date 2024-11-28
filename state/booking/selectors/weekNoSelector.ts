@@ -23,7 +23,7 @@ export const weekNoSelector = selector({
 
     const productionStartDate = parseISO(productionStart);
 
-    for (const date of dates) result[date] = calculateWeekNumber(productionStartDate, parseISO(date));
+    for (const date of dates) result[date] = calculateWeekNumber(productionStartDate.getTime(), date);
 
     return result;
   },
