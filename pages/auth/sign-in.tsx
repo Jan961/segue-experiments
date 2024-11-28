@@ -89,16 +89,13 @@ const SignIn = () => {
           }
         }
       } catch (error) {
-        console.log(error);
         if (error instanceof yup.ValidationError) {
-          console.log(error.inner);
           const formattedErrors = error.inner.reduce((acc, err) => {
             return {
               ...acc,
               [err.path]: acc[err.path] ? acc[err.path] : [err.message],
             };
           }, {});
-          console.log(formattedErrors);
           setValidationError(formattedErrors);
         } else if (!isNullOrEmpty(error.errors)) {
           const errorCode = error.errors[0].code;
