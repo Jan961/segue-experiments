@@ -587,13 +587,33 @@ export const EditDealMemoContractModal = ({
       <PopupModal
         show={visible}
         title="Deal Memo"
-        titleClass={classNames('text-xl text-primary-navy font-bold -mt-2.5')}
         onClose={() => handleCancelForm(false)}
         hasOverlay={true}
         hasOverflow={false}
-        panelClass="overflow-y-hidden"
+        footerComponent={
+          <div className="flex justify-end items-center">
+            <Button onClick={() => handleCancelForm(false)} className="w-33" variant="secondary" text="Cancel" />
+            <Button
+              onClick={() => submitForm(false)}
+              className="ml-4 w-28"
+              variant="primary"
+              text="Save and Close"
+              testId="deal-memo-save-and-close"
+            />
+            <Button
+              onClick={() => submitForm(true)}
+              className="ml-4 w-44"
+              variant="primary"
+              text="Save, Close and Export"
+              testId="deal-memo-save-close-and-export"
+              iconProps={{ className: 'h-4 w-3' }}
+              sufixIconName="document-solid"
+              disabled={!canExport}
+            />
+          </div>
+        }
       >
-        <div className="h-[80vh] w-[82vw] overflow-y-scroll pr-2">
+        <div className="w-[82vw] pr-2">
           <p className="text-primary-red ">PLEASE NOTE:</p>{' '}
           <p className="text-primary-input-text">
             Some information is pre-populated from other areas of Segue. <br /> For venue details including addresses
@@ -2378,27 +2398,6 @@ export const EditDealMemoContractModal = ({
           ) : (
             <div />
           )}
-
-          <div className="flex justify-end items-center">
-            <Button onClick={() => handleCancelForm(false)} className="w-33" variant="secondary" text="Cancel" />
-            <Button
-              onClick={() => submitForm(false)}
-              className="ml-4 w-28"
-              variant="primary"
-              text="Save and Close"
-              testId="deal-memo-save-and-close"
-            />
-            <Button
-              onClick={() => submitForm(true)}
-              className="ml-4 w-44"
-              variant="primary"
-              text="Save, Close and Export"
-              testId="deal-memo-save-close-and-export"
-              iconProps={{ className: 'h-4 w-3' }}
-              sufixIconName="document-solid"
-              disabled={!canExport}
-            />
-          </div>
         </div>
 
         {isLoading && <LoadingOverlay />}
