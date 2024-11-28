@@ -11,8 +11,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const { productionId, runTag } = req.body;
     const fromDate = new Date(req.body?.fromDate);
     const toDate = new Date(req.body?.toDate);
-    fromDate.setUTCHours(0);
-    toDate.setUTCHours(0);
 
     const conflictList = [];
     const performanceBookings: Booking[] = await prisma.booking.findMany({
@@ -91,7 +89,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const conflicts: BookingWithVenueDTO[] = performanceBookings
       .map(bookingMapperWithVenue)
       .sort((a, b) => new Date(a.Date).valueOf() - new Date(b.Date).valueOf());
-    res.status(200).json([...conflicts, ...conflictList] || []);
+    res.status(200).json([...conflicts, ...conflictList]);
   } catch (e) {
     console.log(e);
     res.status(500).json({ err: 'Error fetching report' });

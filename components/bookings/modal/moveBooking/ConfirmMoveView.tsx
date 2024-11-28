@@ -2,9 +2,9 @@ import Button from 'components/core-ui-lib/Button';
 import Label from 'components/core-ui-lib/Label';
 import { useState } from 'react';
 import { useWizard } from 'react-use-wizard';
-import { format, parseISO } from 'date-fns';
 import { BookingItem } from '../NewBooking/reducer';
 import axios from 'axios';
+import { formatDate } from 'services/dateService';
 
 interface ConfirmMoveViewProps {
   onClose: (value?: string) => void;
@@ -35,7 +35,7 @@ const ConfirmMoveView = ({ bookings, count, venue, productionName, date, onClose
         className="my-2 leading-[1.125]"
         variant="md"
         text={`Your ${count} date booking at ${venue}  has been moved to start on ${
-          date ? format(parseISO(date), 'dd/MM/yy') : ''
+          date ? formatDate(date, 'dd/MM/yy') : ''
         } as part of ${productionName}.`}
       />
       <Label
@@ -51,7 +51,7 @@ const ConfirmMoveView = ({ bookings, count, venue, productionName, date, onClose
         className="my-2 leading-[1.125]"
         variant="md"
         text={`This date is available. Your ${count} date booking at ${venue} would be moved to start on ${
-          date ? format(parseISO(date), 'dd/MM/yy') : ''
+          date ? formatDate(date, 'dd/MM/yy') : ''
         } as part of ${productionName}.`}
       />
       <Label className="my-2 leading-[1.125]" text={`Are you sure you want to move? `} variant="md" />

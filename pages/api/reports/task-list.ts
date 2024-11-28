@@ -12,7 +12,7 @@ import {
 import { getWeekNumsToDateMap } from 'utils/getDateFromWeekNum';
 import { group } from 'radash';
 import { makeRowTextBoldAndAllignLeft } from './promoter-holds';
-import { calculateWeekNumber, formatDate, formattedDateWithDay } from 'services/dateService';
+import { calculateWeekNumber, formatDate, formattedDateWithWeekDay, newDate } from 'services/dateService';
 import { COLOR_HEXCODE, colorTextAndBGCell } from 'services/salesSummaryService';
 import { addWidthAsPerContent, applyGradientFillToColumn } from 'services/reportsService';
 import { addBorderToAllCells } from 'utils/export';
@@ -36,7 +36,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       views: [{ state: 'frozen', xSplit: 0, ySplit: 5 }],
     });
 
-    const title = `Production Tasks ${formatDate(new Date(), 'dd.MM.yy')}`;
+    const title = `Production Tasks ${formatDate(newDate(), 'dd.MM.yy')}`;
     if (!taskList?.length) {
       await exportWorkbook(res, workbook, title, format);
       return;
@@ -93,8 +93,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       taskList = taskList.filter((task) => {
         const taskDueDate = weekNumToDateMap?.[task.CompleteByWeekNum] || '';
         return !(
-          (startDueDate && new Date(taskDueDate) < new Date(startDueDate)) ||
-          (endDueDate && new Date(taskDueDate) > new Date(endDueDate))
+          (startDueDate && newDate(taskDueDate) < newDate(startDueDate)) ||
+          (endDueDate && newDate(taskDueDate) > newDate(endDueDate))
         );
       });
       if (!taskList.length) continue;
@@ -104,7 +104,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       worksheet.addRow([]);
       rows += 3;
       productionRowList.push(rows - 1);
-      const currentWeekNum = calculateWeekNumber(StartDate, new Date());
+      const currentWeekNum = calculateWeekNumber(StartDate.getTime(), newDate());
 
       taskList
         .sort((a, b) => a.StartByWeekNum - b.StartByWeekNum)
@@ -120,9 +120,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
               `${fullProductionCode}-${Code}`,
               Name,
               startWeek || '',
-              formattedDateWithDay(weekNumToDateMap[StartByWeekNum]),
+              formattedDateWithWeekDay(weekNumToDateMap[StartByWeekNum], 'Short'),
               dueWeek || '',
-              formattedDateWithDay(weekNumToDateMap[CompleteByWeekNum]),
+              formattedDateWithWeekDay(weekNumToDateMap[CompleteByWeekNum], 'Short'),
               Progress,
               status,
               `${FirstName || ''} ${LastName || ''}`,

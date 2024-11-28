@@ -1,8 +1,9 @@
 import getPrismaClient from 'lib/prisma';
 import { TSalesView } from 'types/MarketingTypes';
 import { getCurrencyFromBookingId } from 'services/venueCurrencyService';
-import { format } from 'date-fns';
 import { BOOK_STATUS_CODES } from 'types/SalesSummaryTypes';
+import { formatDate } from 'services/dateService';
+import { UTCDate } from '@date-fns/utc';
 
 const getMapKey = ({
   FullProductionCode,
@@ -35,23 +36,33 @@ export default async function handle(req, res) {
     const currencySymbol = (await getCurrencyFromBookingId(req, BookingId)) || '';
 
     // Fetch data using Prisma Client
-    const data = await prisma.salesView.findMany({
-      where: {
-        BookingId,
-        SaleTypeName: {
-          not: '',
+    const data = await prisma.salesView
+      .findMany({
+        where: {
+          BookingId,
+          SaleTypeName: {
+            not: '',
+          },
         },
-      },
-      orderBy: [{ BookingFirstDate: 'asc' }, { SetSalesFiguresDate: 'asc' }],
-    });
+        orderBy: [{ BookingFirstDate: 'asc' }, { SetSalesFiguresDate: 'asc' }],
+      })
+      .then((res) =>
+        res.map((x) => ({
+          ...x,
+          ProductionStartDate: new UTCDate(x.ProductionStartDate),
+          BookingFirstDate: new UTCDate(x.BookingFirstDate),
+          SetSalesFiguresDate: new UTCDate(x.SetSalesFiguresDate),
+          SetProductionWeekDate: new UTCDate(x.SetProductionWeekDate),
+        })),
+      );
 
     const groupedData = data.reduce((acc, sale) => {
       const formattedSale = {
         ...sale,
-        ProductionStartDate: format(sale.ProductionStartDate, 'yyyy-MM-dd'),
-        BookingFirstDate: format(sale.BookingFirstDate, 'yyyy-MM-dd'),
-        SetSalesFiguresDate: format(sale.SetSalesFiguresDate, 'yyyy-MM-dd'),
-        SetProductionWeekDate: format(sale.SetProductionWeekDate, 'yyyy-MM-dd'),
+        ProductionStartDate: formatDate(sale.ProductionStartDate, 'yyyy-MM-dd'),
+        BookingFirstDate: formatDate(sale.BookingFirstDate, 'yyyy-MM-dd'),
+        SetSalesFiguresDate: formatDate(sale.SetSalesFiguresDate, 'yyyy-MM-dd'),
+        SetProductionWeekDate: formatDate(sale.SetProductionWeekDate, 'yyyy-MM-dd'),
         BookingStatusCode: BOOK_STATUS_CODES[sale.BookingStatusCode],
       };
       const key = getMapKey(formattedSale);

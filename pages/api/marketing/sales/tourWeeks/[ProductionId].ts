@@ -1,7 +1,14 @@
+import { UTCDate } from '@date-fns/utc';
 import { startOfDay } from 'date-fns';
 import getPrismaClient from 'lib/prisma';
 import master from 'lib/prisma_master';
-import { addDurationToDate, getArrayOfDatesBetween, getMonday, getWeeksBetweenDates } from 'services/dateService';
+import {
+  getArrayOfDatesBetween,
+  getDateDaysAway,
+  getMonday,
+  getWeeksBetweenDates,
+  newDate,
+} from 'services/dateService';
 import { getAccountIdFromReq } from 'services/userService';
 import formatInputDate from 'utils/dateInputFormat';
 
@@ -10,12 +17,19 @@ export default async function handle(req, res) {
     const ProductionId = parseInt(req.query.ProductionId, 10);
     const accountId = await getAccountIdFromReq(req);
     const prisma = await getPrismaClient(req);
-    const dateBlock = await prisma.dateBlock.findMany({
-      where: {
-        ProductionId,
-        IsPrimary: true,
-      },
-    });
+    const dateBlock = await prisma.dateBlock
+      .findMany({
+        where: {
+          ProductionId,
+          IsPrimary: true,
+        },
+      })
+      .then((res) =>
+        res.map((x) => ({
+          ...x,
+          StartDate: new UTCDate(x.StartDate),
+        })),
+      );
 
     const prodCo = await master.productionCompany.findMany({
       where: {
@@ -39,7 +53,7 @@ export default async function handle(req, res) {
     const numWeeks = salesStartWeek.ProdCoSaleStartWeek > 0 ? salesStartWeek : salesStartWeek * -1;
     const salesFrequency = production.SalesFrequency;
 
-    const startDate = addDurationToDate(dateBlock[0].StartDate, numWeeks * 7, false);
+    const startDate = getDateDaysAway(dateBlock[0].StartDate, numWeeks * 7);
     const endDate = dateBlock[0].EndDate;
     const dateStartMonday = getMonday(startDate);
     const weeks = getWeeksBetweenDates(dateStartMonday.toISOString(), endDate.toISOString());
@@ -48,7 +62,7 @@ export default async function handle(req, res) {
     let weekNo = numWeeks * -1;
     weeks.forEach((week) => {
       const weekStart = week.mondayDate;
-      const weekEnd = addDurationToDate(new Date(week.mondayDate), 6, true);
+      const weekEnd = getDateDaysAway(newDate(week.mondayDate), 6);
 
       // skip weekNo 0, there isn't a 0, go straight from -1 to 1
       if (weekNo === 0) {

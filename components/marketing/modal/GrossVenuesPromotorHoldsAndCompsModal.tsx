@@ -19,6 +19,7 @@ import { useQuery } from '@tanstack/react-query';
 import { transformToOptions } from 'utils';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import { bookingStatusOptions, venueSelectionOptions } from 'config/Reports';
+import { newDate } from 'services/dateService';
 
 interface GrossVenuesPromotorHoldsAndCompsModalProps {
   visible: boolean;
@@ -159,7 +160,7 @@ const GrossVenuesPromotorHoldsAndCompsModal = ({
               onChange('fromDate', from?.toISOString() || '');
               onChange('toDate', !to ? from?.toISOString() : to?.toISOString() || '');
             }}
-            value={{ from: fromDate ? new Date(fromDate) : null, to: toDate ? new Date(toDate) : null }}
+            value={{ from: fromDate ? newDate(fromDate) : null, to: toDate ? newDate(toDate) : null }}
           />
         )}
 
