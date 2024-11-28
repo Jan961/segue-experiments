@@ -7,11 +7,48 @@ import BaseComp from '../global/BaseComp'; // Adjust the path if necessary
 // Define the setup function as provided
 function setup(props: SelectProps) {
   mount(
-    <BaseComp>
+    <BaseComp styles={{ width: '200px' }}>
       <Select {...props} />
     </BaseComp>,
   );
 }
+
+const names = [
+  'Abigail',
+  'Benjamin',
+  'Charlotte',
+  'Daniel',
+  'Ethan',
+  'Fiona',
+  'Gabriella',
+  'Henry',
+  'Isabella',
+  'Jackson',
+  'Katherine',
+  'Liam',
+  'Madison',
+  'Nathaniel',
+  'Olivia',
+  'Patrick',
+  'Quentin',
+  'Rebecca',
+  'Samuel',
+  'Thomas',
+  'Uma',
+  'Victoria',
+  'William',
+  'Xavier',
+  'Yasmine',
+  'Zachary',
+  'Alexandra',
+  'Felix',
+  'Ophelia',
+  'Jasper',
+];
+
+// check typing
+// width - different font for options and display
+// custom options
 
 describe('Select Component', () => {
   const options = [
@@ -52,12 +89,12 @@ describe('Select Component', () => {
     const placeholder = 'Select an option';
     setup({ onChange: cy.stub(), options, placeholder });
 
-    cy.get('[id="react-select-:r3:-placeholder"]').should('contain', placeholder);
+    cy.get('[id*="react-select-"][id$="-placeholder"] ').should('contain', placeholder);
   });
 
   it('renders the label when label prop is provided', () => {
     const label = 'Select Label';
-    setup({ onChange: cy.stub(), options, label });
+    setup({ onChange: cy.stub(), options, label, placeholder: 'Select an option' });
 
     cy.get('[data-testid="core-ui-lib-select-label"]').should('contain', label);
   });
@@ -76,15 +113,15 @@ describe('Select Component', () => {
     setup({ onChange, options, isMulti: true });
 
     cy.get('[data-testid="core-ui-lib-select"]').click();
-    cy.get(`[data-testid="core-ui-lib-select-option-${options[0].value}"]`).click();
-    cy.get(`[data-testid="core-ui-lib-select-option-${options[1].value}"]`).click();
+    cy.contains(options[0].text).click();
+    cy.contains(options[1].text).click();
 
     cy.wrap(onChange).should('have.been.calledTwice');
     cy.wrap(onChange).then((stub) => {
       expect(stub.getCall(1).args[0]).to.deep.equal([options[0].value, options[1].value]);
     });
 
-    cy.get('.react-select__multi-value__label').should('contain', '2 items selected');
+    cy.get('[data-testid="core-ui-lib-select"]').should('contain', '2 items selected');
   });
 
   it('allows clearing the selected option when isClearable is true', () => {
@@ -92,8 +129,8 @@ describe('Select Component', () => {
     setup({ onChange, options, isClearable: true });
 
     cy.get('[data-testid="core-ui-lib-select"]').click();
-    cy.get(`[data-testid="core-ui-lib-select-option-${options[0].value}"]`).click();
-    cy.get('.react-select__clear-indicator').click();
+    cy.contains(options[0].text).click();
+    cy.get('.css-qrq13a-indicatorContainer').click();
 
     cy.wrap(onChange).should('have.been.calledTwice');
     cy.wrap(onChange).then((stub) => {
@@ -105,7 +142,7 @@ describe('Select Component', () => {
     setup({ onChange: cy.stub(), options, isClearable: false });
 
     cy.get('[data-testid="core-ui-lib-select"]').click();
-    cy.get(`[data-testid="core-ui-lib-select-option-${options[0].value}"]`).click();
+    cy.contains(options[0].text).click();
     cy.get('.react-select__clear-indicator').should('not.exist');
   });
 
@@ -113,9 +150,12 @@ describe('Select Component', () => {
     const customStyles = {
       control: (styles) => ({ ...styles, backgroundColor: 'rgb(255, 192, 203)' }), // Pink
     };
-    setup({ onChange: cy.stub(), options, customStyles });
+    setup({ onChange: cy.stub(), options, customStyles, placeholder: 'Select an option' });
 
-    cy.get('.react-select__control').should('have.css', 'background-color', 'rgb(255, 192, 203)');
+    cy.get('[id*="react-select-"][id$="-placeholder"] ')
+      .parent()
+      .parent()
+      .should('have.css', 'background-color', 'rgb(255, 192, 203)');
   });
 
   it('displays error styles when error prop is true', () => {
@@ -125,6 +165,10 @@ describe('Select Component', () => {
   });
 
   it('allows searching when isSearchable is true', () => {
+    const fileredNames = (input) => {
+      names.filter((name) => name.toLowerCase().includes(input.toLowerCase()));
+    };
+
     setup({ onChange: cy.stub(), options, isSearchable: true });
 
     cy.get('[data-testid="core-ui-lib-select"]').click();
@@ -145,7 +189,7 @@ describe('Select Component', () => {
 
     cy.get('[data-testid="core-ui-lib-select"]').click();
     cy.get('.react-select__menu').should('exist');
-    cy.get(`[data-testid="core-ui-lib-select-option-${options[0].value}"]`).click();
+    cy.contains(options[0].text).click();
     cy.get('.react-select__menu').should('not.exist');
   });
 
@@ -154,7 +198,7 @@ describe('Select Component', () => {
 
     cy.get('[data-testid="core-ui-lib-select"]').click();
     cy.get('.react-select__menu').should('exist');
-    cy.get(`[data-testid="core-ui-lib-select-option-${options[0].value}"]`).click();
+    cy.contains(options[0].value).click();
     cy.get('.react-select__menu').should('exist');
   });
 
