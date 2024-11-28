@@ -28,7 +28,8 @@
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
       "prettier --config .prettierrc --write",
-      "eslint --config .eslintrc.js --fix"
+      "eslint --config .eslintrc.js --fix",
+      "git add"
     ]
   },
   "husky": {
