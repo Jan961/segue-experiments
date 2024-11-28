@@ -184,11 +184,11 @@ const SignUp = () => {
       // Authenticate the user within clerk first to check if we have a valid password
       await signIn(accountDetails.email, accountDetails.password);
 
-      const sigInUrl = getSignInUrl();
+      const signInUrl = getSignInUrl();
       // Create the user in our database
       const { data } = await axios.post('/api/user/create-admin-user', {
         user: accountDetails,
-        sigInUrl,
+        signInUrl,
         accountUserOnly: true,
       });
 
