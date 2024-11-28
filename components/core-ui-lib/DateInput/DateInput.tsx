@@ -4,16 +4,17 @@ import TextInput from '../TextInput';
 import React, { createRef, forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import Label from '../Label';
 import { Portal } from 'react-overlays';
-import { format, isValid } from 'date-fns';
-import { formatDate } from 'services/dateService';
+import { isValid } from 'date-fns';
+import { UTCDate } from '@date-fns/utc';
+import { formatDate, newDate, safeDate } from 'services/dateService';
 
 export interface DateInputProps {
   value?: string | Date;
-  onChange: (value: Date) => void;
+  onChange: (value: UTCDate) => void;
   inputClass?: string;
   error?: string;
-  minDate?: Date;
-  maxDate?: Date;
+  minDate?: UTCDate;
+  maxDate?: UTCDate;
   placeholder?: string;
   popperClassName?: string;
   className?: string;
@@ -27,7 +28,7 @@ export interface DateInputProps {
 const regex = /^\d{2}\/\d{2}\/\d{2}$/;
 
 type Ref = {
-  setValue: (value: Date | null, useIfValueNull: Date | null) => void;
+  setValue: (value: UTCDate | null, useIfValueNull: UTCDate | null) => void;
 } | null;
 
 export default forwardRef<Ref, DateInputProps>(function DateInput(
@@ -49,7 +50,7 @@ export default forwardRef<Ref, DateInputProps>(function DateInput(
   ref,
 ) {
   const inputRef = createRef<HTMLInputElement>();
-  const [selectedDate, setSelectedDate] = useState<Date>(null);
+  const [selectedDate, setSelectedDate] = useState<UTCDate>(null);
   const [inputValue, setInputValue] = useState<string>('');
   const [errorMsg, setErrorMsg] = useState<string>('');
   const dpRef = useRef(null);
@@ -58,10 +59,10 @@ export default forwardRef<Ref, DateInputProps>(function DateInput(
     if (dateValue) {
       if (typeof dateValue === 'string' && regex.test(dateValue)) {
         setInputValue(dateValue);
-        setSelectedDate(new Date(dateValue));
+        setSelectedDate(safeDate(dateValue));
       } else {
         setInputValue(formatDate(dateValue, 'dd/MM/yy'));
-        setSelectedDate(dateValue as Date);
+        setSelectedDate(safeDate(dateValue));
       }
     } else {
       setInputValue('');
@@ -70,7 +71,7 @@ export default forwardRef<Ref, DateInputProps>(function DateInput(
   };
 
   useImperativeHandle(ref, () => ({
-    setValue: (value: Date | null, useIfValueNull: Date | null) => {
+    setValue: (value: UTCDate | null, useIfValueNull: UTCDate | null) => {
       setDateValue(value, useIfValueNull);
     },
   }));
@@ -83,10 +84,9 @@ export default forwardRef<Ref, DateInputProps>(function DateInput(
     setErrorMsg(error);
   }, [error]);
 
-  const getDateFromInputValue = (): Date => {
+  const getDateFromInputValue = (): UTCDate => {
     if (inputValue) {
-      const vals = inputValue.split('/');
-      const date = new Date(`${vals[1]}/${vals[0]}/${vals[2]}`);
+      const date = newDate(inputValue, 'UK');
       return date;
     } else {
       return null;
@@ -123,7 +123,7 @@ export default forwardRef<Ref, DateInputProps>(function DateInput(
         setSelectedDate(d);
       } else {
         if (value) {
-          setInputValue(format(d, 'dd/MM/yy'));
+          setInputValue(formatDate(d, 'dd/MM/yy'));
         } else {
           setInputValue('');
         }
@@ -167,7 +167,7 @@ export default forwardRef<Ref, DateInputProps>(function DateInput(
           placeholderText={placeholder}
           dateFormat="dd/MM/yy"
           popperClassName={`!z-50 ${position}`}
-          onChange={(e) => onChange(e)}
+          onChange={(e) => onChange(new UTCDate(e))}
           selected={selectedDate}
           openToDate={selectedDate}
           customInput={<div className="cursor-pointer w-4 h-4 " />}
