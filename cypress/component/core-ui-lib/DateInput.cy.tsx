@@ -1,6 +1,7 @@
 import DateInput, { DateInputProps } from '../../../components/core-ui-lib/DateInput';
 import BaseComp from '../global/BaseComp';
 import { mount } from 'cypress/react18';
+import { newDate } from '../../../services/dateService';
 
 describe('DateInput tests', () => {
   it('should render correctly', () => {
@@ -38,8 +39,8 @@ describe('DateInput tests', () => {
   });
 
   it('check if a date outside of the minDate - maxDate range can be selected on the calendar', () => {
-    const minDate = new Date('2021-01-01');
-    const maxDate = new Date('2021-12-31');
+    const minDate = newDate('2021-01-01');
+    const maxDate = newDate('2021-12-31');
     const props: DateInputProps = {
       testId: 'test-date-input',
       onChange: cy.stub(),

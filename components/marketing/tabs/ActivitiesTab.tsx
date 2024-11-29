@@ -23,6 +23,7 @@ import { notify } from 'components/core-ui-lib';
 import GlobalActivityModal, { GlobalActivity } from '../modal/GlobalActivityModal';
 import axios from 'axios';
 import { accessMarketingHome } from 'state/account/selectors/permissionSelector';
+import { newDate } from 'services/dateService';
 
 interface ActivitiesTabProps {
   bookingId: string;
@@ -85,7 +86,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
       const venues = bookings.bookings.map((option) => {
         return {
           ...option.Venue,
-          date: new Date(option.Date),
+          date: newDate(option.Date),
         };
       });
 
@@ -121,16 +122,14 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
       setActTypeList(actTypes);
 
       if (data && Array.isArray(data.activities) && data.activities.length > 0 && Array.isArray(data.activityTypes)) {
-        const sortedActivities = data.activities.sort(
-          (a, b) => new Date(a.Date).getTime() - new Date(b.Date).getTime(),
-        );
+        const sortedActivities = data.activities.sort((a, b) => a.Date - b.Date);
 
         const tempRows = sortedActivities.map((act) => ({
           actName: act.Name,
           actType: actTypes.find((type) => type.value === act.ActivityTypeId)?.text,
-          actDate: !act.Date ? null : startOfDay(new Date(act.Date)),
+          actDate: !act.Date ? null : startOfDay(newDate(act.Date)),
           followUpCheck: act.FollowUpRequired,
-          followUpDt: !act.DueByDate ? null : startOfDay(new Date(act.DueByDate)),
+          followUpDt: !act.DueByDate ? null : startOfDay(newDate(act.DueByDate)),
           companyCost: act.CompanyCost,
           venueCost: act.VenueCost,
           notes: act.Notes,
@@ -166,9 +165,9 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
         const tempGlobList = globalActivities.activities.map((act) => ({
           actName: act.Name,
           actType: globalActivities.activityTypes.find((type) => type.Id === act.ActivityTypeId)?.Name,
-          actDate: startOfDay(new Date(act.Date)),
+          actDate: startOfDay(newDate(act.Date)),
           followUpCheck: act.FollowUpRequired,
-          followUpDt: act.DueByDate === '' ? null : startOfDay(new Date(act.DueByDate)),
+          followUpDt: act.DueByDate === '' ? null : startOfDay(newDate(act.DueByDate)),
           cost: parseFloat(act.Cost) * conversionRate,
           id: act.Id,
           notes: act.Notes,
@@ -211,7 +210,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
         FollowUpRequired: data.followUpCheck,
         Name: data.actName,
         Notes: data.notes,
-        DueByDate: data.followUpCheck ? new Date(data.followUpDt) : null,
+        DueByDate: data.followUpCheck ? newDate(data.followUpDt) : null,
         Id: data.id,
         ProductionId: productionId,
         VenueIds: data.venueIds,
@@ -268,7 +267,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
           FollowUpRequired: data.followUpCheck,
           Name: data.actName,
           Notes: data.notes,
-          DueByDate: data.followUpCheck ? (!data.followUpDt ? null : new Date(data.followUpDt)) : null,
+          DueByDate: data.followUpCheck ? (!data.followUpDt ? null : newDate(data.followUpDt)) : null,
           Id: data.id,
         };
 
@@ -308,9 +307,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
         const activityData = [...actRowData, newRow];
 
         // re sort the rows to ensure the new field is put in the correct place chronologically
-        const sortedActivities = activityData.sort(
-          (a, b) => new Date(a.actDate).getTime() - new Date(b.actDate).getTime(),
-        );
+        const sortedActivities = activityData.sort((a, b) => a.actDate - b.actDate);
 
         setActRowData(sortedActivities);
         calculateActivityTotals(sortedActivities);
@@ -337,9 +334,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
           newRows[rowIndex] = updatedRow;
 
           // re sort the rows to ensure the new field is put in the correct place chronologically
-          const sortedActivities = newRows.sort(
-            (a, b) => new Date(a.actDate).getTime() - new Date(b.actDate).getTime(),
-          );
+          const sortedActivities = newRows.sort((a, b) => a.actDate - b.actDate);
 
           calculateActivityTotals(sortedActivities);
           setActRowData(sortedActivities);
