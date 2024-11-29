@@ -125,7 +125,12 @@ const SignUp = () => {
           // Show error  to prevent them from signing up again
           const userResponse = await verifyUserExits();
           if (userResponse.accountUserExists) {
-            setError('An error occurred, please contact Segue support');
+            setError('An error has occurred, please contact Segue support');
+            return;
+          } else if (userResponse.firstName || userResponse.lastName) {
+            setError(
+              `User ${userResponse.firstName} ${userResponse.lastName} is already registered with a different account pending email verification`,
+            );
             return;
           }
           setAuthMode('newUser');
