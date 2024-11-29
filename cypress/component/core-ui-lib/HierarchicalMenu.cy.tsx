@@ -3,7 +3,7 @@
 import { mount } from 'cypress/react18';
 import HierarchicalMenu from '../../../components/core-ui-lib/HierarchicalMenu';
 import BaseComp from '../global/BaseComp';
-import { createRef, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 function setup(props, ref = null) {
   mount(
@@ -160,13 +160,10 @@ describe('HierarchicalMenu Component', () => {
     cy.contains('Option 1-1').next().click();
     cy.contains('Option 1-1-1').should('be.visible');
 
-    const labels = ['Option 1', 'Option 1-1', 'Option 1-1-1'];
     cy.contains('Option 1')
       .parent()
       .parent()
       .then(($parent) => {
-        const parentRect = $parent[0].getBoundingClientRect();
-
         const elements = ['Option 1', 'Option 1-1', 'Option 1-1-1'];
 
         elements.forEach((el) => {
