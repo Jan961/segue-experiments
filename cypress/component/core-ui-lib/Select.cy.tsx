@@ -14,36 +14,36 @@ function setup(props: SelectProps) {
 }
 
 const names = [
-  'Abigail',
-  'Benjamin',
-  'Charlotte',
-  'Daniel',
-  'Ethan',
-  'Fiona',
-  'Gabriella',
-  'Henry',
-  'Isabella',
-  'Jackson',
-  'Katherine',
-  'Liam',
-  'Madison',
-  'Nathaniel',
-  'Olivia',
-  'Patrick',
-  'Quentin',
-  'Rebecca',
-  'Samuel',
-  'Thomas',
-  'Uma',
-  'Victoria',
-  'William',
-  'Xavier',
-  'Yasmine',
-  'Zachary',
-  'Alexandra',
-  'Felix',
-  'Ophelia',
-  'Jasper',
+  { value: 'Abigail', text: 'Abigail' },
+  { value: 'Benjamin', text: 'Benjamin' },
+  { value: 'Charlotte', text: 'Charlotte' },
+  { value: 'Daniel', text: 'Daniel' },
+  { value: 'Ethan', text: 'Ethan' },
+  { value: 'Fiona', text: 'Fiona' },
+  { value: 'Gabriella', text: 'Gabriella' },
+  { value: 'Henry', text: 'Henry' },
+  { value: 'Isabella', text: 'Isabella' },
+  { value: 'Jackson', text: 'Jackson' },
+  { value: 'Katherine', text: 'Katherine' },
+  { value: 'Liam', text: 'Liam' },
+  { value: 'Madison', text: 'Madison' },
+  { value: 'Nathaniel', text: 'Nathaniel' },
+  { value: 'Olivia', text: 'Olivia' },
+  { value: 'Patrick', text: 'Patrick' },
+  { value: 'Quentin', text: 'Quentin' },
+  { value: 'Rebecca', text: 'Rebecca' },
+  { value: 'Samuel', text: 'Samuel' },
+  { value: 'Thomas', text: 'Thomas' },
+  { value: 'Uma', text: 'Uma' },
+  { value: 'Victoria', text: 'Victoria' },
+  { value: 'William', text: 'William' },
+  { value: 'Xavier', text: 'Xavier' },
+  { value: 'Yasmine', text: 'Yasmine' },
+  { value: 'Zachary', text: 'Zachary' },
+  { value: 'Alexandra', text: 'Alexandra' },
+  { value: 'Felix', text: 'Felix' },
+  { value: 'Ophelia', text: 'Ophelia' },
+  { value: 'Jasper', text: 'Jasper' },
 ];
 
 // check typing
@@ -104,7 +104,7 @@ describe('Select Component', () => {
 
     cy.get('[data-testid="core-ui-lib-select"] div div').should('have.attr', 'aria-disabled', 'true');
     cy.get('[data-testid="core-ui-lib-select"]').click();
-    cy.get('#react-select-:r1:-listbox').should('not.exist');
+    cy.get('[id*=react-select][id$=listbox]').should('not.exist');
     cy.get('[role="listbox"]').should('not.exist');
   });
 
@@ -165,16 +165,41 @@ describe('Select Component', () => {
   });
 
   it('allows searching when isSearchable is true', () => {
-    const fileredNames = (input) => {
-      names.filter((name) => name.toLowerCase().includes(input.toLowerCase()));
-    };
+    // set up a function to filter names based on input
+    // const filterNames = (input:string) => names.reduce((res, { value }) =>
+    // value.toLowerCase().includes(input.toLowerCase()) ? [...res, value] : res, []);
 
-    setup({ onChange: cy.stub(), options, isSearchable: true });
+    const filterNames = (input: string) =>
+      names.filter(({ value }) => value.toLowerCase().includes(input.toLowerCase())).map(({ value }) => value);
 
-    cy.get('[data-testid="core-ui-lib-select"]').click();
-    cy.get('input').type('Option 2');
-    cy.get('.react-select__option').should('have.length', 1);
-    cy.get('.react-select__option').should('contain', 'Option 2');
+    // set up a function to check if the select filtering behaves as expected after each character is typed
+    function checkInput(fullInput: string) {
+      for (let i = 0; i < fullInput.length; i++) {
+        const char = fullInput.charAt(i);
+        cy.get('input').type(char);
+        cy.log(`filtered names: ${filterNames(fullInput.slice(0, i + 1))}`);
+
+        filterNames(fullInput.slice(0, i + 1)).forEach((name) => {
+          cy.contains(name).should('exist');
+        });
+        cy.get('[id*="react-select"][role="option"]').should(
+          'have.length',
+          filterNames(fullInput.slice(0, i + 1)).length,
+        );
+      }
+      cy.get('input').clear();
+    }
+
+    setup({ onChange: cy.stub(), options: names, isSearchable: true, isClearable: true });
+
+    // check some inputs
+    checkInput('Abigail');
+    checkInput('Benjamin');
+    checkInput('Ophelia');
+    checkInput('FakeName');
+    checkInput('aabdsf');
+
+    checkInput('jamin');
   });
 
   it('does not allow searching when isSearchable is false', () => {
