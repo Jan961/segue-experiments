@@ -95,7 +95,7 @@ const SignIn = () => {
           const formattedErrors = error.inner.reduce((acc, err) => {
             return {
               ...acc,
-              [err.path]: acc[err.path] ? [...acc[err.path], err.message[0]] : [err.message[0]],
+              [err.path]: acc[err.path] ? acc[err.path] : [err.message],
             };
           }, {});
           setValidationError(formattedErrors);
@@ -243,9 +243,7 @@ const SignIn = () => {
             disabled={isAuthenticated}
             autoComplete="off"
           />
-          {validationError?.password
-            ? validationError.password.map((error) => <AuthError key={error} error={error} />)
-            : null}
+          {validationError?.password && <AuthError error={validationError.password[0]} />}
           <div className="flex justify-end">
             <Link href="/auth/password-reset" passHref className="ml-4 mt-2">
               Forgotten Password?
