@@ -210,11 +210,9 @@ const Final = () => {
       }
 
       // get the salesFigures for the selected date/week if they exist
-      const response = await axios.post('/api/marketing/sales/final/read', {
+      const { data: sales } = await axios.post('/api/marketing/sales/final/read', {
         bookingId: bookings.selected,
       });
-
-      const sales = response.data;
 
       if (Object.values(sales).length > 0) {
         const salesFigures = sales as SalesFigureSet;

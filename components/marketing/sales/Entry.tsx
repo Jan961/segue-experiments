@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useMemo, useState } from 'react';
 import { Button, Checkbox, Table, TextArea, TextInput } from 'components/core-ui-lib';
 import { salesEntryColDefs, styleProps } from '../table/tableConfig';
 import { useRecoilState, useRecoilValue } from 'recoil';
@@ -7,7 +7,7 @@ import { productionJumpState } from 'state/booking/productionJumpState';
 import { SelectOption } from '../MarketingHome';
 import { getDateDaysAway, getMonday, newDate, toISO } from 'services/dateService';
 import { formatDecimalOnBlur, formatDecimalValue, isNullOrEmpty, isNullOrUndefined } from 'utils';
-import { Spinner } from 'components/global/Spinner';
+// import { Spinner } from 'components/global/Spinner';
 import { currencyState } from 'state/global/currencyState';
 import { UpdateWarningModal } from '../modal/UpdateWarning';
 import axios from 'axios';
@@ -65,15 +65,23 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
   const [batchUpdateData, setBatchUpdateData] = useState({});
   const [showWarning, setShowWarning] = useState<boolean>(false);
   const [warnFieldType, setWarnFieldType] = useState('');
-  const [loading, setLoading] = useState<boolean>(true);
+  const [, setLoading] = useState<boolean>(true);
   const [bookings, setBookings] = useRecoilState(bookingJumpState);
   const [setId, setSetId] = useState(-1);
-  const { selected: productionId } = useRecoilValue(productionJumpState);
+  const productionJump = useRecoilValue(productionJumpState);
   const [schoolErrors, setSchoolErrors] = useState([]);
   const [generalErrors, setGeneralErrors] = useState([]);
   const [warningIssued, setWarningIssued] = useState<boolean>(false);
   const currency = useRecoilValue(currencyState);
   const [salesApiAction, setSalesApiAction] = useState('create');
+  const [finalSales, setFinalSales] = useState(true);
+
+  const prodVenue = useMemo(() => {
+    const production = productionJump.productions.find((prod) => prod.Id === productionJump.selected);
+    const selectedBooking = bookings.bookings.find((booking) => booking.Id === bookings.selected);
+
+    return `${production?.ShowCode}${production?.Code} ${production?.ShowName} ${selectedBooking?.Venue?.Name}`;
+  }, [productionJump]);
 
   const compareSalesFigures = (prev, curr) => {
     // If prev is null, there are no errors.
@@ -272,7 +280,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
 
   const getSalesFrequency = async () => {
     try {
-      const response = await axios.get(`/api/marketing/sales/tourWeeks/${productionId.toString()}`);
+      const response = await axios.get(`/api/marketing/sales/tourWeeks/${productionJump.selected}`);
 
       if (typeof response.data === 'object') {
         const tourData = response.data as TourResponse;
@@ -364,7 +372,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
         const holdCompResponse = await axios.post('/api/marketing/sales/read/hold-comp', {
           bookingId: bookings.selected,
           salesDate,
-          productionId,
+          prodctionId: productionJump.selected,
         });
 
         const holdCompList = holdCompResponse.data;
@@ -466,6 +474,16 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
           setSalesDate(newDate());
         }
 
+        // check if final sales exist
+        const { data: finalSales } = await axios.post('/api/marketing/sales/final/read', {
+          bookingId: bookings.selected,
+        });
+
+        // if general.seatsSold is an empty string - display final sales messaghe
+        if (isNullOrEmpty(finalSales?.general?.seatsSold)) {
+          setFinalSales(true);
+        }
+
         setSalesFigures(inputDate, false, bookings.selected);
         setSalesFigures(inputDate, true, bookings.selected);
       } catch (error) {
@@ -502,12 +520,21 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
     },
   }));
 
+  // if(loading) {
+  //   return (<Spinner size="lg" className="mt-2 mr-3 -mb-1" />)
+  // }
+
   return (
     <div>
       {bookings.selected !== undefined && bookings.selected !== null && (
         <div>
-          {loading ? (
-            <Spinner size="lg" className="mt-2 mr-3 -mb-1" />
+          {finalSales ? (
+            <div className="text-base">
+              Sales cannot be entered for {prodVenue} because Final Sales have already been entered.
+              <br />
+              To enter further sales information, please return to Final Figures Entry and remove the previously entered
+              figures
+            </div>
           ) : (
             <div className="flex flex-row w-full gap-8">
               <div className="flex flex-col">
