@@ -9,6 +9,7 @@ import Checkbox from 'components/core-ui-lib/Checkbox';
 import DateRange from 'components/core-ui-lib/DateRange';
 import { Icon, TextInput, UploadModal } from 'components/core-ui-lib';
 import { REGIONS_LIST, SALES_FIG_OPTIONS } from 'config/shows';
+import { newDate } from 'services/dateService';
 
 interface FormDataType {
   production: number | null;
@@ -134,8 +135,8 @@ const ProductionsViewModal = ({ visible, onClose, title, onSave }: ProductionsVi
               onChange('rehearsalToDate', !rehearsalToDate && !to ? from?.toISOString() : to?.toISOString() || '');
             }}
             value={{
-              from: rehearsalFromDate ? new Date(rehearsalFromDate) : null,
-              to: rehearsalToDate ? new Date(rehearsalToDate) : null,
+              from: rehearsalFromDate ? newDate(rehearsalFromDate) : null,
+              to: rehearsalToDate ? newDate(rehearsalToDate) : null,
             }}
           />
         </div>
@@ -149,8 +150,8 @@ const ProductionsViewModal = ({ visible, onClose, title, onSave }: ProductionsVi
               onChange('productionToDate', !productionToDate && !to ? from?.toISOString() : to?.toISOString() || '');
             }}
             value={{
-              from: productionFromDate ? new Date(productionFromDate) : null,
-              to: productionToDate ? new Date(productionToDate) : null,
+              from: productionFromDate ? newDate(productionFromDate) : null,
+              to: productionToDate ? newDate(productionToDate) : null,
             }}
           />
         </div>

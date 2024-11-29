@@ -5,13 +5,14 @@ import { useRecoilState, useRecoilValue } from 'recoil';
 import { bookingJumpState } from 'state/marketing/bookingJumpState';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import { SelectOption } from '../MarketingHome';
-import { addDurationToDate, getMonday, toISO } from 'services/dateService';
+import { getDateDaysAway, getMonday, newDate, toISO } from 'services/dateService';
 import { formatDecimalOnBlur, formatDecimalValue, isNullOrEmpty, isNullOrUndefined } from 'utils';
 import { Spinner } from 'components/global/Spinner';
 import { currencyState } from 'state/global/currencyState';
 import { UpdateWarningModal } from '../modal/UpdateWarning';
 import axios from 'axios';
 import { decRegexLeadingZero } from 'utils/regexUtils';
+import { UTCDate } from '@date-fns/utc';
 
 export type TourResponse = {
   data: Array<SelectOption>;
@@ -294,7 +295,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
     seatsSoldVal: formatDecimalValue(fig?.seatsSoldVal),
   });
 
-  const setSalesFigures = async (inputDate: Date, previous: boolean, bookingId: number) => {
+  const setSalesFigures = async (inputDate: UTCDate, previous: boolean, bookingId: number) => {
     try {
       setLoading(true);
 
@@ -328,7 +329,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
       const duration = frequency === 'W' ? 7 : 1;
       let salesDate = frequency === 'W' ? getMonday(inputDate) : inputDate;
 
-      if (previous) salesDate = addDurationToDate(salesDate, duration, false);
+      if (previous) salesDate = getDateDaysAway(salesDate, -duration);
 
       const salesResponse = await axios.post('/api/marketing/sales/current/read', {
         bookingId,
@@ -458,11 +459,11 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
   useEffect(() => {
     const initForm = async () => {
       try {
-        let inputDate = new Date();
+        let inputDate = newDate();
         if (salesDate !== null) {
           inputDate = salesDate;
         } else {
-          setSalesDate(new Date());
+          setSalesDate(newDate());
         }
 
         setSalesFigures(inputDate, false, bookings.selected);
@@ -495,9 +496,9 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
 
   useImperativeHandle(ref, () => ({
     resetForm: (week) => {
-      setSalesDate(new Date(week));
-      setSalesFigures(new Date(week), false, null);
-      setSalesFigures(new Date(week), true, null);
+      setSalesDate(newDate(week));
+      setSalesFigures(newDate(week), false, null);
+      setSalesFigures(newDate(week), true, null);
     },
   }));
 

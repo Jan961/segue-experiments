@@ -223,11 +223,16 @@ const ArchSalesDialog = ({
     <PopupModal
       show={visible}
       title={title[variant]}
-      titleClass={classNames('text-xl text-primary-navy font-bold -mt-2', variant === 'both' ? 'w-48' : '')}
       onClose={handleModalCancel}
       subtitle={variant === 'both' ? '' : subTitle}
+      footerComponent={
+        <div className="float-right flex flex-row">
+          <Button className="w-32" variant="secondary" text="Cancel" onClick={onCancel} />
+          <Button className="ml-4 w-32" variant="primary" text="Accept" onClick={() => submitSelection()} />
+        </div>
+      }
     >
-      <div className="w-[340px] h-auto">
+      <div className={classNames('w-[340px]', loading && 'h-16')}>
         {variant === 'both' ? (
           <div>
             <Select
@@ -259,8 +264,6 @@ const ArchSalesDialog = ({
                   <div>
                     {prodCompData.length > 0 && (
                       <SalesTable
-                        containerHeight="h-auto"
-                        containerWidth="w-auto"
                         module="marketing"
                         variant="prodCompArch"
                         onCellValChange={selectForComparison}
@@ -282,8 +285,6 @@ const ArchSalesDialog = ({
               <div>
                 {prodCompData.length > 0 && (
                   <SalesTable
-                    containerHeight="h-auto"
-                    containerWidth="w-[340px]"
                     module="marketing"
                     variant="prodCompArch"
                     onCellValChange={selectForComparison}
@@ -297,12 +298,6 @@ const ArchSalesDialog = ({
           </div>
         )}
         <div className="text text-base text-primary-red mr-12">{errorMessage}</div>
-
-        <div className="float-right flex flex-row mt-5 py-2">
-          <Button className="w-32" variant="secondary" text="Cancel" onClick={onCancel} />
-
-          <Button className="ml-4 w-32" variant="primary" text="Accept" onClick={() => submitSelection()} />
-        </div>
       </div>
     </PopupModal>
   );
