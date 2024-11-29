@@ -10,6 +10,7 @@ import Button from 'components/core-ui-lib/Button';
 import { currentProductionSelector } from 'state/booking/selectors/currentProductionSelector';
 import { venueOptionsSelector } from 'state/booking/selectors/venueOptionsSelector';
 import { productionOptionsSelector } from 'state/booking/selectors/productionOptionsSelector';
+import { newDate } from 'services/dateService';
 
 const INITIAL_FORM_STATE = {
   productionId: null,
@@ -102,9 +103,9 @@ const Form = ({ onSubmit }: { onSubmit: (data: any) => void }) => {
                   toDate: !toDate && !to ? from?.toISOString() : to?.toISOString() || '',
                 })
               }
-              value={{ from: fromDate ? new Date(fromDate) : null, to: toDate ? new Date(toDate) : null }}
-              minDate={minDate ? new Date(minDate) : null}
-              maxDate={maxDate ? new Date(maxDate) : null}
+              value={{ from: fromDate ? newDate(fromDate) : null, to: toDate ? newDate(toDate) : null }}
+              minDate={minDate ? newDate(minDate) : null}
+              maxDate={maxDate ? newDate(maxDate) : null}
             />
           </div>
           <div className="col-span-2 col-start-4 row-start-4">

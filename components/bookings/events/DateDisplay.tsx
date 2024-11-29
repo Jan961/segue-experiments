@@ -18,7 +18,7 @@ export const DateDisplay = ({ date }: { date: string }) => {
       <div className="w-41 text-sm p-1 text-soft-primary-grey col-span-4 lg:col-span-3 xl:col-span-2">
         <div className={baseClass}>
           <div className="grid grid-cols-12">
-            <div className="col-span-6">{getWeekDay(date).slice(0, 3)}</div>
+            <div className="col-span-6">{getWeekDay(date, 'short')}</div>
             <div className="col-span-6 flex justify-end gap-1 px-1 overflow-hidden">
               <div>{dateToSimple(date)}</div>
             </div>
