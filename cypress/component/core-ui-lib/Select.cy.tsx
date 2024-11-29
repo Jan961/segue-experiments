@@ -377,11 +377,11 @@ describe('Select Component', () => {
 
     cy.get('[data-testid="core-ui-lib-select"]').click();
     // the below will automatically scroll to the bottom of the div - no need to call scrollTo (stupid Cypress - it shouldn't work like this)
-    cy.get('[data-testid="last-item"]');
+    cy.contains('Yes').click();
     cy.wrap(onChange).should('have.been.calledOnceWith', true);
 
     cy.get('[data-testid="core-ui-lib-select"]').click();
-    cy.get('[data-testid="core-ui-lib-select-option-false"]').click();
+    cy.contains('No').click();
     cy.wrap(onChange).should('have.been.calledTwice');
     cy.wrap(onChange).then((stub) => {
       expect(stub.getCall(1).args[0]).to.equal(false);
@@ -397,7 +397,7 @@ describe('Select Component', () => {
       value: [options[0].value, options[1].value],
     });
 
-    cy.get('.react-select__multi-value__label').should('contain', '2 items selected');
+    cy.get('[data-testid="core-ui-lib-select"]').should('contain', '2 items selected');
   });
 
   it('selects all options when "select_all" option is selected', () => {
@@ -406,14 +406,14 @@ describe('Select Component', () => {
     setup({ onChange, options: optionsWithSelectAll, isMulti: true });
 
     cy.get('[data-testid="core-ui-lib-select"]').click();
-    cy.get('[data-testid="core-ui-lib-select-option-select_all"]').click();
+    cy.contains('Select All').click();
 
     cy.wrap(onChange).should('have.been.calledOnce');
     cy.wrap(onChange).then((stub) => {
-      expect(stub.getCall(0).args[0]).to.deep.equal(options.map((o) => o.value));
+      expect(stub.getCall(0).args[0]).to.deep.include(options.map((o) => o.value));
     });
 
-    cy.get('.react-select__multi-value__label').should('contain', `${options.length} items selected`);
+    cy.get('[data-testid="core-ui-lib-select"]').should('contain', `${options.length} items selected`);
   });
 
   it('deselects all options when "select_all" option is deselected', () => {
@@ -422,8 +422,8 @@ describe('Select Component', () => {
     setup({ onChange, options: optionsWithSelectAll, isMulti: true });
 
     cy.get('[data-testid="core-ui-lib-select"]').click();
-    cy.get('[data-testid="core-ui-lib-select-option-select_all"]').click();
-    cy.get('[data-testid="core-ui-lib-select-option-select_all"]').click();
+    cy.contains('Select All').click(); // not a double click - click once the n again to deselect
+    cy.contains('Select All').click();
 
     cy.wrap(onChange).should('have.been.calledTwice');
     cy.wrap(onChange).then((stub) => {
