@@ -1,3 +1,4 @@
+import { UTCDate } from '@date-fns/utc';
 import { DealMemoHold, DealMemoPrice, Region } from 'prisma/generated/prisma-client';
 
 export type StatusCode = 'C' | 'U' | 'X';
@@ -109,7 +110,7 @@ export type ProductionTaskDTO = {
   TaskAssignedToAccUserId?: number;
   StartDate?: string;
   CompleteDate?: string;
-  TaskCompletedDate: Date;
+  TaskCompletedDate: UTCDate;
   ProductionTaskRepeat?: any;
   PRTId?: number;
   CopiedFrom?: string;
@@ -148,11 +149,11 @@ export type Production = {
   Code: string;
   Logo: string;
   ShowId: Show;
-  ProductionStartDate: Date;
-  ProductionEndDate: Date;
+  ProductionStartDate: UTCDate;
+  ProductionEndDate: UTCDate;
   Archived: boolean;
-  RehearsalStartDate: Date;
-  RehearsalEndDate: Date;
+  RehearsalStartDate: UTCDate;
+  RehearsalEndDate: UTCDate;
   Show: Show;
   ProductionTask: ProductionTaskDTO[];
 };
@@ -397,26 +398,26 @@ export type VenueContactDTO = {
 
 export type ActivityDTO = {
   Id?: number;
-  Date: Date | string;
+  Date: UTCDate | string;
   Name: string;
   BookingId: number;
   ActivityTypeId: number;
   CompanyCost: number;
   VenueCost: number;
   FollowUpRequired: boolean;
-  DueByDate?: Date | string;
+  DueByDate?: UTCDate | string;
   Notes: string;
 };
 
 export type GlobalActivityDTO = {
   Id?: number;
-  Date: Date | string;
+  Date: UTCDate | string;
   Name: string;
   ProductionId: number;
   ActivityTypeId: number;
   Cost: number;
   FollowUpRequired: boolean;
-  DueByDate?: Date | string;
+  DueByDate?: UTCDate | string;
   Notes: string;
 };
 
@@ -504,8 +505,8 @@ export type Venue = {
   VenueWarningNote: string | null;
   VenueStatus: string;
   deleted: number | null;
-  updated_at: Date;
-  created_at: Date;
+  updated_at: UTCDate;
+  created_at: UTCDate;
   // Define related types if needed
 };
 export type VenueTechnicalInfo = {
@@ -589,7 +590,7 @@ export interface IAttachedFile {
 export interface IFileData {
   description: string;
   originalFilename: string;
-  fileDT: Date;
+  fileDT: UTCDate;
   fileContent: any;
 }
 
@@ -597,14 +598,14 @@ export type ContractStatusType = {
   ContractNotes: string;
   BookingId: number;
   StatusCode: string;
-  SignedDate: Date;
+  SignedDate: UTCDate;
   SignedBy: string;
-  ReturnDate: Date;
+  ReturnDate: UTCDate;
   CheckedBy: string;
   RoyaltyPercentage: string;
   DealType: string;
   Notes: string;
-  ReceivedBackDate: Date;
+  ReceivedBackDate: UTCDate;
   Exceptions: string;
   BankDetailsSent: boolean;
   TechSpecSent: boolean;
@@ -616,11 +617,11 @@ export type ContractStatusType = {
 export type ContractBookingStatusType = {
   DateBlockId: number;
   VenueId: number;
-  FirstDate: Date;
+  FirstDate: UTCDate;
   StatusCode: string;
   PencilNum: number;
   LandingPageURL: string;
-  TicketsOnSaleFromDate: Date;
+  TicketsOnSaleFromDate: UTCDate;
   TicketsOnSale: boolean;
   MarketingPlanReceived: boolean;
   ContactInfoReceived: boolean;
@@ -638,7 +639,7 @@ export type ContractBookingStatusType = {
   CastRateTicketsNotes: string;
   RunTag: string;
   MarketingCostsStatus: string;
-  MarketingCostsApprovalDate: Date;
+  MarketingCostsApprovalDate: UTCDate;
   MarketingCostsNotes: string;
 };
 
@@ -676,9 +677,9 @@ export interface StandardSeatRowType {
 
 export interface VenueContractFormData {
   StatusCode: string;
-  SignedDate: Date;
-  ReturnDate: Date;
-  ReceivedBackDate: Date;
+  SignedDate: UTCDate;
+  ReturnDate: UTCDate;
+  ReceivedBackDate: UTCDate;
   DealType: string;
   bookingNotes: string;
   TicketPriceNotes: string;
@@ -705,9 +706,9 @@ export interface VenueContractFormData {
 
 export interface SaveContractFormState {
   StatusCode?: string;
-  SignedDate?: Date;
-  ReturnDate?: Date;
-  ReceivedBackDate?: Date;
+  SignedDate?: UTCDate;
+  ReturnDate?: UTCDate;
+  ReceivedBackDate?: UTCDate;
   DealType?: string;
   bookingNotes?: string;
   Exceptions?: string;
@@ -747,12 +748,12 @@ export interface DealMemoContractFormData {
   Id?: number;
   BookingId?: number;
   AccContId?: number;
-  RunningTime?: Date;
-  DateIssued?: Date;
+  RunningTime?: UTCDate;
+  DateIssued?: UTCDate;
   VatCode?: string;
   RunningTimeNotes?: string;
   PrePostShowEvents?: string;
-  VenueCurfewTime?: Date;
+  VenueCurfewTime?: UTCDate;
   PerformanceNotes?: string;
   ProgrammerVenueContactId?: number;
   ROTTPercentage?: number;
@@ -769,7 +770,7 @@ export interface DealMemoContractFormData {
   AgreedContraItems?: string;
   AgreedContraItemsNotes?: string;
   BOMVenueContactId?: number;
-  OnSaleDate?: Date;
+  OnSaleDate?: UTCDate;
   SettlementVenueContactId?: number;
   SellableSeats?: number;
   MixerDeskPosition?: string;
@@ -787,8 +788,8 @@ export interface DealMemoContractFormData {
   AgeNotes?: string;
   SalesDayNum?: number;
   MMVenueContactId?: number;
-  BrochureDeadline?: Date;
-  FinalProofBy?: Date;
+  BrochureDeadline?: UTCDate;
+  FinalProofBy?: UTCDate;
   PrintReqs?: string;
   LocalMarketingBudget?: string;
   LocalMarketingContra?: string;
@@ -802,8 +803,8 @@ export interface DealMemoContractFormData {
   SellMerchCommPercent?: number;
   SellPitchFee?: string;
   TechVenueContactId?: number;
-  TechArrivalDate?: Date;
-  TechArrivalTime?: Date;
+  TechArrivalDate?: UTCDate;
+  TechArrivalTime?: UTCDate;
   DressingRooms?: string;
   NumFacilitiesLaundry?: boolean;
   NumFacilitiesDrier?: boolean;
@@ -813,7 +814,7 @@ export interface DealMemoContractFormData {
   BarringClause?: string;
   AdvancePaymentRequired?: boolean;
   AdvancePaymentAmount?: string;
-  AdvancePaymentDueBy?: Date;
+  AdvancePaymentDueBy?: UTCDate;
   SettlementDays?: number;
   ContractClause?: string;
   DealMemoPrice?: DealMemoPrice[];
@@ -823,7 +824,7 @@ export interface DealMemoContractFormData {
   Status?: string;
   CompletedBy?: string;
   ApprovedBy?: string;
-  DateReturned?: Date;
+  DateReturned?: UTCDate;
   Notes?: string;
   CompAccContId?: number;
   SendTo?: Array<number>;

@@ -3,9 +3,10 @@ import libre from 'libreoffice-convert';
 import util from 'util';
 import ExcelJS from 'exceljs';
 import { addDays, differenceInDays, eachWeekOfInterval, endOfWeek, parse } from 'date-fns';
-import { formatDate, getDateObject } from 'services/dateService';
+import { formatDate, newDate } from 'services/dateService';
+import { UTCDate } from '@date-fns/utc';
 
-export const convertToPDF = async (workbook) => {
+export const convertToPDF = async (workbook: any) => {
   const excelbuffer = await workbook.xlsx.writeBuffer();
   const converter = util.promisify(libre.convert);
   const pdfBuffer = await converter(excelbuffer, '.pdf', undefined);
@@ -79,8 +80,8 @@ export const getWeeksBetweenDates = (
   endDate: string,
 ): Array<{ sundayDate: string; mondayDate: string }> => {
   // Parse input dates into Date objects
-  const start = getDateObject(startDate);
-  const end = getDateObject(endDate);
+  const start = newDate(startDate);
+  const end = newDate(endDate);
 
   // Get the start of each week between startDate and endDate
   const weeks = eachWeekOfInterval({ start, end }, { weekStartsOn: 0 }); // weekStartsOn: 0 (Sunday)
@@ -91,8 +92,8 @@ export const getWeeksBetweenDates = (
     const mondayDate = addDays(weekStart, 1); // Add 1 day to Sunday to get Monday
 
     return {
-      sundayDate: formatDate(sundayDate, 'yyyy-MM-dd'),
-      mondayDate: formatDate(mondayDate, 'yyyy-MM-dd'),
+      sundayDate: formatDate(new UTCDate(sundayDate), 'yyyy-MM-dd'),
+      mondayDate: formatDate(new UTCDate(mondayDate), 'yyyy-MM-dd'),
     };
   });
 };

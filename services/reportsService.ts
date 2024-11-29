@@ -1,4 +1,3 @@
-import moment from 'moment';
 import cheerio from 'cheerio';
 import { COLOR_HEXCODE } from './salesSummaryService';
 
@@ -70,11 +69,6 @@ const getHTMLFieldMaxWidth = (text: string) => {
 
 export const range = (start: number, end: number) =>
   Array.from({ length: end - start + 1 }, (_, index) => start + index);
-
-export const getCurrentMondayDate = () => {
-  const currentMonday = moment(new Date()).startOf('isoWeek').set('hour', 0).add(1, 'day');
-  return currentMonday.toISOString()?.split('T')?.[0];
-};
 
 export const applyGradientFillToColumn = ({
   worksheet,

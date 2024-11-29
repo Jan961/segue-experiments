@@ -50,6 +50,7 @@ import { ProductionWithDateblocks } from 'services/productionService';
 import { BookingsWithPerformances } from 'services/bookingService';
 import { dateTimeToTime, toISO } from 'services/dateService';
 import { getFileUrlFromLocation } from 'utils/fileUpload';
+import { UTCDate } from '@date-fns/utc';
 
 /*
 
@@ -68,7 +69,7 @@ We also have full control of types here so we can get type safety to child objec
 
 // This is so we can change the implimentation if needed. We had some issues with timezone.
 export const convertDate = (date: Date) => {
-  if (date) return toISO(date);
+  if (date) return toISO(date.getTime());
   return '';
 };
 
@@ -432,6 +433,7 @@ export const dealMemoMapper = (dealMemo: DealMemoContractFormData) => {
 export const mapToProductionTaskDTO = (t: ProductionTask): ProductionTaskDTO => {
   return {
     ...t,
+    TaskCompletedDate: new UTCDate(t.TaskCompletedDate),
   };
 };
 

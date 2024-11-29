@@ -1,7 +1,8 @@
 import getPrismaClient from 'lib/prisma';
-import { addDurationToDate, addOneMonth, calculateWeekNumber } from './dateService';
+import { addOneMonth, calculateWeekNumber, getDateDaysAway } from './dateService';
 import { sortTasksByDueAndAlpha } from 'utils/tasks';
 import { NextApiRequest } from 'next';
+import { UTCDate } from '@date-fns/utc';
 
 export const getMasterTasksList = async (req: NextApiRequest) => {
   const prisma = await getPrismaClient(req);
@@ -200,8 +201,8 @@ export const generateRecurringProductionTasks = async (
   const tasksToCreate = [];
 
   const taskAllowance = CompleteByWeekNum - StartByWeekNum;
-  let taskStartDate = addDurationToDate(prodStartDate, TaskRepeatFromWeekNum * 7, true);
-  const taskEndDate = addDurationToDate(prodStartDate, TaskRepeatToWeekNum * 7, true);
+  let taskStartDate = getDateDaysAway(prodStartDate, TaskRepeatFromWeekNum * 7);
+  const taskEndDate = getDateDaysAway(prodStartDate, TaskRepeatToWeekNum * 7);
 
   const multiplier = RepeatInterval === 'biWeekly' ? 2 : 1;
   while (taskStartDate <= taskEndDate) {
@@ -214,38 +215,34 @@ export const generateRecurringProductionTasks = async (
       Progress: parseInt(Progress) || 0,
       TaskAssignedToAccUserId,
       CompleteByIsPostProduction: CompleteByWeekNum > calculateWeekNumber(prodStartDate, prodBlock?.EndDate),
-      StartByWeekNum: calculateWeekNumber(prodStartDate, taskStartDate),
+      StartByWeekNum: calculateWeekNumber(prodStartDate, taskStartDate.getTime()),
       StartByIsPostProduction: StartByWeekNum > calculateWeekNumber(prodStartDate, prodBlock?.EndDate),
-      CompleteByWeekNum: calculateWeekNumber(prodStartDate, taskStartDate) + taskAllowance,
+      CompleteByWeekNum: calculateWeekNumber(prodStartDate, taskStartDate.getTime()) + taskAllowance,
       TaskCompletedDate,
       PRTId,
     });
     maxTaskCode++;
     taskStartDate =
-      RepeatInterval === 'monthly'
-        ? addOneMonth(taskStartDate)
-        : addDurationToDate(taskStartDate, 7 * multiplier, true);
+      RepeatInterval === 'monthly' ? addOneMonth(taskStartDate) : getDateDaysAway(taskStartDate, 7 * multiplier);
   }
   return tasksToCreate;
 };
 
 export const getNewTasksNum = (
-  prodStartDate: Date,
+  prodStartDate: UTCDate,
   taskRepeatFromWeekNum,
   taskRepeatToWeekNum,
   repeatInterval,
 ): number => {
-  let taskStartDate = addDurationToDate(prodStartDate, taskRepeatFromWeekNum * 7, true);
-  const taskEndDate = addDurationToDate(prodStartDate, taskRepeatToWeekNum * 7, true);
+  let taskStartDate = getDateDaysAway(prodStartDate, taskRepeatFromWeekNum * 7);
+  const taskEndDate = getDateDaysAway(prodStartDate, taskRepeatToWeekNum * 7);
 
   const multiplier = repeatInterval === 'biweekly' ? 2 : 1;
   let counter = 0;
   while (taskStartDate <= taskEndDate) {
     counter++;
     taskStartDate =
-      repeatInterval === 'monthly'
-        ? addOneMonth(taskStartDate)
-        : addDurationToDate(taskStartDate, 7 * multiplier, true);
+      repeatInterval === 'monthly' ? addOneMonth(taskStartDate) : getDateDaysAway(taskStartDate, 7 * multiplier);
   }
 
   return counter;

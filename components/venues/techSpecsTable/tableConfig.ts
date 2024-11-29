@@ -1,6 +1,6 @@
 import DefaultTextRenderer from 'components/core-ui-lib/Table/renderers/DefaultTextRenderer';
 import formatInputDate from 'utils/dateInputFormat';
-import { getTimeFromDateAndTime } from 'services/dateService';
+import { dateTimeToTime, newDate } from 'services/dateService';
 import ButtonRenderer from 'components/core-ui-lib/Table/renderers/ButtonRenderer';
 import IconRowRenderer from 'components/global/salesTable/renderers/IconRowRenderer';
 import { tileColors } from 'config/global';
@@ -18,9 +18,9 @@ export const attachmentsColDefs = [
     field: 'uploadDateTime',
     cellRenderer: DefaultTextRenderer,
     cellRendererParams: function (params) {
-      const updDate = new Date(params.data.uploadDateTime);
+      const updDate = newDate(params.data.uploadDateTime);
       return {
-        value: formatInputDate(updDate) + ' ' + getTimeFromDateAndTime(updDate),
+        value: formatInputDate(updDate) + ' ' + dateTimeToTime(updDate),
       };
     },
     width: 150,

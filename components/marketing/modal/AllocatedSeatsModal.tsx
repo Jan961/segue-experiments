@@ -10,7 +10,7 @@ import { ConfDialogVariant } from 'components/core-ui-lib/ConfirmationDialog/Con
 import { useRecoilValue } from 'recoil';
 import { userState } from 'state/account/userState';
 import formatInputDate from 'utils/dateInputFormat';
-import { getTimeFromDateAndTime } from 'services/dateService';
+import { dateTimeToTime } from 'services/dateService';
 import { hasAllocSeatsChanged } from '../utils';
 import { isNullOrEmpty } from 'utils';
 import FormError from 'components/core-ui-lib/FormError';
@@ -83,7 +83,7 @@ export default function AllocatedSeatsModal({
 
     if (type === 'edit') {
       const perf = performances.find(
-        (perfRec) => formatInputDate(perfRec.date) === data.date && getTimeFromDateAndTime(perfRec.date) === data.time,
+        (perfRec) => formatInputDate(perfRec.date) === data.date && dateTimeToTime(perfRec.date) === data.time,
       );
 
       setForm({
