@@ -11,6 +11,7 @@ export const fuseFilter: any = (options: any, searchTerm: string, keys: string[]
     shouldSort: true,
     useExtendedSearch: true,
     threshold: 0.5,
+    ignoreLocation: true,
     keys,
   };
 
