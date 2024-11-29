@@ -14,9 +14,16 @@ interface VenueBarringFormProps {
   validationErrors?: Record<string, string>;
   onChange: (data: any) => void;
   updateValidationErrrors?: (key: string, value: string) => void;
+  disabled?: boolean;
 }
 
-const VenueBarringForm = ({ venue, onChange, validationErrors, updateValidationErrrors }: VenueBarringFormProps) => {
+const VenueBarringForm = ({
+  venue,
+  onChange,
+  validationErrors,
+  updateValidationErrrors,
+  disabled,
+}: VenueBarringFormProps) => {
   const [formData, setFormData] = useState<Partial<UiTransformedVenue>>({ ...initialVenueBarringRules, ...venue });
   const [barredVenueTableRows, setBarredVenueTableRows] = useState<UiBarredVenue[]>(venue?.barredVenues || []);
   const venueOptions = useRecoilValue(venueOptionsSelector([venue?.id]));
@@ -77,6 +84,7 @@ const VenueBarringForm = ({ venue, onChange, validationErrors, updateValidationE
           className="w-full max-h-32 min-h-[50px]  justify-between"
           value={formData.barringClause}
           onChange={(e) => handleInputChange('barringClause', e.target.value)}
+          disabled={disabled}
         />
       </label>
       <div className="grid grid-cols-2 gap-7 ">
@@ -93,6 +101,7 @@ const VenueBarringForm = ({ venue, onChange, validationErrors, updateValidationE
                 className="w-full justify-between"
                 value={formData.preShow + ''}
                 onChange={(e) => handleInputChange('preShow', parseFloat(e.target.value))}
+                disabled={disabled}
               />
             </label>
             {validationErrors.preShow && <small className="text-primary-red">{validationErrors.preShow}</small>}
@@ -108,6 +117,7 @@ const VenueBarringForm = ({ venue, onChange, validationErrors, updateValidationE
                 className="w-full justify-between"
                 value={formData.postShow + ''}
                 onChange={(e) => handleInputChange('postShow', parseFloat(e.target.value))}
+                disabled={disabled}
               />
             </label>
             {validationErrors.postShow && <small className="text-primary-red">{validationErrors.postShow}</small>}
@@ -124,6 +134,7 @@ const VenueBarringForm = ({ venue, onChange, validationErrors, updateValidationE
                 inputClassName="w-full"
                 value={formData.barringMiles + ''}
                 onChange={(e) => handleInputChange('barringMiles', parseFloat(e.target.value))}
+                disabled={disabled}
               />
             </label>
             {validationErrors.barringMiles && (
@@ -138,6 +149,7 @@ const VenueBarringForm = ({ venue, onChange, validationErrors, updateValidationE
               testId="add-barred-venue-btn"
               text="Add Barred Venue"
               className="w-32"
+              disabled={disabled}
             />
           </div>
           <Table

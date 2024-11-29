@@ -438,108 +438,112 @@ export const newBookingColumnDefs = (
   addRow,
   deleteRow,
   showAddDeleteRow = false,
-) => [
-  {
-    headerName: 'Date',
-    field: 'date',
-    cellRenderer: showAddDeleteRow ? AddDeleteRowRenderer : DefaultCellRenderer,
-    cellRendererParams: {
-      addRow,
-      deleteRow,
+  canAccessNotes: boolean,
+) => {
+  const columns = [
+    {
+      headerName: 'Date',
+      field: 'date',
+      cellRenderer: showAddDeleteRow ? AddDeleteRowRenderer : DefaultCellRenderer,
+      cellRendererParams: {
+        addRow,
+        deleteRow,
+      },
+      width: showAddDeleteRow ? 155 : 112,
+      maxWidth: showAddDeleteRow ? 155 : 112,
     },
-    width: showAddDeleteRow ? 155 : 112,
-    maxWidth: showAddDeleteRow ? 155 : 112,
-  },
 
-  // for perf y/n the style for the checkbox is givin in the components\core-ui-lib\Table\gridStyles.ts
-  {
-    headerName: `Perf Y/N`,
-    field: 'perf',
-    width: 72,
-    maxWidth: 72,
-    cellRenderer: CheckPerfRenderer,
-    cellRendererParams: {
-      dayTypeOptions,
+    // for perf y/n the style for the checkbox is givin in the components\core-ui-lib\Table\gridStyles.ts
+    {
+      headerName: `Perf Y/N`,
+      field: 'perf',
+      width: 72,
+      maxWidth: 72,
+      cellRenderer: CheckPerfRenderer,
+      cellRendererParams: {
+        dayTypeOptions,
+      },
+      cellStyle: {
+        display: 'flex',
+        justifyContent: 'center',
+        paddingTop: '0.75rem',
+      },
     },
-    cellStyle: {
-      display: 'flex',
-      justifyContent: 'center',
-      paddingTop: '0.75rem',
-    },
-  },
 
-  {
-    headerName: 'Day Type',
-    field: 'dayType',
-    cellRenderer: SelectDayTypeRender,
-    cellRendererParams: {
-      dayTypeOptions,
+    {
+      headerName: 'Day Type',
+      field: 'dayType',
+      cellRenderer: SelectDayTypeRender,
+      cellRendererParams: {
+        dayTypeOptions,
+      },
+      width: 230,
+      maxWidth: 230,
+      cellStyle: {
+        overflow: 'visible',
+      },
     },
-    width: 230,
-    maxWidth: 230,
-    cellStyle: {
-      overflow: 'visible',
+    {
+      headerName: 'Venue',
+      field: 'venue',
+      cellRenderer: SelectVenueRenderer,
+      cellRendererParams: {
+        dayTypeOptions,
+        venueOptions,
+      },
+      flex: 1,
+      cellStyle: {
+        overflow: 'visible',
+      },
     },
-  },
-  {
-    headerName: 'Venue',
-    field: 'venue',
-    cellRenderer: SelectVenueRenderer,
-    cellRendererParams: {
-      dayTypeOptions,
-      venueOptions,
+    {
+      headerName: 'No Perf',
+      field: 'noPerf',
+      cellRenderer: NoPerfRenderer,
+      width: 72,
+      maxWidth: 72,
     },
-    flex: 1,
-    cellStyle: {
-      overflow: 'visible',
+    {
+      headerName: 'Times',
+      field: 'times',
+      wrapText: true,
+      cellRenderer: PerformanceTimesRenderer,
+      width: 102,
+      maxWidth: 102,
+      cellStyle: {
+        display: 'flex',
+        paddingTop: '0.3rem',
+      },
     },
-  },
-  {
-    headerName: 'No Perf',
-    field: 'noPerf',
-    cellRenderer: NoPerfRenderer,
-    width: 72,
-    maxWidth: 72,
-  },
-  {
-    headerName: 'Times',
-    field: 'times',
-    wrapText: true,
-    cellRenderer: PerformanceTimesRenderer,
-    width: 102,
-    maxWidth: 102,
-    cellStyle: {
-      display: 'flex',
-      paddingTop: '0.3rem',
+    {
+      headerName: 'Booking Status',
+      field: 'bookingStatus',
+      cellRenderer: SelectBookingStatusRenderer,
+      cellRendererParams: {
+        dayTypeOptions,
+      },
+      maxWidth: 180,
+      width: 180,
+      cellStyle: {
+        overflow: 'visible',
+      },
     },
-  },
-  {
-    headerName: 'Booking Status',
-    field: 'bookingStatus',
-    cellRenderer: SelectBookingStatusRenderer,
-    cellRendererParams: {
-      dayTypeOptions,
+    {
+      headerName: 'Pencil No.',
+      field: 'pencilNo',
+      cellRenderer: SelectPencilRenderer,
+      cellRendererParams: {
+        dayTypeOptions,
+      },
+      width: 110,
+      maxWidth: 110,
+      cellStyle: {
+        overflow: 'visible',
+      },
     },
-    maxWidth: 180,
-    width: 180,
-    cellStyle: {
-      overflow: 'visible',
-    },
-  },
-  {
-    headerName: 'Pencil No.',
-    field: 'pencilNo',
-    cellRenderer: SelectPencilRenderer,
-    cellRendererParams: {
-      dayTypeOptions,
-    },
-    width: 110,
-    maxWidth: 110,
-    cellStyle: {
-      overflow: 'visible',
-    },
-  },
-  {
+  ];
+
+  const notesColumn = {
     headerName: 'Notes',
     field: 'notes',
     cellRenderer: NoteColumnRenderer,
@@ -555,8 +559,10 @@ export const newBookingColumnDefs = (
       justifyContent: 'center',
       alignItems: 'center',
     },
-  },
-];
+  };
+
+  return canAccessNotes ? [...columns, notesColumn] : columns;
+};
 
 export const gapSuggestColumnDefs = [
   { headerName: 'Venue', field: 'Name', cellRenderer: SelectableColumnRenderer, flex: 1, headerClass: 'text-center' },
@@ -688,7 +694,7 @@ export const venueColumnDefs = [
   },
 ];
 
-export const venueContactDefs = (defaultRoles) => [
+export const venueContactDefs = (defaultRoles, disabled?: boolean) => [
   {
     headerName: 'Id',
     field: 'id',
@@ -706,7 +712,7 @@ export const venueContactDefs = (defaultRoles) => [
   {
     headerName: 'First Name',
     field: 'firstName',
-    editable: true,
+    editable: !disabled,
     cellRenderer: DefaultCellRenderer,
     width: 150,
     headerClass: 'text-center',
@@ -714,7 +720,7 @@ export const venueContactDefs = (defaultRoles) => [
   {
     headerName: 'Last Name',
     field: 'lastName',
-    editable: true,
+    editable: !disabled,
     cellRenderer: DefaultCellRenderer,
     width: 150,
     headerClass: 'text-center',
@@ -722,7 +728,7 @@ export const venueContactDefs = (defaultRoles) => [
   {
     headerName: 'Phone',
     field: 'phone',
-    editable: true,
+    editable: !disabled,
     cellRenderer: DefaultCellRenderer,
     width: 120,
     headerClass: 'text-center',
@@ -730,7 +736,7 @@ export const venueContactDefs = (defaultRoles) => [
   {
     headerName: 'Email',
     field: 'email',
-    editable: true,
+    editable: !disabled,
     cellRenderer: DefaultCellRenderer,
     flex: 1,
     headerClass: 'text-center',

@@ -287,6 +287,7 @@ export default function AddEditVenueModal({
               onChange={onChange}
               validationErrors={validationErrors}
               updateValidationErrrors={updateValidationErrors}
+              disabled={true}
             />
           </div>
           <h2 className="text-xl text-primary-navy font-bold pt-7">Addresses</h2>
@@ -297,6 +298,7 @@ export default function AddEditVenueModal({
               onChange={onChange}
               validationErrors={validationErrors}
               updateValidationErrrors={updateValidationErrors}
+              disabled={true}
             />
           </div>
           <div className="pt-7">
@@ -305,6 +307,7 @@ export default function AddEditVenueModal({
               venue={formData}
               contactsList={formData.venueContacts}
               onChange={onChange}
+              disabled={true}
             />
           </div>
           <div className="pt-7">
@@ -316,6 +319,7 @@ export default function AddEditVenueModal({
               updateValidationErrrors={updateValidationErrors}
               setFileList={setFileList}
               setDeleteList={setDeleteList}
+              disabled={true}
             />
             <div className="pt-7 ">
               <h2 className="text-xl text-primary-navy font-bold ">Barring</h2>
@@ -324,6 +328,7 @@ export default function AddEditVenueModal({
                 validationErrors={validationErrors}
                 onChange={onChange}
                 updateValidationErrrors={updateValidationErrors}
+                disabled={true}
               />
             </div>
             <div className="pt-7">
@@ -335,6 +340,7 @@ export default function AddEditVenueModal({
                 className="w-full max-h-40 min-h-[50px] justify-between"
                 value={formData.confidentialNotes}
                 onChange={(e) => handleInputChange('confidentialNotes', e.target.value)}
+                disabled={true}
               />
             </div>
             <div className="flex gap-4 pt-4 float-right">

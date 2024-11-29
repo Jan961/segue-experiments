@@ -16,6 +16,7 @@ interface VenueContactDetailsFormProps {
   tableHeight?: number;
   title?: string;
   module?: string;
+  disabled?: boolean;
 }
 
 const gridOptions = {
@@ -38,6 +39,7 @@ const VenueContactForm = ({
   tableHeight = 0, // 0 uses default sizing
   title = 'Venue Contacts',
   module = 'bookings',
+  disabled,
 }: VenueContactDetailsFormProps) => {
   const [venueContacts, setVenueContacts] = useState<UiVenueContact[]>(contactsList);
   const confVariant = 'delete';
@@ -110,7 +112,7 @@ const VenueContactForm = ({
 
   const onCellClicked = (e) => {
     const { column, rowIndex } = e;
-    if (column.colId === 'delete') {
+    if (column.colId === 'delete' && !disabled) {
       setShowDeleteModal(!showDeleteModal);
       setDeleteIndex(rowIndex);
     }
@@ -141,7 +143,7 @@ const VenueContactForm = ({
       <div className="flex flex-row items-center justify-between  pb-5">
         <h2 className="text-xl text-primary-navy font-bold ">{title}</h2>
         <Button
-          disabled={createMode}
+          disabled={createMode || disabled}
           onClick={onAddNewVenueContact}
           variant="primary"
           testId="add-new-contract-btn"
@@ -151,7 +153,7 @@ const VenueContactForm = ({
       <div className="min-h-52">
         <Table
           testId="venue-contacts-table"
-          columnDefs={venueContactDefs(venueRoleOptionList)}
+          columnDefs={venueContactDefs(venueRoleOptionList, disabled)}
           rowData={venueContacts}
           styleProps={tableStyleProps}
           getRowStyle={getRowStyle}

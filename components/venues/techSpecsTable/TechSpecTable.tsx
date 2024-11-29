@@ -13,9 +13,10 @@ interface TechSpecTableProps {
   venueId: number;
   setFilesToSend: (params: any) => void;
   setFilesToDelete: (params: any) => void;
+  disabled?: boolean;
 }
 
-export const TechSpecTable = ({ venueId, setFilesToSend, setFilesToDelete }: TechSpecTableProps) => {
+export const TechSpecTable = ({ venueId, setFilesToSend, setFilesToDelete, disabled }: TechSpecTableProps) => {
   const permissions = useRecoilValue(accessBookingsHome);
   const [uploadVisible, setUploadVisible] = useState<boolean>(null);
   const [rowData, setRowData] = useState([]);
@@ -112,7 +113,7 @@ export const TechSpecTable = ({ venueId, setFilesToSend, setFilesToDelete }: Tec
             await fetchFileList();
             setUploadVisible(true);
           }}
-          disabled={!permissions.includes('UPLOAD_ATTACHMENTS')}
+          disabled={!permissions.includes('UPLOAD_ATTACHMENTS') || disabled}
         />
       </div>
       {rowData.length > 0 && (

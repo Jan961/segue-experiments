@@ -13,6 +13,7 @@ interface VenueAddressFormProps {
   validationErrors?: Record<string, string>;
   updateValidationErrrors?: (key: string, value: string) => void;
   onChange: (data: any) => void;
+  disabled?: boolean;
 }
 const VenueAddressForm = ({
   venue,
@@ -20,6 +21,7 @@ const VenueAddressForm = ({
   validationErrors,
   updateValidationErrrors,
   onChange,
+  disabled,
 }: VenueAddressFormProps) => {
   const [formData, setFormData] = useState<Partial<UiTransformedVenue>>({ ...initialVenueAddressDetails, ...venue });
   const handleInputChange = (field: string, value: any) => {
@@ -55,6 +57,7 @@ const VenueAddressForm = ({
                 value={formData.primaryAddress1}
                 error={validationErrors.primaryAddress1}
                 onChange={(e) => handleInputChange('primaryAddress1', e.target.value)}
+                disabled={disabled}
               />
               <FormError error={validationErrors.primaryAddress1} className="absolute" />
             </div>
@@ -69,6 +72,7 @@ const VenueAddressForm = ({
             inputClassName="w-full"
             value={formData.primaryAddress2}
             onChange={(e) => handleInputChange('primaryAddress2', e.target.value)}
+            disabled={disabled}
           />
         </label>
         <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
@@ -80,6 +84,7 @@ const VenueAddressForm = ({
             inputClassName="w-full"
             value={formData.primaryAddress3}
             onChange={(e) => handleInputChange('primaryAddress3', e.target.value)}
+            disabled={disabled}
           />
         </label>
         <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
@@ -93,6 +98,7 @@ const VenueAddressForm = ({
               value={formData.primaryTown}
               error={validationErrors.primaryTown}
               onChange={(e) => handleInputChange('primaryTown', e.target.value)}
+              disabled={disabled}
             />
             <FormError error={validationErrors.primaryTown} className="absolute" />
           </div>
@@ -108,6 +114,7 @@ const VenueAddressForm = ({
               value={formData.primaryPostCode}
               onChange={(e) => handleInputChange('primaryPostCode', e.target.value)}
               error={validationErrors.primaryPostCode}
+              disabled={disabled}
             />
             <FormError error={validationErrors.primaryPostCode} className="absolute" />
           </div>
@@ -138,6 +145,7 @@ const VenueAddressForm = ({
                 options={countryOptions}
                 isSearchable
                 error={validationErrors.primaryCountry && true}
+                disabled={disabled}
               />
               <FormError error={validationErrors.primaryCountry} className="absolute" />
             </div>
@@ -152,6 +160,7 @@ const VenueAddressForm = ({
             inputClassName="w-full"
             value={formData.primaryPhoneNumber}
             onChange={(e) => handleInputChange('primaryPhoneNumber', e.target.value)}
+            disabled={disabled}
           />
         </label>
         <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
@@ -163,6 +172,7 @@ const VenueAddressForm = ({
             inputClassName="w-full"
             value={formData.primaryEMail}
             onChange={(e) => handleInputChange('primaryEMail', e.target.value)}
+            disabled={disabled}
           />
         </label>
         <label htmlFor="" className="grid grid-cols-[170px_minmax(100px,_1fr)] gap-10 justify-between  w-full">
@@ -173,6 +183,7 @@ const VenueAddressForm = ({
             className="w-full justify-between"
             inputClassName="w-full"
             value={formData.primaryWhat3Words}
+            disabled={disabled}
             onChange={(e) => handleInputChange('primaryWhat3Words', e.target.value)}
           />
         </label>
@@ -184,6 +195,7 @@ const VenueAddressForm = ({
             className="w-full justify-between"
             inputClassName="w-full"
             value={formData.what3WordsStage}
+            disabled={disabled}
             onChange={(e) => handleInputChange('what3WordsStage', e.target.value)}
           />
         </label>
@@ -196,6 +208,7 @@ const VenueAddressForm = ({
             inputClassName="w-full"
             value={formData.what3WordsLoading}
             onChange={(e) => handleInputChange('what3WordsLoading', e.target.value)}
+            disabled={disabled}
           />
         </label>
       </div>
@@ -210,6 +223,7 @@ const VenueAddressForm = ({
             inputClassName="w-full"
             value={formData.deliveryAddress1}
             onChange={(e) => handleInputChange('deliveryAddress1', e.target.value)}
+            disabled={disabled}
           />
         </label>
         <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
@@ -221,6 +235,7 @@ const VenueAddressForm = ({
             inputClassName="w-full"
             value={formData.deliveryAddress2}
             onChange={(e) => handleInputChange('deliveryAddress2', e.target.value)}
+            disabled={disabled}
           />
         </label>
         <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
@@ -231,6 +246,7 @@ const VenueAddressForm = ({
             className="w-full justify-between"
             inputClassName="w-full"
             value={formData.deliveryAddress3}
+            disabled={disabled}
             onChange={(e) => handleInputChange('deliveryAddress3', e.target.value)}
           />
         </label>
@@ -243,6 +259,7 @@ const VenueAddressForm = ({
             inputClassName="w-full"
             value={formData.deliveryTown}
             onChange={(e) => handleInputChange('deliveryTown', e.target.value)}
+            disabled={disabled}
           />
         </label>
         <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
@@ -254,6 +271,7 @@ const VenueAddressForm = ({
             inputClassName="w-full"
             value={formData.deliveryPostCode}
             onChange={(e) => handleInputChange('deliveryPostCode', e.target.value)}
+            disabled={disabled}
           />
         </label>
 
@@ -280,6 +298,7 @@ const VenueAddressForm = ({
             onChange={(value) => handleInputChange('deliveryCountry', parseInt(value as string, 10))}
             options={countryOptions}
             isSearchable
+            disabled={disabled}
           />
         </label>
         <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
@@ -291,6 +310,7 @@ const VenueAddressForm = ({
             inputClassName="w-full"
             value={formData.deliveryPhoneNumber}
             onChange={(e) => handleInputChange('deliveryPhoneNumber', e.target.value)}
+            disabled={disabled}
           />
         </label>
         <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
@@ -302,6 +322,7 @@ const VenueAddressForm = ({
             inputClassName="w-full"
             value={formData.deliveryEMail}
             onChange={(e) => handleInputChange('deliveryEMail', e.target.value)}
+            disabled={disabled}
           />
         </label>
       </div>

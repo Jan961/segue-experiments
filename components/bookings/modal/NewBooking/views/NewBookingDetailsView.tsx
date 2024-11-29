@@ -120,7 +120,16 @@ export default function NewBookingDetailsView({
     if (isNewBooking) {
       let dayTypeOption = null;
       if (dayTypeOptions && venueOptions) {
-        setColumnDefs(newBookingColumnDefs(dayTypeOptions, venueOptions, addRowToTable, removeRowFromTable));
+        setColumnDefs(
+          newBookingColumnDefs(
+            dayTypeOptions,
+            venueOptions,
+            addRowToTable,
+            removeRowFromTable,
+            changeBookingLength,
+            permissions.includes('ACCESS_BOOKING_NOTES'),
+          ),
+        );
         dayTypeOption = dayTypeOptions.find(({ value }) => value === dateType);
       }
 
@@ -179,7 +188,14 @@ export default function NewBookingDetailsView({
   useEffect(() => {
     if (data !== null && data.length > 0) {
       setColumnDefs(
-        newBookingColumnDefs(dayTypeOptions, venueOptions, addRowToTable, removeRowFromTable, changeBookingLength),
+        newBookingColumnDefs(
+          dayTypeOptions,
+          venueOptions,
+          addRowToTable,
+          removeRowFromTable,
+          changeBookingLength,
+          permissions.includes('ACCESS_BOOKING_NOTES'),
+        ),
       );
       setBookingData(data);
     }
@@ -440,6 +456,7 @@ export default function NewBookingDetailsView({
         productionItem={productionItem}
         onSave={handleSaveNote}
         onCancel={handleNotesCancel}
+        disabled={!permissions.includes('EDIT_BOOKING_NOTES')}
       />
       <div className="pt-8 w-full flex items-end justify-between">
         <Button

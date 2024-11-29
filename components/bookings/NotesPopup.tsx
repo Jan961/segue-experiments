@@ -11,9 +11,10 @@ interface NotesPopupProps {
   onSave: (n: string) => void;
   onCancel: () => void;
   productionItem: any;
+  disabled?: boolean;
 }
 
-export default function NotesPopup({ show, onSave, onCancel, productionItem, testId }: NotesPopupProps) {
+export default function NotesPopup({ show, onSave, onCancel, productionItem, testId, disabled }: NotesPopupProps) {
   const [note, setNote] = useState<string>('');
   const [confirm, setConfirm] = useState<boolean>(false);
   const [confVariant, setVariant] = useState<ConfDialogVariant>('close');
@@ -55,6 +56,7 @@ export default function NotesPopup({ show, onSave, onCancel, productionItem, tes
             className="mt-2 h-[237px] w-full min-w-[508px]"
             value={note}
             onChange={(e) => setNote(e.target.value)}
+            disabled={disabled}
           />
           <div className="w-full mt-4 flex justify-end items-center">
             <Button
@@ -70,6 +72,7 @@ export default function NotesPopup({ show, onSave, onCancel, productionItem, tes
               variant="primary"
               text="Save and Close"
               onClick={() => onSave(note)}
+              disabled={disabled}
             />
           </div>
         </div>

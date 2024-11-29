@@ -63,7 +63,7 @@ export default function BookingsTable({ rowData, tableRef }: BookingsTableProps)
     if (
       e.column.colId === 'note' &&
       canAccessNotes &&
-      permissions.includes('EDIT_BOOKING_NOTES') &&
+      permissions.includes('ACCESS_BOOKING_NOTES') &&
       e.data.venue &&
       !isNullOrEmpty(e.data.dayType)
     ) {
@@ -83,10 +83,10 @@ export default function BookingsTable({ rowData, tableRef }: BookingsTableProps)
       if (!data.Id && permissions.includes('CREATE_NEW_BOOKING')) {
         setShowAddEditBookingModal({
           visible: true,
-          startDate: e.data.dateTime,
-          endDate: e.data.dateTime,
+          startDate: data.dateTime,
+          endDate: data.dateTime,
         });
-      } else if (permissions.includes('EDIT_BOOKING_DETAILS')) {
+      } else if (data.Id && permissions.includes('EDIT_BOOKING_DETAILS')) {
         setShowAddEditBookingModal({
           visible: true,
           startDate: data.dateTime,
@@ -171,13 +171,13 @@ export default function BookingsTable({ rowData, tableRef }: BookingsTableProps)
         productionItem={productionItem}
         onSave={handleSaveNote}
         onCancel={() => setShowModal(false)}
+        disabled={!permissions.includes('EDIT_BOOKING_NOTES')}
       />
       {showAddEditBookingModal.visible && (
         <AddBooking {...showAddEditBookingModal} onClose={handleClose} bookingInfo={bookingInfo} />
       )}
       <ConfirmationDialog
         labelYes="OK"
-        labelNo=""
         show={showConfirmationModal}
         content={{ question: 'To Add / Edit Bookings please', warning: 'select a single Production' }}
         onYesClick={() => setShowConfirmationModal(false)}
