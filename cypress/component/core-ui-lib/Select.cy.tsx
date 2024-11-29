@@ -37,13 +37,14 @@ const names = [
   { value: 'Uma', text: 'Uma' },
   { value: 'Victoria', text: 'Victoria' },
   { value: 'William', text: 'William' },
+  { value: 'William', text: 'William' },
   { value: 'Xavier', text: 'Xavier' },
   { value: 'Yasmine', text: 'Yasmine' },
   { value: 'Zachary', text: 'Zachary' },
   { value: 'Alexandra', text: 'Alexandra' },
   { value: 'Felix', text: 'Felix' },
   { value: 'Ophelia', text: 'Ophelia' },
-  { value: 'Jasper', text: 'Jasper' },
+  { value: 'Jasper', text: 'akjsdhka laksjlak a kjalsla asjd;aks aks ;a jsadksksksj jasper' },
 ];
 
 // check typing
@@ -166,11 +167,8 @@ describe('Select Component', () => {
 
   it('allows searching when isSearchable is true', () => {
     // set up a function to filter names based on input
-    // const filterNames = (input:string) => names.reduce((res, { value }) =>
-    // value.toLowerCase().includes(input.toLowerCase()) ? [...res, value] : res, []);
-
     const filterNames = (input: string) =>
-      names.filter(({ value }) => value.toLowerCase().includes(input.toLowerCase())).map(({ value }) => value);
+      names.reduce((res, { text }) => (text.toLowerCase().includes(input.toLowerCase()) ? [...res, text] : res), []);
 
     // set up a function to check if the select filtering behaves as expected after each character is typed
     function checkInput(fullInput: string) {
@@ -197,9 +195,10 @@ describe('Select Component', () => {
     checkInput('Benjamin');
     checkInput('Ophelia');
     checkInput('FakeName');
-    checkInput('aabdsf');
-
     checkInput('jamin');
+
+    // problematic case before the FuseFilter settings fix - "jasper" is at the end of along string in the options
+    checkInput('Jasper');
   });
 
   it('does not allow searching when isSearchable is false', () => {

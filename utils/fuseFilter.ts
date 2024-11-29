@@ -6,11 +6,10 @@ export const fuseFilter: any = (options: any, searchTerm: string, keys: string[]
   if (fuseCustomParams) fuseCustomParams.keys = keys;
   const fuseParams = fuseCustomParams || {
     includeScore: true,
-    // includeMatches: true,
     isCaseSensitive: false,
     shouldSort: true,
     useExtendedSearch: true,
-    threshold: 0.5,
+    threshold: 0.3,
     ignoreLocation: true,
     keys,
   };
