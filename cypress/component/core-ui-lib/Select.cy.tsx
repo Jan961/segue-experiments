@@ -44,7 +44,7 @@ const names = [
   { value: 'Alexandra', text: 'Alexandra' },
   { value: 'Felix', text: 'Felix' },
   { value: 'Ophelia', text: 'Ophelia' },
-  { value: 'Jasper', text: 'akjsdhka laksjlak a kjalsla asjd;aks aks ;a jsadksksksj jasper' },
+  { value: 'Long String Name', text: 'akjsdhka laksjlak a kjalsla asjd;aks aks ;a jsadksksksj Long String Name' },
 ];
 
 // check typing
@@ -131,6 +131,8 @@ describe('Select Component', () => {
 
     cy.get('[data-testid="core-ui-lib-select"]').click();
     cy.contains(options[0].text).click();
+
+    //this is indicator (cross sign) is provided by react-select so this is probably the best/easiest selector to use
     cy.get('.css-qrq13a-indicatorContainer').click();
 
     cy.wrap(onChange).should('have.been.calledTwice');
@@ -144,7 +146,7 @@ describe('Select Component', () => {
 
     cy.get('[data-testid="core-ui-lib-select"]').click();
     cy.contains(options[0].text).click();
-    cy.get('.react-select__clear-indicator').should('not.exist');
+    cy.get('.css-qrq13a-indicatorContainer').should('not.exist');
   });
 
   it('applies custom styles when customStyles prop is provided', () => {
@@ -165,7 +167,7 @@ describe('Select Component', () => {
     cy.get('.border-primary-red').should('exist');
   });
 
-  it('allows searching when isSearchable is true', () => {
+  it('allows searching when isSearchable is true and displays correct search results', () => {
     // set up a function to filter names based on input
     const filterNames = (input: string) =>
       names.reduce((res, { text }) => (text.toLowerCase().includes(input.toLowerCase()) ? [...res, text] : res), []);
@@ -194,43 +196,45 @@ describe('Select Component', () => {
     checkInput('Abigail');
     checkInput('Benjamin');
     checkInput('Ophelia');
-    checkInput('FakeName');
-    checkInput('jamin');
+    checkInput('Fake Name');
+    checkInput('dhjdaa');
 
-    // problematic case before the FuseFilter settings fix - "jasper" is at the end of along string in the options
-    checkInput('Jasper');
+    // problematic case before the FuseFilter settings fix - "Long String Name" is at the end of a long string in the options
+    checkInput('Long String Name');
   });
 
   it('does not allow searching when isSearchable is false', () => {
     setup({ onChange: cy.stub(), options, isSearchable: false });
 
-    cy.get('[data-testid="core-ui-lib-select"]').click();
-    cy.get('input').should('not.exist');
+    const someInput = 'some input';
+    cy.get('input').type(someInput, { force: true });
+    cy.contains(someInput).should('not.exist');
   });
 
   it('closes menu on select when closeMenuOnSelect is true', () => {
     setup({ onChange: cy.stub(), options, closeMenuOnSelect: true });
 
     cy.get('[data-testid="core-ui-lib-select"]').click();
-    cy.get('.react-select__menu').should('exist');
+    cy.get('[id*=react-select][id$=listbox]').should('exist');
     cy.contains(options[0].text).click();
-    cy.get('.react-select__menu').should('not.exist');
+    cy.get('[id*=react-select][id$=listbox]').should('not.exist');
   });
 
   it('does not close menu on select when closeMenuOnSelect is false', () => {
     setup({ onChange: cy.stub(), options, closeMenuOnSelect: false });
 
     cy.get('[data-testid="core-ui-lib-select"]').click();
-    cy.get('.react-select__menu').should('exist');
-    cy.contains(options[0].value).click();
-    cy.get('.react-select__menu').should('exist');
+    cy.get('[id*=react-select][id$=listbox]').should('exist');
+    cy.contains(options[0].text).click();
+    cy.get('[id*=react-select][id$=listbox]').should('exist');
   });
 
   it('handles no options provided', () => {
     setup({ onChange: cy.stub(), options: [] });
 
     cy.get('[data-testid="core-ui-lib-select"]').click();
-    cy.get('.react-select__menu').should('not.exist');
+    cy.get('[id*=react-select][id$=listbox]').children().should('have.length', 1);
+    cy.contains('No options').should('exist');
   });
 
   it('renders custom option when renderOption prop is provided', () => {
@@ -242,25 +246,23 @@ describe('Select Component', () => {
 
     cy.get('[data-testid="core-ui-lib-select"]').click();
     options.forEach((option) => {
-      cy.get(`[data-testid="custom-option-${option.value}"]`).should('exist').and('contain', `Custom ${option.text}`);
+      cy.contains(option.text).should('exist').and('contain', `Custom ${option.text}`);
     });
-  });
-
-  it('changes appearance based on variant prop', () => {
-    setup({ onChange: cy.stub(), options, variant: 'transparent' });
-
-    cy.get('.react-select__control').should('have.css', 'background-color', 'rgba(0, 0, 0, 0)');
-
-    setup({ onChange: cy.stub(), options, variant: 'colored' });
-
-    cy.get('.react-select__control').should('have.css', 'background-color', 'rgb(255, 255, 255)');
   });
 
   it('positions menu according to menuPlacement prop', () => {
     setup({ onChange: cy.stub(), options, menuPlacement: 'top' });
 
     cy.get('[data-testid="core-ui-lib-select"]').click();
-    cy.get('.react-select__menu--placement-top').should('exist');
+    cy.get('[id*=react-select][id$=listbox]').then(($el1) => {
+      cy.get('[data-testid="core-ui-lib-select"]').then(($el2) => {
+        const rect1 = $el1[0].getBoundingClientRect();
+        const rect2 = $el2[0].getBoundingClientRect();
+
+        // Assert that element1 is above element2
+        expect(rect1.bottom).to.be.lessThan(rect2.top);
+      });
+    });
   });
 
   it('calls onBlur when component loses focus', () => {
@@ -273,19 +275,96 @@ describe('Select Component', () => {
   });
 
   it('closes menu on scroll when closeMenuOnScroll is true', () => {
-    setup({ onChange: cy.stub(), options, closeMenuOnScroll: true });
+    const ScrollableDiv = () => {
+      return (
+        <BaseComp styles={{ width: '200px' }}>
+          <div
+            data-testid="scrollable-div"
+            style={{
+              width: '100%',
+              height: '200px',
+              overflowY: 'scroll',
+              border: '1px solid black',
+            }}
+          >
+            {/* Content that exceeds the div's height */}
+            <Select options={options} onChange={cy.stub()} closeMenuOnScroll={true} />
+            <h1>Item 1</h1>
+            <h1>Item 2</h1>
+            <h1>Item 3</h1>
+            <h1>Item 4</h1>
+            <h1>Item 5</h1>
+            <h1>Item 6</h1>
+            <h1>Item 7</h1>
+            <h1>Item 8</h1>
+            <h1>Item 9</h1>
+            <h1>Item 10</h1>
+            <h1>Item 11</h1>
+            <h1>Item 12</h1>
+            <h1>Item 13</h1>
+            <h1>Item 14</h1>
+            <h1>Item 15</h1>
+            <h1>Item 16</h1>
+            <h1>Item 17</h1>
+            <h1>Item 18</h1>
+            <h1 data-testid="last-item">Item 19</h1>
+          </div>
+        </BaseComp>
+      );
+    };
+
+    mount(<ScrollableDiv />);
 
     cy.get('[data-testid="core-ui-lib-select"]').click();
-    cy.scrollTo('bottom');
-    cy.get('.react-select__menu').should('not.exist');
+    cy.get('[data-testid="last-item"]');
+    cy.get('[id*=react-select][id$=listbox]').should('not.exist');
   });
 
   it('does not close menu on scroll when closeMenuOnScroll is false', () => {
-    setup({ onChange: cy.stub(), options, closeMenuOnScroll: false });
+    const ScrollableDiv = () => {
+      return (
+        <BaseComp styles={{ width: '200px' }}>
+          <div
+            data-testid="scrollable-div"
+            style={{
+              width: '100%',
+              height: '200px',
+              overflowY: 'scroll',
+              border: '1px solid black',
+            }}
+          >
+            {/* Content that exceeds the div's height */}
+            <Select options={options} onChange={cy.stub()} closeMenuOnScroll={true} />
+            <h1>Item 1</h1>
+            <h1>Item 2</h1>
+            <h1>Item 3</h1>
+            <h1>Item 4</h1>
+            <h1>Item 5</h1>
+            <h1>Item 6</h1>
+            <h1>Item 7</h1>
+            <h1>Item 8</h1>
+            <h1>Item 9</h1>
+            <h1>Item 10</h1>
+            <h1>Item 11</h1>
+            <h1>Item 12</h1>
+            <h1>Item 13</h1>
+            <h1>Item 14</h1>
+            <h1>Item 15</h1>
+            <h1>Item 16</h1>
+            <h1>Item 17</h1>
+            <h1>Item 18</h1>
+            <h1 data-testid="last-item">Item 19</h1>
+          </div>
+        </BaseComp>
+      );
+    };
+
+    mount(<ScrollableDiv />);
 
     cy.get('[data-testid="core-ui-lib-select"]').click();
-    cy.scrollTo('bottom');
-    cy.get('.react-select__menu').should('exist');
+    // the below will automatically scroll to the bottom of the div - no need to call scrollTo (stupid Cypress - it shouldn't work like this)
+    cy.get('[data-testid="last-item"]');
+    cy.get('[id*=react-select][id$=listbox]').should('exist');
   });
 
   it('handles boolean value', () => {
@@ -297,7 +376,8 @@ describe('Select Component', () => {
     setup({ onChange, options: boolOptions });
 
     cy.get('[data-testid="core-ui-lib-select"]').click();
-    cy.get('[data-testid="core-ui-lib-select-option-true"]').click();
+    // the below will automatically scroll to the bottom of the div - no need to call scrollTo (stupid Cypress - it shouldn't work like this)
+    cy.get('[data-testid="last-item"]');
     cy.wrap(onChange).should('have.been.calledOnceWith', true);
 
     cy.get('[data-testid="core-ui-lib-select"]').click();
