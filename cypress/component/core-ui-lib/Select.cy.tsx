@@ -418,6 +418,7 @@ describe('Select Component', () => {
     });
 
     cy.get('[data-testid="core-ui-lib-select"]').should('contain', `${options.length} items selected`);
+    cy.get('[aria-selected="true"]').should('have.length', options.length + 1); // +1 for the "Select All" option
   });
 
   it.only('deselects all options when "select_all" option is deselected', () => {
@@ -426,7 +427,7 @@ describe('Select Component', () => {
     setup({ onChange, options: optionsWithSelectAll, isMulti: true });
 
     cy.get('[data-testid="core-ui-lib-select"]').click();
-    cy.contains('Select All').click(); // not a double click - click once the n again to deselect
+    cy.contains('Select All').click(); // not a double click - click once the and again to deselect
     cy.contains('Select All').click();
 
     cy.wrap(onChange).should('have.been.calledTwice');
@@ -438,6 +439,6 @@ describe('Select Component', () => {
         });
     });
 
-    cy.get('.react-select__multi-value__label').should('not.exist');
+    cy.get('[aria-selected="true"]').should('not.exist');
   });
 });
