@@ -1,6 +1,6 @@
 import { NextApiRequest } from 'next';
 import { generateRecurringProductionTasks } from 'services/TaskService';
-import { calculateWeekNumber } from 'services/dateService';
+import { calculateWeekNumber, newDate } from 'services/dateService';
 import { omit } from 'radash';
 import { Prisma } from '@prisma/client';
 
@@ -91,7 +91,10 @@ export const handleSingleTask = async (
 ) => {
   const Code = baseCode + index + 1;
 
-  const weeksCalculation = calculateWeekNumber(prodStartDate, prodEndDate);
+  const weeksCalculation = calculateWeekNumber(
+    newDate(prodStartDate.toISOString()),
+    newDate(prodEndDate.toISOString()),
+  );
   const taskCompleteBys = {
     StartByIsPostProduction: task.StartByWeekNum < 0 ? false : task.StartByWeekNum > weeksCalculation,
     CompleteByIsPostProduction: task.CompleteByWeekNum < 0 ? false : task.CompleteByWeekNum > weeksCalculation,
