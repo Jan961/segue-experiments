@@ -1,3 +1,4 @@
+import { UTCDate } from '@date-fns/utc';
 import { companyContractStatusOrder } from 'config/contracts';
 import { useMemo } from 'react';
 import { useRecoilValue } from 'recoil';
@@ -23,8 +24,8 @@ const useCompanyContractsFilter = () => {
           compareStrings(contract.lastName, contractText) ||
           compareStrings(contract.role, contractText)) &&
         (department === -1 || !department || department === contract.departmentId) &&
-        (!endDate || compareDatesWithoutTime(contract.dateIssued, endDate, '<=')) &&
-        (!startDate || compareDatesWithoutTime(contract.dateIssued, startDate, '>=')) &&
+        (!endDate || compareDatesWithoutTime(contract.dateIssued, new UTCDate(endDate), '<=')) &&
+        (!startDate || compareDatesWithoutTime(contract.dateIssued, new UTCDate(startDate), '>=')) &&
         (status === 'all' || status === contract.contractStatus)
       );
     });

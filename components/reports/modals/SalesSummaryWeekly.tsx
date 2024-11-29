@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import moment from 'moment';
-import { dateToSimple, getDateDaysAgo, toISO } from 'services/dateService';
+import { dateToSimple, getDateDaysAway, getMonday, newDate } from 'services/dateService';
 import { faLineChart } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
-import { getCurrentMondayDate, range } from 'services/reportsService';
+import { range } from 'services/reportsService';
 import { SwitchBoardItem } from 'components/global/SwitchBoardItem';
 import { Spinner } from 'components/global/Spinner';
 import { defaultStatus } from './SalesSummarySimple';
@@ -32,9 +31,7 @@ export default function SalesSummaryWeekly({ activeProductions }: Props) {
   };
 
   function formatShortYearDate(dateString) {
-    const dateMomentObject = moment(dateString) || moment(moment(dateString).format('DD/MM/YY'), 'DD/MM/YY'); // 1st argument - string, 2nd argument - format
-    const day = toISO(dateMomentObject as any).substring(0, 10);
-    return day; // new Date( dateMomentObject.toDate());
+    return dateToSimple(dateString);
   }
 
   function handleOnSubmit(e) {
@@ -42,7 +39,7 @@ export default function SalesSummaryWeekly({ activeProductions }: Props) {
     setStatus((prevStatus) => ({ ...prevStatus, submitting: true }));
     const selectedProduction = activeProductions.find((production) => production.Id === parseInt(inputs.Production));
     const toWeek = formatShortYearDate(inputs.ProductionWeek);
-    const fromWeek = formatShortYearDate(getDateDaysAgo(toWeek, inputs.numberOfWeeks * 7));
+    const fromWeek = formatShortYearDate(getDateDaysAway(toWeek, -inputs.numberOfWeeks * 7));
     setLoading(true);
     fetch('/api/reports/sales-summary-simple', {
       method: 'POST',
@@ -119,7 +116,7 @@ export default function SalesSummaryWeekly({ activeProductions }: Props) {
           setProductionWeeks([]);
           // Set production weeks with data
           setProductionWeeks(data || []);
-          const currentWeekMonday = getCurrentMondayDate();
+          const currentWeekMonday = getMonday(newDate());
           setInputs((prev) => ({ ...prev, ProductionWeek: currentWeekMonday }));
         })
         .finally(() => {
@@ -253,7 +250,7 @@ export default function SalesSummaryWeekly({ activeProductions }: Props) {
               </div>
             </div>
           </div>
-          <div className="opacity-25 fixed inset-0 z-40 bg-black"></div>
+          <div className="opacity-25 fixed inset-0 z-40 bg-black" />
         </>
       ) : null}
     </>

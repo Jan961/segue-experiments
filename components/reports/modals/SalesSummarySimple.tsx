@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { GetServerSideProps } from 'next';
 import { faPieChart } from '@fortawesome/free-solid-svg-icons';
-import moment from 'moment';
-import { dateToSimple } from 'services/dateService';
-import { getCurrentMondayDate, range } from 'services/reportsService';
+import { dateToSimple, getDateDaysAway, getKey, getMonday, newDate } from 'services/dateService';
+import { range } from 'services/reportsService';
 import axios from 'axios';
 import { SwitchBoardItem } from 'components/global/SwitchBoardItem';
 import { Spinner } from 'components/global/Spinner';
@@ -51,17 +50,14 @@ export default function SalesSummarySimple({ activeProductions }: Props) {
         setLoading(false);
       });
     setProductionWeeks(weeks);
-    const currentWeekMonday = getCurrentMondayDate();
+    const currentWeekMonday = getMonday(newDate());
     setInputs((prev) => ({ ...prev, productionWeek: currentWeekMonday }));
   };
 
   const downloadReport = async () => {
     const selectedProduction = activeProductions.find((production) => production.Id === parseInt(inputs.production));
     const toWeek = inputs.productionWeek?.split('T')?.[0];
-    const fromWeek = moment(inputs.productionWeek)
-      .subtract(inputs.numberOfWeeks - 1, 'weeks')
-      .toISOString()
-      ?.split('T')?.[0];
+    const fromWeek = getKey(getDateDaysAway(inputs.productionWeek, -(inputs.numberOfWeeks - 1) * 7));
     setLoading(true);
     fetch('/api/reports/sales-summary-simple', {
       method: 'POST',

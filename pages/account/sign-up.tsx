@@ -15,8 +15,9 @@ import { notify } from 'components/core-ui-lib';
 import { getCountriesAsSelectOptions, getCurrenciesAsSelectOptions } from 'services/globalService';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import LoadingOverlay from 'components/core-ui-lib/LoadingOverlay';
-import useAuth from 'hooks/useAuth';
+
 import Head from 'next/head';
+import useNavigation from 'hooks/useNavigation';
 
 export const getServerSideProps: GetServerSideProps = async () => {
   const planColors = ['#41a29a', '#0093c0', '#7b568d'];
@@ -88,7 +89,7 @@ const NewAccount = ({
   const [accountDetails, setAccountDetails] = useState<Account>(DEFAULT_ACCOUNT_DETAILS);
   const [subcriptionDetails, seSubscriptionDetails] = useState<Plan>(null);
   const [loading, setLoading] = useState(false);
-  const { getSignUpUrl } = useAuth();
+  const { getSignUpUrl } = useNavigation();
 
   const handleSaveAccountDetails = async (onSaveSuccess: () => void) => {
     setError('');

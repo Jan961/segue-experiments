@@ -1,9 +1,10 @@
+import { UTCDate } from '@date-fns/utc';
 import { atom } from 'recoil';
 
 export type GlobalActivityFilterState = {
   searchText?: string;
-  startDate?: Date;
-  endDate?: Date;
+  startDate?: UTCDate;
+  endDate?: UTCDate;
 };
 
 export const intialGbaFilterState: GlobalActivityFilterState = {
