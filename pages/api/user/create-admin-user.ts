@@ -47,7 +47,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
 
     const formattedProductions = productions.map(({ Id }) => ({
       AUPProductionId: Id,
-      AUPAccUserId: newUser.AccountUser[0].AccUserId,
+      AUPAccUserId: accountUserOnly ? newUser.AccUserId : newUser.AccountUser[0].AccUserId,
     }));
 
     await prismaClient.accountUserProduction.createMany({
