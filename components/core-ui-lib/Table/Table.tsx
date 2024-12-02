@@ -19,7 +19,7 @@ export type StyleProps = {
   headerColor?: string;
 };
 
-interface TableProps {
+export interface TableProps {
   rowData?: any[];
   columnDefs?: any[];
   styleProps?: StyleProps;
