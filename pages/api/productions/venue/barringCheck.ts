@@ -40,23 +40,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const prisma = await getPrismaClient(req);
     const givenStartDate = newDate(startDate);
     const givenEndDate = newDate(endDate);
-    // uv stands for user venue, The venue the user selected to do a barring check for
+
+    // Get user venue info
     const uv = await prisma.venue.findUnique({
       where: { Id: VenueId },
-      include: {
-        VenueBarredVenue_VenueBarredVenue_VBVVenueIdToVenue: true,
-      },
     });
+
     const {
       BarringWeeksPost: uvBarringWeeksPost,
       BarringWeeksPre: uvBarringWeeksPre,
       BarringMiles: uvBarringMiles,
     } = uv;
-    const uvBarredVenueList = uv.VenueBarredVenue_VenueBarredVenue_VBVVenueIdToVenue?.map(
-      (barredVenue) => barredVenue.BarredVenueId,
-    );
-    // Get all venues within the production, their bookings, and distances to the given venue
-    const bookingsWithDistances = await prisma.booking.findMany({
+
+    // Get all venues within the production and their bookings
+    const bookingsWithVenues = await prisma.booking.findMany({
       where: {
         DateBlock: { ProductionId },
         Venue: {
@@ -73,25 +70,51 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         },
       },
       include: {
-        Venue: {
-          include: {
-            VenueVenue1: { where: { Venue2Id: VenueId } },
-            VenueVenue2: { where: { Venue1Id: VenueId } },
-            VenueBarredVenue_VenueBarredVenue_VBVVenueIdToVenue: true,
-          },
-        },
+        Venue: true,
       },
     });
+
+    // Get all venue IDs from bookings
+    const venueIds = bookingsWithVenues.map((booking) => booking.Venue.Id);
+
+    // Fetch travel info for all relevant venues
+    const travelInfo = await prisma.venueVenueTravelView.findMany({
+      where: {
+        OR: [
+          {
+            Venue1Id: VenueId,
+            Venue2Id: { in: venueIds },
+          },
+          {
+            Venue2Id: VenueId,
+            Venue1Id: { in: venueIds },
+          },
+        ],
+      },
+    });
+
+    // Create a map for quick travel info lookup
+    const travelInfoMap = new Map();
+    travelInfo.forEach((info) => {
+      const otherVenueId = info.Venue1Id === VenueId ? info.Venue2Id : info.Venue1Id;
+      if (info.Mileage || info.TimeMins) {
+        travelInfoMap.set(otherVenueId, {
+          mileage: info.Mileage,
+          timeMins: info.TimeMins,
+        });
+      }
+    });
+
     let results: BarredVenue[] = [];
-    for (const { Venue: bv, FirstDate, Id } of bookingsWithDistances) {
-      // bv stands for booked Venue, All the venues booked on the specified production
+    for (const { Venue: bv, FirstDate, Id } of bookingsWithVenues) {
       let info = '';
       let isBarred = false;
-      const venueVenueInfo1 = bv.VenueVenue1[0];
-      const venueVenueInfo2 = bv.VenueVenue2[0];
-      const venueVenueInfo = venueVenueInfo1 || venueVenueInfo2 || null;
-      const distance = venueVenueInfo?.Mileage;
+
+      const venueVenueInfo = travelInfoMap.get(bv.Id);
+      const distance = venueVenueInfo?.mileage;
+
       if (bv.Id === VenueId || !distance) continue;
+
       const {
         BarringWeeksPost: bvBarringWeeksPost,
         BarringWeeksPre: bvBarringWeeksPre,
@@ -104,10 +127,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         isBarred = true;
         info = info + `${uv.Name} is within ${Miles} miles of ${bv.Name} `;
       }
-
-      const bvBarredVenueList = bv.VenueBarredVenue_VenueBarredVenue_VBVVenueIdToVenue.map(
-        (barredVenue) => barredVenue.BarredVenueId,
-      );
 
       const bvBarringStartDate = getDateFromWeekNumber(FirstDate.toISOString(), -bvBarringWeeksPre);
       const bvBarringEndDate = getDateFromWeekNumber(FirstDate.toISOString(), bvBarringWeeksPost);
@@ -122,12 +141,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           { fromDate: bvBarringStartDate, toDate: bvBarringEndDate },
         );
       const bvBarredDistanceCheck =
-        bvBarringPeriodOverlap && distance !== null && bvBarringMiles && distance?.lte(bvBarringMiles);
-      const bvBarredVenueCheck = bvBarringPeriodOverlap && bvBarredVenueList.includes(uv.Id);
-      if (bvBarredDistanceCheck || bvBarredVenueCheck) {
+        bvBarringPeriodOverlap && distance !== null && bvBarringMiles && distance <= bvBarringMiles;
+
+      if (bvBarredDistanceCheck) {
         isBarred = true;
         info = info + `${bv.Name} bars ${uv.Name} for selected period \n`;
       }
+
       const uvBarringStartDate = getDateFromWeekNumber(startDate, -uvBarringWeeksPre);
       const uvBarringEndDate = getDateFromWeekNumber(endDate, uvBarringWeeksPost);
       const uvBarringPeriodOverlap =
@@ -140,9 +160,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           { fromDate: new UTCDate(FirstDate), toDate: new UTCDate(FirstDate) },
         );
       const uvBarredDistanceCheck =
-        uvBarringPeriodOverlap && distance !== null && uvBarringMiles && distance?.lte(uvBarringMiles);
-      const uvBarredVenueCheck = uvBarringPeriodOverlap && uvBarredVenueList.includes(bv.Id);
-      if (uvBarredDistanceCheck || uvBarredVenueCheck) {
+        uvBarringPeriodOverlap && distance !== null && uvBarringMiles && distance <= uvBarringMiles;
+
+      if (uvBarredDistanceCheck) {
         isBarred = true;
         info = info + `${uv.Name} bars ${bv.Name} over period overlap \n`;
       }
@@ -150,6 +170,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       if (!isBarred) {
         info = 'No Barring Issues found';
       }
+
       const barredVenue = {
         id: bv.Id,
         bookingId: Id,
@@ -158,15 +179,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         mileage: Number(distance),
         date: FirstDate.toISOString(),
         hasBarringConflict: isBarred,
-        timeMins: venueVenueInfo.TimeMins,
+        timeMins: venueVenueInfo.timeMins,
         info,
       };
+
       if (filterBarredVenues) {
         if (isBarred) results.push(barredVenue);
         continue;
       }
       results.push(barredVenue);
     }
+
     results = results.sort((a: BarredVenue, b: BarredVenue) => Number(a?.mileage || 0) - Number(b?.mileage || 0));
 
     res.json(results);
