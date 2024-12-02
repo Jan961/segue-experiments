@@ -13,6 +13,7 @@ function setup(props: SelectProps) {
   );
 }
 
+// list of names to be used as options
 const names = [
   { value: 'Abigail', text: 'Abigail' },
   { value: 'Benjamin', text: 'Benjamin' },
@@ -46,10 +47,6 @@ const names = [
   { value: 'Ophelia', text: 'Ophelia' },
   { value: 'Long String Name', text: 'akjsdhka laksjlak a kjalsla asjd;aks aks ;a jsadksksksj Long String Name' },
 ];
-
-// check typing
-// width - different font for options and display
-// custom options
 
 describe('Select Component', () => {
   const options = [
@@ -174,19 +171,22 @@ describe('Select Component', () => {
 
     // set up a function to check if the select filtering behaves as expected after each character is typed
     function checkInput(fullInput: string) {
+      // type each character and check if the filtered names are displayed
       for (let i = 0; i < fullInput.length; i++) {
         const char = fullInput.charAt(i);
         cy.get('input').type(char);
         cy.log(`filtered names: ${filterNames(fullInput.slice(0, i + 1))}`);
-
+        // check if each filtered name is displayed
         filterNames(fullInput.slice(0, i + 1)).forEach((name) => {
           cy.contains(name).should('exist');
         });
+        // check if the number of displayed options is correct
         cy.get('[id*="react-select"][role="option"]').should(
           'have.length',
           filterNames(fullInput.slice(0, i + 1)).length,
         );
       }
+      // clear the input for the next test
       cy.get('input').clear();
     }
 
