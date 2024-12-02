@@ -100,7 +100,7 @@ describe('PopupModal Component', () => {
     cy.contains('Test Title').should('have.class', 'custom-title-class');
   });
 
-  it.only('render as expected with loads of content and vertical scroll set to true', () => {
+  it('render as expected with loads of content and vertical scroll set to true', () => {
     const loadsOfVerticalContent = () => {
       return (
         <BaseComp styles={{ width: '100vw', height: '100vh' }}>
@@ -170,7 +170,7 @@ describe('PopupModal Component', () => {
       expect(el.scrollHeight).to.be.greaterThan(el.clientHeight);
     });
   });
-  it.only('render as expected with loads of content and vertical scroll set to false', () => {
+  it('render as expected with loads of content and vertical scroll set to false', () => {
     const loadsHorizontalContent = () => {
       return (
         <BaseComp>
