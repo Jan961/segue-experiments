@@ -31,7 +31,6 @@ export default function PopupModal({
   panelClass,
   hasOverlay = false,
   closeOnOverlayClick = false,
-  verticalScroll = true,
   testId = 'overlay',
   footerComponent,
 }: PopupModalProps) {
@@ -110,10 +109,7 @@ export default function PopupModal({
                   <Dialog.Title className="text-xl font-bold leading-6 text-primary-navy">{subtitle}</Dialog.Title>
                 )}
 
-                <div
-                  className={`${verticalScroll ? '' : 'h-[max-content]'} mt-3 pr-3 overflow-y-auto`}
-                  data-testid="popup-modal-content"
-                >
+                <div className="h-[max-content]' mt-3 pr-3 overflow-y-auto" data-testid="popup-modal-content">
                   {children}
                 </div>
 

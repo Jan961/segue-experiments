@@ -100,11 +100,11 @@ describe('PopupModal Component', () => {
     cy.contains('Test Title').should('have.class', 'custom-title-class');
   });
 
-  it('render as expected with loads of content and vertical scroll set to true', () => {
+  it('render as expected with loads of overflowing content', () => {
     const loadsOfVerticalContent = () => {
       return (
         <BaseComp styles={{ width: '100vw', height: '100vh' }}>
-          <PopupModal show={true} title="Loads of vertical content" verticalScroll={true}>
+          <PopupModal show={true} title="Loads of vertical content">
             <div
               style={{
                 width: '800px',
@@ -170,11 +170,11 @@ describe('PopupModal Component', () => {
       expect(el.scrollHeight).to.be.greaterThan(el.clientHeight);
     });
   });
-  it('render as expected with loads of content and vertical scroll set to false', () => {
+  it('render as expected with not enough content to overflow given the popup modal max height & width', () => {
     const loadsHorizontalContent = () => {
       return (
         <BaseComp>
-          <PopupModal show={true} title="Loads of vertical content" verticalScroll={false}>
+          <PopupModal show={true} title="Loads of vertical content">
             <div
               style={{
                 display: 'grid',
@@ -225,5 +225,10 @@ describe('PopupModal Component', () => {
 
     mount(loadsHorizontalContent());
     cy.get('[data-testid="popup-modal-content"]').should('be.visible');
+    cy.get('[data-testid="popup-modal-content"]').should(($el) => {
+      const el = $el[0];
+      // Check if the element is scrollable
+      expect(el.scrollHeight).to.be.equal(el.clientHeight);
+    });
   });
 });
