@@ -6,8 +6,7 @@ import { bookingJumpState } from 'state/marketing/bookingJumpState';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import { SelectOption } from '../MarketingHome';
 import { getDateDaysAway, getMonday, newDate, toISO } from 'services/dateService';
-import { formatDecimalOnBlur, formatDecimalValue, isNullOrEmpty, isNullOrUndefined } from 'utils';
-// import { Spinner } from 'components/global/Spinner';
+import { formatDecimalOnBlur, formatDecimalValue, isNullOrEmpty, isNullOrUndefined, isUndefined } from 'utils';
 import { currencyState } from 'state/global/currencyState';
 import { UpdateWarningModal } from '../modal/UpdateWarning';
 import axios from 'axios';
@@ -65,7 +64,6 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
   const [batchUpdateData, setBatchUpdateData] = useState({});
   const [showWarning, setShowWarning] = useState<boolean>(false);
   const [warnFieldType, setWarnFieldType] = useState('');
-  const [, setLoading] = useState<boolean>(true);
   const [bookings, setBookings] = useRecoilState(bookingJumpState);
   const [setId, setSetId] = useState(-1);
   const productionJump = useRecoilValue(productionJumpState);
@@ -74,14 +72,18 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
   const [warningIssued, setWarningIssued] = useState<boolean>(false);
   const currency = useRecoilValue(currencyState);
   const [salesApiAction, setSalesApiAction] = useState('create');
-  const [finalSales, setFinalSales] = useState(true);
+  const [finalSales, setFinalSales] = useState(false);
 
   const prodVenue = useMemo(() => {
     const production = productionJump.productions.find((prod) => prod.Id === productionJump.selected);
     const selectedBooking = bookings.bookings.find((booking) => booking.Id === bookings.selected);
 
-    return `${production?.ShowCode}${production?.Code} ${production?.ShowName} ${selectedBooking?.Venue?.Name}`;
-  }, [productionJump]);
+    if (!isUndefined(selectedBooking?.Venue) && !isUndefined(production)) {
+      return `for ${production?.ShowCode}${production?.Code} ${production?.ShowName} ${selectedBooking?.Venue?.Name}`;
+    } else {
+      return '';
+    }
+  }, [bookings.selected]);
 
   const compareSalesFigures = (prev, curr) => {
     // If prev is null, there are no errors.
@@ -305,8 +307,6 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
 
   const setSalesFigures = async (inputDate: UTCDate, previous: boolean, bookingId: number) => {
     try {
-      setLoading(true);
-
       const emptySalesSet = {
         setId: 0,
         general: {
@@ -393,12 +393,8 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
 
         setSetId(salesSetId > -1 ? salesSetId : compHoldSetId > -1 ? compHoldSetId : -1);
       }
-
-      setLoading(false);
     } catch (error) {
       console.error(error);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -481,13 +477,17 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
           bookingId: bookings.selected,
         });
 
-        // if general.seatsSold is an empty string - display final sales messaghe
-        if (isNullOrEmpty(finalSales?.general?.seatsSold)) {
-          setFinalSales(true);
-        }
+        console.log(finalSales);
 
-        setSalesFigures(inputDate, false, bookings.selected);
-        setSalesFigures(inputDate, true, bookings.selected);
+        // if general.seatsSold is not an empty string - show final sales warning opposed to Sales Entry form
+        if (!isNullOrEmpty(finalSales?.general?.seatsSold)) {
+          setFinalSales(true);
+
+          // else get the sales figures from the database
+        } else {
+          setSalesFigures(inputDate, false, bookings.selected);
+          setSalesFigures(inputDate, true, bookings.selected);
+        }
       } catch (error) {
         console.log(error);
       }
@@ -525,20 +525,16 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
     },
   }));
 
-  // if(loading) {
-  //   return (<Spinner size="lg" className="mt-2 mr-3 -mb-1" />)
-  // }
-
   return (
     <div>
       {bookings.selected !== undefined && bookings.selected !== null && (
         <div>
           {finalSales ? (
             <div className="text-base">
-              Sales cannot be entered for {prodVenue} because Final Sales have already been entered.
+              Sales cannot be entered {prodVenue} because Final Sales have already been entered.
               <br />
               To enter further sales information, please return to Final Figures Entry and remove the previously entered
-              figures
+              figures.
             </div>
           ) : (
             <div className="flex flex-row w-full gap-8">
@@ -565,7 +561,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                         className="w-[137px]"
                         placeholder="Enter Seats"
                         id="genSeatsSold"
-                        value={currSalesFigureSet.general.seatsSold}
+                        value={currSalesFigureSet?.general?.seatsSold}
                         pattern={decRegexLeadingZero}
                         onFocus={(event) => event?.target?.select?.()}
                         onChange={(event) => handleSalesFigChange('seatsSold', 'general', event.target.value)}
@@ -577,7 +573,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                         className="w-[137px]"
                         placeholder="Enter Value"
                         id="genSeatsSoldVal"
-                        value={currSalesFigureSet.general.seatsSoldVal}
+                        value={currSalesFigureSet?.general?.seatsSoldVal}
                         onFocus={(event) => event?.target?.select?.()}
                         pattern={/^\d*(\.\d*)?$/}
                         onChange={(event) => handleSalesFigChange('seatsSoldVal', 'general', event.target.value)}
@@ -599,7 +595,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                         className="w-[137px] h-[31px] flex flex-col -mt-1"
                         placeholder="Enter Seats"
                         id="genSeatsReserved"
-                        value={currSalesFigureSet.general.seatsReserved}
+                        value={currSalesFigureSet?.general?.seatsReserved}
                         onFocus={(event) => event?.target?.select?.()}
                         pattern={decRegexLeadingZero}
                         onChange={(event) => handleSalesFigChange('seatsReserved', 'general', event.target.value)}
@@ -611,7 +607,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                         className="w-[137px]"
                         placeholder="Enter Value"
                         id="genSeatsReservedVal"
-                        value={currSalesFigureSet.general.seatsReservedVal}
+                        value={currSalesFigureSet?.general?.seatsReservedVal}
                         onFocus={(event) => event?.target?.select?.()}
                         pattern={/^\d*(\.\d*)?$/}
                         onChange={(event) => handleSalesFigChange('seatsReservedVal', 'general', event.target.value)}
@@ -672,7 +668,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                               className="w-[137px] h-[31px] flex flex-col -mt-1"
                               placeholder="Enter Seats"
                               id="schSeatsSold"
-                              value={currSalesFigureSet.schools.seatsSold}
+                              value={currSalesFigureSet?.schools?.seatsSold}
                               onFocus={(event) => event?.target?.select?.()}
                               pattern={decRegexLeadingZero}
                               onChange={(event) => handleSalesFigChange('seatsSold', 'schools', event.target.value)}
@@ -686,7 +682,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                               className="w-[137px] h-[31px] flex flex-col -mt-1"
                               placeholder="Enter Value"
                               id="schSeatsSoldVal"
-                              value={currSalesFigureSet.schools.seatsSoldVal}
+                              value={currSalesFigureSet?.schools?.seatsSoldVal}
                               onFocus={(event) => event?.target?.select?.()}
                               pattern={/^\d*(\.\d*)?$/}
                               onChange={(event) => handleSalesFigChange('seatsSoldVal', 'schools', event.target.value)}
@@ -716,7 +712,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                               className="w-[137px] h-[31px] flex flex-col -mt-1"
                               placeholder="Enter Seats"
                               id="schSeatsReserved"
-                              value={currSalesFigureSet.schools.seatsReserved}
+                              value={currSalesFigureSet?.schools?.seatsReserved}
                               onFocus={(event) => event?.target?.select?.()}
                               pattern={decRegexLeadingZero}
                               onChange={(event) => handleSalesFigChange('seatsReserved', 'schools', event.target.value)}
