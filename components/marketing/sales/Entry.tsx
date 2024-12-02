@@ -6,7 +6,7 @@ import { bookingJumpState } from 'state/marketing/bookingJumpState';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import { SelectOption } from '../MarketingHome';
 import { getDateDaysAway, getMonday, newDate, toISO } from 'services/dateService';
-import { formatDecimalOnBlur, formatDecimalValue, isNullOrEmpty, isNullOrUndefined, isUndefined } from 'utils';
+import { formatDecimalOnBlur, formatDecimalValue, isNullOrEmpty, isNullOrUndefined } from 'utils';
 import { currencyState } from 'state/global/currencyState';
 import { UpdateWarningModal } from '../modal/UpdateWarning';
 import axios from 'axios';
@@ -78,11 +78,9 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
     const production = productionJump.productions.find((prod) => prod.Id === productionJump.selected);
     const selectedBooking = bookings.bookings.find((booking) => booking.Id === bookings.selected);
 
-    if (!isUndefined(selectedBooking?.Venue) && !isUndefined(production)) {
-      return `for ${production?.ShowCode}${production?.Code} ${production?.ShowName} ${selectedBooking?.Venue?.Name}`;
-    } else {
-      return '';
-    }
+    return selectedBooking?.Venue && production
+      ? `for ${production?.ShowCode}${production?.Code} ${production?.ShowName} ${selectedBooking?.Venue?.Name}`
+      : '';
   }, [bookings.selected]);
 
   const compareSalesFigures = (prev, curr) => {
@@ -476,8 +474,6 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
         const { data: finalSales } = await axios.post('/api/marketing/sales/final/read', {
           bookingId: bookings.selected,
         });
-
-        console.log(finalSales);
 
         // if general.seatsSold is not an empty string - show final sales warning opposed to Sales Entry form
         if (!isNullOrEmpty(finalSales?.general?.seatsSold)) {
