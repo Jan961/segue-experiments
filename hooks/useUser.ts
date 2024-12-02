@@ -6,7 +6,7 @@ import { NEW_USER_PIN_EMAIL, NEW_USER_WELCOME_EMAIL } from 'config/global';
 import { Production } from 'components/admin/modals/config';
 import { TreeItemOption } from 'components/global/TreeSelect/types';
 import { generateUserPassword } from 'utils/authUtils';
-import useAuth from './useAuth';
+import useNavigation from './useNavigation';
 
 type UserDetails = {
   email: string;
@@ -22,7 +22,7 @@ type UserDetails = {
 const useUser = () => {
   const { isLoaded: isSignUpLoaded } = useSignUp();
   // 👇 useUrl() returns `null` until hydration, so plan for that with `??`;
-  const { getSignInUrl } = useAuth();
+  const { getSignInUrl } = useNavigation();
   const { session } = useSession();
   const [error, setError] = useState('');
   const [isBusy, setIsBusy] = useState(false);
