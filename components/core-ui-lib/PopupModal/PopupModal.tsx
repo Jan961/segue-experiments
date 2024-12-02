@@ -16,7 +16,6 @@ interface PopupModalProps {
   panelClass?: string;
   hasOverlay?: boolean;
   closeOnOverlayClick?: boolean;
-  verticalScroll?: boolean;
   testId?: string;
 }
 
