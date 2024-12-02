@@ -1,16 +1,18 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import Select from 'components/core-ui-lib/Select';
 import { mapBookingsToProductionOptions } from 'mappers/productionCodeMapper';
 import { bookingJumpState } from 'state/marketing/bookingJumpState';
 import { ProductionJumpMenu } from 'components/global/nav/ProductionJumpMenu';
-import useAxios from 'hooks/useAxios';
 import { SelectOption } from './MarketingHome';
 import { getWeekDay, DATE_PATTERNS } from 'services/dateService';
 import formatInputDate from 'utils/dateInputFormat';
 import { currencyState } from 'state/global/currencyState';
 import axios from 'axios';
+import useAxiosCancelToken from 'hooks/useCancelToken';
+import { debug } from 'utils/logging';
+import { isNullOrUndefined } from 'utils';
 
 type TourResponse = {
   data: Array<SelectOption>;
@@ -31,22 +33,35 @@ const SalesEntryFilters: React.FC<Props> = ({ onDateChanged }) => {
   const [lastDates, setLastDates] = useState([]);
   const [, setCurrency] = useRecoilState(currencyState);
 
-  const { fetchData } = useAxios();
+  const cancelToken = useAxiosCancelToken();
+
+  const initSelectedTourWeek = useCallback((tourWeeks = []) => {
+    if (Array.isArray(tourWeeks) && tourWeeks.length > 0) {
+      const selectedTourIndex = tourWeeks.findIndex((week) => week.selected === true);
+      if (selectedTourIndex !== -1) {
+        setSelectedTourWeek(tourWeeks[selectedTourIndex].value);
+      }
+    }
+  }, []);
 
   const getTourWeeks = async (productionId) => {
-    const data = await fetchData({
-      url: '/api/marketing/sales/tourWeeks/' + productionId.toString(),
-      method: 'POST',
-    });
-
-    if (typeof data === 'object') {
-      const tourData = data as TourResponse;
-      setTourWeeks(tourData.data);
-      if (tourData.frequency === 'W') {
-        setTourLabel('Sales Week');
-      } else if (tourData.frequency === 'D') {
-        setTourLabel('Sales Date');
+    try {
+      const { data } = await axios.post<TourResponse>(
+        '/api/marketing/sales/tourWeeks/' + productionId.toString(),
+        {},
+        { cancelToken },
+      );
+      if (data?.data) {
+        setTourWeeks(data?.data ?? []);
+        initSelectedTourWeek(data?.data ?? []);
+        if (data?.frequency === 'W') {
+          setTourLabel('Sales Week');
+        } else if (data?.frequency === 'D') {
+          setTourLabel('Sales Date');
+        }
       }
+    } catch (error) {
+      debug('Error retrieving tour weeks:', error);
     }
   };
 
@@ -120,22 +135,11 @@ const SalesEntryFilters: React.FC<Props> = ({ onDateChanged }) => {
   }, [bookings.bookings, lastDates]);
 
   useEffect(() => {
-    if (productionId !== null && productionId !== undefined) {
+    if (!isNullOrUndefined(productionId)) {
       getTourWeeks(productionId);
       fetchLastDates();
     }
   }, [productionId]);
-
-  useEffect(() => {
-    try {
-      const selectedTourIndex = tourWeeks.findIndex((week) => week.selected === true);
-      if (selectedTourIndex !== -1) {
-        setSelectedTourWeek(tourWeeks[selectedTourIndex].value);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }, [tourWeeks]);
 
   useEffect(() => {
     setSelectedValue(bookings.selected);
@@ -157,7 +161,7 @@ const SalesEntryFilters: React.FC<Props> = ({ onDateChanged }) => {
             </div>
 
             <Select
-              onChange={(tourWeek) => setTourWeek(tourWeek.toString())}
+              onChange={setTourWeek}
               value={selectedTourWeek}
               disabled={!productionId}
               placeholder="Select Sales Week"

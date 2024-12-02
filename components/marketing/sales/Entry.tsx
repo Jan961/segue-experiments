@@ -397,6 +397,8 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
       setLoading(false);
     } catch (error) {
       console.error(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -514,9 +516,12 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
 
   useImperativeHandle(ref, () => ({
     resetForm: (week) => {
-      setSalesDate(newDate(week));
-      setSalesFigures(newDate(week), false, null);
-      setSalesFigures(newDate(week), true, null);
+      const updatedDate = week ? newDate(week) : null;
+      setSalesDate(updatedDate);
+      if (updatedDate) {
+        setSalesFigures(newDate(week), false, null);
+        setSalesFigures(newDate(week), true, null);
+      }
     },
   }));
 
