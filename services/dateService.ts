@@ -584,9 +584,11 @@ export const compareDatesWithoutTime = (
   date1: UTCDate | string | number,
   date2: UTCDate | string | number,
   operator: ComparisonOperator,
+  date1Locale?: Locale,
+  date2Locale?: Locale,
 ): boolean => {
-  const d1 = safeDate(date1);
-  const d2 = safeDate(date2);
+  const d1 = safeDate(getKey(date1, date1Locale)).getTime();
+  const d2 = safeDate(getKey(date2, date2Locale)).getTime();
 
   switch (operator) {
     case '<':
