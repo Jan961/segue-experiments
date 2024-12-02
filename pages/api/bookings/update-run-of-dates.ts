@@ -140,6 +140,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const promises = [];
 
     for (const bookingType of Object.entries(rowsMap)) {
+      console.log('BT -> ', bookingType);
       const [type, { rowsToInsert, rowsToUpdate, rowsToDelete }] = bookingType;
       const deletePromises = [];
       rowsToDelete.forEach((rowToDelete) => {

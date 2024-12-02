@@ -36,7 +36,7 @@ const SelectBookingStatusRenderer = ({
         handleValueChange(null);
       }
     }
-  }, [data, node]);
+  }, [data.perf, data.dayType]);
 
   const bookingStatusOptions = useMemo(() => {
     return statusOptions.filter((option) => option.text !== 'Available');

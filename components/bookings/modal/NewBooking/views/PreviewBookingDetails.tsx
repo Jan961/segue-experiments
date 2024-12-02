@@ -157,6 +157,7 @@ export default function PreviewBookingDetails({
   };
 
   const getPerformanceTimes = (item) => {
+    console.log('Times', item.times);
     if (item.times) {
       const times = item.times.split(';');
       const accTimes = times.slice(0, item.noPerf);
@@ -171,7 +172,6 @@ export default function PreviewBookingDetails({
   };
 
   const formatRowData = (data) => {
-    console.log('Rows', data);
     const rowItems: PreviewDataItem[] = data.map((item: any) => {
       const calculateWeek = () => {
         return calculateWeekNumber(newDate(production.StartDate), newDate(item.dateAsISOString));

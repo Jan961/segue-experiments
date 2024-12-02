@@ -340,6 +340,7 @@ export default function NewBookingDetailsView({
 
   const handePreviewBookingClick = () => {
     const rowData = getRowData();
+    console.log('ROWDATA', rowData);
     if (!validateBooking(rowData)) {
       return;
     }

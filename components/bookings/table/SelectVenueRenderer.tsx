@@ -28,12 +28,12 @@ export default function SelectVenueRenderer({
   };
 
   useEffect(() => {
-    console.log(value);
     if (data) {
       if (data.isRunOfDates) {
         setIsDisabled(node.rowIndex > 0);
       }
-      setValue(value);
+
+      setValue(node.data.venue);
     }
   }, [data, node]);
 

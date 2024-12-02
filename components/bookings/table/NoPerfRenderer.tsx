@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ICellRendererParams } from 'ag-grid-community';
 import TextInputRenderer from 'components/core-ui-lib/Table/renderers/TextInputRenderer';
-import { isNullOrUndefined } from 'utils';
+import { isNullOrEmpty } from 'utils';
 
 const ROW_HEIGHT = 35;
 const MARGIN = 9;
@@ -16,10 +16,9 @@ const NoPerfRenderer = ({ eGridCell, value, setValue, data, api, node }: ICellRe
   };
 
   useEffect(() => {
-    if (data.perf && (value === 0 || value === null)) {
-      handleChange(1);
-    }
-    if (!data.perf) {
+    if (data.perf) {
+      handleChange(isNullOrEmpty(value) ? 1 : value);
+    } else if (!data.perf) {
       handleChange('');
       updateRowHeight(ROW_HEIGHT + MARGIN);
     } else {
@@ -27,11 +26,11 @@ const NoPerfRenderer = ({ eGridCell, value, setValue, data, api, node }: ICellRe
       updateRowHeight(value * ROW_HEIGHT + MARGIN);
     }
     setIsDisabled(!data.perf);
-  }, [data.perf, value]);
+  }, [data.perf]);
 
   const handleChange = (newValue) => {
     // changed the param name from event to newValue as this function in fact handles event.target.value
-    if (isNullOrUndefined(newValue)) {
+    if (isNullOrEmpty(newValue)) {
       setNoOfPerfs('');
       setValue(0);
       updateRowHeight(ROW_HEIGHT + MARGIN);

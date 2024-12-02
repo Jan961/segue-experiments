@@ -11,16 +11,17 @@ interface CheckPerfRendererProps extends ICellRendererParams {
 const CheckPerfRenderer = ({ eGridCell, data, dayTypeOptions, node, setValue, api }: CheckPerfRendererProps) => {
   const [perfChecked, setPerfChecked] = useState(false);
   const pencilledStatus = statusOptions.find(({ text }) => text === 'Pencilled').value;
+  const perfomanceDayType = dayTypeOptions.find(({ text }) => text === 'Performance').value;
 
   useEffect(() => {
-    const isChecked = data.perf || data.dayType === -2;
+    const isChecked = data.perf || data.dayType === perfomanceDayType;
     setValue(isChecked);
     setPerfChecked(isChecked);
   }, [data, dayTypeOptions]);
 
   const getDayType = (checked: boolean): string | number | boolean => {
     if (checked) {
-      return dayTypeOptions.find(({ text }) => text === 'Performance').value; // Set default dayType for check of permance
+      return perfomanceDayType; // Set default dayType for check of permance
     } else {
       if (node.rowIndex === 0) {
         return dayTypeOptions.find(({ text }) => text === 'TBA').value; // Set default dayType for uncheck of performance for top row only
