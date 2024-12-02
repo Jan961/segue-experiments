@@ -53,8 +53,8 @@ export default async function handle(req, res) {
     const numWeeks = salesStartWeek.ProdCoSaleStartWeek > 0 ? salesStartWeek : salesStartWeek * -1;
     const salesFrequency = production.SalesFrequency;
 
-    const startDate = getDateDaysAway(dateBlock[0].StartDate, numWeeks * 7);
-    const endDate = dateBlock[0].EndDate;
+    const startDate = getDateDaysAway(dateBlock[0].StartDate, numWeeks * -7);
+    const endDate = newDate(dateBlock[0].EndDate.getTime());
     const dateStartMonday = getMonday(startDate);
     const weeks = getWeeksBetweenDates(dateStartMonday.toISOString(), endDate.toISOString());
 
