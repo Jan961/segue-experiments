@@ -18,6 +18,8 @@ import {
   mapObjectValues,
   flattenHierarchicalOptions,
   tidyString,
+  replaceTemplateString,
+  getSegueMicroServiceUrl,
 } from 'utils';
 
 describe('Tests for utility functions', () => {
@@ -661,5 +663,115 @@ describe('tidyString', () => {
 
   it('should return the original string if the value contains spaces', () => {
     expect(tidyString('   spaces   ')).toBe('   spaces   ');
+  });
+});
+
+describe('replaceTemplateString', () => {
+  it('should return an empty string if template is null', () => {
+    expect(replaceTemplateString(null, { NAME: 'John' }, null, null)).toBe('');
+  });
+
+  it('should return the template if data is null', () => {
+    expect(replaceTemplateString('This a [template]', null, null, null)).toBe('This a [template]');
+  });
+
+  it('should return Hello, John!', () => {
+    expect(replaceTemplateString('Hello, {name}!', { name: 'John' }, '{', '}')).toBe('Hello, John!');
+  });
+
+  it('should replace all instances of  [DB_NAME] by frtxigoo_dev', () => {
+    const template = 'CREATE DATABASE [DB_NAME] WHERE [DB_NAME] IS NOT NULL; RETURN [DB_NAME];';
+    const replacements = { DB_NAME: 'frtxigoo_dev' };
+    const result = replaceTemplateString(template, replacements, '[', ']');
+    expect(result.split('frtxigoo_dev').length).toBe(4);
+  });
+});
+
+// ------------------------ getSegueMicroServiceUrl ------------------------
+describe('getSegueMicroServiceUrl', () => {
+  const originalEnv = process.env;
+
+  beforeEach(() => {
+    // Backup original environment variables
+    process.env = { ...originalEnv };
+    process.env.FASTHOST_BASE_URL = 'https://barringclause.co.uk';
+  });
+
+  afterEach(() => {
+    // Restore original environment variables
+    process.env = originalEnv;
+  });
+
+  it('should return the correct URL for production environment', () => {
+    process.env.DEPLOYMENT_ENV = 'prod';
+    const endpoint = '/convertDocxToPDF';
+    const result = getSegueMicroServiceUrl(endpoint);
+    expect(result).toBe('https://barringclause.co.uk/api/convertDocxToPDF');
+  });
+
+  it('should return the correct URL for development environment', () => {
+    process.env.DEPLOYMENT_ENV = 'dev';
+    const endpoint = '/convertDocxToPDF';
+    const result = getSegueMicroServiceUrl(endpoint);
+    expect(result).toBe('https://barringclause.co.uk/dev/api/convertDocxToPDF');
+  });
+
+  it('should return the correct URL for staging environment', () => {
+    process.env.DEPLOYMENT_ENV = 'staging';
+    const endpoint = '/convertDocxToPDF';
+    const result = getSegueMicroServiceUrl(endpoint);
+    expect(result).toBe('https://barringclause.co.uk/staging/api/convertDocxToPDF');
+  });
+
+  it('should handle a different endpoint for production', () => {
+    process.env.DEPLOYMENT_ENV = 'prod';
+    const endpoint = '/addVenue';
+    const result = getSegueMicroServiceUrl(endpoint);
+    expect(result).toBe('https://barringclause.co.uk/api/addVenue');
+  });
+
+  it('should handle a different endpoint for development', () => {
+    process.env.DEPLOYMENT_ENV = 'dev';
+    const endpoint = '/addVenue';
+    const result = getSegueMicroServiceUrl(endpoint);
+    expect(result).toBe('https://barringclause.co.uk/dev/api/addVenue');
+  });
+
+  it('should handle a different endpoint for staging', () => {
+    process.env.DEPLOYMENT_ENV = 'staging';
+    const endpoint = '/addVenue';
+    const result = getSegueMicroServiceUrl(endpoint);
+    expect(result).toBe('https://barringclause.co.uk/staging/api/addVenue');
+  });
+
+  it('should return undefined and log an error if FASTHOST_BASE_URL is not defined', () => {
+    delete process.env.FASTHOST_BASE_URL;
+    process.env.DEPLOYMENT_ENV = 'prod';
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
+    const endpoint = '/convertDocxToPDF';
+
+    const result = getSegueMicroServiceUrl(endpoint);
+
+    expect(result).toBeUndefined();
+    expect(consoleSpy).toHaveBeenCalledWith(
+      'either DEPLOYMENT_ENV or FASTHOST_BASE_URL is not set in the environment variables',
+    );
+
+    consoleSpy.mockRestore();
+  });
+
+  it('should return undefined and log an error if DEPLOYMENT_ENV is not defined', () => {
+    delete process.env.DEPLOYMENT_ENV;
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
+    const endpoint = '/convertDocxToPDF';
+
+    const result = getSegueMicroServiceUrl(endpoint);
+
+    expect(result).toBeUndefined();
+    expect(consoleSpy).toHaveBeenCalledWith(
+      'either DEPLOYMENT_ENV or FASTHOST_BASE_URL is not set in the environment variables',
+    );
+
+    consoleSpy.mockRestore();
   });
 });

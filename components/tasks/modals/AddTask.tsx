@@ -10,7 +10,6 @@ import PopupModal from 'components/core-ui-lib/PopupModal';
 import Select from 'components/core-ui-lib/Select';
 import TextArea from 'components/core-ui-lib/TextArea/TextArea';
 import TextInput from 'components/core-ui-lib/TextInput';
-import moment from 'moment';
 import { omit } from 'radash';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRecoilValue } from 'recoil';
@@ -20,10 +19,11 @@ import { isNullOrEmpty } from 'utils';
 import { getWeekOptions } from 'utils/taskDate';
 import { priorityOptions, generatePercentageOptions } from 'utils/tasks';
 import { productionJumpState } from 'state/booking/productionJumpState';
-import { addDurationToDate, addOneMonth } from 'services/dateService';
+import { addOneMonth, formatDate, getDateDaysAway, newDate } from 'services/dateService';
 import { RecurringTasksPopup } from './RecurringTasksPopup';
 import { DeleteRecurringPopup } from './DeleteRecurringPopup';
 import { useRouter } from 'next/router';
+import { UTCDate } from '@date-fns/utc';
 
 interface AddTaskProps {
   visible: boolean;
@@ -75,7 +75,7 @@ const DEFAULT_MASTER_TASK: Partial<MasterTask> & {
   Progress: 0,
   DueDate: '',
   ProductionId: 0,
-  TaskCompletedDate: '',
+  TaskCompletedDate: null,
 };
 
 const AddTask = ({
@@ -231,7 +231,7 @@ const AddTask = ({
     if (id === 'Progress') {
       newInputs = {
         ...newInputs,
-        TaskCompletedDate: value === 100 ? moment.utc(new Date(), 'DD/MM/YY').toString() : null,
+        TaskCompletedDate: value === 100 ? formatDate(newDate(), 'dd/MM/yy').toString() : null,
       };
 
       setInputs(newInputs);
@@ -242,11 +242,16 @@ const AddTask = ({
     setStatus({ ...status, submitted: false });
   };
 
-  const getNewTasksNum = (prodStartDate: Date, taskRepeatFromWeekNum, taskRepeatToWeekNum, repeatInterval): number => {
+  const getNewTasksNum = (
+    prodStartDate: UTCDate,
+    taskRepeatFromWeekNum,
+    taskRepeatToWeekNum,
+    repeatInterval,
+  ): number => {
     if (isNullOrEmpty(repeatInterval)) return 1;
 
-    let taskStartDate = addDurationToDate(prodStartDate, taskRepeatFromWeekNum * 7, true);
-    const taskEndDate = addDurationToDate(prodStartDate, taskRepeatToWeekNum * 7, true);
+    let taskStartDate = getDateDaysAway(prodStartDate, taskRepeatFromWeekNum * 7);
+    const taskEndDate = getDateDaysAway(prodStartDate, taskRepeatToWeekNum * 7);
 
     const multiplier = repeatInterval === 'biweekly' ? 2 : 1;
     let counter = 0;
@@ -254,9 +259,7 @@ const AddTask = ({
     while (taskStartDate <= taskEndDate) {
       counter++;
       taskStartDate =
-        repeatInterval === 'monthly'
-          ? addOneMonth(taskStartDate)
-          : addDurationToDate(taskStartDate, 7 * multiplier, true);
+        repeatInterval === 'monthly' ? addOneMonth(taskStartDate) : getDateDaysAway(taskStartDate, 7 * multiplier);
     }
 
     return counter;
@@ -306,14 +309,14 @@ const AddTask = ({
     }
 
     const previousTasks = getNewTasksNum(
-      new Date(production?.StartDate),
+      newDate(production?.StartDate),
       previousTaskInfo?.TaskRepeatFromWeekNum,
       previousTaskInfo?.TaskRepeatToWeekNum,
       previousTaskInfo?.RepeatInterval,
     );
 
     const updatedTasks = getNewTasksNum(
-      new Date(production?.StartDate),
+      newDate(production?.StartDate),
       updatedTaskInfo?.TaskRepeatFromWeekNum,
       updatedTaskInfo?.TaskRepeatToWeekNum,
       updatedTaskInfo?.RepeatInterval,
@@ -469,9 +472,8 @@ const AddTask = ({
       onClose={handleCancel}
       hasOverlay={showOverlay}
       title={inputs.Id ? 'Edit Task' : 'Create New Task'}
-      titleClass="text-primary-navy text-xl mb-4"
     >
-      <form className="flex flex-col gap-4">
+      <form className="flex flex-col gap-4 mt-2">
         {loading && <LoadingOverlay />}
         <div className="col-span-2 col-start-4 flex items-center justify-between">
           <Label className="!text-secondary pr-6 " text="Task Name" />

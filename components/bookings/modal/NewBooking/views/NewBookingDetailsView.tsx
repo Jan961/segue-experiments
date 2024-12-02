@@ -1,7 +1,6 @@
 // import NoPerfRenderEditor from 'components/bookings/table/NoPerfRenderEditor';
 import { newBookingColumnDefs, styleProps } from 'components/bookings/table/tableConfig';
 import Button from 'components/core-ui-lib/Button';
-import { addDays, parseISO, subDays } from 'date-fns';
 import Table from 'components/core-ui-lib/Table';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useWizard } from 'react-use-wizard';
@@ -12,7 +11,7 @@ import { ColDef } from 'ag-grid-community';
 import { getStepIndex } from 'config/AddBooking';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import { ConfDialogVariant } from 'components/core-ui-lib/ConfirmationDialog/ConfirmationDialog';
-import { dateToSimple, formattedDateWithWeekDay, toISO } from 'services/dateService';
+import { dateToSimple, formattedDateWithWeekDay, getDateDaysAway, newDate } from 'services/dateService';
 import { BookingWithVenueDTO, ProductionDTO } from 'interfaces';
 import { venueState } from 'state/booking/venueState';
 import { useRecoilValue } from 'recoil';
@@ -76,6 +75,7 @@ export default function NewBookingDetailsView({
   const tableRef = useRef(null);
   const confirmationType = useRef<ConfDialogVariant>('cancel');
   const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     updateModalTitle(`${isNewBooking ? 'New' : 'Edit'} Booking Details`);
@@ -98,7 +98,7 @@ export default function NewBookingDetailsView({
       initRows[0].data.isRunOfDates = true;
     }
     const rowDate =
-      direction === 'before' ? subDays(parseISO(data.dateAsISOString), 1) : addDays(parseISO(data.dateAsISOString), 1);
+      direction === 'before' ? getDateDaysAway(data.dateAsISOString, -1) : getDateDaysAway(data.dateAsISOString, 1);
     const date = formattedDateWithWeekDay(rowDate, 'Short');
     const dateAsISOString = rowDate.toISOString();
     const rowToAdd = { ...data, noPerf: null, times: '', date, dateAsISOString, id: null, isRunOfDates: true };
@@ -116,8 +116,6 @@ export default function NewBookingDetailsView({
     api.redrawRows();
   };
 
-  // test
-
   useEffect(() => {
     if (isNewBooking) {
       let dayTypeOption = null;
@@ -130,8 +128,8 @@ export default function NewBookingDetailsView({
       const isRehearsal = dayTypeOption && dayTypeOption.text === 'Rehearsal';
       const isGetInFitUp = dayTypeOption && dayTypeOption.text === 'Get in / Fit Up';
 
-      let startDate = new Date(fromDate);
-      const endDate = new Date(toDate);
+      let startDate = newDate(fromDate);
+      const endDate = newDate(toDate);
       const dates = [];
       while (startDate <= endDate) {
         const formattedDate = `${startDate.toLocaleDateString('en-US', {
@@ -146,7 +144,7 @@ export default function NewBookingDetailsView({
         const dateObject = {
           dateBlockId,
           date: reorderedDate,
-          dateAsISOString: toISO(startDate),
+          dateAsISOString: startDate,
           perf: isPerformance,
           dayType: dateType,
           venue: venueId,
@@ -163,13 +161,13 @@ export default function NewBookingDetailsView({
 
         dates.push(dateObject);
         // Increment currentDate by one day for the next iteration
-        startDate = addDays(startDate, 1);
+        startDate = getDateDaysAway(startDate, 1);
       }
 
       setBookingData(dates);
     }
   }, [fromDate, toDate, dateType, venueId, dayTypeOptions, venueOptions, dateBlockId, isRunOfDates, isNewBooking]);
-  const productionCode = `${production?.ShowCode}${production?.Code}  ${production?.ShowName}`;
+
   const productionItem = useMemo(() => {
     return {
       production: `${production?.ShowCode}${production?.Code}`,
@@ -314,18 +312,38 @@ export default function NewBookingDetailsView({
     }
   };
 
-  const storeBookingDetails = () => {
+  const getRowData = () => {
     if (tableRef.current.getApi()) {
       const rowData = [];
       tableRef.current.getApi().forEachNode((node) => {
         rowData.push(node.data);
       });
-      isNewBooking ? onSubmit(rowData) : onUpdate(rowData);
+      return rowData;
     }
+    return [];
+  };
+
+  const validateBooking = (rowData: BookingItem[]) => {
+    // Do not allow a performance booking to be changed to a non-performance booking
+    const isPerformanceBooking = bookingData.some((row) => row.isBooking);
+    if (isPerformanceBooking && !rowData.some((row) => row.isBooking)) {
+      setError('Cannot change a performance booking to a non-performance booking');
+      return false;
+    }
+    return true;
+  };
+
+  const storeBookingDetails = (rowData) => {
+    setError(null);
+    isNewBooking ? onSubmit(rowData) : onUpdate(rowData);
   };
 
   const handePreviewBookingClick = () => {
-    storeBookingDetails();
+    const rowData = getRowData();
+    if (!validateBooking(rowData)) {
+      return;
+    }
+    storeBookingDetails(rowData);
     const firstRow = tableRef.current.getApi().getDisplayedRowAtIndex(0);
     if (firstRow.data.venue && formData.venueId !== firstRow.data.venue) {
       checkForBarredVenues();
@@ -335,7 +353,7 @@ export default function NewBookingDetailsView({
   };
 
   const handeCheckMileageClick = () => {
-    storeBookingDetails();
+    storeBookingDetails(getRowData());
     goToStep(getStepIndex(isNewBooking, 'Check Mileage'));
   };
 
@@ -376,7 +394,7 @@ export default function NewBookingDetailsView({
 
   const handleChangeOrConfirmBooking = () => {
     if (changeBookingLength) {
-      storeBookingDetails();
+      storeBookingDetails(getRowData());
       checkForBookingConflicts();
     } else {
       // The user has opted to change the length of the booking, so we need to make it a run of dates if it is not already one
@@ -400,40 +418,38 @@ export default function NewBookingDetailsView({
   };
 
   return (
-    <>
-      <div className="flex justify-between">
-        <div className="text-primary-navy text-xl my-2 font-bold">{productionCode}</div>
-      </div>
-      <div
-        className="w-[750px] lg:w-[950px] xl:w-[1450px] h-full flex flex-col "
-        data-testid="edit-booking-model"
-        tabIndex={1}
-      >
-        <Table
-          testId="edit-booking-details-table"
-          ref={tableRef}
-          columnDefs={columnDefs}
-          rowData={bookingData}
-          styleProps={styleProps}
-          onCellClicked={handleCellClick}
-          onRowClicked={handleRowSelected}
-          gridOptions={gridOptions}
-          onCellValueChange={handleCellValueChange}
+    <div
+      className="w-[750px] lg:w-[950px] xl:w-[1450px] h-full flex flex-col "
+      data-testid="edit-booking-model"
+      tabIndex={1}
+    >
+      <Table
+        testId="edit-booking-details-table"
+        ref={tableRef}
+        columnDefs={columnDefs}
+        rowData={bookingData}
+        styleProps={styleProps}
+        onCellClicked={handleCellClick}
+        onRowClicked={handleRowSelected}
+        gridOptions={gridOptions}
+        onCellValueChange={handleCellValueChange}
+      />
+      <NotesPopup
+        testId="cnb-booking-details-tbl-notes"
+        show={showNotesModal}
+        productionItem={productionItem}
+        onSave={handleSaveNote}
+        onCancel={handleNotesCancel}
+      />
+      <div className="pt-8 w-full flex items-end justify-between">
+        <Button
+          className="w-33 "
+          text="Check Mileage"
+          onClick={handeCheckMileageClick}
+          disabled={!permissions.includes('ACCESS_MILEAGE_CHECK') || changeBookingLength}
         />
-        <NotesPopup
-          testId="cnb-booking-details-tbl-notes"
-          show={showNotesModal}
-          productionItem={productionItem}
-          onSave={handleSaveNote}
-          onCancel={handleNotesCancel}
-        />
-        <div className="pt-8 w-full grid grid-cols-2 items-center ">
-          <Button
-            className="w-33 "
-            text="Check Mileage"
-            onClick={handeCheckMileageClick}
-            disabled={!permissions.includes('ACCESS_MILEAGE_CHECK') || changeBookingLength}
-          />
+        <div className="flex flex-col justify-end  justify-items-end">
+          {error && <span className="mb-3 text-right text-responsive-sm text-primary-red">{error}</span>}
           <div className="flex justify-end  justify-items-end gap-4">
             {isNewBooking && (
               <Button className="w-33" variant="secondary" text="Back" onClick={handleBackButtonClick} />
@@ -474,22 +490,22 @@ export default function NewBookingDetailsView({
             />
           </div>
         </div>
-        {showMoveBookingModal && (
-          <MoveBooking
-            visible={showMoveBookingModal}
-            onClose={handleMoveBookingClose}
-            bookings={bookingData}
-            venueOptions={venueOptions}
-          />
-        )}
-        <ConfirmationDialog
-          variant={confirmationType.current}
-          show={showConfirmation}
-          onYesClick={handleYesClick}
-          onNoClick={handleNoClick}
-          hasOverlay={false}
-        />
       </div>
-    </>
+      {showMoveBookingModal && (
+        <MoveBooking
+          visible={showMoveBookingModal}
+          onClose={handleMoveBookingClose}
+          bookings={bookingData}
+          venueOptions={venueOptions}
+        />
+      )}
+      <ConfirmationDialog
+        variant={confirmationType.current}
+        show={showConfirmation}
+        onYesClick={handleYesClick}
+        onNoClick={handleNoClick}
+        hasOverlay={false}
+      />
+    </div>
   );
 }

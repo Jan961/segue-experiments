@@ -1,30 +1,39 @@
+import { UTCDate } from '@date-fns/utc';
 import { performanceMapper } from 'lib/mappers';
 import getPrismaClient from 'lib/prisma';
 import { NextApiRequest } from 'next';
-import { dateToSimple, getTimeFromDateAndTime } from 'services/dateService';
+import { dateToSimple, dateTimeToTime } from 'services/dateService';
+import { isNull } from 'utils';
 
 export const getPerformanceCompAllocationsByBookingId = async (bookingId: number, req: NextApiRequest) => {
   const prisma = await getPrismaClient(req);
-  const performanceRaw = await prisma.performance.findMany({
-    where: {
-      BookingId: bookingId,
-    },
-    orderBy: [
-      {
-        Date: 'asc',
+  const performanceRaw = await prisma.performance
+    .findMany({
+      where: {
+        BookingId: bookingId,
       },
-      {
-        Time: 'asc',
-      },
-    ],
-    include: {
-      AvailableComp: {
-        include: {
-          CompAllocation: true,
+      orderBy: [
+        {
+          Date: 'asc',
+        },
+        {
+          Time: 'asc',
+        },
+      ],
+      include: {
+        AvailableComp: {
+          include: {
+            CompAllocation: true,
+          },
         },
       },
-    },
-  });
+    })
+    .then((res) => {
+      const r = res.map((e) => {
+        return { ...e, Date: new UTCDate(e.Date), Time: new UTCDate(e.Time) };
+      });
+      return r;
+    });
 
   const holds = [];
   const allocations = [];
@@ -40,7 +49,11 @@ export const getPerformanceCompAllocationsByBookingId = async (bookingId: number
       availableCompId = ac.Id;
 
       for (const ca of ac.CompAllocation) {
-        allocations.push({ ...ca, date: dateToSimple(p.Date), time: getTimeFromDateAndTime(p.Time) });
+        allocations.push({
+          ...ca,
+          date: dateToSimple(p.Date),
+          time: isNull(p.Time) ? 'TBC' : dateTimeToTime(p.Time),
+        });
         totalAllocated += ca.Seats;
       }
     }

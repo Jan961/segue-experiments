@@ -1,7 +1,7 @@
 import React from 'react';
 import PopupModal from '../PopupModal';
 
-interface ImagePreviewModalProps {
+export interface ImagePreviewModalProps {
   show: boolean;
   onClose: () => void;
   imageUrl: string;

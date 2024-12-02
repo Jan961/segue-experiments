@@ -1,7 +1,7 @@
 import { ICellRendererParams } from 'ag-grid-community';
 import DateInput from 'components/core-ui-lib/DateInput';
 import { useRef, useState } from 'react';
-import { getDateObject } from 'services/dateService';
+import { newDate } from 'services/dateService';
 
 interface CustomDateCellRendererParams extends ICellRendererParams {
   disableAnimations?: boolean;
@@ -22,7 +22,7 @@ const DateRenderer = ({
   const fromInputRef = useRef(null);
   const [error, setError] = useState<string>('');
 
-  const [date, setDate] = useState(getDateObject(value) || null);
+  const [date, setDate] = useState(newDate(value) || null);
 
   const handleDateFromChange = (dateVal) => {
     setError('');
@@ -45,7 +45,7 @@ const DateRenderer = ({
         inputClass={`!shadow-none  ${error && isRequired ? '!border-primary-red' : '!border-primary-white'}`}
         value={date}
         onChange={handleDateFromChange}
-        minDate={defaultMinDateToToday ? new Date() : null}
+        minDate={defaultMinDateToToday ? newDate() : null}
         error={!disableAnimations && error}
       />
     </div>

@@ -19,7 +19,13 @@ import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import { BarredVenue } from 'pages/api/productions/venue/barringCheck';
 import Toggle from 'components/core-ui-lib/Toggle/Toggle';
 import Label from 'components/core-ui-lib/Label';
-import { areDatesSame, dateToSimple, formattedDateWithWeekDay, getArrayOfDatesBetween } from 'services/dateService';
+import {
+  areDatesSame,
+  dateToSimple,
+  formattedDateWithWeekDay,
+  getArrayOfDatesBetween,
+  newDate,
+} from 'services/dateService';
 import { debug } from 'utils/logging';
 import { isNullOrEmpty } from 'utils';
 import { accessBookingsHome } from 'state/account/selectors/permissionSelector';
@@ -28,7 +34,6 @@ type AddBookingProps = {
   formData: TForm;
   dayTypeOptions: SelectOption[];
   venueOptions: SelectOption[];
-  productionCode: string;
   updateBookingConflicts: (bookingConflicts: BookingWithVenueDTO[]) => void;
   updateBarringConflicts: (barringConflicts: BarredVenue[]) => void;
   onBarringCheckComplete: (nextStep: string) => void;
@@ -43,7 +48,6 @@ const NewBookingView = ({
   onChange,
   onSubmit,
   formData,
-  productionCode,
   dayTypeOptions,
   venueOptions,
   updateBookingConflicts,
@@ -177,16 +181,15 @@ const NewBookingView = ({
   };
   return (
     <div className="w-[385px]">
-      <div className="text-primary-navy text-xl my-2 font-bold">{productionCode}</div>
       <form className="flex flex-col bg-primary-navy py-3 pl-4 pr-5 rounded-lg" onSubmit={handleOnSubmit}>
         <DateRange
           testId="cnb-date-range"
           label="Date"
           className=" bg-white my-2 w-fit"
           onChange={handleChange}
-          value={{ from: fromDate ? new Date(fromDate) : null, to: toDate ? new Date(toDate) : null }}
-          minDate={minDate ? new Date(minDate) : null}
-          maxDate={maxDate ? new Date(maxDate) : null}
+          value={{ from: fromDate ? newDate(fromDate) : null, to: toDate ? newDate(toDate) : null }}
+          minDate={minDate ? newDate(minDate) : null}
+          maxDate={maxDate ? newDate(maxDate) : null}
         />
         {!isDateTypeOnly && (
           <div className="flex items-center gap-2 my-1 justify-start">

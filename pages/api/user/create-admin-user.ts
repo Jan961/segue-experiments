@@ -3,15 +3,16 @@ import { createPrismaClient } from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getAllPermissionsWithIdAndName } from 'services/permissionService';
 import { createNewAccountUser, createNewUser } from 'services/userService';
+import { sendNewUserEmail, sendUserPinEmail } from 'services/emailService';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const { user, accountUserOnly = false } = req.body;
-
+    const { user, signInUrl, accountUserOnly = false } = req.body;
+    const { email, companyName, password } = user;
     const { AccountOrganisationId } = await prisma.account.findFirst({
       where: {
-        AccountName: user.companyName,
-        AccountMainEmail: user.email,
+        AccountName: companyName,
+        AccountMainEmail: email,
       },
       select: {
         AccountOrganisationId: true,
@@ -54,6 +55,12 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         data: formattedProductions,
       });
     }
+
+    // Send new user email
+    await sendNewUserEmail(email, password, companyName, signInUrl);
+
+    // Send out an email with account pin
+    await sendUserPinEmail(email, user.pin);
 
     const formattedPermissions = permissions.map(({ PermissionName }) => PermissionName);
     const accountUser = accountUserOnly

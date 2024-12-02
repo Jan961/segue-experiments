@@ -193,6 +193,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
       setShowCompSelect(false);
       setShowVenueSelect(true);
     } else if (type === 'venue') {
+      setVenueDesc('');
       setVenueSelectView('select');
     }
   };
@@ -237,12 +238,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
   };
   return (
     <div>
-      <PopupModal
-        show={showVenueSelectModal}
-        title="Venue History"
-        titleClass="text-xl text-primary-navy font-bold"
-        onClose={handleModalCancel}
-      >
+      <PopupModal show={showVenueSelectModal} title="Venue History" onClose={handleModalCancel}>
         <div className="w-[417px] p-2">
           {venueSelectView === 'select' ? (
             <div className="flex flex-col">
@@ -284,13 +280,11 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
       <PopupModal
         show={showCompSelectModal}
         title="Venue History"
-        titleClass="text-xl text-primary-navy font-bold -mt-2"
         onClose={handleModalCancel}
         hasOverlay={showSalesSnapshot}
+        subtitle={venueDesc}
       >
-        <div className="w-[920px] h-auto">
-          <div className="text-xl text-primary-navy font-bold mb-4">{venueDesc}</div>
-
+        <div className="w-[920px]">
           {showCompSelectModal && (
             <SalesTable
               salesTableRef={salesTableRef}
@@ -318,15 +312,8 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
         </div>
       </PopupModal>
 
-      <PopupModal
-        show={showResultsModal}
-        title="Venue History"
-        titleClass="text-xl text-primary-navy font-bold -mt-2"
-        onClose={handleModalCancel}
-      >
+      <PopupModal show={showResultsModal} title="Venue History" onClose={handleModalCancel} subtitle={venueDesc}>
         <TableWrapper multiplier={selectedBookings.length}>
-          <div className="text-xl text-primary-navy font-bold mb-4">{venueDesc}</div>
-
           {showResultsModal && (
             <SalesTable
               salesTableRef={salesTableRef}
@@ -335,6 +322,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
               module="bookings"
               variant="salesComparison"
               data={salesCompData}
+              tableHeight={650}
             />
           )}
         </TableWrapper>
@@ -379,22 +367,11 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
       <PopupModal
         show={showSalesSnapshot}
         title="Venue History"
-        titleClass="text-xl text-primary-navy font-bold -mt-2"
         onClose={handleModalCancel}
         hasOverlay={false}
-      >
-        <div className="w-auto h-auto">
-          <div className="text-xl text-primary-navy font-bold mb-4">{venueDesc}</div>
-
-          <SalesTable
-            salesTableRef={salesTableRef}
-            containerHeight="h-auto"
-            module="bookings"
-            variant="salesSnapshot"
-            data={salesSnapData}
-          />
-
-          <div className="float-right flex flex-row mt-5 py-2">
+        subtitle={venueDesc}
+        footerComponent={
+          <div className="float-right flex flex-row">
             <Button
               className="ml-4 mr-10 w-32"
               onClick={() => setIsExportModalOpen(true)}
@@ -406,6 +383,16 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
             />
             <Button className="w-32" variant="primary" text="Close" onClick={() => setShowSalesSnapshot(false)} />
           </div>
+        }
+      >
+        <div className="w-auto h-auto">
+          <SalesTable
+            salesTableRef={salesTableRef}
+            containerHeight="h-auto"
+            module="bookings"
+            variant="salesSnapshot"
+            data={salesSnapData}
+          />
         </div>
       </PopupModal>
     </div>

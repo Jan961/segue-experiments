@@ -7,6 +7,7 @@ import Select from 'components/core-ui-lib/Select';
 import schema from './schema/accountDetailsFormSchema';
 import { Checkbox, PopupModal } from 'components/core-ui-lib';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
+import AuthError from './AuthError';
 
 export type Account = {
   accountId?: number;
@@ -33,9 +34,17 @@ interface AccountDetailsFormProps {
   accountDetails: Account;
   onChange: (v: Account) => void;
   onSave: (callBack: () => void) => void;
+  error?: string;
 }
 
-const AccountDetailsForm = ({ currencies, countries, accountDetails, onChange, onSave }: AccountDetailsFormProps) => {
+const AccountDetailsForm = ({
+  currencies,
+  countries,
+  accountDetails,
+  onChange,
+  onSave,
+  error,
+}: AccountDetailsFormProps) => {
   const { nextStep } = useWizard();
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [showModal, setShowModal] = useState(false);
@@ -58,6 +67,7 @@ const AccountDetailsForm = ({ currencies, countries, accountDetails, onChange, o
   }
 
   const handleNextClick = async () => {
+    setValidationErrors({});
     if (await validateForm(accountDetails)) {
       onSave(() => nextStep());
     }
@@ -259,7 +269,9 @@ const AccountDetailsForm = ({ currencies, countries, accountDetails, onChange, o
               <small className="text-primary-red mt-1">{validationErrors.agreementChecked}</small>
             )}
           </div>
-          <div className="w-full flex gap-2  items-center justify-end mt-10">
+
+          <div className="w-full flex flex-col gap-2  items-end justify-end mt-10">
+            {error && <AuthError error={error} />}
             <Button text="Next" onClick={handleNextClick} className="w-32" />
           </div>
         </section>

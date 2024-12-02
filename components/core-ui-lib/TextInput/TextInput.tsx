@@ -53,7 +53,7 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
   ) => {
     const baseClass = `block w-fit-content pl-2 h-[1.9375rem] text-sm shadow-input-shadow text-primary-input-text rounded-md outline-none autofill-white-bg`;
     const inputClass = error ? '!border-primary-red' : '!border-primary-border';
-    const disabledClass = disabled ? 'disabled-input !border-none !bg-gray-200 focus:outline-none' : '';
+    const disabledClass = disabled ? 'disabled-input !border-none focus:outline-none' : '';
 
     const handleChange = (e) => {
       if (isUndefined(pattern)) {

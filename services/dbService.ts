@@ -1,6 +1,7 @@
 import axios from 'axios';
 import s3 from 'lib/s3';
 import MariaDB from 'mariadb';
+import { replaceTemplateString } from 'utils';
 
 const DB_USER_PRIVILEGES = 'SELECT,INSERT,UPDATE,DELETE,EXECUTE,SHOW VIEW';
 
@@ -81,8 +82,15 @@ export const createClientDB = async (organisationId: string) => {
     if (!response.Body || response.ContentLength === 0) {
       throw new Error('Unable to create new DB. Unable to get DB seed script');
     }
+    // Replace template strings [DB_PREFIX] with actual value
+    const formattedScript = replaceTemplateString(
+      response.Body.toString('utf-8'),
+      { DB_PREFIX: `${process.env.DB_USER}_${deploymentEnv}` },
+      '[',
+      ']',
+    );
 
-    await executeSQLFromFile(host, dboUser, process.env.DBO_PASSWORD, dbName, response.Body.toString('utf-8'));
+    await executeSQLFromFile(host, dboUser, process.env.DBO_PASSWORD, dbName, formattedScript);
   } else {
     throw new Error('Unable to create new DB');
   }

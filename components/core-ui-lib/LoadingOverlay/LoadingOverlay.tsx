@@ -1,7 +1,7 @@
 import Spinner from 'components/core-ui-lib/Spinner';
 import classNames from 'classnames';
 import { Loader } from '../index';
-import { variant } from '../Loader/Loader';
+import { variant } from '../Loader';
 
 interface LoaderProps {
   className?: string;

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Button from '../Button';
 import PopupModal from '../PopupModal';
+import classNames from 'classnames';
 
 export type ConfDialogVariant = 'close' | 'cancel' | 'delete' | 'logout' | 'leave' | 'return' | 'continue';
 
@@ -21,13 +22,13 @@ export enum ConfVariant {
 
 export interface ConfirmationDialogProps {
   children?: React.ReactNode;
-  show: boolean;
+  show?: boolean;
   onYesClick?: () => void;
   onNoClick?: () => void;
   variant?: ConfDialogVariant;
-  yesBtnClass: string;
-  noBtnClass: string;
-  labelYes: string;
+  yesBtnClass?: string;
+  noBtnClass?: string;
+  labelYes?: string;
   labelNo?: string;
   hasOverlay?: boolean;
   content?: ConfirmationDialogContent;
@@ -65,16 +66,19 @@ export const confOptions = {
   },
 };
 
+// The confirmation dialog component has to have a defined "variant" or a define "content" prop
 export default function ConfirmationDialog({
   show = false,
   onYesClick,
   onNoClick,
   labelYes = 'Yes',
   labelNo = 'No',
+  yesBtnClass,
+  noBtnClass,
   variant,
   hasOverlay = false,
   content,
-  testId,
+  testId = 'confirmation-dialog-wrapper',
 }: Partial<ConfirmationDialogProps>) {
   const [visible, setVisible] = useState<boolean>(show);
 
@@ -88,7 +92,7 @@ export default function ConfirmationDialog({
   };
 
   return (
-    <PopupModal data-testid={testId} show={visible} showCloseIcon={false} hasOverlay={hasOverlay}>
+    <PopupModal testId={testId} show={visible} showCloseIcon={false} hasOverlay={hasOverlay}>
       <div data-testid="confirmation-dialog" className="p-2 flex flex-col gap-4">
         <div className="text-center">
           <div data-testid="confirmation-dialog-question" className="text text-primary-navy font-bold text-xl">
@@ -99,10 +103,10 @@ export default function ConfirmationDialog({
           </div>
         </div>
         <div className="w-full flex justify-center items-center">
-          {labelNo && (
+          {noBtnClass?.trim() !== 'hidden' && (
             <Button
               testId="confirmation-dialog-no-btn"
-              className="w-32"
+              className={classNames('w-32', noBtnClass)}
               variant="secondary"
               text={labelNo}
               onClick={() => handleAction(false)}
@@ -110,7 +114,7 @@ export default function ConfirmationDialog({
           )}
           <Button
             testId="confirmation-dialog-yes-btn"
-            className="ml-4 w-32"
+            className={classNames('ml-4 w-32', yesBtnClass)}
             variant={variant === 'delete' ? 'tertiary' : 'primary'}
             text={labelYes}
             onClick={() => handleAction(true)}

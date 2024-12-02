@@ -1,10 +1,11 @@
 import { Time } from 'components/core-ui-lib/TimeInput/TimeInput';
 import { startOfDay } from 'date-fns';
 import { pick } from 'radash';
-import { getDateWithOffset, getShortWeekFormat } from 'services/dateService';
+import { getShortWeekFormat, newDate } from 'services/dateService';
 import { formatDecimalValue, isNullOrEmpty, isNullOrUndefined, isUndefined } from 'utils';
 import formatInputDate from 'utils/dateInputFormat';
 import { PriceState } from './modal/EditDealMemoContractModal';
+import { UTCDate } from '@date-fns/utc';
 
 export const defaultPrice = [
   { DMPTicketName: 'Premium', DMPTicketPrice: 0, DMPNumTickets: 0, DMPDeMoId: 0, DMPNotes: '' },
@@ -91,11 +92,6 @@ export const filterPercentage = (num: number) => {
     return Math.floor(num * 100) / 100;
   }
   return 100;
-};
-
-export const formatDecimalOnBlur = (event: any) => {
-  const value = event.target.value;
-  return formatDecimalValue(value);
 };
 
 export const filterCurrencyNum = (num: number) => {
@@ -249,7 +245,7 @@ export const dtToTime = (datetime: Date): Time => {
   };
 };
 
-export const timeToDateTime = (inputTime: Time | string): Date => {
+export const timeToDateTime = (inputTime: Time | string): UTCDate => {
   if (isNullOrEmpty(inputTime)) {
     return null;
   }
@@ -263,7 +259,7 @@ export const timeToDateTime = (inputTime: Time | string): Date => {
     time = inputTime;
   }
 
-  const datetime = getDateWithOffset(new Date());
+  const datetime = newDate();
   datetime.setHours(parseInt(time.hrs), parseInt(time.min), 0);
 
   return datetime;

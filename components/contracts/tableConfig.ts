@@ -1,15 +1,19 @@
-import ContractStatusCellRenderer from 'components/contracts/table/ContractStatusCellRenderer';
 import DefaultCellRenderer from '../bookings/table/DefaultCellRenderer';
 import VenueColumnRenderer from './table/VenueColumnRenderer';
 import DateColumnRenderer from './table/DateColumnRenderer';
 import { tileColors } from 'config/global';
 import DefaultTextRenderer from 'components/core-ui-lib/Table/renderers/DefaultTextRenderer';
 import formatInputDate from 'utils/dateInputFormat';
-import { getTimeFromDateAndTime } from 'services/dateService';
+import { dateTimeToTime, newDate } from 'services/dateService';
 import ButtonRenderer from 'components/core-ui-lib/Table/renderers/ButtonRenderer';
 import IconRowRenderer from 'components/global/salesTable/renderers/IconRowRenderer';
 import SelectCellRenderer from 'components/core-ui-lib/Table/renderers/SelectCellRenderer';
-import { companyContractStatusOptions, statusToBgColorMap } from 'config/contracts';
+import {
+  companyContractStatusOptions,
+  contractsStatusMap,
+  statusToBgColorMap,
+  venueContractStatusToStyleMap,
+} from 'config/contracts';
 import DateRenderer from 'components/core-ui-lib/Table/renderers/DateRenderer';
 import NotesRenderer from 'components/core-ui-lib/Table/renderers/NotesRenderer';
 import TextInputRenderer from 'components/core-ui-lib/Table/renderers/TextInputRenderer';
@@ -69,13 +73,34 @@ export const contractsColumnDefs = [
   { headerName: 'Town', field: 'town', cellRenderer: DefaultCellRenderer, minWidth: 80, flex: 1 },
   { headerName: 'Capacity', field: 'capacity', cellRenderer: DefaultCellRenderer, width: 90 },
   { headerName: 'No. of Perfs', field: 'performanceCount', cellRenderer: DefaultCellRenderer, width: 90 },
-  { headerName: 'Deal Memo Status', field: 'dealMemoStatus', cellRenderer: ContractStatusCellRenderer, width: 180 },
+  {
+    headerName: 'Deal Memo Status',
+    field: 'dealMemoStatus',
+    cellRenderer: DefaultCellRenderer,
+    width: 180,
+    valueGetter: (params) => contractsStatusMap[params?.data?.dealMemoStatus],
+    cellStyle: function (params) {
+      const { dealMemoStatus } = params.data;
+      return {
+        backgroundColor: 'white',
+        ...(venueContractStatusToStyleMap[dealMemoStatus] || {}),
+      };
+    },
+  },
   {
     headerName: 'Contract Status',
     field: 'contractStatus',
-    cellRenderer: ContractStatusCellRenderer,
+    cellRenderer: DefaultCellRenderer,
     resizable: false,
     width: 180,
+    valueGetter: (params) => contractsStatusMap[params?.data?.contractStatus],
+    cellStyle: function (params) {
+      const { contractStatus } = params.data;
+      return {
+        backgroundColor: 'white',
+        ...(venueContractStatusToStyleMap[contractStatus] || {}),
+      };
+    },
   },
 ];
 
@@ -227,7 +252,7 @@ export const getCompanyContractsColumnDefs = (
   },
 ];
 
-export const seatKillsColDefs = (handleChange, currencySymbol) => [
+export const seatKillsColDefs = (handleChange, currencySymbol, disabled: boolean) => [
   {
     headerName: 'Type',
     field: 'type',
@@ -248,6 +273,7 @@ export const seatKillsColDefs = (handleChange, currencySymbol) => [
       className: 'w-[108px] ml-1 mt-1 font-bold',
       value: formatValue(params.data.seats),
       pattern: /^\d*$/,
+      disabled: { disabled },
     }),
     width: 120,
     headerClass: 'right-border-full',
@@ -266,6 +292,7 @@ export const seatKillsColDefs = (handleChange, currencySymbol) => [
       value: formatValue(params.data.value),
       className: 'w-24 font-bold',
       pattern: /^\d*(\.\d*)?$/,
+      disabled: { disabled },
     }),
     width: 120,
     suppressMovable: true,
@@ -287,9 +314,9 @@ export const attachmentsColDefs = (exportPdfPermission: boolean) => [
     field: 'FileUploadedDateTime',
     cellRenderer: DefaultTextRenderer,
     cellRendererParams: function (params) {
-      const updDate = new Date(params.data.FileUploadedDateTime);
+      const updDate = newDate(params.data.FileUploadedDateTime);
       return {
-        value: formatInputDate(updDate) + ' ' + getTimeFromDateAndTime(updDate),
+        value: formatInputDate(updDate) + ' ' + dateTimeToTime(updDate),
       };
     },
     width: 100,

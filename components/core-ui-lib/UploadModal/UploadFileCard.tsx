@@ -39,7 +39,14 @@ const FileCard = ({ fileName, fileSize, onDelete, progress, errorMessage, imageU
           </div>
         </div>
         <div className="relative bottom-1 right-1">
-          <Icon iconName="cross" fill="#21345B" variant="sm" className="cursor-pointer" onClick={() => onDelete()} />
+          <Icon
+            iconName="cross"
+            fill="#21345B"
+            variant="sm"
+            className="cursor-pointer"
+            onClick={() => onDelete()}
+            testId="close-icon"
+          />
         </div>
       </div>
       {showImagePreviewModal && (

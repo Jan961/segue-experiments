@@ -76,6 +76,7 @@ const CONTRACTS_TECH_PERMISSIONS = [
 const CONTRACTS_VENUE_PERMISSIONS = [
   'ACCESS_DEAL_MEMO_AND_CONTRACT_OVERVIEW',
   'ACCESS_EDIT_DEAL_MEMO',
+  'EDIT_DEAL_MEMO',
   'CREATE_DEAL_MEMO',
   'EDIT_DEAL_MEMO_AND_CONRTACT_OVERVIEW',
   'EXPORT_DEAL_MEMO',
@@ -230,5 +231,13 @@ export const accessAdminHome = selector({
   get: ({ get }) => {
     const { permissions = [] } = get(userPermissionsState);
     return permissions.filter((x) => ADMIN_HOME_PERMISSIONS.includes(x));
+  },
+});
+
+export const isPermissionsInitialised = selector({
+  key: 'isPermissionsInitialisedSelector',
+  get: ({ get }) => {
+    const { isInitialised } = get(userPermissionsState);
+    return isInitialised;
   },
 });
