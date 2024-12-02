@@ -280,7 +280,6 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
       <PopupModal
         show={showCompSelectModal}
         title="Venue History"
-        titleClass="text-xl text-primary-navy font-bold -mt-2"
         onClose={handleModalCancel}
         hasOverlay={showSalesSnapshot}
         subtitle={venueDesc}
@@ -313,13 +312,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
         </div>
       </PopupModal>
 
-      <PopupModal
-        show={showResultsModal}
-        title="Venue History"
-        titleClass="text-xl text-primary-navy font-bold -mt-2"
-        onClose={handleModalCancel}
-        subtitle={venueDesc}
-      >
+      <PopupModal show={showResultsModal} title="Venue History" onClose={handleModalCancel} subtitle={venueDesc}>
         <TableWrapper multiplier={selectedBookings.length}>
           {showResultsModal && (
             <SalesTable
@@ -374,21 +367,11 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
       <PopupModal
         show={showSalesSnapshot}
         title="Venue History"
-        titleClass="text-xl text-primary-navy font-bold -mt-2"
         onClose={handleModalCancel}
         hasOverlay={false}
         subtitle={venueDesc}
-      >
-        <div className="w-auto h-auto">
-          <SalesTable
-            salesTableRef={salesTableRef}
-            containerHeight="h-auto"
-            module="bookings"
-            variant="salesSnapshot"
-            data={salesSnapData}
-          />
-
-          <div className="float-right flex flex-row mt-5 py-2">
+        footerComponent={
+          <div className="float-right flex flex-row">
             <Button
               className="ml-4 mr-10 w-32"
               onClick={() => setIsExportModalOpen(true)}
@@ -400,6 +383,16 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
             />
             <Button className="w-32" variant="primary" text="Close" onClick={() => setShowSalesSnapshot(false)} />
           </div>
+        }
+      >
+        <div className="w-auto h-auto">
+          <SalesTable
+            salesTableRef={salesTableRef}
+            containerHeight="h-auto"
+            module="bookings"
+            variant="salesSnapshot"
+            data={salesSnapData}
+          />
         </div>
       </PopupModal>
     </div>
