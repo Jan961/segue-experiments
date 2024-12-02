@@ -400,7 +400,7 @@ describe('Select Component', () => {
     cy.get('[data-testid="core-ui-lib-select"]').should('contain', '2 items selected');
   });
 
-  it.only('selects all options when "select_all" option is selected', () => {
+  it('selects all options when "select_all" option is selected', () => {
     const optionsWithSelectAll = [{ value: 'select_all', text: 'Select All' }, ...options];
     const onChange = cy.stub();
     setup({ onChange, options: optionsWithSelectAll, isMulti: true });
@@ -417,18 +417,18 @@ describe('Select Component', () => {
         });
     });
 
-    cy.get('[data-testid="core-ui-lib-select"]').should('contain', `${options.length} items selected`);
     cy.get('[aria-selected="true"]').should('have.length', options.length + 1); // +1 for the "Select All" option
+    cy.get('[data-testid="core-ui-lib-select"]').should('contain', `${options.length} items selected`);
   });
 
-  it.only('deselects all options when "select_all" option is deselected', () => {
+  it('deselects all options when "select_all" option is deselected', () => {
     const optionsWithSelectAll = [{ value: 'select_all', text: 'Select All' }, ...options];
     const onChange = cy.stub();
     setup({ onChange, options: optionsWithSelectAll, isMulti: true });
 
     cy.get('[data-testid="core-ui-lib-select"]').click();
-    cy.contains('Select All').click(); // not a double click - click once the and again to deselect
-    cy.contains('Select All').click();
+    cy.contains('Select All').click(); // not a double click - click once and then again to deselect
+    cy.get('[id*=react-select-][id$=-option-0]').click(); // deselect - use a different CSS selector as Cypress doesn't like the same one for some reason
 
     cy.wrap(onChange).should('have.been.calledTwice');
     cy.wrap(onChange).then((stub) => {
