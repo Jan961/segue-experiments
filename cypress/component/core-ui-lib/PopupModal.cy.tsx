@@ -100,6 +100,129 @@ describe('PopupModal Component', () => {
     cy.contains('Test Title').should('have.class', 'custom-title-class');
   });
 
+  it.skip('render as expected with loads of content on the y axis', () => {
+    const loadsOfVerticalContent = () => {
+      return (
+        <BaseComp>
+          <PopupModal show={true} title="Loads of vertical content" hasOverflow={false}>
+            <div
+              style={{
+                width: '800px',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                flexDirection: 'column',
+              }}
+            >
+              <div style={{ height: '50px' }}>
+                <p>Content 1</p>
+              </div>
+
+              <div style={{ height: '50px' }}>
+                <p>Content 2</p>
+              </div>
+
+              <div style={{ height: '50px' }}>
+                <p>Content 3</p>
+              </div>
+
+              <div style={{ height: '50px' }}>
+                <p>Content 4</p>
+              </div>
+
+              <div style={{ height: '50px' }}>
+                <p>Content 5</p>
+              </div>
+
+              <div style={{ height: '50px' }}>
+                <p>Content 6</p>
+              </div>
+
+              <div style={{ height: '50px' }}>
+                <p>Content 7</p>
+              </div>
+
+              <div style={{ height: '50px' }}>
+                <p>Content 8</p>
+              </div>
+
+              <div style={{ height: '50px' }}>
+                <p>Content 9</p>
+              </div>
+
+              <div style={{ height: '50px' }}>
+                <p>Content 10</p>
+              </div>
+
+              <div style={{ height: '50px' }}>
+                <p>Content 11</p>
+              </div>
+            </div>
+          </PopupModal>
+        </BaseComp>
+      );
+    };
+    mount(loadsOfVerticalContent());
+    cy.get('[data-testid="popup-modal-content"]').should('be.visible');
+  });
+  it.skip('render as expected with loads of content on the x axis', () => {
+    const loadsHorizontalContent = () => {
+      return (
+        <BaseComp>
+          <PopupModal show={true} title="Loads of vertical content" hasOverflow={false}>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                flexDirection: 'row',
+              }}
+            >
+              <div style={{ height: '50px', padding: '20px' }}>
+                <p>Content 1</p>
+              </div>
+
+              <div style={{ height: '50px', padding: '20px' }}>
+                <p>Content 2</p>
+              </div>
+
+              <div style={{ height: '50px', padding: '20px' }}>
+                <p>Content 3</p>
+              </div>
+
+              <div style={{ height: '50px', padding: '20px' }}>
+                <p>Content 1</p>
+              </div>
+
+              <div style={{ height: '50px', padding: '20px' }}>
+                <p>Content 2</p>
+              </div>
+
+              <div style={{ height: '50px', padding: '20px' }}>
+                <p>Content 3</p>
+              </div>
+
+              <div style={{ height: '50px', padding: '20px' }}>
+                <p>Content 1</p>
+              </div>
+
+              <div style={{ height: '50px', padding: '20px' }}>
+                <p>Content 2</p>
+              </div>
+
+              <div style={{ height: '50px', padding: '20px' }}>
+                <p>Content 3</p>
+              </div>
+            </div>
+          </PopupModal>
+        </BaseComp>
+      );
+    };
+
+    mount(loadsHorizontalContent());
+    cy.get('[data-testid="popup-modal-content"]').should('be.visible');
+  });
+
   it('renders with overflow when "hasOverflow" is true', () => {
     setup({ show: true, hasOverflow: true });
 
