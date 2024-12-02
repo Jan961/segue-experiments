@@ -32,6 +32,7 @@ interface AddEditVenueModalProps {
   onClose: (isSuccess?: boolean) => void;
   fetchVenues: (payload?: any) => Promise<void>;
   setIsLoading: (bool: boolean) => void;
+  disabled?: boolean;
 }
 
 export default function AddEditVenueModal({
@@ -43,6 +44,7 @@ export default function AddEditVenueModal({
   onClose,
   fetchVenues,
   setIsLoading,
+  disabled,
 }: AddEditVenueModalProps) {
   const permissions = useRecoilValue(accessBookingsHome);
   const [formData, setFormData] = useState({ ...initialVenueState, ...(venue || {}) });
@@ -272,7 +274,7 @@ export default function AddEditVenueModal({
       />
       <PopupModal
         onClose={onClose}
-        title="Add / Edit Venue"
+        title={`${formData.id ? 'Edit' : 'Add'} Venue`}
         show={visible}
         panelClass="relative h-[95vh] overflow-x-auto pb-4"
         titleClass="text-xl text-primary-navy"
@@ -287,7 +289,7 @@ export default function AddEditVenueModal({
               onChange={onChange}
               validationErrors={validationErrors}
               updateValidationErrrors={updateValidationErrors}
-              disabled={true}
+              disabled={disabled}
             />
           </div>
           <h2 className="text-xl text-primary-navy font-bold pt-7">Addresses</h2>
@@ -298,7 +300,7 @@ export default function AddEditVenueModal({
               onChange={onChange}
               validationErrors={validationErrors}
               updateValidationErrrors={updateValidationErrors}
-              disabled={true}
+              disabled={disabled}
             />
           </div>
           <div className="pt-7">
@@ -307,7 +309,7 @@ export default function AddEditVenueModal({
               venue={formData}
               contactsList={formData.venueContacts}
               onChange={onChange}
-              disabled={true}
+              disabled={disabled}
             />
           </div>
           <div className="pt-7">
@@ -319,7 +321,7 @@ export default function AddEditVenueModal({
               updateValidationErrrors={updateValidationErrors}
               setFileList={setFileList}
               setDeleteList={setDeleteList}
-              disabled={true}
+              disabled={disabled}
             />
             <div className="pt-7 ">
               <h2 className="text-xl text-primary-navy font-bold ">Barring</h2>
@@ -328,7 +330,7 @@ export default function AddEditVenueModal({
                 validationErrors={validationErrors}
                 onChange={onChange}
                 updateValidationErrrors={updateValidationErrors}
-                disabled={true}
+                disabled={disabled}
               />
             </div>
             <div className="pt-7">
@@ -340,7 +342,7 @@ export default function AddEditVenueModal({
                 className="w-full max-h-40 min-h-[50px] justify-between"
                 value={formData.confidentialNotes}
                 onChange={(e) => handleInputChange('confidentialNotes', e.target.value)}
-                disabled={true}
+                disabled={disabled}
               />
             </div>
             <div className="flex gap-4 pt-4 float-right">
@@ -352,7 +354,7 @@ export default function AddEditVenueModal({
                 className="w-32"
               />
               <Button
-                disabled={!permissions.includes('UPDATE_VENUE') || !venue?.id || isDeleting || isSaving}
+                disabled={!permissions.includes('DELETE_VENUE') || !venue?.id || isDeleting || isSaving}
                 onClick={toggleDeleteConfirmation}
                 variant="tertiary"
                 text={isDeleting ? 'Deleting Venue...' : 'Delete Venue'}
