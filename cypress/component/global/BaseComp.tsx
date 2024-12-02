@@ -11,5 +11,4 @@ const BaseComp: React.FC<{
     </div>
   );
 };
-
 export default BaseComp;
