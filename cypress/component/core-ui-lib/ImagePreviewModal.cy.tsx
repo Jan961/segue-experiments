@@ -22,44 +22,70 @@ describe('ImagePreviewModal Component', () => {
   const defaultProps = (): ImagePreviewModalProps => ({
     show: false,
     onClose: onCloseStub,
-    imageUrl: 'https://example.com/image.jpg',
+    imageUrl: '',
     altText: 'Test Image',
   });
 
   it('should not display the modal when show is false', () => {
+    cy.fixture('placeholder.png', 'base64').then((imageData) => {
+      const imageUrl = `data:image/jpeg;base64,${imageData}`;
+      setup({ ...defaultProps(), show: true, imageUrl });
+      // cy.get('[data-testid="preview-image"]')
+      //   .should('be.visible')
+    });
     setup({ ...defaultProps(), show: false });
     cy.get('[data-testid="preview-image"]').should('not.exist');
   });
 
   it('should display the modal and image when show is true', () => {
-    setup({ ...defaultProps(), show: true });
-    cy.get('[data-testid="preview-image"]')
-      .should('be.visible')
-      .and('have.attr', 'src', defaultProps().imageUrl)
-      .and('have.attr', 'alt', defaultProps().altText);
+    let imageUrl = '';
+    cy.fixture('placeholder.png', 'base64').then((imageData) => {
+      imageUrl = `data:image/jpeg;base64,${imageData}`;
+      setup({ ...defaultProps(), show: true, imageUrl });
+    });
+
+    cy.then(() => {
+      cy.get('[data-testid="preview-image"]')
+        .should('be.visible')
+        .and('have.attr', 'src', imageUrl)
+        .and('have.attr', 'alt', defaultProps().altText);
+    });
   });
 
   it('should use default altText if not provided', () => {
+    cy.fixture('placeholder.png', 'base64').then((imageData) => {
+      const imageUrl = `data:image/jpeg;base64,${imageData}`;
+      setup({ ...defaultProps(), show: true, altText: undefined, imageUrl });
+    });
     setup({ ...defaultProps(), show: true, altText: undefined });
     cy.get('[data-testid="preview-image"]').should('have.attr', 'alt', 'Image preview');
   });
 
   it('should call onClose when overlay is clicked', () => {
-    setup({ ...defaultProps(), show: true });
-    // Assuming the overlay has data-testid="popup-overlay"
-    cy.get('[data-testid="popup-overlay"]').click({ force: true });
+    cy.fixture('placeholder.png', 'base64').then((imageData) => {
+      const imageUrl = `data:image/jpeg;base64,${imageData}`;
+      setup({ ...defaultProps(), show: true, imageUrl });
+    });
+
+    cy.get('[data-testid="overlay"]').click();
     cy.get('@onClose').should('have.been.calledOnce');
   });
 
   it('should call onClose when close button is clicked', () => {
-    setup({ ...defaultProps(), show: true });
+    cy.fixture('placeholder.png', 'base64').then((imageData) => {
+      const imageUrl = `data:image/jpeg;base64,${imageData}`;
+      setup({ ...defaultProps(), show: true, imageUrl });
+    });
     // Assuming the close button has data-testid="close-button"
-    cy.get('[data-testid="close-button"]').click();
+    cy.get('[data-testid="close-icon"]').click();
     cy.get('@onClose').should('have.been.calledOnce');
   });
 
   it('should have the correct styles applied', () => {
-    setup({ ...defaultProps(), show: true });
+    cy.fixture('placeholder.png', 'base64').then((imageData) => {
+      const imageUrl = `data:image/jpeg;base64,${imageData}`;
+      setup({ ...defaultProps(), show: true, imageUrl });
+    });
     cy.get('[data-testid="preview-image"]').should('have.class', 'w-11/12').and('have.class', 'h-1/2');
   });
 });

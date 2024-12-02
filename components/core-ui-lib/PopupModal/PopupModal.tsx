@@ -108,7 +108,7 @@ export default function PopupModal({
                   <Dialog.Title className={`text-xl font-bold leading-6 text-primary-navy ${titleClass}`}>
                     {title}
                   </Dialog.Title>
-                  {showCloseIcon && <Icon iconName="cross" variant="lg" onClick={onClose} data-testid="close-icon" />}
+                  {showCloseIcon && <Icon iconName="cross" variant="lg" onClick={onClose} testId="close-icon" />}
                 </header>
 
                 {subtitle && (
