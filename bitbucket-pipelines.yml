@@ -81,7 +81,7 @@ pipelines:
                 USERNAME: $SMTP_USERNAME
                 PASSWORD: $SMTP_PASSWORD
                 FROM: $SMTP_USERNAME
-                TO: jan@segue360.co.uk
+                TO: $TESTERS_GROUP_EMAIL
                 HOST: 'smtp.gmail.com'
                 SUBJECT: '${ALERT_TYPE}: Segue Integration Tests for ${BITBUCKET_BRANCH}'
                 BODY_HTML: 'email-report.html'
