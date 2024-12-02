@@ -22,6 +22,7 @@ import {
   getDateTime,
   getDifferenceInDays,
   getDifferenceInWeeks,
+  compareDatesWithoutTime,
   // checkDateOverlap,
 } from '../dateService';
 
@@ -480,6 +481,24 @@ describe.each([
     expect(getDifferenceInWeeks(input.fromDate, input.toDate, input.fromLocale, input.toLocale)).toStrictEqual(
       expected,
     );
+  });
+});
+
+// --compareDatesWithoutTime
+describe.each([
+  [{ date1: '2024-10-15', date2: '2024-10-15', operator: '==' }, true],
+  [{ date1: '2024-10-15', date2: '2024-10-16', operator: '==' }, false],
+  [{ date1: '2024-10-15', date2: '2024-10-16', operator: '<' }, true],
+  [{ date1: '2024-10-15', date2: '2024-10-15', operator: '<' }, false],
+  [{ date1: '2024-10-15', date2: '2024-10-15', operator: '<=' }, true],
+  [{ date1: '2024-10-15', date2: '2024-10-14', operator: '>' }, true],
+  [{ date1: '2024-10-15', date2: '2024-10-15', operator: '>' }, false],
+  [{ date1: '2024-10-15', date2: '2024-10-15', operator: '>=' }, true],
+  [{ date1: '2024-10-15', date2: '2024-10-15', operator: '!=' }, false],
+  [{ date1: '2024-10-15', date2: '2024-10-16', operator: '!=' }, true],
+])('compareDatesWithoutTime', (input: { date1; date2; operator }, expected) => {
+  test(`Expect ${input.date1} ${input.operator} ${input.date2} to be ${expected}`, () => {
+    expect(compareDatesWithoutTime(input.date1, input.date2, input.operator)).toStrictEqual(expected);
   });
 });
 

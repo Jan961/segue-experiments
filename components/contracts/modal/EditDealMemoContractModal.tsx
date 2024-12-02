@@ -589,7 +589,6 @@ export const EditDealMemoContractModal = ({
         title="Deal Memo"
         onClose={() => handleCancelForm(false)}
         hasOverlay={true}
-        hasOverflow={false}
         footerComponent={
           <div className="flex justify-end items-center">
             <Button onClick={() => handleCancelForm(false)} className="w-33" variant="secondary" text="Cancel" />
