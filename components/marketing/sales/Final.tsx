@@ -9,6 +9,8 @@ import { currentUserState } from 'state/marketing/currentUserState';
 import { TourResponse } from './Entry';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import axios from 'axios';
+import { UTCDate } from '@date-fns/utc';
+import { areDatesSame, getDateDaysAway, newDate } from 'services/dateService';
 
 interface SalesFigure {
   seatsReserved: string;
@@ -68,22 +70,20 @@ const Final = () => {
 
   const handleUpdate = async () => {
     try {
+      const frequency = await getSalesFrequency();
+
+      // get previous sales figures first and check for errors
+      const { data: prevSales } = await axios.post('/api/marketing/sales/current/read', {
+        bookingId: bookings.selected,
+        salesDate: null,
+        frequency,
+      });
+
       // conly complete checks if discrepancy notes are not visible
       if (!showDiscrepancyNotes) {
-        const frequency = await getSalesFrequency();
-
-        // get previous sales figures first and check for errors
-        const response = await axios.post('/api/marketing/sales/current/read', {
-          bookingId: bookings.selected,
-          salesDate: null,
-          frequency,
-        });
-
-        if (!isNullOrEmpty(response.data)) {
-          const sales = response.data;
-
-          if (typeof sales === 'object') {
-            const salesFigures = sales as SalesFigureSet;
+        if (!isNullOrEmpty(prevSales)) {
+          if (typeof prevSales === 'object') {
+            const salesFigures = prevSales as SalesFigureSet;
 
             let tempGeneralWarning = '';
             // check if the final value submitted is lower the the last sales entry
@@ -132,8 +132,14 @@ const Final = () => {
         }
       }
 
+      // if final sales are being entered on the same day as normal sales - set final sales date to the next day
+      let finalSalesDate = new UTCDate();
+      if (areDatesSame(newDate(prevSales.setSaleFiguresDate), new UTCDate())) {
+        finalSalesDate = getDateDaysAway(finalSalesDate, 1);
+      }
+
       const data = {
-        salesDate: new Date(),
+        salesDate: finalSalesDate,
         bookingId: bookings.selected,
         user: currentUser,
         schools: hasSchoolsSales

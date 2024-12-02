@@ -6,12 +6,11 @@ import { useRecoilValue } from 'recoil';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import { exportSalesSummaryReport, fetchProductionWeek } from './request';
 import { transformToOptions } from 'utils';
-import { dateToSimple } from 'services/dateService';
+import { dateToSimple, getMonday, newDate } from 'services/dateService';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import { MAX_WEEK, MIN_WEEK, salesSummarySortOptions } from 'config/Reports';
 import Button from 'components/core-ui-lib/Button';
 import Label from 'components/core-ui-lib/Label';
-import { getCurrentMondayDate } from 'services/reportsService';
 import { notify } from 'components/core-ui-lib/Notifications';
 import { TextInput } from 'components/core-ui-lib';
 
@@ -47,12 +46,10 @@ const SalesSummaryReportModal = ({ visible, onClose, activeModal }: SalesSummary
   const [loading, setLoading] = useState(false);
   const title = useMemo(() => getModalTitle(activeModal), [activeModal]);
   const { production, productionWeek, numberOfWeeks, order } = formData;
-  const updateProductionWeek = useCallback(
-    (week) => {
-      setFormData((data) => ({ ...data, productionWeek: week }));
-    },
-    [setFormData],
-  );
+  const updateProductionWeek = useCallback(() => {
+    const currentWeekMonday = getMonday(newDate());
+    setFormData((data) => ({ ...data, productionWeek: currentWeekMonday }));
+  }, [setFormData]);
   const { data: weeks = [] } = useQuery({
     queryKey: ['productionWeeks', production],
     queryFn: async () => {
@@ -64,11 +61,11 @@ const SalesSummaryReportModal = ({ visible, onClose, activeModal }: SalesSummary
         error: 'Error fetching production weeks',
       });
       const result = await productionWeekPromise;
-      const currentWeekMonday = getCurrentMondayDate();
+      const currentWeekMonday = getMonday(newDate());
       console.log('currentWeekMonday', currentWeekMonday);
-      const currentWeekExists = result.findIndex((week) => week.mondayDate === currentWeekMonday);
+      const currentWeekExists = result.findIndex((week) => week.mondayDate === currentWeekMonday.toISOString());
       if (currentWeekExists !== -1) {
-        updateProductionWeek(currentWeekMonday);
+        updateProductionWeek();
       }
       return result;
     },

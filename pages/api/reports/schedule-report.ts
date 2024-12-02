@@ -1,7 +1,6 @@
 import { Performance } from 'prisma/generated/prisma-client';
 import ExcelJS from 'exceljs';
 import getPrismaClient from 'lib/prisma';
-import moment from 'moment';
 import {
   COLOR_HEXCODE,
   alignColumnTextHorizontally,
@@ -15,8 +14,9 @@ import { convertToPDF } from 'utils/report';
 import { bookingStatusMap } from 'config/bookings';
 import { addBorderToAllCells } from 'utils/export';
 import { PerformanceInfo, SCHEDULE_VIEW, getSheduleReport } from 'services/reports/schedule-report';
-import { convertMinutesToHoursMins } from 'services/dateService';
 import { sum } from 'radash';
+import { formatDate, getDateDaysAway, getTimeFormattedFromDateTime, newDate, timeFormat } from 'services/dateService';
+import { differenceInDays, isSameDay } from 'date-fns';
 
 const makeRowBold = ({ worksheet, row }: { worksheet: any; row: number }) => {
   worksheet.getRow(row).font = { bold: true };
@@ -105,7 +105,7 @@ const handler = async (req, res) => {
 
       bookingIdPerformanceMap[BookingId].push({
         performanceId: Id,
-        performanceTime: Time ? moment.utc(Time).format('HH:mm') : null,
+        performanceTime: Time ? getTimeFormattedFromDateTime(Time.getTime()) : null,
         performanceDate: Date ? Date.toISOString() : null,
       });
     });
@@ -113,9 +113,9 @@ const handler = async (req, res) => {
     const workbook = new ExcelJS.Workbook();
     const formattedData = data.map((x) => ({
       ...x,
-      EntryDate: moment(x.EntryDate).format('YYYY-MM-DD'),
-      ProductionStartDate: moment(x.ProductionStartDate).format('YYYY-MM-DD'),
-      ProductionEndDate: moment(x.ProductionEndDate).format('YYYY-MM-DD'),
+      EntryDate: formatDate(x.EntryDate.getTime(), 'yyyy-MM-dd'),
+      ProductionStartDate: formatDate(x.ProductionStartDate.getTime(), 'yyyy-MM-dd'),
+      ProductionEndDate: formatDate(x.ProductionEndDate.getTime(), 'yyyy-MM-dd'),
     }));
 
     const worksheet = workbook.addWorksheet('Tour Schedule', {
@@ -134,18 +134,18 @@ const handler = async (req, res) => {
     }
 
     const { ShowName, FullProductionCode } = data[0];
-    const title = `${FullProductionCode} ${ShowName} Tour Schedule - ${moment().format('DD.MM.YY')}`;
+    const title = `${FullProductionCode} ${ShowName} Tour Schedule - ${formatDate(newDate(), 'dd.MM.yy')}`;
     let headerRowsLength = 4;
     worksheet.addRow([title]);
-    worksheet.addRow([`Exported: ${moment().format('DD/MM/YY [at] HH:mm')} - Layout: Standard`]);
+    worksheet.addRow([`Exported: ${formatDate(newDate(), 'dd/MM/yy H:mm')} - Layout: Standard`]);
 
     if (from) {
-      worksheet.addRow([`Start Date: ${moment(formatedFromDate).format('YYYY-MM-DD')}`]);
+      worksheet.addRow([`Start Date: ${formatDate(formatedFromDate.getTime(), 'yyyy-MM-dd')}`]);
       headerRowsLength++;
     }
 
     if (to) {
-      worksheet.addRow([`End Date: ${moment(formatedToDate).format('YYYY-MM-DD')}`]);
+      worksheet.addRow([`End Date: ${formatDate(formatedToDate.getTime(), 'yyyy-MM-dd')}`]);
       headerRowsLength++;
     }
 
@@ -165,7 +165,7 @@ const handler = async (req, res) => {
       'DAY TYPE',
       'STATUS',
       'CAPACITY',
-      '/DAY',
+      'DAY',
       'TIME',
       'TIME',
       'MILES',
@@ -174,7 +174,7 @@ const handler = async (req, res) => {
     worksheet.addRow([]);
 
     const map: { [key: string]: SCHEDULE_VIEW } = formattedData.reduce((acc, x) => ({ ...acc, [getKey(x)]: x }), {});
-    const daysDiff = moment(to).diff(moment(from), 'days');
+    const daysDiff = differenceInDays(to, from); // tt
     let rowNo = 8;
     let prevProductionWeekNum = '';
     let lastWeekMetaInfo = {
@@ -190,11 +190,15 @@ const handler = async (req, res) => {
 
     for (let i = 1; i <= daysDiff; i++) {
       lastWeekMetaInfo = { ...lastWeekMetaInfo, weekTotalPrinted: false };
-      const weekDay = moment(moment(from).add(i - 1, 'day')).format('dddd');
-      const dateInIncomingFormat = moment(moment(from).add(i - 1, 'day'));
-      const nextDateIncomingFormat = moment(moment(from).add(i, 'day'));
-      const key = getKey({ FullProductionCode, ShowName, EntryDate: dateInIncomingFormat.format('YYYY-MM-DD') });
-      const nextKey = getKey({ FullProductionCode, ShowName, EntryDate: nextDateIncomingFormat.format('YYYY-MM-DD') });
+      const weekDay = formatDate(getDateDaysAway(from, i - 1), 'eeee');
+      const dateInIncomingFormat = getDateDaysAway(from, i - 1);
+      const nextDateIncomingFormat = getDateDaysAway(from, i);
+      const key = getKey({ FullProductionCode, ShowName, EntryDate: formatDate(dateInIncomingFormat, 'yyyy-MM-dd') });
+      const nextKey = getKey({
+        FullProductionCode,
+        ShowName,
+        EntryDate: formatDate(nextDateIncomingFormat, 'yyyy-MM-dd'),
+      });
       const value: SCHEDULE_VIEW = map[key];
       const nextValue: SCHEDULE_VIEW = map[nextKey];
       const isOtherDay = [
@@ -211,7 +215,7 @@ const handler = async (req, res) => {
         worksheet.addRow([
           FullProductionCode,
           weekDay.substring(0, 3),
-          dateInIncomingFormat.format('DD/MM/YY'),
+          formatDate(dateInIncomingFormat, 'dd/MM/yy'),
           prevProductionWeekNum,
         ]);
         colorTextAndBGCell({
@@ -234,16 +238,16 @@ const handler = async (req, res) => {
           EntryStatusCode,
           EntryType = '',
         } = value;
-        const formattedTime = TimeMins ? convertMinutesToHoursMins(Number(TimeMins)) : '';
+        const formattedTime = TimeMins ? timeFormat(Number(TimeMins)) : '';
         const performances = bookingIdPerformanceMap[EntryId];
         const performancesOnThisDay = performances?.filter?.((performance) =>
-          moment(performance.performanceDate).isSame(dateInIncomingFormat, 'day'),
+          isSameDay(newDate(performance.performanceDate).getTime(), dateInIncomingFormat),
         );
         prevProductionWeekNum = ProductionWeekNum ? String(ProductionWeekNum) : prevProductionWeekNum;
         let row = [
           FullProductionCode,
           weekDay.substring(0, 3),
-          dateInIncomingFormat.format('DD/MM/YY'),
+          formatDate(dateInIncomingFormat, 'dd/MM/yy'),
           ProductionWeekNum,
           EntryName || '',
         ];
@@ -328,7 +332,7 @@ const handler = async (req, res) => {
       '',
       '',
       totalMileage.reduce((acc, m) => acc + Number(m || 0), 0),
-      convertMinutesToHoursMins(sum(totalTime)),
+      timeFormat(sum(totalTime)),
     ]);
 
     rowNo++;

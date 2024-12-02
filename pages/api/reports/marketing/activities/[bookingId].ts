@@ -1,5 +1,4 @@
 import ExcelJS from 'exceljs';
-import moment from 'moment';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getActivitiesByBookingId } from 'services/bookingService';
 import { sum } from 'radash';
@@ -7,6 +6,7 @@ import { createHeaderRow } from 'services/marketing/reports';
 import { addWidthAsPerContent } from 'services/reportsService';
 import { COLOR_HEXCODE, applyFormattingToRange } from 'services/salesSummaryService';
 import { convertToPDF } from 'utils/report';
+import { formatDate } from 'services/dateService';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { bookingId, format } = req.query || {};
@@ -59,7 +59,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const row = worksheet.addRow([
       activity.Name || '',
       activityTypeMap.get(activity.ActivityTypeId) || '',
-      activity.Date ? moment(activity.Date).format('DD/MM/YY') : '',
+      activity.Date ? formatDate(activity.Date, 'dd/MM/yy') : '',
       activity.FollowUpRequired,
       activity.CompanyCost,
       activity.VenueCost,

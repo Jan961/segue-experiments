@@ -5,7 +5,7 @@ import DateInput from 'components/core-ui-lib/DateInput';
 import TextArea from 'components/core-ui-lib/TextArea/TextArea';
 import Button from 'components/core-ui-lib/Button';
 import { BookingContactNoteDTO } from 'interfaces';
-import { getTimeFromDateAndTime, toISO } from 'services/dateService';
+import { dateTimeToTime, newDate, toISO } from 'services/dateService';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import { ConfDialogVariant } from 'components/core-ui-lib/ConfirmationDialog/ConfirmationDialog';
 import { hasContactNoteChanged } from '../utils';
@@ -13,6 +13,7 @@ import { useRecoilValue } from 'recoil';
 import { userState } from 'state/account/userState';
 import classNames from 'classnames';
 import Select from 'components/core-ui-lib/Select';
+import { UTCDate } from '@date-fns/utc';
 
 export type ContactNoteModalVariant = 'add' | 'edit' | 'delete';
 
@@ -40,7 +41,7 @@ export default function ContactNoteModal({
 }: Partial<ContactModalProps>) {
   const [visible, setVisible] = useState<boolean>(show);
   const [personContacted, setPersonContacted] = useState<string>(null);
-  const [date, setDate] = useState<Date>();
+  const [date, setDate] = useState<UTCDate>();
   const [time, setTime] = useState<string>();
   const [actionedBy, setActionedBy] = useState<number>();
   const [notes, setNotes] = useState<string>();
@@ -65,15 +66,15 @@ export default function ContactNoteModal({
   const initForm = () => {
     if (variant === 'add') {
       setPersonContacted('');
-      setDate(new Date());
-      setTime(getTimeFromDateAndTime(new Date()));
+      setDate(newDate());
+      setTime(dateTimeToTime(newDate()));
       setActionedBy(null);
       setNotes('');
       setShowNameLengthError(false);
     } else if (variant === 'edit') {
       setPersonContacted(data.CoContactName);
-      setDate(new Date(data.ContactDate));
-      setTime(getTimeFromDateAndTime(new Date(data.ContactDate)));
+      setDate(newDate(data.ContactDate));
+      setTime(dateTimeToTime(newDate(data.ContactDate)));
       setActionedBy(data.ActionAccUserId);
       setNotes(data.Notes);
       setId(data.Id);

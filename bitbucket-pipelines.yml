@@ -1,58 +1,81 @@
 image: atlassian/default-image:2
-image: cypress/browsers:latest
+
+
 options:
   docker: true
   size: 2x
 pipelines:
+
   custom:
     cypress:
-      - variables:
-          - name: browser_name
-            default: "chrome"
-            allowed-values:
-              - "chrome"
-              - "firefox"
-              - "electron"
+#      - step:
+#          name: "Build and Push Docker Image"
+#          script:
+#            - docker info
+#            - docker build -t jan961/cypress-segue:myimage .
+#            - docker login -u jan961 -p $DOCKER_PASSWORD
+#            - docker  push jan961/cypress-segue:myimage
+
       - step:
+          size: 4x
           name: "Run Cypress Tests"
-          image: cypress/included:latest
+          image:            # get the docker image from DockerHub
+            name: jan961/cypress-segue:myimage
+            username: $DOCKER_PASSWORD
+            password: $DOCKER_USERNAME
+            email: $DOCKER_EMAIL
+
           caches:
             - node
             - cypress
+            - nextcache
+          timeout:
           script:
+            - echo "Current directory is $(pwd)"
+            - ls
+            # Downgrade npm
+            - npm install -g npm@9.6.7
+             # Get the start-server-and-test utility that will keep the server running while tests are run
+            - npm install -g start-server-and-test
+            - apt-get update && apt-get install -y zip
+            - mkdir segue-dir
+            # enable extended pattern matching in bash
+            - shopt -s extglob
+            # include hidden files such as .git (which here is apparently needed for husky)
+            - shopt -s dotglob
+            # Copy the contents of the current directory (all of Segue) to the segue-dir directory
+            - mv !(segue-dir) segue-dir/
+            - cd segue-dir &&  npm install
             - echo $TEST_APP_ENV | base64 --decode --ignore-garbage > .env
             - cat .env
-            - npm ci
             - npm run build
-            - cat .env
-            - npm run start &
-            - npx wait-on http://localhost:3000
-            # Clone Cypress repo in a separate directory
-            - mkdir cypress-tests && cd cypress-tests
-            - git clone git@bitbucket.org:segue-team/cypress.git
+            - cd ..
+            # Clone the Cypress repository into a dir at the same level as Segue
+            - git clone git@bitbucket.org:segue-team/cypress.git && cd cypress
+            - npm install
+            - npx cypress install
+            - cd ..
+            - set +e # Disable exit on error - cypress breaks if any of the tests fail
+            - DEBUG=start-server-and-test start-server-and-test "npm --prefix segue-dir/ run start" http://localhost:3000 "npm --prefix cypress/ run cy:alltests"
+            - EXIT_CODE=$?
+            - echo "Cypress exited with code $EXIT_CODE"
+            - if [ $EXIT_CODE -ne 0 ]; then
+                ALERT_TYPE="fail"; else
+                ALERT_TYPE="success"; 
+              fi
+            - set -e # Re-enable exit on error for the rest of the script
             - cd cypress
-            - npm ci
-            # Run Cypress tests in headless mode
-            - npm run cy:alltests --browser chrome || true                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
-            # - npm run cy:permissions --browser chrome
-            - npx mochawesome-merge cypress/reports/mocha/*.json -o output.json
-          after-script:
-            - cd cypress-tests/cypress
-            # Create a custom HTML report from output.json
-            - npm run merge:reports
-            - npm run generate:report
-            # Set alert type based on test results
-            - ALERT_TYPE="success"
-            - |
-              if [[ $(jq '.stats.failures' output.json) -ne 0 ]]; then 
-                ALERT_TYPE="error"
-                echo "Tests failed but continuing with report generation"
-              fi
-            - ALERT_TYPE="success"
-            - if [[ $BITBUCKET_EXIT_CODE -ne 0 ]]; then 
-                ALERT_TYPE="error";
-                echo "Tests failed but continuing with report generation";
-              fi
+            - echo "Merging reports"
+            # Merge reports from different spec files
+            - npx mochawesome-merge cypress/results/*.json -o output.json
+            # Generate HTML report from merged JSON
+            - npx marge output.json
+            # Generate email report template HTML file that will form the body of the email
+            - node create-email-report
+            # Zip the full report directory - this is commanded out for now - I can add upload to the repo later if needed
+            #zip -r full-report.zip mochawesome-report/
+
+            # Use pre-built Atlassian email-notify pipe with the variables as below to send email with test results
             - pipe: atlassian/email-notify:0.13.2
               variables:
                 USERNAME: $SMTP_USERNAME
@@ -60,31 +83,37 @@ pipelines:
                 FROM: $SMTP_USERNAME
                 TO: $TESTERS_GROUP_EMAIL
                 HOST: 'smtp.gmail.com'
-                SUBJECT: '${ALERT_TYPE}:Bitbucket Pipe Notification for ${BITBUCKET_BRANCH}'
-                BODY_HTML: 'cypress/reports/mocha/test-report.html'
+                SUBJECT: '${ALERT_TYPE}: Segue Integration Tests for ${BITBUCKET_BRANCH}'
+                BODY_HTML: 'email-report.html'
+                DEBUG: 'true'
           artifacts:
-            - cypress-tests/cypress/reports/**
-            - cypress-tests/cypress/cypress/reports/mocha/test-report.html
+            - cypress/mochawesome-report
+            - cypress/full-report.zip
+            - cypress/email-report.html
+            - cypress/cypress/results/**
+            - cypress/cypress/screenshots/**
+
+
   default:
-      - step:
-          name: Build and Test
-          image: node:18.20.4
-          variables:
-            NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: $NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
-            CLERK_SECRET_KEY: $CLERK_SECRET_KEY
-            WEB_APP_URI: $CYPRESS_BASE_URL
-          caches:
-            - node
-          script:
-            - npm install
-            - npm run test:ci
-            - npm run build
-      - step:
-          name: SonarQube Analysis
-          image: node:18.20.4
-          script:
-            - pipe: sonarsource/sonarcloud-scan:2.0.0
-            - pipe: sonarsource/sonarcloud-quality-gate:0.1.6
+    - step:
+        name: Build and Test
+        image: node:18.20.4
+        variables:
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: $NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+          CLERK_SECRET_KEY: $CLERK_SECRET_KEY
+          WEB_APP_URI: $CYPRESS_BASE_URL
+        caches:
+          - node
+        script:
+          - npm install
+          - npm run test:ci
+          - npm run build
+    - step:
+        name: SonarQube Analysis
+        image: node:18.20.4
+        script:
+          - pipe: sonarsource/sonarcloud-scan:2.0.0
+          - pipe: sonarsource/sonarcloud-quality-gate:0.1.6
 definitions:
   caches:
     npm: ~/.npm
@@ -93,3 +122,9 @@ definitions:
   services:
     docker:
       memory: 4096
+
+
+
+
+
+

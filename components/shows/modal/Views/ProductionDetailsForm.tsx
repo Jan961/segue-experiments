@@ -21,6 +21,7 @@ import { uploadStrings } from 'config/upload';
 import axios from 'axios';
 import classNames from 'classnames';
 import { accessShows } from 'state/account/selectors/permissionSelector';
+import { newDate } from 'services/dateService';
 
 export interface ProductionFormData {
   id?: number;
@@ -265,8 +266,8 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
               onChange('rehearsalDateBlock', { ...rehearsalDateBlock, StartDate, EndDate });
             }}
             value={{
-              from: rehearsalDateBlock?.StartDate ? new Date(rehearsalDateBlock?.StartDate) : null,
-              to: rehearsalDateBlock?.EndDate ? new Date(rehearsalDateBlock?.EndDate) : null,
+              from: rehearsalDateBlock?.StartDate ? newDate(rehearsalDateBlock?.StartDate) : null,
+              to: rehearsalDateBlock?.EndDate ? newDate(rehearsalDateBlock?.EndDate) : null,
             }}
             disabled={isArchived}
           />
@@ -284,8 +285,8 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
                   onChange('productionDateBlock', { ...productionDateBlock, StartDate, EndDate });
                 }}
                 value={{
-                  from: productionDateBlock?.StartDate ? new Date(productionDateBlock?.StartDate) : null,
-                  to: productionDateBlock?.EndDate ? new Date(productionDateBlock?.EndDate) : null,
+                  from: productionDateBlock?.StartDate ? newDate(productionDateBlock?.StartDate) : null,
+                  to: productionDateBlock?.EndDate ? newDate(productionDateBlock?.EndDate) : null,
                 }}
                 disabled={isArchived}
               />
