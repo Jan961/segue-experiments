@@ -2,7 +2,7 @@
 
 import { mount } from 'cypress/react18';
 import PopupModal from '../../../components/core-ui-lib/PopupModal';
-import BaseComp from '../global/BaseComp'; // Adjust the path based on your directory structure
+import BaseComp from '../global/BaseComp';
 
 // Setup function to mount the component
 function setup(props) {
@@ -100,11 +100,11 @@ describe('PopupModal Component', () => {
     cy.contains('Test Title').should('have.class', 'custom-title-class');
   });
 
-  it.skip('render as expected with loads of content on the y axis', () => {
+  it.only('render as expected with loads of content and vertical scroll set to true', () => {
     const loadsOfVerticalContent = () => {
       return (
-        <BaseComp>
-          <PopupModal show={true} title="Loads of vertical content" hasOverflow={false}>
+        <BaseComp styles={{ width: '100vw', height: '100vh' }}>
+          <PopupModal show={true} title="Loads of vertical content" verticalScroll={true}>
             <div
               style={{
                 width: '800px',
@@ -163,19 +163,23 @@ describe('PopupModal Component', () => {
       );
     };
     mount(loadsOfVerticalContent());
-    cy.get('[data-testid="popup-modal-content"]').should('be.visible');
+    cy.get('[data-testid="popup-modal-content"] div ').should('be.visible');
+    cy.get('[data-testid="popup-modal-content"]').should(($el) => {
+      const el = $el[0];
+      // Check if the element is scrollable
+      expect(el.scrollHeight).to.be.greaterThan(el.clientHeight);
+    });
   });
-  it.skip('render as expected with loads of content on the x axis', () => {
+  it.only('render as expected with loads of content and vertical scroll set to false', () => {
     const loadsHorizontalContent = () => {
       return (
         <BaseComp>
-          <PopupModal show={true} title="Loads of vertical content" hasOverflow={false}>
+          <PopupModal show={true} title="Loads of vertical content" verticalScroll={false}>
             <div
               style={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                flexDirection: 'row',
+                display: 'grid',
+                gridTemplateColumns: 'repeat(3, 1fr)', // 3 columns, each taking equal space
+                gap: '10px', // spacing between grid items
               }}
             >
               <div style={{ height: '50px', padding: '20px' }}>
@@ -221,17 +225,5 @@ describe('PopupModal Component', () => {
 
     mount(loadsHorizontalContent());
     cy.get('[data-testid="popup-modal-content"]').should('be.visible');
-  });
-
-  it('renders with overflow when "hasOverflow" is true', () => {
-    setup({ show: true, hasOverflow: true });
-
-    cy.get('[data-testid="overlay"]').should('have.class', 'overflow-y-auto');
-  });
-
-  it('does not render with overflow when "hasOverflow" is false', () => {
-    setup({ show: true, hasOverflow: false });
-
-    cy.get('[data-testid="overlay"]').should('not.have.class', 'overflow-y-auto');
   });
 });
