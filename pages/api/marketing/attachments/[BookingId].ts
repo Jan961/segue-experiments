@@ -21,7 +21,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       ...File,
     }));
 
-    res.json(result);
+    res.status(200).json(result);
   } catch (err) {
     console.log(err);
     res.status(500).json({ err: 'Error occurred while generating search results.' });

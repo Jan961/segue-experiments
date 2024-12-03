@@ -73,14 +73,14 @@ const AttachmentsTab = forwardRef<AttachmentsTabRef, AttachmentsTabProps>((props
         BookingFileBookingId: parseInt(bookingIdVal),
         BookingFileFileId: fileUpdRes.id,
         BookingFileType: attachType,
-        BookingFileDescription: fileUpdRes.originalFilename,
+        BookingFileDescription: '',
       };
 
       // update in the database
       const { data } = await axios.post('/api/marketing/attachments/create', fileRec);
 
       const uploadedFile = {
-        OriginalFilename: fileRec.BookingFileDescription,
+        OriginalFilename: fileUpdRes.originalFilename,
         UploadDateTime: new Date(fileUpdRes.uploadDateTime),
         Location: fileUpdRes.location,
         BookingFileId: data.BookingFileId,
@@ -102,11 +102,14 @@ const AttachmentsTab = forwardRef<AttachmentsTabRef, AttachmentsTabProps>((props
     try {
       const { data } = await axios.get(`/api/marketing/attachments/${bookingId}`);
 
-      if (Array.isArray(data)) {
-        if ('error' in data) {
-          return;
-        }
+      // if API has errored, display the attachement tables with no data
+      if (Object.prototype.hasOwnProperty.call(data, 'err')) {
+        setVenueAttachRows([]);
+        setProdAttachRows([]);
+        setIsLoading(false);
+      }
 
+      if (Array.isArray(data)) {
         const venueAttach = data.filter((attach) => attach.BookingFileType === 'Venue');
         const prodAttach = data.filter((attach) => attach.BookingFileType === 'Production');
 
