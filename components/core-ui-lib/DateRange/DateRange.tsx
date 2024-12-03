@@ -72,7 +72,6 @@ export default function DateRange({
 
   const handleDateFromChange = (v: UTCDate) => {
     const updatedDate = { ...dateRange, from: v };
-
     if (checkDateRangeValid(updatedDate.from, updatedDate.to)) {
       setDateRange(updatedDate);
       onChange(updatedDate);
@@ -84,7 +83,6 @@ export default function DateRange({
 
   const handleDateToChange = (v: UTCDate) => {
     const updatedDate = { ...dateRange, to: v };
-
     if (checkDateRangeValid(updatedDate.from, updatedDate.to)) {
       setDateRange(updatedDate);
       onChange(updatedDate);
