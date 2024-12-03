@@ -44,6 +44,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       techSpecsUrl: TechSpecsURL,
       what3WordsStage: AddressStageDoorW3W,
       what3WordsLoading: AddressLoadingW3W,
+      what3WordsEntrance: AddressEntranceW3W,
       flags: VenueFlags,
       excludeFromChecks: ExcludeFromChecks,
       primaryAddress1,
@@ -145,6 +146,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       VenueAccountId: accountId,
       AddressStageDoorW3W,
       AddressLoadingW3W,
+      AddressEntranceW3W,
     };
     let updatedVenue;
     const barredVenueIds = barredVenues.map(({ barredVenueId }) => barredVenueId).filter((x: number) => x);
