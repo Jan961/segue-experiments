@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import IconWithText from '../IconWithText';
 import { faChartPie } from '@fortawesome/free-solid-svg-icons';
-import { dateToSimple } from 'services/dateService';
-import { getCurrentMondayDate } from 'services/reportsService';
+import { dateToSimple, getMonday, newDate } from 'services/dateService';
 import { Spinner } from 'components/global/Spinner';
 
 type Props = {
@@ -68,7 +67,7 @@ export default function SalesSummary({ activeProductions }: Props) {
           setProductionWeeks([]);
           // Set production weeks with data
           setProductionWeeks(data?.data || []);
-          const currentWeekMonday = getCurrentMondayDate();
+          const currentWeekMonday = getMonday(newDate());
           setInputs((prev) => ({ ...prev, ProductionWeek: currentWeekMonday }));
         })
         .finally(() => {
@@ -84,7 +83,7 @@ export default function SalesSummary({ activeProductions }: Props) {
 
   return (
     <>
-      <IconWithText icon={faChartPie} text={'Sales Summary'} onClick={() => setShowModal(true)} />
+      <IconWithText icon={faChartPie} text="Sales Summary" onClick={() => setShowModal(true)} />
       {showModal ? (
         <>
           <div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none overflow-scroll p-10">
@@ -130,11 +129,22 @@ export default function SalesSummary({ activeProductions }: Props) {
                     </select>
                   </div>
                   <div className="flex flex-col space-y-2 mt-4">
-                    <input type={'hidden'} name={'productionStartDate'} id={'productionStartDate'} value={inputs.productionStartDate} />
-                    <input type={'hidden'} name={'productionEndDate'} id={'productionEndDate'} value={inputs.productionEndDate} />
+                    <input
+                      type="hidden"
+                      name="productionStartDate"
+                      id="productionStartDate"
+                      value={inputs.productionStartDate}
+                    />
+                    <input
+                      type="hidden"
+                      name="productionEndDate"
+                      id="productionEndDate"
+                      value={inputs.productionEndDate}
+                    />
                     {inputs.productionStartDate != null ? (
                       <p className="text-lg">
-                        Production Dates {dateToSimple(inputs.productionStartDate)} to {dateToSimple(inputs.productionEndDate)}
+                        Production Dates {dateToSimple(inputs.productionStartDate)} to{' '}
+                        {dateToSimple(inputs.productionEndDate)}
                       </p>
                     ) : (
                       <p className="text-lg">Select a Production to populate report filters</p>
@@ -195,9 +205,9 @@ export default function SalesSummary({ activeProductions }: Props) {
                       name="Order"
                       onChange={handleOnChange}
                     >
-                      <option value={'date'}>Show Date</option>
-                      <option value={'sales'}>Show Sales (Low to Highest)</option>
-                      <option value={'change'}>Change (Lowest to highest)</option>
+                      <option value="date">Show Date</option>
+                      <option value="sales">Show Sales (Low to Highest)</option>
+                      <option value="change">Change (Lowest to highest)</option>
                     </select>
                   </div>
 
@@ -227,7 +237,7 @@ export default function SalesSummary({ activeProductions }: Props) {
               </div>
             </div>
           </div>
-          <div className="opacity-25 fixed inset-0 z-40 bg-black"></div>
+          <div className="opacity-25 fixed inset-0 z-40 bg-black" />
         </>
       ) : null}
     </>

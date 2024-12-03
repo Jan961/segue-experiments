@@ -42,7 +42,7 @@ import {
   defaultTechProvision,
 } from '../utils';
 import { dealMemoInitialState } from 'state/contracts/contractsFilterState';
-import { dateToTimeString, getDateWithOffset } from 'services/dateService';
+import { dateTimeToTime, disectTime, getDateWithOffset, newDate, safeDate } from 'services/dateService';
 import StandardSeatKillsTable, { SeatKillRow } from '../table/StandardSeatKillsTable';
 import LoadingOverlay from 'components/core-ui-lib/LoadingOverlay';
 import { CustomOption } from 'components/core-ui-lib/Table/renderers/SelectCellRenderer';
@@ -206,21 +206,22 @@ export const EditDealMemoContractModal = ({
     setDealMemoTechProvision(processedTechProvision);
 
     // get techArrivalTime with time offset
-    const techArrivalTime = getDateWithOffset(new Date());
+    const techArrivalTime = newDate();
     if (isNullOrUndefined(demoModalData.TechArrivalTime)) {
       techArrivalTime.setHours(9);
     } else {
-      const timeArrive = new Date(demoModalData.TechArrivalTime);
-      techArrivalTime.setHours(timeArrive.getHours());
-      techArrivalTime.setMinutes(timeArrive.getMinutes());
+      const timeArrive = safeDate(demoModalData.TechArrivalTime).toISOString();
+      const time = disectTime(timeArrive.split('T')[1]);
+      techArrivalTime.setHours(time.h);
+      techArrivalTime.setMinutes(time.m);
     }
 
     setFormData({
       ...demoModalData,
-      DateIssued: isUndefined(demoModalData.DateIssued) ? new Date() : demoModalData.DateIssued,
+      DateIssued: isUndefined(demoModalData.DateIssued) ? newDate() : demoModalData.DateIssued,
       TechArrivalTime: techArrivalTime,
       TechArrivalDate: isUndefined(demoModalData.TechArrivalDate)
-        ? new Date(selectedTableCell.contract.dateTime)
+        ? newDate(selectedTableCell.contract.dateTime)
         : demoModalData.TechArrivalDate,
       RunningTime: timeToDateTime(currentProduction.RunningTime),
       PrintDelUseVenueAddress: isUndefined(demoModalData.PrintDelUseVenueAddress)
@@ -586,13 +587,33 @@ export const EditDealMemoContractModal = ({
       <PopupModal
         show={visible}
         title="Deal Memo"
-        titleClass={classNames('text-xl text-primary-navy font-bold -mt-2.5')}
         onClose={() => handleCancelForm(false)}
         hasOverlay={true}
         hasOverflow={false}
-        panelClass="overflow-y-hidden"
+        footerComponent={
+          <div className="flex justify-end items-center">
+            <Button onClick={() => handleCancelForm(false)} className="w-33" variant="secondary" text="Cancel" />
+            <Button
+              onClick={() => submitForm(false)}
+              className="ml-4 w-28"
+              variant="primary"
+              text="Save and Close"
+              testId="deal-memo-save-and-close"
+            />
+            <Button
+              onClick={() => submitForm(true)}
+              className="ml-4 w-44"
+              variant="primary"
+              text="Save, Close and Export"
+              testId="deal-memo-save-close-and-export"
+              iconProps={{ className: 'h-4 w-3' }}
+              sufixIconName="document-solid"
+              disabled={!canExport}
+            />
+          </div>
+        }
       >
-        <div className="h-[80vh] w-[82vw] overflow-y-scroll pr-2">
+        <div className="w-[82vw] pr-2">
           <p className="text-primary-red ">PLEASE NOTE:</p>{' '}
           <p className="text-primary-input-text">
             Some information is pre-populated from other areas of Segue. <br /> For venue details including addresses
@@ -788,7 +809,7 @@ export const EditDealMemoContractModal = ({
             <div className="w-4/5 flex items-center" data-testid="perf-curfew-time">
               <TimeInput
                 className="w-fit h-[31px] [&>input]:!h-[25px] [&>input]:!w-11 !justify-center shadow-input-shadow"
-                value={formData && formData.VenueCurfewTime ? dateToTimeString(formData.VenueCurfewTime) : null}
+                value={formData && formData.VenueCurfewTime ? dateTimeToTime(formData.VenueCurfewTime) : null}
                 disabled={disableDate || !canEdit}
                 onInput={(event) => handleTimeInput(event, 'VenueCurfewTime')}
                 onBlur={() => handleTimeBlur('VenueCurfewTime')}
@@ -2086,7 +2107,7 @@ export const EditDealMemoContractModal = ({
               <div className="ml-4 w-[100px]" data-testid="company-arrival-time">
                 <TimeInput
                   className="w-fit h-[31px] [&>input]:!h-[25px] [&>input]:!w-11 !justify-center shadow-input-shadow ml-2"
-                  value={formData && formData.TechArrivalTime ? dateToTimeString(formData.TechArrivalTime) : null}
+                  value={formData && formData.TechArrivalTime ? dateTimeToTime(formData.TechArrivalTime) : null}
                   disabled={disableDate || !canEdit}
                   onInput={(event) => handleTimeInput(event, 'TechArrivalTime')}
                   onBlur={() => handleTimeBlur('TechArrivalTime')}
@@ -2377,27 +2398,6 @@ export const EditDealMemoContractModal = ({
           ) : (
             <div />
           )}
-
-          <div className="flex justify-end items-center">
-            <Button onClick={() => handleCancelForm(false)} className="w-33" variant="secondary" text="Cancel" />
-            <Button
-              onClick={() => submitForm(false)}
-              className="ml-4 w-28"
-              variant="primary"
-              text="Save and Close"
-              testId="deal-memo-save-and-close"
-            />
-            <Button
-              onClick={() => submitForm(true)}
-              className="ml-4 w-44"
-              variant="primary"
-              text="Save, Close and Export"
-              testId="deal-memo-save-close-and-export"
-              iconProps={{ className: 'h-4 w-3' }}
-              sufixIconName="document-solid"
-              disabled={!canExport}
-            />
-          </div>
         </div>
 
         {isLoading && <LoadingOverlay />}

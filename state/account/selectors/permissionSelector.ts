@@ -233,3 +233,11 @@ export const accessAdminHome = selector({
     return permissions.filter((x) => ADMIN_HOME_PERMISSIONS.includes(x));
   },
 });
+
+export const isPermissionsInitialised = selector({
+  key: 'isPermissionsInitialisedSelector',
+  get: ({ get }) => {
+    const { isInitialised } = get(userPermissionsState);
+    return isInitialised;
+  },
+});

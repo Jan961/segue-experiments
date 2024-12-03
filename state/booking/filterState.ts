@@ -1,14 +1,15 @@
+import { UTCDate } from '@date-fns/utc';
 import { atom } from 'recoil';
 
 export type FilterState = {
   venueText?: string;
   masterTaskText?: string;
   status?: string;
-  startDate?: Date;
-  endDate?: Date;
+  startDate?: UTCDate;
+  endDate?: UTCDate;
   scrollToDate?: string;
-  scheduleStartDate?: Date;
-  scheduleEndDate?: Date;
+  scheduleStartDate?: UTCDate;
+  scheduleEndDate?: UTCDate;
 };
 
 export const intialBookingFilterState: FilterState = {

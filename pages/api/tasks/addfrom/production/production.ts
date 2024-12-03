@@ -28,9 +28,9 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           ToWeekNum,
           Interval,
           FromWeekNumIsPostProduction:
-            FromWeekNum < 0 ? false : FromWeekNum > calculateWeekNumber(prodStartDate, prodEndDate),
+            FromWeekNum < 0 ? false : FromWeekNum > calculateWeekNumber(prodStartDate.getTime(), prodEndDate.getTime()),
           ToWeekNumIsPostProduction:
-            ToWeekNum < 0 ? false : ToWeekNum > calculateWeekNumber(prodStartDate, prodEndDate),
+            ToWeekNum < 0 ? false : ToWeekNum > calculateWeekNumber(prodStartDate.getTime(), prodEndDate.getTime()),
         };
         const newRepeatingTask = await prisma.productionTaskRepeat.create({ data: { ...recurringTaskRecord } });
         const recurringTaskInfo = {
@@ -71,11 +71,13 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         const Code = (await getMaxProductionTaskCode(ProductionId, req)) + index + 1;
         const taskCompleteBys = {
           StartByIsPostProduction:
-            task.StartByWeekNum < 0 ? false : task.StartByWeekNum > calculateWeekNumber(prodStartDate, prodEndDate),
+            task.StartByWeekNum < 0
+              ? false
+              : task.StartByWeekNum > calculateWeekNumber(prodStartDate.getTime(), prodEndDate.getTime()),
           CompleteByIsPostProduction:
             task.CompleteByWeekNum < 0
               ? false
-              : task.CompleteByWeekNum > calculateWeekNumber(prodStartDate, prodEndDate),
+              : task.CompleteByWeekNum > calculateWeekNumber(prodStartDate.getTime(), prodEndDate.getTime()),
         };
         const filteredTask = omit(task, ['Id', 'FromWeekNum', 'ToWeekNum', 'Interval']);
         const newTaskRecord = {

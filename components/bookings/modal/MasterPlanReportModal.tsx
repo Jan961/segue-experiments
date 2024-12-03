@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { Button, DateRange, PopupModal, notify } from 'components/core-ui-lib';
 import { exportMasterplanReport } from './request';
+import { newDate } from 'services/dateService';
 
 interface MasterPlanReportModalProps {
   visible: boolean;
@@ -40,7 +41,7 @@ const MasterPlanReportModal: React.FC<MasterPlanReportModalProps> = ({ visible, 
           onChange('fromDate', from?.toISOString() || '');
           onChange('toDate', !to ? from?.toISOString() : to?.toISOString() || '');
         }}
-        value={{ from: fromDate ? new Date(fromDate) : null, to: toDate ? new Date(toDate) : null }}
+        value={{ from: fromDate ? newDate(fromDate) : null, to: toDate ? newDate(toDate) : null }}
       />
       <div className="pt-3 w-full flex items-center justify-end gap-2">
         <Button
