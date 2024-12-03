@@ -153,7 +153,7 @@ const SignIn = () => {
         const formattedErrors = error.inner.reduce((acc, err) => {
           return {
             ...acc,
-            [err.path]: acc[err.path] ? [...acc[err.path], err.message[0]] : [err.message[0]],
+            [err.path]: acc[err.path] ? [...acc[err.path], err.message] : [err.message],
           };
         }, {});
         setValidationError(formattedErrors);
