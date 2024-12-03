@@ -61,7 +61,6 @@ export default function DateRange({
         ? 'Invalid date'
         : '';
     setErrors({ fromError: error, toError: error });
-    console.log('error', error);
 
     return error === '';
   };
@@ -73,11 +72,7 @@ export default function DateRange({
 
   const handleDateFromChange = (v: UTCDate) => {
     const updatedDate = { ...dateRange, from: v };
-    console.log('updatedDate', updatedDate);
-    console.log(
-      'checkDateRangeValid(updatedDate.from, updatedDate.to)',
-      checkDateRangeValid(updatedDate.from, updatedDate.to),
-    );
+
     if (checkDateRangeValid(updatedDate.from, updatedDate.to)) {
       setDateRange(updatedDate);
       onChange(updatedDate);
@@ -89,11 +84,7 @@ export default function DateRange({
 
   const handleDateToChange = (v: UTCDate) => {
     const updatedDate = { ...dateRange, to: v };
-    console.log('updatedDate', updatedDate);
-    console.log(
-      'checkDateRangeValid(updatedDate.from, updatedDate.to)',
-      checkDateRangeValid(updatedDate.from, updatedDate.to),
-    );
+
     if (checkDateRangeValid(updatedDate.from, updatedDate.to)) {
       setDateRange(updatedDate);
       onChange(updatedDate);

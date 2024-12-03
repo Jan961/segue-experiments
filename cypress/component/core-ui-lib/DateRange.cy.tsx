@@ -2,6 +2,7 @@ import { mount } from 'cypress/react18';
 import DateRange, { DateRangeProps } from '../../../components/core-ui-lib/DateRange';
 import BaseComp from '../global/BaseComp';
 import { UTCDate } from '@date-fns/utc';
+import { newDate } from '../../../services/dateService';
 
 function setup(props: DateRangeProps) {
   mount(
@@ -38,30 +39,31 @@ describe('DateRange Component', () => {
       from: new UTCDate('2023-01-01'),
       to: new UTCDate('2023-01-31'),
     };
-
     setup({
       onChange,
       value,
     });
-
     cy.get('[data-testid="start-date-input"] input').should('have.value', '01/01/23');
     cy.get('[data-testid="end-date-input"] input').should('have.value', '31/01/23');
   });
 
-  it.only('calls onChange with correct value when "from" date is changed', () => {
-    const onChange = cy.spy().as('onChangeSpy');
+  it('calls onChange with correct value when "from" date is changed', () => {
+    const onChange = cy.stub().as('onChangeSpy');
     setup({
       onChange,
     });
 
-    const fromDate = '01/01/2023';
+    const fromDate = '05/01/23';
 
     cy.get('[data-testid="start-date-input"] input').type(`${fromDate}{enter}`);
-
-    cy.get('@onChangeSpy').should('have.been.calledWithMatch', {
-      from: Cypress.sinon.match((value) => value.from),
-      to: null,
-    });
+    cy.get('@onChangeSpy')
+      .should('have.been.called')
+      .then(() => {
+        const args = onChange.getCall(0).args[0];
+        // note that DateInput (and as a result DateRange does that as well) uses newDate with 'UK' "locale" parameter
+        // and therefore it always interprets '05/01/23' as 5 Jan 2023
+        expect(args.from).to.deep.equal(newDate(fromDate, 'UK'));
+      });
   });
 
   it('calls onChange with correct value when "to" date is changed', () => {
@@ -70,17 +72,21 @@ describe('DateRange Component', () => {
       onChange,
     });
 
-    const toDate = '01/31/2023';
+    const toDate = '05/01/23';
 
     cy.get('[data-testid="end-date-input"] input').type(`${toDate}{enter}`);
 
-    cy.get('@onChangeSpy').should('have.been.calledWithMatch', {
-      from: null,
-      to: Cypress.sinon.match((value) => value.toISOString().startsWith('2023-01-31')),
-    });
+    cy.get('@onChangeSpy')
+      .should('have.been.called')
+      .then(() => {
+        const args = onChange.getCall(0).args[0];
+        // note that DateInput (and as a result DateRange does that as well) uses newDate with 'UK' "locale" parameter
+        // and therefore it always interprets '05/01/23' as 5 Jan 2023 - it is important never to use the US locale
+        expect(args.to).to.deep.equal(newDate(toDate, 'UK'));
+      });
   });
 
-  it('shows error when "to" date is earlier than "from" date', () => {
+  it('shows error when you start from blank enter a "from" and then an earlier "to" date', () => {
     const onChange = cy.stub().as('onChangeSpy');
     setup({
       onChange,
@@ -91,14 +97,31 @@ describe('DateRange Component', () => {
 
     cy.get('[data-testid="start-date-input"] input').type(`${fromDate}{enter}`);
     cy.get('[data-testid="end-date-input"] input').type(`${toDate}{enter}`);
+    cy.get('[data-testid="start-date-input"]').should('have.class', 'animate-shake');
+    cy.get('[data-testid="end-date-input"]').should('have.class', 'animate-shake');
 
-    cy.get('[data-testid="start-date-input"]').contains('Invalid date').should('exist');
-    cy.get('[data-testid="end-date-input"]').contains('Invalid date').should('exist');
+    cy.get('[data-testid="end-date-input"]').should('not.nested.include.text', '01/05/2023');
+    cy.get('[data-testid="end-date-input"]').should('have.value', '');
+    cy.get('@onChangeSpy').should('have.been.calledOnce');
+  });
 
-    cy.get('@onChangeSpy').should('not.have.been.calledWithMatch', {
-      from: Cypress.sinon.match.any,
-      to: Cypress.sinon.match.any,
+  it("shows an error when you start from blank, enter a 'to' date and then an later 'from' date", () => {
+    const onChange = cy.stub().as('onChangeSpy');
+    setup({
+      onChange,
     });
+
+    const fromDate = '01/10/2023';
+    const toDate = '01/05/2023';
+    cy.get('[data-testid="end-date-input"] input').type(`${toDate}{enter}`);
+    cy.get('[data-testid="start-date-input"] input').type(`${fromDate}{enter}`);
+
+    cy.get('[data-testid="end-date-input"]').should('not.nested.include.text', '01/05/2023');
+    cy.get('[data-testid="end-date-input"]').should('have.value', '');
+    cy.get('@onChangeSpy').should('have.been.calledOnce');
+
+    cy.get('[data-testid="start-date-input"]').should('have.class', 'animate-shake');
+    cy.get('[data-testid="end-date-input"]').should('have.class', 'animate-shake');
   });
 
   it('disables the component when disabled prop is true', () => {
@@ -122,10 +145,12 @@ describe('DateRange Component', () => {
     });
 
     cy.get('[data-testid="start-date-input"] input').type('12/31/2022{enter}');
-    cy.get('[data-testid="start-date-input"]').contains('Invalid date').should('exist');
+    cy.get('[data-testid="start-date-input"]').should('have.class', 'animate-shake');
+    cy.get('[data-testid="end-date-input"]').should('have.class', 'animate-shake');
 
     cy.get('[data-testid="end-date-input"] input').type('01/01/2024{enter}');
-    cy.get('[data-testid="end-date-input"]').contains('Invalid date').should('exist');
+    cy.get('[data-testid="start-date-input"]').should('have.class', 'animate-shake');
+    cy.get('[data-testid="end-date-input"]').should('have.class', 'animate-shake');
 
     cy.get('@onChangeSpy').should('not.have.been.called');
   });
