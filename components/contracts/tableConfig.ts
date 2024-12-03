@@ -75,7 +75,7 @@ export const contractsColumnDefs = [
   {
     headerName: 'No. of Perfs',
     field: 'performanceCount',
-    cellRenderer: (params) => {
+    valueGetter: (params) => {
       const { PerformanceTimes, dateTime } = params.data;
       if (Array.isArray(PerformanceTimes)) {
         let count = 0;
