@@ -3,7 +3,7 @@ import DefaultCellRenderer from 'components/core-ui-lib/Table/renderers/DefaultC
 import DefaultTextRenderer from 'components/core-ui-lib/Table/renderers/DefaultTextRenderer';
 import IconRowRenderer from 'components/global/salesTable/renderers/IconRowRenderer';
 import { tileColors } from 'config/global';
-import { dateTimeToTime, newDate } from 'services/dateService';
+import { dateTimeToTime, formatDate } from 'services/dateService';
 import formatInputDate from 'utils/dateInputFormat';
 import TwoLineRenderer from './TwoLineRenderer';
 import ButtonRenderer from 'components/core-ui-lib/Table/renderers/ButtonRenderer';
@@ -284,7 +284,7 @@ export const allocSeatsColDefs = [
 export const attachmentsColDefs = [
   {
     headerName: 'Title',
-    field: 'FileOriginalFilename',
+    field: 'OriginalFilename',
     editable: true,
     cellRenderer: DefaultTextRenderer,
     width: 600,
@@ -294,9 +294,9 @@ export const attachmentsColDefs = [
     field: 'FileUploadedDateTime',
     cellRenderer: DefaultTextRenderer,
     cellRendererParams: function (params) {
-      const updDate = newDate(params.data.FileUploadedDateTime);
+      const updDate = params.data.UploadDateTime;
       return {
-        value: formatInputDate(updDate) + ' ' + dateTimeToTime(updDate),
+        value: formatDate(updDate, 'dd/MM/yy') + ' ' + dateTimeToTime(updDate),
       };
     },
     width: 150,
@@ -306,9 +306,9 @@ export const attachmentsColDefs = [
     field: 'FileDateTime',
     cellRenderer: DefaultTextRenderer,
     cellRendererParams: function (params) {
-      const fileDt = newDate(params.data.FileDateTime);
+      const fileDt = params.data.UploadDateTime;
       return {
-        value: formatInputDate(fileDt) + ' ' + dateTimeToTime(fileDt),
+        value: formatDate(fileDt, 'dd/MM/yy') + ' ' + dateTimeToTime(fileDt),
       };
     },
     width: 150,
