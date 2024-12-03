@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState, useRef } from 'react';
+import React, { Fragment, useEffect, useState, useRef, ReactNode } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { calibri } from 'lib/fonts';
 import Icon from '../Icon';
@@ -9,13 +9,14 @@ interface PopupModalProps {
   subtitle?: string;
   children?: React.ReactNode;
   show: boolean;
+  footerComponent?: ReactNode;
   onClose?: () => void;
   titleClass?: string;
   showCloseIcon?: boolean;
   panelClass?: string;
   hasOverlay?: boolean;
   closeOnOverlayClick?: boolean;
-  hasOverflow?: boolean;
+  testId?: string;
 }
 
 export default function PopupModal({
@@ -29,7 +30,8 @@ export default function PopupModal({
   panelClass,
   hasOverlay = false,
   closeOnOverlayClick = false,
-  hasOverflow = true,
+  testId = 'overlay',
+  footerComponent,
 }: PopupModalProps) {
   const [overlay, setOverlay] = useState<boolean>(false);
   const [isScrollbarVisible, setIsScrollbarVisible] = useState(false);
@@ -61,7 +63,7 @@ export default function PopupModal({
 
   return (
     <Transition appear show={show} as={Fragment}>
-      <Dialog as="div" className="relative z-150" onClick={handleOverlayClick} onClose={() => null}>
+      <Dialog as="div" className="relative z-150 h-[max-content]" onClick={handleOverlayClick} onClose={() => null}>
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-300"
@@ -74,13 +76,8 @@ export default function PopupModal({
           <div className="fixed inset-0 z-10" />
         </Transition.Child>
         <div
-          className={classNames(
-            calibri.variable,
-            'font-calibri fixed inset-0 z-50',
-            hasOverflow ? 'overflow-y-auto' : '',
-            overlay ? '' : 'bg-black/75',
-          )}
-          data-testid="overlay"
+          className={classNames(calibri.variable, 'font-calibri fixed inset-0 z-50', overlay ? '' : 'bg-black/75')}
+          data-testid={testId}
         >
           <div className="flex min-h-full items-center justify-center p-4 text-center">
             <Transition.Child
@@ -104,14 +101,20 @@ export default function PopupModal({
                   <Dialog.Title className={`text-xl font-bold leading-6 text-primary-navy ${titleClass}`}>
                     {title}
                   </Dialog.Title>
-                  {showCloseIcon && <Icon iconName="cross" variant="lg" onClick={onClose} data-testid="close-icon" />}
+                  {showCloseIcon && <Icon iconName="cross" variant="lg" onClick={onClose} testId="close-icon" />}
                 </header>
 
                 {subtitle && (
                   <Dialog.Title className="text-xl font-bold leading-6 text-primary-navy">{subtitle}</Dialog.Title>
                 )}
 
-                <div className="overflow-y-auto mt-3 pr-3">{children}</div>
+                <div className="h-[max-content]' mt-3 pr-3 overflow-y-auto" data-testid="popup-modal-content">
+                  {children}
+                </div>
+
+                {footerComponent && (
+                  <div className="sticky bottom-0 mt-4 flex justify-end mr-3 space-x-3 bg-white">{footerComponent}</div>
+                )}
               </Dialog.Panel>
             </Transition.Child>
           </div>

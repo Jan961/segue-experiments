@@ -47,6 +47,7 @@ export default function PromotorHolds({ activeProductions }: Props) {
         fromDate: inputs.dateFrom,
         toDate: inputs.dateTo,
         venue: inputs.venue,
+        exportedAt: new Date().toISOString(),
       }),
     })
       .then(async (response) => {
@@ -217,7 +218,7 @@ export default function PromotorHolds({ activeProductions }: Props) {
                       name="venue"
                       onChange={handleOnChange}
                     >
-                      <option key={'all'} value={null}>
+                      <option key="all" value={null}>
                         All
                       </option>
                       {venues.map((venue) => (
@@ -252,7 +253,7 @@ export default function PromotorHolds({ activeProductions }: Props) {
               </div>
             </div>
           </div>
-          <div className="opacity-25 fixed inset-0 z-40 bg-black"></div>
+          <div className="opacity-25 fixed inset-0 z-40 bg-black" />
         </>
       ) : null}
     </>

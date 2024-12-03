@@ -66,7 +66,7 @@ export default forwardRef(function Table(
     rowClassRules,
     displayHeader = true,
     getRowHeight,
-    tableHeight = 650,
+    tableHeight = 0,
     headerHeight,
     onRowSelected = () => null,
     onRowDoubleClicked = () => null,

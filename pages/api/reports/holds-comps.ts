@@ -1,35 +1,20 @@
-import { Prisma } from 'prisma/generated/prisma-client';
+import { BookingHoldCompsView } from 'prisma/generated/prisma-client';
 import ExcelJS from 'exceljs';
 import getPrismaClient from 'lib/prisma';
-import moment from 'moment';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { all } from 'radash';
-import { toSql } from 'services/dateService';
 import { getProductionWithContent } from 'services/productionService';
 import { addWidthAsPerContent } from 'services/reportsService';
 import { COLOR_HEXCODE } from 'services/salesSummaryService';
 
 import { getExportedAtTitle } from 'utils/export';
 import { convertToPDF } from 'utils/report';
+import { formatDate } from 'services/dateService';
 
 enum HOLD_OR_COMP {
   HOLD = 'Hold',
   COMP = 'Comp',
 }
-
-type TBookingHolds = {
-  FullProductionCode: string;
-  VenueCode: string;
-  VenueName: string;
-  VenueSeats: number;
-  BookingFirstDate: string;
-  HoldOrComp: HOLD_OR_COMP;
-  Code: string;
-  Name: string;
-  Seats: string;
-  SoldSeats: number;
-  ReservedSeats: number | null;
-};
 
 type TBookingCodeAndName = {
   HoldOrComp: string;
@@ -104,19 +89,13 @@ const getAggregateKey = ({
   VenueName,
   BookingFirstDate,
 }: {
-  FullProductionCode: TBookingHolds['FullProductionCode'];
-  VenueCode: TBookingHolds['VenueCode'];
-  VenueName: TBookingHolds['VenueName'];
-  BookingFirstDate: TBookingHolds['BookingFirstDate'];
+  FullProductionCode: string;
+  VenueCode: string;
+  VenueName: string;
+  BookingFirstDate: string;
 }) => `${FullProductionCode} | ${VenueCode} | ${VenueName} | ${BookingFirstDate}`;
 
-const getTypeAndCodeKey = ({
-  HoldOrComp,
-  Code,
-}: {
-  HoldOrComp: TBookingCodeAndName['HoldOrComp'];
-  Code: TBookingCodeAndName['Code'];
-}) => `${HoldOrComp} | ${Code}`;
+const getTypeAndCodeKey = ({ HoldOrComp, Code }: { HoldOrComp: string; Code: string }) => `${HoldOrComp} | ${Code}`;
 
 const groupBasedOnTypeAndCode = ({
   allBookingCodeAndNameForADate,
@@ -151,10 +130,15 @@ const groupBasedOnTypeAndCode = ({
 const groupBasedOnVenueAndSameDate = ({
   fetchedValues,
 }: {
-  fetchedValues: TBookingHolds[];
+  fetchedValues: BookingHoldCompsView[];
 }): TBookingHoldsGroupedByCommonKey =>
-  fetchedValues.reduce((acc, obj: TBookingHolds) => {
-    const key: string = getAggregateKey(obj);
+  fetchedValues.reduce((acc, obj: BookingHoldCompsView) => {
+    const key: string = getAggregateKey({
+      FullProductionCode: obj.FullProductionCode,
+      VenueCode: obj.VenueCode,
+      VenueName: obj.VenueName,
+      BookingFirstDate: obj.BookingFirstDate.toISOString(),
+    });
     const val: TBookingHoldsGrouped = acc[key];
     if (val) {
       return {
@@ -202,32 +186,38 @@ const makeCellTextBold = ({ worksheet, row, col }: { worksheet: any; row: number
 };
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  const timezoneOffset = parseInt(req.headers.timezoneoffset as string, 10) || 0;
-  let { productionId, productionCode = '', fromDate, toDate, venue, status, format } = req.body;
+  const { productionId, productionCode = '', fromDate, toDate, venue, status, format, exportedAt } = req.body;
 
   try {
     const prisma = await getPrismaClient(req);
     const workbook = new ExcelJS.Workbook();
-    const conditions: Prisma.Sql[] = [];
+    const whereQuery: {
+      FullProductionCode?: string;
+      VenueCode?: string;
+      BookingFirstDate?: { gte: Date; lte: Date };
+      BookingStatusCode?: string;
+    } = {};
     if (productionCode) {
-      conditions.push(Prisma.sql`FullProductionCode = ${productionCode}`);
+      whereQuery.FullProductionCode = productionCode;
     }
     if (venue) {
-      conditions.push(Prisma.sql`VenueCode = ${venue}`);
+      whereQuery.VenueCode = venue;
     }
     if (fromDate && toDate) {
-      fromDate = toSql(fromDate);
-      toDate = toSql(toDate);
-      conditions.push(Prisma.sql`BookingFirstDate BETWEEN ${fromDate} AND ${toDate}`);
+      whereQuery.BookingFirstDate = { gte: new Date(fromDate), lte: new Date(toDate) };
     }
     if (status) {
-      conditions.push(Prisma.sql`BookingStatusCode = ${status}`);
+      whereQuery.BookingStatusCode = status;
     }
-    const where: Prisma.Sql = conditions.length ? Prisma.sql` where ${Prisma.join(conditions, ' and ')}` : Prisma.empty;
-    const [data, productionDetails] = await all([
-      prisma.$queryRaw`SELECT * FROM BookingHoldCompsView ${where} ORDER BY BookingFirstDate;`,
-      getProductionWithContent(productionId, req),
-    ]);
+    const getHoldsAndCompsQuery = prisma.bookingHoldCompsView.findMany({
+      where: {
+        ...whereQuery,
+      },
+      orderBy: {
+        BookingFirstDate: 'asc',
+      },
+    });
+    const [data, productionDetails] = await all([getHoldsAndCompsQuery, getProductionWithContent(productionId, req)]);
 
     const showName = (productionDetails as ProductionDetails)?.Show?.Name || '';
     const filename = `${productionCode} ${showName} Holds and Comps`;
@@ -236,7 +226,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     });
 
     worksheet.addRow(['BOOKING HOLDS/COMPS REPORT']);
-    const exportedAtTitle = getExportedAtTitle(timezoneOffset);
+    const exportedAtTitle = getExportedAtTitle(exportedAt);
     worksheet.addRow([exportedAtTitle]);
     worksheet.addRow(['PRODUCTION', 'VENUE', '', 'SHOW']);
     worksheet.addRow(['CODE', 'CODE', 'NAME', 'DATE', 'TYPE', 'CODE', 'NAME', 'SEATS', 'TOTAL', 'REMAINING']);
@@ -244,7 +234,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const numberOfColumns = worksheet.columnCount;
 
     const groupBasedOnVenueAndDate: TBookingHoldsGroupedByCommonKey = groupBasedOnVenueAndSameDate({
-      fetchedValues: data as TBookingHolds[],
+      fetchedValues: data as BookingHoldCompsView[],
     });
     const groupBasedOnVenueAndDateForAllTypes: TBookingHoldsGrouped[] = Object.values(groupBasedOnVenueAndDate).map(
       (x: TBookingHoldsGrouped) => ({ ...x, data: groupBasedOnTypeAndCode({ allBookingCodeAndNameForADate: x.data }) }),
@@ -266,7 +256,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         x.FullProductionCode,
         x.VenueCode,
         x.VenueName,
-        x.BookingFirstDate ? moment(x.BookingFirstDate).format('DD/MM/YY') : '',
+        x.BookingFirstDate ? formatDate(x.BookingFirstDate, 'dd/MM/yy') : '',
         '',
         '',
         'Capacity',

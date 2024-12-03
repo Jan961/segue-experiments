@@ -3,6 +3,7 @@ import Decimal from 'decimal.js';
 export enum BOOK_STATUS_CODES {
   C = 'C',
   X = 'X',
+  S = 'S',
 }
 
 export enum VENUE_CURRENCY_SYMBOLS {

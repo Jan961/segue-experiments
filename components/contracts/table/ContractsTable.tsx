@@ -35,7 +35,7 @@ export default function ContractsTable({ rowData }: ContractsTableProps) {
   };
 
   useEffect(() => {
-    if (tableRef && tableRef.current && filter?.scrollToDate) {
+    if (tableRef?.current && filter?.scrollToDate) {
       const rowIndex = rowData.findIndex(({ date }) => date === filter.scrollToDate);
       if (rowIndex !== -1) {
         tableRef.current?.getApi().ensureIndexVisible(rowIndex, 'middle');

@@ -1,15 +1,16 @@
+import { clerkClient } from '@clerk/nextjs';
 import prismaMaster from 'lib/prisma_master';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { replaceProudctionPermissions, replaceUserPermissions } from 'services/permissionService';
-import { getOrganisationIdFromReq } from 'services/userService';
+import { getClerkUserByEmailAddress, getOrganisationIdFromReq, getUserPermisisons } from 'services/userService';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
     const userDetails = req.body;
+    const accountId = await getOrganisationIdFromReq(req);
 
     // check if this user is the only system adminstrattor. If so, reject the update
     if (!userDetails.isSystemAdmin) {
-      const accountId = await getOrganisationIdFromReq(req);
       const countAdminUsers = await prismaMaster.AccountUser.count({
         where: { AccUserIsAdmin: true, Account: { AccountOrganisationId: accountId } },
       });
@@ -19,7 +20,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         return;
       }
     }
-
+    const user = await getClerkUserByEmailAddress(userDetails.email);
     const updatedUSer = await prismaMaster.user.update({
       data: {
         UserFirstName: userDetails.firstName,
@@ -42,10 +43,14 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         UserEmail: userDetails.email,
       },
     });
-
     await replaceUserPermissions(userDetails.accountUserId, userDetails.permissions);
     await replaceProudctionPermissions(userDetails.accountUserId, userDetails.productions, req);
-
+    if (user?.unsafeMetadata?.organisationId === accountId) {
+      const permissions = await getUserPermisisons(userDetails.email, accountId);
+      await clerkClient.users.updateUserMetadata(user.id, {
+        unsafeMetadata: { permissions, organisationId: accountId },
+      });
+    }
     return res.json(updatedUSer);
   } catch (err) {
     console.log(err);

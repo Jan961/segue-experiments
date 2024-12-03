@@ -3,6 +3,7 @@ import { Button, Icon, Label, PasswordInput, TextInput, Tooltip } from 'componen
 import { useRouter } from 'next/router';
 import * as yup from 'yup';
 import React, { useEffect, useState } from 'react';
+import Head from 'next/head';
 import {
   PASSWORD_INCORRECT,
   INVALID_EMAIL_OR_COMPANY_NAME,
@@ -22,6 +23,7 @@ import useAuth from 'hooks/useAuth';
 import usePermissions from 'hooks/usePermissions';
 import { isNullOrEmpty } from 'utils';
 import LoadingOverlay from '../../components/core-ui-lib/LoadingOverlay';
+import useNavigation from 'hooks/useNavigation';
 
 const DEFAULT_ACCOUNT_DETAILS = {
   firstName: '',
@@ -38,7 +40,8 @@ const DEFAULT_ACCOUNT_DETAILS = {
 
 const SignUp = () => {
   const router = useRouter();
-  const { signIn, signOut, navigateToHome } = useAuth();
+  const { signIn, signOut } = useAuth();
+  const { navigateToHome, navigateToSignIn, getSignInUrl } = useNavigation();
   const [isBusy, setIsBusy] = useState(false);
   const { isSignedIn, setUserPermissions } = usePermissions();
   const [error, setError] = useState('');
@@ -67,10 +70,19 @@ const SignUp = () => {
         companyName: accountDetails.companyName,
         email: accountDetails.email,
       });
-      if (data.accountUserExists) {
-        router.push('/auth/sign-in');
+      return data;
+    } catch (err) {
+      setError(err.errors[0].message);
+    }
+  };
+
+  const processExistingUser = async () => {
+    try {
+      const userResponse = await verifyUserExits();
+      if (userResponse.accountUserExists) {
+        navigateToSignIn();
       } else {
-        setAccountDetails((prev) => ({ ...prev, firstName: data.firstName, lastName: data.lastName }));
+        setAccountDetails((prev) => ({ ...prev, firstName: userResponse.firstName, lastName: userResponse.lastName }));
         setAuthMode('existingUser');
       }
     } catch (err) {
@@ -94,9 +106,8 @@ const SignUp = () => {
         return;
       }
       setAccountDetails((prev) => ({ ...prev, accountId: data.id }));
-      // Check if user already registered with Clerk. The create method will error if the user already exists
+      // Check if user already registered with Clerk. The signIn method will error if the user already exists
       await signIn(accountDetails.email, 'dummy_password');
-      return true;
     } catch (error) {
       if (error instanceof yup.ValidationError) {
         const formattedErrors = error.inner.reduce((acc, err) => {
@@ -110,10 +121,22 @@ const SignUp = () => {
         const errorCode = error?.errors[0]?.code;
 
         if (errorCode === EMAIL_NOT_FOUND) {
+          // check if the user exists in our database. This can happen when a user has already signed up but not yet verified email with clerk
+          // Show error  to prevent them from signing up again
+          const userResponse = await verifyUserExits();
+          if (userResponse.accountUserExists) {
+            setError('An error has occurred, please contact Segue support');
+            return;
+          } else if (userResponse.firstName || userResponse.lastName) {
+            setError(
+              `User ${userResponse.firstName} ${userResponse.lastName} is already registered with a different account pending email verification`,
+            );
+            return;
+          }
           setAuthMode('newUser');
         } else if (errorCode === PASSWORD_INCORRECT || errorCode === INVALID_VERIFICATION_STRATEGY) {
           // 'User already registeredwith clerk. Verify if they have a pin registered'
-          verifyUserExits();
+          processExistingUser();
         } else if (errorCode === SESSION_ALREADY_EXISTS) {
           setShowLogout(true);
           setError('Please log out of the current session and try again');
@@ -133,13 +156,12 @@ const SignUp = () => {
       // Prepare email address verification
       await result.prepareEmailAddressVerification({
         strategy: 'email_link',
-        redirectUrl: `${window.location.origin}/sign-in`,
+        redirectUrl: getSignInUrl(),
       });
-      return true;
     } catch (err) {
       setError(err.errors[0].code);
       console.error('error', err.errors[0].longMessage);
-      return false;
+      throw err;
     }
   };
 
@@ -151,8 +173,10 @@ const SignUp = () => {
       // Create the user within clerk
       await createNewUserWithClerk();
 
+      const signInUrl = getSignInUrl();
+
       // Create the user in our database
-      await axios.post('/api/user/create-admin-user', { user: accountDetails, accountUserOnly: false });
+      await axios.post('/api/user/create-admin-user', { signInUrl, user: accountDetails, accountUserOnly: false });
 
       router.push('/auth/user-created');
     } catch (error: any) {
@@ -184,8 +208,14 @@ const SignUp = () => {
       // Authenticate the user within clerk first to check if we have a valid password
       await signIn(accountDetails.email, accountDetails.password);
 
+      const signInUrl = getSignInUrl();
+
       // Create the user in our database
-      const { data } = await axios.post('/api/user/create-admin-user', { user: accountDetails, accountUserOnly: true });
+      const { data } = await axios.post('/api/user/create-admin-user', {
+        user: accountDetails,
+        signInUrl,
+        accountUserOnly: true,
+      });
 
       setSignedInExistingUserDetails({ organisationId: data.organisationId, permissions: data.permissions });
     } catch (error: any) {
@@ -248,6 +278,12 @@ const SignUp = () => {
 
   return (
     <div className={`${calibri.variable} font-calibri background-gradient flex flex-col py-20  px-6`}>
+      <Head>
+        <title>Sign Up | Segue</title>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+        <link rel="icon" href="/segue/segue_mini_icon.png" type="image/png" />
+      </Head>
       <Image className="mx-auto mb-2" height={160} width={310} src="/segue/segue_logo_full.png" alt="Segue" />
       <h1 className="my-4 text-2xl font-bold text-center text-primary-input-text">Setup New Account</h1>
       <div className="text-center text-primary-input-text w-[580px] mx-auto">

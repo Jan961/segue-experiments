@@ -2,11 +2,11 @@ import { useSignUp, useSession } from '@clerk/nextjs';
 import axios from 'axios';
 import { useState } from 'react';
 import { isNullOrEmpty, mapRecursive } from 'utils';
-import { useUrl } from 'nextjs-current-url';
-import { NEW_USER_CONFIRMATION_EMAIL_TEMPLATE, SEND_ACCOUNT_PIN_TEMPLATE } from 'config/global';
+import { NEW_USER_PIN_EMAIL, NEW_USER_WELCOME_EMAIL } from 'config/global';
 import { Production } from 'components/admin/modals/config';
 import { TreeItemOption } from 'components/global/TreeSelect/types';
 import { generateUserPassword } from 'utils/authUtils';
+import useNavigation from './useNavigation';
 
 type UserDetails = {
   email: string;
@@ -22,7 +22,7 @@ type UserDetails = {
 const useUser = () => {
   const { isLoaded: isSignUpLoaded } = useSignUp();
   // 👇 useUrl() returns `null` until hydration, so plan for that with `??`;
-  const { origin: currentUrl } = useUrl() ?? {};
+  const { getSignInUrl } = useNavigation();
   const { session } = useSession();
   const [error, setError] = useState('');
   const [isBusy, setIsBusy] = useState(false);
@@ -62,20 +62,6 @@ const useUser = () => {
         return false;
       }
 
-      // Send out an email with the newly generated password
-      await axios.post('/api/email/send', {
-        to: userDetails.email,
-        templateName: NEW_USER_CONFIRMATION_EMAIL_TEMPLATE,
-        data: { username: userDetails.email, password, Weblink: `${currentUrl}/auth/sign-in` },
-      });
-
-      // Send out an email with the account PIN
-      await axios.post('/api/email/send', {
-        to: userDetails.email,
-        templateName: SEND_ACCOUNT_PIN_TEMPLATE,
-        data: { AccountPin: userDetails.accountPIN },
-      });
-
       // Create the user in our database
       const { data: createResponse } = await axios.post('/api/user/create', userDetails);
       if (createResponse.error) {
@@ -90,6 +76,20 @@ const useUser = () => {
           productionIds: userDetails.productions,
         });
       }
+      // Send out an email with the newly generated password
+      await axios.post('/api/email/send', {
+        to: userDetails.email,
+        templateName: NEW_USER_WELCOME_EMAIL,
+        data: { username: userDetails.email, password, weblink: getSignInUrl() },
+      });
+
+      // Send out an email with the account pin
+      await axios.post('/api/email/send', {
+        to: userDetails.email,
+        templateName: NEW_USER_PIN_EMAIL,
+        data: { AccountPin: userDetails.accountPIN },
+      });
+
       return true;
     } catch (error) {
       console.log(error);

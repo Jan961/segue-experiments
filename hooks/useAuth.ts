@@ -1,11 +1,11 @@
 import { useClerk, useSignIn, useUser } from '@clerk/nextjs';
-import { useRouter } from 'next/router';
+import useNavigation from './useNavigation';
 
 const useAuth = () => {
   const { signOut: clerkSignOut } = useClerk();
   const { signIn: clerkSignIn, setActive } = useSignIn();
   const { user } = useUser();
-  const router = useRouter();
+  const { navigateToSignIn } = useNavigation();
 
   const signOut = async () => {
     try {
@@ -19,7 +19,7 @@ const useAuth = () => {
       // Sign out from Clerk
       await clerkSignOut();
       // navigate to sign-in page
-      router.push('/auth/sign-in');
+      navigateToSignIn();
     } catch (err) {
       console.error(err);
     }
@@ -42,11 +42,7 @@ const useAuth = () => {
     return false;
   };
 
-  const navigateToHome = () => {
-    router.push('/');
-  };
-
-  return { signIn, signOut, navigateToHome };
+  return { signIn, signOut };
 };
 
 export default useAuth;

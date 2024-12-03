@@ -1,19 +1,30 @@
+import { useEffect, useMemo } from 'react';
 import { useUser } from '@clerk/nextjs';
-import { useSetRecoilState } from 'recoil';
+import { useRecoilState, useSetRecoilState } from 'recoil';
 import { userPermissionsState } from 'state/account/userPermissionsState';
 import { globalState } from 'state/global/globalState';
 import { isNullOrEmpty } from 'utils';
 import { getMenuItems } from 'components/PopoutMenu/config';
 import useStrings from './useStrings';
-import { useMemo } from 'react';
 
 const usePermissions = () => {
   const { isSignedIn, user } = useUser();
   const getStrings = useStrings();
-  const setPermissionsState = useSetRecoilState(userPermissionsState);
+  const [permissionState, setPermissionsState] = useRecoilState(userPermissionsState);
   const setGlobalState = useSetRecoilState(globalState);
 
   const menuItems = useMemo(() => getMenuItems(getStrings), [getStrings]);
+
+  useEffect(() => {
+    if (isSignedIn && permissionState?.permissions.length !== 0 && permissionState?.accountId !== '') {
+      // Updates User permissions in the Recoil state when the user is updated from the Clerk context
+      setPermissionsState((currentVal) => ({
+        ...(currentVal ?? {}),
+        permissions: (user.unsafeMetadata?.permissions as string[]) || permissionState?.permissions || [],
+        accountId: (user.unsafeMetadata?.organisationId as string) || permissionState?.accountId || '',
+      }));
+    }
+  }, [user]);
 
   const applyPermissionsToMenuItems = (items, permissions = []) => {
     const filteredItems = items.reduce((acc, item) => {
@@ -33,7 +44,7 @@ const usePermissions = () => {
   const setUserPermissions = async (organisationId: string, permissions: string[]) => {
     try {
       if (isSignedIn) {
-        user.update({
+        await user.update({
           unsafeMetadata: {
             organisationId,
             permissions,
@@ -43,6 +54,7 @@ const usePermissions = () => {
         setPermissionsState({
           permissions,
           accountId: organisationId,
+          isInitialised: true,
         });
         const updatedmenuItems = applyPermissionsToMenuItems(menuItems, permissions);
         setGlobalState((prev) => ({ ...prev, menuItems: updatedmenuItems }));

@@ -1,6 +1,6 @@
 import { BookingWithVenueDTO } from 'interfaces';
 import * as React from 'react';
-import { calculateWeekNumber, getWeekDayShort } from 'services/dateService';
+import { calculateWeekNumber, getWeekDay, newDate } from 'services/dateService';
 
 function formatDate(showDate) {
   const newDate = new Date(showDate);
@@ -55,10 +55,10 @@ const BookingDetailsListingPanel = ({
               >
                 <div className="grid grid-cols-12 justify-between ">
                   <div className="col-span-1">
-                    {calculateWeekNumber(new Date(bookings[0].Date), new Date(booking.Date))}
+                    {calculateWeekNumber(newDate(bookings[0].Date), newDate(booking.Date))}
                   </div>
                   <div className="col-span-4">
-                    {getWeekDayShort(booking.Date)}&nbsp;{formatDate(booking.Date)}
+                    {getWeekDay(booking.Date, 'short')}&nbsp;{formatDate(booking.Date)}
                   </div>
                   <div className="col-span-7">{booking?.Venue?.Name}</div>
                 </div>

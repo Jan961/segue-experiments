@@ -3,8 +3,7 @@ import { findPreviosAndNextBookings, hasContinuosGap } from 'components/bookings
 import { gapSuggestColumnDefs, styleProps } from 'components/bookings/table/tableConfig';
 import Button from 'components/core-ui-lib/Button';
 import Table from 'components/core-ui-lib/Table';
-import { GapSuggestionReponse, GapSuggestionUnbalancedProps } from 'pages/api/venue/read/distance';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import { bookingState } from 'state/booking/bookingState';
 import { rowsSelector } from 'state/booking/selectors/rowsSelector';
@@ -12,9 +11,10 @@ import Form from './Form';
 import { formatMinutes } from 'utils/booking';
 import BarringCheck from './BarringCheck';
 import { isNull } from 'utils';
-import { exportToExcel } from 'utils/export';
 import { BookingRow } from 'types/BookingTypes';
-import { formattedDateWithWeekDay } from 'services/dateService';
+import { GapSuggestionResponse, GapSuggestionUnbalancedProps } from 'services/booking/gapSuggestion/types';
+import { notify } from 'components/core-ui-lib';
+import { exportGapSuggestions } from './request';
 
 type GapSuggestProps = {
   booking: BookingRow;
@@ -33,19 +33,14 @@ export const gridOptions = {
   suppressRowClickSelection: true,
 };
 
-const GapSuggest = ({ startDate, endDate, productionId, onOkClick = () => null, booking }: GapSuggestProps) => {
+const GapSuggest = ({ startDate, endDate, productionId, booking, onOkClick = () => null }: GapSuggestProps) => {
   const bookingDict = useRecoilValue(bookingState);
   const { rows: bookings } = useRecoilValue(rowsSelector);
   const [rows, setRows] = useState(null);
   const [selectedVenueIds, setSelectedVenueIds] = useState<number[]>([]);
   const [barringCheckContext, setBarringCheckContext] = useState<number | null>(null);
-  const [excelFilename, setExcelFilename] = useState<string>('');
+  const [formData, setFormData] = useState<Partial<GapSuggestionUnbalancedProps>>();
   const tableRef = useRef(null);
-
-  useEffect(() => {
-    const newDate = `${formattedDateWithWeekDay(booking.dateTime, 'Short').replaceAll('/', '.')}`;
-    setExcelFilename(`Venue Gap Suggestion ${booking.production} ${newDate}.xlsx`);
-  }, [booking]);
 
   const filteredRows = useMemo(() => {
     const filteredRows = [];
@@ -79,11 +74,13 @@ const GapSuggest = ({ startDate, endDate, productionId, onOkClick = () => null, 
     onError: (err: any) => void,
   ) => {
     try {
-      const response = await axios.post<GapSuggestionReponse>('/api/venue/read/distance', {
+      const payload = {
         ...data,
         StartVenue: prevVenueId,
         EndVenue: nextVenueId,
-      });
+      };
+      const response = await axios.post<GapSuggestionResponse>('/api/venue/read/distance', payload);
+      setFormData(payload);
       if (response.status >= 200 && response.status < 400) {
         setSelectedVenueIds([]);
         setRows(response.data?.VenueInfo);
@@ -103,7 +100,13 @@ const GapSuggest = ({ startDate, endDate, productionId, onOkClick = () => null, 
   };
 
   const exportTableData = () => {
-    exportToExcel(tableRef, { fileName: excelFilename });
+    // exportToExcel(tableRef, { fileName: excelFilename });
+    const title = 'Venue Gap Suggestions';
+    notify.promise(exportGapSuggestions(formData, selectedVenueIds, booking?.production), {
+      loading: `'Generating ${title}...`,
+      success: `${title} downloaded successfully`,
+      error: `Error generating ${title}`,
+    });
   };
 
   const onRowSelected = (e: any) => {
@@ -143,7 +146,7 @@ const GapSuggest = ({ startDate, endDate, productionId, onOkClick = () => null, 
         <div>
           <div className="block">
             <div className="text-md my-2">Check the box of venues you wish to remove from this list.</div>
-            <div className="w-full overflow-hidden flex flex-col" style={{ maxHeight: 'calc(100vh - 400px)' }}>
+            <div className="w-full overflow-hidden flex flex-col mb-5" style={{ maxHeight: 'calc(100vh - 400px)' }}>
               <Table
                 testId="gap-suggest-table"
                 onRowSelected={onRowSelected}
@@ -154,6 +157,7 @@ const GapSuggest = ({ startDate, endDate, productionId, onOkClick = () => null, 
                 styleProps={styleProps}
                 gridOptions={gapSuggestTableOptions}
                 headerHeight={80}
+                tableHeight={280}
               />
             </div>
           </div>
