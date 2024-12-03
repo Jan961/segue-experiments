@@ -154,7 +154,6 @@ const MoveBookingView = ({
 
   const checkForBookingConflicts = async () => {
     if (bookingDetails.venue) {
-      console.log(bookings);
       try {
         const response = await axios
           .post('/api/bookings/conflict', {

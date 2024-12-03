@@ -88,7 +88,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     }
 
     const conflicts: BookingWithVenueDTO[] = performanceBookings
-      .map(bookingMapperWithVenue) // .filter((x) => (x.Id !== productionId, console.log(x.Id !== productionId)))
+      .map(bookingMapperWithVenue)
       .sort((a, b) => new Date(a.Date).valueOf() - new Date(b.Date).valueOf());
     res.status(200).json([...conflicts, ...conflictList]);
   } catch (e) {
