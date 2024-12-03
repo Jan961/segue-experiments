@@ -69,6 +69,7 @@ export default async function handle(req, res) {
           seatsReservedVal: generalReservations?.Value === undefined ? '' : generalReservations.Value,
         },
         setId: generalSales?.SetId,
+        setSaleFiguresDate: generalSales?.SetSalesFiguresDate,
       };
 
       res.status(200).json(result);
