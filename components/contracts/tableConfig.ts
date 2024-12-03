@@ -4,7 +4,7 @@ import DateColumnRenderer from './table/DateColumnRenderer';
 import { tileColors } from 'config/global';
 import DefaultTextRenderer from 'components/core-ui-lib/Table/renderers/DefaultTextRenderer';
 import formatInputDate from 'utils/dateInputFormat';
-import { dateTimeToTime, newDate } from 'services/dateService';
+import { compareDatesWithoutTime, dateTimeToTime, newDate } from 'services/dateService';
 import ButtonRenderer from 'components/core-ui-lib/Table/renderers/ButtonRenderer';
 import IconRowRenderer from 'components/global/salesTable/renderers/IconRowRenderer';
 import SelectCellRenderer from 'components/core-ui-lib/Table/renderers/SelectCellRenderer';
@@ -72,7 +72,24 @@ export const contractsColumnDefs = [
   },
   { headerName: 'Town', field: 'town', cellRenderer: DefaultCellRenderer, minWidth: 80, flex: 1 },
   { headerName: 'Capacity', field: 'capacity', cellRenderer: DefaultCellRenderer, width: 90 },
-  { headerName: 'No. of Perfs', field: 'performanceCount', cellRenderer: DefaultCellRenderer, width: 90 },
+  {
+    headerName: 'No. of Perfs',
+    field: 'performanceCount',
+    cellRenderer: (params) => {
+      const { PerformanceTimes, dateTime } = params.data;
+      if (Array.isArray(PerformanceTimes)) {
+        let count = 0;
+        PerformanceTimes?.forEach((time) => {
+          const split = time.split('?');
+          if (compareDatesWithoutTime(split[1], dateTime, '==')) {
+            count++;
+          }
+        });
+        return count;
+      }
+    },
+    width: 90,
+  },
   {
     headerName: 'Deal Memo Status',
     field: 'dealMemoStatus',
