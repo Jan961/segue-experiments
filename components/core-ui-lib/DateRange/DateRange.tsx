@@ -15,7 +15,7 @@ export type DateRangeError = {
   toError: string;
 };
 
-interface DateRangeProps {
+export interface DateRangeProps {
   className?: string;
   disabled?: boolean;
   testId?: string;
@@ -61,17 +61,23 @@ export default function DateRange({
         ? 'Invalid date'
         : '';
     setErrors({ fromError: error, toError: error });
+    console.log('error', error);
 
     return error === '';
   };
 
   useEffect(() => {
-    checkDateRangeValid(value.from, value.to);
-    setDateRange({ from: value.from, to: value.to });
+    checkDateRangeValid(value?.from, value?.to);
+    setDateRange({ from: value?.from, to: value?.to });
   }, [value]);
 
   const handleDateFromChange = (v: UTCDate) => {
     const updatedDate = { ...dateRange, from: v };
+    console.log('updatedDate', updatedDate);
+    console.log(
+      'checkDateRangeValid(updatedDate.from, updatedDate.to)',
+      checkDateRangeValid(updatedDate.from, updatedDate.to),
+    );
     if (checkDateRangeValid(updatedDate.from, updatedDate.to)) {
       setDateRange(updatedDate);
       onChange(updatedDate);
@@ -83,6 +89,11 @@ export default function DateRange({
 
   const handleDateToChange = (v: UTCDate) => {
     const updatedDate = { ...dateRange, to: v };
+    console.log('updatedDate', updatedDate);
+    console.log(
+      'checkDateRangeValid(updatedDate.from, updatedDate.to)',
+      checkDateRangeValid(updatedDate.from, updatedDate.to),
+    );
     if (checkDateRangeValid(updatedDate.from, updatedDate.to)) {
       setDateRange(updatedDate);
       onChange(updatedDate);
@@ -126,7 +137,7 @@ export default function DateRange({
         inputClass={`!shadow-none ${!errors?.toError ? '!border-primary-white' : ''}`}
         value={dateRange.to}
         onChange={handleDateToChange}
-        minDate={dateRange.from || minDate}
+        minDate={dateRange?.from || minDate}
         error={errors?.toError}
         maxDate={maxDate}
         disabled={disabled}
