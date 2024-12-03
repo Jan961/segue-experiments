@@ -6,13 +6,22 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const BookingId = parseInt(req.query.BookingId as string);
     const prisma = await getPrismaClient(req);
 
-    const attachments = await prisma.bookingAttachedFile.findMany({
+    // get BookingFile records for the booking
+    const attachments = await prisma.bookingFile.findMany({
       where: {
-        FileBookingBookingId: BookingId,
+        BookingFileBookingId: BookingId,
+      },
+      include: {
+        File: true,
       },
     });
 
-    res.json(attachments);
+    const result = attachments.map(({ File, ...rest }) => ({
+      ...rest,
+      ...File,
+    }));
+
+    res.status(200).json(result);
   } catch (err) {
     console.log(err);
     res.status(500).json({ err: 'Error occurred while generating search results.' });
