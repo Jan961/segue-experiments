@@ -80,8 +80,9 @@ describe('DateRange Component', () => {
       .should('have.been.called')
       .then(() => {
         const args = onChange.getCall(0).args[0];
-        // note that DateInput (and as a result DateRange does that as well) uses newDate with 'UK' "locale" parameter
+        // note that DateInput (and as a result DateRange as well) uses newDate with 'UK' "locale" parameter
         // and therefore it always interprets '05/01/23' as 5 Jan 2023 - it is important never to use the US locale
+        // or the UTCDate constructor directly both of which would interpret '05/01/23' as 1 May 2023
         expect(args.to).to.deep.equal(newDate(toDate, 'UK'));
       });
   });
