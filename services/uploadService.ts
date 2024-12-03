@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { FileDTO } from 'interfaces';
 import config from 'config';
 import { File } from 'prisma/generated/prisma-client';
+import { UTCDate } from '@date-fns/utc';
 
 const bulkFileUpload = async (path, files, userId) => {
   const metadataList: FileDTO[] = [];
@@ -84,7 +85,7 @@ const transformForUi = (data: File): Partial<FileDTO> => {
     mediaType: data.MediaType,
     location: data.Location,
     uploadUserId: data.UploadUserId,
-    uploadDateTime: data.UploadDateTime.toDateString(),
+    uploadDateTime: new UTCDate(data.UploadDateTime).toISOString(),
   };
 };
 
