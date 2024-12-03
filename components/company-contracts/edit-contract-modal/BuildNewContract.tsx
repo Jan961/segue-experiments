@@ -241,7 +241,7 @@ export const BuildNewContract = ({
   };
 
   return (
-    <PopupModal show={visible} title="Contract Details" hasOverflow={false} onClose={onClose}>
+    <PopupModal show={visible} title="Contract Details" onClose={onClose}>
       <div className="flex flex-col justify-between ">
         <div>
           <div className="text-xl text-primary-navy font-bold w-[50vw]">
