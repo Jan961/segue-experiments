@@ -1,3 +1,4 @@
-import TimeInput from './TimeInput';
+import TimeInput, { TimeInputProps } from './TimeInput';
 
 export default TimeInput;
+export type { TimeInputProps };

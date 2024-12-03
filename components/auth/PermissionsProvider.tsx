@@ -1,34 +1,25 @@
 import { useEffect } from 'react';
-import { useUser } from '@clerk/nextjs';
 import LoadingOverlay from '../core-ui-lib/LoadingOverlay';
 import { useRouter } from 'next/router';
-import axios from 'axios';
 import usePermissions from 'hooks/usePermissions';
-import { PUBLIC_PATH_URLS } from 'config/auth';
+import { ACCESS_DENIED_URL, PUBLIC_PATH_URLS } from 'config/auth';
 import useNavigation from 'hooks/useNavigation';
 
 const PermissionsProvider = ({ children }: { children: React.ReactNode }) => {
-  const { isSignedIn, user } = useUser();
   const { navigateToSignIn } = useNavigation();
-  const { setUserPermissions } = usePermissions();
+  const { updatePermissions, isSignedIn, user } = usePermissions();
   const router = useRouter();
 
-  const fetchPermissions = async (organisationId: string) => {
-    try {
-      const { data } = await axios(`/api/user/permissions/read?organisationId=${organisationId}`);
-      setUserPermissions(organisationId, data);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
   useEffect(() => {
-    if (!PUBLIC_PATH_URLS.includes(router.pathname) && isSignedIn) {
+    if (
+      (!PUBLIC_PATH_URLS.includes(router.pathname) && isSignedIn) ||
+      (isSignedIn && router.pathname === ACCESS_DENIED_URL)
+    ) {
       const organisationId = user.unsafeMetadata.organisationId as string;
       if (!organisationId) {
         navigateToSignIn();
       } else {
-        fetchPermissions(organisationId);
+        updatePermissions(organisationId);
       }
     }
   }, [isSignedIn]);
