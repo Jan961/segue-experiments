@@ -44,7 +44,7 @@ const AttachmentsTab = forwardRef<AttachmentsTabRef, AttachmentsTabProps>((props
     let slowProgressInterval; // interval for slow progress simulation
 
     try {
-      const response = await axios.post('/api/upload', formData, {
+      const { data: fileUpdRes } = await axios.post('/api/upload', formData, {
         onUploadProgress: (progressEvent) => {
           const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
           if (percentCompleted <= 50) {
@@ -70,16 +70,21 @@ const AttachmentsTab = forwardRef<AttachmentsTabRef, AttachmentsTabProps>((props
       clearInterval(slowProgressInterval);
 
       const fileRec = {
-        FileBookingBookingId: parseInt(bookingIdVal),
-        FileDateTime: new Date(),
-        FileDescription: attachType,
-        FileOriginalFilename: response.data.originalFilename,
-        FileURL: getFileUrl(response.data.location),
-        FileUploadedDateTime: new Date(),
+        BookingFileBookingId: parseInt(bookingIdVal),
+        BookingFileFileId: fileUpdRes.id,
+        BookingFileType: attachType,
+        BookingFileDescription: '',
       };
 
       // update in the database
-      const { data: uploadedFile } = await axios.post('/api/marketing/attachments/create', fileRec);
+      const { data } = await axios.post('/api/marketing/attachments/create', fileRec);
+
+      const uploadedFile = {
+        OriginalFilename: fileUpdRes.originalFilename,
+        UploadDateTime: new Date(fileUpdRes.uploadDateTime),
+        Location: fileUpdRes.location,
+        BookingFileId: data.BookingFileId,
+      };
 
       // append to table to prevent the need for an API call to get new data
       if (attachType === 'Production') {
@@ -95,15 +100,18 @@ const AttachmentsTab = forwardRef<AttachmentsTabRef, AttachmentsTabProps>((props
 
   const getAttachments = async (bookingId) => {
     try {
-      const response = await axios.get(`/api/marketing/attachments/${bookingId}`);
+      const { data } = await axios.get(`/api/marketing/attachments/${bookingId}`);
 
-      if (Array.isArray(response.data)) {
-        if ('error' in response.data) {
-          return;
-        }
+      // if API has errored, display the attachement tables with no data
+      if (Object.prototype.hasOwnProperty.call(data, 'err')) {
+        setVenueAttachRows([]);
+        setProdAttachRows([]);
+        setIsLoading(false);
+      }
 
-        const venueAttach = response.data.filter((attach) => attach.FileDescription === 'Venue');
-        const prodAttach = response.data.filter((attach) => attach.FileDescription === 'Production');
+      if (Array.isArray(data)) {
+        const venueAttach = data.filter((attach) => attach.BookingFileType === 'Venue');
+        const prodAttach = data.filter((attach) => attach.BookingFileType === 'Production');
 
         setVenueAttachRows(venueAttach);
         setProdAttachRows(prodAttach);
@@ -118,14 +126,14 @@ const AttachmentsTab = forwardRef<AttachmentsTabRef, AttachmentsTabProps>((props
     }
   };
 
-  const toggleUploadModal = (type) => {
+  const toggleUploadModal = (type: string) => {
     setAttachType(type);
     setShowUploadModal(true);
   };
 
   const handleCellClicked = (event) => {
     if (event.column.colId === 'ViewBtn') {
-      const fileUrl = event.data.FileURL;
+      const fileUrl = getFileUrl(event.data.Location);
       window.open(fileUrl, '_blank');
     } else if (event.column.colId === 'icons') {
       setAttachRow(event.data);
@@ -138,13 +146,13 @@ const AttachmentsTab = forwardRef<AttachmentsTabRef, AttachmentsTabProps>((props
     try {
       await axios.post('/api/marketing/attachments/delete', data);
 
-      if (data.FileDescription === 'Venue') {
+      if (data.BookingFileType === 'Venue') {
         const newRows = [...venueAttachRows];
         if (rowIndex !== -1) {
           newRows.splice(rowIndex, 1);
         }
         setVenueAttachRows(newRows);
-      } else if (data.FileDescription === 'Production') {
+      } else if (data.BookingFileType === 'Production') {
         const newRows = [...prodAttachRows];
         if (rowIndex !== -1) {
           newRows.splice(rowIndex, 1);

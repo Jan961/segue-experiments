@@ -116,16 +116,18 @@ model DBSetting {
 }
 
 model File {
-  FileId               Int                 @id @default(autoincrement())
-  FileOriginalFilename String              @db.VarChar(200)
-  FileMediaType        String?             @db.VarChar(200)
-  FileLocation         String              @db.VarChar(512)
-  FileUploadDateTime   DateTime            @db.DateTime(0)
-  FileUploadAccUserId  Int
-  FileSizeBytes        BigInt?
-  Account              Account[]
-  AccountUser          AccountUser         @relation(fields: [FileUploadAccUserId], references: [AccUserId], map: "User_AttachedFile")
-  ProductionCompany    ProductionCompany[]
+  FileId                   Int                 @id @default(autoincrement())
+  FileOriginalFilename     String              @db.VarChar(200)
+  FileMediaType            String?             @db.VarChar(200)
+  FileLocation             String              @db.VarChar(512)
+  FileUploadDateTime       DateTime            @db.DateTime(0)
+  FileUploadAccUserId      Int
+  FileSizeBytes            BigInt?
+  FileCreatedDateTime      DateTime            @db.DateTime(0)
+  FileLastModifiedDateTime DateTime            @db.DateTime(0)
+  Account                  Account[]
+  AccountUser              AccountUser         @relation(fields: [FileUploadAccUserId], references: [AccUserId], map: "User_AttachedFile")
+  ProductionCompany        ProductionCompany[]
 
   @@index([FileUploadAccUserId], map: "User_AttachedFile")
 }
