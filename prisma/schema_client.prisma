@@ -179,8 +179,6 @@ model Venue {
   VenueBarredVenue_VenueBarredVenue_VBVVenueIdToVenue       VenueBarredVenue[]           @relation("VenueBarredVenue_VBVVenueIdToVenue")
   VenueContact                                              VenueContact[]
   VenueFile                                                 VenueFile[]
-  VenueVenue1                                               VenueVenue[]                 @relation("VenueVenue_VVVenue1IdToVenue")
-  VenueVenue2                                               VenueVenue[]                 @relation("VenueVenue_VVVenue2IdToVenue")
 
   @@index([FamilyId], map: "Venue_VenueFamily")
 }
@@ -333,11 +331,11 @@ model CompAllocation {
   Id                     Int           @id @default(autoincrement()) @map("CompAllocationId")
   AvailableCompId        Int           @map("CompAllocationAvailableCompId")
   TicketHolderName       String        @map("CompAllocationTicketHolderName") @db.VarChar(50)
-  Seats                  Int           @default(1) @map("CompAllocationSeats") @db.TinyInt
+  Seats                  Int           @default(1) @map("CompAllocationSeats") @db.UnsignedSmallInt
   Comments               String?       @map("CompAllocationComments") @db.VarChar(100)
   RequestedBy            String?       @map("CompAllocationRequestedBy") @db.VarChar(50)
   ArrangedByAccUserId    Int           @map("CompAllocationArrangedByAccUserId")
-  VenueConfirmationNotes String?       @map("CompAllocationVenueConfirmationNotes") @db.VarChar(100)
+  VenueConfirmationNotes String?       @map("CompAllocationVenueConfirmationNotes") @db.Text
   TicketHolderEmail      String?       @map("CompAllocationTicketHolderEmail") @db.VarChar(80)
   SeatsAllocated         String?       @map("CompAllocationSeatsAllocated") @db.VarChar(50)
   AvailableComp          AvailableComp @relation(fields: [AvailableCompId], references: [Id], onDelete: Cascade, map: "AvailableCompsMayBeAllocated")
@@ -782,18 +780,20 @@ model DealMemoTechProvision {
 }
 
 model File {
-  Id               Int              @id @default(autoincrement()) @map("FileId")
-  OriginalFilename String           @map("FileOriginalFilename") @db.VarChar(200)
-  MediaType        String?          @map("FileMediaType") @db.VarChar(200)
-  Location         String           @map("FileLocation") @db.VarChar(512)
-  UploadDateTime   DateTime         @map("FileUploadDateTime") @db.DateTime(0)
-  UploadUserId     Int              @map("FileUploadUserId")
-  SizeBytes        BigInt?          @map("FileSizeBytes")
-  ACCContract      ACCContract[]
-  BookingFile      BookingFile[]
-  Production       Production[]
-  ProductionFile   ProductionFile[]
-  Template         Template[]
+  Id                       Int              @id @default(autoincrement()) @map("FileId")
+  OriginalFilename         String           @map("FileOriginalFilename") @db.VarChar(200)
+  MediaType                String?          @map("FileMediaType") @db.VarChar(200)
+  Location                 String           @map("FileLocation") @db.VarChar(512)
+  UploadDateTime           DateTime         @map("FileUploadDateTime") @db.DateTime(0)
+  UploadUserId             Int              @map("FileUploadUserId")
+  SizeBytes                BigInt?          @map("FileSizeBytes")
+  FileCreatedDateTime      DateTime?        @db.DateTime(0)
+  FileLastModifiedDateTime DateTime?        @db.DateTime(0)
+  ACCContract              ACCContract[]
+  BookingFile              BookingFile[]
+  Production               Production[]
+  ProductionFile           ProductionFile[]
+  Template                 Template[]
 
   @@index([UploadUserId], map: "UserAttachedFile")
 }
@@ -1195,30 +1195,18 @@ model BookingFile {
   @@index([BookingFileFileId], map: "BookingFileFileId")
 }
 
-model VenueVenue {
-  Venue1Id Int     @map("VVVenue1Id")
-  Venue2Id Int     @map("VVVenue2Id")
-  Mileage  Decimal @map("VVMileage") @db.Decimal(5, 1)
-  TimeMins Int?    @map("VVTimeMins")
-  Venue1   Venue   @relation("VenueVenue_VVVenue1IdToVenue", fields: [Venue1Id], references: [Id], onDelete: Cascade, map: "Venue_VenueVenue1")
-  Venue2   Venue   @relation("VenueVenue_VVVenue2IdToVenue", fields: [Venue2Id], references: [Id], onDelete: Cascade, map: "Venue_VenueVenue2")
-
-  @@id([Venue1Id, Venue2Id])
-  @@index([Venue1Id], map: "Venue_VenueVenue1_idx")
-  @@index([Venue2Id], map: "Venue_VenueVenue2_idx")
-}
-
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view SalesFiguresView {
-  SetId               Int      @default(0)
-  BookingId           Int
+  RowNumber           BigInt    @default(0)
+  SetId               Int?      @default(0)
+  BookingId           Int?
   PerformanceId       Int?
-  SetSalesFiguresDate DateTime @db.Date
-  SaleTypeId          Int      @default(0)
-  SaleTypeName        String   @db.VarChar(45)
-  SaleId              Int?     @default(0)
+  SetSalesFiguresDate DateTime? @db.Date
+  SaleTypeId          Int?      @default(0)
+  SaleTypeName        String?   @db.VarChar(45)
+  SaleId              Int?      @default(0)
   SaleSeats           Int?
-  SaleValue           Decimal? @db.Decimal(10, 2)
+  SaleValue           Decimal?  @db.Decimal(10, 2)
 
   @@ignore
 }
@@ -1247,9 +1235,10 @@ view BookingHoldCompUnionView {
 }
 
 view ScheduleView {
+  RowNumber           BigInt    @default(0)
   ProductionId        Int       @default(0)
   FullProductionCode  String?   @db.VarChar(20)
-  ShowName            String    @db.VarChar(80)
+  ShowName            String?   @db.VarChar(80)
   RehearsalStartDate  DateTime? @db.Date
   ProductionStartDate DateTime? @db.Date
   ProductionEndDate   DateTime? @db.Date
@@ -1258,7 +1247,7 @@ view ScheduleView {
   EntryType           String?   @db.VarChar(30)
   EntryId             Int       @default(0)
   EntryName           String?   @db.VarChar(255)
-  EntryStatusCode     String    @default("") @db.Char(1)
+  EntryStatusCode     String?   @default("") @db.Char(1)
   Location            String?   @db.VarChar(50)
   PencilNum           Int?
   VenueId             Int?
@@ -1297,9 +1286,10 @@ view DateBlockDatesView {
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view BarringView {
-  VenueId       Int    @default(0)
-  BarredVenueId Int    @default(0)
-  BarType       String @default("") @db.VarChar(7)
+  RowNumber     BigInt  @default(0)
+  VenueId       Int?    @default(0)
+  BarredVenueId Int?    @default(0)
+  BarType       String? @default("") @db.VarChar(7)
 
   @@ignore
 }
@@ -1318,6 +1308,7 @@ view BookingDateDiffView {
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view BookingHoldCompsView {
+  RowNumber          BigInt   @default(0)
   FullProductionCode String   @db.VarChar(20)
   VenueCode          String   @db.VarChar(6)
   VenueName          String   @db.VarChar(255)
@@ -1336,41 +1327,43 @@ view BookingHoldCompsView {
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view PromoterHoldsView {
+  RowNumber                            BigInt    @default(0)
   ProductionId                         Int       @default(0)
   FullProductionCode                   String?   @db.VarChar(20)
-  ShowName                             String    @db.VarChar(80)
-  VenueCode                            String    @db.VarChar(6)
-  VenueName                            String    @db.VarChar(255)
+  ShowName                             String?   @db.VarChar(80)
+  VenueCode                            String?   @db.VarChar(6)
+  VenueName                            String?   @db.VarChar(255)
   BookingId                            Int       @default(0)
   PerformanceDate                      DateTime  @db.Date
   PerformanceTime                      DateTime  @db.Time(0)
   AvailableCompSeats                   Int?      @default(1) @db.TinyInt
   AvailableCompNotes                   String?   @db.LongText
-  CompAllocationSeats                  Int?      @default(1) @db.TinyInt
+  CompAllocationSeats                  Int?      @default(1) @db.UnsignedSmallInt
   CompAllocationTicketHolderName       String?   @db.VarChar(50)
   CompAllocationSeatsAllocated         String?   @db.VarChar(50)
   CompAllocationTicketHolderEmail      String?   @db.VarChar(80)
   CompAllocationComments               String?   @db.VarChar(100)
   CompAllocationRequestedBy            String?   @db.VarChar(50)
   CompAllocationArrangedBy             String?   @db.VarChar(101)
-  CompAllocationVenueConfirmationNotes String?   @db.VarChar(100)
+  CompAllocationVenueConfirmationNotes String?   @db.Text
 
   @@id([ProductionId, BookingId, PerformanceDate, PerformanceTime])
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view ScheduledDatesView {
-  DateBlockId Int      @default(0)
-  EntryId     Int      @default(0)
-  EntryDate   DateTime @default(dbgenerated("('0000-00-00')")) @db.Date
-  EntrySource String   @default("") @db.VarChar(13)
-  EntryName   String?  @db.VarChar(255)
-  TownName    String?  @db.VarChar(50)
-  StatusCode  String   @default("") @db.Char(1)
+  Name_exp_1  BigInt    @default(0)
+  DateBlockId Int?      @default(0)
+  EntryId     Int?      @default(0)
+  EntryDate   DateTime? @default(dbgenerated("('0000-00-00')")) @db.Date
+  EntrySource String?   @default("") @db.VarChar(13)
+  EntryName   String?   @db.VarChar(255)
+  TownName    String?   @db.VarChar(50)
+  StatusCode  String?   @default("") @db.Char(1)
   PencilNum   Int?
   VenueSeats  Float?
-  Mileage     Decimal? @db.Decimal(5, 0)
-  TimeMins    Decimal? @db.Decimal(5, 0)
+  Mileage     Decimal?  @db.Decimal(5, 0)
+  TimeMins    Decimal?  @db.Decimal(5, 0)
 
   @@ignore
 }
@@ -1388,19 +1381,21 @@ view SalesSetTotalsView {
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view ProductionSummaryView {
-  ProductionId                Int      @default(0)
-  DateTypeAffectsAvailability Boolean? @db.Bit(1)
-  DateTypeId                  Int?
-  DateTypeSeqNo               Decimal? @db.Decimal(3, 0)
-  Item                        String   @default("") @db.VarChar(30)
-  StatusCode                  String   @default("") @db.Char(1)
-  Count                       BigInt   @default(0)
+  row_number___over__order_by_ProductionId__Item_ BigInt   @default(0) @map("row_number() over (order by ProductionId, Item)")
+  ProductionId                                    Int?     @default(0)
+  DateTypeAffectsAvailability                     Boolean? @db.Bit(1)
+  DateTypeId                                      Int?
+  DateTypeSeqNo                                   Decimal? @db.Decimal(3, 0)
+  Item                                            String?  @default("") @db.VarChar(30)
+  StatusCode                                      String?  @default("") @db.Char(1)
+  Count                                           BigInt?  @default(0)
 
   @@ignore
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view ProductionPerformanceSummaryView {
+  RowNumber    BigInt @default(0)
   ProductionId Int
   StatusCode   String @default("U") @db.Char(1)
   Count        BigInt @default(0)
@@ -1410,15 +1405,16 @@ view ProductionPerformanceSummaryView {
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view ProductionView {
-  ProductionId         Int       @default(0)
-  ProductionCode       String    @db.VarChar(10)
+  RowNumber            BigInt    @default(0)
+  ProductionId         Int?      @default(0)
+  ProductionCode       String?   @db.VarChar(10)
   FullProductionCode   String?   @db.VarChar(20)
   ProductionSalesEmail String?   @db.VarChar(80)
-  ProductionIsArchived Boolean   @default(dbgenerated("(b'0')")) @db.Bit(1)
-  ProductionIsDeleted  Boolean   @default(dbgenerated("(b'0')")) @db.Bit(1)
-  ShowId               Int       @default(0)
-  ShowCode             String    @db.VarChar(10)
-  ShowName             String    @db.VarChar(80)
+  ProductionIsArchived Boolean?  @default(dbgenerated("(b'0')")) @db.Bit(1)
+  ProductionIsDeleted  Boolean?  @default(dbgenerated("(b'0')")) @db.Bit(1)
+  ShowId               Int?      @default(0)
+  ShowCode             String?   @db.VarChar(10)
+  ShowName             String?   @db.VarChar(80)
   ShowType             String?   @db.VarChar(1)
   ProductionLogoFileId Int?
   RehearsalStartDate   DateTime? @db.Date
@@ -1431,74 +1427,77 @@ view ProductionView {
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view ShowView {
-  ShowId         Int     @default(0)
-  ShowCode       String  @db.VarChar(10)
-  ShowName       String  @db.VarChar(80)
-  ShowType       String? @db.VarChar(1)
-  ShowIsArchived Boolean @default(dbgenerated("(b'0')")) @db.Bit(1)
+  RowNumber      BigInt   @default(0)
+  ShowId         Int?     @default(0)
+  ShowCode       String?  @db.VarChar(10)
+  ShowName       String?  @db.VarChar(80)
+  ShowType       String?  @db.VarChar(1)
+  ShowIsArchived Boolean? @default(dbgenerated("(b'0')")) @db.Bit(1)
 
   @@ignore
 }
 
 view VenueView {
-  VenueId                      Int     @default(0)
-  VenueCode                    String  @db.VarChar(6)
-  VenueName                    String  @db.VarChar(255)
-  VenueStatusCode              String  @default("O") @db.VarChar(1)
-  VenueWebsite                 String? @db.VarChar(255)
-  VenueFamily                  String? @db.VarChar(50)
-  VenueCurrencyCode            String? @db.VarChar(3)
-  VenueVATIndicator            Boolean @default(dbgenerated("(b'0')")) @db.Bit(1)
-  VenueTechSpecsURL            String? @db.VarChar(255)
+  RowNumber                    BigInt   @default(0)
+  VenueId                      Int      @default(0)
+  VenueCode                    String   @db.VarChar(6)
+  VenueName                    String?  @db.VarChar(255)
+  VenueStatusCode              String?  @default("O") @db.VarChar(1)
+  VenueWebsite                 String?  @db.VarChar(255)
+  VenueFamily                  String?  @db.VarChar(50)
+  VenueCurrencyCode            String?  @db.VarChar(3)
+  VenueVATIndicator            Boolean? @default(dbgenerated("(b'0')")) @db.Bit(1)
+  VenueTechSpecsURL            String?  @db.VarChar(255)
   VenueSeats                   Float?
-  VenueBarringClause           String? @db.VarChar(255)
+  VenueBarringClause           String?  @db.VarChar(255)
   VenueTownPopulation          Float?
-  VenueLXDesk                  String? @db.VarChar(50)
-  VenueLXNotes                 String? @db.VarChar(2000)
-  VenueSoundDesk               String? @db.VarChar(50)
-  VenueSoundNotes              String? @db.VarChar(2000)
-  VenueStageSize               String? @db.VarChar(50)
-  VenueGridHeight              String? @db.VarChar(50)
-  VenueVenueFlags              String? @db.VarChar(2000)
-  VenueBarringWeeksPre         Int?    @db.TinyInt
-  VenueBarringWeeksPost        Int?    @db.TinyInt
+  VenueLXDesk                  String?  @db.VarChar(50)
+  VenueLXNotes                 String?  @db.VarChar(2000)
+  VenueSoundDesk               String?  @db.VarChar(50)
+  VenueSoundNotes              String?  @db.VarChar(2000)
+  VenueStageSize               String?  @db.VarChar(50)
+  VenueGridHeight              String?  @db.VarChar(50)
+  VenueVenueFlags              String?  @db.VarChar(2000)
+  VenueBarringWeeksPre         Int?     @db.TinyInt
+  VenueBarringWeeksPost        Int?     @db.TinyInt
   VenueBarringMiles            Int?
-  VenueCulturallyExempt        Boolean @default(dbgenerated("(b'0')")) @db.Bit(1)
-  VenueAccountId               Int
-  VenueIsDeleted               Boolean @default(dbgenerated("(b'0')")) @db.Bit(1)
-  VenueMainAddress1            String? @db.VarChar(50)
-  VenueMainAddress2            String? @db.VarChar(50)
-  VenueMainAddress3            String? @db.VarChar(50)
-  VenueMainAddressTown         String? @db.VarChar(50)
-  VenueMainAddressCounty       String? @db.VarChar(50)
-  VenueMainAddressPostcode     String? @db.VarChar(12)
-  VenueMainAddressCountry      String? @db.VarChar(40)
-  VenueDeliveryAddress1        String? @db.VarChar(50)
-  VenueDeliveryAddress2        String? @db.VarChar(50)
-  VenueDeliveryAddress3        String? @db.VarChar(50)
-  VenueDeliveryAddressTown     String? @db.VarChar(50)
-  VenueDeliveryAddressCounty   String? @db.VarChar(50)
-  VenueDeliveryAddressPostcode String? @db.VarChar(12)
-  VenueDeliveryAddressCountry  String? @db.VarChar(40)
-  VenueMainNoteText            String? @db.LongText
-  VenueWarningNoteText         String? @db.LongText
+  VenueCulturallyExempt        Boolean? @default(dbgenerated("(b'0')")) @db.Bit(1)
+  VenueAccountId               Int?
+  VenueIsDeleted               Boolean? @default(dbgenerated("(b'0')")) @db.Bit(1)
+  VenueMainAddress1            String?  @db.VarChar(50)
+  VenueMainAddress2            String?  @db.VarChar(50)
+  VenueMainAddress3            String?  @db.VarChar(50)
+  VenueMainAddressTown         String?  @db.VarChar(50)
+  VenueMainAddressCounty       String?  @db.VarChar(50)
+  VenueMainAddressPostcode     String?  @db.VarChar(12)
+  VenueMainAddressCountry      String?  @db.VarChar(40)
+  VenueDeliveryAddress1        String?  @db.VarChar(50)
+  VenueDeliveryAddress2        String?  @db.VarChar(50)
+  VenueDeliveryAddress3        String?  @db.VarChar(50)
+  VenueDeliveryAddressTown     String?  @db.VarChar(50)
+  VenueDeliveryAddressCounty   String?  @db.VarChar(50)
+  VenueDeliveryAddressPostcode String?  @db.VarChar(12)
+  VenueDeliveryAddressCountry  String?  @db.VarChar(40)
+  VenueMainNoteText            String?  @db.LongText
+  VenueWarningNoteText         String?  @db.LongText
 
   @@id([VenueId, VenueCode])
 }
 
 view SalesView {
-  ShowName                    String    @db.VarChar(80)
-  ProductionId                Int       @default(0)
+  RowNumber                   BigInt    @default(0)
+  ShowName                    String?   @db.VarChar(80)
+  ProductionId                Int?      @default(0)
   FullProductionCode          String?   @db.VarChar(20)
   ProductionStartDate         DateTime? @db.Date
   ProductionEndDate           DateTime? @db.Date
   BookingId                   Int       @default(0)
-  BookingFirstDate            DateTime  @db.Date
-  BookingStatusCode           String    @default("U") @db.Char(1)
+  BookingFirstDate            DateTime? @db.Date
+  BookingStatusCode           String?   @default("U") @db.Char(1)
   BookingProductionWeekNum    Int?      @db.SmallInt
   VenueTown                   String?   @db.VarChar(50)
-  VenueCode                   String    @db.VarChar(6)
-  VenueName                   String    @db.VarChar(255)
+  VenueCode                   String?   @db.VarChar(6)
+  VenueName                   String?   @db.VarChar(255)
   VenueCurrencyCode           String?   @db.VarChar(3)
   VenueCurrencySymbolUnicode  String?   @db.VarChar(30)
   ConversionToCurrencyCode    String?   @db.VarChar(3)
@@ -1532,32 +1531,34 @@ view SalesView {
 }
 
 view BookingSelectionView {
-  BookingId             Int      @default(0)
-  BookingStatusCode     String   @default("U") @db.Char(1)
-  BookingFirstDate      DateTime @db.Date
-  VenueId               Int      @default(0)
-  VenueCode             String   @db.VarChar(6)
-  VenueMainAddressTown  String?  @db.VarChar(50)
-  ProductionId          Int      @default(0)
-  FullProductionCode    String?  @db.VarChar(20)
-  ProductionLengthWeeks Int?     @db.SmallInt
+  RowNumber             BigInt    @default(0)
+  BookingId             Int       @default(0)
+  BookingStatusCode     String?   @default("U") @db.Char(1)
+  BookingFirstDate      DateTime? @db.Date
+  VenueId               Int       @default(0)
+  VenueCode             String?   @db.VarChar(6)
+  VenueMainAddressTown  String?   @db.VarChar(50)
+  ProductionId          Int       @default(0)
+  FullProductionCode    String?   @db.VarChar(20)
+  ProductionLengthWeeks Int?      @db.SmallInt
 
   @@id([BookingId, VenueId, ProductionId])
 }
 
 view SalesSummaryView {
+  RowNumber                  BigInt    @default(0)
   ProductionId               Int       @default(0)
   FullProductionCode         String?   @db.VarChar(20)
-  ShowName                   String    @db.VarChar(80)
+  ShowName                   String?   @db.VarChar(80)
   ProductionStartDate        DateTime? @db.Date
   ProductionEndDate          DateTime? @db.Date
   ProductionWeekNum          Int?      @db.SmallInt
   EntryDate                  DateTime  @default(dbgenerated("('0000-00-00')")) @db.Date
   Location                   String?   @db.VarChar(50)
-  EntryId                    Int       @default(0)
+  EntryId                    Int?      @default(0)
   EntryName                  String?   @db.VarChar(255)
   EntryType                  String?   @db.VarChar(30)
-  EntryStatusCode            String    @default("") @db.Char(1)
+  EntryStatusCode            String?   @default("") @db.Char(1)
   Value                      Decimal?  @db.Decimal(32, 2)
   VenueCurrencyCode          String?   @db.VarChar(3)
   VenueCurrencySymbolUnicode String?   @db.VarChar(30)
@@ -1573,11 +1574,12 @@ view SalesSummaryView {
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view ACCContractListView {
-  PersonFirstName          String    @db.VarChar(50)
+  RowNumber                BigInt    @default(0)
+  PersonFirstName          String?   @db.VarChar(50)
   PersonLastName           String?   @db.VarChar(50)
-  RoleName                 String    @db.VarChar(50)
-  StatusCode               String    @db.VarChar(4)
-  CompletedByUserFirstName String    @db.VarChar(50)
+  RoleName                 String?   @db.VarChar(50)
+  StatusCode               String?   @db.VarChar(4)
+  CompletedByUserFirstName String?   @db.VarChar(50)
   CompletedByUserLastName  String?   @db.VarChar(50)
   CheckedByUserFirstName   String?   @db.VarChar(50)
   CheckedByUserLastName    String?   @db.VarChar(50)
