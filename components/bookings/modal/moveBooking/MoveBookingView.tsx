@@ -154,12 +154,15 @@ const MoveBookingView = ({
 
   const checkForBookingConflicts = async () => {
     if (bookingDetails.venue) {
+      console.log(bookings);
       try {
-        const response = await axios.post('/api/bookings/conflict', {
-          fromDate: bookingDetails.moveDate,
-          toDate: bookingDetails.moveEndDate,
-          productionId: selectedProduction.value,
-        });
+        const response = await axios
+          .post('/api/bookings/conflict', {
+            fromDate: bookingDetails.moveDate,
+            toDate: bookingDetails.moveEndDate,
+            productionId: selectedProduction.value,
+          })
+          .then((res) => ({ ...res, data: res.data.filter((x) => x.Id !== bookings[0].id) }));
         if (!isNullOrEmpty(response.data)) {
           updateBookingConflicts(response.data);
           await checkForBarredVenues(true);
