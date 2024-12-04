@@ -2,7 +2,7 @@
 
 import { mount } from 'cypress/react18';
 import LoadingOverlay from '../../../components/core-ui-lib/LoadingOverlay';
-import BaseComp from '../global/BaseComp';
+import BaseComp from '../helpers/BaseComp';
 
 // Define the setup function for mounting the component
 function setup(props) {

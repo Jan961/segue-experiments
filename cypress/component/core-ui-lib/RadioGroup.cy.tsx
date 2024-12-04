@@ -1,7 +1,7 @@
 import { mount } from 'cypress/react18';
 import RadioGroup, { Direction } from '../../../components/core-ui-lib/RadioGroup';
 import { SelectOption } from '../../../components/core-ui-lib/Select/Select';
-import BaseComp from '../global/BaseComp';
+import BaseComp from '../helpers/BaseComp';
 
 function setup(props) {
   mount(

@@ -3,7 +3,7 @@
 import { mount } from 'cypress/react';
 import Tabs from '../../../components/core-ui-lib/Tabs';
 import { Tab } from '@headlessui/react';
-import BaseComp from '../global/BaseComp';
+import BaseComp from '../helpers/BaseComp';
 
 describe('Tabs Component', () => {
   const tabs = ['Tab 1', 'Tab 2', 'Tab 3'];
