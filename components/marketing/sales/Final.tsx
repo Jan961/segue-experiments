@@ -70,11 +70,15 @@ const Final = () => {
       const frequency = await getSalesFrequency();
 
       // get previous sales figures first and check for errors
-      const { data: prevSales } = await axios.post('/api/marketing/sales/current/read', {
+      const { data: salesData } = await axios.post('/api/marketing/sales/current/read', {
         bookingId: bookings.selected,
         salesDate: null,
         frequency,
       });
+
+      // data is returned as an object with the "current" key
+      // we don't have the date the last set of figures were entered so the api handles this
+      const prevSales = salesData.current;
 
       // conly complete checks if discrepancy notes are not visible
       if (!showDiscrepancyNotes) {
