@@ -2,11 +2,12 @@
 
 import { mount } from 'cypress/react18'; // Adjust import if using a different version
 import Select, { SelectProps } from '../../../components/core-ui-lib/Select'; // Adjust the path to your Select component
+import { SelectOption } from '../../../components/core-ui-lib/Select/Select';
 import BaseComp from '../global/BaseComp'; // Adjust the path if necessary
 
 //Create a simple scrollable div component to place the select component in
-const ScrollableDiv = (options) => {
-  return (
+const setupScrollableDiv = (options: SelectOption[]) => {
+  mount(
     <BaseComp styles={{ width: '200px' }}>
       <div
         data-testid="scrollable-div"
@@ -39,7 +40,7 @@ const ScrollableDiv = (options) => {
         <h1>Item 18</h1>
         <h1 data-testid="last-item">Item 19</h1>
       </div>
-    </BaseComp>
+    </BaseComp>,
   );
 };
 
@@ -314,7 +315,7 @@ describe('Select Component', () => {
   });
 
   it('closes menu on scroll when closeMenuOnScroll is true', () => {
-    mount(<ScrollableDiv options={options} />);
+    setupScrollableDiv(options);
 
     cy.get('[data-testid="core-ui-lib-select"]').click();
     cy.get('[data-testid="last-item"]');
@@ -322,7 +323,7 @@ describe('Select Component', () => {
   });
 
   it('does not close menu on scroll when closeMenuOnScroll is false', () => {
-    mount(<ScrollableDiv options={options} />);
+    setupScrollableDiv(options);
 
     cy.get('[data-testid="core-ui-lib-select"]').click();
     // the below will automatically scroll to the bottom of the div - no need to call scrollTo (stupid Cypress - it shouldn't work like this)
