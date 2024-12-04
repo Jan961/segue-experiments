@@ -4,6 +4,45 @@ import { mount } from 'cypress/react18'; // Adjust import if using a different v
 import Select, { SelectProps } from '../../../components/core-ui-lib/Select'; // Adjust the path to your Select component
 import BaseComp from '../global/BaseComp'; // Adjust the path if necessary
 
+//Create a simple scrollable div component to place the select component in
+const ScrollableDiv = (options) => {
+  return (
+    <BaseComp styles={{ width: '200px' }}>
+      <div
+        data-testid="scrollable-div"
+        style={{
+          width: '100%',
+          height: '200px',
+          overflowY: 'scroll',
+          border: '1px solid black',
+        }}
+      >
+        {/* Content that exceeds the div's height */}
+        <Select options={options} onChange={cy.stub()} closeMenuOnScroll={true} />
+        <h1>Item 1</h1>
+        <h1>Item 2</h1>
+        <h1>Item 3</h1>
+        <h1>Item 4</h1>
+        <h1>Item 5</h1>
+        <h1>Item 6</h1>
+        <h1>Item 7</h1>
+        <h1>Item 8</h1>
+        <h1>Item 9</h1>
+        <h1>Item 10</h1>
+        <h1>Item 11</h1>
+        <h1>Item 12</h1>
+        <h1>Item 13</h1>
+        <h1>Item 14</h1>
+        <h1>Item 15</h1>
+        <h1>Item 16</h1>
+        <h1>Item 17</h1>
+        <h1>Item 18</h1>
+        <h1 data-testid="last-item">Item 19</h1>
+      </div>
+    </BaseComp>
+  );
+};
+
 // Define the setup function as provided
 function setup(props: SelectProps) {
   mount(
@@ -275,45 +314,7 @@ describe('Select Component', () => {
   });
 
   it('closes menu on scroll when closeMenuOnScroll is true', () => {
-    const ScrollableDiv = () => {
-      return (
-        <BaseComp styles={{ width: '200px' }}>
-          <div
-            data-testid="scrollable-div"
-            style={{
-              width: '100%',
-              height: '200px',
-              overflowY: 'scroll',
-              border: '1px solid black',
-            }}
-          >
-            {/* Content that exceeds the div's height */}
-            <Select options={options} onChange={cy.stub()} closeMenuOnScroll={true} />
-            <h1>Item 1</h1>
-            <h1>Item 2</h1>
-            <h1>Item 3</h1>
-            <h1>Item 4</h1>
-            <h1>Item 5</h1>
-            <h1>Item 6</h1>
-            <h1>Item 7</h1>
-            <h1>Item 8</h1>
-            <h1>Item 9</h1>
-            <h1>Item 10</h1>
-            <h1>Item 11</h1>
-            <h1>Item 12</h1>
-            <h1>Item 13</h1>
-            <h1>Item 14</h1>
-            <h1>Item 15</h1>
-            <h1>Item 16</h1>
-            <h1>Item 17</h1>
-            <h1>Item 18</h1>
-            <h1 data-testid="last-item">Item 19</h1>
-          </div>
-        </BaseComp>
-      );
-    };
-
-    mount(<ScrollableDiv />);
+    mount(<ScrollableDiv options={options} />);
 
     cy.get('[data-testid="core-ui-lib-select"]').click();
     cy.get('[data-testid="last-item"]');
@@ -321,45 +322,7 @@ describe('Select Component', () => {
   });
 
   it('does not close menu on scroll when closeMenuOnScroll is false', () => {
-    const ScrollableDiv = () => {
-      return (
-        <BaseComp styles={{ width: '200px' }}>
-          <div
-            data-testid="scrollable-div"
-            style={{
-              width: '100%',
-              height: '200px',
-              overflowY: 'scroll',
-              border: '1px solid black',
-            }}
-          >
-            {/* Content that exceeds the div's height */}
-            <Select options={options} onChange={cy.stub()} closeMenuOnScroll={true} />
-            <h1>Item 1</h1>
-            <h1>Item 2</h1>
-            <h1>Item 3</h1>
-            <h1>Item 4</h1>
-            <h1>Item 5</h1>
-            <h1>Item 6</h1>
-            <h1>Item 7</h1>
-            <h1>Item 8</h1>
-            <h1>Item 9</h1>
-            <h1>Item 10</h1>
-            <h1>Item 11</h1>
-            <h1>Item 12</h1>
-            <h1>Item 13</h1>
-            <h1>Item 14</h1>
-            <h1>Item 15</h1>
-            <h1>Item 16</h1>
-            <h1>Item 17</h1>
-            <h1>Item 18</h1>
-            <h1 data-testid="last-item">Item 19</h1>
-          </div>
-        </BaseComp>
-      );
-    };
-
-    mount(<ScrollableDiv />);
+    mount(<ScrollableDiv options={options} />);
 
     cy.get('[data-testid="core-ui-lib-select"]').click();
     // the below will automatically scroll to the bottom of the div - no need to call scrollTo (stupid Cypress - it shouldn't work like this)
