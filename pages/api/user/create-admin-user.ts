@@ -32,29 +32,27 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       ? await createNewAccountUser(user, AccountOrganisationId, permissionIds)
       : await createNewUser(user, AccountOrganisationId, permissionIds);
 
-    if (!accountUserOnly && newUser) {
-      // Set PIN for the account
-      await prisma.account.update({
-        where: {
-          AccountOrganisationId,
-        },
-        data: {
-          AccountPIN: user.pin,
-        },
-      });
+    // Set PIN for the account
+    await prisma.account.update({
+      where: {
+        AccountOrganisationId,
+      },
+      data: {
+        AccountPIN: user.pin,
+      },
+    });
 
-      // Create Production permisisons
-      const productions = await prismaClient.production.findMany();
+    // Create Production permisisons
+    const productions = await prismaClient.production.findMany();
 
-      const formattedProductions = productions.map(({ Id }) => ({
-        AUPProductionId: Id,
-        AUPAccUserId: newUser.AccountUser[0].AccUserId,
-      }));
+    const formattedProductions = productions.map(({ Id }) => ({
+      AUPProductionId: Id,
+      AUPAccUserId: accountUserOnly ? newUser.AccUserId : newUser.AccountUser[0].AccUserId,
+    }));
 
-      await prismaClient.accountUserProduction.createMany({
-        data: formattedProductions,
-      });
-    }
+    await prismaClient.accountUserProduction.createMany({
+      data: formattedProductions,
+    });
 
     // Send new user email
     await sendNewUserEmail(email, password, companyName, signInUrl);
