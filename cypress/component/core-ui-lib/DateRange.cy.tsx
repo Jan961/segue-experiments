@@ -166,4 +166,18 @@ describe('DateRange Component', () => {
     cy.get('[data-testid="start-date-input"] input').should('have.value', '');
     cy.get('[data-testid="end-date-input"] input').should('have.value', '');
   });
+
+  it('handles invalid dates correctly', () => {
+    const onChange = cy.stub();
+    setup({
+      onChange,
+    });
+
+    cy.get('[data-testid="start-date-input"] input').type('31/02/23{enter}');
+    cy.get('[data-testid="start-date-input"] input').should('not.have.value', '31/02/23');
+    cy.get('[data-testid="end-date-input"] input').type('32/01/23{enter}');
+    cy.get('[data-testid="end-date-input"] input').should('not.have.value', '32/01/23');
+    cy.get('[data-testid="end-date-input"] input').type('31/04/23{enter}');
+    cy.get('[data-testid="end-date-input"] input').should('not.have.value', '31/04/23');
+  });
 });
