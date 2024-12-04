@@ -20,7 +20,6 @@ import { debug } from 'utils/logging';
 import { uploadStrings } from 'config/upload';
 import axios from 'axios';
 import classNames from 'classnames';
-import { accessShows } from 'state/account/selectors/permissionSelector';
 import { newDate } from 'services/dateService';
 
 export interface ProductionFormData {
@@ -47,6 +46,7 @@ interface ProductionsViewModalProps {
   production: any;
   onClose: () => void;
   onSave?: (formData: ProductionFormData, callback?: () => void) => void;
+  disabled?: boolean;
 }
 
 export const defaultProductionFormData: ProductionFormData = {
@@ -66,8 +66,14 @@ export const defaultProductionFormData: ProductionFormData = {
   runningTimeNote: '',
 };
 
-const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: ProductionsViewModalProps) => {
-  const permissions = useRecoilValue(accessShows);
+const ProductionDetailsForm = ({
+  visible,
+  onClose,
+  title,
+  onSave,
+  production,
+  disabled,
+}: ProductionsViewModalProps) => {
   const currencyList = useRecoilValue(currencyListState);
   const productionCompanyList = useRecoilValue(productionCompanyState);
   const [formData, setFormData] = useState(production || defaultProductionFormData);
@@ -184,7 +190,7 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
 
   return (
     <PopupModal
-      hasOverlay={isUploadOpen}
+      hasOverlay={isUploadOpen && !disabled}
       titleClass="text-xl text-primary-navy text-bold"
       title={title}
       show={visible}
@@ -226,7 +232,7 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
                   error={validationErrors?.prodCode}
                   maxlength={10}
                   required
-                  disabled={isArchived}
+                  disabled={isArchived || disabled}
                   ref={prodCodeRef}
                 />
                 {validationErrors.prodCode && <small className="text-red-400">{validationErrors.prodCode}</small>}
@@ -241,7 +247,7 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
             </div>
           </div>
         </div>
-        {isUploadOpen && (
+        {isUploadOpen && !disabled && (
           <UploadModal
             visible={isUploadOpen}
             title="Production Image"
@@ -269,7 +275,7 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
               from: rehearsalDateBlock?.StartDate ? newDate(rehearsalDateBlock?.StartDate) : null,
               to: rehearsalDateBlock?.EndDate ? newDate(rehearsalDateBlock?.EndDate) : null,
             }}
-            disabled={isArchived}
+            disabled={isArchived || disabled}
           />
         </div>
         <div className="flex-col">
@@ -288,7 +294,7 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
                   from: productionDateBlock?.StartDate ? newDate(productionDateBlock?.StartDate) : null,
                   to: productionDateBlock?.EndDate ? newDate(productionDateBlock?.EndDate) : null,
                 }}
-                disabled={isArchived}
+                disabled={isArchived || disabled}
               />
               {validationErrors.productionDateBlock && (
                 <small className="text-red-400">{validationErrors.productionDateBlock}</small>
@@ -308,7 +314,7 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
                 value={region}
                 isMulti={true}
                 renderOption={(option) => <CustomOption option={option} isMulti={true} />}
-                disabled={isArchived}
+                disabled={isArchived || disabled}
               />
               {validationErrors.region && <small className="text-red-400">{validationErrors.region}</small>}
             </div>
@@ -325,7 +331,7 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
                 options={currencyListOptions}
                 value={currency}
                 isSearchable
-                disabled={isArchived}
+                disabled={isArchived || disabled}
               />
               {validationErrors.currency && <small className="text-red-400">{validationErrors.currency}</small>}
             </div>
@@ -341,7 +347,7 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
                 onChange={(value) => onChange('company', value as string)}
                 options={productionCompanyOptions}
                 value={company}
-                disabled={isArchived}
+                disabled={isArchived || disabled}
               />
               {validationErrors.company && <small className="text-red-400">{validationErrors.company}</small>}
             </div>
@@ -356,7 +362,7 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
             type="string"
             onChange={(e) => onChange('email', e.target.value)}
             value={email}
-            disabled={isArchived}
+            disabled={isArchived || disabled}
           />
         </div>
         <div className="flex items-center">
@@ -367,7 +373,7 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
             onChange={(value) => onChange('frequency', value as string)}
             options={SALES_FIG_OPTIONS}
             value={frequency}
-            disabled={isArchived}
+            disabled={isArchived || disabled}
           />
         </div>
         <div className="flex items-center">
@@ -381,7 +387,7 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
               return handleTimeInput(e);
             }}
             value={runningTime}
-            disabled={isArchived}
+            disabled={isArchived || disabled}
           />
         </div>
         <div className="flex items-center">
@@ -393,7 +399,7 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
             type="string"
             onChange={(e) => onChange('runningTimeNote', e.target.value)}
             value={runningTimeNote}
-            disabled={isArchived}
+            disabled={isArchived || disabled}
           />
         </div>
         <div className="flex items-center ml-1 float-end justify-end">
@@ -402,6 +408,7 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
             label="Archived"
             checked={isArchived}
             onChange={(e) => onChange('isArchived', e.target.checked)}
+            disabled={disabled}
           />
         </div>
         <div className="w-full flex items-center justify-end gap-2">
@@ -412,7 +419,7 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
             iconProps={{ className: 'h-4 w-3' }}
             text="Save and Close"
             onClick={onSubmit}
-            disabled={!permissions.includes('EDIT_PRODUCTION_DETAILS')}
+            disabled={disabled}
           />
         </div>
       </form>
