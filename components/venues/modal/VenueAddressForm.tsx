@@ -172,8 +172,8 @@ const VenueAddressForm = ({
             placeholder="what.three.words"
             className="w-full justify-between"
             inputClassName="w-full"
-            value={formData.primaryWhat3Words}
-            onChange={(e) => handleInputChange('primaryWhat3Words', e.target.value)}
+            value={formData.what3WordsEntrance}
+            onChange={(e) => handleInputChange('what3WordsEntrance', e.target.value)}
           />
         </label>
         <label htmlFor="" className="grid grid-cols-[170px_minmax(100px,_1fr)] gap-10 justify-between  w-full">
