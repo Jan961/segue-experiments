@@ -126,8 +126,8 @@ export default function NewBookingDetailsView({
             venueOptions,
             addRowToTable,
             removeRowFromTable,
-            changeBookingLength,
             permissions.includes('ACCESS_BOOKING_NOTES'),
+            changeBookingLength,
           ),
         );
         dayTypeOption = dayTypeOptions.find(({ value }) => value === dateType);
