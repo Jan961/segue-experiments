@@ -451,11 +451,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                   variant="primary"
                   text={dealMemoButtonText}
                   onClick={handleEditDealMemo}
-                  disabled={
-                    (dealMemoButtonText === 'Create Deal Memo' && !createDealMemo) ||
-                    (dealMemoButtonText === 'Edit Deal Memo' && !editDealMemo) ||
-                    !editModal
-                  }
+                  disabled={(!dealMemoCreated && !createDealMemo) || (dealMemoCreated && !editDealMemo)}
                 />
                 <Button
                   className="w-32"
@@ -463,7 +459,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                   text="Export to PDF"
                   onClick={pdfExportDealMemo}
                   sufixIconName="document-solid"
-                  disabled={!exportDealMemo || !editModal}
+                  disabled={!exportDealMemo}
                 />
               </div>
             </div>
@@ -547,7 +543,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                 className="mr-1 w-33"
                 variant="primary"
                 text="Add Attachments"
-                disabled={!addAttachment || !editModal}
+                disabled={!addAttachment}
               />
             </div>
             <div className="w-[423px]">
