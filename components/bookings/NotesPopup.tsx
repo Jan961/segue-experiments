@@ -14,7 +14,14 @@ interface NotesPopupProps {
   disabled?: boolean;
 }
 
-export default function NotesPopup({ show, onSave, onCancel, productionItem, testId, disabled }: NotesPopupProps) {
+export default function NotesPopup({
+  show,
+  onSave,
+  onCancel,
+  productionItem,
+  testId,
+  disabled,
+}: Readonly<NotesPopupProps>) {
   const [note, setNote] = useState<string>('');
   const [confirm, setConfirm] = useState<boolean>(false);
   const [confVariant, setVariant] = useState<ConfDialogVariant>('close');

@@ -437,8 +437,8 @@ export const newBookingColumnDefs = (
   venueOptions = [],
   addRow,
   deleteRow,
-  showAddDeleteRow = false,
   canAccessNotes: boolean,
+  showAddDeleteRow = false,
 ) => {
   const columns = [
     {
