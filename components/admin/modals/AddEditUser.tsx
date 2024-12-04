@@ -1,7 +1,7 @@
 import { Button, Checkbox, ConfirmationDialog, Label, PopupModal, Select, TextInput } from 'components/core-ui-lib';
 import TreeSelect from 'components/global/TreeSelect';
 import { TreeItemOption } from 'components/global/TreeSelect/types';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import useUser from 'hooks/useUser';
 import Spinner from 'components/core-ui-lib/Spinner';
 import { newUserSchema } from 'validators/user';
@@ -14,6 +14,7 @@ import classNames from 'classnames';
 import axios from 'axios';
 import { NEW_USER_PIN_EMAIL } from 'config/global';
 import { notify } from 'components/core-ui-lib/Notifications';
+import usePermissions from 'hooks/usePermissions';
 
 type UserDetails = {
   accountUserId?: number;
@@ -68,6 +69,8 @@ const AdEditUser = ({
   const [permissionGroups, setPermissionGroups] = useState<SelectOption[]>([]);
   const [selectedGroups, setSelectedGroups] = useState<number[]>([]);
   const { isSignUpLoaded, isBusy, createUser, updateUser, fetchPermissionsForSelectedUser, error } = useUser();
+  const { user: currentUser, updatePermissions } = usePermissions();
+  const currentUserEmailAddress = useMemo(() => currentUser?.primaryEmailAddress?.emailAddress, [currentUser]);
 
   const handleInputChange = (e) => {
     setIsFormDirty(true);
@@ -212,6 +215,9 @@ const AdEditUser = ({
     const selectedProductions = userDetails.productions.filter(({ checked }) => checked).map(({ id }) => id);
     const payload = { ...userDetails, permissions, productions: selectedProductions, accountPIN };
     const success = selectedUser ? await updateUser(payload) : await createUser(payload);
+    if (selectedUser?.email === currentUserEmailAddress && success) {
+      updatePermissions();
+    }
     if (!success) {
       return;
     }
