@@ -7,6 +7,7 @@ import BaseComp from '../global/BaseComp'; // Adjust the path if necessary
 
 //Create a simple scrollable div component to place the select component in
 const setupScrollableDiv = (options: SelectOption[]) => {
+  const numberOfElements = 19;
   mount(
     <BaseComp styles={{ width: '200px' }}>
       <div
@@ -20,24 +21,9 @@ const setupScrollableDiv = (options: SelectOption[]) => {
       >
         {/* Content that exceeds the div's height */}
         <Select options={options} onChange={cy.stub()} closeMenuOnScroll={true} />
-        <h1>Item 1</h1>
-        <h1>Item 2</h1>
-        <h1>Item 3</h1>
-        <h1>Item 4</h1>
-        <h1>Item 5</h1>
-        <h1>Item 6</h1>
-        <h1>Item 7</h1>
-        <h1>Item 8</h1>
-        <h1>Item 9</h1>
-        <h1>Item 10</h1>
-        <h1>Item 11</h1>
-        <h1>Item 12</h1>
-        <h1>Item 13</h1>
-        <h1>Item 14</h1>
-        <h1>Item 15</h1>
-        <h1>Item 16</h1>
-        <h1>Item 17</h1>
-        <h1>Item 18</h1>
+        {Array.from({ length: numberOfElements }, (_, i) => (
+          <h1>Item {i}</h1>
+        ))}
         <h1 data-testid="last-item">Item 19</h1>
       </div>
     </BaseComp>,
