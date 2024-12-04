@@ -26,10 +26,6 @@ interface SalesFigureSet {
   user: string;
 }
 
-export interface SalesEntryRef {
-  resetForm: (salesWeek: string) => void;
-}
-
 const Final = () => {
   const [genSeatsSold, setGenSeatsSold] = useState('');
   const [genSeatsSoldVal, setGenSeatsSoldVal] = useState('');

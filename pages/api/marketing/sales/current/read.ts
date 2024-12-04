@@ -1,19 +1,65 @@
 import getPrismaClient from 'lib/prisma';
+import { PrismaClient } from 'prisma/generated/prisma-client';
+import { compareDatesWithoutTime, getDateDaysAway, getMonday } from 'services/dateService';
+import { formatDecimalValue, isNullOrUndefined, isUndefined } from 'utils';
 
-// date-fns startOfDay not applicable for this use case
-const removeTime = (inputDate: Date) => {
-  const date = new Date(inputDate);
-  return new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0, 0);
+const generateSalesObject = (sales) => {
+  const schoolReservations = sales.find((sale) => sale.SaleTypeName === 'School Reservations');
+  const schoolSales = sales.find((sale) => sale.SaleTypeName === 'School Sales');
+  const generalReservations = sales.find((sale) => sale.SaleTypeName === 'General Reservations');
+  const generalSales = sales.find((sale) => sale.SaleTypeName === 'General Sales');
+
+  return sales.length > 0
+    ? {
+        schools: {
+          seatsSold: isNullOrUndefined(schoolSales?.Seats) ? '' : schoolSales.Seats,
+          seatsSoldVal: isNullOrUndefined(schoolSales?.Value) ? '' : formatDecimalValue(schoolSales.Value),
+          seatsReserved: isNullOrUndefined(schoolReservations?.Seats) ? '' : schoolReservations.Seats,
+          seatsReservedVal: isNullOrUndefined(schoolReservations?.Value)
+            ? ''
+            : formatDecimalValue(schoolReservations.Value),
+        },
+        general: {
+          seatsSold: isNullOrUndefined(generalSales?.Seats) ? '' : generalSales.Seats,
+          seatsSoldVal: isNullOrUndefined(generalSales?.Value) ? '' : formatDecimalValue(generalSales.Value),
+          seatsReserved: isNullOrUndefined(generalReservations?.Seats) ? '' : generalReservations.Seats,
+          seatsReservedVal: isNullOrUndefined(generalReservations?.Value)
+            ? ''
+            : formatDecimalValue(generalReservations.Value),
+        },
+        setId: generalSales?.SetId,
+        setSaleFiguresDate: generalSales?.SetSalesFiguresDate,
+      }
+    : {};
+};
+
+const getSalesFrequency = async (prisma: PrismaClient, productionId: number) => {
+  const production = await prisma.production.findUnique({
+    where: {
+      Id: productionId,
+    },
+    select: {
+      SalesFrequency: true,
+    },
+  });
+
+  return production.SalesFrequency;
 };
 
 export default async function handle(req, res) {
   try {
     const prisma = await getPrismaClient(req);
     const bookingId = parseInt(req.body.bookingId);
-    let salesDate = new Date(req.body.salesDate);
+    const productionId = req.body.productionId;
 
-    const salesFrequency = req.body.frequency;
+    // control whether the previous sales are returned or not
+    // the value can be undefined if not supplied
+    const prevRequired = isUndefined(req.body.prevRequired) ? false : Boolean(req.body.prevRequired);
+
+    const salesFrequency = await getSalesFrequency(prisma, productionId);
     let dateField = salesFrequency === 'W' ? 'SetProductionWeekDate' : 'SetSalesFiguresDate';
+    const salesEntryDuration = salesFrequency === 'W' ? 7 : 1;
+    let currentSalesDate = salesFrequency === 'W' ? getMonday(req.body.salesDate) : req.body.salesDate;
 
     const data = await prisma.salesView.findMany({
       where: {
@@ -43,41 +89,31 @@ export default async function handle(req, res) {
         (a, b) => new Date(b.SetProductionWeekDate).getTime() - new Date(a.SetProductionWeekDate).getTime(),
       );
 
-      salesDate = new Date(sortedData[0].SetProductionWeekDate);
+      currentSalesDate = new Date(sortedData[0].SetProductionWeekDate);
       dateField = 'SetProductionWeekDate';
     }
 
-    const filtered = data.filter((sale) => removeTime(sale[dateField]).getTime() === removeTime(salesDate).getTime());
+    const currentSales = data.filter((sale) =>
+      compareDatesWithoutTime(sale[dateField], currentSalesDate.getTime(), '=='),
+    );
 
-    if (filtered.length > 0) {
-      const schoolReservations = filtered.find((sale) => sale.SaleTypeName === 'School Reservations');
-      const schoolSales = filtered.find((sale) => sale.SaleTypeName === 'School Sales');
-      const generalReservations = filtered.find((sale) => sale.SaleTypeName === 'General Reservations');
-      const generalSales = filtered.find((sale) => sale.SaleTypeName === 'General Sales');
+    let result = {
+      current: !isNullOrUndefined(currentSales) ? generateSalesObject(currentSales) : null,
+      previous: null,
+    };
 
-      const result = {
-        schools: {
-          seatsSold: schoolSales?.Seats === undefined ? '' : schoolSales.Seats,
-          seatsSoldVal: schoolSales?.Value === undefined ? '' : schoolSales.Value,
-          seatsReserved: schoolReservations?.Seats === undefined ? '' : schoolReservations.Seats,
-          seatsReservedVal: schoolReservations?.Value === undefined ? '' : schoolReservations.Value,
-        },
-        general: {
-          seatsSold: generalSales?.Seats === undefined ? '' : generalSales.Seats,
-          seatsSoldVal: generalSales?.Value === undefined ? '' : generalSales.Value,
-          seatsReserved: generalReservations?.Seats === undefined ? '' : generalReservations.Seats,
-          seatsReservedVal: generalReservations?.Value === undefined ? '' : generalReservations.Value,
-        },
-        setId: generalSales?.SetId,
-        setSaleFiguresDate: generalSales?.SetSalesFiguresDate,
-      };
-
-      res.status(200).json(result);
-    } else {
-      res.status(200).json({});
+    // if previous sales are required, filter the data and append to the result
+    if (prevRequired) {
+      const previousSalesDate = getDateDaysAway(currentSalesDate.getTime(), -salesEntryDuration);
+      const previousSales = data.filter((sale) =>
+        compareDatesWithoutTime(sale[dateField], previousSalesDate.getTime(), '=='),
+      );
+      result = { ...result, previous: !isNullOrUndefined(previousSales) ? generateSalesObject(previousSales) : null };
     }
+
+    res.status(200).json(result);
   } catch (err) {
     console.log(err);
-    res.status(500).json({ err: 'Error occurred getting current days sales.' });
+    res.status(500).json({ err: 'Error occurred getting current/previous days sales.' });
   }
 }

@@ -581,10 +581,18 @@ export const salesColDefs = (schoolDataAvail, isMarketing, booking, setSalesActi
           seatsChange = currentValue;
         } else {
           const previousRowData = params.api.getDisplayedRowAtIndex(rowIndex - 1).data;
-          const prevSchSeatsSold = previousRowData.schSeatsSold === '' ? 0 : parseInt(previousRowData.schSeatsSold);
-          const prevGenSeatsSold = previousRowData.genSeatsSold === '' ? 0 : parseInt(previousRowData.genSeatsSold);
-          const prevSchReserved = previousRowData.schReserved === '' ? 0 : parseInt(previousRowData.schReserved);
-          const prevGenReserved = previousRowData.genReserved === '' ? 0 : parseInt(previousRowData.genReserved);
+          const prevSchSeatsSold = isNullOrEmpty(previousRowData.schSeatsSold)
+            ? 0
+            : parseInt(previousRowData.schSeatsSold);
+          const prevGenSeatsSold = isNullOrEmpty(previousRowData.genSeatsSold)
+            ? 0
+            : parseInt(previousRowData.genSeatsSold);
+          const prevSchReserved = isNullOrEmpty(previousRowData.schReserved)
+            ? 0
+            : parseInt(previousRowData.schReserved);
+          const prevGenReserved = isNullOrEmpty(previousRowData.genReserved)
+            ? 0
+            : parseInt(previousRowData.genReserved);
           const prevSeats = prevSchSeatsSold + prevGenSeatsSold + prevSchReserved + prevGenReserved;
           seatsChange = currentValue - prevSeats;
         }

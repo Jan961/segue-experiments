@@ -5,8 +5,8 @@ import { useRecoilState, useRecoilValue } from 'recoil';
 import { bookingJumpState } from 'state/marketing/bookingJumpState';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import { SelectOption } from '../MarketingHome';
-import { getDateDaysAway, getMonday, newDate, toISO } from 'services/dateService';
-import { formatDecimalOnBlur, formatDecimalValue, isNullOrEmpty, isNullOrUndefined } from 'utils';
+import { newDate, toISO } from 'services/dateService';
+import { formatDecimalOnBlur, isNull, isNullOrEmpty, isNullOrUndefined } from 'utils';
 import { currencyState } from 'state/global/currencyState';
 import { UpdateWarningModal } from '../modal/UpdateWarning';
 import axios from 'axios';
@@ -46,12 +46,28 @@ interface SalesFigureSet {
 }
 
 export interface SalesEntryRef {
-  resetForm: (salesWeek: string) => void;
+  changeWeek: (salesWeek: string) => void;
 }
 
+const emptySalesSet = {
+  setId: 0,
+  general: {
+    seatsReserved: '0',
+    seatsReservedVal: '0.00',
+    seatsSold: '0',
+    seatsSoldVal: '0.00',
+  },
+  schools: {
+    seatsReserved: '0',
+    seatsReservedVal: '0.00',
+    seatsSold: '0',
+    seatsSoldVal: '0.00',
+  },
+};
+
 const Entry = forwardRef<SalesEntryRef>((_, ref) => {
-  const [prevSalesFigureSet, setPrevSalesFigureSet] = useState<SalesFigureSet>(null);
-  const [currSalesFigureSet, setCurrSalesFigureSet] = useState<SalesFigureSet>(null);
+  const [prevSalesFigureSet, setPrevSalesFigureSet] = useState<SalesFigureSet>(emptySalesSet);
+  const [currSalesFigureSet, setCurrSalesFigureSet] = useState<SalesFigureSet>(emptySalesSet);
   const [bookingHasSchoolSales, setBookingHasSchoolSales] = useState<boolean>(false);
   const [bookingSaleNotes, setBookingSaleNotes] = useState('');
   const [holdData, setHoldData] = useState([]);
@@ -71,7 +87,6 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
   const [generalErrors, setGeneralErrors] = useState([]);
   const [warningIssued, setWarningIssued] = useState<boolean>(false);
   const currency = useRecoilValue(currencyState);
-  const [salesApiAction, setSalesApiAction] = useState('create');
   const [finalSales, setFinalSales] = useState(false);
 
   const prodVenue = useMemo(() => {
@@ -159,7 +174,6 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
         setId,
         general: currFigs.general,
         schools: currFigs.schools,
-        action: salesApiAction,
       };
 
       const emptySchools = {
@@ -173,10 +187,10 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
         data = { ...data, schools: currFigs.schools };
       }
 
-      const response = await axios.post('/api/marketing/sales/entry/v2/upsert', data);
+      const { data: salesUpd } = await axios.post('/api/marketing/sales/entry/v2/upsert', data);
 
-      if (typeof response.data === 'object') {
-        const setIdObj = response.data as { setId: number; transaction: string };
+      if (typeof salesUpd === 'object') {
+        const setIdObj = salesUpd as { setId: number };
         setSetId(setIdObj.setId);
         setWarningIssued(false);
         setSchoolErrors([]);
@@ -278,119 +292,52 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
     copyPreviousWeeks();
   };
 
-  const getSalesFrequency = async () => {
+  const setSalesFigures = async (inputDate: UTCDate, bookingId: number) => {
     try {
-      const response = await axios.get(`/api/marketing/sales/tourWeeks/${productionJump.selected}`);
-
-      if (typeof response.data === 'object') {
-        const tourData = response.data as TourResponse;
-        if (tourData.frequency === undefined) {
-          return;
-        }
-
-        return tourData.frequency;
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  // helper function for setSalesFigures to reduce duplicate code
-  const createSalesFigure = (fig: SalesFigure | undefined) => ({
-    seatsReserved: fig?.seatsReserved,
-    seatsReservedVal: formatDecimalValue(fig?.seatsReservedVal),
-    seatsSold: fig?.seatsSold,
-    seatsSoldVal: formatDecimalValue(fig?.seatsSoldVal),
-  });
-
-  const setSalesFigures = async (inputDate: UTCDate, previous: boolean, bookingId: number) => {
-    try {
-      const emptySalesSet = {
-        setId: 0,
-        general: {
-          seatsReserved: '0',
-          seatsReservedVal: '0.00',
-          seatsSold: '0',
-          seatsSoldVal: '0.00',
-        },
-        schools: {
-          seatsReserved: '0',
-          seatsReservedVal: '0.00',
-          seatsSold: '0',
-          seatsSoldVal: '0.00',
-        },
-      };
-
-      // Set default sales figure set based on 'previous' flag
-      if (previous) {
-        setPrevSalesFigureSet(emptySalesSet);
-      } else {
-        setCurrSalesFigureSet(emptySalesSet);
-        setSalesApiAction('create');
-      }
-
       if (isNullOrUndefined(bookingId)) return;
-
-      const frequency = await getSalesFrequency();
-      const duration = frequency === 'W' ? 7 : 1;
-      let salesDate = frequency === 'W' ? getMonday(inputDate) : inputDate;
-
-      if (previous) salesDate = getDateDaysAway(salesDate, -duration);
-
-      const salesResponse = await axios.post('/api/marketing/sales/current/read', {
-        bookingId,
-        salesDate,
-        frequency,
-      });
-
-      const sales = salesResponse.data;
 
       let salesSetId = -1;
       let compHoldSetId = -1;
 
-      if (typeof sales === 'object' && !isNullOrEmpty(sales)) {
-        const salesFigures = sales as SalesFigureSet;
-        if (!previous) setSalesApiAction('update');
+      const { data: sales } = await axios.post('/api/marketing/sales/current/read', {
+        bookingId,
+        salesDate: inputDate,
+        prevRequired: true,
+        productionId: productionJump.selected,
+      });
 
-        const updatedSalesSet = {
-          general: createSalesFigure(salesFigures.general),
-          schools: createSalesFigure(salesFigures.schools),
-          setId: salesFigures.setId,
-        };
+      // if data returned from API is not null set the state variable so the form can be updated
+      isNull(sales.current) ? setCurrSalesFigureSet(emptySalesSet) : setCurrSalesFigureSet(sales.current);
+      isNull(sales.previous) ? setPrevSalesFigureSet(emptySalesSet) : setPrevSalesFigureSet(sales.previous);
 
-        if (previous) {
-          setPrevSalesFigureSet(updatedSalesSet);
-        } else {
-          salesSetId = salesFigures.setId;
-          setCurrSalesFigureSet(updatedSalesSet);
-        }
+      // set the setId from the current sales
+      salesSetId = sales?.current?.setId;
+
+      // remaining logic will be refactored as part of SK-566
+      // (the entire Holds/Comps functionality is broken)
+
+      const { data: holdCompList } = await axios.post('/api/marketing/sales/read/hold-comp', {
+        bookingId: bookings.selected,
+        salesDate,
+        prodctionId: productionJump.selected,
+      });
+
+      if (typeof holdCompList === 'object') {
+        const holdCompData = holdCompList as HoldCompSet;
+        setHoldData(holdCompData.holds);
+        setCompData(holdCompData.comps);
+        compHoldSetId = holdCompData.setId;
       }
 
-      if (!previous) {
-        const holdCompResponse = await axios.post('/api/marketing/sales/read/hold-comp', {
-          bookingId: bookings.selected,
-          salesDate,
-          prodctionId: productionJump.selected,
-        });
-
-        const holdCompList = holdCompResponse.data;
-        if (typeof holdCompList === 'object') {
-          const holdCompData = holdCompList as HoldCompSet;
-          setHoldData(holdCompData.holds);
-          setCompData(holdCompData.comps);
-          compHoldSetId = holdCompData.setId;
-        }
-
-        const booking = bookings.bookings.find((b) => b.Id === bookingId);
-        if (booking) {
-          setBookingSaleNotes(booking.BookingSalesNotes || '');
-          setCompNotes(booking.BookingCompNotes || '');
-          setHoldNotes(booking.BookingHoldNotes || '');
-          setBookingHasSchoolSales(booking.BookingHasSchoolsSales);
-        }
-
-        setSetId(salesSetId > -1 ? salesSetId : compHoldSetId > -1 ? compHoldSetId : -1);
+      const booking = bookings.bookings.find((b) => b.Id === bookingId);
+      if (booking) {
+        setBookingSaleNotes(booking.BookingSalesNotes || '');
+        setCompNotes(booking.BookingCompNotes || '');
+        setHoldNotes(booking.BookingHoldNotes || '');
+        setBookingHasSchoolSales(booking.BookingHasSchoolsSales);
       }
+
+      setSetId(salesSetId > -1 ? salesSetId : compHoldSetId > -1 ? compHoldSetId : -1);
     } catch (error) {
       console.error(error);
     }
@@ -481,8 +428,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
 
           // else get the sales figures from the database
         } else {
-          setSalesFigures(inputDate, false, bookings.selected);
-          setSalesFigures(inputDate, true, bookings.selected);
+          setSalesFigures(inputDate, bookings.selected);
         }
       } catch (error) {
         console.log(error);
@@ -511,12 +457,12 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
   // }, []);
 
   useImperativeHandle(ref, () => ({
-    resetForm: (week) => {
+    changeWeek: (week) => {
       const updatedDate = week ? newDate(week) : null;
       setSalesDate(updatedDate);
+      console.log(updatedDate);
       if (updatedDate) {
-        setSalesFigures(newDate(week), false, null);
-        setSalesFigures(newDate(week), true, null);
+        setSalesFigures(updatedDate, bookings.selected);
       }
     },
   }));
@@ -722,7 +668,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                               className="w-[137px] h-[31px] flex flex-col -mt-1"
                               placeholder="Enter Value"
                               id="schSeatsReservedVal"
-                              value={currSalesFigureSet.schools.seatsReservedVal}
+                              value={currSalesFigureSet?.schools?.seatsReservedVal}
                               onFocus={(event) => event?.target?.select?.()}
                               pattern={/^\d*(\.\d*)?$/}
                               onChange={(event) =>

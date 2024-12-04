@@ -1,5 +1,6 @@
 import Layout from 'components/Layout';
-import { SalesEntryRef } from 'components/marketing/activity/GlobalActivityView';
+import { SalesEntryRef } from 'components/marketing/sales/Entry';
+
 import SalesEntryFilters from 'components/marketing/SalesEntryFilters';
 import { bookingMapperWithVenue, venueRoleMapper } from 'lib/mappers';
 import { InitialState } from 'lib/recoil';
@@ -18,7 +19,7 @@ const Index = () => {
 
   const handleDateChanged = (salesWeek) => {
     if (salesEntryRef.current) {
-      salesEntryRef.current.resetForm(salesWeek);
+      salesEntryRef.current.changeWeek(salesWeek);
     }
   };
 
