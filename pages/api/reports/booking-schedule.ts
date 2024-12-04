@@ -13,12 +13,13 @@ import { makeRowTextBoldAndAllignLeft } from './promoter-holds';
 import { convertToPDF } from 'utils/report';
 import { addBorderToAllCells } from 'utils/export';
 import { bookingStatusMap } from 'config/bookings';
-import { add, parseISO, differenceInDays } from 'date-fns';
+import { add, parseISO } from 'date-fns';
 import {
   calculateWeekNumber,
   dateTimeToTime,
   formatDate,
   getDateDaysAway,
+  getDifferenceInDays,
   newDate,
   timeFormat,
 } from 'services/dateService';
@@ -226,7 +227,8 @@ const handler = async (req, res) => {
     worksheet.addRow([]);
 
     const map: { [key: string]: SCHEDULE_VIEW } = formattedData.reduce((acc, x) => ({ ...acc, [getKey(x)]: x }), {});
-    const daysDiff = differenceInDays(parseISO(to), parseISO(from));
+    // +1 is to include end date in the calculation
+    const daysDiff = getDifferenceInDays(from, to);
     let rowNo = 8;
     let prevProductionWeekNum = '';
     let lastWeekMetaInfo = {

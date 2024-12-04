@@ -15,8 +15,15 @@ import { bookingStatusMap } from 'config/bookings';
 import { addBorderToAllCells } from 'utils/export';
 import { PerformanceInfo, SCHEDULE_VIEW, getSheduleReport } from 'services/reports/schedule-report';
 import { sum } from 'radash';
-import { formatDate, getDateDaysAway, getTimeFormattedFromDateTime, newDate, timeFormat } from 'services/dateService';
-import { differenceInDays, isSameDay } from 'date-fns';
+import {
+  formatDate,
+  getDateDaysAway,
+  getDifferenceInDays,
+  getTimeFormattedFromDateTime,
+  newDate,
+  timeFormat,
+} from 'services/dateService';
+import { isSameDay } from 'date-fns';
 
 const makeRowBold = ({ worksheet, row }: { worksheet: any; row: number }) => {
   worksheet.getRow(row).font = { bold: true };
@@ -83,7 +90,7 @@ const handler = async (req, res) => {
         EntryDate: 'asc',
       },
     });
-
+    console.log('Data Length: ', formatedFromDate, formatedToDate, data.length);
     const bookingIdPerformanceMap: Record<number, PerformanceInfo[]> = {};
     const bookingIdList: number[] =
       data.map((entry) => (entry.EntryType === 'Booking' ? entry.EntryId : null)).filter((id) => id) || [];
@@ -174,7 +181,8 @@ const handler = async (req, res) => {
     worksheet.addRow([]);
 
     const map: { [key: string]: SCHEDULE_VIEW } = formattedData.reduce((acc, x) => ({ ...acc, [getKey(x)]: x }), {});
-    const daysDiff = differenceInDays(to, from); // tt
+    // +1 is to include end date in the calculation
+    const daysDiff = getDifferenceInDays(from, to) + 1; // tt
     let rowNo = 8;
     let prevProductionWeekNum = '';
     let lastWeekMetaInfo = {
