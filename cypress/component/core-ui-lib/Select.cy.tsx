@@ -22,7 +22,7 @@ const setupScrollableDiv = (options: SelectOption[]) => {
         {/* Content that exceeds the div's height */}
         <Select options={options} onChange={cy.stub()} closeMenuOnScroll={true} />
         {Array.from({ length: numberOfElements }, (_, i) => (
-          <h1>Item {i}</h1>
+          <h1 key={i}>Item {i}</h1>
         ))}
         <h1 data-testid="last-item">Item 19</h1>
       </div>
