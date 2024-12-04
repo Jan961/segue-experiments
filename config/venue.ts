@@ -167,7 +167,7 @@ export const initialVenueAddressDetails = {
   primaryEMail: '',
   what3WordsStage: '',
   what3WordsLoading: '',
-  primaryWhat3Words: '',
+  what3WordsEntrance: '',
   primaryCoordinates: { latitude: null, longitude: null },
 };
 

@@ -6,12 +6,14 @@ import { globalState } from 'state/global/globalState';
 import { isNullOrEmpty } from 'utils';
 import { getMenuItems } from 'components/PopoutMenu/config';
 import useStrings from './useStrings';
+import axios from 'axios';
 
 const usePermissions = () => {
   const { isSignedIn, user } = useUser();
   const getStrings = useStrings();
   const [permissionState, setPermissionsState] = useRecoilState(userPermissionsState);
   const setGlobalState = useSetRecoilState(globalState);
+  const userOrganisationId = useMemo(() => user?.unsafeMetadata?.organisationId as string, [user]);
 
   const menuItems = useMemo(() => getMenuItems(getStrings), [getStrings]);
 
@@ -64,7 +66,17 @@ const usePermissions = () => {
     }
   };
 
-  return { isSignedIn, setUserPermissions };
+  const updatePermissions = async (organisationId = userOrganisationId) => {
+    if (!organisationId) return;
+    try {
+      const { data } = await axios(`/api/user/permissions/read?organisationId=${organisationId}`);
+      setUserPermissions(organisationId, data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  return { isSignedIn, setUserPermissions, updatePermissions, user };
 };
 
 export default usePermissions;
