@@ -9,10 +9,12 @@ describe('TreeSelect Component', () => {
       id: '1',
       label: 'Option 1',
       checked: false,
-      children: [
+      value: 'Option 1',
+      options: [
         {
           id: '1-1',
           label: 'Option 1-1',
+          value: 'Option 1-1',
           checked: false,
         },
       ],
@@ -20,6 +22,7 @@ describe('TreeSelect Component', () => {
     {
       id: '2',
       label: 'Option 2',
+      value: 'Option 2',
       checked: false,
     },
   ];
@@ -130,6 +133,7 @@ describe('TreeSelect Component', () => {
         id: '3',
         label: 'Option 3',
         checked: false,
+        value: 'Option 3',
       },
     ];
     mount(
