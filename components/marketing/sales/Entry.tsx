@@ -423,10 +423,9 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
         });
 
         // if general.seatsSold is not an empty string - show final sales warning opposed to Sales Entry form
+        // else get the sales figures from the database
         if (!isNullOrEmpty(finalSales?.general?.seatsSold)) {
           setFinalSales(true);
-
-          // else get the sales figures from the database
         } else {
           setSalesFigures(inputDate, bookings.selected);
         }

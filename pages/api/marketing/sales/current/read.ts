@@ -1,7 +1,7 @@
 import getPrismaClient from 'lib/prisma';
 import { PrismaClient } from 'prisma/generated/prisma-client';
 import { compareDatesWithoutTime, getDateDaysAway, getMonday } from 'services/dateService';
-import { formatDecimalValue, isNullOrUndefined, isUndefined } from 'utils';
+import { formatDecimalValue, isNullOrUndefined } from 'utils';
 
 const generateSalesObject = (sales) => {
   const schoolReservations = sales.find((sale) => sale.SaleTypeName === 'School Reservations');
@@ -12,20 +12,16 @@ const generateSalesObject = (sales) => {
   return sales.length > 0
     ? {
         schools: {
-          seatsSold: isNullOrUndefined(schoolSales?.Seats) ? '' : schoolSales.Seats,
-          seatsSoldVal: isNullOrUndefined(schoolSales?.Value) ? '' : formatDecimalValue(schoolSales.Value),
-          seatsReserved: isNullOrUndefined(schoolReservations?.Seats) ? '' : schoolReservations.Seats,
-          seatsReservedVal: isNullOrUndefined(schoolReservations?.Value)
-            ? ''
-            : formatDecimalValue(schoolReservations.Value),
+          seatsSold: schoolSales?.Seats || '',
+          seatsSoldVal: formatDecimalValue(schoolSales?.Value),
+          seatsReserved: schoolReservations?.Seats || '',
+          seatsReservedVal: formatDecimalValue(schoolReservations?.Value),
         },
         general: {
-          seatsSold: isNullOrUndefined(generalSales?.Seats) ? '' : generalSales.Seats,
-          seatsSoldVal: isNullOrUndefined(generalSales?.Value) ? '' : formatDecimalValue(generalSales.Value),
-          seatsReserved: isNullOrUndefined(generalReservations?.Seats) ? '' : generalReservations.Seats,
-          seatsReservedVal: isNullOrUndefined(generalReservations?.Value)
-            ? ''
-            : formatDecimalValue(generalReservations.Value),
+          seatsSold: generalSales?.Seats || '',
+          seatsSoldVal: formatDecimalValue(generalSales?.Value),
+          seatsReserved: generalReservations?.Seats || '',
+          seatsReservedVal: formatDecimalValue(generalReservations?.Value),
         },
         setId: generalSales?.SetId,
         setSaleFiguresDate: generalSales?.SetSalesFiguresDate,
@@ -54,7 +50,7 @@ export default async function handle(req, res) {
 
     // control whether the previous sales are returned or not
     // the value can be undefined if not supplied
-    const prevRequired = isUndefined(req.body.prevRequired) ? false : Boolean(req.body.prevRequired);
+    const prevRequired = !!req.body.prevRequired;
 
     const salesFrequency = await getSalesFrequency(prisma, productionId);
     let dateField = salesFrequency === 'W' ? 'SetProductionWeekDate' : 'SetSalesFiguresDate';
