@@ -5,7 +5,7 @@ export const INITIAL_STATE = {
     isDateTypeOnly: false,
     dateType: null,
     venueId: null,
-    shouldFilterVenues: true,
+    shouldFilterVenues: false,
     isRunOfDates: true,
   },
   bookingConflicts: [],
