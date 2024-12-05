@@ -71,3 +71,5 @@ storybook-static/
 cypress/reports/
 mochawesome-report/
 cypress/screenshots/
+cypress/downloads/
+component_test_report.json

@@ -49,8 +49,12 @@ pipelines:
             - echo $TEST_APP_ENV | base64 --decode --ignore-garbage > .env
             - cat .env
             - npm run build
-            - cd ..
+            # Run cypress component tests
+            - npm run cy:components
+            # generate component report
+            - npm run cy:report
             # Clone the Cypress repository into a dir at the same level as Segue
+            - cd ..
             - git clone git@bitbucket.org:segue-team/cypress.git && cd cypress
             - npm install
             - npx cypress install
@@ -66,13 +70,11 @@ pipelines:
             - set -e # Re-enable exit on error for the rest of the script
             - cd cypress
             - echo "Merging reports"
-            # Merge reports from different spec files
-            - npx mochawesome-merge cypress/results/*.json -o output.json
-            # Generate HTML report from merged JSON
-            - npx marge output.json
-            # Generate email report template HTML file that will form the body of the email
+            # Merge reports from different spec files and generate an HTML report
+            - npm run merge-reports
+            # Generate email report  template HTML file containing both component and integration test results that will form the body of the email
             - node create-email-report
-            # Zip the full report directory - this is commanded out for now - I can add upload to the repo later if needed
+            # Zip the full report directory - this is commented out for now - I can add upload to the repo later if needed
             #zip -r full-report.zip mochawesome-report/
 
             # Use pre-built Atlassian email-notify pipe with the variables as below to send email with test results

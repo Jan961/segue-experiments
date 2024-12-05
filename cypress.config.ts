@@ -9,7 +9,7 @@ export default defineConfig({
     reporter: 'mochawesome',
     reporterOptions: {
       useInlineDiffs: true,
-      embeddedScreenshots: true,
+      embeddedScreenshots: false,
       reportDir: 'cypress/results',
       reportFilename: '[name].html',
       overwrite: true,

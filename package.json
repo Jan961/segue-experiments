@@ -20,7 +20,7 @@
     "cy:open": "cypress open",
     "cy:ci": "npx cypress run",
     "cy:components": "cypress run --component --headless --spec cypress/component/**/**.cy.tsx",
-    "cy:report": "npx mochawesome-merge cypress/results/*.json -o component_test_report.json && marge component_test_report.json",
+    "cy:report": "mochawesome-merge cypress/results/*.json -o component_test_report.json && marge component_test_report.json",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "db-dev": "prisma studio --schema prisma/schema_client.prisma",
