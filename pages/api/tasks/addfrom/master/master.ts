@@ -1,80 +1,85 @@
-import { NextApiRequest, NextApiResponse } from 'next';
 import getPrismaClient from 'lib/prisma';
-import { getMaxProductionTaskCode } from 'services/TaskService';
+import { NextApiRequest, NextApiResponse } from 'next';
+
+import { getMaxMasterTaskCode } from 'services/TaskService';
 import { isNullOrEmpty } from 'utils';
-import { SelectedTask, handleRecurringTask, handleSingleTask } from 'services/tasks/moveTasks';
+import { omit } from 'radash';
 
-interface TaskRequest {
-  selectedTaskList: SelectedTask[];
-  ProductionId: number;
-}
-
-const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
-
-  const prisma = await getPrismaClient(req);
-
+export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const { selectedTaskList, ProductionId } = req.body as TaskRequest;
+    const { selectedTaskList } = req.body;
 
-    if (!Array.isArray(selectedTaskList) || !ProductionId) {
-      return res.status(400).json({ error: 'Invalid request body' });
-    }
+    const prisma = await getPrismaClient(req);
 
-    const result = await prisma.$transaction(async (tx) => {
-      const productionWeeks = await tx.dateBlock.findFirst({
-        where: {
-          ProductionId,
-          Name: 'Production',
-        },
-        select: { StartDate: true, EndDate: true },
-      });
+    const taskList = selectedTaskList.map(async (task) => {
+      const { Code } = await getMaxMasterTaskCode(req);
+      if (!isNullOrEmpty(task.MTRId)) {
+        const {
+          Interval,
+          FromWeekNum,
+          ToWeekNum,
+          Name,
+          StartByWeekNum,
+          CompleteByWeekNum,
+          Priority,
+          TaskAssignedToAccUserId,
+          Notes,
+        } = task;
 
-      if (!productionWeeks) {
-        throw new Error('Production dates not found');
+        const newRepeatingTask = await prisma.masterTaskRepeat.create({
+          data: {
+            FromWeekNum,
+            ToWeekNum,
+            Interval,
+            FromWeekNumIsPostProduction: false,
+            ToWeekNumIsPostProduction: false,
+          },
+        });
+
+        return await prisma.masterTask.create({
+          data: {
+            Name,
+            StartByWeekNum,
+            CompleteByWeekNum,
+            Priority,
+            TaskAssignedToAccUserId,
+            Notes,
+            Code: Code + 1,
+            CopiedFrom: 'D',
+            CopiedId: task.MTRId,
+            MTRId: newRepeatingTask.Id,
+          },
+        });
+      } else {
+        const filteredTask = omit(task, [
+          'Id',
+          'TaskRepeatFromWeekNum',
+          'TaskRepeatToWeekNum',
+          'RepeatInterval',
+          'ProductionId',
+          'Progress',
+          'CompleteByIsPostProduction',
+          'StartByIsPostProduction',
+          'PRTId',
+          'MasterTaskRepeat',
+        ]);
+        return await prisma.masterTask.create({
+          data: {
+            ...filteredTask,
+            TaskStartByIsPostProduction: false,
+            TaskCompleteByIsPostProduction: false,
+            Code: Code + 1,
+            CopiedFrom: 'M',
+            CopiedId: task.Id,
+            Name: task.Name,
+          },
+        });
       }
-
-      const { StartDate: prodStartDate, EndDate: prodEndDate } = productionWeeks;
-      const counter = 1;
-
-      // Get the initial max code outside the loop to prevent race conditions
-      const baseCode = await getMaxProductionTaskCode(ProductionId, req);
-
-      // Process all tasks sequentially within the transaction
-      const results = [];
-      for (let i = 0; i < selectedTaskList.length; i++) {
-        const task = selectedTaskList[i];
-
-        if (!isNullOrEmpty(task?.MTRId)) {
-          const recurringResult = await handleRecurringTask(
-            task,
-            ProductionId,
-            productionWeeks,
-            prodStartDate,
-            counter,
-            req,
-            tx,
-          );
-          results.push(recurringResult);
-        } else {
-          const singleResult = await handleSingleTask(task, ProductionId, prodStartDate, prodEndDate, i, tx, baseCode);
-          results.push(singleResult);
-        }
-      }
-
-      return results;
     });
 
-    return res.status(200).json(result);
-  } catch (error) {
-    console.error('Moving tasks failed:', error);
-    return res.status(500).json({
-      error: 'Error processing tasks',
-      message: error instanceof Error ? error.message : 'Unknown error',
-    });
+    return res.status(200).json(taskList);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ error: 'Error creating adding from Master Task' });
   }
-};
-
-export default handler;
+}

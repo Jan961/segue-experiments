@@ -28,10 +28,11 @@ export const handleRecurringTask = async (
   tx: Prisma.TransactionClient,
 ) => {
   // Create recurring task record
+  const { RepeatInterval, TaskRepeatFromWeekNum, TaskRepeatToWeekNum } = task;
   const recurringTaskRecord = {
-    FromWeekNum: task.TaskRepeatFromWeekNum,
-    ToWeekNum: task.TaskRepeatToWeekNum,
-    Interval: task.RepeatInterval,
+    FromWeekNum: TaskRepeatFromWeekNum,
+    ToWeekNum: TaskRepeatToWeekNum,
+    Interval: RepeatInterval,
     FromWeekNumIsPostProduction: false,
     ToWeekNumIsPostProduction: false,
   };
@@ -46,9 +47,9 @@ export const handleRecurringTask = async (
     CompleteByWeekNum: task.CompleteByWeekNum,
     Priority: task.Priority,
     Progress: 0,
-    RepeatInterval: task.RepeatInterval,
-    TaskRepeatFromWeekNum: task.TaskRepeatFromWeekNum,
-    TaskRepeatToWeekNum: task.TaskRepeatToWeekNum,
+    RepeatInterval,
+    TaskRepeatFromWeekNum,
+    TaskRepeatToWeekNum,
     TaskCompletedDate: null,
     TaskAssignedToAccUserId: task.TaskAssignedToAccUserId,
     ProductionId,
