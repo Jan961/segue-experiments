@@ -1,32 +1,10 @@
-import { mount } from 'cypress/react';
+import { mount } from 'cypress/react18';
 import TreeSelect from '../../../components/global/TreeSelect';
 import { TreeItemOption } from '../../../components/global/TreeSelect/types';
 import BaseComp from '../helpers/BaseComp'; // Assuming BaseComp is available
+import options from '../helpers/TreeSelectOptions';
 
 describe('TreeSelect Component', () => {
-  const options: TreeItemOption[] = [
-    {
-      id: '1',
-      label: 'Option 1',
-      checked: false,
-      value: 'Option 1',
-      options: [
-        {
-          id: '1-1',
-          label: 'Option 1-1',
-          value: 'Option 1-1',
-          checked: false,
-        },
-      ],
-    },
-    {
-      id: '2',
-      label: 'Option 2',
-      value: 'Option 2',
-      checked: false,
-    },
-  ];
-
   function setup(props) {
     mount(
       <BaseComp>
@@ -35,24 +13,33 @@ describe('TreeSelect Component', () => {
     );
   }
 
+  function expandAll() {
+    cy.get('[data-testid="tree-item-close"]').click({ multiple: true });
+    // break up the clicks avoid cypress errors
+    cy.get('[data-testid="tree-item-close"]').eq(0).click();
+    cy.get('[data-testid="tree-item-close"]').click();
+  }
+
   it('should render the component with given options', () => {
     const onChange = cy.stub().as('onChange');
     setup({ options, onChange });
     // Check that the 'Select All' checkbox is rendered
     cy.get('[data-testid="tree-select-select-all"]').should('exist');
-    // Check that the options are rendered
-    cy.get('[data-testid="tree-item"]').should('have.length', options.length);
+    // Check that the options are rendered - +1 for 'Select All'
+    cy.get('[id*="form-input-checkbox"]').should('have.length', options.length + 1);
   });
 
   it('should select all options when "Select All" is checked', () => {
     const onChange = cy.stub().as('onChange');
     setup({ options, onChange });
     // Click on 'Select All' checkbox
-    cy.get('[data-testid="tree-select-select-all"]').find('input').check();
-    // All options should be checked
-    cy.get('[data-testid="tree-item"]').each(($el) => {
-      cy.wrap($el).find('input[type="checkbox"]').should('be.checked');
+    cy.get('#form-input-checkbox-select-all').check();
+    // Expand all options and see if they are checked
+    expandAll();
+    cy.get('input[type="checkbox"]').each(($el) => {
+      cy.wrap($el).should('be.checked');
     });
+
     // onChange should be called with updated options
     cy.get('@onChange').should('have.been.called');
     cy.get('@onChange').should(
@@ -65,16 +52,22 @@ describe('TreeSelect Component', () => {
 
   it('should unselect all options when "Select All" is unchecked', () => {
     const onChange = cy.stub().as('onChange');
-    // Start with options all checked
-    const checkedOptions = options.map((opt) => ({ ...opt, checked: true }));
-    setup({ options: checkedOptions, onChange });
-    // 'Select All' should be checked
-    cy.get('[data-testid="tree-select-select-all"]').find('input').should('be.checked');
-    // Uncheck 'Select All'
-    cy.get('[data-testid="tree-select-select-all"]').find('input').uncheck();
+
+    setup({ options, onChange });
+    expandAll();
+
+    // check some options
+    cy.get('input[type="checkbox"]').eq(3).click();
+    cy.get('input[type="checkbox"]').eq(4).click();
+    cy.get('input[type="checkbox"]').eq(7).click();
+    cy.get('input[type="checkbox"]').eq(10).click();
+
+    //Click  'Select All' twice
+    cy.get('[data-testid="tree-select-select-all"]').click().click();
+
     // All options should be unchecked
-    cy.get('[data-testid="tree-item"]').each(($el) => {
-      cy.wrap($el).find('input[type="checkbox"]').should('not.be.checked');
+    cy.get('input[type="checkbox"]').each(($el) => {
+      cy.wrap($el).should('not.be.checked');
     });
     // onChange should be called with updated options
     cy.get('@onChange').should('have.been.called');
@@ -90,15 +83,21 @@ describe('TreeSelect Component', () => {
     const onChange = cy.stub().as('onChange');
     setup({ options, onChange });
     // Initially, 'Select All' should be unchecked
-    cy.get('[data-testid="tree-select-select-all"]').find('input').should('not.be.checked');
-    // Check an individual option
-    cy.get('[data-testid="tree-item"]').first().find('input[type="checkbox"]').check();
-    // 'Select All' should still be unchecked
-    cy.get('[data-testid="tree-select-select-all"]').find('input').should('not.be.checked');
-    // Check all options
-    cy.get('[data-testid="tree-item"]').find('input[type="checkbox"]').check({ multiple: true });
-    // 'Select All' should be checked
-    cy.get('[data-testid="tree-select-select-all"]').find('input').should('be.checked');
+    cy.get('[data-testid="tree-select-select-all"]').should('not.be.checked');
+    expandAll();
+    // select the two top-level options
+    cy.get('[data-testid="Option 1"]').click();
+    cy.get('[data-testid="Option 2"]').click();
+
+    // All checkboxes, including 'Select All', should be checked
+    cy.get('input[type="checkbox"]').each(($el) => {
+      cy.wrap($el).should('be.checked');
+    });
+
+    // Uncheck one grandchild option
+    cy.get('[data-testid="Option 1-1-1"]').click();
+    // 'Select All' should be unchecked
+    cy.get('[data-testid="tree-select-select-all"]').should('not.be.checked');
   });
 
   it('should disable all options when disabled prop is true', () => {
