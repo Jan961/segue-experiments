@@ -224,7 +224,7 @@ describe('TreeItem Component', () => {
     setup({ value: nonLeafNode, onChange, defaultOpen: true });
 
     // Select one child
-    cy.get(`input[type="checkbox"][id="child-6"]`).click();
+    cy.get(`input[type="checkbox"][id="form-input-checkbox-child-6"]`).click();
 
     // Parent should now be in intermediate state
     cy.get(`input[type="checkbox"][id="form-input-checkbox-${nonLeafNode.id}"]`).should(
