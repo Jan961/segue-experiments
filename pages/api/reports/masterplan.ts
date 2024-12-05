@@ -220,8 +220,7 @@ const handler = async (req, res) => {
       isBold: true,
     });
 
-    // +1 to include the end date in calculation
-    const daysDiff = getDifferenceInDays(fromDate, toDate) + 1;
+    const daysDiff = getDifferenceInDays(fromDate, toDate, null, null, true);
 
     const minRehearsalStartTimeInEpoch = data.reduce((acc, x) => {
       if (x.RehearsalStartDate && new Date(x.RehearsalStartDate).getTime() < acc) {

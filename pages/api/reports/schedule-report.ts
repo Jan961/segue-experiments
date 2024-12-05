@@ -90,7 +90,6 @@ const handler = async (req, res) => {
         EntryDate: 'asc',
       },
     });
-    console.log('Data Length: ', formatedFromDate, formatedToDate, data.length);
     const bookingIdPerformanceMap: Record<number, PerformanceInfo[]> = {};
     const bookingIdList: number[] =
       data.map((entry) => (entry.EntryType === 'Booking' ? entry.EntryId : null)).filter((id) => id) || [];
@@ -181,8 +180,7 @@ const handler = async (req, res) => {
     worksheet.addRow([]);
 
     const map: { [key: string]: SCHEDULE_VIEW } = formattedData.reduce((acc, x) => ({ ...acc, [getKey(x)]: x }), {});
-    // +1 is to include end date in the calculation
-    const daysDiff = getDifferenceInDays(from, to) + 1; // tt
+    const daysDiff = getDifferenceInDays(from, to, null, null, true);
     let rowNo = 8;
     let prevProductionWeekNum = '';
     let lastWeekMetaInfo = {

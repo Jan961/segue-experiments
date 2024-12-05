@@ -645,6 +645,7 @@ export const getDifferenceInDays = (
   toDate: string | UTCDate | number,
   fromLocale?: Locale,
   toLocale?: Locale,
+  includeLastDate = false,
 ): number => {
   if (!fromDate || !toDate) {
     return null;
@@ -657,7 +658,12 @@ export const getDifferenceInDays = (
     return null;
   }
 
-  return differenceInDays(tDate, fDate);
+  let difference = differenceInDays(tDate, fDate);
+  if (includeLastDate) {
+    difference += 1;
+  }
+
+  return difference;
 };
 
 /**
