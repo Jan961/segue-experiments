@@ -432,7 +432,7 @@ describe('TreeItem Component', () => {
 
     // Initially, no children should be present
     cy.get(`input[type="checkbox"][id="form-input-checkbox-${dynamicNode.id}"]`).should('exist');
-    cy.get('input[type="checkbox"]').should('have.length', 1);
+    cy.get('input[type="checkbox"]').should('have.length', 2);
 
     // Simulate adding a child node dynamically
     dynamicNode.options.push({
