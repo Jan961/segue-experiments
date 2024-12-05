@@ -47,6 +47,7 @@ export const getMenuItems = (getStrings): MenuItem[] => [
         value: '/bookings',
         labelClass: leve2,
         testId: 'sidepanel-bookings-home',
+        permission: 'ACCESS_BOOKING_HOME',
       },
       {
         id: '22',
