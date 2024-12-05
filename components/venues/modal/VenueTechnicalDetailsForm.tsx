@@ -13,6 +13,7 @@ interface VenueTechnicalDetailsFormProps {
   updateValidationErrrors?: (key: string, value: string) => void;
   setFileList: (data: any) => void;
   setDeleteList: (data: any) => void;
+  disabled?: boolean;
 }
 
 const VenueTechnicalDetailsForm = ({
@@ -22,6 +23,7 @@ const VenueTechnicalDetailsForm = ({
   updateValidationErrrors,
   setFileList,
   setDeleteList,
+  disabled,
 }: VenueTechnicalDetailsFormProps) => {
   const [formData, setFormData] = useState<Partial<UiTransformedVenue>>({ ...initialVenueTechnicalDetails, ...venue });
 
@@ -54,12 +56,18 @@ const VenueTechnicalDetailsForm = ({
               inputClassName="w-full"
               value={formData.techSpecsUrl}
               onChange={(e) => handleInputChange('techSpecsUrl', e.target.value)}
+              disabled={disabled}
             />
           </label>
           {validationErrors.techSpecsUrl && <small className="text-primary-red">{validationErrors.techSpecsUrl}</small>}
         </div>
       </div>
-      <TechSpecTable venueId={venue.id} setFilesToSend={setFileList} setFilesToDelete={setDeleteList} />
+      <TechSpecTable
+        venueId={venue.id}
+        setFilesToSend={setFileList}
+        setFilesToDelete={setDeleteList}
+        disabled={disabled}
+      />
       <div className="grid grid-cols-2 gap-5 pt-5">
         <div className="flex flex-col gap-5">
           <label htmlFor="" className="grid grid-cols-[100px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
@@ -71,6 +79,7 @@ const VenueTechnicalDetailsForm = ({
               inputClassName="w-full"
               value={formData.techLXDesk}
               onChange={(e) => handleInputChange('techLXDesk', e.target.value)}
+              disabled={disabled}
             />
           </label>
           <label htmlFor="" className="grid grid-cols-[100px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
@@ -81,6 +90,7 @@ const VenueTechnicalDetailsForm = ({
               className="!w-full max-h-40 min-h-[50px]  justify-between"
               value={formData.techLXNotes}
               onChange={(e) => handleInputChange('techLXNotes', e.target.value)}
+              disabled={disabled}
             />
           </label>
           <label htmlFor="" className="grid grid-cols-[100px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
@@ -92,6 +102,7 @@ const VenueTechnicalDetailsForm = ({
               inputClassName="w-full"
               value={formData.stageSize}
               onChange={(e) => handleInputChange('stageSize', e.target.value)}
+              disabled={disabled}
             />
           </label>
         </div>
@@ -106,6 +117,7 @@ const VenueTechnicalDetailsForm = ({
               inputClassName="w-full"
               value={formData.soundDesk}
               onChange={(e) => handleInputChange('soundDesk', e.target.value)}
+              disabled={disabled}
             />
           </label>
           <label htmlFor="" className="grid grid-cols-[100px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
@@ -117,6 +129,7 @@ const VenueTechnicalDetailsForm = ({
               className="!w-full max-h-40 min-h-[50px]  justify-between"
               value={formData.soundNotes}
               onChange={(e) => handleInputChange('soundNotes', e.target.value)}
+              disabled={disabled}
             />
           </label>
           <label htmlFor="" className="grid grid-cols-[100px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
@@ -129,6 +142,7 @@ const VenueTechnicalDetailsForm = ({
               inputClassName="w-full"
               value={formData.gridHeight}
               onChange={(e) => handleInputChange('gridHeight', e.target.value)}
+              disabled={disabled}
             />
           </label>
         </div>
@@ -141,6 +155,7 @@ const VenueTechnicalDetailsForm = ({
             className="w-full max-h-40 min-h-[50px]  justify-between"
             value={formData.flags}
             onChange={(e) => handleInputChange('flags', e.target.value)}
+            disabled={disabled}
           />
         </label>
       </div>

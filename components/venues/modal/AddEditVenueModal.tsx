@@ -32,6 +32,7 @@ interface AddEditVenueModalProps {
   onClose: (isSuccess?: boolean) => void;
   fetchVenues: (payload?: any) => Promise<void>;
   setIsLoading: (bool: boolean) => void;
+  disabled?: boolean;
 }
 
 export default function AddEditVenueModal({
@@ -43,6 +44,7 @@ export default function AddEditVenueModal({
   onClose,
   fetchVenues,
   setIsLoading,
+  disabled,
 }: AddEditVenueModalProps) {
   const permissions = useRecoilValue(accessBookingsHome);
   const [formData, setFormData] = useState({ ...initialVenueState, ...(venue || {}) });
@@ -103,14 +105,15 @@ export default function AddEditVenueModal({
         const addressUrl = `${process.env.NEXT_PUBLIC_ADDRESS_LOOKUP_URL_START}${query}${process.env.NEXT_PUBLIC_ADDRESS_LOOKUP_URL_END}`;
         const response = await fetch(addressUrl, { method: 'GET' });
         const result = await response.json();
-        const { primaryWhat3Words } = formData;
+        const { what3WordsEntrance } = formData;
+        // If coords not found from address input
         if (result.length === 0) {
-          //  address failed then they entered what3words
-          if (primaryWhat3Words !== '' && addressAttempted) {
-            if (primaryWhat3Words.split('.').length === 3) {
+          // Address failed initially then they entered what3words
+          if (what3WordsEntrance !== '' && addressAttempted) {
+            if (what3WordsEntrance.split('.').length === 3) {
               const wordsResponse = await axios.get('/api/address/check-what-three-words', {
                 params: {
-                  searchTerm: primaryWhat3Words,
+                  searchTerm: what3WordsEntrance,
                 },
               });
               const { status, data } = wordsResponse;
@@ -122,10 +125,10 @@ export default function AddEditVenueModal({
               setAddressAttempted(false);
               setShowAddressMessage('UsingWhat3Words');
             }
-          } else if (primaryWhat3Words === '' && addressAttempted) {
+          }
+          // Address failed and no value was entered for what 3 words
+          else if (what3WordsEntrance === '' && addressAttempted) {
             setShowAddressMessage('NotUsingWhat3Words');
-          } else if (primaryWhat3Words !== '') {
-            // request server to check if the what3words is valid, if so then confirm usage
           } else {
             setShowAddressMessage('NotFound');
             setAddressAttempted(true);
@@ -272,7 +275,7 @@ export default function AddEditVenueModal({
       />
       <PopupModal
         onClose={onClose}
-        title="Add / Edit Venue"
+        title={`${formData.id ? 'Edit' : 'Add'} Venue`}
         show={visible}
         panelClass="relative h-[95vh] overflow-x-auto pb-4"
         titleClass="text-xl text-primary-navy"
@@ -287,6 +290,7 @@ export default function AddEditVenueModal({
               onChange={onChange}
               validationErrors={validationErrors}
               updateValidationErrrors={updateValidationErrors}
+              disabled={disabled}
             />
           </div>
           <h2 className="text-xl text-primary-navy font-bold pt-7">Addresses</h2>
@@ -297,6 +301,7 @@ export default function AddEditVenueModal({
               onChange={onChange}
               validationErrors={validationErrors}
               updateValidationErrrors={updateValidationErrors}
+              disabled={disabled}
             />
           </div>
           <div className="pt-7">
@@ -305,6 +310,7 @@ export default function AddEditVenueModal({
               venue={formData}
               contactsList={formData.venueContacts}
               onChange={onChange}
+              disabled={disabled}
             />
           </div>
           <div className="pt-7">
@@ -316,6 +322,7 @@ export default function AddEditVenueModal({
               updateValidationErrrors={updateValidationErrors}
               setFileList={setFileList}
               setDeleteList={setDeleteList}
+              disabled={disabled}
             />
             <div className="pt-7 ">
               <h2 className="text-xl text-primary-navy font-bold ">Barring</h2>
@@ -324,6 +331,7 @@ export default function AddEditVenueModal({
                 validationErrors={validationErrors}
                 onChange={onChange}
                 updateValidationErrrors={updateValidationErrors}
+                disabled={disabled}
               />
             </div>
             <div className="pt-7">
@@ -335,6 +343,7 @@ export default function AddEditVenueModal({
                 className="w-full max-h-40 min-h-[50px] justify-between"
                 value={formData.confidentialNotes}
                 onChange={(e) => handleInputChange('confidentialNotes', e.target.value)}
+                disabled={disabled}
               />
             </div>
             <div className="flex gap-4 pt-4 float-right">
@@ -346,7 +355,7 @@ export default function AddEditVenueModal({
                 className="w-32"
               />
               <Button
-                disabled={!permissions.includes('UPDATE_VENUE') || !venue?.id || isDeleting || isSaving}
+                disabled={!permissions.includes('DELETE_VENUE') || !venue?.id || isDeleting || isSaving}
                 onClick={toggleDeleteConfirmation}
                 variant="tertiary"
                 text={isDeleting ? 'Deleting Venue...' : 'Delete Venue'}
