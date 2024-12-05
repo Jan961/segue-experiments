@@ -1,5 +1,5 @@
 // TreeItem.spec.tsx
-import { mount } from 'cypress/react';
+import { mount } from 'cypress/react18';
 import TreeItem from '../../../components/global/TreeSelect/TreeItem';
 import { TreeItemOption } from '../../../components/global/TreeSelect/types';
 
@@ -31,7 +31,7 @@ describe('TreeItem Component', () => {
     setup({ value: leafNode, onChange, defaultOpen: false });
 
     // Check that the checkbox and label are rendered
-    cy.get(`input[type="checkbox"][id="${leafNode.id}"]`).should('exist');
+    cy.get(`input[type="checkbox"][id="form-input-checkbox-${leafNode.id}"]`).should('exist');
     cy.contains(leafNode.label).should('exist');
 
     // Disclosure buttons should not be present for leaf nodes
@@ -70,15 +70,15 @@ describe('TreeItem Component', () => {
     setup({ value: nonLeafNode, onChange, defaultOpen: false });
 
     // Check that the checkbox and label are rendered
-    cy.get(`input[type="checkbox"][id="${nonLeafNode.id}"]`).should('exist');
+    cy.get(`input[type="checkbox"][id="form-input-checkbox-${nonLeafNode.id}"]`).should('exist');
     cy.contains(nonLeafNode.label).should('exist');
 
     // Disclosure button should be present for non-leaf nodes
     cy.get('[data-testid="tree-item-close"]').should('exist');
 
     // Children should not be visible initially
-    cy.contains('Child Node 1').should('not.be.visible');
-    cy.contains('Child Node 2').should('not.be.visible');
+    cy.contains('Child Node 1').should('not.exist');
+    cy.contains('Child Node 2').should('not.exist');
   });
 
   it('toggles children visibility when disclosure button is clicked', () => {
@@ -105,7 +105,7 @@ describe('TreeItem Component', () => {
     setup({ value: nonLeafNode, onChange, defaultOpen: false });
 
     // Children should not be visible initially
-    cy.contains('Child Node 3').should('not.be.visible');
+    cy.contains('Child Node 3').should('not.exist');
 
     // Click the disclosure button to open
     cy.get('[data-testid="tree-item-close"]').click();
@@ -121,7 +121,7 @@ describe('TreeItem Component', () => {
     cy.get('[data-testid="tree-item-open"]').click();
 
     // Children should not be visible again
-    cy.contains('Child Node 3').should('not.be.visible');
+    cy.contains('Child Node 3').should('not.exist');
   });
 
   it('calls onChange with correct value when a leaf node is selected', () => {
@@ -139,7 +139,7 @@ describe('TreeItem Component', () => {
     setup({ value: leafNode, onChange, defaultOpen: false });
 
     // Click on the checkbox
-    cy.get(`input[type="checkbox"][id="${leafNode.id}"]`).click();
+    cy.get(`input[type="checkbox"][id="form-input-checkbox-${leafNode.id}"]`).click();
 
     // Assert that onChange was called once
     cy.get('@onChange').should('have.been.calledOnce');
@@ -182,14 +182,14 @@ describe('TreeItem Component', () => {
     setup({ value: nonLeafNode, onChange, defaultOpen: true });
 
     // Click on the parent checkbox
-    cy.get(`input[type="checkbox"][id="${nonLeafNode.id}"]`).click();
+    cy.get(`input[type="checkbox"][id="form-input-checkbox-${nonLeafNode.id}"]`).click();
 
     // Assert that onChange was called
     cy.get('@onChange').should('have.been.calledOnce');
 
     // Children checkboxes should now be checked
     nonLeafNode.options.forEach((child) => {
-      cy.get(`input[type="checkbox"][id="${child.id}"]`).should('be.checked');
+      cy.get(`input[type="checkbox"][id="form-input-checkbox-${child.id}"]`).should('be.checked');
     });
   });
 
@@ -227,10 +227,14 @@ describe('TreeItem Component', () => {
     cy.get(`input[type="checkbox"][id="child-6"]`).click();
 
     // Parent should now be in intermediate state
-    cy.get(`input[type="checkbox"][id="${nonLeafNode.id}"]`).should('have.prop', 'indeterminate', true);
+    cy.get(`input[type="checkbox"][id="form-input-checkbox-${nonLeafNode.id}"]`).should(
+      'have.prop',
+      'indeterminate',
+      true,
+    );
 
     // Parent checkbox should not be checked
-    cy.get(`input[type="checkbox"][id="${nonLeafNode.id}"]`).should('not.be.checked');
+    cy.get(`input[type="checkbox"][id="form-input-checkbox-${nonLeafNode.id}"]`).should('not.be.checked');
   });
 
   it('does not allow interaction with disabled nodes', () => {
@@ -248,10 +252,10 @@ describe('TreeItem Component', () => {
     setup({ value: leafNode, onChange, defaultOpen: false });
 
     // The checkbox should be disabled
-    cy.get(`input[type="checkbox"][id="${leafNode.id}"]`).should('be.disabled');
+    cy.get(`input[type="checkbox"][id="form-input-checkbox-${leafNode.id}"]`).should('be.disabled');
 
     // Attempt to click the checkbox
-    cy.get(`input[type="checkbox"][id="${leafNode.id}"]`).click({ force: true });
+    cy.get(`input[type="checkbox"][id="form-input-checkbox-${leafNode.id}"]`).click({ force: true });
 
     // onChange should not have been called
     expect(onChange).not.to.have.been.called;
@@ -355,14 +359,18 @@ describe('TreeItem Component', () => {
 
     // Select all children
     nonLeafNode.options.forEach((child) => {
-      cy.get(`input[type="checkbox"][id="${child.id}"]`).click();
+      cy.get(`input[type="checkbox"][id="form-input-checkbox-${child.id}"]`).click();
     });
 
     // Parent should now be checked
-    cy.get(`input[type="checkbox"][id="${nonLeafNode.id}"]`).should('be.checked');
+    cy.get(`input[type="checkbox"][id="form-input-checkbox-${nonLeafNode.id}"]`).should('be.checked');
 
     // Parent should not be in intermediate state
-    cy.get(`input[type="checkbox"][id="${nonLeafNode.id}"]`).should('have.prop', 'indeterminate', false);
+    cy.get(`input[type="checkbox"][id="form-input-checkbox-${nonLeafNode.id}"]`).should(
+      'have.prop',
+      'indeterminate',
+      false,
+    );
   });
 
   it('updates parent to unchecked state when all children are deselected', () => {
@@ -397,11 +405,11 @@ describe('TreeItem Component', () => {
 
     // Deselect all children
     nonLeafNode.options.forEach((child) => {
-      cy.get(`input[type="checkbox"][id="${child.id}"]`).click();
+      cy.get(`input[type="checkbox"][id="form-input-checkbox-${child.id}"]`).click();
     });
 
     // Parent should now be unchecked
-    cy.get(`input[type="checkbox"][id="${nonLeafNode.id}"]`).should('not.be.checked');
+    cy.get(`input[type="checkbox"][id="form-input-checkbox-${nonLeafNode.id}"]`).should('not.be.checked');
 
     // Parent should not be in intermediate state
     cy.get(`input[type="checkbox"][id="${nonLeafNode.id}"]`).should('have.prop', 'indeterminate', false);
@@ -423,7 +431,7 @@ describe('TreeItem Component', () => {
     setup({ value: dynamicNode, onChange, defaultOpen: true });
 
     // Initially, no children should be present
-    cy.get(`input[type="checkbox"][id="${dynamicNode.id}"]`).should('exist');
+    cy.get(`input[type="checkbox"][id="form-input-checkbox-${dynamicNode.id}"]`).should('exist');
     cy.get('input[type="checkbox"]').should('have.length', 1);
 
     // Simulate adding a child node dynamically
