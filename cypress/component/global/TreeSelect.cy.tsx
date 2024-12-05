@@ -1,6 +1,5 @@
 import { mount } from 'cypress/react18';
 import TreeSelect from '../../../components/global/TreeSelect';
-import { TreeItemOption } from '../../../components/global/TreeSelect/types';
 import BaseComp from '../helpers/BaseComp'; // Assuming BaseComp is available
 import options from '../helpers/TreeSelectOptions';
 
