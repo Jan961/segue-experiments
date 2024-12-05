@@ -57,7 +57,7 @@ const HierarchicalMenu = forwardRef(
         });
       }
       setItemOptions(updated);
-      onToggle(updated);
+      if (onToggle) onToggle(updated);
     };
 
     return (

@@ -1,6 +1,6 @@
 import Table from 'components/core-ui-lib/Table';
 import { contractsStyleProps, contractsColumnDefs } from 'components/contracts/tableConfig';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { contractsFilterState } from 'state/contracts/contractsFilterState';
 import { formatRowsForMultipeBookingsAtSameVenue, formatRowsForPencilledBookings } from '../../bookings/utils';
@@ -9,6 +9,7 @@ import EditVenueContractModal from '../modal/EditVenueContractModal';
 import { addEditContractsState } from '../../../state/contracts/contractsState';
 import { RowDoubleClickedEvent } from 'ag-grid-community';
 import { accessVenueContracts } from 'state/account/selectors/permissionSelector';
+import { compareDatesWithoutTime } from 'services/dateService';
 
 interface ContractsTableProps {
   rowData?: ContractTableRowType;
@@ -20,6 +21,24 @@ export default function ContractsTable({ rowData }: ContractsTableProps) {
   const [filter, setFilter] = useRecoilState(contractsFilterState);
   const [editContractData, setEditContractData] = useRecoilState(addEditContractsState);
   const [rows, setRows] = useState([]);
+
+  const performanceCounts = useMemo(() => {
+    return rows.map((row) => {
+      const { PerformanceTimes, dateTime } = row;
+      if (Array.isArray(PerformanceTimes)) {
+        let count = 0;
+        PerformanceTimes?.forEach((time) => {
+          const split = time.split('?');
+          if (compareDatesWithoutTime(split[1], dateTime, '==')) {
+            count++;
+          }
+        });
+        return count;
+      }
+      return null;
+    });
+  }, [rows]);
+
   const gridOptions = {
     getRowStyle: (params) => {
       return params.data.status === 'U' ? { fontStyle: 'italic' } : '';
@@ -48,7 +67,7 @@ export default function ContractsTable({ rowData }: ContractsTableProps) {
     if (rowData) {
       let formattedRows = formatRowsForPencilledBookings(rowData);
       formattedRows = formatRowsForMultipeBookingsAtSameVenue(formattedRows);
-
+      formattedRows = formattedRows.map((row, index) => ({ ...row, performanceCount: performanceCounts[index] }));
       setRows(formattedRows);
     }
   }, [rowData]);
