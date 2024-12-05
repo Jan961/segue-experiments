@@ -20,6 +20,26 @@ describe('TreeSelect Component', () => {
     cy.get('[data-testid="tree-item-close"]').click();
   }
 
+  function iterateNestedObject(obj, callback) {
+    // Check if the input is an object or array
+    if (obj && typeof obj === 'object') {
+      // Iterate over the object's keys
+      for (const key in obj) {
+        if (Object.hasOwnProperty.call(obj)) {
+          const value = obj[key];
+
+          // Apply the callback to the current key-value pair
+          callback(key, value);
+
+          // Recursively call the function for nested objects
+          if (typeof value === 'object' && value !== null) {
+            iterateNestedObject(value, callback);
+          }
+        }
+      }
+    }
+  }
+
   it('should render the component with given options', () => {
     const onChange = cy.stub().as('onChange');
     setup({ options, onChange });
@@ -104,27 +124,50 @@ describe('TreeSelect Component', () => {
     const onChange = cy.stub().as('onChange');
     setup({ options, onChange, disabled: true });
     // 'Select All' should be disabled
-    cy.get('[data-testid="tree-select-select-all"]').find('input').should('be.disabled');
+    cy.get('[data-testid="tree-select-select-all"]').should('be.disabled');
     // All options should be disabled
-    cy.get('[data-testid="tree-item"]').each(($el) => {
-      cy.wrap($el).find('input[type="checkbox"]').should('be.disabled');
+    cy.get('input[type="checkbox"]').each(($el) => {
+      cy.wrap($el).should('be.disabled');
     });
+  });
+
+  it('should not expand on click when disabled', () => {
+    const onChange = cy.stub().as('onChange');
+    setup({ options, onChange, disabled: true });
+
+    //try to expand all options if they exist
+    cy.get('[data-testid="tree-item-close"]').then(($el) => {
+      if ($el.length > 0) {
+        cy.get('[data-testid="tree-item-close"]').click();
+      }
+    });
+
+    //Children should not exist
+    cy.get('[data-testid="Option 1-1"]').should('not.exist');
+    cy.get('[data-testid="Option 1-2"]').should('not.exist');
+    // Grand children should not exist
+    cy.get('[data-testid="Option 1-1-1"]').should('not.exist');
+    cy.get('[data-testid="Option 1-1-2"]').should('not.exist');
   });
 
   it('should pass defaultOpen prop to TreeItem components', () => {
     const onChange = cy.stub().as('onChange');
     setup({ options, onChange, defaultOpen: true });
-    // Assuming TreeItem has a class or attribute indicating open state
-    cy.get('[data-testid="tree-item"]').each(($el) => {
-      cy.wrap($el).should('have.class', 'open');
+    // All TreeItem components should be expanded
+    cy.get('button').each(($el) => {
+      cy.wrap($el).should('have.attr', 'aria-expanded', 'true');
+    });
+    // All options should be rendered
+    iterateNestedObject(options, (key, value) => {
+      if (key === 'label') cy.get(`[data-testid="${value}"]`).should('exist');
     });
   });
 
   it('should update when options prop changes', () => {
     const onChange = cy.stub().as('onChange');
     setup({ options, onChange });
-    // Initial options are rendered
-    cy.get('[data-testid="tree-item"]').should('have.length', options.length);
+    // Initial options are rendered - +1 for 'Select All'
+    cy.get('input[type="checkbox"]').should('have.length', options.length + 1);
     // Now, update options by remounting component with new props
     const newOptions = [
       ...options,
@@ -141,6 +184,6 @@ describe('TreeSelect Component', () => {
       </BaseComp>,
     );
     // Now, options should be updated
-    cy.get('[data-testid="tree-item"]').should('have.length', newOptions.length);
+    cy.get('input[type="checkbox"]').should('have.length', newOptions.length + 1);
   });
 });
