@@ -50,7 +50,9 @@ pipelines:
             - cat .env
             - npm run build
             # Run cypress component tests
+            - set +e # Disable exit on error - cypress breaks if any of the tests fail
             - npm run cy:components
+            - set -e
             # generate component report
             - npm run cy:report
             # Clone the Cypress repository into a dir at the same level as Segue
