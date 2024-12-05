@@ -72,7 +72,12 @@ export const contractsColumnDefs = [
   },
   { headerName: 'Town', field: 'town', cellRenderer: DefaultCellRenderer, minWidth: 80, flex: 1 },
   { headerName: 'Capacity', field: 'capacity', cellRenderer: DefaultCellRenderer, width: 90 },
-  { headerName: 'No. of Perfs', field: 'performanceCount', cellRenderer: DefaultCellRenderer, width: 90 },
+  {
+    headerName: 'No. of Perfs',
+    field: 'performanceCount',
+    cellRenderer: DefaultCellRenderer,
+    width: 90,
+  },
   {
     headerName: 'Deal Memo Status',
     field: 'dealMemoStatus',
