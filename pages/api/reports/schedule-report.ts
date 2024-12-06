@@ -13,9 +13,23 @@ import { makeRowTextBoldAndAllignLeft } from './promoter-holds';
 import { convertToPDF } from 'utils/report';
 import { bookingStatusMap } from 'config/bookings';
 import { addBorderToAllCells } from 'utils/export';
-import { PerformanceInfo, SCHEDULE_VIEW, getSheduleReport } from 'services/reports/schedule-report';
-import { sum } from 'radash';
-import { formatDate, getDateDaysAway, getTimeFormattedFromDateTime, newDate, timeFormat } from 'services/dateService';
+import {
+  PerformanceInfo,
+  ScheduleViewFormatted,
+  getBookingByKey,
+  getNextConfirmedBooking,
+  getSheduleReport,
+  isOtherDayType,
+} from 'services/reports/schedule-report';
+import { group, isEmpty, sum } from 'radash';
+import {
+  calculateWeekNumber,
+  formatDate,
+  getDateDaysAway,
+  getTimeFormattedFromDateTime,
+  newDate,
+  timeFormat,
+} from 'services/dateService';
 import { differenceInDays, isSameDay } from 'date-fns';
 
 const makeRowBold = ({ worksheet, row }: { worksheet: any; row: number }) => {
@@ -97,7 +111,7 @@ const handler = async (req, res) => {
     });
 
     performances.forEach((performance) => {
-      const { Id, BookingId, Time, Date } = performance;
+      const { Id, BookingId, Time, Date: performanceDate } = performance;
 
       if (!bookingIdPerformanceMap[BookingId]) {
         bookingIdPerformanceMap[BookingId] = [];
@@ -106,7 +120,7 @@ const handler = async (req, res) => {
       bookingIdPerformanceMap[BookingId].push({
         performanceId: Id,
         performanceTime: Time ? getTimeFormattedFromDateTime(Time.getTime()) : null,
-        performanceDate: Date ? Date.toISOString() : null,
+        performanceDate: performanceDate ? performanceDate.toISOString() : null,
       });
     });
 
@@ -120,7 +134,7 @@ const handler = async (req, res) => {
 
     const worksheet = workbook.addWorksheet('Tour Schedule', {
       pageSetup: { fitToPage: true, fitToHeight: 5, fitToWidth: 7 },
-      views: [{ state: 'frozen', xSplit: 0, ySplit: 5 }],
+      views: [{ state: 'frozen', xSplit: 0, ySplit: 7 }],
     });
 
     if (!formattedData?.length) {
@@ -133,7 +147,7 @@ const handler = async (req, res) => {
       return;
     }
 
-    const { ShowName, FullProductionCode } = data[0];
+    const { ShowName, FullProductionCode, ProductionStartDate } = data[0];
     const title = `${FullProductionCode} ${ShowName} Tour Schedule - ${formatDate(newDate(), 'dd.MM.yy')}`;
     let headerRowsLength = 4;
     worksheet.addRow([title]);
@@ -173,7 +187,7 @@ const handler = async (req, res) => {
     ]);
     worksheet.addRow([]);
 
-    const map: { [key: string]: SCHEDULE_VIEW } = formattedData.reduce((acc, x) => ({ ...acc, [getKey(x)]: x }), {});
+    const map: Record<string, ScheduleViewFormatted[]> = group(formattedData, (x: ScheduleViewFormatted) => getKey(x));
     const daysDiff = differenceInDays(to, from); // tt
     let rowNo = 8;
     let prevProductionWeekNum = '';
@@ -192,123 +206,119 @@ const handler = async (req, res) => {
       lastWeekMetaInfo = { ...lastWeekMetaInfo, weekTotalPrinted: false };
       const weekDay = formatDate(getDateDaysAway(from, i - 1), 'eeee');
       const dateInIncomingFormat = getDateDaysAway(from, i - 1);
-      const nextDateIncomingFormat = getDateDaysAway(from, i);
       const key = getKey({ FullProductionCode, ShowName, EntryDate: formatDate(dateInIncomingFormat, 'yyyy-MM-dd') });
-      const nextKey = getKey({
-        FullProductionCode,
-        ShowName,
-        EntryDate: formatDate(nextDateIncomingFormat, 'yyyy-MM-dd'),
-      });
-      const value: SCHEDULE_VIEW = map[key];
-      const nextValue: SCHEDULE_VIEW = map[nextKey];
-      const isOtherDay = [
-        'Day Off',
-        'Travel Day',
-        'Get-In / Fit-Up Day',
-        'Tech / Dress Day',
-        'Rehearsal Day',
-        'Declared Holiday',
-      ].includes(value?.EntryName);
-      const isCancelled = value?.EntryStatusCode === 'X';
-      const isSuspended = value?.EntryStatusCode === 'S';
-      if (!value) {
-        worksheet.addRow([
-          FullProductionCode,
-          weekDay.substring(0, 3),
-          formatDate(dateInIncomingFormat, 'dd/MM/yy'),
-          prevProductionWeekNum,
-        ]);
-        colorTextAndBGCell({
-          worksheet,
-          row: rowNo + 1,
-          col: 5,
-          textColor: COLOR_HEXCODE.BLACK,
-          cellColor: COLOR_HEXCODE.WHITE,
-        });
-      } else {
-        const {
-          ProductionWeekNum,
-          Location,
-          EntryName,
-          TimeMins,
-          Mileage,
-          VenueSeats,
-          EntryId,
-          PencilNum,
-          EntryStatusCode,
-          EntryType = '',
-        } = value;
-        const formattedTime = TimeMins ? timeFormat(Number(TimeMins)) : '';
-        const performances = bookingIdPerformanceMap[EntryId];
-        const performancesOnThisDay = performances?.filter?.((performance) =>
-          isSameDay(newDate(performance.performanceDate).getTime(), dateInIncomingFormat),
-        );
-        prevProductionWeekNum = ProductionWeekNum ? String(ProductionWeekNum) : prevProductionWeekNum;
-        let row = [
-          FullProductionCode,
-          weekDay.substring(0, 3),
-          formatDate(dateInIncomingFormat, 'dd/MM/yy'),
-          ProductionWeekNum,
-          EntryName || '',
-        ];
-        if (isOtherDay) {
-          row = row.concat([Location || '', EntryType || '']);
-        } else if (!isCancelled && !isSuspended) {
-          const isFinalDay = nextValue?.Location !== value?.Location;
-          row = row.concat([
-            Location || '',
-            'Performance',
-            `${bookingStatusMap?.[EntryStatusCode] || ''} ${PencilNum ? `(${PencilNum})` : ''}`,
-            VenueSeats,
-            performancesOnThisDay?.length,
-            performancesOnThisDay?.[0]?.performanceTime || '',
-            performancesOnThisDay?.[1]?.performanceTime || '',
-          ]);
-          seats.push(Number(VenueSeats) || 0);
-          performancesPerDay.push(performancesOnThisDay?.length || 0);
-          if (isFinalDay) {
-            row = row.concat([Number(Mileage) || '', formattedTime]);
-            time.push(Number(TimeMins) || 0);
-            mileage.push(Number(Mileage) || 0);
-          }
-        } else {
-          row = row.concat([
-            Location || '',
-            'Performance',
-            `${bookingStatusMap?.[EntryStatusCode] || ''} ${PencilNum ? `(${PencilNum})` : ''}`,
-            // VenueSeats,
-            // performancesOnThisDay?.length,
-            // performancesOnThisDay?.[0]?.performanceTime || '',
-            // performancesOnThisDay?.[1]?.performanceTime || '',
-          ]);
-        }
-        worksheet.addRow([...row]);
-      }
-      rowNo++;
 
-      if (isOtherDay) {
-        colorTextAndBGCell({
-          worksheet,
-          row: rowNo,
-          col: 5,
-          textColor: COLOR_HEXCODE.YELLOW,
-          cellColor: COLOR_HEXCODE.RED,
-        });
+      const values = getBookingByKey(key, map);
+      const nextValue = getNextConfirmedBooking({
+        index: i,
+        fullProductionCode: FullProductionCode,
+        showName: ShowName,
+        startDate: from,
+        dataLookUp: map,
+        maxDays: daysDiff,
+      });
+      const weekNumber = calculateWeekNumber(newDate(ProductionStartDate.getTime()), dateInIncomingFormat.getTime());
+      for (const value of values) {
+        const isOtherDay = isOtherDayType(value?.EntryName);
+        const isCancelled = value?.EntryStatusCode === 'X';
+        const isSuspended = value?.EntryStatusCode === 'S';
+        const isConfirmed = value?.EntryStatusCode === 'C';
+        if (!value || isEmpty(value)) {
+          worksheet.addRow([
+            FullProductionCode,
+            weekDay.substring(0, 3),
+            formatDate(dateInIncomingFormat, 'dd/MM/yy'),
+            weekNumber ?? prevProductionWeekNum,
+          ]);
+          colorTextAndBGCell({
+            worksheet,
+            row: rowNo + 1,
+            col: 5,
+            textColor: COLOR_HEXCODE.BLACK,
+            cellColor: COLOR_HEXCODE.WHITE,
+          });
+        } else {
+          const {
+            ProductionWeekNum,
+            Location,
+            EntryName,
+            TimeMins,
+            Mileage,
+            VenueSeats,
+            EntryId,
+            PencilNum,
+            EntryStatusCode,
+            EntryType = '',
+          } = value;
+          const formattedTime = TimeMins ? timeFormat(Number(TimeMins)) : '';
+          const performances = bookingIdPerformanceMap[EntryId];
+          const performancesOnThisDay = performances?.filter?.((performance) =>
+            isSameDay(newDate(performance.performanceDate).getTime(), dateInIncomingFormat),
+          );
+          prevProductionWeekNum = ProductionWeekNum ? String(ProductionWeekNum) : prevProductionWeekNum;
+          let row = [
+            FullProductionCode,
+            weekDay.substring(0, 3),
+            formatDate(dateInIncomingFormat, 'dd/MM/yy'),
+            weekNumber ?? ProductionWeekNum,
+            EntryName || '',
+          ];
+          if (isOtherDay) {
+            row = row.concat([Location || '', EntryType || '']);
+          } else if (!isCancelled && !isSuspended) {
+            const isFinalDay = nextValue?.Location !== value?.Location;
+            const bookingStatus = bookingStatusMap?.[EntryStatusCode] || '';
+            const pencilNum = PencilNum ? `(${PencilNum})` : '';
+            row = row.concat([
+              Location || '',
+              'Performance',
+              bookingStatus + ' ' + pencilNum,
+              VenueSeats,
+              performancesOnThisDay?.length,
+              performancesOnThisDay?.[0]?.performanceTime || '',
+              performancesOnThisDay?.[1]?.performanceTime || '',
+            ]);
+            seats.push(Number(VenueSeats) || 0);
+            performancesPerDay.push(performancesOnThisDay?.length || 0);
+            if (isFinalDay && isConfirmed) {
+              row = row.concat([Number(Mileage) || '', formattedTime]);
+              time.push(Number(TimeMins) || 0);
+              mileage.push(Number(Mileage) || 0);
+            }
+          } else {
+            const bookingStatus = bookingStatusMap?.[EntryStatusCode] || '';
+            const pencilNum = PencilNum ? `(${PencilNum})` : '';
+            row = row.concat([Location || '', 'Performance', bookingStatus + ' ' + pencilNum]);
+          }
+          worksheet.addRow([...row]);
+        }
+        rowNo++;
+
+        if (isOtherDay) {
+          colorTextAndBGCell({
+            worksheet,
+            row: rowNo,
+            col: 5,
+            textColor: COLOR_HEXCODE.YELLOW,
+            cellColor: COLOR_HEXCODE.RED,
+          });
+        }
+        if (isCancelled || isSuspended) {
+          colorTextAndBGCell({
+            worksheet,
+            row: rowNo,
+            col: 5,
+            textColor: COLOR_HEXCODE.WHITE,
+            cellColor: isSuspended ? COLOR_HEXCODE.PURPLE : COLOR_HEXCODE.BLACK,
+          });
+        }
+        if (weekDay === 'Monday') {
+          colorCell({ worksheet, row: rowNo, col: 1, argbColor: COLOR_HEXCODE.CREAM });
+          colorCell({ worksheet, row: rowNo, col: 2, argbColor: COLOR_HEXCODE.CREAM });
+          colorCell({ worksheet, row: rowNo, col: 3, argbColor: COLOR_HEXCODE.CREAM });
+        }
       }
-      if (isCancelled || isSuspended) {
-        colorTextAndBGCell({
-          worksheet,
-          row: rowNo,
-          col: 5,
-          textColor: COLOR_HEXCODE.WHITE,
-          cellColor: isSuspended ? COLOR_HEXCODE.PURPLE : COLOR_HEXCODE.BLACK,
-        });
-      }
-      if (weekDay === 'Monday') {
-        colorCell({ worksheet, row: rowNo, col: 1, argbColor: COLOR_HEXCODE.CREAM });
-        colorCell({ worksheet, row: rowNo, col: 2, argbColor: COLOR_HEXCODE.CREAM });
-        colorCell({ worksheet, row: rowNo, col: 3, argbColor: COLOR_HEXCODE.CREAM });
-      }
+
       lastWeekMetaInfo = { ...lastWeekMetaInfo, prevProductionWeekNum };
     }
 
