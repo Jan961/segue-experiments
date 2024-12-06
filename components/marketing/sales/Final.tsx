@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Button, Checkbox, TextArea, TextInput } from 'components/core-ui-lib';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { bookingJumpState } from 'state/marketing/bookingJumpState';
-import { isNullOrEmpty } from 'utils';
+import { formatDecimalOnBlur, isNullOrEmpty } from 'utils';
 import { Spinner } from 'components/global/Spinner';
 import { currencyState } from 'state/global/currencyState';
 import { currentUserState } from 'state/marketing/currentUserState';
@@ -11,6 +11,7 @@ import { productionJumpState } from 'state/booking/productionJumpState';
 import axios from 'axios';
 import { UTCDate } from '@date-fns/utc';
 import { areDatesSame, getDateDaysAway, newDate } from 'services/dateService';
+import { decRegexLeadingZero } from 'utils/regexUtils';
 
 interface SalesFigure {
   seatsReserved: string;
@@ -23,10 +24,6 @@ interface SalesFigureSet {
   general: SalesFigure;
   schools: SalesFigure;
   user: string;
-}
-
-export interface SalesEntryRef {
-  resetForm: (salesWeek: string) => void;
 }
 
 const Final = () => {
@@ -73,11 +70,15 @@ const Final = () => {
       const frequency = await getSalesFrequency();
 
       // get previous sales figures first and check for errors
-      const { data: prevSales } = await axios.post('/api/marketing/sales/current/read', {
+      const { data: salesData } = await axios.post('/api/marketing/sales/current/read', {
         bookingId: bookings.selected,
         salesDate: null,
         frequency,
       });
+
+      // data is returned as an object with the "current" key
+      // we don't have the date the last set of figures were entered so the api handles this
+      const prevSales = salesData.current;
 
       // conly complete checks if discrepancy notes are not visible
       if (!showDiscrepancyNotes) {
@@ -178,18 +179,6 @@ const Final = () => {
     setShowDiscrepancyNotes(false);
   };
 
-  const setNumericVal = (setFunction: (value) => void, value: string) => {
-    if (value === '') {
-      setFunction(0);
-    } else {
-      const regexPattern = /^-?\d*(\.\d*)?$/;
-
-      if (regexPattern.test(value)) {
-        setFunction(value);
-      }
-    }
-  };
-
   const setSalesFigures = async () => {
     try {
       setLoading(true);
@@ -210,11 +199,9 @@ const Final = () => {
       }
 
       // get the salesFigures for the selected date/week if they exist
-      const response = await axios.post('/api/marketing/sales/final/read', {
+      const { data: sales } = await axios.post('/api/marketing/sales/final/read', {
         bookingId: bookings.selected,
       });
-
-      const sales = response.data;
 
       if (Object.values(sales).length > 0) {
         const salesFigures = sales as SalesFigureSet;
@@ -373,7 +360,8 @@ const Final = () => {
                               placeholder="Enter Seats"
                               id="genSeatsSold"
                               value={genSeatsSold === '0' ? '' : genSeatsSold}
-                              onChange={(event) => setNumericVal(setGenSeatsSold, event.target.value)}
+                              onFocus={(event) => event?.target?.select?.()}
+                              onChange={(event) => setGenSeatsSold(event.target.value)}
                             />
                           </div>
                         </div>
@@ -389,7 +377,10 @@ const Final = () => {
                               placeholder="Enter Value"
                               id="genSeatsSoldVal"
                               value={genSeatsSoldVal === '0' ? '' : genSeatsSoldVal}
-                              onChange={(event) => setNumericVal(setGenSeatsSoldVal, event.target.value)}
+                              pattern={decRegexLeadingZero}
+                              onFocus={(event) => event?.target?.select?.()}
+                              onBlur={(event) => setGenSeatsSoldVal(formatDecimalOnBlur(event))}
+                              onChange={(event) => setGenSeatsSoldVal(event.target.value)}
                             />
                           </div>
                         </div>
@@ -418,7 +409,8 @@ const Final = () => {
                                   placeholder="Enter Seats"
                                   id="schSeatsSold"
                                   value={schSeatsSold === '0' ? '' : schSeatsSold}
-                                  onChange={(event) => setNumericVal(setSchSeatsSold, event.target.value)}
+                                  onFocus={(event) => event?.target?.select?.()}
+                                  onChange={(event) => setSchSeatsSold(event.target.value)}
                                 />
                               </div>
                             </div>
@@ -434,7 +426,10 @@ const Final = () => {
                                   placeholder="Enter Value"
                                   id="schSeatsSoldVal"
                                   value={schSeatsSoldVal === '0' ? '' : schSeatsSoldVal}
-                                  onChange={(event) => setNumericVal(setSchSeatsSoldVal, event.target.value)}
+                                  pattern={decRegexLeadingZero}
+                                  onFocus={(event) => event?.target?.select?.()}
+                                  onBlur={(event) => setSchSeatsSoldVal(formatDecimalOnBlur(event))}
+                                  onChange={(event) => setSchSeatsSoldVal(event.target.value)}
                                 />
                               </div>
                             </div>
