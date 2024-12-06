@@ -257,7 +257,7 @@ export const getCompanyContractsColumnDefs = (
   },
 ];
 
-export const seatKillsColDefs = (handleChange, currencySymbol, disabled: boolean) => [
+export const seatKillsColDefs = (handleChange, currencySymbol, editDisabled: boolean) => [
   {
     headerName: 'Type',
     field: 'type',
@@ -278,7 +278,7 @@ export const seatKillsColDefs = (handleChange, currencySymbol, disabled: boolean
       className: 'w-[108px] ml-1 mt-1 font-bold',
       value: formatValue(params.data.seats),
       pattern: /^\d*$/,
-      disabled: { disabled },
+      disabled: editDisabled,
     }),
     width: 120,
     headerClass: 'right-border-full',
@@ -297,7 +297,7 @@ export const seatKillsColDefs = (handleChange, currencySymbol, disabled: boolean
       value: formatValue(params.data.value),
       className: 'w-24 font-bold',
       pattern: /^\d*(\.\d*)?$/,
-      disabled: { disabled },
+      disabled: editDisabled,
     }),
     width: 120,
     suppressMovable: true,
