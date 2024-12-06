@@ -1327,25 +1327,25 @@ view BookingHoldCompsView {
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view PromoterHoldsView {
-  RowNumber                            BigInt   @default(0)
-  ProductionId                         Int      @default(0)
-  FullProductionCode                   String?  @db.VarChar(20)
-  ShowName                             String?  @db.VarChar(80)
-  VenueCode                            String?  @db.VarChar(6)
-  VenueName                            String?  @db.VarChar(255)
-  BookingId                            Int      @default(0)
-  PerformanceDate                      DateTime @db.Date
-  PerformanceTime                      DateTime @db.Time(0)
-  AvailableCompSeats                   Int?     @default(1) @db.TinyInt
-  AvailableCompNotes                   String?  @db.LongText
-  CompAllocationSeats                  Int?     @default(1) @db.UnsignedSmallInt
-  CompAllocationTicketHolderName       String?  @db.VarChar(50)
-  CompAllocationSeatsAllocated         String?  @db.VarChar(50)
-  CompAllocationTicketHolderEmail      String?  @db.VarChar(80)
-  CompAllocationComments               String?  @db.VarChar(100)
-  CompAllocationRequestedBy            String?  @db.VarChar(50)
-  CompAllocationArrangedBy             String?  @db.VarChar(101)
-  CompAllocationVenueConfirmationNotes String?  @db.Text
+  RowNumber                            BigInt    @default(0)
+  ProductionId                         Int       @default(0)
+  FullProductionCode                   String?   @db.VarChar(20)
+  ShowName                             String?   @db.VarChar(80)
+  VenueCode                            String?   @db.VarChar(6)
+  VenueName                            String?   @db.VarChar(255)
+  BookingId                            Int       @default(0)
+  PerformanceDate                      DateTime  @db.Date
+  PerformanceTime                      DateTime  @db.Time(0)
+  AvailableCompSeats                   Int?      @default(1) @db.TinyInt
+  AvailableCompNotes                   String?   @db.LongText
+  CompAllocationSeats                  Int?      @default(1) @db.UnsignedSmallInt
+  CompAllocationTicketHolderName       String?   @db.VarChar(50)
+  CompAllocationSeatsAllocated         String?   @db.VarChar(50)
+  CompAllocationTicketHolderEmail      String?   @db.VarChar(80)
+  CompAllocationComments               String?   @db.VarChar(100)
+  CompAllocationRequestedBy            String?   @db.VarChar(50)
+  CompAllocationArrangedBy             String?   @db.VarChar(101)
+  CompAllocationVenueConfirmationNotes String?   @db.Text
 
   @@id([ProductionId, BookingId, PerformanceDate, PerformanceTime])
 }
@@ -1381,14 +1381,14 @@ view SalesSetTotalsView {
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view ProductionSummaryView {
-  row_number___over__order_by_ProductionId__Item_ BigInt   @default(0) @map("row_number() over (order by ProductionId, Item)")
-  ProductionId                                    Int?     @default(0)
-  DateTypeAffectsAvailability                     Boolean? @db.Bit(1)
-  DateTypeId                                      Int?
-  DateTypeSeqNo                                   Decimal? @db.Decimal(3, 0)
-  Item                                            String?  @default("") @db.VarChar(30)
-  StatusCode                                      String?  @default("") @db.Char(1)
-  Count                                           BigInt?  @default(0)
+  RowNumber                   BigInt   @default(0)
+  ProductionId                Int?     @default(0)
+  DateTypeAffectsAvailability Boolean? @db.Bit(1)
+  DateTypeId                  Int?
+  DateTypeSeqNo               Decimal? @db.Decimal(3, 0)
+  Item                        String?  @default("") @db.VarChar(30)
+  StatusCode                  String?  @default("") @db.Char(1)
+  Count                       BigInt?  @default(0)
 
   @@ignore
 }
@@ -1485,15 +1485,14 @@ view VenueView {
 }
 
 view SalesView {
-  RowNumber                   BigInt    @default(0)
   ShowName                    String?   @db.VarChar(80)
   ProductionId                Int?      @default(0)
   FullProductionCode          String?   @db.VarChar(20)
   ProductionStartDate         DateTime? @db.Date
   ProductionEndDate           DateTime? @db.Date
   BookingId                   Int       @default(0)
-  BookingFirstDate            DateTime? @db.Date
-  BookingStatusCode           String?   @default("U") @db.Char(1)
+  BookingFirstDate            DateTime  @db.Date
+  BookingStatusCode           String    @default("U") @db.Char(1)
   BookingProductionWeekNum    Int?      @db.SmallInt
   VenueTown                   String?   @db.VarChar(50)
   VenueCode                   String?   @db.VarChar(6)
