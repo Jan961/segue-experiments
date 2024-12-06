@@ -6,7 +6,7 @@ import { bookingJumpState } from 'state/marketing/bookingJumpState';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import { SelectOption } from '../MarketingHome';
 import { newDate, toISO } from 'services/dateService';
-import { formatDecimalOnBlur, isNull, isNullOrEmpty, isNullOrUndefined } from 'utils';
+import { formatDecimalOnBlur, isNullOrEmpty, isNullOrUndefined } from 'utils';
 import { currencyState } from 'state/global/currencyState';
 import { UpdateWarningModal } from '../modal/UpdateWarning';
 import axios from 'axios';
@@ -307,8 +307,8 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
       });
 
       // if data returned from API is not null set the state variable so the form can be updated
-      isNull(sales.current) ? setCurrSalesFigureSet(emptySalesSet) : setCurrSalesFigureSet(sales.current);
-      isNull(sales.previous) ? setPrevSalesFigureSet(emptySalesSet) : setPrevSalesFigureSet(sales.previous);
+      isNullOrUndefined(sales.current) ? setCurrSalesFigureSet(emptySalesSet) : setCurrSalesFigureSet(sales.current);
+      isNullOrUndefined(sales.previous) ? setPrevSalesFigureSet(emptySalesSet) : setPrevSalesFigureSet(sales.previous);
 
       // set the setId from the current sales
       salesSetId = sales?.current?.setId;
@@ -459,7 +459,6 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
     changeWeek: (week) => {
       const updatedDate = week ? newDate(week) : null;
       setSalesDate(updatedDate);
-      console.log(updatedDate);
       if (updatedDate) {
         setSalesFigures(updatedDate, bookings.selected);
       }
