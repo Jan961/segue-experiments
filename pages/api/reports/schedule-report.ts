@@ -23,6 +23,7 @@ import {
 } from 'services/reports/schedule-report';
 import { group, isEmpty, sum } from 'radash';
 import {
+  areDatesSame,
   calculateWeekNumber,
   formatDate,
   getDateDaysAway,
@@ -31,7 +32,6 @@ import {
   newDate,
   timeFormat,
 } from 'services/dateService';
-import { isSameDay } from 'date-fns';
 
 const makeRowBold = ({ worksheet, row }: { worksheet: any; row: number }) => {
   worksheet.getRow(row).font = { bold: true };
@@ -253,7 +253,7 @@ const handler = async (req, res) => {
           const formattedTime = TimeMins ? timeFormat(Number(TimeMins)) : '';
           const performances = bookingIdPerformanceMap[EntryId];
           const performancesOnThisDay = performances?.filter?.((performance) =>
-            isSameDay(newDate(performance.performanceDate).getTime(), dateInIncomingFormat),
+            areDatesSame(performance.performanceDate, dateInIncomingFormat),
           );
           prevProductionWeekNum = ProductionWeekNum ? String(ProductionWeekNum) : prevProductionWeekNum;
           let row = [
