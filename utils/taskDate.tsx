@@ -45,7 +45,7 @@ const formatWeekOption = (week: number, suffix = '') => {
 export const getWeekOptions = (production, isMasterTask: boolean, appendDate: boolean): SelectOption[] => {
   const eotNumber = 26;
   const numWeeksInDropDown = 260;
-  if (!isMasterTask && production) {
+  if (!isMasterTask && production?.StartDate && production?.EndDate) {
     const startDate = getMonday(new UTCDate(production?.StartDate));
     const endDate = new UTCDate(production?.EndDate);
     const millisecondsPerWeek = 7 * 24 * 60 * 60 * 1000;
