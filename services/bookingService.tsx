@@ -12,7 +12,11 @@ export type NewPerformance = {
   Time: string;
 };
 
-type NewBooking = Partial<Booking> & { Performances: NewPerformance[]; BookingDate: string; RunTag: string };
+export type EnrichedBooking = Partial<Booking> & {
+  Performances: NewPerformance[];
+  BookingDate: string;
+  RunTag: string;
+};
 
 export interface AddBookingsParams {
   Date: string;
@@ -41,7 +45,7 @@ export type BookingsWithPerformances = Prisma.BookingGetPayload<{
   include: typeof bookingInclude;
 }>;
 
-export const updateBooking = async (booking: NewBooking, tx) => {
+export const updateBooking = async (booking: EnrichedBooking, tx) => {
   let updatedBooking = null;
   let updatedPerformances = null;
   const payload = {
@@ -79,6 +83,7 @@ export const updateBooking = async (booking: NewBooking, tx) => {
     return { ...updatedBooking, ...updatedPerformances };
   } catch (e) {
     console.log('Error in booking service', e);
+    throw e;
   }
 };
 
@@ -269,7 +274,7 @@ export const changeBookingDate = async (Id: number, FirstDate: Date, prisma) => 
 };
 
 export const createNewBooking = (
-  { Performances, VenueId, DateBlockId, BookingDate, StatusCode, Notes, PencilNum, RunTag }: NewBooking,
+  { Performances, VenueId, DateBlockId, BookingDate, StatusCode, Notes, PencilNum, RunTag }: EnrichedBooking,
   tx,
 ) => {
   const performanceData = Performances.map((p: NewPerformance) => {

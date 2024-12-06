@@ -638,6 +638,7 @@ export const getDateTime = (date: string | UTCDate | number, time: string, local
  * @param {UTCDate | string | number} toDate - The date to count to.
  * @param {Locale} fromLocale - The locale of the first inputted date.
  * @param {Locale} toLocale - The locale of the second inputted date.
+ * @param {includeLastDate} includeLastDate - includes last in calculating the difference
  * @returns {number} Returns the difference in days between the dates.
  */
 export const getDifferenceInDays = (
@@ -645,6 +646,7 @@ export const getDifferenceInDays = (
   toDate: string | UTCDate | number,
   fromLocale?: Locale,
   toLocale?: Locale,
+  includeLastDate = false,
 ): number => {
   if (!fromDate || !toDate) {
     return null;
@@ -657,7 +659,12 @@ export const getDifferenceInDays = (
     return null;
   }
 
-  return differenceInDays(tDate, fDate);
+  let difference = differenceInDays(tDate, fDate);
+  if (includeLastDate) {
+    difference += 1;
+  }
+
+  return difference;
 };
 
 /**
