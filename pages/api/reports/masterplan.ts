@@ -1,8 +1,7 @@
 import ExcelJS from 'exceljs';
 import getPrismaClient from 'lib/prisma';
-import { differenceInDays } from 'date-fns';
 import { COLOR_HEXCODE, colorCell, colorTextAndBGCell, fillRowBGColorAndTextColor } from 'services/salesSummaryService';
-import { calculateWeekNumber, formatDate, getDateDaysAway, newDate } from 'services/dateService';
+import { calculateWeekNumber, formatDate, getDateDaysAway, getDifferenceInDays, newDate } from 'services/dateService';
 import { convertToPDF } from 'utils/report';
 import { getExportedAtTitle } from 'utils/export';
 import { UTCDate } from '@date-fns/utc';
@@ -221,7 +220,7 @@ const handler = async (req, res) => {
       isBold: true,
     });
 
-    const daysDiff = differenceInDays(new Date(toDate), new Date(fromDate));
+    const daysDiff = getDifferenceInDays(fromDate, toDate, null, null, true);
 
     const minRehearsalStartTimeInEpoch = data.reduce((acc, x) => {
       if (x.RehearsalStartDate && new Date(x.RehearsalStartDate).getTime() < acc) {
