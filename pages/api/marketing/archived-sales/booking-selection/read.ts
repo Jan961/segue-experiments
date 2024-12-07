@@ -94,7 +94,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           uniqueIds[selection.ProductionId] = true; // Mark this id as seen
           selection.HasSalesData = !performancesNoSales.includes(selection.BookingId);
 
-          // remove row number and it cannot be serialized as its a BigInt
+          // remove row number and it cannot be serialised as its a BigInt
           delete selection.RowNumber;
 
           results.push(selection);
