@@ -49,12 +49,13 @@ pipelines:
             - echo $TEST_APP_ENV | base64 --decode --ignore-garbage > .env
             - cat .env
             - npm run build
+            - npx cypress install
             # Run cypress component tests
             - set +e # Disable exit on error - cypress breaks if any of the tests fail
             - npm run cy:components
             - set -e
-            # generate component report
-            - npm run cy:report
+            # generate component report and don't stop the pipeline if the report generation fails
+            - npm run cy:report  || true
             # Clone the Cypress repository into a dir at the same level as Segue
             - cd ..
             - git clone git@bitbucket.org:segue-team/cypress.git && cd cypress
@@ -73,9 +74,9 @@ pipelines:
             - cd cypress
             - echo "Merging reports"
             # Merge reports from different spec files and generate an HTML report
-            - npm run merge-reports
+            - npm run merge-reports || true
             # Generate email report  template HTML file containing both component and integration test results that will form the body of the email
-            - node create-email-report
+            - node create-email-report || true
             # Zip the full report directory - this is commented out for now - I can add upload to the repo later if needed
             #zip -r full-report.zip mochawesome-report/
 
