@@ -93,7 +93,11 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         if (!uniqueIds[selection.ProductionId]) {
           uniqueIds[selection.ProductionId] = true; // Mark this id as seen
           selection.HasSalesData = !performancesNoSales.includes(selection.BookingId);
-          results.push(selection); // Push the unique item to the result array
+
+          // remove row number and it cannot be serialized as its a BigInt
+          delete selection.RowNumber;
+
+          results.push(selection);
         }
       });
 
