@@ -7,7 +7,6 @@ import classNames from 'classnames';
 import Button from 'components/core-ui-lib/Button';
 import SalesTable from 'components/global/salesTable';
 import { SalesTableVariant } from 'components/global/salesTable/SalesTable';
-import useAxios from 'hooks/useAxios';
 import styled from 'styled-components';
 import { Spinner } from 'components/global/Spinner';
 import { BookingSelection, SalesComparison, SalesSnapshot } from 'types/MarketingTypes';
@@ -52,8 +51,6 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
   const { productions } = useRecoilValue(productionJumpState);
   const [isExportModalOpen, setIsExportModalOpen] = useState<boolean>(false);
   const salesTableRef = useRef(null);
-
-  const { fetchData } = useAxios();
 
   const handleModalCancel = () => onCancel?.();
   const [venueDesc, setVenueDesc] = useState<string>('');
@@ -112,13 +109,9 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
 
     setLoading(true);
     try {
-      const data = await fetchData({
-        url: '/api/marketing/archived-sales/booking-selection/read',
-        method: 'POST',
-        data: {
-          salesByType: 'venue',
-          venueCode: venue.Code,
-        },
+      const { data } = await axios.post('/api/marketing/archived-sales/booking-selection/read', {
+        salesByType: 'venue',
+        venueCode: venue.Code,
       });
 
       if (Array.isArray(data) && data.length > 0) {
@@ -288,7 +281,6 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
           {showCompSelectModal && (
             <SalesTable
               salesTableRef={salesTableRef}
-              key={JSON.stringify(selectedBookings)}
               containerHeight="h-auto"
               containerWidth="w-[920px]"
               module="bookings"

@@ -104,6 +104,7 @@ export type BookingSelection = {
   ProductionLengthWeeks: number;
   PerformanceCount?: number;
   HasSalesData?: boolean;
+  RowNumber?: bigint;
 };
 
 export type SalesTabs =
