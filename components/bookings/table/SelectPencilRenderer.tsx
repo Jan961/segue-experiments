@@ -13,7 +13,7 @@ const pencilNos = Array.from({ length: 9 }, (_, index) => ({ text: `${index + 1}
 const SelectPencilRenderer = ({ eGridCell, value, setValue, data, api, node }: SelectPencilRendererProps) => {
   const [isDisabled, setIsDisabled] = useState<boolean>(false);
 
-  const handleValueChange = (value: number) => {
+  const handleValueChange = (value) => {
     setValue(value);
     node.setData({ ...node.data, pencilNo: value });
     if (data.isRunOfDates && node.rowIndex === 0) {
@@ -39,7 +39,7 @@ const SelectPencilRenderer = ({ eGridCell, value, setValue, data, api, node }: S
         eGridCell={eGridCell}
         onChange={handleValueChange}
         options={pencilNos}
-        value={`${value !== null ? value : null}`}
+        value={value ? `${value}` : value}
         inline
         isSearchable={false}
         disabled={isDisabled}

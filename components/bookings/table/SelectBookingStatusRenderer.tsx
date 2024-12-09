@@ -22,7 +22,9 @@ const SelectBookingStatusRenderer = ({
     setValue(value);
     node.setData({ ...data, bookingStatus: value });
     if (data.isRunOfDates && node.rowIndex === 0) {
-      api.forEachNode((node: IRowNode) => node.setData({ ...node.data, bookingStatus: value }));
+      api.forEachNode((node: IRowNode) =>
+        node.setData({ ...node.data, bookingStatus: value, pencilNo: data.pencilNo }),
+      );
     }
   };
 

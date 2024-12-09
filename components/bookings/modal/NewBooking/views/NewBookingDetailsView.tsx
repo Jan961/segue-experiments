@@ -193,8 +193,8 @@ export default function NewBookingDetailsView({
           venueOptions,
           addRowToTable,
           removeRowFromTable,
-          changeBookingLength,
           permissions.includes('ACCESS_BOOKING_NOTES'),
+          changeBookingLength,
         ),
       );
       setBookingData(data);
@@ -356,7 +356,6 @@ export default function NewBookingDetailsView({
 
   const handePreviewBookingClick = () => {
     const rowData = getRowData();
-    console.log('ROWDATA', rowData);
     if (!validateBooking(rowData)) {
       return;
     }
