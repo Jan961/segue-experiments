@@ -589,7 +589,6 @@ export const EditDealMemoContractModal = ({
         title="Deal Memo"
         onClose={() => handleCancelForm(false)}
         hasOverlay={true}
-        hasOverflow={false}
         footerComponent={
           <div className="flex justify-end items-center">
             <Button onClick={() => handleCancelForm(false)} className="w-33" variant="secondary" text="Cancel" />
@@ -1058,7 +1057,7 @@ export const EditDealMemoContractModal = ({
                           !formData.HasCalls ||
                           !dealCall[index].DMCType ||
                           !dealCall[index].DMCPromoterOrVenue ||
-                          canEdit
+                          !canEdit
                         }
                         onBlur={(value) => {
                           if (dealCall[index].DMCType === 'v') {

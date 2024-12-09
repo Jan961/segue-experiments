@@ -5,7 +5,7 @@ import { getUserPermisisons } from 'services/userService';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const { email, companyName, pin } = req.body;
+    const { email, organisationId, pin } = req.body;
     const accountUser = await prisma.AccountUser.findFirst({
       where: {
         AccUserIsActive: true,
@@ -15,7 +15,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         },
         Account: {
           AccountPIN: pin,
-          AccountName: companyName,
+          AccountOrganisationId: organisationId,
         },
       },
       select: {

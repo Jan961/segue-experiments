@@ -14,7 +14,6 @@ import { userState } from 'state/account/userState';
 import { useMemo, useState } from 'react';
 import { getColumnDefs } from 'components/tasks/tableConfig';
 import { mapToProductionTasksDTO } from 'mappers/tasks';
-import { productionJumpState } from 'state/booking/productionJumpState';
 import Spinner from 'components/core-ui-lib/Spinner';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -37,7 +36,7 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
   if (!exists) {
     usersList.unshift({ value: -1, text: 'All' });
   }
-  const currentProductionObjList = useRecoilValue(productionJumpState).productions;
+
   return (
     <>
       {isShowSpinner && (
@@ -56,10 +55,8 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
           <TasksTable rowData={[]} />
         ) : (
           filteredProductions.map((production) => {
-            const columnDefs = getColumnDefs(
-              usersList,
-              currentProductionObjList.find((item) => item.Id === production.Id),
-            );
+            const columnDefs = getColumnDefs(usersList, production);
+
             return (
               <div key={production.Id} className="mb-10">
                 <TasksTable

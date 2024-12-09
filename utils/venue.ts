@@ -13,7 +13,7 @@ export interface PrimaryAddress {
   primaryPostCode?: string;
   primaryPhoneNumber?: string;
   primaryEMail?: string;
-  primaryWhat3Words?: string;
+  what3WordsEntrance?: string;
   primaryCoordinates?: { latitude: null; longitude: null };
 }
 
@@ -52,6 +52,7 @@ type UiVenueAddress = PrimaryAddress | DeliveryAddress;
 export interface VenueData {
   AddressLoadingW3W: string;
   AddressStageDoorW3W: string;
+  AddressEntranceW3W: string;
   BarringClause: number;
   BarringMiles: number;
   BarringWeeksPost: number;
@@ -110,6 +111,7 @@ export interface UiVenue {
   excludeFromChecks: boolean;
   what3WordsStage?: string;
   what3WordsLoading?: string;
+  what3WordsEntrance: string;
   barredVenues?: UiBarredVenue[];
   files?: fileInterface[];
 }
@@ -199,6 +201,7 @@ export const transformVenues = (
       ExcludeFromChecks,
       AddressStageDoorW3W,
       AddressLoadingW3W,
+      AddressEntranceW3W,
       VenueBarredVenue_VenueBarredVenue_VBVVenueIdToVenue: BarredVenues,
       VenueContact,
       Files,
@@ -238,6 +241,7 @@ export const transformVenues = (
         excludeFromChecks: ExcludeFromChecks,
         what3WordsStage: AddressStageDoorW3W,
         what3WordsLoading: AddressLoadingW3W,
+        what3WordsEntrance: AddressEntranceW3W,
         barredVenues,
         ...address1,
         ...address2,
