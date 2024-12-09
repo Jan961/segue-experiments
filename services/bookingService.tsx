@@ -66,7 +66,6 @@ export const updateBooking = async (booking: EnrichedBooking, tx) => {
       data: payload,
       include: bookingInclude,
     });
-    console.log(booking.Performances);
     if (isNullOrEmpty(booking.Performances)) {
       updatedPerformances = await tx.performance.create({
         data: { BookingId: booking.Id, Date: booking.FirstDate, Time: null },

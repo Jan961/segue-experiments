@@ -152,7 +152,6 @@ const AddBooking = ({ visible, onClose, startDate, endDate, bookingInfo, booking
         ...b,
         runTag: state.form.isRunOfDates ? runTagForRunOfDates : nanoid(8),
       }));
-      console.log('new', bookingsWithRunTag);
       const { data } = await axios.post('/api/bookings/add', bookingsWithRunTag);
       onClose(data);
     } catch (e) {
@@ -173,7 +172,6 @@ const AddBooking = ({ visible, onClose, startDate, endDate, bookingInfo, booking
     try {
       const runTag = state.form.isRunOfDates ? state.booking[0].runTag : nanoid(8);
       const bookingsUpdatedWithRunTag = state.bookingUpdates.map((b) => (!b.runTag ? { ...b, runTag } : b));
-      console.log('Update', bookingsUpdatedWithRunTag);
       const { data: updated } = await axios.post(
         `${state.form.isRunOfDates ? '/api/bookings/update-run-of-dates' : '/api/bookings/update'}`,
         {
@@ -181,7 +179,6 @@ const AddBooking = ({ visible, onClose, startDate, endDate, bookingInfo, booking
           updated: bookingsUpdatedWithRunTag,
         },
       );
-      console.log('Update Updated', updated);
       onClose(updated);
     } catch (e) {
       console.log('Failed to update booking', e);

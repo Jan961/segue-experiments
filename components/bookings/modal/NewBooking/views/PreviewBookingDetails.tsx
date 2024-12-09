@@ -157,7 +157,6 @@ export default function PreviewBookingDetails({
   };
 
   const getPerformanceTimes = (item) => {
-    console.log('Times', item.times);
     if (item.times) {
       const times = item.times.split(';');
       const accTimes = times.slice(0, item.noPerf);

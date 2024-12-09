@@ -32,8 +32,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       }
     });
 
-    console.log('1FFG', formattedBookings);
-
     // check if we have run of dates
     const { isRunOfDates } = bookingsData[0];
     if (isRunOfDates) {
@@ -51,8 +49,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       }
       formattedBookings = [...nonPerformances, performanceBooking];
     }
-
-    console.log(formattedBookings);
 
     const { bookings, performances, rehearsals, getInFitUps, others } = await BookingService.createBookings(
       formattedBookings,
