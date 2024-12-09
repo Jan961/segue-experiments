@@ -1,7 +1,7 @@
 // Label.spec.tsx
 import { mount } from 'cypress/react18';
 import Label from '../../../components/core-ui-lib/Label/Label';
-import BaseComp from '../global/BaseComp'; // Adjust the import path as needed
+import BaseComp from '../helpers/BaseComp'; // Adjust the import path as needed
 
 // Define the setup function for mounting the component
 function setup(props) {

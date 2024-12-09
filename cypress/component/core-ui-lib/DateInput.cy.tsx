@@ -1,5 +1,5 @@
 import DateInput, { DateInputProps } from '../../../components/core-ui-lib/DateInput';
-import BaseComp from '../global/BaseComp';
+import BaseComp from '../helpers/BaseComp';
 import { mount } from 'cypress/react18';
 import { newDate } from '../../../services/dateService';
 

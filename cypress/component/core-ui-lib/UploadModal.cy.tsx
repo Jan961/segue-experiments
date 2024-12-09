@@ -4,7 +4,7 @@ import { mount } from 'cypress/react18';
 import UploadModal from '../../../components/core-ui-lib/UploadModal';
 import { UploadModalProps } from '../../../components/core-ui-lib/UploadModal/interface';
 import 'cypress-file-upload';
-import BaseComp from '../global/BaseComp';
+import BaseComp from '../helpers/BaseComp';
 
 function setup(props: UploadModalProps) {
   mount(
