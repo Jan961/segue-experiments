@@ -454,6 +454,9 @@ export const getMonday = (inputDate: UTCDate | string | number, locale?: Locale)
     return null;
   }
   const currentDateObj = safeDate(inputDate, locale);
+  if (!isValid(currentDateObj)) {
+    return null;
+  }
   currentDateObj.setDate(currentDateObj.getDate() - ((currentDateObj.getDay() + 6) % 7));
   return currentDateObj;
 };

@@ -144,6 +144,29 @@ const ADMIN_HOME_PERMISSIONS = [
   'DELETE_USER',
 ];
 
+const PROJECT_MANAGEMENT_PERMISSIONS = [
+  'ACCESS_MASTER_TASK_LIST',
+  'ACCESS_PRODUCTION_TASK_LISTS',
+  'ACCESS_MASTER_TASK_NOTES',
+  'ADD_MASTER_TASK',
+  'CLONE_MASTER_TASK',
+  'DELETE_MASTER_TASK',
+  'ACCESS_EDIT_MASTER_TASKS',
+  'ACCESS_EDIT_MASTER_TASKS',
+  'EDIT_MASTER_TASKS',
+  'ACCESS_EDIT_PROD_TASKS',
+  'ACCESS_PROD_TASK_NOTES',
+  'ACCESS_PROD_TASK_REPORTS',
+  'ADD_PROD_TASK',
+  'EDIT_PROD_TASK_DROPDOWNS',
+  'DELETE_PROD_TASK',
+  'EDIT_PROD_TASK',
+  'EDIT_MASTER_TASK_NOTES',
+  'EDIT_PROD_TASK_NOTES',
+  'EXPORT_MASTER_TASK_LIST',
+  'EXPORT_PRODUCTION_TASK_LIST',
+];
+
 export const accessHome = selector({
   key: 'accessHomeSelector',
   get: ({ get }) => {
@@ -231,6 +254,14 @@ export const accessAdminHome = selector({
   get: ({ get }) => {
     const { permissions = [] } = get(userPermissionsState);
     return permissions.filter((x) => ADMIN_HOME_PERMISSIONS.includes(x));
+  },
+});
+
+export const accessProjectManagement = selector({
+  key: 'accessProjectManagement',
+  get: ({ get }) => {
+    const { permissions = [] } = get(userPermissionsState);
+    return permissions.filter((x) => PROJECT_MANAGEMENT_PERMISSIONS.includes(x));
   },
 });
 
