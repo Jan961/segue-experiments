@@ -6,6 +6,7 @@ import { checkDateValid, getPerformanceTime } from 'utils/getTimeFromDateTime';
 import { NextApiRequest } from 'next';
 import getPrismaClient from 'lib/prisma';
 import { activityMapper } from 'lib/mappers';
+import { newDate } from './dateService';
 
 export type NewPerformance = {
   Date: string;
@@ -71,7 +72,7 @@ export const updateBooking = async (booking: NewBooking, tx) => {
       updatedPerformances = await tx.performance.createMany({
         data: booking.Performances.map((p: NewPerformance) => ({
           BookingId: booking.Id,
-          Date: new Date(p.Date),
+          Date: newDate(p.Date),
           Time: getPerformanceTime(p),
         })),
       });
@@ -274,7 +275,7 @@ export const createNewBooking = (
 ) => {
   const performanceData = Performances.map((p: NewPerformance) => {
     return {
-      Date: new Date(p.Date),
+      Date: newDate(p.Date),
       Time: checkDateValid(getPerformanceTime(p)),
     };
   });
@@ -332,7 +333,7 @@ export const createNewRehearsal = (
       StatusCode,
       RunTag,
       PencilNum,
-      Date: new Date(BookingDate),
+      Date: newDate(BookingDate),
       DateBlock: {
         connect: {
           Id: DateBlockId,
@@ -363,7 +364,7 @@ export const createGetInFitUp = (
       Notes,
       PencilNum,
       RunTag,
-      Date: new Date(BookingDate),
+      Date: newDate(BookingDate),
       DateBlock: {
         connect: {
           Id: DateBlockId,
@@ -394,7 +395,7 @@ export const createOtherBooking = (
       StatusCode,
       PencilNum,
       RunTag,
-      Date: new Date(BookingDate),
+      Date: newDate(BookingDate),
       DateBlock: {
         connect: {
           Id: DateBlockId,
