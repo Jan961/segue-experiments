@@ -54,7 +54,7 @@ const valueWithCurrency = (inputText: string) => {
   return currencySymbol + profit;
 };
 
-const intFormatter: (inputSeats: string) => number = (inputSeats: string) => {
+const integerFormatter: (inputSeats: string) => number = (inputSeats: string) => {
   return parseInt(inputSeats) || 0;
 };
 
@@ -569,10 +569,10 @@ export const salesColDefs = (schoolDataAvail, isMarketing, booking, setSalesActi
       field: 'seatsChange',
       cellRenderer: function (params) {
         const rowIndex = params.node.rowIndex;
-        const schSeatsSold = intFormatter(params.data.schSeatsSold);
-        const genSeatsSold = intFormatter(params.data.genSeatsSold);
-        const schReserved = intFormatter(params.data.schReserved);
-        const genReserved = intFormatter(params.data.genReserved);
+        const schSeatsSold = integerFormatter(params.data.schSeatsSold);
+        const genSeatsSold = integerFormatter(params.data.genSeatsSold);
+        const schReserved = integerFormatter(params.data.schReserved);
+        const genReserved = integerFormatter(params.data.genReserved);
         const currentValue = schSeatsSold + genSeatsSold + schReserved + genReserved;
 
         let seatsChange;
