@@ -54,8 +54,12 @@ const valueWithCurrency = (inputText: string) => {
   return currencySymbol + profit;
 };
 
-const seatsTotalFormatter: (inputSeats: string) => number = (inputSeats: string) => {
+const intFormatter: (inputSeats: string) => number = (inputSeats: string) => {
   return parseInt(inputSeats) || 0;
+};
+
+const floatFormatter: (inputValue: string) => number = (inputValue: string) => {
+  return parseFloat(inputValue) || 0;
 };
 
 export const prodComparisionColDefs = (optionsLength = 0, selectForComparison, selectedBookings) => [
@@ -515,15 +519,13 @@ export const salesColDefs = (schoolDataAvail, isMarketing, booking, setSalesActi
       field: 'valueChange',
       cellRenderer: function (params) {
         const rowIndex = params.node.rowIndex;
-        const currSchResValue =
-          params.data.schReservations === '' ? 0 : parseFloat(params.data.schReservations.slice(1));
-        const currGenResValue =
-          params.data.genReservations === '' ? 0 : parseFloat(params.data.genReservations.slice(1));
-        const totalReserve = currSchResValue + currGenResValue;
-        const currSchSoldVal = params.data.schTotalValue === '' ? 0 : parseFloat(params.data.schTotalValue.slice(1));
-        const currGenSoldVal = params.data.genTotalValue === '' ? 0 : parseFloat(params.data.genTotalValue.slice(1));
+        const currSchResValue = params.data.schReservations === '' ? 0 : params.data.schReservations.slice(1);
+        const currGenResValue = params.data.genReservations === '' ? 0 : params.data.genReservations.slice(1);
+        const totalReserve = floatFormatter(currSchResValue) + floatFormatter(currGenResValue);
+        const currSchSoldVal = params.data.schTotalValue === '' ? 0 : params.data.schTotalValue.slice(1);
+        const currGenSoldVal = params.data.genTotalValue === '' ? 0 : params.data.genTotalValue.slice(1);
 
-        const totalSold = currSchSoldVal + currGenSoldVal;
+        const totalSold = floatFormatter(currSchSoldVal) + floatFormatter(currGenSoldVal);
         const currentValue = totalReserve + totalSold;
         const currencySymbol = params.data.genTotalValue.charAt(0);
         let valueChange;
@@ -531,17 +533,14 @@ export const salesColDefs = (schoolDataAvail, isMarketing, booking, setSalesActi
           valueChange = currentValue;
         } else {
           const previousRowData = params.api.getDisplayedRowAtIndex(rowIndex - 1).data;
-          const prevSchResValue =
-            previousRowData.schReservations === '' ? 0 : parseFloat(previousRowData.schReservations.slice(1));
-          const prevGenResValue =
-            previousRowData.genReservations === '' ? 0 : parseFloat(previousRowData.genReservations.slice(1));
-          const totalPrevReserve = prevSchResValue + prevGenResValue;
-          const prevSchSoldVal =
-            previousRowData.schTotalValue === '' ? 0 : parseFloat(previousRowData.schTotalValue.slice(1));
-          const prevGenSoldVal =
-            previousRowData.genTotalValue === '' ? 0 : parseFloat(previousRowData.genTotalValue.slice(1));
+          const prevSchResValue = previousRowData.schReservations === '' ? 0 : previousRowData.schReservations.slice(1);
+          const prevGenResValue = previousRowData.genReservations === '' ? 0 : previousRowData.genReservations.slice(1);
 
-          const totalPrevSold = prevSchSoldVal + prevGenSoldVal;
+          const totalPrevReserve = floatFormatter(prevSchResValue) + floatFormatter(prevGenResValue);
+          const prevSchSoldVal = previousRowData.schTotalValue === '' ? 0 : previousRowData.schTotalValue.slice(1);
+          const prevGenSoldVal = previousRowData.genTotalValue === '' ? 0 : previousRowData.genTotalValue.slice(1);
+
+          const totalPrevSold = floatFormatter(prevSchSoldVal) + floatFormatter(prevGenSoldVal);
           const prevValueTotal = totalPrevReserve + totalPrevSold;
           valueChange = currentValue - prevValueTotal;
         }
@@ -570,10 +569,10 @@ export const salesColDefs = (schoolDataAvail, isMarketing, booking, setSalesActi
       field: 'seatsChange',
       cellRenderer: function (params) {
         const rowIndex = params.node.rowIndex;
-        const schSeatsSold = seatsTotalFormatter(params.data.schSeatsSold);
-        const genSeatsSold = seatsTotalFormatter(params.data.genSeatsSold);
-        const schReserved = seatsTotalFormatter(params.data.schReserved);
-        const genReserved = seatsTotalFormatter(params.data.genReserved);
+        const schSeatsSold = intFormatter(params.data.schSeatsSold);
+        const genSeatsSold = intFormatter(params.data.genSeatsSold);
+        const schReserved = intFormatter(params.data.schReserved);
+        const genReserved = intFormatter(params.data.genReserved);
         const currentValue = schSeatsSold + genSeatsSold + schReserved + genReserved;
 
         let seatsChange;
