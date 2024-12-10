@@ -25,10 +25,6 @@ type TourResponse = {
   frequency: string;
 };
 
-export interface SalesEntryRef {
-  resetForm: (salesWeek: string) => void;
-}
-
 const GlobalActivityView = () => {
   const permissions = useRecoilValue(accessMarketingHome);
   const [loading, setLoading] = useState<boolean>(false);

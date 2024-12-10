@@ -3,6 +3,8 @@ import { startOfDay } from 'date-fns';
 import getPrismaClient from 'lib/prisma';
 import master from 'lib/prisma_master';
 import {
+  compareDatesWithoutTime,
+  formatDate,
   getArrayOfDatesBetween,
   getDateDaysAway,
   getMonday,
@@ -64,6 +66,9 @@ export default async function handle(req, res) {
       const weekStart = week.mondayDate;
       const weekEnd = getDateDaysAway(newDate(week.mondayDate), 6);
 
+      // if weekStart is in the future - end the forEach so user cannot enter sales in the future
+      if (compareDatesWithoutTime(weekStart, newDate(), '>')) return;
+
       // skip weekNo 0, there isn't a 0, go straight from -1 to 1
       if (weekNo === 0) {
         weekNo = weekNo + 1;
@@ -71,10 +76,13 @@ export default async function handle(req, res) {
 
       // for daily sales
       if (salesFrequency === 'D') {
-        const dates = getArrayOfDatesBetween(weekStart, weekEnd.toString());
+        // don't show dates in the future
+        const weekEndDate = compareDatesWithoutTime(weekEnd, newDate(), '>') ? newDate() : weekEnd.getTime();
+
+        const dates = getArrayOfDatesBetween(newDate(weekStart).getTime(), weekEndDate);
         dates.forEach((date) => {
           let obj = {
-            text: weekNo.toString() + ' ' + formatInputDate(date),
+            text: weekNo.toString() + ' ' + formatDate(date, 'dd/MM/yy'),
             value: date,
             selected: false,
             weekNo,

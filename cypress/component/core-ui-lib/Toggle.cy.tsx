@@ -1,7 +1,7 @@
 // cypress/component/Toggle.spec.tsx
 import { mount } from 'cypress/react18';
 import Toggle from '../../../components/core-ui-lib/Toggle';
-import BaseComp from '../global/BaseComp';
+import BaseComp from '../helpers/BaseComp';
 import { useState } from 'react';
 
 describe('Toggle Component Tests', () => {

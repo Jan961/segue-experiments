@@ -1057,7 +1057,7 @@ export const EditDealMemoContractModal = ({
                           !formData.HasCalls ||
                           !dealCall[index].DMCType ||
                           !dealCall[index].DMCPromoterOrVenue ||
-                          canEdit
+                          !canEdit
                         }
                         onBlur={(value) => {
                           if (dealCall[index].DMCType === 'v') {
