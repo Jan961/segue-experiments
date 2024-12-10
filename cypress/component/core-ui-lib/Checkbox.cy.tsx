@@ -3,7 +3,7 @@
 import { mount } from 'cypress/react18';
 import Checkbox from '../../../components/core-ui-lib/Checkbox';
 import { useState } from 'react';
-import BaseComp from '../global/BaseComp';
+import BaseComp from '../helpers/BaseComp';
 
 describe('Checkbox Component', () => {
   it('renders correctly', () => {

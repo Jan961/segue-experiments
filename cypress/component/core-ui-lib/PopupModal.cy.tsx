@@ -2,8 +2,8 @@
 
 import { mount } from 'cypress/react18';
 import PopupModal from '../../../components/core-ui-lib/PopupModal';
-import BaseComp from '../global/BaseComp';
-import { GridContent, VerticalContent } from '../global/Content';
+import BaseComp from '../helpers/BaseComp';
+import { GridContent, VerticalContent } from '../helpers/Content';
 
 // Setup function to mount the component
 function setup(props) {

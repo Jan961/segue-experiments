@@ -1,7 +1,7 @@
 // cypress/component/Iframe.cy.tsx
 import { mount } from 'cypress/react18';
 import Iframe, { IframeProps, Variant } from '../../../components/core-ui-lib/Iframe';
-import BaseComp from '../global/BaseComp'; // Adjust the import path accordingly
+import BaseComp from '../helpers/BaseComp'; // Adjust the import path accordingly
 
 const setup = (props: IframeProps) => {
   mount(
