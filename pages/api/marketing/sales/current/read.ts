@@ -1,6 +1,7 @@
+import { UTCDate } from '@date-fns/utc';
 import getPrismaClient from 'lib/prisma';
 import { PrismaClient } from 'prisma/generated/prisma-client';
-import { compareDatesWithoutTime, getDateDaysAway, getMonday } from 'services/dateService';
+import { compareDatesWithoutTime, getDateDaysAway, getMonday, newDate } from 'services/dateService';
 import { formatDecimalValue, isNullOrUndefined } from 'utils';
 
 const generateSalesObject = (sales) => {
@@ -55,7 +56,7 @@ export default async function handle(req, res) {
     const salesFrequency = await getSalesFrequency(prisma, productionId);
     let dateField = salesFrequency === 'W' ? 'SetProductionWeekDate' : 'SetSalesFiguresDate';
     const salesEntryDuration = salesFrequency === 'W' ? 7 : 1;
-    let currentSalesDate = salesFrequency === 'W' ? getMonday(req.body.salesDate) : req.body.salesDate;
+    let currentSalesDate = salesFrequency === 'W' ? getMonday(req.body.salesDate) : newDate(req.body.salesDate);
 
     const data = await prisma.salesView.findMany({
       where: {
@@ -82,10 +83,10 @@ export default async function handle(req, res) {
     // if sale date is null, final sales entry is making the request, set the sales date to the last date entry
     if (req.body.salesDate === null) {
       const sortedData = data.sort(
-        (a, b) => new Date(b.SetProductionWeekDate).getTime() - new Date(a.SetProductionWeekDate).getTime(),
+        (a, b) => new UTCDate(b.SetProductionWeekDate).getTime() - new UTCDate(a.SetProductionWeekDate).getTime(),
       );
 
-      currentSalesDate = new Date(sortedData[0].SetProductionWeekDate);
+      currentSalesDate = new UTCDate(sortedData[0].SetProductionWeekDate);
       dateField = 'SetProductionWeekDate';
     }
 
