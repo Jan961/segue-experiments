@@ -14,8 +14,10 @@ const SelectPencilRenderer = ({ eGridCell, value, setValue, data, api, node }: S
   const [isDisabled, setIsDisabled] = useState<boolean>(false);
 
   const handleValueChange = (value) => {
-    node.setData({ ...data, pencilNo: value });
-    if (data.isRunOfDates) {
+    setValue(value);
+    node.setData({ ...node.data, pencilNo: value });
+    if (data.isRunOfDates && node.rowIndex === 0) {
+      node.setData({ ...data, pencilNo: value });
       api.forEachNode((node: IRowNode) => node.setData({ ...node.data, pencilNo: value }));
     }
   };
@@ -24,17 +26,12 @@ const SelectPencilRenderer = ({ eGridCell, value, setValue, data, api, node }: S
     if (data) {
       const { dayType, bookingStatus } = data;
       const pencilled = statusOptions.find(({ text }) => text === 'Pencilled').value;
-
+      data.bookingStatus === pencilled ? handleValueChange(1) : handleValueChange(null);
       setIsDisabled(
         (node.rowIndex > 0 && data.isRunOfDates) || dayType === null || dayType === '' || bookingStatus !== pencilled,
       );
-      if (!data.isRunOfDates) {
-        setValue(dayType === null || dayType === '' || bookingStatus !== pencilled ? null : value);
-      } else if (node.rowIndex === 0 && value !== null && (dayType === null || dayType === '')) {
-        handleValueChange(null);
-      }
     }
-  }, [data, node]);
+  }, [data.bookingStatus, data.perf]);
 
   return (
     <div className="pl-1 pr-2 mt-1">
@@ -42,7 +39,7 @@ const SelectPencilRenderer = ({ eGridCell, value, setValue, data, api, node }: S
         eGridCell={eGridCell}
         onChange={handleValueChange}
         options={pencilNos}
-        value={`${value > 0 ? value : ''}`}
+        value={value ? `${value}` : value}
         inline
         isSearchable={false}
         disabled={isDisabled}

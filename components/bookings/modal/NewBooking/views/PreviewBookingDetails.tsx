@@ -148,7 +148,7 @@ export default function PreviewBookingDetails({
   };
 
   const getVenue = (item) => {
-    if (!item.perf) {
+    if (!item.perf && item.dayType) {
       return dayTypeOptions.find((option) => option.value === item.dayType)?.text;
     }
     return item.venue
