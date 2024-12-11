@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from 'react';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import { ICellRendererParams } from 'ag-grid-community';
 import SelectRenderer from 'components/core-ui-lib/Table/renderers/SelectRenderer';
-import { statusOptions } from 'config/bookings';
 import { RUN_OF_DATES_DAY_TYPE_FILTERS } from '../utils';
 
 interface SelectDayTypeRendererProps extends ICellRendererParams {
@@ -17,7 +16,6 @@ const SelectDayTypeRender = ({
   dayTypeOptions,
   eGridCell,
 }: SelectDayTypeRendererProps) => {
-  const pencilledStatus = statusOptions.find(({ text }) => text === 'Pencilled').value;
   const [selectedDateType, setSelectedDateType] = useState<string>('');
 
   const options = useMemo(() => {
@@ -47,7 +45,6 @@ const SelectDayTypeRender = ({
       isBooking,
       isRehearsal,
       isGetInFitUp,
-      bookingStatus: pencilledStatus,
     });
   };
 
