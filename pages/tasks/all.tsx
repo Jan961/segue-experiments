@@ -59,12 +59,7 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
           <TasksTable rowData={[]} />
         ) : (
           filteredProductions.map((production) => {
-            const columnDefs = getColumnDefs(
-              usersList,
-              currentProductionObjList.find((item) => item.Id === production.Id),
-              canEdit,
-              canAccessTaskNotes,
-            );
+            const columnDefs = getColumnDefs(usersList, production, canEdit, canAccessTaskNotes);
             return (
               <div key={production.Id} className="mb-10">
                 <TasksTable
