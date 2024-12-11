@@ -9,7 +9,6 @@ import EditVenueContractModal from '../modal/EditVenueContractModal';
 import { addEditContractsState } from '../../../state/contracts/contractsState';
 import { RowDoubleClickedEvent } from 'ag-grid-community';
 import { accessVenueContracts } from 'state/account/selectors/permissionSelector';
-
 interface ContractsTableProps {
   rowData?: ContractTableRowType;
 }
@@ -20,6 +19,7 @@ export default function ContractsTable({ rowData }: ContractsTableProps) {
   const [filter, setFilter] = useRecoilState(contractsFilterState);
   const [editContractData, setEditContractData] = useRecoilState(addEditContractsState);
   const [rows, setRows] = useState([]);
+
   const gridOptions = {
     getRowStyle: (params) => {
       return params.data.status === 'U' ? { fontStyle: 'italic' } : '';
@@ -48,7 +48,6 @@ export default function ContractsTable({ rowData }: ContractsTableProps) {
     if (rowData) {
       let formattedRows = formatRowsForPencilledBookings(rowData);
       formattedRows = formatRowsForMultipeBookingsAtSameVenue(formattedRows);
-
       setRows(formattedRows);
     }
   }, [rowData]);

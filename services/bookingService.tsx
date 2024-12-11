@@ -6,13 +6,18 @@ import { checkDateValid, getPerformanceTime } from 'utils/getTimeFromDateTime';
 import { NextApiRequest } from 'next';
 import getPrismaClient from 'lib/prisma';
 import { activityMapper } from 'lib/mappers';
+import { newDate } from './dateService';
 
 export type NewPerformance = {
   Date: string;
   Time: string;
 };
 
-type NewBooking = Partial<Booking> & { Performances: NewPerformance[]; BookingDate: string; RunTag: string };
+export type EnrichedBooking = Partial<Booking> & {
+  Performances: NewPerformance[];
+  BookingDate: string;
+  RunTag: string;
+};
 
 export interface AddBookingsParams {
   Date: string;
@@ -41,7 +46,7 @@ export type BookingsWithPerformances = Prisma.BookingGetPayload<{
   include: typeof bookingInclude;
 }>;
 
-export const updateBooking = async (booking: NewBooking, tx) => {
+export const updateBooking = async (booking: EnrichedBooking, tx) => {
   let updatedBooking = null;
   let updatedPerformances = null;
   const payload = {
@@ -71,7 +76,7 @@ export const updateBooking = async (booking: NewBooking, tx) => {
       updatedPerformances = await tx.performance.createMany({
         data: booking.Performances.map((p: NewPerformance) => ({
           BookingId: booking.Id,
-          Date: new Date(p.Date),
+          Date: newDate(p.Date),
           Time: getPerformanceTime(p),
         })),
       });
@@ -79,6 +84,7 @@ export const updateBooking = async (booking: NewBooking, tx) => {
     return { ...updatedBooking, ...updatedPerformances };
   } catch (e) {
     console.log('Error in booking service', e);
+    throw e;
   }
 };
 
@@ -269,12 +275,12 @@ export const changeBookingDate = async (Id: number, FirstDate: Date, prisma) => 
 };
 
 export const createNewBooking = (
-  { Performances, VenueId, DateBlockId, BookingDate, StatusCode, Notes, PencilNum, RunTag }: NewBooking,
+  { Performances, VenueId, DateBlockId, BookingDate, StatusCode, Notes, PencilNum, RunTag }: EnrichedBooking,
   tx,
 ) => {
   const performanceData = Performances.map((p: NewPerformance) => {
     return {
-      Date: new Date(p.Date),
+      Date: newDate(p.Date),
       Time: checkDateValid(getPerformanceTime(p)),
     };
   });
@@ -332,7 +338,7 @@ export const createNewRehearsal = (
       StatusCode,
       RunTag,
       PencilNum,
-      Date: new Date(BookingDate),
+      Date: newDate(BookingDate),
       DateBlock: {
         connect: {
           Id: DateBlockId,
@@ -363,7 +369,7 @@ export const createGetInFitUp = (
       Notes,
       PencilNum,
       RunTag,
-      Date: new Date(BookingDate),
+      Date: newDate(BookingDate),
       DateBlock: {
         connect: {
           Id: DateBlockId,
@@ -394,7 +400,7 @@ export const createOtherBooking = (
       StatusCode,
       PencilNum,
       RunTag,
-      Date: new Date(BookingDate),
+      Date: newDate(BookingDate),
       DateBlock: {
         connect: {
           Id: DateBlockId,

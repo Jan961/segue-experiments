@@ -14,7 +14,6 @@ import { userState } from 'state/account/userState';
 import { useMemo, useState } from 'react';
 import { getColumnDefs } from 'components/tasks/tableConfig';
 import { mapToProductionTasksDTO } from 'mappers/tasks';
-import { productionJumpState } from 'state/booking/productionJumpState';
 import Spinner from 'components/core-ui-lib/Spinner';
 import { accessProjectManagement } from 'state/account/selectors/permissionSelector';
 
@@ -41,7 +40,7 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
   if (!exists) {
     usersList.unshift({ value: -1, text: 'All' });
   }
-  const currentProductionObjList = useRecoilValue(productionJumpState).productions;
+
   return (
     <>
       {isShowSpinner && (

@@ -4,9 +4,20 @@ import { isNullOrEmpty } from 'utils';
 export default async function handle(req, res) {
   try {
     const prisma = await getPrismaClient(req);
-    let { bookingId, salesDate, general, schools, setId, action } = req.body;
+    let { bookingId, salesDate, general, schools, setId } = req.body;
 
-    if (setId === -1) {
+    // validate the setId
+    const saleSetRecord = await prisma.salesSet.findFirst({
+      where: {
+        SetId: setId,
+      },
+      select: {
+        SetId: true,
+      },
+    });
+
+    // if there is no sales set - create one
+    if (isNullOrEmpty(saleSetRecord)) {
       const setResult = await prisma.salesSet.create({
         data: {
           SetBookingId: parseInt(bookingId),
@@ -19,35 +30,7 @@ export default async function handle(req, res) {
           SetIsCopy: false,
         },
       });
-
       setId = setResult.SetId;
-    } else {
-      const saleSetRecord = await prisma.salesSet.findFirst({
-        where: {
-          SetSalesFiguresDate: salesDate,
-          SetBookingId: bookingId,
-        },
-        select: {
-          SetId: true,
-        },
-      });
-      if (isNullOrEmpty(saleSetRecord)) {
-        const setResult = await prisma.salesSet.create({
-          data: {
-            SetBookingId: parseInt(bookingId),
-            SetPerformanceId: null,
-            SetSalesFiguresDate: salesDate,
-            SetBrochureReleased: false,
-            SetSingleSeats: false,
-            SetNotOnSale: false,
-            SetIsFinalFigures: false,
-            SetIsCopy: false,
-          },
-        });
-        setId = setResult.SetId;
-      } else {
-        setId = saleSetRecord.SetId;
-      }
     }
 
     const sales = [];
@@ -106,7 +89,7 @@ export default async function handle(req, res) {
       }
     }
 
-    res.status(200).json({ setId, transaction: action });
+    res.status(200).json({ setId });
   } catch (e) {
     console.error('Error:', e);
     res.status(500).json({ error: e.message });

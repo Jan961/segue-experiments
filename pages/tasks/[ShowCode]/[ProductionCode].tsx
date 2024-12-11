@@ -122,7 +122,6 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
     setIsProductionTaskList(false);
     setIsMasterTaskList(false);
   };
-  const currentProductionObj = useRecoilValue(productionJumpState).productions.find((item) => item.Id === ProductionId);
   return (
     <>
       {isShowSpinner && (

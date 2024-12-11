@@ -1,7 +1,7 @@
 // Loader.spec.tsx
 import Loader, { LoaderProps, variant } from '../../../components/core-ui-lib/Loader';
 import { mount } from 'cypress/react18';
-import BaseComp from '../global/BaseComp';
+import BaseComp from '../helpers/BaseComp';
 
 const setup = (props: LoaderProps) => {
   return mount(

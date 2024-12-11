@@ -2,7 +2,7 @@
 
 import { mount } from 'cypress/react18';
 import ExportModal from '../../../components/core-ui-lib/ExportModal/ExportModal';
-import BaseComp from '../global/BaseComp';
+import BaseComp from '../helpers/BaseComp';
 
 // Define the setup function for mounting the component
 function setup(props) {

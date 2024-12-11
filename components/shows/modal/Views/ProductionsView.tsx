@@ -348,6 +348,7 @@ const ProductionsView = ({ showData, visible, onClose }: ProductionsViewProps) =
             visible={openEditModal}
             onSave={onSaveProduction}
             onClose={() => setOpenEditModal(false)}
+            disabled={!permissions.includes('EDIT_PRODUCTION_DETAILS')}
           />
         )}
         {openCurrencyConversionModal && (

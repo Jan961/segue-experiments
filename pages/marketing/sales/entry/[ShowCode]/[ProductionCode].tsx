@@ -18,7 +18,7 @@ const Index = () => {
 
   const handleDateChanged = (salesWeek) => {
     if (salesEntryRef.current) {
-      salesEntryRef.current.resetForm(salesWeek);
+      salesEntryRef.current.changeWeek(salesWeek);
     }
   };
 

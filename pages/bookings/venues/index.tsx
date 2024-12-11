@@ -23,6 +23,8 @@ import { getAllCurrencyList } from 'services/globalService';
 import { UiTransformedVenue, transformVenues } from 'utils/venue';
 import { initialVenueState } from 'config/venue';
 import Spinner from 'components/core-ui-lib/Spinner';
+import { useRecoilValue } from 'recoil';
+import { accessBookingsHome } from 'state/account/selectors/permissionSelector';
 
 export type VenueFilters = {
   venueId: string;
@@ -43,6 +45,7 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
   const [editVenueContext, setEditVenueContext] = useState<UiTransformedVenue>(null);
   const { productionId, town, country, search } = filters;
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const permissions = useRecoilValue(accessBookingsHome);
 
   const filterVenues = useMemo(() => debounce({ delay: 1000 }, (payload) => fetchVenues(payload)), []);
 
@@ -126,6 +129,7 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
           onClose={onModalClose}
           fetchVenues={fetchVenues}
           setIsLoading={setIsLoading}
+          disabled={editVenueContext.id ? !permissions.includes('EDIT_VENUE_DETAILS') : false}
         />
       )}
     </>

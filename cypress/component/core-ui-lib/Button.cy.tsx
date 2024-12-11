@@ -1,5 +1,5 @@
 import Button from '../../../components/core-ui-lib/Button';
-import BaseComp from '../global/BaseComp';
+import BaseComp from '../helpers/BaseComp';
 
 const Wrapper = ({ props }) => (
   <BaseComp>

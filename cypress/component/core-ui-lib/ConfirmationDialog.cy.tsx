@@ -7,7 +7,7 @@ import ConfirmationDialog, {
   ConfirmationDialogProps,
 } from '../../../components/core-ui-lib/ConfirmationDialog';
 import { useState } from 'react';
-import BaseComp from '../global/BaseComp';
+import BaseComp from '../helpers/BaseComp';
 
 describe('ConfirmationDialog Component', () => {
   const defaultProps: Partial<ConfirmationDialogProps> = {
