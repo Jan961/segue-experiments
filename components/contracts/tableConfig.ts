@@ -4,7 +4,7 @@ import DateColumnRenderer from './table/DateColumnRenderer';
 import { tileColors } from 'config/global';
 import DefaultTextRenderer from 'components/core-ui-lib/Table/renderers/DefaultTextRenderer';
 import formatInputDate from 'utils/dateInputFormat';
-import { dateTimeToTime, newDate } from 'services/dateService';
+import { compareDatesWithoutTime, dateTimeToTime, newDate } from 'services/dateService';
 import ButtonRenderer from 'components/core-ui-lib/Table/renderers/ButtonRenderer';
 import IconRowRenderer from 'components/global/salesTable/renderers/IconRowRenderer';
 import SelectCellRenderer from 'components/core-ui-lib/Table/renderers/SelectCellRenderer';
@@ -74,8 +74,12 @@ export const contractsColumnDefs = [
   { headerName: 'Capacity', field: 'capacity', cellRenderer: DefaultCellRenderer, width: 90 },
   {
     headerName: 'No. of Perfs',
-    field: 'performanceCount',
     cellRenderer: DefaultCellRenderer,
+    valueGetter: (params) => {
+      return params.data.PerformanceTimes?.filter((x) =>
+        compareDatesWithoutTime(x.split('?')[1], params.data.dateTime, '=='),
+      ).length;
+    },
     width: 90,
   },
   {
@@ -257,7 +261,7 @@ export const getCompanyContractsColumnDefs = (
   },
 ];
 
-export const seatKillsColDefs = (handleChange, currencySymbol, editDisabled: boolean) => [
+export const seatKillsColDefs = (handleChange, currencySymbol, disabled: boolean) => [
   {
     headerName: 'Type',
     field: 'type',
@@ -278,7 +282,7 @@ export const seatKillsColDefs = (handleChange, currencySymbol, editDisabled: boo
       className: 'w-[108px] ml-1 mt-1 font-bold',
       value: formatValue(params.data.seats),
       pattern: /^\d*$/,
-      disabled: editDisabled,
+      disabled,
     }),
     width: 120,
     headerClass: 'right-border-full',
@@ -297,7 +301,7 @@ export const seatKillsColDefs = (handleChange, currencySymbol, editDisabled: boo
       value: formatValue(params.data.value),
       className: 'w-24 font-bold',
       pattern: /^\d*(\.\d*)?$/,
-      disabled: editDisabled,
+      disabled,
     }),
     width: 120,
     suppressMovable: true,

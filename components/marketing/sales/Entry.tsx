@@ -6,7 +6,7 @@ import { bookingJumpState } from 'state/marketing/bookingJumpState';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import { SelectOption } from '../MarketingHome';
 import { newDate, toISO } from 'services/dateService';
-import { formatDecimalOnBlur, isNullOrEmpty, isNullOrUndefined } from 'utils';
+import { formatDecimalOnBlur, isNullOrEmpty, isNullOrUndefined, isUndefined } from 'utils';
 import { currencyState } from 'state/global/currencyState';
 import { UpdateWarningModal } from '../modal/UpdateWarning';
 import axios from 'axios';
@@ -126,16 +126,16 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
     const result = {
       setId: salesFigures.setId,
       general: {
-        seatsReserved: parseInt(salesFigures.general.seatsReserved),
-        seatsReservedVal: parseFloat(salesFigures.general.seatsReservedVal),
-        seatsSold: parseInt(salesFigures.general.seatsSold),
-        seatsSoldVal: parseFloat(salesFigures.general.seatsSoldVal),
+        seatsReserved: parseInt(salesFigures?.general?.seatsReserved) || null,
+        seatsReservedVal: parseFloat(salesFigures?.general?.seatsReservedVal) || null,
+        seatsSold: parseInt(salesFigures?.general?.seatsSold) || null,
+        seatsSoldVal: parseFloat(salesFigures?.general?.seatsSoldVal) || null,
       },
       schools: {
-        seatsReserved: parseInt(salesFigures.schools.seatsReserved),
-        seatsReservedVal: parseFloat(salesFigures.schools.seatsReservedVal),
-        seatsSold: parseInt(salesFigures.schools.seatsSold),
-        seatsSoldVal: parseFloat(salesFigures.schools.seatsSoldVal),
+        seatsReserved: parseInt(salesFigures?.schools?.seatsReserved) || null,
+        seatsReservedVal: parseFloat(salesFigures?.schools?.seatsReservedVal) || null,
+        seatsSold: parseInt(salesFigures?.schools?.seatsSold) || null,
+        seatsSoldVal: parseFloat(salesFigures?.schools?.seatsSoldVal) || null,
       },
     };
     return result;
@@ -337,7 +337,16 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
         setBookingHasSchoolSales(booking.BookingHasSchoolsSales);
       }
 
-      setSetId(salesSetId > -1 ? salesSetId : compHoldSetId > -1 ? compHoldSetId : -1);
+      // salesSetId will be taken by default, if it is undefined we will try for the compHoldSetId
+      // (this will be populated if hold/comps are entered before sales)
+      if (!isUndefined(salesSetId) || salesSetId > -1) {
+        setSetId(salesSetId);
+      } else {
+        // otherwise - check to see if we have a compHoldSetId
+        // it is important that we only have one set for each week or day depending on the frequency
+        // if undefined, setId will be -1 and created in the API
+        setSetId(isUndefined(compHoldSetId) ? -1 : compHoldSetId);
+      }
     } catch (error) {
       console.error(error);
     }
