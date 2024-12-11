@@ -8,7 +8,6 @@ import { BookingItem } from '../NewBooking/reducer';
 import DateInput from 'components/core-ui-lib/DateInput';
 import { isNullOrEmpty } from 'utils';
 import { toWords } from 'number-to-words';
-import format from 'date-fns/format';
 import { addDays, parseISO } from 'date-fns';
 import { currentProductionSelector } from 'state/booking/selectors/currentProductionSelector';
 import Button from 'components/core-ui-lib/Button';
@@ -16,7 +15,7 @@ import axios from 'axios';
 import { BarredVenue } from 'pages/api/productions/venue/barringCheck';
 import { BookingWithVenueDTO } from 'interfaces';
 import { useWizard } from 'react-use-wizard';
-import { dateToSimple } from 'services/dateService';
+import { dateToSimple, formatDate, newDate } from 'services/dateService';
 import { MoveParams } from '.';
 import { productionJumpState } from 'state/booking/productionJumpState';
 
@@ -156,13 +155,14 @@ const MoveBookingView = ({
   const checkForBookingConflicts = async () => {
     if (bookingDetails.venue) {
       try {
-        const response = await axios.post('/api/bookings/conflict', {
+        const { data } = await axios.post('/api/bookings/conflict', {
           fromDate: bookingDetails.moveDate,
           toDate: bookingDetails.moveEndDate,
           productionId: selectedProduction.value,
         });
-        if (!isNullOrEmpty(response.data)) {
-          updateBookingConflicts(response.data);
+        const fData = data.filter((x) => x.Id !== bookings[0].id);
+        if (!isNullOrEmpty(fData)) {
+          updateBookingConflicts(fData);
           await checkForBarredVenues(true);
           goToStep(viewSteps.indexOf('Booking Conflict'));
         } else {
@@ -221,7 +221,7 @@ const MoveBookingView = ({
       </div>
       <Label
         text={`Currently scheduled to start on ${
-          bookingDetails.moveDate ? format(parseISO(bookingDetails.moveDate), 'dd/MM/yy') : ''
+          bookingDetails.moveDate ? formatDate(bookingDetails.moveDate, 'dd/MM/yy') : ''
         }`}
       />
       <div className="flex item-center gap-2">
@@ -231,8 +231,8 @@ const MoveBookingView = ({
           label="Date"
           onChange={handleDateChange}
           value={bookingDetails.moveDate}
-          minDate={parseISO(scheduleDate?.startDate)}
-          maxDate={parseISO(scheduleDate?.endDate)}
+          minDate={newDate(scheduleDate?.startDate)}
+          maxDate={newDate(scheduleDate?.endDate)}
         />
       </div>
       <div className="pt-8 w-full flex justify-end  items-center gap-3">

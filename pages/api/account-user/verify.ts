@@ -1,5 +1,6 @@
 import prisma from 'lib/prisma_master';
 import { NextApiRequest, NextApiResponse } from 'next';
+
 import { getUserPermisisons } from 'services/userService';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
@@ -7,18 +8,14 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const { email, organisationId, pin } = req.body;
     const accountUser = await prisma.AccountUser.findFirst({
       where: {
+        AccUserIsActive: true,
         User: {
-          UserEmail: {
-            equals: email,
-          },
+          UserEmail: email,
+          UserIsActive: true,
         },
         Account: {
-          AccountOrganisationId: {
-            equals: organisationId,
-          },
-        },
-        AccUserPIN: {
-          equals: pin,
+          AccountPIN: pin,
+          AccountOrganisationId: organisationId,
         },
       },
       select: {
@@ -26,9 +23,15 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       },
     });
 
-    const permissions = await getUserPermisisons(email, organisationId);
+    if (!accountUser) {
+      return res.status(200).json({ isValid: false, permissions: [] });
+    }
 
-    return res.status(200).json({ isValid: accountUser !== null, permissions });
+    const { AccountOrganisationId } = accountUser.Account;
+
+    const permissions = await getUserPermisisons(email, AccountOrganisationId);
+
+    return res.status(200).json({ isValid: AccountOrganisationId !== null, permissions });
   } catch (err) {
     console.log(err);
     res.status(500).json({ err: 'Error occurred while validating pin' });

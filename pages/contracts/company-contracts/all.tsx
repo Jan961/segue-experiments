@@ -9,24 +9,86 @@ import { getAllVenuesMin, getUniqueVenueCountrylist } from 'services/venueServic
 import { intialContractsFilterState } from 'state/contracts/contractsFilterState';
 import { fetchAllMinPersonsList } from 'services/personService';
 import { all, objectify } from 'radash';
-import { PersonMinimalDTO, StandardClauseDTO, TemplateMinimalDTO, UserDto } from 'interfaces';
+import { ContractPermissionGroup, PersonMinimalDTO, StandardClauseDTO, TemplateMinimalDTO, UserDto } from 'interfaces';
 import { getAllCurrencylist } from 'services/productionService';
 import { fetchAllContracts, fetchAllStandardClauses, fetchDepartmentList } from 'services/contracts';
 import { IContractDepartment, IContractSummary } from 'interfaces/contracts';
 import useCompanyContractsFilter from 'hooks/useCompanyContractsFilters';
 import { getAccountContacts } from 'services/contactService';
 import { fetchAllTemplates } from 'services/templateService';
+import { useRecoilValue } from 'recoil';
+import { accessAllContracts, accessContractsHome } from 'state/account/selectors/permissionSelector';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const ContractsPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  const accessPermissions = useRecoilValue(accessContractsHome);
+  const permissions = useRecoilValue(accessAllContracts);
+
+  // Add permission getting
+  const accessNewPerson: ContractPermissionGroup = {
+    artisteContracts: permissions.includes('ADD_NEW_PERSON_ARTISTE'),
+    creativeContracts: permissions.includes('ADD_NEW_PERSON_CREATIVE'),
+    smTechCrewContracts: permissions.includes('ADD_TECH_NEW_PERSON'),
+  };
+
+  const accessNewContract: ContractPermissionGroup = {
+    artisteContracts: permissions.includes('ADD_NEW_ARTISTE_CONTRACT'),
+    creativeContracts: permissions.includes('ADD_NEW_CREATIVE_CONTRACT'),
+    smTechCrewContracts: permissions.includes('ADD_NEW_TECH_CONTRACT'),
+  };
+
+  const accessContracts: ContractPermissionGroup = {
+    artisteContracts: accessPermissions.includes('ACCESS_ARTISTE_CONTRACTS'),
+    creativeContracts: accessPermissions.includes('ACCESS_CREATIVE_CONTRACTS'),
+    smTechCrewContracts: accessPermissions.includes('ACCESS_SM_/_CREW_/_TECH_CONTRACTS'),
+  };
+
+  const accessEditRow: ContractPermissionGroup = {
+    artisteContracts: permissions.includes('EDIT_CONTRACT_ARTISTE'),
+    creativeContracts: permissions.includes('EDIT_CONTRACT_CREATIVE'),
+    smTechCrewContracts: permissions.includes('EDIT_TECH_CONTRACT'),
+  };
+
+  const accessSavePdf: ContractPermissionGroup = {
+    artisteContracts: permissions.includes('EXPORT_ARTISTE_CONTRACT'),
+    creativeContracts: permissions.includes('EXPORT_CREATIVE_CONTRACT'),
+    smTechCrewContracts: permissions.includes('EXPORT_TECH_CONTRACT'),
+  };
+
+  const accessChangeStatus: ContractPermissionGroup = {
+    artisteContracts: permissions.includes('EDIT_ARTISTE_CONTRACT_STATUS_DROPDOWNS'),
+    creativeContracts: permissions.includes('EDIT_CREATIVE_CONTRACT_STATUS_DROPDOWNS'),
+    smTechCrewContracts: permissions.includes('EDIT_TECH_CONTRACT_STATUS_DROPDOWNS'),
+  };
+
+  const accessEditPerson: ContractPermissionGroup = {
+    artisteContracts: permissions.includes('EDIT_PERSON_DETAILS_ARTISTE'),
+    creativeContracts: permissions.includes('EDIT_PERSON_DETAILS_CREATIVE'),
+    smTechCrewContracts: permissions.includes('EDIT_TECH_PERSON_DETAILS'),
+  };
   const rows = useCompanyContractsFilter();
 
   return (
     <Layout title="Contracts | Segue" flush>
       <div className="mb-8">
-        <CompanyContractFilters />
+        <CompanyContractFilters
+          permissions={{
+            accessNewPerson,
+            accessNewContract,
+            accessContracts,
+          }}
+        />
       </div>
-      <CompanyContractsTable rowData={rows} />
+      <CompanyContractsTable
+        rowData={rows}
+        permissions={{
+          accessContracts,
+          editRow: accessEditRow,
+          savePDF: accessSavePdf,
+          changeStatus: accessChangeStatus,
+          editPerson: accessEditPerson,
+        }}
+      />
     </Layout>
   );
 };

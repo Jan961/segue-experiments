@@ -3,10 +3,11 @@ import DateInput from '../DateInput';
 import Label from '../Label';
 import { set, isBefore } from 'date-fns';
 import classNames from 'classnames';
+import { UTCDate } from '@date-fns/utc';
 
 export type DateRangeValue = {
-  from: Date;
-  to: Date;
+  from: UTCDate;
+  to: UTCDate;
 };
 
 export type DateRangeError = {
@@ -14,15 +15,15 @@ export type DateRangeError = {
   toError: string;
 };
 
-interface DateRangeProps {
+export interface DateRangeProps {
   className?: string;
   disabled?: boolean;
   testId?: string;
   label?: string;
   onChange: (v: DateRangeValue) => void;
   value?: DateRangeValue;
-  minDate?: Date;
-  maxDate?: Date;
+  minDate?: UTCDate;
+  maxDate?: UTCDate;
   labelClass?: string;
 }
 
@@ -65,11 +66,11 @@ export default function DateRange({
   };
 
   useEffect(() => {
-    checkDateRangeValid(value.from, value.to);
-    setDateRange({ from: value.from, to: value.to });
+    checkDateRangeValid(value?.from, value?.to);
+    setDateRange({ from: value?.from, to: value?.to });
   }, [value]);
 
-  const handleDateFromChange = (v: Date) => {
+  const handleDateFromChange = (v: UTCDate) => {
     const updatedDate = { ...dateRange, from: v };
     if (checkDateRangeValid(updatedDate.from, updatedDate.to)) {
       setDateRange(updatedDate);
@@ -80,7 +81,7 @@ export default function DateRange({
     }
   };
 
-  const handleDateToChange = (v: Date) => {
+  const handleDateToChange = (v: UTCDate) => {
     const updatedDate = { ...dateRange, to: v };
     if (checkDateRangeValid(updatedDate.from, updatedDate.to)) {
       setDateRange(updatedDate);
@@ -125,7 +126,7 @@ export default function DateRange({
         inputClass={`!shadow-none ${!errors?.toError ? '!border-primary-white' : ''}`}
         value={dateRange.to}
         onChange={handleDateToChange}
-        minDate={dateRange.from || minDate}
+        minDate={dateRange?.from || minDate}
         error={errors?.toError}
         maxDate={maxDate}
         disabled={disabled}

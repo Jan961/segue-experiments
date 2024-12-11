@@ -11,16 +11,13 @@ import { isNullOrEmpty } from 'utils';
 import { SESSION_ALREADY_EXISTS } from 'utils/authUtils';
 import Head from 'next/head';
 import useAuth from 'hooks/useAuth';
-import Spinner from 'components/core-ui-lib/Spinner';
-
-export const LoadingOverlay = () => (
-  <div className="inset-0 absolute bg-white bg-opacity-50 z-50 flex justify-center items-center top-20 left-20 right-20 bottom-20">
-    <Spinner size="lg" />
-  </div>
-);
+import LoadingOverlay from '../../components/core-ui-lib/LoadingOverlay';
+import { SIGN_IN_URL } from 'config/auth';
+import useNavigation from 'hooks/useNavigation';
 
 const PasswordReset = () => {
   const { signOut } = useAuth();
+  const { navigateToSignIn } = useNavigation();
   const [isBusy, setIsBusy] = useState(false);
   const { isLoaded, signIn, setActive } = useSignIn();
   const [showLogout, setShowLogout] = useState(false);
@@ -86,7 +83,7 @@ const PasswordReset = () => {
         // the newly created session (user is now signed in)
         setActive({ session: result.createdSessionId });
         setError('');
-        router.push('/auth/sign-in?selectAccount=true');
+        router.push(`${SIGN_IN_URL}/?selectAccount=true`);
       }
     } catch (error) {
       setIsBusy(false);
@@ -147,7 +144,7 @@ const PasswordReset = () => {
         </div>
         <div className="mt-5 flex flex-col items-end gap-2">
           <div className="flex justify-end gap-2">
-            <Button variant="secondary" text="Login" onClick={() => router.push('/auth/sign-in')} className="w-32" />
+            <Button variant="secondary" text="Login" onClick={navigateToSignIn} className="w-32" />
             <Button text="Get Password Reset Code" onClick={attemptClerkAuth} className="w-32" />
           </div>
         </div>
@@ -217,7 +214,7 @@ const PasswordReset = () => {
           </div>
         )}
       </div>
-      {isBusy && <LoadingOverlay />}
+      {isBusy && <LoadingOverlay className="top-20 left-20 right-20 bottom-20" />}
     </div>
   );
 };

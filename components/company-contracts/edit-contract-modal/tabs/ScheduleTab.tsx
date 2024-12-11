@@ -35,7 +35,8 @@ const ScheduleTab = ({ schedule, updateSchedule }: ScheduleTabProps) => {
           styleProps={contractsStyleProps}
           onCellValueChange={onCellValueChange}
           onCellClicked={handleCellClick}
-          tableHeight={650}
+          tableHeight={570}
+          gridOptions={{ suppressHorizontalScroll: true }}
         />
       </div>
     </>

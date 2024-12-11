@@ -16,6 +16,7 @@ const publicPaths = [
   '/account/sign-up',
   '/access-denied',
   '/auth/**',
+  '/api/clerk/**',
 ];
 
 const isPublic = (path: string) => {

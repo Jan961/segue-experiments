@@ -13,7 +13,7 @@ import { notify } from 'components/core-ui-lib/Notifications';
 import { ToastMessages } from 'config/shows';
 import { debug } from 'utils/logging';
 import ProductionDetailsForm, { ProductionFormData, defaultProductionFormData } from './ProductionDetailsForm';
-import LoadingOverlay from 'components/shows/LoadingOverlay';
+import LoadingOverlay from 'components/core-ui-lib/LoadingOverlay';
 import CurrencyConversionModal from './CurrencyConversionModal';
 import { ConfirmationDialog, PopupModal } from 'components/core-ui-lib';
 import { all, group, objectify } from 'radash';
@@ -348,6 +348,7 @@ const ProductionsView = ({ showData, visible, onClose }: ProductionsViewProps) =
             visible={openEditModal}
             onSave={onSaveProduction}
             onClose={() => setOpenEditModal(false)}
+            disabled={!permissions.includes('EDIT_PRODUCTION_DETAILS')}
           />
         )}
         {openCurrencyConversionModal && (

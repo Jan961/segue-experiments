@@ -55,3 +55,12 @@ export const getAccountPIN = async (accountId: number) => {
   });
   return account.AccountPIN;
 };
+
+export const getAccountByName = async (name: string) => {
+  const account = await prisma.account.findFirst({
+    where: {
+      AccountName: name,
+    },
+  });
+  return account;
+};

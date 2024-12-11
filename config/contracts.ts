@@ -1,10 +1,10 @@
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
 
 export const statusOptions: SelectOption[] = [
-  { text: 'Received Not Returned', value: 'CSAR' },
-  { text: 'Received, Questions Raised', value: 'U' },
-  { text: 'Producer Signed, Returned to Venue', value: 'X' },
-  { text: 'Countersigned and Filed', value: 'CSAF' },
+  { text: 'Recieved, Not Returned', value: 'RNR' },
+  { text: 'Recieved, Questions Raised', value: 'RQR' },
+  { text: 'Producer Signed and Returned', value: 'SAR' },
+  { text: 'Countersigned and Filed', value: 'CSF' },
   { text: 'None', value: 'NONE' },
 ];
 
@@ -61,20 +61,38 @@ export const sellerOptions = [
   { text: 'VENUE', value: 'Venue' },
 ];
 
+export enum CONTRACT_STATUS {
+  RECEIVED_NOT_RETURNED = 'RNR',
+  RECEIVED_QUESTIONS_RAISED = 'RQR',
+  PRODUCER_SIGNED_AND_RETURNED = 'SAR',
+  COUNTERSIGNED_AND_FILED = 'CSF',
+  NONE = 'NONE',
+}
+
 export const contractsStatusMap = {
-  CSAR: 'Received Not Returned',
-  U: 'Received, Questions Raised',
-  X: 'Producer Signed, Returned to Venue',
-  CSAF: 'Countersigned and Filed',
-  NONE: 'None',
+  [CONTRACT_STATUS.RECEIVED_NOT_RETURNED]: 'Received, Not Returned',
+  [CONTRACT_STATUS.RECEIVED_QUESTIONS_RAISED]: 'Received, Questions Raised',
+  [CONTRACT_STATUS.PRODUCER_SIGNED_AND_RETURNED]: 'Producer Signed and Returned',
+  [CONTRACT_STATUS.COUNTERSIGNED_AND_FILED]: 'Countersigned and Filed',
+  [CONTRACT_STATUS.NONE]: 'None',
 };
 
-export const contractsKeyStatusMap = {
-  'Received Not Returned': 'CSAR',
-  'Received, Questions Raised': 'U',
-  'Producer Signed, Returned to Venue': 'X',
-  'Countersigned and Filed': 'CSAF',
-  None: 'NONE',
+export const venueContractStatusToStyleMap = {
+  [CONTRACT_STATUS.RECEIVED_NOT_RETURNED]: {
+    backgroundColor: '#FFE606',
+  },
+  [CONTRACT_STATUS.RECEIVED_QUESTIONS_RAISED]: {
+    backgroundColor: '#D41818',
+    color: '#FFFFFF',
+  },
+  [CONTRACT_STATUS.PRODUCER_SIGNED_AND_RETURNED]: {
+    backgroundColor: '#E94580',
+    color: '#FFFFFF',
+  },
+  [CONTRACT_STATUS.COUNTERSIGNED_AND_FILED]: {
+    backgroundColor: '#10841C',
+    color: '#FFFFFF',
+  },
 };
 
 export const contractDealTypeMap = {
@@ -263,7 +281,17 @@ export const paymentTypes = [
   },
 ];
 
+export const contractOptionMapping = {
+  artisteContracts: 'Artiste',
+  creativeContracts: 'Creative',
+  smTechCrewContracts: 'SM / Tech / Crew',
+};
+
 export const contractDepartmentOptions = [
+  {
+    text: 'All',
+    value: -1,
+  },
   {
     text: 'Artiste',
     value: 1,

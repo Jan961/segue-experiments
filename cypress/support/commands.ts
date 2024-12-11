@@ -1,45 +1,38 @@
 /// <reference types="cypress" />
-
-// @ts-nocheck
-Cypress.Commands.add(`signOut`, () => {
-  cy.log(`sign out by clearing all cookies.`);
-  cy.clearCookies({ domain: null });
-});
-
-Cypress.Commands.add(`signIn`, () => {
-  const { WEB_APP_URI = '', cyUser, cyPassword } = Cypress.env();
-  cy.log(`Signing in.`, Cypress.env());
-
-  cy.visit({
-    url: WEB_APP_URI,
-    auth: {
-      username: cyUser,
-      password: cyPassword,
-    },
-  });
-
-  cy.window()
-    .should((window) => {
-      expect(window).to.not.have.property(`Clerk`, undefined);
-      expect(window.Clerk.isReady()).to.eq(true);
-    })
-    .then(async (window) => {
-      await cy.clearCookies({ domain: window.location.domain });
-      const res = await window.Clerk.client.signIn.create({
-        identifier: cyUser,
-        password: cyPassword,
-      });
-
-      await window.Clerk.setActive({
-        session: res.createdSessionId,
-      });
-
-      cy.log(`Finished Signing in.`);
-    });
-});
-
-const navigateToDashboard = () => {
-  cy.visit(Cypress.env('WEB_APP_URI'), { failOnStatusCode: false });
-};
-
-Cypress.Commands.addAll({ navigateToDashboard });
+// ***********************************************
+// This example commands.ts shows you how to
+// create various custom commands and overwrite
+// existing commands.
+//
+// For more comprehensive examples of custom
+// commands please read more here:
+// https://on.cypress.io/custom-commands
+// ***********************************************
+//
+//
+// -- This is a parent command --
+// Cypress.Commands.add('login', (email, password) => { ... })
+//
+//
+// -- This is a child command --
+// Cypress.Commands.add('drag', { prevSubject: 'element'}, (subject, options) => { ... })
+//
+//
+// -- This is a dual command --
+// Cypress.Commands.add('dismiss', { prevSubject: 'optional'}, (subject, options) => { ... })
+//
+//
+// -- This will overwrite an existing command --
+// Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
+//
+// declare global {
+//   namespace Cypress {
+//     interface Chainable {
+//       login(email: string, password: string): Chainable<void>
+//       drag(subject: string, options?: Partial<TypeOptions>): Chainable<Element>
+//       dismiss(subject: string, options?: Partial<TypeOptions>): Chainable<Element>
+//       visit(originalFn: CommandOriginalFn, url: string, options: Partial<VisitOptions>): Chainable<Element>
+//     }
+//   }
+// }
+import 'cypress-file-upload';

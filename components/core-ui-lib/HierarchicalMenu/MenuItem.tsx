@@ -11,7 +11,7 @@ export interface MenuItemProps {
 }
 
 export default memo(function MenuItem({ option, onClick, onToggle }: MenuItemProps) {
-  const { label, value, options, groupHeader, icon, expanded, labelClass, testId = '' } = option;
+  const { label, value, options, groupHeader, icon, expanded, labelClass, testId = `menu-item-${label}` } = option;
   const [isExpanded, setIsExpanded] = useState<boolean>(expanded);
   const isLeafNode = !options || options.length === 0;
   const baseClass = 'cursor-pointer';

@@ -63,3 +63,13 @@ prisma/generated/
 
 #dev tools directory for custom dev tools
 devTools/
+
+#storybook
+storybook-static/
+
+#cypress reports
+cypress/reports/
+mochawesome-report/
+cypress/screenshots/
+cypress/downloads/
+component_test_report.json

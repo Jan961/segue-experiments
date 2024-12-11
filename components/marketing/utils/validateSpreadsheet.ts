@@ -1,6 +1,6 @@
 import ExcelJS from 'exceljs';
 import { VenueMinimalDTO } from 'interfaces';
-import { simpleToDateDMY, dateToSimple } from 'services/dateService';
+import { dateToSimple, simpleToDateDMY } from 'services/dateService';
 import {
   SpreadsheetRow,
   SpreadsheetIssues,

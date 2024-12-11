@@ -4,6 +4,7 @@ import prisma from 'lib/prisma_master';
 import { userMapper } from 'lib/mappers';
 import { UserDto } from 'interfaces';
 import { isNullOrEmpty } from 'utils';
+import { Permission } from 'prisma/generated/prisma-master';
 
 export const getUsers = async (AccountId: number): Promise<UserDto[]> => {
   const result = await prisma.user.findMany({
@@ -115,10 +116,10 @@ export const getAccountIdFromReq = async (req: any) => {
   return getAccountId(email);
 };
 
-export const getOrganisationIdFromReq = async (req: any) => {
+export const getOrganisationIdFromReq = async (req: any): Promise<string> => {
   const { userId } = getAuth(req);
   const user = await clerkClient.users.getUser(userId);
-  return user?.unsafeMetadata?.organisationId;
+  return user?.unsafeMetadata?.organisationId as string;
 };
 
 export const getUserId = async (email: string) => {
@@ -135,7 +136,7 @@ export const getUserId = async (email: string) => {
 };
 
 export const getClerkUserByEmailAddress = async (emailAddress: string) => {
-  const clerkUsers = await clerkClient.users.getUserList();
+  const clerkUsers = await clerkClient.users.getUserList({ emailAddress: [emailAddress] });
   const user = clerkUsers.find((user) => user.emailAddresses[0].emailAddress === emailAddress);
   return user;
 };
@@ -190,4 +191,73 @@ export const getUserPermisisons = async (email: string, organisationId: string) 
   const formattedPermissions =
     accountUser?.AccountUserPermission.map(({ Permission }) => Permission.PermissionName) || [];
   return formattedPermissions;
+};
+
+type User = {
+  firstName: string;
+  lastName: string;
+  email: string;
+};
+
+type AccountUser = User & {
+  isSystemAdmin: boolean;
+  permissions: Partial<Permission>[];
+};
+
+export const createNewUser = async (user: AccountUser, organisationId: string, permissions: Partial<Permission>[]) => {
+  return await prisma.user.create({
+    data: {
+      UserIsActive: true,
+      UserFirstName: user.firstName,
+      UserLastName: user.lastName,
+      UserEmail: user.email,
+      AccountUser: {
+        create: {
+          AccUserIsAdmin: user.isSystemAdmin,
+          AccUserIsActive: true,
+          Account: {
+            connect: {
+              AccountOrganisationId: organisationId,
+            },
+          },
+          AccountUserPermission: {
+            createMany: {
+              data: permissions,
+            },
+          },
+        },
+      },
+    },
+    include: {
+      AccountUser: true,
+    },
+  });
+};
+
+export const createNewAccountUser = async (
+  user: AccountUser,
+  organisationId: string,
+  permissions: Partial<Permission>[],
+) => {
+  return await prisma.accountUser.create({
+    data: {
+      AccUserIsAdmin: user.isSystemAdmin,
+      AccUserIsActive: true,
+      User: {
+        connect: {
+          UserEmail: user.email,
+        },
+      },
+      Account: {
+        connect: {
+          AccountOrganisationId: organisationId,
+        },
+      },
+      AccountUserPermission: {
+        createMany: {
+          data: permissions,
+        },
+      },
+    },
+  });
 };

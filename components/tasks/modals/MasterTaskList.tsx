@@ -7,7 +7,7 @@ import { userState } from 'state/account/userState';
 import { useEffect, useMemo, useState } from 'react';
 import { tileColors } from 'config/global';
 import axios from 'axios';
-import Loader from 'components/core-ui-lib/Loader';
+import LoadingOverlay from '../../core-ui-lib/LoadingOverlay';
 import { isNullOrEmpty } from 'utils';
 import ExistingTasks from './ExistingTasks';
 import { useRouter } from 'next/router';
@@ -19,12 +19,6 @@ interface MasterTaskListProps {
   productionId?: number;
   isMaster?: boolean;
 }
-
-const LoadingOverlay = () => (
-  <div className="inset-0 absolute bg-white bg-opacity-50 z-50 flex justify-center items-center">
-    <Loader className="ml-2" iconProps={{ stroke: '#FFF' }} />
-  </div>
-);
 
 const MasterTaskList = ({ visible, onClose, productionId }: MasterTaskListProps) => {
   const { users } = useRecoilValue(userState);
@@ -140,7 +134,7 @@ const MasterTaskList = ({ visible, onClose, productionId }: MasterTaskListProps)
       hasOverlay={showExistingTaskModal}
     >
       <div className=" w-[750px] lg:w-[1386px] h-[606px] flex flex-col ">
-        {loading && <LoadingOverlay />}
+        {loading && <LoadingOverlay spinner={false} />}
         <Table
           columnDefs={columnDefs}
           rowData={rowData}

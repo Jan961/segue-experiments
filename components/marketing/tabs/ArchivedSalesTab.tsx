@@ -41,7 +41,7 @@ const ArchivedSalesTab = forwardRef<ArchSalesTabRef, ArchSalesProps>((props, ref
   const venueTownData = useMemo(() => {
     return {
       townList: Object.values(townList).map((town) => {
-        return { text: town.Town, value: town.Town };
+        return { text: town, value: town };
       }),
       venueList: Object.values(venueDict).map((venue) => {
         return { text: `${venue.Code} ${venue.Name}`, value: venue };

@@ -1,6 +1,7 @@
+import { UTCDate } from '@date-fns/utc';
 import { SelectOption } from 'components/global/forms/FormInputSelect';
 import { isThisWeek } from 'date-fns';
-import { formatShortDateUK } from 'services/dateService';
+import { formatShortDateUK, getDifferenceInWeeks, getMonday } from 'services/dateService';
 
 export default function getTaskDateStatusColor(date: string, progress: number) {
   if (progress === 100) {
@@ -44,13 +45,14 @@ const formatWeekOption = (week: number, suffix = '') => {
 export const getWeekOptions = (production, isMasterTask: boolean, appendDate: boolean): SelectOption[] => {
   const eotNumber = 26;
   const numWeeksInDropDown = 260;
-  if (!isMasterTask && production) {
-    const startDate = new Date(production?.StartDate);
-    const endDate = new Date(production?.EndDate);
+  if (!isMasterTask && production?.StartDate && production?.EndDate) {
+    const startDate = getMonday(new UTCDate(production?.StartDate));
+    const endDate = new UTCDate(production?.EndDate);
     const millisecondsPerWeek = 7 * 24 * 60 * 60 * 1000;
 
     const numTourWeeks: number =
-      Math.ceil((endDate.getTime() - startDate.getTime()) / millisecondsPerWeek) || -eotNumber;
+      // Math.ceil((endDate.getTime() - startDate.getTime()) / millisecondsPerWeek) || -eotNumber;
+      getDifferenceInWeeks(startDate, endDate) + 1 || -eotNumber;
     return Array.from(Array(numWeeksInDropDown + numTourWeeks + eotNumber).keys()).map((x) => {
       const week = x - numWeeksInDropDown;
       const weeklyDate = new Date(startDate.getTime() + week * millisecondsPerWeek);

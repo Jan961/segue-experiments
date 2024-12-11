@@ -4,6 +4,7 @@ import { getStepIndex } from 'config/AddBooking';
 import { useEffect, useMemo } from 'react';
 import PreviewBookingDetails, { PreviewBookingDetailsProps } from './PreviewBookingDetails';
 import { isNullOrEmpty } from 'utils';
+import FormError from 'components/core-ui-lib/FormError';
 
 type PreviewBookingViewProps = PreviewBookingDetailsProps & {
   onSaveBooking: () => void;
@@ -35,7 +36,10 @@ export default function PreviewBookingView(props: PreviewBookingViewProps) {
   return (
     <>
       <PreviewBookingDetails {...props} />
-      <div className="pt-8 w-full flex justify-end  gap-3 float-right">
+      {areInputFieldsValid && (
+        <FormError className="pt-5 flex justify-end" error="All required fields must be filled" />
+      )}
+      <div className={`${areInputFieldsValid ? 'pt-2' : 'pt-5'} w-full flex justify-end  gap-3 float-right`}>
         <div className="flex gap-4">
           <Button className="w-33" variant="secondary" text="Back" onClick={previousStepFunc} />
           <Button className="w-33" text="Accept" onClick={props.onSaveBooking} disabled={areInputFieldsValid} />

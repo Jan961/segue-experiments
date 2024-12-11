@@ -5,9 +5,14 @@ import { contractsOtherState } from '../contractsOtherState';
 import { contractsVenueState } from '../contractsVenueState';
 import { productionJumpState } from '../../booking/productionJumpState';
 import { objectify } from 'radash';
-import moment from 'moment';
-import { contractsRow, contractsStatusMap } from 'config/contracts';
-import { calculateWeekNumber, getKey, getArrayOfDatesBetween } from 'services/dateService';
+import { contractsRow } from 'config/contracts';
+import {
+  calculateWeekNumber,
+  getKey,
+  getArrayOfDatesBetween,
+  newDate,
+  formattedDateWithWeekDay,
+} from 'services/dateService';
 import { contractsPerformanceState } from '../contractsPerformanceState';
 import ContractsHelper from 'utils/contracts';
 import { contractsDateBlockState } from '../contractsDateBlockState';
@@ -43,7 +48,7 @@ export const contractsRowsSelector = selector({
       const { ProductionId, PrimaryDateBlock } = data;
       const production = productionDict[ProductionId] || {};
       const rowData = transformer(data);
-      const week = calculateWeekNumber(new Date(PrimaryDateBlock?.StartDate), new Date(date));
+      const week = calculateWeekNumber(newDate(PrimaryDateBlock?.StartDate), newDate(date));
       const otherDayType = dayTypes.find(({ Id }) => Id === data.DateTypeId)?.Name;
       const getValueForDayType = (value, type) => {
         if (!value) {
@@ -59,7 +64,7 @@ export const contractsRowsSelector = selector({
         ...rowData,
         week,
         dateTime: date,
-        date: date ? moment(date).format('ddd DD/MM/YY') : '',
+        date: date ? formattedDateWithWeekDay(date, 'Short') : '',
         productionName: getProductionName(production),
         production: getProductionCode(production),
         productionId: ProductionId,
@@ -67,7 +72,7 @@ export const contractsRowsSelector = selector({
         bookingStatus: data?.StatusCode,
         status: data?.StatusCode,
         venue: getValueForDayType(rowData.venue, type),
-        contractStatus: contractData[rowData.Id] ? contractsStatusMap[contractData[rowData.Id].StatusCode] : '',
+        contractStatus: contractData[rowData.Id] ? contractData[rowData.Id].StatusCode : '',
         dealMemoStatus: dealMemoStatus[rowData.Id] ? dealMemoStatus[rowData.Id.toString()].Status : '',
         SignedDate: contractData[rowData.Id] ? contractData[rowData.Id].SignedDate : '',
         SignedBy: contractData[rowData.Id] ? contractData[rowData.Id].SignedBy : '',
@@ -165,12 +170,12 @@ export const contractsRowsSelector = selector({
         if (!production) {
           continue;
         }
-        const week = calculateWeekNumber(new Date(production?.StartDate), new Date(date)) || '';
+        const week = calculateWeekNumber(newDate(production?.StartDate), newDate(date)) || '';
         const emptyRow = {
           ...contractsRow,
           week,
-          date: moment(date).format('ddd DD/MM/YY'),
-          dateTime: new Date(date).toISOString(),
+          date: formattedDateWithWeekDay(date, 'Short'),
+          dateTime: newDate(date).toISOString(),
           production: production ? getProductionCode(production) : '',
           productionId: production?.Id,
           productionCode: production?.Code,

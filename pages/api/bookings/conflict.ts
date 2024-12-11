@@ -4,15 +4,14 @@ import { Booking } from 'prisma/generated/prisma-client';
 import { bookingMapperWithVenue } from 'lib/mappers';
 import { BookingWithVenueDTO } from 'interfaces';
 import { getDateTypeFromId } from 'services/dayTypeService';
+import { newDate } from 'services/dateService';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
     const prisma = await getPrismaClient(req);
     const { productionId, runTag } = req.body;
-    const fromDate = new Date(req.body?.fromDate);
-    const toDate = new Date(req.body?.toDate);
-    fromDate.setUTCHours(0);
-    toDate.setUTCHours(0);
+    const fromDate = newDate(req.body?.fromDate);
+    const toDate = newDate(req.body?.toDate);
 
     const conflictList = [];
     const performanceBookings: Booking[] = await prisma.booking.findMany({
@@ -60,7 +59,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       GetInFitUp?.forEach((getIn) => {
         const { StatusCode, Date } = getIn;
         if (StatusCode === 'C' || StatusCode === 'U') {
-          if (fromDate <= Date && Date <= toDate) {
+          if (fromDate.getTime() <= Date.getTime() && Date.getTime() <= toDate.getTime()) {
             conflictList.push({ ...getIn, Venue: { Name: 'Get In' } });
           }
         }
@@ -70,7 +69,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         (Other || []).map(async (otherBooking) => {
           const { StatusCode, Date, DateTypeId } = otherBooking;
           if (StatusCode === 'C' || StatusCode === 'U') {
-            if (fromDate <= Date && Date <= toDate) {
+            if (fromDate.getTime() <= Date.getTime() && Date.getTime() <= toDate.getTime()) {
               const dateTypeText = await getDateTypeFromId(DateTypeId, req);
               conflictList.push({ ...otherBooking, Venue: { Name: dateTypeText } });
             }
@@ -81,7 +80,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       Rehearsal?.forEach((rehearsalBooking) => {
         const { StatusCode, Date } = rehearsalBooking;
         if (StatusCode === 'C' || StatusCode === 'U') {
-          if (fromDate <= Date && Date <= toDate) {
+          if (fromDate.getTime() <= Date.getTime() && Date.getTime() <= toDate.getTime()) {
             conflictList.push({ ...rehearsalBooking, Venue: { Name: 'Rehearsal' } });
           }
         }
@@ -91,7 +90,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const conflicts: BookingWithVenueDTO[] = performanceBookings
       .map(bookingMapperWithVenue)
       .sort((a, b) => new Date(a.Date).valueOf() - new Date(b.Date).valueOf());
-    res.status(200).json([...conflicts, ...conflictList] || []);
+    res.status(200).json([...conflicts, ...conflictList]);
   } catch (e) {
     console.log(e);
     res.status(500).json({ err: 'Error fetching report' });

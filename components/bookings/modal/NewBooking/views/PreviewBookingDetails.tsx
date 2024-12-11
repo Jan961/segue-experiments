@@ -3,8 +3,8 @@ import { styleProps, previewColumnDefs } from 'components/bookings/table/tableCo
 import { BookingItem, PreviewDataItem, TForm } from '../reducer';
 import { useRecoilValue } from 'recoil';
 import { rowsSelector } from 'state/booking/selectors/rowsSelector';
-import { calculateWeekNumber } from 'services/dateService';
-import { addDays, subDays, parseISO, isWithinInterval } from 'date-fns';
+import { calculateWeekNumber, getDateDaysAway, newDate, safeDate } from 'services/dateService';
+import { parseISO, isWithinInterval } from 'date-fns';
 import { venueState } from 'state/booking/venueState';
 import { bookingStatusMap } from 'config/bookings';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
@@ -148,7 +148,7 @@ export default function PreviewBookingDetails({
   };
 
   const getVenue = (item) => {
-    if (!item.perf) {
+    if (!item.perf && item.dayType) {
       return dayTypeOptions.find((option) => option.value === item.dayType)?.text;
     }
     return item.venue
@@ -160,10 +160,11 @@ export default function PreviewBookingDetails({
     const times = item.times.split(';');
     const accTimes = times.slice(0, item.noPerf);
     let str = '';
-    for (let i = 0; i < accTimes.length - 1; i++) {
-      str += `${accTimes[i]}; `;
+    for (let i = 0; i < item.noPerf - 1; i++) {
+      str += `${accTimes[i] ? accTimes[i] : ''}; `;
     }
-    str += accTimes[accTimes.length - 1];
+    str += accTimes[item.noPerf - 1] ? accTimes[item.noPerf - 1] : '';
+    // str += accTimes[accTimes.noPerf - 1] ? accTimes[accTimes.noPerf - 1] : '';
     item.times = str;
     return str;
   };
@@ -171,7 +172,7 @@ export default function PreviewBookingDetails({
   const formatRowData = (data) => {
     const rowItems: PreviewDataItem[] = data.map((item: any) => {
       const calculateWeek = () => {
-        return calculateWeekNumber(new Date(production.StartDate), new Date(item.dateAsISOString));
+        return calculateWeekNumber(newDate(production.StartDate), newDate(item.dateAsISOString));
       };
       return {
         ...item,
@@ -194,12 +195,12 @@ export default function PreviewBookingDetails({
 
     const fromDate = data[0].dateAsISOString;
     const toDate = data.length > 1 ? data[data.length - 1].dateAsISOString : fromDate;
-    const fromDateAsDate = parseISO(fromDate);
-    const toDateAsDate = parseISO(toDate);
-    const pastStartDate = subDays(fromDateAsDate, 6);
-    const toStartDate = subDays(fromDateAsDate, 1);
-    const toDateSet = addDays(toDateAsDate, 1);
-    const futureEndDate = addDays(toDateAsDate, 7);
+    const fromDateAsDate = safeDate(fromDate);
+    const toDateAsDate = safeDate(toDate);
+    const pastStartDate = getDateDaysAway(fromDateAsDate, -6);
+    const toStartDate = getDateDaysAway(fromDateAsDate, -1);
+    const toDateSet = getDateDaysAway(toDateAsDate, 1);
+    const futureEndDate = getDateDaysAway(toDateAsDate, 7);
 
     // Remove any existing bookings being edited that are also present in rowSelector to avoid duplicates
     const editedRowsIds = rowItems.map(({ item }) => item.id);
@@ -240,19 +241,15 @@ export default function PreviewBookingDetails({
   }, [originalRows, updatedRows]);
 
   return (
-    <>
-      <div className="flex justify-between">
-        <div className="text-primary-navy text-xl my-2 font-bold">{productionCode}</div>
-      </div>
-      <div className="w-[700px] lg:w-[1386px] h-full  z-[999] flex flex-col ">
-        <Table
-          testId="preview-booking-details"
-          gridOptions={gridOptions}
-          rowData={rows}
-          columnDefs={previewColumnDefs}
-          styleProps={styleProps}
-        />
-      </div>
-    </>
+    <div className="w-[700px] lg:w-[1386px] h-full  z-[999] flex flex-col">
+      <Table
+        testId="preview-booking-details"
+        gridOptions={gridOptions}
+        rowData={rows}
+        columnDefs={previewColumnDefs}
+        styleProps={styleProps}
+        tableHeight={650}
+      />
+    </div>
   );
 }

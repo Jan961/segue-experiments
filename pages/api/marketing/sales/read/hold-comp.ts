@@ -1,4 +1,5 @@
 import getPrismaClient from 'lib/prisma';
+import { NextApiRequest, NextApiResponse } from 'next';
 import { isNullOrEmpty } from 'utils';
 
 interface Hold {
@@ -22,7 +23,7 @@ export type Res = {
 
 let prisma = null;
 
-const getCompHoldData = async (bookingId) => {
+const getCompHoldData = async (bookingId: number) => {
   const holdTypes = await prisma.holdType.findMany({
     orderBy: {
       HoldTypeSeqNo: 'asc',
@@ -135,11 +136,13 @@ const getCompHoldData = async (bookingId) => {
   };
 };
 
-export default async function handle(req, res) {
+export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const salesDate = new Date(req.body.salesDate);
+    const bookingId = req.body.bookingId;
     prisma = await getPrismaClient(req);
-    const result = await getCompHoldData(salesDate);
+
+    const result = await getCompHoldData(bookingId);
+
     res.status(200).json(result);
   } catch (err) {
     console.log(err);

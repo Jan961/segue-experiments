@@ -8,7 +8,7 @@ import useAxiosCancelToken from 'hooks/useCancelToken';
 import { PersonDetailsTab } from './tabs/PersonDetailsTab';
 import { PreviewTab } from './tabs/PreviewTab';
 import ContractDetailsTab from './tabs/ContractDetailsTab';
-import LoadingOverlay from 'components/shows/LoadingOverlay';
+import LoadingOverlay from 'components/core-ui-lib/LoadingOverlay';
 import { IContractSchedule, IScheduleDay } from '../../contracts/types';
 import { useRecoilValue } from 'recoil';
 import { productionJumpState } from 'state/booking/productionJumpState';
@@ -20,6 +20,8 @@ import { TemplateFormRow, TemplateFormRowPopulated, ContractData } from '../type
 import { contractTemplateState } from 'state/contracts/contractTemplateState';
 import { getFileUrl } from 'lib/s3';
 import { populateContractData, populateTemplateWithValues } from './utils';
+import { ContractPermissionGroup } from 'interfaces';
+import { accessAllContracts } from 'state/account/selectors/permissionSelector';
 
 export interface BuildNewContractProps {
   contractSchedule?: Partial<IContractSchedule>;
@@ -27,6 +29,7 @@ export interface BuildNewContractProps {
   contractId?: number;
   isEdit?: boolean;
   onClose: () => void;
+  editPerson: ContractPermissionGroup;
 }
 
 export const BuildNewContract = ({
@@ -35,6 +38,7 @@ export const BuildNewContract = ({
   contractId,
   isEdit = false,
   onClose = noop,
+  editPerson = { artisteContracts: false, creativeContracts: false, smTechCrewContracts: false },
 }: BuildNewContractProps) => {
   const { productions } = useRecoilValue(productionJumpState);
   const [contractPerson, setContractPerson] = useState(null);
@@ -61,6 +65,13 @@ export const BuildNewContract = ({
   const [templateFormStructure, setTemplateFormStructure] = useState<TemplateFormRow[]>(null);
   const [formData, setFormData] = useState<TemplateFormRowPopulated[]>(null);
   const [contractData, setContractData] = useState<ContractData[]>(null);
+
+  const permissions = useRecoilValue(accessAllContracts);
+  const { exportTech, exportCreative, exportArtiste } = {
+    exportTech: permissions.includes('EXPORT_TECH_CONTRACT'),
+    exportCreative: permissions.includes('EXPORT_CREATIVE_CONTRACT'),
+    exportArtiste: permissions.includes('EXPORT_ARTISTE_CONTRACT'),
+  };
 
   useEffect(() => {
     const fetchTemplateDocument = async () => {
@@ -205,6 +216,19 @@ export const BuildNewContract = ({
     }
   };
 
+  const showContractPreview = () => {
+    switch (contractSchedule.department) {
+      case 1:
+        return exportArtiste;
+      case 2:
+        return exportCreative;
+      case 3:
+        return exportTech;
+      default:
+        return false;
+    }
+  };
+
   const goToNext = useCallback(() => {
     if (activeViewIndex === 3) {
       return;
@@ -217,23 +241,14 @@ export const BuildNewContract = ({
   };
 
   return (
-    <PopupModal
-      show={visible}
-      title="Contract Details"
-      titleClass="text-xl text-primary-navy font-bold -mt-2"
-      panelClass="h-[95vh] w-[100vw]"
-      hasOverflow={false}
-      onClose={onClose}
-    >
+    <PopupModal show={visible} title="Contract Details" onClose={onClose}>
       <div className="flex flex-col justify-between ">
         <div>
-          <div className="">
-            <div className="text-xl text-primary-navy font-bold w-[50vw]">
-              Production - {`${selectedProduction.ShowCode}${selectedProduction.Code}`}
-            </div>
-            <div className="text-xl text-primary-navy font-bold w-[50vw]">
-              Department - {getDepartmentNameByID(contractSchedule.department, departmentMap)}
-            </div>
+          <div className="text-xl text-primary-navy font-bold w-[50vw]">
+            Production - {`${selectedProduction.ShowCode}${selectedProduction.Code}`}
+          </div>
+          <div className="text-xl text-primary-navy font-bold w-[50vw]">
+            Department - {getDepartmentNameByID(contractSchedule.department, departmentMap)}
           </div>
 
           <div className="flex justify-center w-[100%] pt-2 pb-2">
@@ -258,19 +273,28 @@ export const BuildNewContract = ({
             >
               Schedule
             </div>
-            <div
-              className="w-[24vw] border-solid border-2 border-primary-navy text-center rounded cursor-pointer"
-              style={{ background: activeViewIndex === 3 ? '#0093C0' : 'white' }}
-              onClick={() => setActiveViewIndex(3)}
-            >
-              Contract Preview
-            </div>
+            {showContractPreview() && (
+              <div
+                className="w-[24vw] border-solid border-2 border-primary-navy text-center rounded cursor-pointer"
+                style={{ background: activeViewIndex === 3 ? '#0093C0' : 'white' }}
+                onClick={() => setActiveViewIndex(3)}
+              >
+                Contract Preview
+              </div>
+            )}
           </div>
 
-          <div className="border-solid border-2 border-primary-navy rounded p-2 h-[70vh] overflow-y-scroll">
+          <div className="border-solid border-2 border-primary-navy rounded p-2 h-[65vh] overflow-y-auto">
             {activeViewIndex === 0 && contractPerson && (
               <div className="flex flex-col gap-8 px-16">
-                <PersonDetailsTab person={contractPerson} updateFormData={setContractPerson} height="" />
+                <PersonDetailsTab
+                  type="Edit"
+                  person={contractPerson}
+                  updateFormData={setContractPerson}
+                  height=""
+                  permissions={editPerson}
+                  departmentId={contractSchedule.department}
+                />
               </div>
             )}
             {activeViewIndex === 1 && (

@@ -6,19 +6,13 @@ import Router from 'next/router';
 import { calibri } from 'lib/fonts';
 import { useRecoilValue } from 'recoil';
 import { globalState } from 'state/global/globalState';
-import Spinner from './core-ui-lib/Spinner';
+import LoadingOverlay from './core-ui-lib/LoadingOverlay';
 
 type Props = {
   children?: ReactNode;
   title?: string;
   flush?: boolean;
 };
-
-const LoadingOverlay = ({ testId = 'loading-overlay' }: { testId: string }) => (
-  <div data-testid={testId} className="inset-0 absolute bg-white bg-opacity-50 z-50 flex justify-center items-center">
-    <Spinner size="lg" />
-  </div>
-);
 
 const Layout = ({ children, title = 'Your production assistant', flush = false }: Props) => {
   const [menuIsOpen, setMenuIsOpen] = useState(false);

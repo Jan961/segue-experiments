@@ -16,6 +16,7 @@ interface MainVenueFormProps {
   validationErrors?: Record<string, string>;
   onChange: (data: any) => void;
   updateValidationErrrors?: (key: string, value: string) => void;
+  disabled?: boolean;
 }
 const MainVenueForm = ({
   venue,
@@ -23,6 +24,7 @@ const MainVenueForm = ({
   validationErrors,
   updateValidationErrrors,
   onChange,
+  disabled,
 }: MainVenueFormProps) => {
   const [formData, setFormData] = useState<Partial<UiTransformedVenue>>({ ...initialMainVenueDetails, ...venue });
   const handleInputChange = (field: string, value: any) => {
@@ -63,6 +65,7 @@ const MainVenueForm = ({
               value={formData.venueCode}
               error={validationErrors.venueCode}
               onChange={(e) => handleInputChange('venueCode', e.target.value)}
+              disabled={disabled}
             />
             <FormError error={validationErrors.venueCode} className="absolute" />
           </Tooltip>
@@ -77,6 +80,7 @@ const MainVenueForm = ({
           value={formData.venueStatus}
           placeholder="Select Venue Status"
           className="w-[430px] font-bold place-self-end"
+          disabled={disabled}
         />
         <FormError error={validationErrors.venueStatus} className="absolute" />
       </div>
@@ -93,6 +97,7 @@ const MainVenueForm = ({
               value={formData.venueName}
               error={validationErrors.venueName}
               onChange={(e) => handleInputChange('venueName', e.target.value)}
+              disabled={disabled}
             />
             <FormError error={validationErrors.venueName} className="absolute" />
           </div>
@@ -105,6 +110,7 @@ const MainVenueForm = ({
           id="vatIndicator"
           checked={formData.vatIndicator}
           onChange={(e) => handleInputChange('vatIndicator', e.target.value)}
+          disabled={disabled}
         />
         <Checkbox
           testId="main-venue-culturallyExempt-checkbox"
@@ -112,6 +118,7 @@ const MainVenueForm = ({
           id="culturallyExempt"
           checked={formData.culturallyExempt}
           onChange={(e) => handleInputChange('culturallyExempt', e.target.value)}
+          disabled={disabled}
         />
       </div>
       <div className="flex flex-col mb-1">
@@ -125,6 +132,7 @@ const MainVenueForm = ({
             onChange={(value) => handleInputChange('venueFamily', value)}
             options={venueFamilyOptionList}
             isSearchable
+            disabled={disabled}
           />
         </label>
         {validationErrors.venueFamily && <small className="text-primary-red">{validationErrors.venueFamily}</small>}
@@ -138,6 +146,7 @@ const MainVenueForm = ({
           className="w-[364px]"
           value={formData.townPopulation}
           onChange={(e) => handleInputChange('townPopulation', parseFloat(e.target.value))}
+          disabled={disabled}
         />
       </label>
       <div className="flex flex-col mb-1">
@@ -150,6 +159,7 @@ const MainVenueForm = ({
             className="w-[364px]"
             value={formData.venueCapacity}
             onChange={(e) => handleInputChange('venueCapacity', parseFloat(e.target.value))}
+            disabled={disabled}
           />
         </label>
         {validationErrors.venueCapacity && <small className="text-primary-red">{validationErrors.venueCapacity}</small>}
@@ -166,6 +176,7 @@ const MainVenueForm = ({
           inputClassName="w-full"
           value={formData.venueWebsite}
           onChange={(e) => handleInputChange('venueWebsite', e.target.value)}
+          disabled={disabled}
         />
       </label>
       <label
@@ -179,6 +190,7 @@ const MainVenueForm = ({
           className="w-full max-h-40 min-h-[50px]  justify-between"
           value={formData.notes}
           onChange={(e) => handleInputChange('notes', e.target.value)}
+          disabled={disabled}
         />
       </label>
       <div />
@@ -196,6 +208,7 @@ const MainVenueForm = ({
           id="excludeFromChecks"
           checked={formData.excludeFromChecks}
           onChange={(e) => handleInputChange('excludeFromChecks', e.target.value)}
+          disabled={disabled}
         />
       </div>
     </>

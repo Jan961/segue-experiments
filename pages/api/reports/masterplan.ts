@@ -1,10 +1,10 @@
 import ExcelJS from 'exceljs';
 import getPrismaClient from 'lib/prisma';
-import Decimal from 'decimal.js';
 import { COLOR_HEXCODE, colorCell, colorTextAndBGCell, fillRowBGColorAndTextColor } from 'services/salesSummaryService';
-import { formatDateWithTimezoneOffset } from 'services/dateService';
+import { calculateWeekNumber, formatDate, getDateDaysAway, getDifferenceInDays, newDate } from 'services/dateService';
 import { convertToPDF } from 'utils/report';
-import { format, add, differenceInDays } from 'date-fns';
+import { getExportedAtTitle } from 'utils/export';
+import { UTCDate } from '@date-fns/utc';
 
 type SCHEDULE_VIEW = {
   ProductionId: number;
@@ -48,17 +48,19 @@ export const styleHeader = ({
   row,
   numberOfColumns,
   bgColor = COLOR_HEXCODE.DARK_ORANGE,
+  alignment = { horizontal: ALIGNMENT.CENTER },
 }: {
   worksheet: any;
   row: number;
   numberOfColumns?: number;
   bgColor?: COLOR_HEXCODE;
+  alignment?: { horizontal?: ALIGNMENT; vertical?: ALIGNMENT };
 }) => {
   const totalColumns = numberOfColumns ?? worksheet.columnCount;
   for (let col = 1; col <= totalColumns; col++) {
     const cell = worksheet.getCell(row, col);
     cell.font = { bold: true, color: { argb: COLOR_HEXCODE.WHITE } };
-    cell.alignment = { horizontal: ALIGNMENT.CENTER };
+    cell.alignment = alignment;
     cell.fill = {
       type: 'pattern',
       pattern: 'solid',
@@ -88,25 +90,16 @@ const getShowAndProductionKey = ({ FullProductionCode, ShowName }) => `${FullPro
 type ReqBody = {
   fromDate: string;
   toDate: string;
-  timezoneOffset: number;
+  exportedAt: string;
   fileFormat?: string;
 };
 
 const handler = async (req, res) => {
-  const { fromDate, toDate, timezoneOffset, fileFormat }: ReqBody = req.body || {};
+  const { fromDate, toDate, exportedAt, fileFormat }: ReqBody = req.body || {};
   try {
     const prisma = await getPrismaClient(req);
-    const formatedFromDateString = formatDateWithTimezoneOffset({
-      date: fromDate,
-      timezoneOffset,
-      dateFormat: 'yyyy-MM-DD',
-    });
-    const formatedToDateString = formatDateWithTimezoneOffset({
-      date: toDate,
-      timezoneOffset,
-      dateFormat: 'yyyy-MM-DD',
-    });
-
+    const formatedFromDateString = formatDate(fromDate, 'yyyy-MM-dd');
+    const formatedToDateString = formatDate(toDate, 'yyyy-MM-dd');
     // Convert the formatted date strings back to Date objects
     const formatedFromDate = new Date(formatedFromDateString);
     const formatedToDate = new Date(formatedToDateString);
@@ -116,29 +109,38 @@ const handler = async (req, res) => {
     }
 
     // Construct the Prisma query
-    const data = await prisma.scheduleView.findMany({
-      where: {
-        EntryDate: {
-          gte: formatedFromDate,
-          lte: formatedToDate,
+    const data = await prisma.scheduleView
+      .findMany({
+        where: {
+          EntryDate: {
+            gte: formatedFromDate,
+            lte: formatedToDate,
+          },
         },
-      },
-      orderBy: {
-        EntryDate: 'asc',
-      },
-    });
+        orderBy: {
+          EntryDate: 'asc',
+        },
+      })
+      .then((res) => {
+        return res.map((e) => ({
+          ...e,
+          EntryDate: new UTCDate(e.EntryDate),
+          ProductionStartDate: new UTCDate(e.ProductionStartDate),
+          ProductionEndDate: new UTCDate(e.ProductionEndDate),
+        }));
+      });
 
     const workbook = new ExcelJS.Workbook();
     const formattedData = data.map((x) => ({
       ...x,
-      EntryDate: format(x.EntryDate, 'yyyy-MM-dd'),
-      ProductionStartDate: format(x.ProductionStartDate, 'yyyy-MM-dd'),
-      ProductionEndDate: format(x.ProductionEndDate, 'yyyy-MM-dd'),
+      EntryDate: formatDate(x.EntryDate, 'yyyy-MM-dd'),
+      ProductionStartDate: formatDate(x.ProductionStartDate, 'yyyy-MM-dd'),
+      ProductionEndDate: formatDate(x.ProductionEndDate, 'yyyy-MM-dd'),
     }));
 
     const showNameAndProductionCode: { [key: string]: string[] } = formattedData.reduce((acc, x) => {
       const value = acc[x.ShowName];
-      if (value && value?.length) {
+      if (value?.length) {
         if (!value.includes(x.FullProductionCode)) {
           return {
             ...acc,
@@ -163,19 +165,12 @@ const handler = async (req, res) => {
       pageSetup: { fitToPage: true, fitToHeight: 5, fitToWidth: 7 },
       views: [{ state: 'frozen', xSplit: 2, ySplit: 6 }],
     });
-    const title = `All Productions Masterplan ${format(new Date(formatedFromDateString), 'dd-MM-yy')} to ${format(
-      new Date(formatedToDateString),
+    const title = `All Productions Masterplan ${formatDate(formatedFromDateString, 'dd-MM-yy')} to ${formatDate(
+      formatedToDateString,
       'dd-MM-yy',
     )}`;
     worksheet.addRow([title]);
-    const date = new Date();
-    worksheet.addRow([
-      `Exported: ${formatDateWithTimezoneOffset({
-        date,
-        dateFormat: 'dd/MM/yy',
-        timezoneOffset,
-      })} at ${formatDateWithTimezoneOffset({ date, dateFormat: 'HH:mm', timezoneOffset })}`,
-    ]);
+    worksheet.addRow([getExportedAtTitle(exportedAt)]);
     worksheet.addRow([]);
     worksheet.addRow(['', '', ...distinctShowNames.map((x) => x.ShowName)]);
     worksheet.addRow(['DAY', 'DATE', ...distinctShowNames.map((x) => x.FullProductionCode)]);
@@ -192,21 +187,12 @@ const handler = async (req, res) => {
         const key = getShowAndProductionKey({ FullProductionCode, ShowName });
         const value = showNameAndProductionMap[key];
         if (!value) {
-          throw new Error('Missing Data');
+          return acc;
         }
-
-        const daysDiff = differenceInDays(new Date(fromDate), new Date(value.ProductionStartDate));
-        let week;
-        if (daysDiff >= 0 && daysDiff <= 6) {
-          week = 1;
-        } else if (daysDiff >= 7) {
-          week = Number(new Decimal(daysDiff).div(7).toFixed(0)) + 1;
-        } else {
-          week = Number(new Decimal(daysDiff).div(7).toFixed(0)) - 1;
-        }
+        const weekNo = calculateWeekNumber(newDate(value.ProductionStartDate), newDate(fromDate));
         return {
           ...acc,
-          [getShowAndProductionKey({ FullProductionCode, ShowName })]: week,
+          [getShowAndProductionKey({ FullProductionCode, ShowName })]: weekNo,
         };
       }, {}) || {};
 
@@ -215,7 +201,7 @@ const handler = async (req, res) => {
       const value = headerWeeks[key];
 
       if (!value) {
-        throw new Error(' Something went wrong');
+        return acc;
       }
       if (value === -1) {
         headerWeeks[key] = 1;
@@ -234,7 +220,7 @@ const handler = async (req, res) => {
       isBold: true,
     });
 
-    const daysDiff = differenceInDays(new Date(toDate), new Date(fromDate));
+    const daysDiff = getDifferenceInDays(fromDate, toDate, null, null, true);
 
     const minRehearsalStartTimeInEpoch = data.reduce((acc, x) => {
       if (x.RehearsalStartDate && new Date(x.RehearsalStartDate).getTime() < acc) {
@@ -245,10 +231,9 @@ const handler = async (req, res) => {
 
     let rowNo = 6;
     for (let i = 1; i <= daysDiff; i++) {
-      const weekDay = format(add(new Date(fromDate), { days: i - 1 }), 'dddd');
-      const dateInIncomingFormat = format(add(new Date(fromDate), { days: i - 1 }), 'yyyy-mm-dd');
-      const date = formatDateWithTimezoneOffset({ date: dateInIncomingFormat, timezoneOffset });
-
+      const weekDay = formatDate(getDateDaysAway(fromDate, i - 1), 'eeee');
+      const dateInIncomingFormat = formatDate(getDateDaysAway(fromDate, i - 1), 'yyyy-MM-dd');
+      const date = formatDate(dateInIncomingFormat, 'dd/MM/yy');
       const values: string[] = distinctShowNames.map(({ FullProductionCode, ShowName }) => {
         const key = getKey({ FullProductionCode, ShowName, EntryDate: dateInIncomingFormat });
         const value = map[key];
@@ -273,7 +258,7 @@ const handler = async (req, res) => {
           }
           return null;
         })
-        .filter((x) => !!x) as number[];
+        .filter((x) => !!x);
       targetCellIdx.forEach((col) =>
         colorTextAndBGCell({
           worksheet,

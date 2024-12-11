@@ -23,6 +23,7 @@ export interface IAgencyDetails {
   town: string;
   postcode: string;
   country: number | null;
+  id?: number;
 }
 
 export interface EmergencyContact {

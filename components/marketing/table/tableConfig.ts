@@ -3,13 +3,14 @@ import DefaultCellRenderer from 'components/core-ui-lib/Table/renderers/DefaultC
 import DefaultTextRenderer from 'components/core-ui-lib/Table/renderers/DefaultTextRenderer';
 import IconRowRenderer from 'components/global/salesTable/renderers/IconRowRenderer';
 import { tileColors } from 'config/global';
-import { getTimeFromDateAndTime, isValidDate } from 'services/dateService';
+import { dateTimeToTime, formatDate } from 'services/dateService';
 import formatInputDate from 'utils/dateInputFormat';
 import TwoLineRenderer from './TwoLineRenderer';
 import ButtonRenderer from 'components/core-ui-lib/Table/renderers/ButtonRenderer';
 import SalesValueInputRenderer from './SalesValueInputRenderer';
 import { isNullOrEmpty } from 'utils';
 import SelectRenderer from 'components/core-ui-lib/Table/renderers/SelectRenderer';
+import { isValid } from 'date-fns';
 
 export const styleProps = { headerColor: tileColors.marketing };
 
@@ -35,7 +36,7 @@ export const activityColDefs = (
     headerName: 'Date',
     field: 'actDate',
     cellRenderer: function (params) {
-      return isValidDate(params.data.actDate) ? formatInputDate(params.data.actDate) : '';
+      return params.data.actDate ? formatInputDate(params.data.actDate) : '';
     },
     cellStyle: {
       paddingLeft: '8px',
@@ -138,7 +139,7 @@ export const contactNoteColDefs = (updateContactNote, userList) => [
     headerName: 'Date',
     field: 'ContactDate',
     cellRenderer: function (params) {
-      return isValidDate(params.data.ContactDate) ? formatInputDate(params.data.ContactDate) : '';
+      return params.data.ContactDate ? formatInputDate(params.data.ContactDate) : '';
     },
     cellStyle: {
       paddingLeft: '8px',
@@ -150,7 +151,7 @@ export const contactNoteColDefs = (updateContactNote, userList) => [
     headerName: 'Time',
     field: 'ContactTime',
     cellRenderer: function (params) {
-      return getTimeFromDateAndTime(params.data.ContactDate);
+      return dateTimeToTime(params.data.ContactDate);
     },
     cellStyle: {
       paddingLeft: '8px',
@@ -236,16 +237,10 @@ export const allocSeatsColDefs = [
     headerName: 'Name / Email of Person Receiving Tickets',
     field: 'name_email',
     cellRenderer: TwoLineRenderer,
-    cellRendererParams: (params) => {
-      return {
-        value: params.data.TicketHolderName + '\n' + params.data.TicketHolderEmail,
-      };
-    },
     cellStyle: {
       marginLeft: '4px',
     },
     wrapText: true,
-    autoHeight: true,
     width: 200,
   },
   {
@@ -289,7 +284,7 @@ export const allocSeatsColDefs = [
 export const attachmentsColDefs = [
   {
     headerName: 'Title',
-    field: 'FileOriginalFilename',
+    field: 'OriginalFilename',
     editable: true,
     cellRenderer: DefaultTextRenderer,
     width: 600,
@@ -299,9 +294,9 @@ export const attachmentsColDefs = [
     field: 'FileUploadedDateTime',
     cellRenderer: DefaultTextRenderer,
     cellRendererParams: function (params) {
-      const updDate = new Date(params.data.FileUploadedDateTime);
+      const updDate = params.data.UploadDateTime;
       return {
-        value: formatInputDate(updDate) + ' ' + getTimeFromDateAndTime(updDate),
+        value: formatDate(updDate, 'dd/MM/yy') + ' ' + dateTimeToTime(updDate),
       };
     },
     width: 150,
@@ -311,9 +306,9 @@ export const attachmentsColDefs = [
     field: 'FileDateTime',
     cellRenderer: DefaultTextRenderer,
     cellRendererParams: function (params) {
-      const fileDt = new Date(params.data.FileDateTime);
+      const fileDt = params.data.UploadDateTime;
       return {
-        value: formatInputDate(fileDt) + ' ' + getTimeFromDateAndTime(fileDt),
+        value: formatDate(fileDt, 'dd/MM/yy') + ' ' + dateTimeToTime(fileDt),
       };
     },
     width: 150,
@@ -469,7 +464,7 @@ export const globalActivityColDefs = (
     headerName: 'Date',
     field: 'actDate',
     cellRenderer: (params) => {
-      return isValidDate(params.data.actDate) ? formatInputDate(params.data.actDate) : '';
+      return isValid(params.data.actDate) ? formatInputDate(params.data.actDate) : '';
     },
     cellStyle: {
       paddingLeft: '8px',
@@ -522,7 +517,7 @@ export const globalActivityColDefs = (
     headerName: 'Due By Date',
     field: 'followUpDt',
     cellRenderer: (params) => {
-      return isValidDate(params.data.followUpDt) ? formatInputDate(params.data.followUpDt) : ' ';
+      return isValid(params.data.followUpDt) ? formatInputDate(params.data.followUpDt) : ' ';
     },
     width: 100,
     hide: true,
@@ -638,7 +633,7 @@ export const globalActivityTabColDefs = (
     headerName: 'Date',
     field: 'actDate',
     cellRenderer: function (params) {
-      return isValidDate(params.data.actDate) ? formatInputDate(params.data.actDate) : '';
+      return isValid(params.data.actDate) ? formatInputDate(params.data.actDate) : '';
     },
     cellStyle: {
       paddingLeft: '8px',

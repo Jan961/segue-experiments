@@ -1,17 +1,18 @@
-import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useMemo, useState } from 'react';
 import { Button, Checkbox, Table, TextArea, TextInput } from 'components/core-ui-lib';
 import { salesEntryColDefs, styleProps } from '../table/tableConfig';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { bookingJumpState } from 'state/marketing/bookingJumpState';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import { SelectOption } from '../MarketingHome';
-import { addDurationToDate, getMonday, toISO } from 'services/dateService';
-import { isNullOrEmpty } from 'utils';
-import { Spinner } from 'components/global/Spinner';
+import { newDate, toISO } from 'services/dateService';
+import { formatDecimalOnBlur, isNullOrEmpty, isNullOrUndefined, isUndefined } from 'utils';
 import { currencyState } from 'state/global/currencyState';
 import { UpdateWarningModal } from '../modal/UpdateWarning';
 import axios from 'axios';
 import { accessMarketingHome } from 'state/account/selectors/permissionSelector';
+import { decRegexLeadingZero } from 'utils/regexUtils';
+import { UTCDate } from '@date-fns/utc';
 
 export type TourResponse = {
   data: Array<SelectOption>;
@@ -33,10 +34,10 @@ interface HoldCompSet {
 }
 
 interface SalesFigure {
-  seatsReserved: number;
-  seatsReservedVal: number;
-  seatsSold: number;
-  seatsSoldVal: number;
+  seatsReserved: string;
+  seatsReservedVal: string;
+  seatsSold: string;
+  seatsSoldVal: string;
 }
 
 interface SalesFigureSet {
@@ -46,12 +47,28 @@ interface SalesFigureSet {
 }
 
 export interface SalesEntryRef {
-  resetForm: (salesWeek: string) => void;
+  changeWeek: (salesWeek: string) => void;
 }
 
+const emptySalesSet = {
+  setId: 0,
+  general: {
+    seatsReserved: '0',
+    seatsReservedVal: '0.00',
+    seatsSold: '0',
+    seatsSoldVal: '0.00',
+  },
+  schools: {
+    seatsReserved: '0',
+    seatsReservedVal: '0.00',
+    seatsSold: '0',
+    seatsSoldVal: '0.00',
+  },
+};
+
 const Entry = forwardRef<SalesEntryRef>((_, ref) => {
-  const [prevSalesFigureSet, setPrevSalesFigureSet] = useState<SalesFigureSet>(null);
-  const [currSalesFigureSet, setCurrSalesFigureSet] = useState<SalesFigureSet>(null);
+  const [prevSalesFigureSet, setPrevSalesFigureSet] = useState<SalesFigureSet>(emptySalesSet);
+  const [currSalesFigureSet, setCurrSalesFigureSet] = useState<SalesFigureSet>(emptySalesSet);
   const [bookingHasSchoolSales, setBookingHasSchoolSales] = useState<boolean>(false);
   const [bookingSaleNotes, setBookingSaleNotes] = useState('');
   const [holdData, setHoldData] = useState([]);
@@ -64,18 +81,26 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
   const [batchUpdateData, setBatchUpdateData] = useState({});
   const [showWarning, setShowWarning] = useState<boolean>(false);
   const [warnFieldType, setWarnFieldType] = useState('');
-  const [loading, setLoading] = useState<boolean>(true);
   const [bookings, setBookings] = useRecoilState(bookingJumpState);
   const [setId, setSetId] = useState(-1);
-  const { selected: productionId } = useRecoilValue(productionJumpState);
+  const productionJump = useRecoilValue(productionJumpState);
   const [schoolErrors, setSchoolErrors] = useState([]);
   const [generalErrors, setGeneralErrors] = useState([]);
   const [warningIssued, setWarningIssued] = useState<boolean>(false);
   const currency = useRecoilValue(currencyState);
-  const [salesApiAction, setSalesApiAction] = useState('create');
+  const [finalSales, setFinalSales] = useState(false);
   const permissions = useRecoilValue(accessMarketingHome);
 
-  const compareSalesFigures = (prev: SalesFigure, curr: SalesFigure) => {
+  const prodVenue = useMemo(() => {
+    const production = productionJump.productions.find((prod) => prod.Id === productionJump.selected);
+    const selectedBooking = bookings.bookings.find((booking) => booking.Id === bookings.selected);
+
+    return selectedBooking?.Venue && production
+      ? `for ${production?.ShowCode}${production?.Code} ${production?.ShowName} ${selectedBooking?.Venue?.Name}`
+      : '';
+  }, [bookings.selected]);
+
+  const compareSalesFigures = (prev, curr) => {
     // If prev is null, there are no errors.
     if (!prev) {
       return null;
@@ -99,11 +124,33 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
     return errors.length > 0 ? errors : null;
   };
 
+  const convertSalesFigures = (salesFigures) => {
+    const result = {
+      setId: salesFigures.setId,
+      general: {
+        seatsReserved: parseInt(salesFigures?.general?.seatsReserved) || null,
+        seatsReservedVal: parseFloat(salesFigures?.general?.seatsReservedVal) || null,
+        seatsSold: parseInt(salesFigures?.general?.seatsSold) || null,
+        seatsSoldVal: parseFloat(salesFigures?.general?.seatsSoldVal) || null,
+      },
+      schools: {
+        seatsReserved: parseInt(salesFigures?.schools?.seatsReserved) || null,
+        seatsReservedVal: parseFloat(salesFigures?.schools?.seatsReservedVal) || null,
+        seatsSold: parseInt(salesFigures?.schools?.seatsSold) || null,
+        seatsSoldVal: parseFloat(salesFigures?.schools?.seatsSoldVal) || null,
+      },
+    };
+    return result;
+  };
+
   const handleUpdate = async () => {
+    const prevFigs = convertSalesFigures(prevSalesFigureSet);
+    const currFigs = convertSalesFigures(currSalesFigureSet);
+
     try {
       if (!warningIssued) {
-        const generalErrors = compareSalesFigures(prevSalesFigureSet.general, currSalesFigureSet.general);
-        const schoolErrors = compareSalesFigures(prevSalesFigureSet.schools, currSalesFigureSet.schools);
+        const generalErrors = compareSalesFigures(prevFigs.general, currFigs.general);
+        const schoolErrors = compareSalesFigures(prevFigs.schools, currFigs.schools);
 
         let figuresHaveIssue = false;
 
@@ -127,9 +174,8 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
         bookingId: bookings.selected,
         salesDate,
         setId,
-        general: currSalesFigureSet.general,
-        schools: {},
-        action: salesApiAction,
+        general: currFigs.general,
+        schools: currFigs.schools,
       };
 
       const emptySchools = {
@@ -139,14 +185,14 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
         seatsSoldVal: 0,
       };
 
-      if (JSON.stringify(currSalesFigureSet.schools) !== JSON.stringify(emptySchools)) {
-        data = { ...data, schools: currSalesFigureSet.schools };
+      if (JSON.stringify(currFigs.schools) !== JSON.stringify(emptySchools)) {
+        data = { ...data, schools: currFigs.schools };
       }
 
-      const response = await axios.post('/api/marketing/sales/entry/v2/upsert', data);
+      const { data: salesUpd } = await axios.post('/api/marketing/sales/entry/v2/upsert', data);
 
-      if (typeof response.data === 'object') {
-        const setIdObj = response.data as { setId: number; transaction: string };
+      if (typeof salesUpd === 'object') {
+        const setIdObj = salesUpd as { setId: number };
         setSetId(setIdObj.setId);
         setWarningIssued(false);
         setSchoolErrors([]);
@@ -248,173 +294,63 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
     copyPreviousWeeks();
   };
 
-  const sanitiseSalesFigue = (value: string): number => {
-    if (value === '') {
-      return 0;
-    } else {
-      const regexPattern = /^-?\d*(\.\d*)?$/;
-
-      if (regexPattern.test(value)) {
-        return parseInt(value);
-      }
-    }
-  };
-
-  const getSalesFrequency = async () => {
+  const setSalesFigures = async (inputDate: UTCDate, bookingId: number) => {
     try {
-      const response = await axios.get(`/api/marketing/sales/tourWeeks/${productionId.toString()}`);
-
-      if (typeof response.data === 'object') {
-        const tourData = response.data as TourResponse;
-        if (tourData.frequency === undefined) {
-          return;
-        }
-
-        return tourData.frequency;
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const setSalesFigures = async (inputDate: Date, previous: boolean) => {
-    try {
-      setLoading(true);
+      if (isNullOrUndefined(bookingId)) return;
 
       let salesSetId = -1;
       let compHoldSetId = -1;
 
-      const emptySalesSet = {
-        setId: 0,
-        general: {
-          seatsReserved: 0,
-          seatsReservedVal: 0,
-          seatsSold: 0,
-          seatsSoldVal: 0,
-        },
-        schools: {
-          seatsReserved: 0,
-          seatsReservedVal: 0,
-          seatsSold: 0,
-          seatsSoldVal: 0,
-        },
-      };
+      const { data: sales } = await axios.post('/api/marketing/sales/current/read', {
+        bookingId,
+        salesDate: inputDate,
+        prevRequired: true,
+        productionId: productionJump.selected,
+      });
 
-      if (previous) {
-        setPrevSalesFigureSet(emptySalesSet);
-      } else {
-        setCurrSalesFigureSet(emptySalesSet);
+      // if data returned from API is not null set the state variable so the form can be updated
+      isNullOrUndefined(sales.current) ? setCurrSalesFigureSet(emptySalesSet) : setCurrSalesFigureSet(sales.current);
+      isNullOrUndefined(sales.previous) ? setPrevSalesFigureSet(emptySalesSet) : setPrevSalesFigureSet(sales.previous);
 
-        // resetting api action every time a new week is selected
-        setSalesApiAction('create');
-      }
+      // set the setId from the current sales
+      salesSetId = sales?.current?.setId;
 
-      // handle when the useImperitive calls this function on selection of a sales week/day before the booking is selected
-      // this will happen on first launch of the module
-      if (bookings.selected === undefined || bookings.selected === null) {
-        return;
-      }
+      // remaining logic will be refactored as part of SK-566
+      // (the entire Holds/Comps functionality is broken)
 
-      const frequency = await getSalesFrequency();
-
-      const duration = frequency === 'W' ? 7 : 1;
-      let salesDate = frequency === 'W' ? getMonday(inputDate) : inputDate;
-
-      if (previous) {
-        salesDate = addDurationToDate(salesDate, duration, false);
-      }
-
-      const salesReadInput = {
+      const { data: holdCompList } = await axios.post('/api/marketing/sales/read/hold-comp', {
         bookingId: bookings.selected,
         salesDate,
-        frequency,
-      };
+        prodctionId: productionJump.selected,
+      });
 
-      // get the salesFigures for the selected date/week if they exist
-      const salesResponse = await axios.post('/api/marketing/sales/current/read', salesReadInput);
-      const sales = salesResponse.data;
-
-      if (typeof sales === 'object' && !isNullOrEmpty(sales)) {
-        const salesFigures = sales as SalesFigureSet;
-
-        // if the code gets into this block - there will be sales figures and therefore when running the api, it should update opposed to create
-        // previous check as we only want to do this for the selected week
-        if (!previous) {
-          setSalesApiAction('update');
-        }
-
-        // set the sales figures, if available
-        const general: SalesFigure = {
-          seatsReserved: validateSale(salesFigures.general?.seatsReserved),
-          seatsReservedVal: validateSale(salesFigures.general?.seatsReservedVal),
-          seatsSold: validateSale(salesFigures.general?.seatsSold),
-          seatsSoldVal: validateSale(salesFigures.general?.seatsSoldVal),
-        };
-
-        const schools: SalesFigure = {
-          seatsReserved: validateSale(salesFigures.schools?.seatsReserved),
-          seatsReservedVal: validateSale(salesFigures.schools?.seatsReservedVal),
-          seatsSold: validateSale(salesFigures.schools?.seatsSold),
-          seatsSoldVal: validateSale(salesFigures.schools?.seatsSoldVal),
-        };
-
-        if (previous) {
-          setPrevSalesFigureSet({ general, schools, setId: salesFigures.setId });
-        } else {
-          // only ever set the setId for the current week
-          salesSetId = salesFigures.setId;
-          setCurrSalesFigureSet({ general, schools, setId: salesFigures.setId });
-        }
+      if (typeof holdCompList === 'object') {
+        const holdCompData = holdCompList as HoldCompSet;
+        setHoldData(holdCompData.holds);
+        setCompData(holdCompData.comps);
+        compHoldSetId = holdCompData.setId;
       }
 
-      if (!previous) {
-        // holds and comps - only run if not retrieving previous values - previous is only valid for the main sales
-        const response = await axios.post('/api/marketing/sales/read/hold-comp', {
-          bookingId: bookings.selected,
-          salesDate,
-          productionId,
-        });
-
-        const holdCompList = response.data;
-
-        if (typeof holdCompList === 'object') {
-          const holdCompData = holdCompList as HoldCompSet;
-
-          setHoldData(holdCompData.holds);
-          setCompData(holdCompData.comps);
-          compHoldSetId = holdCompData.setId;
-        }
-
-        const booking = bookings.bookings.find((booking) => booking.Id === bookings.selected);
-
-        setBookingSaleNotes(booking.BookingSalesNotes === null ? '' : booking.BookingSalesNotes);
-        setCompNotes(booking.BookingCompNotes === null ? '' : booking.BookingCompNotes);
-        setHoldNotes(booking.BookingHoldNotes === null ? '' : booking.BookingHoldNotes);
+      const booking = bookings.bookings.find((b) => b.Id === bookingId);
+      if (booking) {
+        setBookingSaleNotes(booking.BookingSalesNotes || '');
+        setCompNotes(booking.BookingCompNotes || '');
+        setHoldNotes(booking.BookingHoldNotes || '');
         setBookingHasSchoolSales(booking.BookingHasSchoolsSales);
-
-        // by default - we will set the sales setId to the set connected to the sales values
-        // if, for some reason, the hold/comps are set first, the setId from holds/comps will be used
-        // if both are -1, it will remain -1 and the API will know to create a setId
-        if (salesSetId > -1) {
-          setSetId(salesSetId);
-        } else if (compHoldSetId > -1) {
-          setSetId(compHoldSetId);
-        } else {
-          setSetId(-1);
-        }
       }
 
-      setLoading(false);
+      // salesSetId will be taken by default, if it is undefined we will try for the compHoldSetId
+      // (this will be populated if hold/comps are entered before sales)
+      if (!isUndefined(salesSetId) || salesSetId > -1) {
+        setSetId(salesSetId);
+      } else {
+        // otherwise - check to see if we have a compHoldSetId
+        // it is important that we only have one set for each week or day depending on the frequency
+        // if undefined, setId will be -1 and created in the API
+        setSetId(isUndefined(compHoldSetId) ? -1 : compHoldSetId);
+      }
     } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const validateSale = (saleFigure) => {
-    if (isNullOrEmpty(saleFigure)) {
-      return 0;
-    } else {
-      return parseInt(saleFigure);
+      console.error(error);
     }
   };
 
@@ -472,24 +408,44 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
     setCurrSalesFigureSet(prevSalesFigureSet);
   };
 
+  const handleSalesFigChange = (key: string, type: string, value: string) => {
+    setCurrSalesFigureSet({
+      ...currSalesFigureSet,
+      [type]: {
+        ...currSalesFigureSet[type],
+        [key]: value,
+      },
+    });
+  };
+
   useEffect(() => {
     const initForm = async () => {
       try {
-        let inputDate = new Date();
+        let inputDate = newDate();
         if (salesDate !== null) {
           inputDate = salesDate;
         } else {
-          setSalesDate(new Date());
+          setSalesDate(newDate());
         }
 
-        setSalesFigures(inputDate, false);
-        setSalesFigures(inputDate, true);
+        // check if final sales exist
+        const { data: finalSales } = await axios.post('/api/marketing/sales/final/read', {
+          bookingId: bookings.selected,
+        });
+
+        // if general.seatsSold is not an empty string - show final sales warning opposed to Sales Entry form
+        // else get the sales figures from the database
+        if (!isNullOrEmpty(finalSales?.general?.seatsSold)) {
+          setFinalSales(true);
+        } else {
+          setSalesFigures(inputDate, bookings.selected);
+        }
       } catch (error) {
         console.log(error);
       }
     };
 
-    if (bookings.selected !== undefined && bookings.selected !== null) {
+    if (!isNullOrUndefined(bookings.selected)) {
       initForm();
     }
   }, [bookings.selected]);
@@ -511,10 +467,12 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
   // }, []);
 
   useImperativeHandle(ref, () => ({
-    resetForm: (week) => {
-      setSalesDate(new Date(week));
-      setSalesFigures(new Date(week), false);
-      setSalesFigures(new Date(week), true);
+    changeWeek: (week) => {
+      const updatedDate = week ? newDate(week) : null;
+      setSalesDate(updatedDate);
+      if (updatedDate) {
+        setSalesFigures(updatedDate, bookings.selected);
+      }
     },
   }));
 
@@ -522,8 +480,13 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
     <div>
       {bookings.selected !== undefined && bookings.selected !== null && (
         <div>
-          {loading ? (
-            <Spinner size="lg" className="mt-2 mr-3 -mb-1" />
+          {finalSales ? (
+            <div className="text-base">
+              Sales cannot be entered {prodVenue} because Final Sales have already been entered.
+              <br />
+              To enter further sales information, please return to Final Figures Entry and remove the previously entered
+              figures.
+            </div>
           ) : (
             <div className="flex flex-row w-full gap-8">
               <div className="flex flex-col">
@@ -541,252 +504,80 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                       </div>
                     </div>
                   )}
-
-                  <div className="flex flex-row justify-between">
-                    <div className="flex flex-col mr-[20px]">
-                      <div className="flex flex-row mt-4">
-                        <div className="flex flex-col">
-                          <div className="text-primary-dark-blue base font-bold mr-[52px]">Seats Sold</div>
-                        </div>
-                        <TextInput
-                          className="w-[137px] h-[31px] flex flex-col -mt-1"
-                          placeholder="Enter Seats"
-                          id="genSeatsSold"
-                          value={currSalesFigureSet.general.seatsSold}
-                          onChange={(event) =>
-                            setCurrSalesFigureSet({
-                              ...currSalesFigureSet,
-                              general: {
-                                ...currSalesFigureSet.general,
-                                seatsSold: sanitiseSalesFigue(event.target.value),
-                              },
-                            })
-                          }
-                        />
-                      </div>
-
-                      <div className="flex flex-row mt-4">
-                        <div className="flex flex-col">
-                          <div className="text-primary-dark-blue base font-bold mr-5">Reserved Seats</div>
-                        </div>
-                        <TextInput
-                          className="w-[137px] h-[31px] flex flex-col -mt-1"
-                          placeholder="Enter Seats"
-                          id="genSeatsReserved"
-                          value={currSalesFigureSet.general.seatsReserved}
-                          onChange={(event) =>
-                            setCurrSalesFigureSet({
-                              ...currSalesFigureSet,
-                              general: {
-                                ...currSalesFigureSet.general,
-                                seatsReserved: sanitiseSalesFigue(event.target.value),
-                              },
-                            })
-                          }
-                        />
-                      </div>
+                  <div className="grid grid-cols-12 gap-3">
+                    {/* Row1 */}
+                    <div className="flex justify-between items-center col-span-4">
+                      <span className="text-primary-dark-blue base font-bold">Seats Sold</span>
+                      <TextInput
+                        className="w-[137px]"
+                        placeholder="Enter Seats"
+                        id="genSeatsSold"
+                        value={currSalesFigureSet?.general?.seatsSold}
+                        pattern={decRegexLeadingZero}
+                        onFocus={(event) => event?.target?.select?.()}
+                        onChange={(event) => handleSalesFigChange('seatsSold', 'general', event.target.value)}
+                      />
                     </div>
-
-                    <div className="flex flex-col">
-                      <div className="flex flex-row mt-4">
-                        <div className="flex flex-col">
-                          <div className="text-primary-dark-blue base font-bold mr-[52px]">Seats Sold Value</div>
-                        </div>
-                        <TextInput
-                          className="w-[137px] h-[31px] flex flex-col -mt-1"
-                          placeholder="Enter Value"
-                          id="genSeatsSoldVal"
-                          value={currSalesFigureSet.general.seatsSoldVal}
-                          onChange={(event) =>
-                            setCurrSalesFigureSet({
-                              ...currSalesFigureSet,
-                              general: {
-                                ...currSalesFigureSet.general,
-                                seatsSoldVal: sanitiseSalesFigue(event.target.value),
-                              },
-                            })
-                          }
-                        />
-                      </div>
-
-                      <div className="flex flex-row mt-4">
-                        <div className="flex flex-col">
-                          <div className="text-primary-dark-blue base font-bold mr-5">Reserved Seats Value</div>
-                        </div>
-                        <TextInput
-                          className="w-[137px] h-[31px] flex flex-col -mt-1"
-                          placeholder="Enter Value"
-                          id="genSeatsReservedVal"
-                          value={currSalesFigureSet.general.seatsReservedVal}
-                          onChange={(event) =>
-                            setCurrSalesFigureSet({
-                              ...currSalesFigureSet,
-                              general: {
-                                ...currSalesFigureSet.general,
-                                seatsReservedVal: sanitiseSalesFigue(event.target.value),
-                              },
-                            })
-                          }
-                        />
-                      </div>
+                    <div className="flex justify-around items-center col-span-5">
+                      <span className="w-[141px] text-end text-primary-dark-blue base font-bold">Seats Sold Value</span>
+                      <TextInput
+                        className="w-[137px]"
+                        placeholder="Enter Value"
+                        id="genSeatsSoldVal"
+                        value={currSalesFigureSet?.general?.seatsSoldVal}
+                        onFocus={(event) => event?.target?.select?.()}
+                        pattern={/^\d*(\.\d*)?$/}
+                        onChange={(event) => handleSalesFigChange('seatsSoldVal', 'general', event.target.value)}
+                        onBlur={(event) => handleSalesFigChange('seatsSoldVal', 'general', formatDecimalOnBlur(event))}
+                      />
                     </div>
-
-                    <div className="flex flex-col mt-4 justify-end">
-                      <div className="flex flex-col items-end">
-                        <Button
-                          className="w-[132px] flex flex-row mb-2"
-                          variant="primary"
-                          text="Update"
-                          onClick={handleUpdate}
-                        />
-                        <Button
-                          className="w-[211px] flex flex-row"
-                          variant="primary"
-                          text="Copy Previous Week's Sales"
-                          onClick={copyPreviousWeeks}
-                        />
-                      </div>
+                    <div className="flex items-center justify-end col-span-3">
+                      <Button
+                        className="w-[132px] flex flex-row"
+                        variant="primary"
+                        text="Update"
+                        onClick={handleUpdate}
+                      />
                     </div>
-                  </div>
-
-                  {bookingHasSchoolSales ? (
-                    <div>
-                      <div className="leading-6 text-xl text-primary-input-text font-bold mt-5 flex-row">Schools</div>
-
-                      {schoolErrors && schoolErrors.length > 0 && (
-                        <div className="flex flex-row">
-                          <div className="leading-6 text-base text-primary-red font-bold mt-5">
-                            {schoolErrors.map((error, index) => (
-                              <div className="flex flex-row" key={index}>
-                                {error}
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      <div className="flex flex-row justify-between">
-                        <div className="flex flex-col mr-[20px]">
-                          <div className="flex flex-row mt-4">
-                            <div className="flex flex-col">
-                              <div className="text-primary-dark-blue base font-bold mr-[52px]">Seats Sold</div>
-                            </div>
-                            <TextInput
-                              className="w-[137px] h-[31px] flex flex-col -mt-1"
-                              placeholder="Enter Seats"
-                              id="schSeatsSold"
-                              value={currSalesFigureSet.schools.seatsSold}
-                              onChange={(event) =>
-                                setCurrSalesFigureSet({
-                                  ...currSalesFigureSet,
-                                  schools: {
-                                    ...currSalesFigureSet.schools,
-                                    seatsSold: sanitiseSalesFigue(event.target.value),
-                                  },
-                                })
-                              }
-                            />
-                          </div>
-
-                          <div className="flex flex-row mt-4">
-                            <div className="flex flex-col">
-                              <div className="text-primary-dark-blue base font-bold mr-5">Reserved Seats</div>
-                            </div>
-                            <TextInput
-                              className="w-[137px] h-[31px] flex flex-col -mt-1"
-                              placeholder="Enter Seats"
-                              id="schSeatsReserved"
-                              value={currSalesFigureSet.schools.seatsReserved}
-                              onChange={(event) =>
-                                setCurrSalesFigureSet({
-                                  ...currSalesFigureSet,
-                                  schools: {
-                                    ...currSalesFigureSet.schools,
-                                    seatsReserved: sanitiseSalesFigue(event.target.value),
-                                  },
-                                })
-                              }
-                            />
-                          </div>
-                        </div>
-
-                        <div className="flex flex-col">
-                          <div className="flex flex-row mt-4">
-                            <div className="flex flex-col">
-                              <div className="text-primary-dark-blue base font-bold mr-[52px]">Seats Sold Value</div>
-                            </div>
-                            <TextInput
-                              className="w-[137px] h-[31px] flex flex-col -mt-1"
-                              placeholder="Enter Value"
-                              id="schSeatsSoldVal"
-                              value={currSalesFigureSet.schools.seatsSoldVal}
-                              onChange={(event) =>
-                                setCurrSalesFigureSet({
-                                  ...currSalesFigureSet,
-                                  schools: {
-                                    ...currSalesFigureSet.schools,
-                                    seatsSoldVal: sanitiseSalesFigue(event.target.value),
-                                  },
-                                })
-                              }
-                            />
-                          </div>
-
-                          <div className="flex flex-row mt-4">
-                            <div className="flex flex-col">
-                              <div className="text-primary-dark-blue base font-bold mr-5">Reserved Seats Value</div>
-                            </div>
-                            <TextInput
-                              className="w-[137px] h-[31px] flex flex-col -mt-1"
-                              placeholder="Enter Value"
-                              id="schSeatsReservedVal"
-                              value={currSalesFigureSet.schools.seatsReservedVal}
-                              onChange={(event) =>
-                                setCurrSalesFigureSet({
-                                  ...currSalesFigureSet,
-                                  schools: {
-                                    ...currSalesFigureSet.schools,
-                                    seatsReservedVal: sanitiseSalesFigue(event.target.value),
-                                  },
-                                })
-                              }
-                            />
-                          </div>
-                        </div>
-
-                        <div className="flex flex-col mt-4 justify-end">
-                          <div className="flex flex-col items-end">
-                            <div className="flex flex-row mb-5">
-                              <div className="text-base text-primary-dark-blue font-bold flex flex-col mr-3">
-                                School Sales not required
-                              </div>
-                              <div className="flex flex-col">
-                                <Checkbox
-                                  id="schSalesNotRequired"
-                                  name="schSalesNotRequired"
-                                  checked={false}
-                                  onChange={() => editBooking('hasSchoolsSales', false)}
-                                  className="w-[19px] h-[19px]"
-                                />
-                              </div>
-                            </div>
-
-                            <Button
-                              className="w-[132px] flex flex-row"
-                              variant="secondary"
-                              text="Cancel"
-                              onClick={handleCancel}
-                            />
-                          </div>
-                        </div>
-                      </div>
+                    {/* Row2 */}
+                    <div className="flex justify-between items-center col-span-4">
+                      <span className="text-primary-dark-blue base font-bold">Reserved Seats</span>
+                      <TextInput
+                        className="w-[137px] h-[31px] flex flex-col -mt-1"
+                        placeholder="Enter Seats"
+                        id="genSeatsReserved"
+                        value={currSalesFigureSet?.general?.seatsReserved}
+                        onFocus={(event) => event?.target?.select?.()}
+                        pattern={decRegexLeadingZero}
+                        onChange={(event) => handleSalesFigChange('seatsReserved', 'general', event.target.value)}
+                      />
                     </div>
-                  ) : (
-                    <div className="gap-[510px] flex flex-row">
-                      <div className="flex flex-row mb-5 mt-5">
-                        <div className="text-base text-primary-dark-blue font-bold flex flex-col mr-3 ">
-                          School Sales required
-                        </div>
+                    <div className="flex justify-around items-center col-span-5">
+                      <span className="w-[141px] text-primary-dark-blue base font-bold">Reserved Seats Value</span>
+                      <TextInput
+                        className="w-[137px]"
+                        placeholder="Enter Value"
+                        id="genSeatsReservedVal"
+                        value={currSalesFigureSet?.general?.seatsReservedVal}
+                        onFocus={(event) => event?.target?.select?.()}
+                        pattern={/^\d*(\.\d*)?$/}
+                        onChange={(event) => handleSalesFigChange('seatsReservedVal', 'general', event.target.value)}
+                        onBlur={(event) =>
+                          handleSalesFigChange('seatsReservedVal', 'general', formatDecimalOnBlur(event))
+                        }
+                      />
+                    </div>
+                    <div className="flex items-center justify-end col-span-3">
+                      <Button
+                        className="w-[211px] flex flex-row"
+                        variant="primary"
+                        text="Copy Previous Week's Sales"
+                        onClick={copyPreviousWeeks}
+                      />
+                    </div>
+                    {!bookingHasSchoolSales && (
+                      <div className="flex items-center justify col-span-3">
+                        <span className="text-base text-primary-dark-blue font-bold mr-3 ">School Sales required</span>
                         <div className="flex flex-col">
                           <Checkbox
                             id="schSalesRequired"
@@ -797,8 +588,112 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                           />
                         </div>
                       </div>
+                    )}
+                    {!bookingHasSchoolSales && (
+                      <div className="flex justify-end items-center justify col-span-9">
+                        <Button className="w-[132px]" variant="secondary" text="Cancel" onClick={handleCancel} />
+                      </div>
+                    )}
+                  </div>
 
-                      <Button className="w-[132px] mt-3" variant="secondary" text="Cancel" onClick={handleCancel} />
+                  {bookingHasSchoolSales && (
+                    <div>
+                      <div className="leading-6 text-xl text-primary-input-text font-bold mt-5 flex-row">Schools</div>
+
+                      {schoolErrors && schoolErrors.length > 0 && (
+                        <div className="flex flex-row leading-6 text-base text-primary-red font-bold mt-5">
+                          {schoolErrors.map((error, index) => (
+                            <div className="flex flex-row" key={index}>
+                              {error}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      {/* Schools Grid */}
+                      {
+                        <div className="grid grid-cols-12 gap-1">
+                          {/* Row1 */}
+                          <div className="flex justify-between items-center col-span-4">
+                            <span className="text-primary-dark-blue base font-bold">Seats Sold</span>
+                            <TextInput
+                              className="w-[137px] h-[31px] flex flex-col -mt-1"
+                              placeholder="Enter Seats"
+                              id="schSeatsSold"
+                              value={currSalesFigureSet?.schools?.seatsSold}
+                              onFocus={(event) => event?.target?.select?.()}
+                              pattern={decRegexLeadingZero}
+                              onChange={(event) => handleSalesFigChange('seatsSold', 'schools', event.target.value)}
+                            />
+                          </div>
+                          <div className="flex justify-around items-center col-span-5">
+                            <span className="w-[141px] text-end text-primary-dark-blue base font-bold">
+                              Seats Sold Value
+                            </span>
+                            <TextInput
+                              className="w-[137px] h-[31px] flex flex-col -mt-1"
+                              placeholder="Enter Value"
+                              id="schSeatsSoldVal"
+                              value={currSalesFigureSet?.schools?.seatsSoldVal}
+                              onFocus={(event) => event?.target?.select?.()}
+                              pattern={/^\d*(\.\d*)?$/}
+                              onChange={(event) => handleSalesFigChange('seatsSoldVal', 'schools', event.target.value)}
+                              onBlur={(event) =>
+                                handleSalesFigChange('seatsSoldVal', 'schools', formatDecimalOnBlur(event))
+                              }
+                            />
+                          </div>
+                          <div className="flex items-center justify-end col-span-3">
+                            <div className="flex flex-row">
+                              <span className="text-base text-primary-dark-blue font-bold mr-3">
+                                School Sales not required
+                              </span>
+                              <Checkbox
+                                id="schSalesNotRequired"
+                                name="schSalesNotRequired"
+                                checked={false}
+                                onChange={() => editBooking('hasSchoolsSales', false)}
+                                className="w-[19px] h-[19px]"
+                              />
+                            </div>
+                          </div>
+                          {/* Row2 */}
+                          <div className="flex justify-between items-center col-span-4">
+                            <span className="text-primary-dark-blue base font-bold">Reserved Seats</span>
+                            <TextInput
+                              className="w-[137px] h-[31px] flex flex-col -mt-1"
+                              placeholder="Enter Seats"
+                              id="schSeatsReserved"
+                              value={currSalesFigureSet?.schools?.seatsReserved}
+                              onFocus={(event) => event?.target?.select?.()}
+                              pattern={decRegexLeadingZero}
+                              onChange={(event) => handleSalesFigChange('seatsReserved', 'schools', event.target.value)}
+                            />
+                          </div>
+                          <div className="flex justify-around items-center col-span-5">
+                            <span className="w-[141px] text-primary-dark-blue base font-bold">
+                              Reserved Seats Value
+                            </span>
+                            <TextInput
+                              className="w-[137px] h-[31px] flex flex-col -mt-1"
+                              placeholder="Enter Value"
+                              id="schSeatsReservedVal"
+                              value={currSalesFigureSet?.schools?.seatsReservedVal}
+                              onFocus={(event) => event?.target?.select?.()}
+                              pattern={/^\d*(\.\d*)?$/}
+                              onChange={(event) =>
+                                handleSalesFigChange('seatsReservedVal', 'schools', event.target.value)
+                              }
+                              onBlur={(event) =>
+                                handleSalesFigChange('seatsReservedVal', 'schools', formatDecimalOnBlur(event))
+                              }
+                            />
+                          </div>
+                          <div className="flex items-center justify-end col-span-3">
+                            <Button className="w-[132px]" variant="secondary" text="Cancel" onClick={handleCancel} />
+                          </div>
+                        </div>
+                      }
+                      {/* Grid Ends */}
                     </div>
                   )}
                 </div>

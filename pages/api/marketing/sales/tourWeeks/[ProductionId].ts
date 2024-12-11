@@ -1,7 +1,16 @@
+import { UTCDate } from '@date-fns/utc';
 import { startOfDay } from 'date-fns';
 import getPrismaClient from 'lib/prisma';
 import master from 'lib/prisma_master';
-import { addDurationToDate, getArrayOfDatesBetween, getMonday, getWeeksBetweenDates } from 'services/dateService';
+import {
+  compareDatesWithoutTime,
+  formatDate,
+  getArrayOfDatesBetween,
+  getDateDaysAway,
+  getMonday,
+  getWeeksBetweenDates,
+  newDate,
+} from 'services/dateService';
 import { getAccountIdFromReq } from 'services/userService';
 import formatInputDate from 'utils/dateInputFormat';
 
@@ -10,12 +19,19 @@ export default async function handle(req, res) {
     const ProductionId = parseInt(req.query.ProductionId, 10);
     const accountId = await getAccountIdFromReq(req);
     const prisma = await getPrismaClient(req);
-    const dateBlock = await prisma.dateBlock.findMany({
-      where: {
-        ProductionId,
-        IsPrimary: true,
-      },
-    });
+    const dateBlock = await prisma.dateBlock
+      .findMany({
+        where: {
+          ProductionId,
+          IsPrimary: true,
+        },
+      })
+      .then((res) =>
+        res.map((x) => ({
+          ...x,
+          StartDate: new UTCDate(x.StartDate),
+        })),
+      );
 
     const prodCo = await master.productionCompany.findMany({
       where: {
@@ -39,8 +55,8 @@ export default async function handle(req, res) {
     const numWeeks = salesStartWeek.ProdCoSaleStartWeek > 0 ? salesStartWeek : salesStartWeek * -1;
     const salesFrequency = production.SalesFrequency;
 
-    const startDate = addDurationToDate(dateBlock[0].StartDate, numWeeks * 7, false);
-    const endDate = dateBlock[0].EndDate;
+    const startDate = getDateDaysAway(dateBlock[0].StartDate, numWeeks * -7);
+    const endDate = newDate(dateBlock[0].EndDate.getTime());
     const dateStartMonday = getMonday(startDate);
     const weeks = getWeeksBetweenDates(dateStartMonday.toISOString(), endDate.toISOString());
 
@@ -48,7 +64,10 @@ export default async function handle(req, res) {
     let weekNo = numWeeks * -1;
     weeks.forEach((week) => {
       const weekStart = week.mondayDate;
-      const weekEnd = addDurationToDate(new Date(week.mondayDate), 6, true);
+      const weekEnd = getDateDaysAway(newDate(week.mondayDate), 6);
+
+      // if weekStart is in the future - end the forEach so user cannot enter sales in the future
+      if (compareDatesWithoutTime(weekStart, newDate(), '>')) return;
 
       // skip weekNo 0, there isn't a 0, go straight from -1 to 1
       if (weekNo === 0) {
@@ -57,10 +76,13 @@ export default async function handle(req, res) {
 
       // for daily sales
       if (salesFrequency === 'D') {
-        const dates = getArrayOfDatesBetween(weekStart, weekEnd.toString());
+        // don't show dates in the future
+        const weekEndDate = compareDatesWithoutTime(weekEnd, newDate(), '>') ? newDate() : weekEnd.getTime();
+
+        const dates = getArrayOfDatesBetween(newDate(weekStart).getTime(), weekEndDate);
         dates.forEach((date) => {
           let obj = {
-            text: weekNo.toString() + ' ' + formatInputDate(date),
+            text: weekNo.toString() + ' ' + formatDate(date, 'dd/MM/yy'),
             value: date,
             selected: false,
             weekNo,

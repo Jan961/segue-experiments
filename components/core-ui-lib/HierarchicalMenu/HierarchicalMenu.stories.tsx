@@ -52,7 +52,7 @@ const values: MenuOption[] = [
 export const Example: Story = {
   render: () => {
     return (
-      <div className="w-[800px] h-vh bg-primary-dark-blue text-primary-white">
+      <div className="w-[800px] h-vh bg-primary-dark-blue text-primary-white p-8">
         <HierarchicalMenu options={values} />
       </div>
     );

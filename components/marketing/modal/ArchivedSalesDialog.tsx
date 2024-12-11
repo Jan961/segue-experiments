@@ -52,7 +52,7 @@ const ArchSalesDialog = ({
   const { bookings } = useRecoilValue(bookingJumpState);
   const [prodCompData, setProdCompData] = useState<Array<BookingSelection>>([]);
   const [subTitle, setSubTitle] = useState<string>('');
-  const [conditionType, setConditionType] = useState('');
+  const [conditionType, setConditionType] = useState(null);
   const [selectedCondition, setSelectedCondition] = useState(null);
   const [venueList, setVenueList] = useState<Array<SelectOption>>([]);
   const [townList, setTownList] = useState<Array<SelectOption>>([]);
@@ -195,7 +195,7 @@ const ArchSalesDialog = ({
 
   useEffect(() => {
     setVisible(show);
-    setConditionType('');
+    setConditionType(null);
     setSelectedCondition(null);
   }, [show]);
 
@@ -223,16 +223,20 @@ const ArchSalesDialog = ({
     <PopupModal
       show={visible}
       title={title[variant]}
-      titleClass={classNames('text-xl text-primary-navy font-bold -mt-2', variant === 'both' ? 'w-48' : '')}
       onClose={handleModalCancel}
+      subtitle={variant === 'both' ? '' : subTitle}
+      footerComponent={
+        <div className="float-right flex flex-row">
+          <Button className="w-32" variant="secondary" text="Cancel" onClick={onCancel} />
+          <Button className="ml-4 w-32" variant="primary" text="Accept" onClick={() => submitSelection()} />
+        </div>
+      }
     >
-      <div className="w-[340px] h-auto">
-        {variant !== 'both' && <div className="text-xl text-primary-navy font-bold mb-4">{subTitle}</div>}
-
+      <div className={classNames('w-[340px]', loading && 'h-16')}>
         {variant === 'both' ? (
           <div>
             <Select
-              className={classNames('my-2 w-full !border-0 text-primary-navy')}
+              className={classNames('my-2 w-full text-primary-navy')}
               options={bothOptions}
               value={conditionType}
               onChange={(value) => setConditionType(value?.toString() || null)}
@@ -242,13 +246,13 @@ const ArchSalesDialog = ({
             />
 
             <Select
-              className={classNames('my-2 w-full !border-0 text-primary-navy')}
-              options={conditionType === '' ? [] : conditionType === 'Venue' ? venueList : townList}
+              className={classNames('my-2 w-full text-primary-navy')}
+              options={conditionType === null ? [] : conditionType === 'Venue' ? venueList : townList}
               isClearable
               isSearchable
               value={selectedCondition}
               onChange={(value) => getBookingSelection(value)}
-              placeholder={conditionType === '' ? '' : 'Please select a ' + conditionType}
+              placeholder={conditionType === null ? '' : 'Please select a ' + conditionType}
               disabled={conditionType === ''}
             />
 
@@ -260,8 +264,6 @@ const ArchSalesDialog = ({
                   <div>
                     {prodCompData.length > 0 && (
                       <SalesTable
-                        containerHeight="h-auto"
-                        containerWidth="w-auto"
                         module="marketing"
                         variant="prodCompArch"
                         onCellValChange={selectForComparison}
@@ -283,8 +285,6 @@ const ArchSalesDialog = ({
               <div>
                 {prodCompData.length > 0 && (
                   <SalesTable
-                    containerHeight="h-auto"
-                    containerWidth="w-[340px]"
                     module="marketing"
                     variant="prodCompArch"
                     onCellValChange={selectForComparison}
@@ -298,12 +298,6 @@ const ArchSalesDialog = ({
           </div>
         )}
         <div className="text text-base text-primary-red mr-12">{errorMessage}</div>
-
-        <div className="float-right flex flex-row mt-5 py-2">
-          <Button className="w-32" variant="secondary" text="Cancel" onClick={onCancel} />
-
-          <Button className="ml-4 w-32" variant="primary" text="Accept" onClick={() => submitSelection()} />
-        </div>
       </div>
     </PopupModal>
   );

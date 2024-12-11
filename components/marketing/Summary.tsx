@@ -1,4 +1,4 @@
-import { calculateWeekNumber, dateToSimple, getTimeFromDateAndTime } from 'services/dateService';
+import { calculateWeekNumber, dateToSimple, dateTimeToTime, newDate } from 'services/dateService';
 import axios from 'axios';
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import numeral from 'numeral';
@@ -8,6 +8,7 @@ import classNames from 'classnames';
 import SummaryRow from './SummaryRow';
 import { useRecoilValue } from 'recoil';
 import { currencyState } from 'state/global/currencyState';
+import { isNull } from 'utils';
 
 export interface SummaryRef {
   resetData: () => void;
@@ -33,7 +34,7 @@ const Summary = forwardRef<SummaryRef, SummaryProps>((props, ref) => {
   }));
 
   const formatCost = (amount: number) => {
-    if (amount === 0) {
+    if (amount === 0 || isNull(amount)) {
       return currency.symbol + ' -';
     } else {
       return currency.symbol + parseFloat(amount.toString()).toFixed(2);
@@ -66,8 +67,8 @@ const Summary = forwardRef<SummaryRef, SummaryProps>((props, ref) => {
   if (!summary) return null;
 
   const weekNo = calculateWeekNumber(
-    new Date(summary?.ProductionInfo?.StartDate),
-    new Date(summary?.ProductionInfo?.Date),
+    newDate(summary?.ProductionInfo?.StartDate),
+    newDate(summary?.ProductionInfo?.Date),
   );
 
   if (!summary?.Info) return null;
@@ -123,7 +124,7 @@ const Summary = forwardRef<SummaryRef, SummaryProps>((props, ref) => {
       const times: any = x[1];
       const data = {
         date: x[0],
-        time: times.map((item) => (item.Time === null ? 'TBC' : getTimeFromDateAndTime(item.Time))),
+        time: times.map((item) => (item.Time === null ? 'TBC' : dateTimeToTime(item.Time))),
       };
       processed.push(data);
     });
