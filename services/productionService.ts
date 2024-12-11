@@ -1,13 +1,15 @@
 import getPrismaClient from 'lib/prisma';
 import master from 'lib/prisma_master';
-import { Prisma } from 'prisma/generated/prisma-client';
-import { productionEditorMapper } from 'lib/mappers';
+import { Prisma, ProductionRegion } from 'prisma/generated/prisma-client';
+import { dateBlockMapper, productionEditorMapper } from 'lib/mappers';
 
 import { ProductionDTO, UICurrency } from 'interfaces';
 import { getProductionsByStartDate } from 'utils/getProductionsByStartDate';
 import { getWeekNumsToDateMap } from 'utils/getDateFromWeekNum';
 import { omit } from 'radash';
 import { NextApiRequest } from 'next';
+import { getAccountUserByEmailAndOrganisationId, getEmailFromReq } from './userService';
+import { dateTimeToTime } from './dateService';
 
 // Edit Production Page
 const productionDateBlockInclude = Prisma.validator<Prisma.ProductionSelect>()({
@@ -58,7 +60,22 @@ export const getAllProductionPageProps = async (req: NextApiRequest) => {
   return { props: { productions } };
 };
 
-export const getAllProductions = async (req: NextApiRequest) => {
+export const getUserAccessibleProductions = async (req: NextApiRequest, organisationId: string) => {
+  const prisma = await getPrismaClient(req);
+  const email = await getEmailFromReq(req);
+  const accountUser = await getAccountUserByEmailAndOrganisationId(email, organisationId);
+  const accountUserProductions = await prisma.accountUserProduction.findMany({
+    where: {
+      AUPAccUserId: accountUser?.AccUserId,
+    },
+  });
+  return getAllProductions(
+    req,
+    accountUserProductions.map((production) => production.AUPProductionId),
+  );
+};
+
+export const getAllProductions = async (req: NextApiRequest, productionIdList?: number[]) => {
   const prisma = await getPrismaClient(req);
   // TODO: convert this to lookup.
   const productionCompanyList = await master.ProductionCompany.findMany({
@@ -87,6 +104,7 @@ export const getAllProductions = async (req: NextApiRequest) => {
     },
     where: {
       IsDeleted: false,
+      ...(productionIdList && { Id: { in: productionIdList } }),
     },
   });
 
@@ -266,4 +284,40 @@ export const getAllCurrencylist = async (): Promise<UICurrency[]> => {
     name: CurrencyName,
     symbolUnicode: CurrencySymbolUnicode,
   }));
+};
+
+export const transformProductions = (productionsRaw, allProductionRegions: ProductionRegion[]) => {
+  const productions = productionsRaw
+    .map((t) => {
+      let db = t.DateBlock.find((block) => block.IsPrimary);
+      if (db) {
+        db = dateBlockMapper(db);
+      }
+
+      return {
+        Id: t.Id,
+        Code: t.Code,
+        IsArchived: t.IsArchived,
+        ShowCode: t.Show.Code,
+        ShowName: t.Show.Name,
+        StartDate: db?.StartDate || null,
+        EndDate: db?.EndDate || null,
+        ShowRegionId: allProductionRegions
+          ? allProductionRegions.find((pair) => pair.PRProductionId === t.Id)?.PRRegionId
+          : null,
+        RunningTime: t.RunningTime ? dateTimeToTime(t.RunningTime.toISOString()) : null,
+        RunningTimeNote: t.RunningTimeNote,
+        SalesFrequency: t.SalesFrequency,
+        ProductionCompany: t.ProductionCompany || '',
+        SalesEmail: t.SalesEmail,
+      };
+    })
+    .sort((a, b) => {
+      if (a.IsArchived !== b.IsArchived) {
+        return a.IsArchived ? 1 : -1;
+      }
+      return new Date(a.StartDate).valueOf() - new Date(b.StartDate).valueOf();
+    });
+
+  return productions;
 };

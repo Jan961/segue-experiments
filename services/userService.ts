@@ -5,6 +5,7 @@ import { userMapper } from 'lib/mappers';
 import { UserDto } from 'interfaces';
 import { isNullOrEmpty } from 'utils';
 import { Permission } from 'prisma/generated/prisma-master';
+import getPrismaClient from 'lib/prisma';
 
 export const getUsers = async (AccountId: number): Promise<UserDto[]> => {
   const result = await prisma.user.findMany({
@@ -163,6 +164,34 @@ export const removeUserFromClerk = async (emailAddress: string) => {
     return response;
   }
   return true;
+};
+
+export const getAccountUserProductions = async (req, accountUserId: number) => {
+  const client = await getPrismaClient(req);
+  const accountUserProductions = await client.accountUserProduction.findMany({
+    where: {
+      AUPAccUserId: accountUserId,
+    },
+  });
+  return accountUserProductions;
+};
+
+export const getAccountUserByEmailAndOrganisationId = async (email: string, organisationId: string) => {
+  const accountUser = await prisma.AccountUser.findFirst({
+    where: {
+      User: {
+        UserEmail: {
+          equals: email,
+        },
+      },
+      Account: {
+        AccountOrganisationId: {
+          equals: organisationId,
+        },
+      },
+    },
+  });
+  return accountUser;
 };
 
 export const getUserPermisisons = async (email: string, organisationId: string) => {

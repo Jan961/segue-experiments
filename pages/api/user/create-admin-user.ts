@@ -62,7 +62,11 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
 
     const formattedPermissions = permissions.map(({ PermissionName }) => PermissionName);
     const accountUser = accountUserOnly
-      ? { organisationId: AccountOrganisationId, permissions: formattedPermissions }
+      ? {
+          organisationId: AccountOrganisationId,
+          permissions: formattedPermissions,
+          accessibleProductions: productions.map(({ Id }) => Id),
+        }
       : { success: true };
     res.status(200).json(accountUser);
   } catch (err) {
