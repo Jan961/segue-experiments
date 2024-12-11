@@ -8,7 +8,7 @@ import { getProductionsByStartDate } from 'utils/getProductionsByStartDate';
 import { getWeekNumsToDateMap } from 'utils/getDateFromWeekNum';
 import { omit } from 'radash';
 import { NextApiRequest } from 'next';
-import { getAccountUserByEmailAndOrganisationId, getEmailFromReq } from './userService';
+import { getAccountUserByEmailAndOrganisationId, getEmailFromReq, getOrganisationIdFromReq } from './userService';
 import { dateTimeToTime } from './dateService';
 
 // Edit Production Page
@@ -320,4 +320,18 @@ export const transformProductions = (productionsRaw, allProductionRegions: Produ
     });
 
   return productions;
+};
+
+export const checkProductionAccess = async (req: NextApiRequest, productionId: number) => {
+  const prisma = await getPrismaClient(req);
+  const email = await getEmailFromReq(req);
+  const organisationId = await getOrganisationIdFromReq(req);
+  const accountUser = await getAccountUserByEmailAndOrganisationId(email, organisationId);
+  const access = await prisma.accountUserProduction.findFirst({
+    where: {
+      AUPAccUserId: accountUser?.AccUserId,
+      AUPProductionId: productionId,
+    },
+  });
+  return access;
 };

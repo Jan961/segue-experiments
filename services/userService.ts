@@ -118,6 +118,8 @@ export const getAccountIdFromReq = async (req: any) => {
 };
 
 export const getOrganisationIdFromReq = async (req: any): Promise<string> => {
+  const organisationId = req.headers?.['x-organisation-id'] as string;
+  if (organisationId) return organisationId;
   const { userId } = getAuth(req);
   const user = await clerkClient.users.getUser(userId);
   return user?.unsafeMetadata?.organisationId as string;

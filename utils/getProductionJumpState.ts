@@ -15,10 +15,7 @@ interface Params extends ParsedUrlQuery {
 
 export const getProductionJumpState = async (ctx, path: string): Promise<ProductionJump> => {
   const { ProductionCode, ShowCode } = (ctx.params || {}) as Params;
-  let organisationId = ctx.req.headers['x-organisation-id'] as string;
-  if (!organisationId) {
-    organisationId = await getOrganisationIdFromReq(ctx.req as NextApiRequest);
-  }
+  const organisationId = await getOrganisationIdFromReq(ctx.req as NextApiRequest);
   const productionsRaw = await getUserAccessibleProductions(ctx.req as NextApiRequest, organisationId);
   const allProductionRegions: any = await getAllProductionRegions(ctx.req as NextApiRequest);
   const selectedProduction = productionsRaw.find(
