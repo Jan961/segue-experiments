@@ -50,7 +50,7 @@ export default function TasksTable({
   const canEditTaskNotes = permissions.includes('EDIT_PROD_TASK_NOTES');
   const canEditTask = permissions.includes('EDIT_PROD_TASK');
   const canDeleteTask = permissions.includes('DELETE_PROD_TASK');
-  const canCloneTask = permissions.includes(''); // ADD PERMISSIONS
+  const canCloneTask = permissions.includes('CLONE_PROD_TASK');
 
   const handleCellClick = (e) => {
     if (e.column.colId === 'Notes') {
