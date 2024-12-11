@@ -31,6 +31,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           return null;
       }
     });
+
     // check if we have run of dates
     const { isRunOfDates } = bookingsData[0];
     if (isRunOfDates) {
