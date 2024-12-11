@@ -27,9 +27,9 @@ const Filters = ({ usersList, handleShowTask }: FiltersProps) => {
   };
   const permissions = useRecoilValue(accessProjectManagement);
   const canAddTask = !permissions.includes('ADD_PROD_TASK');
-  const canAccessMasterTaskList = !permissions.includes('ACCESS_MASTER_TASK_LIST');
-  const canExportProductionTasks = !permissions.includes('EXPORT_PRODUCTION_TASK_LIST');
-  const canExportMasterTasks = !permissions.includes('EXPORT_MASTER_TASK_LIST');
+  const canAccessMasterTaskList = permissions.includes('ACCESS_MASTER_TASK_LIST');
+  const canExportProductionTasks = permissions.includes('EXPORT_PRODUCTION_TASK_LIST');
+  const canExportMasterTasks = permissions.includes('EXPORT_MASTER_TASK_LIST');
 
   const onDateChange = (change: { from: UTCDate; to: UTCDate }) => {
     const { from: startDueDate, to: endDueDate } = change;
@@ -118,18 +118,18 @@ const Filters = ({ usersList, handleShowTask }: FiltersProps) => {
           className="w-[132px]"
           sufixIconName="excel"
           onClick={handleShowReports}
-          disabled={canExportMasterTasks && canExportProductionTasks}
+          disabled={!canExportMasterTasks && !canExportProductionTasks}
         />
         <Button
           text="Master Task List"
           className="w-[132px]"
           onClick={() => router.push('/tasks/master')}
-          disabled={canAccessMasterTaskList}
+          disabled={!canAccessMasterTaskList}
         />
         <div />
         <Button
           onClick={handleShowTask}
-          disabled={!selected || selected === -1 || canAddTask}
+          disabled={!selected || selected === -1 || !canAddTask}
           text="Add Task"
           className="w-[132px] mt-[1px]"
         />
