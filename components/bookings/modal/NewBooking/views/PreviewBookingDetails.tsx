@@ -157,17 +157,16 @@ export default function PreviewBookingDetails({
   };
 
   const getPerformanceTimes = (item) => {
-    if (item.times) {
-      const times = item.times.split(';');
-      const accTimes = times.slice(0, item.noPerf);
-      let str = '';
-      for (let i = 0; i < accTimes.length - 1; i++) {
-        str += `${accTimes[i]}; `;
-      }
-      str += accTimes[accTimes.length - 1];
-      item.times = str;
-      return str;
-    } else return '';
+    const times = item.times.split(';');
+    const accTimes = times.slice(0, item.noPerf);
+    let str = '';
+    for (let i = 0; i < item.noPerf - 1; i++) {
+      str += `${accTimes[i] ? accTimes[i] : ''}; `;
+    }
+    str += accTimes[item.noPerf - 1] ? accTimes[item.noPerf - 1] : '';
+    // str += accTimes[accTimes.noPerf - 1] ? accTimes[accTimes.noPerf - 1] : '';
+    item.times = str;
+    return str;
   };
 
   const formatRowData = (data) => {
