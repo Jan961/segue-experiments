@@ -19,9 +19,12 @@ const SelectBookingStatusRenderer = ({
   const [isDisabled, setIsDisabled] = useState<boolean>(false);
 
   const handleValueChange = (value) => {
+    setValue(value);
     node.setData({ ...data, bookingStatus: value });
     if (data.isRunOfDates && node.rowIndex === 0) {
-      api.forEachNode((node: IRowNode) => node.setData({ ...node.data, bookingStatus: value }));
+      api.forEachNode((node: IRowNode) =>
+        node.setData({ ...node.data, bookingStatus: value, pencilNo: data.pencilNo }),
+      );
     }
   };
 
@@ -30,12 +33,12 @@ const SelectBookingStatusRenderer = ({
       const { dayType } = data;
       setIsDisabled((node.rowIndex > 0 && data.isRunOfDates) || dayType === null || dayType === '');
       if (!data.isRunOfDates) {
-        setValue(dayType === null || dayType === '' ? null : value);
+        handleValueChange(dayType === null || dayType === '' ? null : value);
       } else if (node.rowIndex === 0 && value !== null && (dayType === null || dayType === '')) {
         handleValueChange(null);
       }
     }
-  }, [data, node]);
+  }, [data.perf, data.dayType]);
 
   const bookingStatusOptions = useMemo(() => {
     return statusOptions.filter((option) => option.text !== 'Available');
