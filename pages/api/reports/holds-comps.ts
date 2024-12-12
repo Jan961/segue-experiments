@@ -44,22 +44,45 @@ type TBookingHoldsGroupedByCommonKey = {
   [key: string]: TBookingHoldsGrouped;
 };
 
+/**
+ * align column text to right
+ * @param worksheet  ExcelJS.Worksheet
+ * @param colAsChar  string
+ */
 const alignColumnTextRight = ({ worksheet, colAsChar }: { worksheet: any; colAsChar: string }) => {
   worksheet.getColumn(colAsChar).eachCell((cell) => {
     cell.alignment = { horizontal: 'right' };
   });
 };
 
+/**
+ * make row text bold
+ * @param worksheet  ExcelJS.Worksheet
+ * @param row  number
+ */
 const makeRowTextBold = ({ worksheet, row }: { worksheet: any; row: number }) => {
   worksheet.getRow(row).eachCell((cell) => {
     cell.font = { bold: true };
   });
 };
 
+/**
+ * make top border double
+ * @param worksheet  ExcelJS.Worksheet
+ * @param row  number
+ * @param col  number
+ */
 const makeTopBorderDouble = ({ worksheet, row, col }: { worksheet: any; row: number; col: number }) => {
   worksheet.getCell(row, col).border = { top: { style: 'thin', color: { argb: COLOR_HEXCODE.BLACK } } };
 };
 
+/**
+ * styles header rows in excel report
+ * @param worksheet  ExcelJS.Worksheet
+ * @param row  number
+ * @param numberOfColumns  number
+ * @param bgColor  string
+ */
 const styleHeader = ({
   worksheet,
   row,
@@ -83,6 +106,13 @@ const styleHeader = ({
   }
 };
 
+/**
+ * gives key in format of FullProductionCode | VenueCode | VenueName | BookingFirstDate
+ * @param FullProductionCode  string
+ * @param VenueCode  string
+ * @param VenueName  string
+ * @param BookingFirstDate  string
+ */
 const getAggregateKey = ({
   FullProductionCode,
   VenueCode,
@@ -95,17 +125,31 @@ const getAggregateKey = ({
   BookingFirstDate: string;
 }) => `${FullProductionCode} | ${VenueCode} | ${VenueName} | ${BookingFirstDate}`;
 
+/**
+ * gives key in format of HoldOrComp | Code
+ * @param HoldOrComp  string
+ * @param Code  string
+ */
 const getTypeAndCodeKey = ({ HoldOrComp, Code }: { HoldOrComp: string; Code: string }) => `${HoldOrComp} | ${Code}`;
 
+/**
+ * Groups and accumulates booking data based on hold/comp type and code
+ * @param allBookingCodeAndNameForADate - Array of booking data for a specific date
+ * @returns Array of merged booking data with accumulated seats for same type and code
+ */
 const groupBasedOnTypeAndCode = ({
   allBookingCodeAndNameForADate,
 }: {
   allBookingCodeAndNameForADate: TBookingCodeAndName[];
 }): TBookingCodeAndName[] => {
+  // Create an object to accumulate bookings with the same type and code
   const accumulationBasedOnTypeAndCode: { [key: string]: TBookingCodeAndName } = allBookingCodeAndNameForADate.reduce(
     (acc, x: TBookingCodeAndName) => {
+      // Generate a unique key combining hold/comp type and code
       const key = getTypeAndCodeKey({ HoldOrComp: x.HoldOrComp, Code: x.Code });
+      // Check if an entry with this key already exists
       const value = acc[key];
+      // If entry exists, add the seats to the existing total
       if (value) {
         return {
           ...acc,
@@ -115,6 +159,7 @@ const groupBasedOnTypeAndCode = ({
           },
         };
       }
+      // If entry doesn't exist, create new entry with initial booking data
       return {
         ...acc,
         [key]: {
@@ -124,22 +169,31 @@ const groupBasedOnTypeAndCode = ({
     },
     {},
   );
+  // Convert the accumulated object back to an array
   return Object.values(accumulationBasedOnTypeAndCode);
 };
 
+/**
+ * Groups booking holds and comps based on venue and date information
+ * @param fetchedValues - Array of BookingHoldCompsView objects to be grouped
+ * @returns Object containing grouped booking data with composite keys
+ */
 const groupBasedOnVenueAndSameDate = ({
   fetchedValues,
 }: {
   fetchedValues: BookingHoldCompsView[];
 }): TBookingHoldsGroupedByCommonKey =>
   fetchedValues.reduce((acc, obj: BookingHoldCompsView) => {
+    // Generate a unique key based on production, venue, and date information
     const key: string = getAggregateKey({
       FullProductionCode: obj.FullProductionCode,
       VenueCode: obj.VenueCode,
       VenueName: obj.VenueName,
       BookingFirstDate: obj.BookingFirstDate.toISOString(),
     });
+    // Check if an entry with this key already exists in the accumulator
     const val: TBookingHoldsGrouped = acc[key];
+    // If entry exists, append new hold/comp data to existing group
     if (val) {
       return {
         ...acc,
@@ -148,6 +202,7 @@ const groupBasedOnVenueAndSameDate = ({
           data: [
             ...val.data,
             {
+              // Add new hold/comp details to existing group
               HoldOrComp: obj.HoldOrComp,
               Code: obj.Code,
               Name: obj.Name,
@@ -157,9 +212,12 @@ const groupBasedOnVenueAndSameDate = ({
         },
       };
     }
+
+    // If entry doesn't exist, create new group with initial data
     return {
       ...acc,
       [key]: {
+        // Venue and production details
         FullProductionCode: obj.FullProductionCode,
         VenueCode: obj.VenueCode,
         VenueName: obj.VenueName,
@@ -185,12 +243,19 @@ const makeCellTextBold = ({ worksheet, row, col }: { worksheet: any; row: number
   worksheet.getCell(row, col).font = { bold: true };
 };
 
+/**
+ * Handles request for holds and comps report
+ * @param req  NextApiRequest
+ * @param res  NextApiResponse
+ */
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { productionId, productionCode = '', fromDate, toDate, venue, status, format, exportedAt } = req.body;
 
   try {
     const prisma = await getPrismaClient(req);
     const workbook = new ExcelJS.Workbook();
+
+    // where conditions based on params
     const whereQuery: {
       FullProductionCode?: string;
       VenueCode?: string;
@@ -209,6 +274,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     if (status) {
       whereQuery.BookingStatusCode = status;
     }
+
+    // prisma query to get holds and comps data for given parameters
     const getHoldsAndCompsQuery = prisma.bookingHoldCompsView.findMany({
       where: {
         ...whereQuery,
@@ -217,10 +284,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         BookingFirstDate: 'asc',
       },
     });
+    //
     const [data, productionDetails] = await all([getHoldsAndCompsQuery, getProductionWithContent(productionId, req)]);
 
     const showName = (productionDetails as ProductionDetails)?.Show?.Name || '';
     const filename = `${productionCode} ${showName} Holds and Comps`;
+    // add worksheet to workbook with name 'Holds and Comps'
     const worksheet = workbook.addWorksheet('Holds and Comps', {
       pageSetup: { fitToPage: true, fitToHeight: 5, fitToWidth: 7 },
     });
@@ -243,15 +312,20 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     let row = 5;
     let currentEntryRowSize = 0;
     let skipFirstRowFormatting = true;
+    // Iterate through each grouped venue and date entry to create Excel rows
     Object.values(groupBasedOnVenueAndDateForAllTypes).forEach((x: TBookingHoldsGrouped) => {
       currentEntryRowSize = 0;
       worksheet.addRow([]);
       row++;
+
+      // Handle the first row's special formatting
       if (skipFirstRowFormatting) {
         skipFirstRowFormatting = false;
       } else {
         worksheet.mergeCells(`A${row - 1}:J${row - 1}`);
       }
+
+      // Add venue and production details row
       worksheet.addRow([
         x.FullProductionCode,
         x.VenueCode,
@@ -269,27 +343,36 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       makeCellTextBold({ worksheet, row, col: 9 });
       row++;
 
+      // Initialize counters for holds and comps
       let totalHoldBooked = '0';
       let totalCompBooked = '0';
       const holdAndCompMap = {
         [HOLD_OR_COMP.HOLD]: [],
         [HOLD_OR_COMP.COMP]: [],
       };
+
+      // Group data by hold/comp type
       x.data.forEach(({ HoldOrComp, Code, Name, Seats }: TBookingCodeAndName) => {
+        // Accumulate totals based on type
         totalHoldBooked =
           HoldOrComp === HOLD_OR_COMP.HOLD ? String(parseInt(totalHoldBooked) + parseInt(Seats)) : totalHoldBooked;
         totalCompBooked =
           HoldOrComp === HOLD_OR_COMP.COMP ? String(parseInt(totalCompBooked) + parseInt(Seats)) : totalCompBooked;
+        // Prepare row data
         const rowValue = ['', '', '', '', HoldOrComp, Code, Name, parseInt(Seats)];
         holdAndCompMap[HoldOrComp].push(rowValue);
       });
 
+      // Add COMP rows if any exist
       if (holdAndCompMap[HOLD_OR_COMP.COMP].length) {
+        // Add individual comp rows
         holdAndCompMap[HOLD_OR_COMP.COMP].forEach((r) => {
           worksheet.addRow(r);
           row++;
           currentEntryRowSize++;
         });
+
+        // Add comp total row with formatting
         worksheet.addRow([
           '',
           '',
@@ -304,18 +387,24 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         makeRowTextBold({ worksheet, row });
         worksheet.mergeCells(`E${row}:F${row}`);
         worksheet.mergeCells(`G${row}:H${row}`);
+        // Add double borders above totals
         for (let i = 7; i <= 9; i++) {
           makeTopBorderDouble({ worksheet, row, col: i });
         }
         row++;
         currentEntryRowSize++;
       }
+
+      // Add HOLD rows if any exist
       if (holdAndCompMap[HOLD_OR_COMP.HOLD].length) {
+        // Add individual hold rows
         holdAndCompMap[HOLD_OR_COMP.HOLD].forEach((r) => {
           worksheet.addRow(r);
           row++;
           currentEntryRowSize++;
         });
+
+        // Add hold total row with formatting
         worksheet.addRow([
           '',
           '',
@@ -330,6 +419,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         makeRowTextBold({ worksheet, row });
         worksheet.mergeCells(`E${row}:F${row}`);
         worksheet.mergeCells(`G${row}:H${row}`);
+
+        // Add double borders above totals
         for (let i = 7; i <= 9; i++) {
           makeTopBorderDouble({ worksheet, row, col: i });
         }
@@ -337,16 +428,22 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         currentEntryRowSize++;
       }
 
+      // Add summary rows for seat statistics
+      // Add Seats Sold row
       worksheet.addRow(['', '', '', '', '', '', 'Seats Sold', '', getZeroOrNegativeValue(x.SoldSeats)]);
       makeRowTextBold({ worksheet, row });
       worksheet.mergeCells(`E${row}:F${row}`);
       worksheet.mergeCells(`G${row}:H${row}`);
       row++;
+
+      // Add Seats Reserved row
       worksheet.addRow(['', '', '', '', '', '', 'Seats Reserved', '', getZeroOrNegativeValue(x.ReservedSeats)]);
       makeRowTextBold({ worksheet, row });
       worksheet.mergeCells(`E${row}:F${row}`);
       worksheet.mergeCells(`G${row}:H${row}`);
       row++;
+
+      // Calculate and add Remaining Seats row
       worksheet.addRow([
         '',
         '',
@@ -373,6 +470,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
       currentEntryRowSize += 3;
 
+      // Merge cells vertically for the venue/production details
       worksheet.mergeCells(`A${row - currentEntryRowSize - 1}:A${row - 1}`);
       worksheet.mergeCells(`B${row - currentEntryRowSize - 1}:B${row - 1}`);
       worksheet.mergeCells(`C${row - currentEntryRowSize - 1}:C${row - 1}`);
