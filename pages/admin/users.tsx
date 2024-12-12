@@ -215,7 +215,7 @@ export default function Users({
           <div className="flex flex-row justify-between items-center my-4">
             <div className="text-primary-navy text-xl font-bold">Your Permission Groups</div>
             <div className="flex flex-row gap-4">
-              {adminPermissions.includes('CREATE_USER_PERMSSION_GROUP') && (
+              {adminPermissions.includes('CREATE_USER_PERMISSION_GROUP') && (
                 <Button
                   className="px-8 mt-2 -mb-1"
                   variant="secondary"

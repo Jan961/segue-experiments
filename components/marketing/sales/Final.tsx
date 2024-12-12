@@ -6,7 +6,6 @@ import { formatDecimalOnBlur, isNullOrEmpty } from 'utils';
 import { Spinner } from 'components/global/Spinner';
 import { currencyState } from 'state/global/currencyState';
 import { currentUserState } from 'state/marketing/currentUserState';
-import { TourResponse } from './Entry';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import axios from 'axios';
 import { UTCDate } from '@date-fns/utc';
@@ -47,33 +46,13 @@ const Final = () => {
   const [discrepancyButtonText, setDiscepancyButtonText] = useState('Ok');
   const [setId, setSetId] = useState(-1);
 
-  const getSalesFrequency = async () => {
-    try {
-      const response = await axios.get('/api/marketing/sales/tourWeeks/' + productionId.toString());
-      const data = response.data;
-
-      if (typeof data === 'object') {
-        const tourData = data as TourResponse;
-        if (tourData.frequency === undefined) {
-          return;
-        }
-
-        return tourData.frequency;
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
   const handleUpdate = async () => {
     try {
-      const frequency = await getSalesFrequency();
-
       // get previous sales figures first and check for errors
       const { data: salesData } = await axios.post('/api/marketing/sales/current/read', {
         bookingId: bookings.selected,
         salesDate: null,
-        frequency,
+        productionId,
       });
 
       // data is returned as an object with the "current" key
