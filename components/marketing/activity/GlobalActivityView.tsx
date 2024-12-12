@@ -8,7 +8,7 @@ import { globalActivityColDefs, styleProps } from '../table/tableConfig';
 import GlobalActivityModal, { ActivityModalVariant, GlobalActivity } from '../modal/GlobalActivityModal';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import { bookingJumpState } from 'state/marketing/bookingJumpState';
-import { isValid, startOfDay } from 'date-fns';
+import { startOfDay } from 'date-fns';
 import { filterState } from 'state/marketing/filterState';
 import fuseFilter from 'utils/fuseFilter';
 import axios from 'axios';
@@ -228,21 +228,12 @@ const GlobalActivityView = () => {
       filterRows = fuseFilter(filterRows, filter.searchText, ['actName', 'actType', 'notes']);
     }
 
-    // if (filter.startDate || filter.endDate) {
     filterRows = filterRows.filter((gba) => {
-      const actDateTime = new Date(gba.actDate).getTime();
-      const startDateTime = isValid(filter.startDate) ? filter.startDate.getTime() : null;
-      const endDateTime = isValid(filter.endDate) ? filter.endDate.getTime() : null;
-      console.log(
-        compareDatesWithoutTime(startDateTime, actDateTime, '<='),
-        compareDatesWithoutTime(endDateTime, actDateTime, '>='),
-      );
       return (
-        compareDatesWithoutTime(startDateTime, actDateTime, '<=') &&
-        compareDatesWithoutTime(endDateTime, actDateTime, '>=')
+        compareDatesWithoutTime(filter.startDate, gba.actDate, '<=') &&
+        compareDatesWithoutTime(filter.endDate, gba.actDate, '>=')
       );
     });
-    // }
 
     setRowData(filterRows);
   }, [filter]);
