@@ -1,6 +1,6 @@
 import Table from 'components/core-ui-lib/Table';
 import { useEffect, useRef, useState } from 'react';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { filterState } from 'state/booking/filterState';
 import axios from 'axios';
 import { styleProps } from './tableConfig';
@@ -12,6 +12,7 @@ import { useRouter } from 'next/router';
 import AddTask from './modals/AddTask';
 import { isNullOrEmpty } from 'utils';
 import { formatDate, newDate } from 'services/dateService';
+import { accessProjectManagement } from 'state/account/selectors/permissionSelector';
 
 interface TasksTableProps {
   rowData?: any;
@@ -44,6 +45,12 @@ export default function TasksTable({
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isEdit, setIsEdit] = useState<boolean>(false);
   const router = useRouter();
+  const permissions = useRecoilValue(accessProjectManagement);
+  const canAccessEdit = permissions.includes('ACCESS_EDIT_PROD_TASKS');
+  const canEditTaskNotes = permissions.includes('EDIT_PROD_TASK_NOTES');
+  const canEditTask = permissions.includes('EDIT_PROD_TASK');
+  const canDeleteTask = permissions.includes('DELETE_PROD_TASK');
+  const canCloneTask = permissions.includes('CLONE_PROD_TASK');
 
   const handleCellClick = (e) => {
     if (e.column.colId === 'Notes') {
@@ -114,8 +121,10 @@ export default function TasksTable({
   }, [rowData]);
 
   const onRowDoubleClicked = (e) => {
-    setCurrentTask(e.data);
-    setIsEdit(true);
+    if (canAccessEdit) {
+      setCurrentTask(e.data);
+      setIsEdit(true);
+    }
   };
 
   const handleClose = () => {
@@ -164,6 +173,7 @@ export default function TasksTable({
         currentTask={currentTask}
         onSave={handleSaveNote}
         onCancel={() => setShowModal(false)}
+        disabled={!canEditTaskNotes}
       />
       {isLoading && (
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
@@ -176,6 +186,9 @@ export default function TasksTable({
         task={modalData}
         productionId={productionId}
         updateTableData={updateTableData}
+        canEdit={!canEditTask}
+        canDelete={!canDeleteTask}
+        canClone={!canCloneTask}
       />
     </>
   );

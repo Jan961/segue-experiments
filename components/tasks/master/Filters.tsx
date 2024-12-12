@@ -3,7 +3,8 @@ import { notify } from 'components/core-ui-lib';
 import Button from 'components/core-ui-lib/Button';
 import TextInput from 'components/core-ui-lib/TextInput';
 import { useRouter } from 'next/router';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { accessProjectManagement } from 'state/account/selectors/permissionSelector';
 import { masterTaskState } from 'state/tasks/masterTaskState';
 
 interface FiltersProps {
@@ -12,6 +13,10 @@ interface FiltersProps {
 
 const Filters = ({ handleShowTask }: FiltersProps) => {
   const [filter, setFilter] = useRecoilState(masterTaskState);
+  const permissions = useRecoilValue(accessProjectManagement);
+  const canAddTask = permissions.includes('ADD_MASTER_TASK');
+  const canExportTasks = permissions.includes('EXPORT_MASTER_TASK_LIST');
+  const canAccessProductionTasks = permissions.includes('ACCESS_PRODUCTION_TASK_LISTS');
 
   const onChange = (e: any) => {
     setFilter({ ...filter, [e.target.id]: e.target.value });
@@ -51,9 +56,20 @@ const Filters = ({ handleShowTask }: FiltersProps) => {
         </div>
       </div>
       <div className="pl-20 flex items-center gap-4 flex-wrap  py-1">
-        <Button text="Production Task Lists" className="w-[158px]" onClick={() => router.push('/tasks')} />
-        <Button text="Export" className="w-[132px]" sufixIconName="excel" onClick={exportMasterTasks} />
-        <Button onClick={handleShowTask} text="Add Task" className="w-[132px]" />
+        <Button
+          text="Production Task Lists"
+          className="w-[158px]"
+          onClick={() => router.push('/tasks')}
+          disabled={!canAccessProductionTasks}
+        />
+        <Button
+          text="Export"
+          className="w-[132px]"
+          sufixIconName="excel"
+          onClick={exportMasterTasks}
+          disabled={!canExportTasks}
+        />
+        <Button onClick={handleShowTask} text="Add Task" className="w-[132px]" disabled={!canAddTask} />
       </div>
     </div>
   );

@@ -19,10 +19,19 @@ import MasterTaskList from 'components/tasks/modals/MasterTaskList';
 import NotesPopup from 'components/tasks/NotesPopup';
 import { isNullOrEmpty } from 'utils';
 import LoadingOverlay from '../../components/core-ui-lib/LoadingOverlay';
+import { useRecoilValue } from 'recoil';
+import { accessProjectManagement } from 'state/account/selectors/permissionSelector';
 
 const MasterTasks = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const { masterTask = [], usersList } = props;
   const tableRef = useRef(null);
+  const permissions = useRecoilValue(accessProjectManagement);
+  const canCloneTask = permissions.includes('CLONE_MASTER_TASK');
+  const canDeleteTask = permissions.includes('DELETE_MASTER_TASK');
+  const canEditTask = permissions.includes('EDIT_MASTER_TASKS');
+  const canViewTask = permissions.includes('ACCESS_EDIT_MASTER_TASKS');
+  const canAccessNotes = permissions.includes('ACCESS_MASTER_TASK_NOTES');
+  const canEditNotes = permissions.includes('EDIT_MASTER_TASK_NOTES');
 
   const router = useRouter();
 
@@ -30,7 +39,7 @@ const MasterTasks = (props: InferGetServerSidePropsType<typeof getServerSideProp
 
   const [currentTask, setCurrentTask] = useState({});
 
-  const columnDefs = getMasterTasksColumnDefs(usersList);
+  const columnDefs = getMasterTasksColumnDefs(usersList, canCloneTask, canDeleteTask, canEditTask, canViewTask);
 
   let { filteredTasks = [] } = useMasterTasksFilter(masterTask);
 
@@ -58,7 +67,7 @@ const MasterTasks = (props: InferGetServerSidePropsType<typeof getServerSideProp
       }
     } else if (e.column.colId === 'edit') {
       setShowAddTask(true);
-    } else if (e.column.colId === 'Notes') {
+    } else if ((e.column.colId === 'Notes', canAccessNotes)) {
       setShowModal(true);
     }
   };
@@ -105,8 +114,10 @@ const MasterTasks = (props: InferGetServerSidePropsType<typeof getServerSideProp
   };
 
   const onRowDoubleClicked = (e) => {
-    setCurrentTask(e.data);
-    setShowAddTask(true);
+    if (canViewTask) {
+      setCurrentTask(e.data);
+      setShowAddTask(true);
+    }
   };
 
   const handleNewTask = () => {
@@ -187,6 +198,7 @@ const MasterTasks = (props: InferGetServerSidePropsType<typeof getServerSideProp
         currentTask={currentTask}
         onSave={handleSaveNote}
         onCancel={() => setShowModal(false)}
+        disabled={!canEditNotes}
       />
     </Layout>
   );
