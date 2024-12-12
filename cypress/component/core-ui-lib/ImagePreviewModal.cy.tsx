@@ -2,7 +2,7 @@
 
 import { mount } from 'cypress/react18';
 import ImagePreviewModal, { ImagePreviewModalProps } from '../../../components/core-ui-lib/ImagePreviewModal';
-import BaseComp from '../global/BaseComp';
+import BaseComp from '../helpers/BaseComp';
 
 function setup(props: ImagePreviewModalProps) {
   mount(

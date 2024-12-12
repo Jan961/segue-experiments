@@ -438,6 +438,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
         if (!isNullOrEmpty(finalSales?.general?.seatsSold)) {
           setFinalSales(true);
         } else {
+          setFinalSales(false);
           setSalesFigures(inputDate, bookings.selected);
         }
       } catch (error) {
