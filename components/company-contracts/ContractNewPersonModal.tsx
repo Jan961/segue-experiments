@@ -6,19 +6,18 @@ import axios from 'axios';
 import { createPersonSchema } from 'validators/person';
 import { debug } from 'utils/logging';
 import { IPerson } from 'components/contracts/types';
-import { ContractPermissionGroup } from 'interfaces';
 import { ConfVariant } from 'components/core-ui-lib/ConfirmationDialog/ConfirmationDialog';
 
 interface ContractNewPersonModalProps {
   openNewPersonContract: boolean;
   onClose: (flag?: boolean) => void;
-  permissions: ContractPermissionGroup;
+  canCreateNewPerson: boolean;
 }
 
 export const ContractNewPersonModal = ({
   openNewPersonContract,
   onClose,
-  permissions,
+  canCreateNewPerson,
 }: ContractNewPersonModalProps) => {
   const [formData, setFormData] = useState<Partial<IPerson>>({});
   const [confirm, setConfirm] = useState<boolean>(false);
@@ -79,7 +78,11 @@ export const ContractNewPersonModal = ({
             <PersonDetailsTab
               type="New"
               updateFormData={onFormDataChange}
-              permissions={permissions}
+              permissions={{
+                artisteContracts: canCreateNewPerson,
+                creativeContracts: canCreateNewPerson,
+                smTechCrewContracts: canCreateNewPerson,
+              }}
               departmentId={0}
               className="h-full overflow-y-auto pb-4"
               height="100%"

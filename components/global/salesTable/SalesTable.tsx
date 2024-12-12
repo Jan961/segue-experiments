@@ -7,6 +7,8 @@ import { prodCompArchColDefs, prodComparisionColDefs, salesColDefs } from './tab
 import salesComparison, { SalesComp } from './utils/salesComparision';
 import { SalesSnapshot, BookingSelection } from 'types/MarketingTypes';
 import axios from 'axios';
+import { useRecoilValue } from 'recoil';
+import { accessMarketingHome } from 'state/account/selectors/permissionSelector';
 import { formatDate } from 'services/dateService';
 
 export type SalesTableVariant = 'prodComparision' | 'salesSnapshot' | 'salesComparison' | 'venue' | 'prodCompArch';
@@ -52,6 +54,7 @@ export default function SalesTable({
   const [numBookings, setNumBookings] = useState<number>(0);
   const [tableWidth, setTableWidth] = useState(containerWidth);
   const [excelStyles, setExcelStyles] = useState([]);
+  const permissions = useRecoilValue(accessMarketingHome);
 
   // set table style props based on module
   const styleProps = { headerColor: tileColors[module] };
@@ -64,7 +67,13 @@ export default function SalesTable({
     );
     setSchoolSales(Boolean(schoolSalesFound));
 
-    let colDefs = salesColDefs(Boolean(schoolSalesFound), module !== 'bookings', booking, setSalesActivity);
+    let colDefs = salesColDefs(
+      Boolean(schoolSalesFound),
+      module !== 'bookings',
+      booking,
+      setSalesActivity,
+      permissions.includes('EDIT_ACTIVTIY_FLAGS'),
+    );
     if (!schoolSalesFound) {
       colDefs = colDefs.filter((column) => column.headerName !== 'School Sales');
       setHeight(containerHeight);
@@ -118,7 +127,7 @@ export default function SalesTable({
     }
   };
 
-  const setSalesActivity = (type, selected, sale) => {
+  const setSalesActivity = (type: string, selected: string, sale: any) => {
     switch (type) {
       case 'isSingleSeats': {
         onSingleSeatChange(type, !sale.isSingleSeats, sale, selected);

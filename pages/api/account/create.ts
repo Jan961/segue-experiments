@@ -1,5 +1,10 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { createAccount, createAccountContact, getAccountByName } from 'services/accountService';
+import {
+  createAccount,
+  createAccountContact,
+  createDefaultProductionCompany,
+  getAccountByName,
+} from 'services/accountService';
 import { createClientDB } from 'services/dbService';
 import { sendAccountSetupEmail } from 'services/emailService';
 import {
@@ -21,6 +26,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const organisationId = (Math.random() + 1).toString(36).substring(5);
     const mappedAccount = mapToAccountPrismaFields({ ...account, organisationId });
     const newAccount = await createAccount(mappedAccount);
+    await createDefaultProductionCompany(newAccount.AccountId, account.companyName);
     const mappedAccountContact = mapToAccountContactPrismaFields({ ...account, accountId: newAccount.AccountId });
     const newAccountContact = await createAccountContact(mappedAccountContact);
 

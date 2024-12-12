@@ -13,11 +13,11 @@ import { formatDate } from 'services/dateService';
 
 export const styleProps = { headerColor: tileColors.tasks };
 
-export const getColumnDefs = (usersList = [], production) => {
+export const getColumnDefs = (usersList = [], production, canEdit?: boolean, canAccessNotes = true) => {
   const weekOptions = getWeekOptions(production, false, false).sort(
     (a, b) => parseInt(b.value.toString()) - parseInt(a.value.toString()),
   );
-  return [
+  const defaultCols = [
     {
       headerName: 'Code',
       field: 'Code',
@@ -61,6 +61,7 @@ export const getColumnDefs = (usersList = [], production) => {
         return {
           options: weekOptions,
           isSearchable: true,
+          disabled: !canEdit,
         };
       },
       width: 120,
@@ -90,6 +91,7 @@ export const getColumnDefs = (usersList = [], production) => {
         return {
           options: weekOptions,
           isSearchable: true,
+          disabled: !canEdit,
         };
       },
       width: 110,
@@ -114,6 +116,7 @@ export const getColumnDefs = (usersList = [], production) => {
       cellRendererParams: {
         options: generatePercentageOptions,
         isSearchable: true,
+        disabled: !canEdit,
       },
       valueGetter: function (params) {
         return params.data?.Progress.toString();
@@ -146,28 +149,37 @@ export const getColumnDefs = (usersList = [], production) => {
       cellRenderer: DefaultCellRenderer,
       width: 136,
     },
-    { headerName: 'Priority', field: 'Priority', cellRenderer: DefaultCellRenderer, width: 100 },
     {
-      headerName: 'Notes',
-      field: 'Notes',
-      cellRenderer: NotesRenderer,
-      cellRendererParams: {
-        tpActive: true,
-      },
-      resizable: false,
-      width: 78,
-      cellStyle: {
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        overflow: 'visible',
-      },
+      headerName: 'Priority',
+      field: 'Priority',
+      cellRenderer: DefaultCellRenderer,
+      width: canAccessNotes ? 100 : 178,
+      resizable: canAccessNotes,
     },
   ];
+
+  const notesCol = {
+    headerName: 'Notes',
+    field: 'Notes',
+    cellRenderer: NotesRenderer,
+    cellRendererParams: {
+      tpActive: true,
+    },
+    resizable: false,
+    width: 78,
+    cellStyle: {
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      overflow: 'visible',
+    },
+  };
+
+  return canAccessNotes ? [...defaultCols, notesCol] : defaultCols;
 };
 
-export const getMasterTasksColumnDefs = (usersList = []) => {
-  return [
+export const getMasterTasksColumnDefs = (usersList = [], canCloneTask, canDeleteTask, canEditTask, canViewTask) => {
+  const defaultCols = [
     {
       headerName: 'Code',
       field: 'Code',
@@ -228,39 +240,47 @@ export const getMasterTasksColumnDefs = (usersList = []) => {
       cellRenderer: ButtonRenderer,
       cellRendererParams: (params) => ({
         buttonText: 'Clone',
-        disabled: !isNullOrEmpty(params.data.MTRId),
+        disabled: !isNullOrEmpty(params.data.MTRId) || !canCloneTask,
       }),
       resizable: false,
       cellClass: 'no-right-border',
       width: 80,
       headerClass: 'text-center',
     },
-    {
-      headerName: '',
-      field: 'edit',
-      cellRenderer: IconRenderer,
-      cellRendererParams: {
-        iconProps: {
-          iconName: 'edit',
-        },
-      },
-      width: 20,
-      cellClass: 'no-right-border',
-      resizable: false,
-      headerClass: 'text-center',
-    },
-    {
-      headerName: '',
-      field: 'delete',
-      cellRenderer: IconRenderer,
-      cellRendererParams: {
-        iconProps: {
-          iconName: 'delete',
-        },
-      },
-      width: 20,
-      resizable: false,
-      headerClass: 'text-center',
-    },
   ];
+
+  const editIconRender = {
+    headerName: '',
+    field: 'edit',
+    cellRenderer: IconRenderer,
+    cellRendererParams: {
+      iconProps: {
+        iconName: canEditTask && canViewTask ? 'edit' : 'info-circle-solid',
+      },
+    },
+    width: 20,
+    cellClass: 'no-right-border',
+    resizable: false,
+    headerClass: 'text-center',
+  };
+
+  const deleteIconRender = {
+    headerName: '',
+    field: 'delete',
+    cellRenderer: IconRenderer,
+    cellRendererParams: {
+      iconProps: {
+        iconName: 'delete',
+      },
+    },
+    width: 20,
+    resizable: false,
+    headerClass: 'text-center',
+  };
+
+  return canViewTask
+    ? canDeleteTask
+      ? [...defaultCols, editIconRender, deleteIconRender]
+      : [...defaultCols, editIconRender]
+    : defaultCols;
 };

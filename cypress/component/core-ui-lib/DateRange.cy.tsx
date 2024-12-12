@@ -1,6 +1,6 @@
 import { mount } from 'cypress/react18';
 import DateRange, { DateRangeProps } from '../../../components/core-ui-lib/DateRange';
-import BaseComp from '../global/BaseComp';
+import BaseComp from '../helpers/BaseComp';
 import { UTCDate } from '@date-fns/utc';
 import { newDate } from '../../../services/dateService';
 

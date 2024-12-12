@@ -32,6 +32,9 @@ interface AddTaskProps {
   task?: Partial<MasterTask> & { ProductionId?: number; ProductionTaskRepeat?: any; RepeatInterval?: string };
   productionId?: number;
   updateTableData: (task: any, isAdding: boolean) => Promise<void>;
+  canEdit?: boolean;
+  canDelete?: boolean;
+  canClone?: boolean;
 }
 
 const RepeatOptions = [
@@ -85,6 +88,9 @@ const AddTask = ({
   isMasterTask = false,
   productionId = null,
   updateTableData,
+  canEdit,
+  canDelete,
+  canClone,
 }: AddTaskProps) => {
   const [inputs, setInputs] = useState<
     Partial<MasterTask> & {
@@ -484,6 +490,7 @@ const AddTask = ({
             onChange={handleOnChange}
             value={inputs?.Name}
             testId="txt-task-name"
+            disabled={canEdit}
           />
         </div>
         <div className="col-span-2 col-start-4 flex items-center justify-between">
@@ -509,6 +516,7 @@ const AddTask = ({
               className="w-52"
               isSearchable={true}
               testId="sel-task-start-week"
+              disabled={canEdit}
             />
           </div>
           <div className="flex ml-10">
@@ -525,6 +533,7 @@ const AddTask = ({
               isSearchable={true}
               testId="sel-task-complete-week"
               key={inputs?.StartByWeekNum}
+              disabled={canEdit}
             />
           </div>
         </div>
@@ -538,12 +547,13 @@ const AddTask = ({
               placeholder="Priority"
               options={priorityOptionList}
               testId="sel-task-priority"
+              disabled={canEdit}
             />
           </div>
           <div className="flex ml-2">
             <Label className="!text-secondary pr-6" text="Progress" />
             <Select
-              disabled={isMasterTask}
+              disabled={isMasterTask || canEdit}
               onChange={(value) => handleOnChange({ target: { id: 'Progress', value } })}
               value={inputs?.Progress?.toString() || '0'}
               placeholder="Progress"
@@ -557,7 +567,7 @@ const AddTask = ({
           <div className="flex ml-2">
             <Label className="!text-secondary pr-6" text="Completed on" />
             <DateInput
-              disabled={isMasterTask || !inputs.Progress || inputs.Progress < 100}
+              disabled={isMasterTask || !inputs.Progress || inputs.Progress < 100 || canEdit}
               value={inputs?.TaskCompletedDate}
               onChange={(value) => handleOnChange({ target: { id: 'TaskCompletedDate', value } })}
               testId="dat-task-complete-date"
@@ -573,6 +583,7 @@ const AddTask = ({
               checked={isRecurring}
               onChange={(event) => handleOnChange({ target: { id: 'isRecurring', checked: event.target.checked } })}
               testId="chk-task-is-recurring"
+              disabled={canEdit}
             />
           </div>
           {!isRecurring && (
@@ -585,6 +596,7 @@ const AddTask = ({
                 options={RepeatOptions}
                 placeholder="Select..."
                 testId="sel-task-repeat-interval"
+                disabled={canEdit}
               />
             </div>
           )}
@@ -600,6 +612,7 @@ const AddTask = ({
                 isSearchable={true}
                 testId="sel-task-repeat-from"
                 key={inputs?.StartByWeekNum}
+                disabled={canEdit}
               />
             </div>
           )}
@@ -615,6 +628,7 @@ const AddTask = ({
                 isSearchable={true}
                 testId="sel-task-repeat-to"
                 key={inputs?.StartByWeekNum}
+                disabled={canEdit}
               />
             </div>
           )}
@@ -628,6 +642,7 @@ const AddTask = ({
             placeholder="Select Assignee"
             className="w-64"
             testId="sel-task-assigned-to"
+            disabled={canEdit}
           />
         </div>
         <div>
@@ -639,6 +654,7 @@ const AddTask = ({
             className="w-full min-h-14"
             id="Notes"
             testId="txt-task-notes"
+            disabled={canEdit}
           />
         </div>
         {!inputs.Id && (
@@ -653,6 +669,7 @@ const AddTask = ({
                   checked={isChecked}
                   onChange={() => setIsChecked(!isChecked)}
                   testId="chk-task-add-master"
+                  disabled={canEdit}
                 />
               </div>
             )}
@@ -670,6 +687,7 @@ const AddTask = ({
                   className="mr-4 w-[132px]"
                   text="Delete"
                   testId="btn-task-delete"
+                  disabled={canDelete}
                 />
                 <Button
                   variant="primary"
@@ -677,7 +695,7 @@ const AddTask = ({
                   className="mr-4 w-[132px]"
                   text="Clone this Task"
                   testId="btn-task-clone"
-                  disabled={!isNullOrEmpty(inputs?.RepeatInterval)}
+                  disabled={!isNullOrEmpty(inputs?.RepeatInterval) || canClone}
                 />
               </>
             )}
@@ -689,6 +707,7 @@ const AddTask = ({
               }}
               text={inputs.Id ? 'Save' : 'Create New Task'}
               testId="btn-task-save"
+              disabled={canEdit}
             />
           </div>
         </div>
