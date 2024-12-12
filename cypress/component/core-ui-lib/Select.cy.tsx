@@ -3,7 +3,7 @@
 import { mount } from 'cypress/react18'; // Adjust import if using a different version
 import Select, { SelectProps } from '../../../components/core-ui-lib/Select'; // Adjust the path to your Select component
 import { SelectOption } from '../../../components/core-ui-lib/Select/Select';
-import BaseComp from '../global/BaseComp'; // Adjust the path if necessary
+import BaseComp from '../helpers/BaseComp'; // Adjust the path if necessary
 
 //Create a simple scrollable div component to place the select component in
 const setupScrollableDiv = (options: SelectOption[]) => {
