@@ -27,11 +27,13 @@ export const ContractScheduleModal = ({
   onClose,
   accessNewPerson,
   accessPermissions,
+  canCreateNewPerson,
 }: {
   openContract: boolean;
   onClose: () => void;
   accessNewPerson: ContractPermissionGroup;
   accessPermissions: ContractPermissionGroup;
+  canCreateNewPerson: boolean;
 }) => {
   const { productions } = useRecoilValue(productionJumpState);
   const [personMap, setPersonMap] = useRecoilState(personState);
@@ -111,14 +113,6 @@ export const ContractScheduleModal = ({
     }
   }, [production, department, role, personId, templateId, setOpenNewBuildContract]);
 
-  const isNewPersonDisabled = () => {
-    return !(
-      accessNewPerson.artisteContracts ||
-      accessNewPerson.creativeContracts ||
-      accessNewPerson.smTechCrewContracts
-    );
-  };
-
   return (
     <PopupModal
       show={openContract}
@@ -150,7 +144,7 @@ export const ContractScheduleModal = ({
         </div>
         <div className="flex justify-end mr-2">
           <Button
-            disabled={!production || !isNewPersonDisabled()}
+            disabled={!production || !canCreateNewPerson}
             className="w-33"
             variant="secondary"
             text="Add New Person"
@@ -207,7 +201,7 @@ export const ContractScheduleModal = ({
       </div>
       {openNewPersonContract && (
         <ContractNewPersonModal
-          permissions={accessNewPerson}
+          canCreateNewPerson={canCreateNewPerson}
           openNewPersonContract={openNewPersonContract}
           onClose={onCloseCreateNewPerson}
         />
