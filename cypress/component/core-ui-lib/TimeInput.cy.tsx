@@ -2,7 +2,7 @@
 
 import { mount } from 'cypress/react18';
 import TimeInput, { TimeInputProps } from '../../../components/core-ui-lib/TimeInput';
-import BaseComp from '../global/BaseComp'; // Assuming BaseComp is available
+import BaseComp from '../helpers/BaseComp'; // Assuming BaseComp is available
 import 'cypress-plugin-tab';
 import { useState } from 'react';
 
