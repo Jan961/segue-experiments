@@ -76,6 +76,12 @@ export const getAggregateKey = ({
 }) => `${Week} | ${Town} | ${Venue}`;
 
 export const LEFT_PORTION_KEYS: string[] = ['Week', 'Day', 'Date', 'Town', 'Venue'];
+/**
+ *  Get values from object based on keys and format them based on key value
+ * @param obj
+ * @param array
+ * @returns
+ */
 export const getValuesFromObject = (obj: object, array: any[]): any[] =>
   array.map((key) => {
     if (key === 'Day') {
@@ -93,6 +99,14 @@ export const CONSTANTS: { [key: string]: string } = {
   RUN_SALES: 'Run Sales',
 };
 
+/**
+ * applies background color to the cell based on different flags like SetIsCopy, SetBrochureReleased, BookingStatusCode, Date, SetProductionWeekDate, NotOnSalesDate
+ * @param worksheet
+ * @param row
+ * @param col
+ * @param props - SetIsCopy, SetBrochureReleased, BookingStatusCode, Date, SetProductionWeekDate, NotOnSalesDate
+ * @param meta - weekCols
+ */
 export const assignBackgroundColor = ({
   worksheet,
   row,
@@ -114,20 +128,25 @@ export const assignBackgroundColor = ({
   meta: { weekCols: number };
 }) => {
   if (Number(SetIsCopy)) {
+    // SetIsCopy - background color purple
     colorCell({ worksheet, row, col, argbColor: COLOR_HEXCODE.PURPLE });
   }
   if (Number(SetBrochureReleased)) {
+    // SetBrochureReleased - background color yellow
     colorCell({ worksheet, row, col, argbColor: COLOR_HEXCODE.YELLOW });
   }
 
   if (isBefore(newDate(Date), simpleToDateMDY(SetProductionWeekDate))) {
+    // if date is before ProductionWeekDate - background color blue
     colorCell({ worksheet, row, col, argbColor: COLOR_HEXCODE.BLUE });
   }
 
   if (NotOnSalesDate && isBefore(simpleToDateMDY(SetProductionWeekDate), simpleToDateMDY(NotOnSalesDate))) {
+    // if NotOnSalesDate is before ProductionWeekDate - background color Red
     colorCell({ worksheet, row, col, argbColor: COLOR_HEXCODE.RED });
   }
   if (BookingStatusCode === BOOK_STATUS_CODES.X || BookingStatusCode === BOOK_STATUS_CODES.S) {
+    // if BookingStatusCode is X or S - background color grey
     const startPoint = 6;
     for (let i = 0; i < weekCols; i++) {
       colorTextAndBGCell({
@@ -652,6 +671,13 @@ export const makeColumnTextBold = ({ worksheet, colAsChar }: { worksheet: any; c
   });
 };
 
+/**
+ * gives report name based on data(infers production related data from data) and other flags
+ * @param isWeeklyReport
+ * @param isSeatsDataRequired
+ * @param data
+ * @returns
+ */
 export const salesReportName = ({ isWeeklyReport, isSeatsDataRequired, data }): string => {
   let reportName = `Sales Summary`;
   if (isSeatsDataRequired) {
