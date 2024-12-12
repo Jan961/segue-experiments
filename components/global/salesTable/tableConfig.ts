@@ -631,17 +631,17 @@ export const salesColDefs = (
           {
             name: 'user-solid',
             color: params.data.isSingleSeats ? '#10841C' : '#ddd',
-            onClick: () => (canEditFlags ? setSalesActivity('isSingleSeats', booking, params.data) : null),
+            onClick: () => (canEditFlags ? setSalesActivity('SetSingleSeats', booking, params.data) : null),
           },
           {
             name: 'book-solid',
             color: params.data.isBrochureReleased ? '#FFE606' : '#ddd',
-            onClick: () => (canEditFlags ? setSalesActivity('isBrochureReleased', booking, params.data) : null),
+            onClick: () => (canEditFlags ? setSalesActivity('SetBrochureReleased', booking, params.data) : null),
           },
           {
             name: 'square-cross',
             color: params.data.isNotOnSale ? '#ED1111' : '#ddd',
-            onClick: () => (canEditFlags ? setSalesActivity('isNotOnSale', booking, params.data) : null),
+            onClick: () => (canEditFlags ? setSalesActivity('SetNotOnSale', booking, params.data) : null),
           },
         ],
       }),

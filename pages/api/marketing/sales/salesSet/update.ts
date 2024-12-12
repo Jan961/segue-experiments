@@ -4,6 +4,9 @@ import { NextApiRequest, NextApiResponse } from 'next';
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
     const { BookingId, SalesFigureDate, ...updatedData } = req.body;
+
+    console.log(req.body);
+
     if (!BookingId) return res.status(400).end();
     const prisma = await getPrismaClient(req);
     const updatedSaleSet = await prisma.salesSet.updateMany({

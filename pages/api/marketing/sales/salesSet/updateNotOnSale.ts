@@ -23,9 +23,7 @@ async function setNotOnSale(BookingId: string, SalesFigureDate: string, updatedD
   const updatedSaleSet = await prisma.SalesSet.updateMany({
     where: {
       SetBookingId: BookingId,
-      SetSalesFiguresDate: {
-        lte: new Date(SalesFigureDate),
-      },
+      SetSalesFiguresDate: new Date(SalesFigureDate),
     },
     data: updatedData,
   });

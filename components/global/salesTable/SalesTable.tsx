@@ -6,10 +6,10 @@ import formatInputDate from 'utils/dateInputFormat';
 import { prodCompArchColDefs, prodComparisionColDefs, salesColDefs } from './tableConfig';
 import salesComparison, { SalesComp } from './utils/salesComparision';
 import { SalesSnapshot, BookingSelection } from 'types/MarketingTypes';
-import axios from 'axios';
+// import axios from 'axios';
 import { useRecoilValue } from 'recoil';
 import { accessMarketingHome } from 'state/account/selectors/permissionSelector';
-import { formatDate } from 'services/dateService';
+// import { formatDate } from 'services/dateService';
 
 export type SalesTableVariant = 'prodComparision' | 'salesSnapshot' | 'salesComparison' | 'venue' | 'prodCompArch';
 
@@ -66,6 +66,8 @@ export default function SalesTable({
         data.schReservations !== '' || data.schReserved !== '' || data.schSeatsSold !== '' || data.schTotalValue !== '',
     );
     setSchoolSales(Boolean(schoolSalesFound));
+
+    console.log(data);
 
     let colDefs = salesColDefs(
       Boolean(schoolSalesFound),
@@ -128,84 +130,85 @@ export default function SalesTable({
   };
 
   const setSalesActivity = (type: string, selected: string, sale: any) => {
-    switch (type) {
-      case 'isSingleSeats': {
-        onSingleSeatChange(type, !sale.isSingleSeats, sale, selected);
-        break;
-      }
+    console.log({ type, selected, sale });
+    // switch (type) {
+    //   case 'isSingleSeats': {
+    //     onSingleSeatChange(type, !sale.isSingleSeats, sale, selected);
+    //     break;
+    //   }
 
-      case 'isBrochureReleased': {
-        onBrochureReleasedChange(type, !sale.isBrochureReleased, sale, selected);
-        break;
-      }
+    //   case 'isBrochureReleased': {
+    //     onBrochureReleasedChange(type, !sale.isBrochureReleased, sale, selected);
+    //     break;
+    //   }
 
-      case 'isNotOnSale': {
-        onIsNotOnSaleChange(type, !sale.isNotOnSale, sale, selected);
-        break;
-      }
-    }
+    //   case 'isNotOnSale': {
+    //     onIsNotOnSaleChange(type, !sale.isNotOnSale, sale, selected);
+    //     break;
+    //   }
+    // }
   };
 
-  const onIsNotOnSaleChange = (key: string, value: boolean, sale: SalesSnapshot, selected: string) => {
-    updateSaleSet('updateNotOnSale', selected, sale.weekOf ? formatDate(sale.weekOf, 'yyyy-MM-dd') : null, {
-      [key.replace('is', 'Set')]: value,
-    });
+  // const onIsNotOnSaleChange = (key: string, value: boolean, sale: SalesSnapshot, selected: string) => {
+  //   updateSaleSet('updateNotOnSale', selected, sale.weekOf ? formatDate(sale.weekOf, 'yyyy-MM-dd') : null, {
+  //     [key.replace('is', 'Set')]: value,
+  //   });
 
-    setRowData((prevSales) =>
-      prevSales.map((s) => {
-        if (!value) {
-          const isOnSale = new Date(s.weekOf) < new Date(sale.weekOf);
-          return { ...s, [key]: isOnSale };
-        } else {
-          const isNotOnSale = new Date(s.weekOf) <= new Date(sale.weekOf);
-          return isNotOnSale ? { ...s, [key]: value } : s;
-        }
-      }),
-    );
-  };
+  //   setRowData((prevSales) =>
+  //     prevSales.map((s) => {
+  //       if (!value) {
+  //         const isOnSale = new Date(s.weekOf) < new Date(sale.weekOf);
+  //         return { ...s, [key]: isOnSale };
+  //       } else {
+  //         const isNotOnSale = new Date(s.weekOf) <= new Date(sale.weekOf);
+  //         return isNotOnSale ? { ...s, [key]: value } : s;
+  //       }
+  //     }),
+  //   );
+  // };
 
-  const onSingleSeatChange = (key: string, value: boolean, sale: SalesSnapshot, selected: string) => {
-    updateSaleSet('updateSingleSeats', selected, sale.weekOf ? formatDate(sale.weekOf, 'yyyy-MM-dd') : null, {
-      [key.replace('is', 'Set')]: value,
-    });
-    setRowData((prevSales) =>
-      prevSales.map((s) => {
-        // Use date comparison that includes the start of the date (midnight) for both dates being compared
-        const currentSaleDate = new Date(s.weekOf);
-        const targetSaleDate = new Date(sale.weekOf);
-        currentSaleDate.setHours(0, 0, 0, 0);
-        targetSaleDate.setHours(0, 0, 0, 0);
+  // const onSingleSeatChange = (key: string, value: boolean, sale: SalesSnapshot, selected: string) => {
+  //   updateSaleSet('updateSingleSeats', selected, sale.weekOf ? formatDate(sale.weekOf, 'yyyy-MM-dd') : null, {
+  //     [key.replace('is', 'Set')]: value,
+  //   });
+  //   setRowData((prevSales) =>
+  //     prevSales.map((s) => {
+  //       // Use date comparison that includes the start of the date (midnight) for both dates being compared
+  //       const currentSaleDate = new Date(s.weekOf);
+  //       const targetSaleDate = new Date(sale.weekOf);
+  //       currentSaleDate.setHours(0, 0, 0, 0);
+  //       targetSaleDate.setHours(0, 0, 0, 0);
 
-        const isSingleSeat = currentSaleDate >= targetSaleDate;
-        return isSingleSeat ? { ...s, [key]: value } : s;
-      }),
-    );
-  };
+  //       const isSingleSeat = currentSaleDate >= targetSaleDate;
+  //       return isSingleSeat ? { ...s, [key]: value } : s;
+  //     }),
+  //   );
+  // };
 
-  const onBrochureReleasedChange = (key: string, value: boolean, sale: SalesSnapshot, selected: string) => {
-    updateSaleSet('update', selected, sale.weekOf ? formatDate(sale.weekOf, 'yyyy-MM-dd') : null, {
-      [key.replace('is', 'Set')]: value,
-    });
-    setRowData((prevSales) =>
-      prevSales.map((s) => {
-        if (sale.weekOf === s.weekOf && sale.week === s.week) {
-          return { ...s, [key]: value };
-        }
-        return s;
-      }),
-    );
-  };
+  // const onBrochureReleasedChange = (key: string, value: boolean, sale: SalesSnapshot, selected: string) => {
+  //   updateSaleSet('update', selected, sale.weekOf ? formatDate(sale.weekOf, 'yyyy-MM-dd') : null, {
+  //     [key.replace('is', 'Set')]: value,
+  //   });
+  //   setRowData((prevSales) =>
+  //     prevSales.map((s) => {
+  //       if (sale.weekOf === s.weekOf && sale.week === s.week) {
+  //         return { ...s, [key]: value };
+  //       }
+  //       return s;
+  //     }),
+  //   );
+  // };
 
-  const updateSaleSet = (type: string, BookingId: string, SalesFigureDate: string, update) => {
-    const data = {
-      BookingId: parseInt(BookingId),
-      SalesFigureDate,
-      ...update,
-    };
-    axios
-      .put(`/api/marketing/sales/salesSet/${type}`, data)
-      .catch((error) => console.log('failed to update sale', error));
-  };
+  // const updateSaleSet = (type: string, BookingId: string, SalesFigureDate: string, update) => {
+  //   const data = {
+  //     BookingId: parseInt(BookingId),
+  //     SalesFigureDate,
+  //     ...update,
+  //   };
+  //   axios
+  //     .put(`/api/marketing/sales/salesSet/${type}`, data)
+  //     .catch((error) => console.log('failed to update sale', error));
+  // };
 
   const calculateWidth = () => {
     switch (variant) {
