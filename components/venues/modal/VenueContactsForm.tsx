@@ -6,6 +6,8 @@ import { useCallback, useState, useEffect } from 'react';
 import { UiTransformedVenue, UiVenueContact, filterEmptyVenueContacts } from 'utils/venue';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import { StyleProps } from 'components/core-ui-lib/Table/Table';
+import { useRecoilValue } from 'recoil';
+import { accessMarketingHome } from 'state/account/selectors/permissionSelector';
 
 interface VenueContactDetailsFormProps {
   venue: Partial<UiTransformedVenue>;
@@ -46,6 +48,10 @@ const VenueContactForm = ({
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteIndex, setDeleteIndex] = useState(null);
   const [createMode, setCreateMode] = useState(false);
+  const permissions = useRecoilValue(accessMarketingHome);
+  const canAddContact = permissions.includes('ADD_NEW_CONTACT');
+  const canDeleteContact = permissions.includes('DELETE_VENUE_CONTACTS');
+  const canEditContact = permissions.includes('EDIT_VENUE_CONTACTS');
 
   const getRowStyle = useCallback(
     (params) => {
@@ -143,7 +149,7 @@ const VenueContactForm = ({
       <div className="flex flex-row items-center justify-between  pb-5">
         <h2 className="text-xl text-primary-navy font-bold ">{title}</h2>
         <Button
-          disabled={createMode || disabled}
+          disabled={createMode || disabled || !canAddContact}
           onClick={onAddNewVenueContact}
           variant="primary"
           testId="add-new-contract-btn"
@@ -153,7 +159,7 @@ const VenueContactForm = ({
       <div className="min-h-52">
         <Table
           testId="venue-contacts-table"
-          columnDefs={venueContactDefs(venueRoleOptionList, disabled)}
+          columnDefs={venueContactDefs(venueRoleOptionList, disabled, canEditContact, canDeleteContact)}
           rowData={venueContacts}
           styleProps={tableStyleProps}
           getRowStyle={getRowStyle}

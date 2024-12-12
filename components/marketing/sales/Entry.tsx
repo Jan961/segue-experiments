@@ -10,6 +10,7 @@ import { formatDecimalOnBlur, isNullOrEmpty, isNullOrUndefined, isUndefined } fr
 import { currencyState } from 'state/global/currencyState';
 import { UpdateWarningModal } from '../modal/UpdateWarning';
 import axios from 'axios';
+import { accessMarketingHome } from 'state/account/selectors/permissionSelector';
 import { decRegexLeadingZero } from 'utils/regexUtils';
 import { UTCDate } from '@date-fns/utc';
 
@@ -88,6 +89,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
   const [warningIssued, setWarningIssued] = useState<boolean>(false);
   const currency = useRecoilValue(currencyState);
   const [finalSales, setFinalSales] = useState(false);
+  const permissions = useRecoilValue(accessMarketingHome);
 
   const prodVenue = useMemo(() => {
     const production = productionJump.productions.find((prod) => prod.Id === productionJump.selected);
@@ -748,6 +750,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                   placeholder="Notes Field"
                   onChange={(e) => setBookingSaleNotes(e.target.value)}
                   onBlur={(e) => editBooking('salesNotes', e.target.value)}
+                  disabled={!permissions.includes('EDIT_BOOKING_SALES_NOTES')}
                 />
               </div>
             </div>

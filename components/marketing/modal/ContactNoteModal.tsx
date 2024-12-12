@@ -29,6 +29,7 @@ interface ContactModalProps {
   variant: ContactNoteModalVariant;
   bookingId;
   data?: BookingContactNoteDTO;
+  editable?: boolean;
 }
 
 export default function ContactNoteModal({
@@ -38,6 +39,7 @@ export default function ContactNoteModal({
   onSave,
   bookingId,
   data,
+  editable,
 }: Partial<ContactModalProps>) {
   const [visible, setVisible] = useState<boolean>(show);
   const [personContacted, setPersonContacted] = useState<string>(null);
@@ -154,6 +156,7 @@ export default function ContactNoteModal({
                 setShowNameLengthError(true);
               }
             }}
+            disabled={!editable}
           />
 
           <div className="flex flex-row gap-[105px]">
@@ -184,6 +187,7 @@ export default function ContactNoteModal({
             placeholder="Select User"
             isClearable
             isSearchable
+            disabled={!editable}
           />
 
           <div className="text-base font-bold text-primary-input-text">Notes</div>
@@ -193,6 +197,7 @@ export default function ContactNoteModal({
             value={notes}
             placeholder="Notes Field"
             onChange={(e) => setNotes(e.target.value)}
+            disabled={!editable}
           />
 
           <div className="float-right flex flex-row mt-5 py-2">
@@ -202,7 +207,13 @@ export default function ContactNoteModal({
               variant="secondary"
               text="Cancel"
             />
-            <Button className="ml-4 w-[132px]" onClick={handleSave} variant="primary" text="Save and Close" />
+            <Button
+              className="ml-4 w-[132px]"
+              onClick={handleSave}
+              variant="primary"
+              text="Save and Close"
+              disabled={!editable}
+            />
           </div>
         </div>
       </PopupModal>
