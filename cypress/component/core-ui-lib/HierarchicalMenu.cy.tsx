@@ -2,7 +2,7 @@
 
 import { mount } from 'cypress/react18';
 import HierarchicalMenu from '../../../components/core-ui-lib/HierarchicalMenu';
-import BaseComp from '../global/BaseComp';
+import BaseComp from '../helpers/BaseComp';
 import { useEffect, useState } from 'react';
 
 function setup(props, ref = null) {

@@ -3,8 +3,9 @@ import { getAuth } from '@clerk/nextjs/server';
 import prisma from 'lib/prisma_master';
 import { userMapper } from 'lib/mappers';
 import { UserDto } from 'interfaces';
-import { isNullOrEmpty } from 'utils';
+import { isNullOrUndefined } from 'utils';
 import { Permission } from 'prisma/generated/prisma-master';
+import getPrismaClient from 'lib/prisma';
 
 export const getUsers = async (AccountId: number): Promise<UserDto[]> => {
   const result = await prisma.user.findMany({
@@ -78,8 +79,8 @@ export const getUserNameForClerkId = async (userId: string): Promise<string> => 
   const accountId = await getAccountId(matching.emailAddress);
   const users = await getUsers(accountId);
   const currentUser = users.find((user) => user.Email === matching.emailAddress);
-  const firstname = isNullOrEmpty(currentUser.FirstName) ? '' : currentUser.FirstName;
-  const lastname = isNullOrEmpty(currentUser.LastName) ? '' : currentUser.LastName;
+  const firstname = isNullOrUndefined(currentUser?.FirstName) ? '' : currentUser.FirstName;
+  const lastname = isNullOrUndefined(currentUser?.LastName) ? '' : currentUser.LastName;
   return firstname + ' ' + lastname;
 };
 
@@ -117,6 +118,8 @@ export const getAccountIdFromReq = async (req: any) => {
 };
 
 export const getOrganisationIdFromReq = async (req: any): Promise<string> => {
+  const organisationId = req.headers?.['x-organisation-id'] as string;
+  if (organisationId) return organisationId;
   const { userId } = getAuth(req);
   const user = await clerkClient.users.getUser(userId);
   return user?.unsafeMetadata?.organisationId as string;
@@ -163,6 +166,34 @@ export const removeUserFromClerk = async (emailAddress: string) => {
     return response;
   }
   return true;
+};
+
+export const getAccountUserProductions = async (req, accountUserId: number) => {
+  const client = await getPrismaClient(req);
+  const accountUserProductions = await client.accountUserProduction.findMany({
+    where: {
+      AUPAccUserId: accountUserId,
+    },
+  });
+  return accountUserProductions;
+};
+
+export const getAccountUserByEmailAndOrganisationId = async (email: string, organisationId: string) => {
+  const accountUser = await prisma.AccountUser.findFirst({
+    where: {
+      User: {
+        UserEmail: {
+          equals: email,
+        },
+      },
+      Account: {
+        AccountOrganisationId: {
+          equals: organisationId,
+        },
+      },
+    },
+  });
+  return accountUser;
 };
 
 export const getUserPermisisons = async (email: string, organisationId: string) => {

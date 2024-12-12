@@ -19,6 +19,7 @@ import { productionJumpState } from 'state/booking/productionJumpState';
 import axios from 'axios';
 import { dateTimeToTime } from 'services/dateService';
 import { PerformanceDTO } from 'interfaces';
+import { accessMarketingHome } from 'state/account/selectors/permissionSelector';
 
 interface PromotorHoldsTabProps {
   bookingId: string;
@@ -53,6 +54,13 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
   const { selected: productionId, productions } = useRecoilValue(productionJumpState);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [perfList, setPerfList] = useState<Array<PerformanceType>>([]);
+  const permissions = useRecoilValue(accessMarketingHome);
+  const canAllocateNewSeats = permissions.includes('ADD_NEW_ALLOCATED_SEATS');
+  const canEditAllocatedSeats = permissions.includes('EDIT_ALLOCATED_SEATS');
+  const canEditAvailableSeats = permissions.includes('EDIT_AVAILABLE_SEATS');
+  const canEditCastRate = permissions.includes('EDIT_CAST_RATE');
+  const canExportAllocatedSeats = permissions.includes('EXPORT_ALLOCATED_SEATS');
+  const canDeleteAllocatedSeats = permissions.includes('DELETE_ALLOCATED_SEATS');
 
   const gridOptions = {
     getRowId: (data) => {
@@ -277,6 +285,7 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
                 onChange={(e) => updateBooking('castRateTicketsArranged', e.target.checked)}
                 className="w-[19px] h-[19px] mt-[2px]"
                 testId="checkCastRateArr"
+                disabled={!canEditCastRate}
               />
             </div>
 
@@ -293,6 +302,7 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
                 ref={textAreaRef}
                 onBlur={(e) => updateBooking('castRateTicketsNotes', e.target.value)}
                 testId="textAreaCastRateNotes"
+                disabled={!canEditCastRate}
               />
             )}
           </div>
@@ -307,13 +317,15 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
               return (
                 <div key={index}>
                   <div className="w-auto bg-white mb-1 rounded-md border border-primary-border">
-                    <Icon
-                      color="#fff"
-                      className="float-right mt-1"
-                      iconName="edit"
-                      onClick={() => editAvailSeats(holdRec)}
-                      testId="iconEditAvailSeats"
-                    />
+                    {canEditAvailableSeats && (
+                      <Icon
+                        color="#fff"
+                        className="float-right mt-1"
+                        iconName="edit"
+                        onClick={() => editAvailSeats(holdRec)}
+                        testId="iconEditAvailSeats"
+                      />
+                    )}
                     <div className="text-base text-primary-navy font-bold ml-2">
                       {date} | {time} | Seats Allocated:{' '}
                       {holdRec.totalAllocated > holdRec.totalAvailable ? (
@@ -350,6 +362,7 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
                 sufixIconName="excel"
                 onClick={onExport}
                 testId="btnExportAllocSeats"
+                disabled={!canExportAllocatedSeats}
               />
 
               <Button
@@ -357,7 +370,7 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
                 className="w-[160px]"
                 onClick={() => newAllocatedSeats()}
                 testId="btnAddNewAllocSeats"
-                disabled={perfList.length === 0}
+                disabled={perfList.length === 0 || !canAllocateNewSeats}
               />
             </div>
           </div>
@@ -379,6 +392,8 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
             data={allocatedRow}
             type={allocType}
             performances={perfList}
+            canDelete={canDeleteAllocatedSeats}
+            canEdit={canEditAllocatedSeats}
           />
 
           <AvailableSeatsModal

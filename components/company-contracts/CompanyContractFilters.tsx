@@ -20,6 +20,7 @@ interface Props {
     accessNewPerson: ContractPermissionGroup;
     accessNewContract: ContractPermissionGroup;
     accessContracts: ContractPermissionGroup;
+    canCreateNewPerson: boolean;
   };
 }
 
@@ -155,6 +156,7 @@ const CompanyContractFilters = (props: Props) => {
           onClose={() => setOpenContract(false)}
           accessNewPerson={props.permissions.accessNewPerson}
           accessPermissions={props.permissions.accessNewContract}
+          canCreateNewPerson={props.permissions.canCreateNewPerson}
         />
       )}
     </div>
