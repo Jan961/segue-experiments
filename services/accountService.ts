@@ -10,6 +10,16 @@ export const createAccount = async (account: Partial<Account>, tx = prisma) => {
   return newAccount;
 };
 
+export const createDefaultProductionCompany = async (accountId: number, companyName: string, tx = prisma) => {
+  const newAccount = await tx.productionCompany.create({
+    data: {
+      ProdCoAccountId: accountId,
+      ProdCoName: companyName,
+    },
+  });
+  return newAccount;
+};
+
 export const updateAccount = async (account: Partial<Account>, tx = prisma) => {
   const updatedAccount = await tx.account.update({
     data: account,
