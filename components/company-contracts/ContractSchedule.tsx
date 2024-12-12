@@ -150,7 +150,7 @@ export const ContractScheduleModal = ({
         </div>
         <div className="flex justify-end mr-2">
           <Button
-            disabled={!production || isNewPersonDisabled()}
+            disabled={!production || !isNewPersonDisabled()}
             className="w-33"
             variant="secondary"
             text="Add New Person"
