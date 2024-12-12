@@ -52,6 +52,7 @@ const SignUp = () => {
   const [signedInExistingUserDetails, setSignedInExistingUserDetails] = useState({
     organisationId: '',
     permissions: [],
+    accessibleProductions: [],
   });
   const [accountDetails, setAccountDetails] = useState(DEFAULT_ACCOUNT_DETAILS);
 
@@ -217,7 +218,11 @@ const SignUp = () => {
         accountUserOnly: true,
       });
 
-      setSignedInExistingUserDetails({ organisationId: data.organisationId, permissions: data.permissions });
+      setSignedInExistingUserDetails({
+        organisationId: data.organisationId,
+        permissions: data.permissions,
+        accessibleProductions: data.accessibleProductions,
+      });
     } catch (error: any) {
       if (error instanceof yup.ValidationError) {
         const formattedErrors = error.inner.reduce((acc, err) => {
@@ -241,13 +246,17 @@ const SignUp = () => {
   };
 
   useEffect(() => {
-    const setDataForSignedInUser = async (organisationId, permissions) => {
-      await setUserPermissions(organisationId, permissions);
+    const setDataForSignedInUser = async (organisationId, permissions, accessibleProductions) => {
+      await setUserPermissions(organisationId, permissions, accessibleProductions);
       navigateToHome();
     };
 
     if (isSignedIn && signedInExistingUserDetails.organisationId) {
-      setDataForSignedInUser(signedInExistingUserDetails.organisationId, signedInExistingUserDetails.permissions);
+      setDataForSignedInUser(
+        signedInExistingUserDetails.organisationId,
+        signedInExistingUserDetails.permissions,
+        signedInExistingUserDetails.accessibleProductions,
+      );
     }
   }, [isSignedIn, signedInExistingUserDetails]);
 

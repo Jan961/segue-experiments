@@ -1,5 +1,6 @@
 import { selector } from 'recoil';
 import { userPermissionsState } from '../userPermissionsState';
+import { productionJumpState } from 'state/booking/productionJumpState';
 
 const HOME_PERMISSIONS = [
   'BOOKINGS',
@@ -325,5 +326,17 @@ export const isPermissionsInitialised = selector({
   get: ({ get }) => {
     const { isInitialised } = get(userPermissionsState);
     return isInitialised;
+  },
+});
+
+export const productionsState = selector({
+  key: 'productionsState',
+  get: ({ get }) => {
+    const { accessibleProductions = [] } = get(userPermissionsState);
+    const { selected, productions } = get(productionJumpState);
+    return {
+      selected,
+      productions: productions.filter((x) => accessibleProductions?.includes(x.Id)),
+    };
   },
 });
