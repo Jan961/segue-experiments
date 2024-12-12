@@ -2,7 +2,7 @@
 
 import { mount } from 'cypress/react18';
 import Table, { TableProps } from '../../../components/core-ui-lib/Table';
-import BaseComp from '../global/BaseComp';
+import BaseComp from '../helpers/BaseComp';
 import { GridApi } from 'ag-grid-community';
 import { useRef } from 'react';
 

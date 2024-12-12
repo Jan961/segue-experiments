@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import BaseCellRenderer from './BaseCellRenderer';
 import { TextInputProps } from 'components/core-ui-lib/TextInput/TextInput';
 import TextInput from 'components/core-ui-lib/TextInput';
@@ -10,6 +10,10 @@ interface TextInputRendererProps extends TextInputProps {
 const TextInputRenderer = ({ eGridCell, error, onChange, value, ...props }: TextInputRendererProps) => {
   const inputRef = useRef(null);
   const [inputValue, setInputValue] = useState(value);
+
+  useEffect(() => {
+    setInputValue(value);
+  }, [value]);
 
   const handleChange = (event) => {
     setInputValue(event.target.value);
