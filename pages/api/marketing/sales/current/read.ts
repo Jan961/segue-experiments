@@ -2,7 +2,7 @@ import { UTCDate } from '@date-fns/utc';
 import getPrismaClient from 'lib/prisma';
 import { PrismaClient } from 'prisma/generated/prisma-client';
 import { compareDatesWithoutTime, getDateDaysAway, getMonday, newDate } from 'services/dateService';
-import { formatDecimalValue, isNullOrUndefined } from 'utils';
+import { formatDecimalValue, isNull, isNullOrUndefined } from 'utils';
 
 const generateSalesObject = (sales) => {
   const schoolReservations = sales.find((sale) => sale.SaleTypeName === 'School Reservations');
@@ -81,13 +81,13 @@ export default async function handle(req, res) {
     }
 
     // if sale date is null, final sales entry is making the request, set the sales date to the last date entry
-    if (req.body.salesDate === null) {
+    if (isNull(req.body.salesDate)) {
       const sortedData = data.sort(
-        (a, b) => new UTCDate(b.SetProductionWeekDate).getTime() - new UTCDate(a.SetProductionWeekDate).getTime(),
+        (a, b) => new UTCDate(b.SetSalesFiguresDate).getTime() - new UTCDate(a.SetSalesFiguresDate).getTime(),
       );
 
-      currentSalesDate = new UTCDate(sortedData[0].SetProductionWeekDate);
-      dateField = 'SetProductionWeekDate';
+      currentSalesDate = new UTCDate(sortedData[0].SetSalesFiguresDate);
+      dateField = 'SetSalesFiguresDate';
     }
 
     const currentSales = data.filter((sale) =>

@@ -128,90 +128,100 @@ export const activityColDefs = (
   },
 ];
 
-export const contactNoteColDefs = (updateContactNote, userList) => [
-  {
-    headerName: 'Person Contacted',
-    field: 'CoContactName',
-    cellRenderer: DefaultCellRenderer,
-    width: 300,
-  },
-  {
-    headerName: 'Date',
-    field: 'ContactDate',
-    cellRenderer: function (params) {
-      return params.data.ContactDate ? formatInputDate(params.data.ContactDate) : '';
+export const contactNoteColDefs = (updateContactNote, userList, canDeleteNote, canEditNote) => {
+  const defaultCols = [
+    {
+      headerName: 'Person Contacted',
+      field: 'CoContactName',
+      cellRenderer: DefaultCellRenderer,
+      width: 300,
     },
-    cellStyle: {
-      paddingLeft: '8px',
-      paddingRight: '8px',
+    {
+      headerName: 'Date',
+      field: 'ContactDate',
+      cellRenderer: function (params) {
+        return params.data.ContactDate ? formatInputDate(params.data.ContactDate) : '';
+      },
+      cellStyle: {
+        paddingLeft: '8px',
+        paddingRight: '8px',
+      },
+      width: 80,
     },
-    width: 80,
-  },
-  {
-    headerName: 'Time',
-    field: 'ContactTime',
-    cellRenderer: function (params) {
-      return dateTimeToTime(params.data.ContactDate);
+    {
+      headerName: 'Time',
+      field: 'ContactTime',
+      cellRenderer: function (params) {
+        return dateTimeToTime(params.data.ContactDate);
+      },
+      cellStyle: {
+        paddingLeft: '8px',
+        paddingRight: '8px',
+      },
+      width: 70,
     },
-    cellStyle: {
-      paddingLeft: '8px',
-      paddingRight: '8px',
+    {
+      headerName: 'Actioned By',
+      field: 'UserId',
+      cellRenderer: function (params) {
+        if (params.data.ActionAccUserId === null) {
+          return '';
+        } else {
+          const actByName = userList.find((user) => user.value === parseInt(params.data.ActionAccUserId)).text;
+          return actByName;
+        }
+      },
+      cellStyle: {
+        paddingLeft: '8px',
+        paddingRight: '8px',
+      },
+      width: 120,
     },
-    width: 70,
-  },
-  {
-    headerName: 'Actioned By',
-    field: 'UserId',
-    cellRenderer: function (params) {
-      if (params.data.ActionAccUserId === null) {
-        return '';
-      } else {
-        const actByName = userList.find((user) => user.value === parseInt(params.data.ActionAccUserId)).text;
-        return actByName;
-      }
+    {
+      headerName: 'Notes',
+      field: 'Notes',
+      wrapText: true,
+      autoHeight: true,
+      cellRenderer: DefaultTextRenderer,
+      cellRendererParams: {
+        truncate: false,
+      },
+      cellStyle: {
+        marginTop: '5px',
+      },
+      width: canEditNote || canDeleteNote ? 423 : 513,
+      resizable: canEditNote || canDeleteNote,
     },
-    cellStyle: {
-      paddingLeft: '8px',
-      paddingRight: '8px',
-    },
-    width: 120,
-  },
-  {
-    headerName: 'Notes',
-    field: 'Notes',
-    wrapText: true,
-    autoHeight: true,
-    cellRenderer: DefaultTextRenderer,
-    cellRendererParams: {
-      truncate: false,
-    },
-    cellStyle: {
-      marginTop: '5px',
-    },
-    width: 423,
-  },
-  {
+  ];
+
+  const iconRow = {
     headerName: '',
     field: 'icons',
     cellRenderer: IconRowRenderer,
     cellRendererParams: (params) => ({
       iconList: [
-        {
-          name: 'edit',
-          table: 'contactnotes',
-          onClick: () => updateContactNote('edit', params.data),
-        },
-        {
-          name: 'delete',
-          table: 'contactnotes',
-          onClick: () => updateContactNote('delete', params.data),
-        },
+        canEditNote
+          ? {
+              name: 'edit',
+              table: 'contactnotes',
+              onClick: () => updateContactNote('edit', params.data),
+            }
+          : null,
+        canDeleteNote
+          ? {
+              name: 'delete',
+              table: 'contactnotes',
+              onClick: () => updateContactNote('delete', params.data),
+            }
+          : null,
       ],
     }),
     width: 90,
     resizable: false,
-  },
-];
+  };
+
+  return canEditNote || canDeleteNote ? [...defaultCols, iconRow] : defaultCols;
+};
 
 export const allocSeatsColDefs = [
   {
@@ -281,48 +291,53 @@ export const allocSeatsColDefs = [
   },
 ];
 
-export const attachmentsColDefs = [
-  {
-    headerName: 'Title',
-    field: 'OriginalFilename',
-    editable: true,
-    cellRenderer: DefaultTextRenderer,
-    width: 600,
-  },
-  {
-    headerName: 'Date Uploaded',
-    field: 'FileUploadedDateTime',
-    cellRenderer: DefaultTextRenderer,
-    cellRendererParams: function (params) {
-      const updDate = params.data.UploadDateTime;
-      return {
-        value: formatDate(updDate, 'dd/MM/yy') + ' ' + dateTimeToTime(updDate),
-      };
+export const attachmentsColDefs = (canViewAttachment, canDeleteAttachment) => {
+  const defaultCols = [
+    {
+      headerName: 'Title',
+      field: 'OriginalFilename',
+      editable: true,
+      cellRenderer: DefaultTextRenderer,
+      width: 600,
     },
-    width: 150,
-  },
-  {
-    headerName: 'Date File Created',
-    field: 'FileDateTime',
-    cellRenderer: DefaultTextRenderer,
-    cellRendererParams: function (params) {
-      const fileDt = params.data.UploadDateTime;
-      return {
-        value: formatDate(fileDt, 'dd/MM/yy') + ' ' + dateTimeToTime(fileDt),
-      };
+    {
+      headerName: 'Date Uploaded',
+      field: 'FileUploadedDateTime',
+      cellRenderer: DefaultTextRenderer,
+      cellRendererParams: function (params) {
+        const updDate = params.data.UploadDateTime;
+        return {
+          value: formatDate(updDate, 'dd/MM/yy') + ' ' + dateTimeToTime(updDate),
+        };
+      },
+      width: 150,
     },
-    width: 150,
-  },
-  {
-    headerName: 'View',
-    field: 'ViewBtn',
-    cellRenderer: ButtonRenderer,
-    cellRendererParams: {
-      buttonText: 'View',
+    {
+      headerName: 'Date File Created',
+      field: 'FileDateTime',
+      cellRenderer: DefaultTextRenderer,
+      cellRendererParams: function (params) {
+        const fileDt = params.data.UploadDateTime;
+        return {
+          value: formatDate(fileDt, 'dd/MM/yy') + ' ' + dateTimeToTime(fileDt),
+        };
+      },
+      width: 150,
     },
-    width: 100,
-  },
-  {
+    {
+      headerName: 'View',
+      field: 'ViewBtn',
+      cellRenderer: ButtonRenderer,
+      cellRendererParams: {
+        buttonText: 'View',
+        disabled: !canViewAttachment,
+      },
+      width: canDeleteAttachment ? 100 : 180,
+      resizable: canDeleteAttachment,
+    },
+  ];
+
+  const deleteCol = {
     headerName: '',
     field: 'icons',
     cellRenderer: IconRowRenderer,
@@ -335,8 +350,10 @@ export const attachmentsColDefs = [
     },
     width: 80,
     resizable: false,
-  },
-];
+  };
+
+  return canDeleteAttachment ? [...defaultCols, deleteCol] : defaultCols;
+};
 
 export const salesEntryColDefs = (type: string, currency: string, handleUpdate) => {
   const colDefs = [

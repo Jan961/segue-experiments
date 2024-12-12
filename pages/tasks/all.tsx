@@ -15,12 +15,16 @@ import { useMemo, useState } from 'react';
 import { getColumnDefs } from 'components/tasks/tableConfig';
 import { mapToProductionTasksDTO } from 'mappers/tasks';
 import Spinner from 'components/core-ui-lib/Spinner';
+import { accessProjectManagement } from 'state/account/selectors/permissionSelector';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const { filteredProductions } = useTasksFilter();
   const [isShowSpinner, setIsShowSpinner] = useState<boolean>(false);
   const { users } = useRecoilValue(userState);
+  const permissions = useRecoilValue(accessProjectManagement);
+  const canAccessTaskNotes = permissions.includes('ACCESS_PROD_TASK_NOTES');
+  const canEdit = permissions.includes('EDIT_PROD_TASK');
 
   const usersList = useMemo(
     () =>
@@ -55,8 +59,7 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
           <TasksTable rowData={[]} />
         ) : (
           filteredProductions.map((production) => {
-            const columnDefs = getColumnDefs(usersList, production);
-
+            const columnDefs = getColumnDefs(usersList, production, canEdit, canAccessTaskNotes);
             return (
               <div key={production.Id} className="mb-10">
                 <TasksTable
