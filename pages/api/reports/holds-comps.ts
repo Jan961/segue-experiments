@@ -237,6 +237,11 @@ const groupBasedOnVenueAndSameDate = ({
     };
   }, {});
 
+/**
+ *  get zero or negative value
+ * @param val
+ * @returns
+ */
 const getZeroOrNegativeValue = (val: number | null): string => (val ? `-${val}` : '0');
 
 const makeCellTextBold = ({ worksheet, row, col }: { worksheet: any; row: number; col: number }) => {
@@ -284,7 +289,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         BookingFirstDate: 'asc',
       },
     });
-    //
+    // fetches production details and holds and comps in parallel
     const [data, productionDetails] = await all([getHoldsAndCompsQuery, getProductionWithContent(productionId, req)]);
 
     const showName = (productionDetails as ProductionDetails)?.Show?.Name || '';
