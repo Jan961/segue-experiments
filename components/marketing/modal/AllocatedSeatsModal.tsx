@@ -25,6 +25,8 @@ interface AllocatedModalProps {
   performances: Array<PerformanceType>;
   data?: any;
   type: string;
+  canDelete?: boolean;
+  canEdit?: boolean;
 }
 
 interface FormInterface {
@@ -46,6 +48,8 @@ export default function AllocatedSeatsModal({
   performances = [],
   data,
   type,
+  canDelete,
+  canEdit,
 }: Partial<AllocatedModalProps>) {
   const [visible, setVisible] = useState<boolean>(show);
   const [userList, setUserList] = useState<{ value: number; text: string }[]>([]);
@@ -304,6 +308,7 @@ export default function AllocatedSeatsModal({
                 error={errors.performance}
                 isClearable
                 isSearchable
+                disabled={!canEdit}
               />
               {errors.performance && <FormError error="This is a Required Field" className="mt-1 ml-2" />}
             </div>
@@ -320,6 +325,7 @@ export default function AllocatedSeatsModal({
                 id="custName"
                 value={form.custName}
                 onChange={handleChange}
+                disabled={!canEdit}
               />
             </div>
           </div>
@@ -335,6 +341,7 @@ export default function AllocatedSeatsModal({
                 name="email"
                 value={form.email}
                 onChange={handleChange}
+                disabled={!canEdit}
               />
             </div>
           </div>
@@ -352,6 +359,7 @@ export default function AllocatedSeatsModal({
                 onChange={handleChange}
                 error={errors.numberOfSeats ? 'Seat number required' : ''}
                 pattern={decRegexLeadingZero}
+                disabled={!canEdit}
               />
               {errors.numberOfSeats && <FormError error="This is a Required Field" className="mt-2 ml-2" />}
             </div>
@@ -368,6 +376,7 @@ export default function AllocatedSeatsModal({
                 name="seatNumList"
                 value={form.seatNumList}
                 onChange={handleChange}
+                disabled={!canEdit}
               />
             </div>
           </div>
@@ -383,6 +392,7 @@ export default function AllocatedSeatsModal({
                 name="requestBy"
                 value={form.requestBy}
                 onChange={handleChange}
+                disabled={!canEdit}
               />
             </div>
           </div>
@@ -398,6 +408,7 @@ export default function AllocatedSeatsModal({
                 name="comments"
                 value={form.comments}
                 onChange={handleChange}
+                disabled={!canEdit}
               />
             </div>
           </div>
@@ -415,6 +426,7 @@ export default function AllocatedSeatsModal({
                 isClearable
                 isSearchable
                 error={errors.arrangedBy}
+                disabled={!canEdit}
               />
               {errors.arrangedBy && <FormError error="This is a Required Field" className="mt-2 ml-2" />}
             </div>
@@ -430,6 +442,7 @@ export default function AllocatedSeatsModal({
                 placeholder="Notes Field"
                 onChange={handleChange}
                 name="venueConfNotes"
+                disabled={!canEdit}
               />
             </div>
           </div>
@@ -445,13 +458,20 @@ export default function AllocatedSeatsModal({
               onClick={() => handleConfirm('cancel')}
             />
             {type !== 'new' && (
-              <Button className="ml-4 w-32" onClick={() => handleConfirm('delete')} variant="tertiary" text="Delete" />
+              <Button
+                className="ml-4 w-32"
+                onClick={() => handleConfirm('delete')}
+                variant="tertiary"
+                text="Delete"
+                disabled={!canDelete}
+              />
             )}
             <Button
               className="ml-4 w-32 flex float-right"
               variant="primary"
               text="Save and Close"
               onClick={handleSave}
+              disabled={!canEdit}
             />
           </div>
         </div>

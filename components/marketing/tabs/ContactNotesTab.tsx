@@ -13,6 +13,7 @@ import { exportExcelReport } from 'components/bookings/modal/request';
 import { notify } from 'components/core-ui-lib';
 import { bookingJumpState } from 'state/marketing/bookingJumpState';
 import axios from 'axios';
+import { accessMarketingHome } from 'state/account/selectors/permissionSelector';
 
 interface ContactNotesTabProps {
   bookingId: string;
@@ -35,6 +36,10 @@ const ContactNotesTab = forwardRef<ContactNoteTabRef, ContactNotesTabProps>((pro
   const { selected: productionId, productions } = useRecoilValue(productionJumpState);
   const bookings = useRecoilState(bookingJumpState);
   const users = useRecoilValue(userState);
+  const permissions = useRecoilValue(accessMarketingHome);
+  const canDeleteNote = permissions.includes('DELETE_CONTACT_NOTES');
+  const canEditNote = permissions.includes('EDIT_CONTACT_NOTE');
+  const canExportNotes = permissions.includes('EXPORT_CONTACT_NOTES_REPORT');
 
   useImperativeHandle(ref, () => ({
     resetData: () => {
@@ -48,7 +53,7 @@ const ContactNotesTab = forwardRef<ContactNoteTabRef, ContactNotesTabProps>((pro
       const contactNotes = contactNoteResponse.data;
 
       if (contactNotes && Array.isArray(contactNotes)) {
-        setContNoteColDefs(contactNoteColDefs(contactNoteUpdate, users));
+        setContNoteColDefs(contactNoteColDefs(contactNoteUpdate, users, canDeleteNote, canEditNote));
         setContactNoteRows(contactNotes);
         setIsLoading(false);
       }
@@ -153,7 +158,7 @@ const ContactNotesTab = forwardRef<ContactNoteTabRef, ContactNotesTabProps>((pro
             <Button
               text="Contact Notes Report"
               className="w-[203px]"
-              disabled={!productionId}
+              disabled={!productionId || !canExportNotes}
               iconProps={{ className: 'h-4 w-3' }}
               sufixIconName="excel"
               onClick={() => onExport()}
@@ -188,6 +193,7 @@ const ContactNotesTab = forwardRef<ContactNoteTabRef, ContactNotesTabProps>((pro
           data={contactNoteRow}
           onSave={(variant, data) => saveContactNote(variant, data)}
           bookingId={bookingIdVal}
+          editable={canEditNote}
         />
 
         <ConfirmationDialog
