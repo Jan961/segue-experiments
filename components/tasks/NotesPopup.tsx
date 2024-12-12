@@ -10,9 +10,10 @@ interface NotesPopupProps {
   onSave: (n: string) => void;
   onCancel: () => void;
   currentTask: any;
+  disabled?: boolean;
 }
 
-export default function NotesPopup({ show, onSave, onCancel, currentTask }: NotesPopupProps) {
+export default function NotesPopup({ show, onSave, onCancel, currentTask, disabled }: NotesPopupProps) {
   const [note, setNote] = useState<string>('');
   const [confirm, setConfirm] = useState<boolean>(false);
   const [confVariant, setVariant] = useState<ConfDialogVariant>('close');
@@ -50,14 +51,21 @@ export default function NotesPopup({ show, onSave, onCancel, currentTask }: Note
             {currentTask?.Code} | {currentTask?.Name}
           </h3>
           <TextArea
-            className={'mt-2 h-[237px] w-full min-w-[508px]'}
+            className="mt-2 h-[237px] w-full min-w-[508px]"
             value={note}
             placeholder="Notes field..."
             onChange={(e) => setNote(e.target.value)}
+            disabled={disabled}
           />
           <div className="w-full mt-4 flex justify-end items-center">
             <Button className="w-33" variant="secondary" text="Cancel" onClick={() => showConfModal('cancel')} />
-            <Button className="ml-4 w-33" variant="primary" text="Save and Close" onClick={() => onSave(note)} />
+            <Button
+              className="ml-4 w-33"
+              variant="primary"
+              text="Save and Close"
+              onClick={() => onSave(note)}
+              disabled={disabled}
+            />
           </div>
         </div>
       </PopupModal>

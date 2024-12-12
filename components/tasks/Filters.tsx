@@ -12,6 +12,7 @@ import { productionJumpState } from 'state/booking/productionJumpState';
 import TaskReports from './modals/TaskReports';
 import { useEffect, useState } from 'react';
 import { UTCDate } from '@date-fns/utc';
+import { accessProjectManagement } from 'state/account/selectors/permissionSelector';
 
 interface FiltersProps {
   usersList: SelectOption[];
@@ -24,6 +25,11 @@ const Filters = ({ usersList, handleShowTask }: FiltersProps) => {
   const onChange = (e: any) => {
     setFilter({ ...filter, [e.target.id]: e.target.value });
   };
+  const permissions = useRecoilValue(accessProjectManagement);
+  const canAddTask = !permissions.includes('ADD_PROD_TASK');
+  const canAccessMasterTaskList = permissions.includes('ACCESS_MASTER_TASK_LIST');
+  const canExportProductionTasks = permissions.includes('EXPORT_PRODUCTION_TASK_LIST');
+  const canExportMasterTasks = permissions.includes('EXPORT_MASTER_TASK_LIST');
 
   const onDateChange = (change: { from: UTCDate; to: UTCDate }) => {
     const { from: startDueDate, to: endDueDate } = change;
@@ -107,17 +113,33 @@ const Filters = ({ usersList, handleShowTask }: FiltersProps) => {
         </div>
       </div>
       <div className="grid grid-cols-2 grid-rows-2 gap-4 max-w-[280px] py-2 mt-1.5">
-        <Button text="Tasks Reports" className="w-[132px]" sufixIconName="excel" onClick={handleShowReports} />
-        <Button text="Master Task List" className="w-[132px]" onClick={() => router.push('/tasks/master')} />
+        <Button
+          text="Tasks Reports"
+          className="w-[132px]"
+          sufixIconName="excel"
+          onClick={handleShowReports}
+          disabled={!canExportMasterTasks && !canExportProductionTasks}
+        />
+        <Button
+          text="Master Task List"
+          className="w-[132px]"
+          onClick={() => router.push('/tasks/master')}
+          disabled={!canAccessMasterTaskList}
+        />
         <div />
         <Button
           onClick={handleShowTask}
-          disabled={!selected || selected === -1}
+          disabled={!selected || selected === -1 || !canAddTask}
           text="Add Task"
           className="w-[132px] mt-[1px]"
         />
       </div>
-      <TaskReports visible={showReports} onClose={handleShowReports} />
+      <TaskReports
+        visible={showReports}
+        onClose={handleShowReports}
+        canExportMasterTasks={canExportMasterTasks}
+        canExportProductionTasks={canExportProductionTasks}
+      />
     </div>
   );
 };

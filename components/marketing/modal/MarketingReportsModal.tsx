@@ -4,6 +4,8 @@ import Button from 'components/core-ui-lib/Button';
 import SalesSummaryAndWeeklyTotalsModal from './SalesSummaryAndWeeklyTotalsModal';
 import GrossVenuesPromotorHoldsAndCompsModal from './GrossVenuesPromotorHoldsAndCompsModal';
 import SalesGraphModal from './SalesGraphModal';
+import { useRecoilValue } from 'recoil';
+import { accessMarketingHome } from 'state/account/selectors/permissionSelector';
 
 interface MarketingReportsProps {
   visible: boolean;
@@ -12,6 +14,15 @@ interface MarketingReportsProps {
 
 export const MarketingReports = ({ visible = false, onClose }: MarketingReportsProps) => {
   const [activeModal, setActiveModal] = useState<string>(null);
+  const permissions = useRecoilValue(accessMarketingHome);
+  const canAccessSalesSummary = permissions.includes('EXPORT_SALES_SUMMARY');
+  const canAccessSalesSummaryAndWeekly = permissions.includes('EXPORT_SALES_SUMARY_+_WEEKLY_TOTALS');
+  const canAccessSalesVsCapacity = permissions.includes('EXPORT_SALES_VS_CAPACITY_%');
+  const canAccessTotalGrossSales = permissions.includes('EXPORT_TOTAL_GROSS_SALES');
+  const canAccessSalesGraph = permissions.includes('EXPORT_SALES_GRAPHS');
+  const canAccessSelectedVenues = permissions.includes('EXPORT_SELECTED_VENUES');
+  const canAccessPromoterHolds = permissions.includes('EXPORT_PROMOTER_HOLDS');
+  const canAccessHoldsAndComps = permissions.includes('EXPORT_HOLDS_+_COMPS');
 
   const isSummaryWeeklyTotalsOrCapacity = useMemo(
     () => ['salesSummary', 'salesSummaryAndWeeklyTotals', 'salesVsCapacity'].includes(activeModal),
@@ -44,6 +55,7 @@ export const MarketingReports = ({ visible = false, onClose }: MarketingReportsP
           iconProps={{ className: 'h-4 w-3 ml-5' }}
           sufixIconName="excel"
           onClick={() => onExportClick('salesSummary')}
+          disabled={!canAccessSalesSummary}
         />
 
         <Button
@@ -52,6 +64,7 @@ export const MarketingReports = ({ visible = false, onClose }: MarketingReportsP
           iconProps={{ className: 'h-4 w-3 ml-5' }}
           sufixIconName="excel"
           onClick={() => onExportClick('salesSummaryAndWeeklyTotals')}
+          disabled={!canAccessSalesSummaryAndWeekly}
         />
 
         <Button
@@ -60,6 +73,7 @@ export const MarketingReports = ({ visible = false, onClose }: MarketingReportsP
           iconProps={{ className: 'h-4 w-3 ml-5' }}
           sufixIconName="excel"
           onClick={() => onExportClick('salesVsCapacity')}
+          disabled={!canAccessSalesVsCapacity}
         />
 
         <Button
@@ -68,6 +82,7 @@ export const MarketingReports = ({ visible = false, onClose }: MarketingReportsP
           iconProps={{ className: 'h-4 w-3 ml-5' }}
           sufixIconName="excel"
           onClick={() => onExportClick('totalGrossSales')}
+          disabled={!canAccessTotalGrossSales}
         />
 
         <Button
@@ -76,6 +91,7 @@ export const MarketingReports = ({ visible = false, onClose }: MarketingReportsP
           iconProps={{ className: 'h-4 w-3 ml-5' }}
           sufixIconName="excel"
           onClick={() => onExportClick('salesGraphs')}
+          disabled={!canAccessSalesGraph}
         />
 
         <Button
@@ -84,6 +100,7 @@ export const MarketingReports = ({ visible = false, onClose }: MarketingReportsP
           iconProps={{ className: 'h-4 w-3 ml-5' }}
           sufixIconName="excel"
           onClick={() => onExportClick('selectedVenues')}
+          disabled={!canAccessSelectedVenues}
         />
 
         <Button
@@ -92,6 +109,7 @@ export const MarketingReports = ({ visible = false, onClose }: MarketingReportsP
           iconProps={{ className: 'h-4 w-3 ml-5' }}
           sufixIconName="excel"
           onClick={() => onExportClick('promotorHolds')}
+          disabled={!canAccessPromoterHolds}
         />
 
         <Button
@@ -100,6 +118,7 @@ export const MarketingReports = ({ visible = false, onClose }: MarketingReportsP
           iconProps={{ className: 'h-4 w-3 ml-5' }}
           sufixIconName="excel"
           onClick={() => onExportClick('holdsAndComps')}
+          disabled={!canAccessHoldsAndComps}
         />
       </div>
       {isSummaryWeeklyTotalsOrCapacity && (
