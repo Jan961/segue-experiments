@@ -72,6 +72,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
   const [bookings, setBookings] = useRecoilState(bookingJumpState);
   const currency = useRecoilValue(currencyState);
   const canEditActChecks = permissions.includes('EDIT_ACTIVITIES_CHECKS');
+  const canEditCosts = permissions.includes('EDIT_MARKETING_COSTS');
 
   const { selected: productionId, productions } = useRecoilValue(productionJumpState);
 
@@ -562,7 +563,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
                   placeholder="Select Approval Status"
                   isClearable={false}
                   testId="selectApprStat"
-                  disabled={!permissions.includes('EDIT_MARKETING_COSTS')}
+                  disabled={!canEditCosts}
                 />
               </div>
               <div className="flex flex-col mt-8 ml-8">
@@ -570,7 +571,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
                   onChange={(value) => editBooking('marketingCostsApprovalDate', value)}
                   value={changeDate}
                   testId="dtInApprDate"
-                  disabled={!permissions.includes('EDIT_MARKETING_COSTS')}
+                  disabled={!canEditCosts}
                 />
               </div>
               <div className="flex flex-col ml-8 mt-1">
@@ -581,7 +582,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
                   onBlur={(e) => editBooking('marketingCostsNotes', e.target.value)}
                   onChange={(e) => setChangeNotes(e.target.value)}
                   testId="textAreaCostNotes"
-                  disabled={!permissions.includes('EDIT_MARKETING_COSTS')}
+                  disabled={!canEditCosts}
                 />
               </div>
             </div>

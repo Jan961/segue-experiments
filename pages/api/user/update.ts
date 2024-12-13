@@ -48,7 +48,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     if (user?.unsafeMetadata?.organisationId === accountId) {
       const permissions = await getUserPermisisons(userDetails.email, accountId);
       await clerkClient.users.updateUserMetadata(user.id, {
-        unsafeMetadata: { permissions, organisationId: accountId },
+        unsafeMetadata: { permissions, organisationId: accountId, accessibleProductions: userDetails.productions },
       });
     }
     return res.json(updatedUSer);

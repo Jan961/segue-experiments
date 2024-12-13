@@ -23,11 +23,15 @@ import { productionJumpState } from 'state/booking/productionJumpState';
 import Spinner from 'components/core-ui-lib/Spinner';
 import { isNullOrEmpty } from 'utils';
 import { useRouter } from 'next/router';
+import { accessProjectManagement } from 'state/account/selectors/permissionSelector';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const { filteredProductions } = useTasksFilter();
   const { users } = useRecoilValue(userState);
+  const permissions = useRecoilValue(accessProjectManagement);
+  const canAccessTaskNotes = permissions.includes('ACCESS_PROD_TASK_NOTES');
+  const canEditDropdowns = permissions.includes('EDIT_PROD_TASK_DROPDOWNS');
 
   const filter = useRecoilValue(tasksfilterState);
   const router = useRouter();
@@ -136,7 +140,7 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
           <TasksTable rowData={[]} />
         ) : (
           filteredProductions.map((production) => {
-            const columnDefs = getColumnDefs(usersList, production);
+            const columnDefs = getColumnDefs(usersList, production, canEditDropdowns, canAccessTaskNotes);
             return (
               <div key={production.Id} className="mb-10">
                 <TasksTable

@@ -78,7 +78,8 @@ export default function GlobalActivityModal({
   const [venueColDefs, setVenueColDefs] = useState([]);
   const [selectedList, setSelectedList] = useState([]);
   const [loadingVisible, setLoadingVisible] = useState<boolean>(false);
-  const canEditGlobActivity = permissions.includes('EDIT_GLOBAL_ACTIVITY');
+  const canChangeGlobActivity =
+    variant === 'add' ? permissions.includes('ADD_NEW_GLOBAL_ACTIVITY') : permissions.includes('EDIT_GLOBAL_ACTIVITY');
 
   const venueList = useMemo(() => {
     if (venues.length === 0) {
@@ -290,7 +291,7 @@ export default function GlobalActivityModal({
             id="activityName"
             value={actName}
             onChange={(event) => setActName(event.target.value)}
-            disabled={variant === 'view' || !canEditGlobActivity}
+            disabled={variant === 'view' || !canChangeGlobActivity}
           />
 
           <Select
@@ -302,7 +303,7 @@ export default function GlobalActivityModal({
             isClearable
             isSearchable
             label="Type"
-            disabled={variant === 'view' || !canEditGlobActivity}
+            disabled={variant === 'view' || !canChangeGlobActivity}
             variant={variant === 'view' ? 'transparent' : 'colored'}
           />
 
@@ -316,7 +317,7 @@ export default function GlobalActivityModal({
                 label="Date"
                 inputClass="!border-0 !shadow-none"
                 labelClassName="text-primary-input-text"
-                disabled={variant === 'view' || !canEditGlobActivity}
+                disabled={variant === 'view' || !canChangeGlobActivity}
               />
             </div>
 
@@ -329,7 +330,7 @@ export default function GlobalActivityModal({
                 name="followUpRequired"
                 checked={actFollowUp}
                 onChange={(e) => setActFollowUp(e.target.checked)}
-                disabled={variant === 'view' || !canEditGlobActivity}
+                disabled={variant === 'view' || !canChangeGlobActivity}
               />
             </div>
           </div>
@@ -345,7 +346,7 @@ export default function GlobalActivityModal({
                   label="Date"
                   inputClass="!border-0 !shadow-none"
                   labelClassName="text-primary-input-text"
-                  disabled={variant === 'view' || !canEditGlobActivity}
+                  disabled={variant === 'view' || !canChangeGlobActivity}
                 />
               </div>
             </div>
@@ -366,7 +367,7 @@ export default function GlobalActivityModal({
                   id="cost"
                   value={cost}
                   onChange={(event) => setCostValue(event.target.value)}
-                  disabled={variant === 'view' || !canEditGlobActivity}
+                  disabled={variant === 'view' || !canChangeGlobActivity}
                 />
               </div>
             </div>
@@ -378,7 +379,7 @@ export default function GlobalActivityModal({
             value={actNotes}
             placeholder="Notes Field"
             onChange={(e) => setActNotes(e.target.value)}
-            disabled={variant === 'view' || !canEditGlobActivity}
+            disabled={variant === 'view' || !canChangeGlobActivity}
             defaultDisabled={false}
           />
 
@@ -416,7 +417,7 @@ export default function GlobalActivityModal({
                 variant="primary"
                 text="Save and Close"
                 onClick={handleSave}
-                disabled={!canEditGlobActivity}
+                disabled={!canChangeGlobActivity}
               />
             </div>
           )}
