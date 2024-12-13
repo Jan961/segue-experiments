@@ -185,6 +185,9 @@ const MasterTasks = (props: InferGetServerSidePropsType<typeof getServerSideProp
         onClose={handleShowTask}
         task={currentTask}
         updateTableData={updateTableData}
+        canClone={canCloneTask}
+        canDelete={canDeleteTask}
+        canEdit={canEditTask}
       />
       <NewProductionTask
         visible={showNewProduction}
