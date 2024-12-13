@@ -122,6 +122,7 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
       {!!editVenueContext && (
         <AddEditVenueModal
           venue={editVenueContext}
+          venueTownList={venueTownOptionList}
           venueFamilyOptionList={venueFamilyOptionList}
           countryOptions={venueCountryOptionList}
           venueRoleOptionList={venueRoleOptionList}
@@ -145,6 +146,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     getAllVenueFamilyList(ctx.req as NextApiRequest),
     getAllVenuesMin(ctx.req as NextApiRequest),
     getAllVenueRoles(ctx.req as NextApiRequest),
+    getUniqueVenueTownlist(ctx.req as NextApiRequest),
   ]);
 
   const productionJump = results[0].status === 'fulfilled' ? results[0].value : intialProductionJumpState;
