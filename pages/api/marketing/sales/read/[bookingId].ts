@@ -1,5 +1,5 @@
 import getPrismaClient from 'lib/prisma';
-import { TSalesView } from 'types/MarketingTypes';
+import { SalesSnapshot, TSalesView } from 'types/MarketingTypes';
 import { getCurrencyFromBookingId } from 'services/venueCurrencyService';
 import { BOOK_STATUS_CODES } from 'types/SalesSummaryTypes';
 import { formatDate } from 'services/dateService';
@@ -97,6 +97,7 @@ export default async function handle(req, res) {
       return {
         ...acc,
         [key]: {
+          setId: sale.SetId,
           week: sale.SetBookingWeekNum ? `Week ${sale.SetBookingWeekNum}` : '',
           weekOf: sale.SetSalesFiguresDate,
           schSeatsSold: '',
@@ -140,7 +141,26 @@ export default async function handle(req, res) {
       };
     }, {});
 
-    res.json(Object.values(groupedData));
+    // Convert groupedData to array
+    const result: Array<SalesSnapshot> = Object.values(groupedData);
+
+    // Apply conditional logic
+    const singleSeatsIndex = result.findIndex((row) => row.isSingleSeats === true);
+    const notOnSaleIndex = result.findIndex((row) => row.isNotOnSale === true);
+
+    if (singleSeatsIndex >= 0) {
+      for (let i = singleSeatsIndex; i < result.length; i++) {
+        result[i].isSingleSeats = true;
+      }
+    }
+
+    if (notOnSaleIndex >= 0) {
+      for (let i = 0; i <= notOnSaleIndex; i++) {
+        result[i].isNotOnSale = true;
+      }
+    }
+
+    res.json(result);
   } catch (err) {
     console.log(err);
     res.status(403).json({ err: 'Error occurred while generating search results.' });
