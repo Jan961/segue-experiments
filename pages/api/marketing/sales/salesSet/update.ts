@@ -3,20 +3,17 @@ import { NextApiRequest, NextApiResponse } from 'next';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const { BookingId, SalesFigureDate, ...updatedData } = req.body;
+    const { setId, dataToUpd } = req.body;
 
-    console.log(req.body);
-
-    if (!BookingId) return res.status(400).end();
     const prisma = await getPrismaClient(req);
-    const updatedSaleSet = await prisma.salesSet.updateMany({
+    const updatedSaleSet = await prisma.salesSet.update({
       where: {
-        SetBookingId: BookingId,
-        SetSalesFiguresDate: new Date(SalesFigureDate),
+        SetId: setId,
       },
-      data: updatedData,
+      data: dataToUpd,
     });
-    res.status(200).json({ ok: true, ...updatedSaleSet });
+
+    res.status(200).json({ ok: true, updatedSaleSet });
   } catch (err) {
     console.log(err);
     res.status(500).json({ err, ok: false });
