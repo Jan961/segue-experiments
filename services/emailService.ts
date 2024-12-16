@@ -4,6 +4,7 @@ import {
   NEW_USER_PIN_EMAIL,
   NEW_USER_VERIFY_EMAIL,
   NEW_USER_WELCOME_EMAIL,
+  PASSWORD_RESET_EMAIL,
 } from 'config/global';
 import prisma from 'lib/prisma_master';
 
@@ -33,6 +34,10 @@ export const sendEmail = async (to: string, templateName: string, data: any) => 
 
 export const sendVerificationEmail = async (to: string, magiclink = '') => {
   await sendEmail(to, NEW_USER_VERIFY_EMAIL, { magiclink });
+};
+
+export const sendPasswordResetEmail = async (to: string, verificationCode = '') => {
+  await sendEmail(to, PASSWORD_RESET_EMAIL, { verificationCode });
 };
 
 export const sendAccountSetupEmail = async (emailAddress: string, companyName: string, signUpUrl: string) => {
