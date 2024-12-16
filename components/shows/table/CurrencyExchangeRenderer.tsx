@@ -30,7 +30,7 @@ const CurrencyExchangeRenderer = ({
     if (value) {
       setInputValue(value + '');
     }
-  }, [data.FromCurrency]);
+  }, [data.FromCurrency, value]);
 
   const handleChange = (e: any) => {
     const newValue = e;
