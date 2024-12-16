@@ -694,54 +694,57 @@ export const venueColumnDefs = [
   },
 ];
 
-export const venueContactDefs = (defaultRoles, disabled?: boolean) => [
-  {
-    headerName: 'Id',
-    field: 'id',
-    cellRenderer: DefaultCellRenderer,
-    hide: true,
-  },
-  {
-    headerName: 'Role',
-    field: 'roleName',
-    cellRenderer: DefaultCellRenderer,
-    editable: (params) => !defaultRoles.some((role) => role.value === params.data.venueRoleId),
-    width: 150,
-    headerClass: 'text-center',
-  },
-  {
-    headerName: 'First Name',
-    field: 'firstName',
-    editable: !disabled,
-    cellRenderer: DefaultCellRenderer,
-    width: 150,
-    headerClass: 'text-center',
-  },
-  {
-    headerName: 'Last Name',
-    field: 'lastName',
-    editable: !disabled,
-    cellRenderer: DefaultCellRenderer,
-    width: 150,
-    headerClass: 'text-center',
-  },
-  {
-    headerName: 'Phone',
-    field: 'phone',
-    editable: !disabled,
-    cellRenderer: DefaultCellRenderer,
-    width: 120,
-    headerClass: 'text-center',
-  },
-  {
-    headerName: 'Email',
-    field: 'email',
-    editable: !disabled,
-    cellRenderer: DefaultCellRenderer,
-    flex: 1,
-    headerClass: 'text-center',
-  },
-  {
+export const venueContactDefs = (defaultRoles, disabled?: boolean, canEdit?: boolean, canDelete?: boolean) => {
+  const defaultCol = [
+    {
+      headerName: 'Id',
+      field: 'id',
+      cellRenderer: DefaultCellRenderer,
+      hide: true,
+    },
+    {
+      headerName: 'Role',
+      field: 'roleName',
+      cellRenderer: DefaultCellRenderer,
+      editable: (params) => !defaultRoles.some((role) => role.value === params.data.venueRoleId),
+      width: 150,
+      headerClass: 'text-center',
+    },
+    {
+      headerName: 'First Name',
+      field: 'firstName',
+      editable: !disabled && canEdit,
+      cellRenderer: DefaultCellRenderer,
+      width: 150,
+      headerClass: 'text-center',
+    },
+    {
+      headerName: 'Last Name',
+      field: 'lastName',
+      editable: !disabled && canEdit,
+      cellRenderer: DefaultCellRenderer,
+      width: 150,
+      headerClass: 'text-center',
+    },
+    {
+      headerName: 'Phone',
+      field: 'phone',
+      editable: !disabled && canEdit,
+      cellRenderer: DefaultCellRenderer,
+      width: 120,
+      headerClass: 'text-center',
+    },
+    {
+      headerName: 'Email',
+      field: 'email',
+      editable: !disabled && canEdit,
+      cellRenderer: DefaultCellRenderer,
+      flex: 1,
+      headerClass: 'text-center',
+    },
+  ];
+
+  const deleteCol = {
     headerName: '',
     field: 'delete',
     cellRenderer: IconRenderer,
@@ -762,8 +765,10 @@ export const venueContactDefs = (defaultRoles, disabled?: boolean) => [
     cellClassRules: {
       '!hidden': (params) => defaultRoles.some((role) => role.value === params.data.venueRoleId),
     },
-  },
-];
+  };
+
+  return canDelete ? [...defaultCol, deleteCol] : defaultCol;
+};
 
 export const getBarredVenuesColDefs = (venueOptions, selectedVenueIds) => [
   {

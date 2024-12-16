@@ -33,6 +33,13 @@ type SALES_SUMMARY = {
   FinalSetSalesFiguresDate: string | null;
 };
 
+/**
+ * utility function to color cell
+ * @param param worksheet
+ * @param param row
+ * @param param col
+ * @param param argbColor
+ */
 export const colorCell = ({
   worksheet,
   row,
@@ -51,6 +58,16 @@ export const colorCell = ({
   };
 };
 
+/**
+ * utility function to color text and background of a cell
+ * @param worksheet
+ * @param row
+ * @param col
+ * @param textColor
+ * @param cellColor
+ * @param numFmt
+ * @returns
+ */
 const colorTextAndBGCell = ({
   worksheet,
   row,
@@ -85,23 +102,56 @@ const colorTextAndBGCell = ({
   }
 };
 
+/**
+ * make row bold
+ * @param worksheet
+ * @param row
+ * @param col
+ * @param align
+ */
 const makeRowBold = ({ worksheet, row }: { worksheet: any; row: number }) => {
   worksheet.getRow(row).font = { bold: true };
 };
 
+/**
+ * formats the title row to 16 size and white color and bold and horizontal aligned to left
+ * @param param worksheet
+ */
 const firstRowFormatting = ({ worksheet }: { worksheet: any }) => {
   worksheet.getRow(1).font = { bold: true, size: 16 };
   worksheet.getRow(1).alignment = { horizontal: 'left' };
 };
 
+/**
+ * returns key in the format of FullProductionCode - ShowName - EntryDate
+ * @param param FullProductionCode
+ * @param param ShowName
+ * @param param EntryDate
+ * @returns
+ */
 const getKey = ({ FullProductionCode, ShowName, EntryDate }) => `${FullProductionCode} - ${ShowName} - ${EntryDate}`;
 
+/**
+ * return converted value in pound
+ * @param param totalOfCurrency
+ * @param param conversionRate
+ * @returns
+ */
 const getTotalInPound = ({ totalOfCurrency, conversionRate }) => {
   const euroVal = totalOfCurrency['€'];
   const finalValOfEuro = euroVal ? new Decimal(euroVal).mul(conversionRate).toNumber() : 0;
   return totalOfCurrency['£'] ? new Decimal(totalOfCurrency['£']).plus(finalValOfEuro).toNumber() : finalValOfEuro;
 };
 
+/**
+ * finds next booking date from the current date in the map
+ * @param currentDate
+ * @param map
+ * @param FullProductionCode
+ * @param ShowName
+ * @param maxDays
+ * @returns
+ */
 const findNextBookingDate = (
   currentDate: string,
   map: Record<string, SALES_SUMMARY>,
@@ -129,6 +179,27 @@ const findNextBookingDate = (
   return null; // No booking found in next 30 days
 };
 
+/**
+ * formats the entrydate, ProductionStartDate and ProductionEndDate in the format of yyyy-MM-dd
+ * @param EntryDate
+ * @param ProductionStartDate
+ * @param ProductionEndDate
+ * @returns
+ */
+const formatProductionDates = ({ EntryDate, ProductionStartDate, ProductionEndDate }) => {
+  return {
+    EntryDate: EntryDate ? formatDate(EntryDate, 'yyyy-MM-dd') : undefined,
+    ProductionStartDate: ProductionStartDate ? formatDate(ProductionStartDate, 'yyyy-MM-dd') : undefined,
+    ProductionEndDate: ProductionEndDate ? formatDate(ProductionEndDate, 'yyyy-MM-dd') : undefined,
+  };
+};
+
+/**
+ * creates a report for gross sales
+ * @param req NextApiRequest
+ * @param res NextApiResponse
+ * @returns
+ */
 const handler = async (req, res) => {
   try {
     const prisma = await getPrismaClient(req);
@@ -136,6 +207,8 @@ const handler = async (req, res) => {
     if (!productionId) {
       throw new Error('Params are missing');
     }
+
+    // prisma query to fetch general and school sales from salesSummaryView for given ProductionId
     const data = await prisma.salesSummaryView
       .findMany({
         where: {
@@ -153,6 +226,8 @@ const handler = async (req, res) => {
           ProductionEndDate: new UTCDate(x.ProductionEndDate),
         })),
       );
+
+    // prisma query to fetch schedule data from scheduleView for given ProductionId
     const schedule = await prisma.scheduleView
       .findMany({
         where: {
@@ -172,26 +247,27 @@ const handler = async (req, res) => {
       );
     let filename = 'Gross Sales';
     const workbook = new ExcelJS.Workbook();
-    const formattedData = data.map((x) => ({
-      ...x,
-      Value: x.Value?.toNumber?.() || 0,
-      EntryDate: formatDate(x.EntryDate, 'yyyy-MM-dd'),
-      ProductionStartDate: formatDate(x.ProductionStartDate, 'yyyy-MM-dd'),
-      ProductionEndDate: formatDate(x.ProductionEndDate, 'yyyy-MM-dd'),
+
+    // formats the dates(Entrydate, ProductionStart, ProductionEnd) in yyyy-MM-dd format
+    const formattedData = data.map((item) => ({
+      ...item,
+      Value: item.Value?.toNumber?.() || 0,
+      ...formatProductionDates(item),
     }));
 
-    const formattedScheduleData = schedule.map((x) => ({
-      ...x,
-      EntryDate: formatDate(x.EntryDate, 'yyyy-MM-dd'),
-      ProductionStartDate: formatDate(x.ProductionStartDate, 'yyyy-MM-dd'),
-      ProductionEndDate: formatDate(x.ProductionEndDate, 'yyyy-MM-dd'),
+    // formats the dates in yyyy-MM-dd format
+    const formattedScheduleData = schedule.map((item) => ({
+      ...item,
+      ...formatProductionDates(item),
     }));
 
+    // creates a worksheet with name Gross Sales
     const worksheet = workbook.addWorksheet('Gross Sales', {
       pageSetup: { fitToPage: true, fitToHeight: 5, fitToWidth: 7 },
     });
 
     if (!schedule?.length) {
+      // If there is no schedule data, export empty workbook
       res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
       res.setHeader('Content-Disposition', `attachment; filename="${filename}.xlsx"`);
 
@@ -201,15 +277,20 @@ const handler = async (req, res) => {
       return;
     }
 
+    // create filename from production code and show name
     const { FullProductionCode = '', ShowName = '' } = schedule?.[0] || {};
     filename = `${FullProductionCode} ${ShowName} Gross Sales`;
     worksheet.addRow([`${filename}`]);
+
+    // add exported at title
     const exportedAtTitle = getExportedAtTitle(exportedAt);
     worksheet.addRow([exportedAtTitle]);
 
     worksheet.addRow([]);
 
+    // create a map with key as FullProductionCode - ShowName - EntryDate and value as SALES_SUMMARY for easy access
     const map: { [key: string]: SALES_SUMMARY } = formattedData.reduce((acc, x) => {
+      // create key in the format of FullProductionCode - ShowName - EntryDate
       const key = getKey(x);
       const previousValue = acc[key];
       return {
@@ -220,6 +301,9 @@ const handler = async (req, res) => {
         },
       };
     }, {});
+
+    // create a map with key as FullProductionCode - ShowName - EntryDate and value as SCHEDULE_VIEW for easy access
+    // scheduleMap is used to get the schedule data for a given date even in case of missing sales data so that we can add the schedule data to the report
     const scheduleMap: { [key: string]: SCHEDULE_VIEW } = formattedScheduleData.reduce(
       (acc, x) => ({ ...acc, [getKey(x)]: x }),
       {},
@@ -232,6 +316,9 @@ const handler = async (req, res) => {
     let colNo = 1;
     let conversionRate = 0;
 
+    // Gross sales report layout is landscape which means entire schedule is entered horizontally in a new column unlike other reports where each booking is entered in a new row
+    // so we will have 6 rows for sales data to be entered
+    //  son we will push each booking in schedule to corresponding row arrays and
     const r4: string[] = [];
     const r5: string[] = [];
     const r6: string[] = [];
@@ -239,15 +326,26 @@ const handler = async (req, res) => {
     const r8: string[] = [];
     const r9: any[] = [];
 
+    // mergeRowCol is used to store all cells which needs to be merged and merge them at the end
     const mergeRowCol: { row: number[]; col: number[] }[] = [];
+    // cell color is used to store all cells which needs to be colored and color them at the end
     const cellColor: {
       cell: { rowNo: number; colNo: number };
       cellColor?: COLOR_HEXCODE;
       textColor?: COLOR_HEXCODE;
       numFmt?: string;
     }[] = [];
+    // totalOfCurrency is used to store total of each currency type
     const totalOfCurrency: { [key: string]: number } = { '£': 0, '€': 0 };
+    // weekStartList is used to store the column number where each week starts
     const weekStartList = [];
+
+    /**
+     * it first entry for start of each week
+     * @param weekNumber
+     * @param colNo
+     * @param padding
+     */
     const addWeekDetails = (weekNumber: number, colNo: number, padding = 7) => {
       r4.push(`Week ${weekNumber}`);
       r5.push('');
@@ -265,6 +363,8 @@ const handler = async (req, res) => {
 
       r7.push('Weekly Costs');
     };
+
+    // loop through each day in the schedule and append entries
     for (let i = 1; i <= daysDiff; i++) {
       const weekDay = formatDate(getDateDaysAway(fromDate, i - 1), 'eeee');
       const dateInIncomingFormat = formatDate(getDateDaysAway(fromDate, i - 1), 'yyyy-MM-dd');
@@ -272,11 +372,15 @@ const handler = async (req, res) => {
       const date = formatDate(dateInIncomingFormat, 'dd/MM/yy');
       const weekNumber = calculateWeekNumber(fromDate, dateInIncomingFormat);
       if (i === 1 && weekDay !== 'Monday') {
+        // If the first day of the schedule is not a Monday, then the production is not starting on a Monday
+        // In that case we should add week start details for the first week
         // +2 is for including currentday and sunday
         addWeekDetails(weekNumber, colNo, calculateRemainingDaysInWeek(weekDay) + 2);
         colNo++;
       }
       if (weekDay === 'Monday') {
+        // If the day is Monday, then it is the start of a new week
+        // so we should add week start details
         if (i > 1 && i < 7) {
           mergeRowCol.push({ row: [4, 4], col: [1, colNo - 1] });
         }
@@ -285,15 +389,18 @@ const handler = async (req, res) => {
         colNo++;
       }
 
+      // Add the day details
       r4.push(`Week ${weekNumber}`);
       r5.push(date);
       r6.push(weekDay);
 
       if (weekDay === 'Monday') {
+        // if the day is Monday, then color the cells with light brown color
         cellColor.push({ cell: { rowNo: 5, colNo }, cellColor: COLOR_HEXCODE.LIGHT_BROWN });
         cellColor.push({ cell: { rowNo: 6, colNo }, cellColor: COLOR_HEXCODE.LIGHT_BROWN });
       }
 
+      // get the key in the format of FullProductionCode - ShowName - EntryDate
       const key = getKey({ FullProductionCode, ShowName, EntryDate: dateInIncomingFormat });
       const value: SALES_SUMMARY = map[key];
       const nextValue: SALES_SUMMARY = nextBookingDate
@@ -303,14 +410,15 @@ const handler = async (req, res) => {
       const statusCode = (value || scheduleValue)?.EntryStatusCode;
       const isCancelled = statusCode === 'X';
       const isSuspended = statusCode === 'S';
+      const otherDays = ['Get In/Fit Up Day', 'Tech/Dress Day', 'Day Off', 'Travel Day', 'Rehearsal Day'];
       if (!value) {
+        // If there is no sales data for the day, then add the schedule data
         if (
           scheduleValue &&
-          (['Get In/Fit Up Day', 'Tech/Dress Day', 'Day Off', 'Travel Day', 'Rehearsal Day'].includes(
-            scheduleValue?.EntryName,
-          ) ||
+          (otherDays.includes(scheduleValue?.EntryName) ||
             scheduleValue?.EntryName?.toLowerCase?.().includes?.('holiday'))
         ) {
+          // If the entry is Get In/Fit Up Day, Tech/Dress Day, Day Off, Travel Day, Rehearsal Day or Holiday, then color the cells with red color and text white
           r7.push(scheduleValue.EntryName);
           cellColor.push({ cell: { rowNo: 7, colNo }, cellColor: COLOR_HEXCODE.RED, textColor: COLOR_HEXCODE.WHITE });
           cellColor.push({ cell: { rowNo: 8, colNo }, cellColor: COLOR_HEXCODE.RED, textColor: COLOR_HEXCODE.WHITE });
@@ -335,6 +443,7 @@ const handler = async (req, res) => {
         } else {
           r9.push(value.Value ? value.Value : '');
           // This adds blue background for Final Sales
+          // blue color signifies final entry of sales for that venue so it has to be added only on last date incase of run of dates
           cellColor.push({
             cell: { rowNo: 9, colNo },
             cellColor: COLOR_HEXCODE.BLUE,
@@ -343,6 +452,7 @@ const handler = async (req, res) => {
           });
 
           if (value.VenueCurrencySymbol && value.Value && !isCancelled && !isSuspended) {
+            // add sales value to totalOfCurrency only if the entry is not cancelled or suspended
             const val = totalOfCurrency[value.VenueCurrencySymbol];
             if (val || val === 0) {
               totalOfCurrency[value.VenueCurrencySymbol] = new Decimal(val)
@@ -353,6 +463,8 @@ const handler = async (req, res) => {
         }
       }
       if (isCancelled || isSuspended) {
+        // If the entry is cancelled, then color the cells with black color
+        // If the entry is suspended, then color the cells with purple color
         cellColor.push({
           cell: { rowNo: 7, colNo },
           cellColor: isCancelled ? COLOR_HEXCODE.BLACK : COLOR_HEXCODE.PURPLE,
@@ -374,6 +486,8 @@ const handler = async (req, res) => {
     }
     weekStartList.push(colNo);
     for (let i = 0; i <= 2; i++) {
+      // add total of each currency type to the report
+      // currently we handle only £ and €
       r4.push('Production Totals');
       r5.push('');
       if (i === 0) {
@@ -418,6 +532,8 @@ const handler = async (req, res) => {
     worksheet.addRow(r8);
     worksheet.addRow(r9);
 
+    // loop through mergecells array and merge them accordingly
+    // excel js errors out if there are duplicates in mergeCells i.e., we shouldnt merge same cells again
     mergeRowCol.forEach((ele) => {
       const { row, col } = ele;
       try {
@@ -445,12 +561,14 @@ const handler = async (req, res) => {
       worksheet.getRow(rowNo).font = { bold: false, size: 11, name: 'Calibri' };
     }
 
+    // merge the first two rows for header cells to expand into
     worksheet.mergeCells(1, 1, 1, numberOfColumns);
     worksheet.mergeCells(2, 1, 2, numberOfColumns);
     firstRowFormatting({ worksheet });
     makeRowBold({ worksheet, row: 2 });
 
     for (let i = 1; i <= numberOfColumns; i++) {
+      // add border for for 4th row which is the header for the sales data
       worksheet.getCell(4, i).border = {
         top: { style: 'thick' },
         left: { style: 'thick' },
@@ -459,6 +577,7 @@ const handler = async (req, res) => {
       };
     }
 
+    // add border for the first row of the week which separate from previous week
     for (const col of weekStartList) {
       for (let row = 5; row <= 9; row++) {
         worksheet.getCell(row, col).border = {
@@ -467,6 +586,7 @@ const handler = async (req, res) => {
       }
     }
 
+    // loop through cellColor array and color the cells accordingly
     cellColor.forEach((ele) => {
       const {
         cell: { rowNo, colNo },

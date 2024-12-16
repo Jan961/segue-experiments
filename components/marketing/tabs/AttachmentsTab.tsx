@@ -8,6 +8,8 @@ import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import { Spinner } from 'components/global/Spinner';
 import { attachmentMimeTypes } from 'components/core-ui-lib/UploadModal/interface';
 import { getFileUrl } from 'lib/s3';
+import { useRecoilValue } from 'recoil';
+import { accessMarketingHome } from 'state/account/selectors/permissionSelector';
 
 interface AttachmentsTabProps {
   bookingId: string;
@@ -28,6 +30,13 @@ const AttachmentsTab = forwardRef<AttachmentsTabRef, AttachmentsTabProps>((props
   const [bookingIdVal, setBookingIdVal] = useState(null);
   const [dataAvailable, setDataAvailable] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const permissions = useRecoilValue(accessMarketingHome);
+  const canDeleteProductionAttachment = permissions.includes('DELETE_PRODUCTION_ATTACHMENT');
+  const canDeleteVenueAttachment = permissions.includes('DELETE_VENUE_ATTACHMENT');
+  const canUploadProductionAttachment = permissions.includes('UPLOAD_NEW_PRODUCTION_ATTACHMENT');
+  const canUploadVenueAttachment = permissions.includes('UPLOAD_NEW_VENUE_ATTACHMENT');
+  const canViewProductionAttachment = permissions.includes('VIEW_PRODUCTION_ATTACHMENT');
+  const canViewVenueAttachment = permissions.includes('VIEW_VENUE_ATTACHMENT');
 
   useImperativeHandle(ref, () => ({
     resetData: () => {
@@ -195,12 +204,13 @@ const AttachmentsTab = forwardRef<AttachmentsTabRef, AttachmentsTabProps>((props
               className="w-[160px]"
               onClick={() => toggleUploadModal('Venue')}
               testId="btnUpdFileByVenue"
+              disabled={!canUploadVenueAttachment}
             />
           </div>
 
           <div className="mb-5">
             <Table
-              columnDefs={attachmentsColDefs}
+              columnDefs={attachmentsColDefs(canViewVenueAttachment, canDeleteVenueAttachment)}
               rowData={venueAttachRows}
               styleProps={styleProps}
               tableHeight={250}
@@ -217,11 +227,12 @@ const AttachmentsTab = forwardRef<AttachmentsTabRef, AttachmentsTabProps>((props
               className="w-[160px]"
               onClick={() => toggleUploadModal('Production')}
               testId="btnUpdProdAttach"
+              disabled={!canUploadProductionAttachment}
             />
           </div>
 
           <Table
-            columnDefs={attachmentsColDefs}
+            columnDefs={attachmentsColDefs(canViewProductionAttachment, canDeleteProductionAttachment)}
             rowData={prodAttachRows}
             styleProps={styleProps}
             tableHeight={250}

@@ -58,6 +58,8 @@ const ContractsPage = (props: InferGetServerSidePropsType<typeof getServerSidePr
     smTechCrewContracts: permissions.includes('EDIT_TECH_PERSON_DETAILS'),
   };
 
+  const canCreateNewPerson = accessPermissions.includes('CONTRACTS_ADD_PERSON');
+
   const rows = useContractsFilter();
 
   return (
@@ -68,6 +70,7 @@ const ContractsPage = (props: InferGetServerSidePropsType<typeof getServerSidePr
             accessNewPerson,
             accessNewContract,
             accessContracts,
+            canCreateNewPerson,
           }}
         />
       </div>

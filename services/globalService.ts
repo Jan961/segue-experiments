@@ -26,8 +26,8 @@ export const getCurrenciesAsSelectOptions = async () => {
 
 export const getCountriesAsSelectOptions = async () => {
   const countries = await getAllCountries();
-  return countries.map(({ CountryCode, CountryName }) => ({
-    value: CountryCode,
+  return countries.map(({ CountryId, CountryName }) => ({
+    value: CountryId,
     text: CountryName,
   }));
 };

@@ -28,6 +28,7 @@ export default authMiddleware({
     if (isPublic(request.nextUrl.pathname)) {
       return NextResponse.next();
     }
+    const requestHeaders = new Headers(request.headers);
     const signInUrl = new URL(SIGN_IN_URL, request.url);
 
     // if the user is not signed in redirect them to the sign in page.
@@ -41,6 +42,7 @@ export default authMiddleware({
     if (!organisationId) {
       return NextResponse.redirect(signInUrl);
     }
+    requestHeaders.set('x-organisation-id', organisationId as string);
     // Check user permissions
     const routeAllowed = allowRoute(request.nextUrl.pathname, permissions as string[]);
 
@@ -49,7 +51,11 @@ export default authMiddleware({
       return NextResponse.redirect(signInUrl);
     }
 
-    return NextResponse.next();
+    return NextResponse.next({
+      request: {
+        headers: requestHeaders,
+      },
+    });
   },
 });
 

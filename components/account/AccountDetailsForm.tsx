@@ -212,6 +212,7 @@ const AccountDetailsForm = ({
               value={accountDetails.country}
               onChange={(value) => onChange({ ...accountDetails, country: value.toString() })}
               isClearable={false}
+              isSearchable
             />
             {validationErrors.country && <small className="text-primary-red mt-1">{validationErrors.country}</small>}
           </div>

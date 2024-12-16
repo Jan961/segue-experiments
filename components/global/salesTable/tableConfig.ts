@@ -228,7 +228,12 @@ export const prodCompArchColDefs = (optionsLength = 0, selectForComparison, sele
   },
 ];
 
-export const salesColDefs = (schoolDataAvail, isMarketing, booking, setSalesActivity) => {
+export const salesColDefs = (
+  schoolDataAvail: boolean,
+  isMarketing: boolean,
+  setSalesActivity: (type: string, sale: any) => void,
+  canEditFlags: boolean,
+) => {
   return [
     {
       headerName: 'Week',
@@ -625,17 +630,17 @@ export const salesColDefs = (schoolDataAvail, isMarketing, booking, setSalesActi
           {
             name: 'user-solid',
             color: params.data.isSingleSeats ? '#10841C' : '#ddd',
-            onClick: () => setSalesActivity('isSingleSeats', booking, params.data),
+            onClick: () => (canEditFlags ? setSalesActivity('SetSingleSeats', params.data) : null),
           },
           {
             name: 'book-solid',
             color: params.data.isBrochureReleased ? '#FFE606' : '#ddd',
-            onClick: () => setSalesActivity('isBrochureReleased', booking, params.data),
+            onClick: () => (canEditFlags ? setSalesActivity('SetBrochureReleased', params.data) : null),
           },
           {
             name: 'square-cross',
             color: params.data.isNotOnSale ? '#ED1111' : '#ddd',
-            onClick: () => setSalesActivity('isNotOnSale', booking, params.data),
+            onClick: () => (canEditFlags ? setSalesActivity('SetNotOnSale', params.data) : null),
           },
         ],
       }),

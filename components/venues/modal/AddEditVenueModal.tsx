@@ -25,6 +25,7 @@ import { accessBookingsHome } from 'state/account/selectors/permissionSelector';
 
 interface AddEditVenueModalProps {
   visible: boolean;
+  venueTownList: SelectOption[];
   venueFamilyOptionList: SelectOption[];
   countryOptions: SelectOption[];
   venueRoleOptionList: SelectOption[];
@@ -38,6 +39,7 @@ interface AddEditVenueModalProps {
 export default function AddEditVenueModal({
   venue,
   visible,
+  venueTownList,
   venueFamilyOptionList,
   venueRoleOptionList,
   countryOptions,
@@ -301,6 +303,7 @@ export default function AddEditVenueModal({
               onChange={onChange}
               validationErrors={validationErrors}
               updateValidationErrrors={updateValidationErrors}
+              townSelectOptions={venueTownList}
               disabled={disabled}
             />
           </div>

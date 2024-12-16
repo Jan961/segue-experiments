@@ -13,6 +13,7 @@ import { exportExcelReport } from 'components/bookings/modal/request';
 import { notify } from 'components/core-ui-lib/Notifications';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import { isNullOrEmpty } from 'utils';
+import { accessMarketingHome } from 'state/account/selectors/permissionSelector';
 
 export interface ArchSalesTabRef {
   resetData: () => void;
@@ -23,6 +24,7 @@ export interface ArchSalesProps {
 }
 
 const ArchivedSalesTab = forwardRef<ArchSalesTabRef, ArchSalesProps>((props, ref) => {
+  const permissions = useRecoilValue(accessMarketingHome);
   const [showArchSalesModal, setShowArchSalesModal] = useState<boolean>(false);
   const [archSaleVariant, setArchSaleVariant] = useState<ArchSalesDialogVariant>('venue');
   const [archivedDataAvail, setArchivedDataAvail] = useState<boolean>(false);
@@ -154,7 +156,7 @@ const ArchivedSalesTab = forwardRef<ArchSalesTabRef, ArchSalesProps>((props, ref
               className="w-[232px]"
               iconProps={{ className: 'h-4 w-3 ml-5' }}
               sufixIconName="excel"
-              disabled={!archivedDataAvail}
+              disabled={!archivedDataAvail || !permissions.includes('EXPORT_DISPLAYED_SALES_DATA')}
               onClick={() => onExport()}
               testId="btnExportData"
             />

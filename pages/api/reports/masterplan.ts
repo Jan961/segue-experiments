@@ -37,12 +37,26 @@ export enum ALIGNMENT {
   LEFT = 'left',
 }
 
+/**
+ * Aligns all cells in a column
+ * @param worksheet - ExcelJS worksheet
+ * @param colAsChar - Column letter
+ * @param align - Alignment type
+ */
 const alignColumn = ({ worksheet, colAsChar, align }: { worksheet: any; colAsChar: string; align: ALIGNMENT }) => {
   worksheet.getColumn(colAsChar).eachCell((cell) => {
     cell.alignment = { horizontal: align, wrapText: true };
   });
 };
 
+/**
+ * Styles header rows with background color and alignment
+ * @param worksheet - ExcelJS worksheet
+ * @param row - Row number to style
+ * @param numberOfColumns - Number of columns to style
+ * @param bgColor - Background color hexcode
+ * @param alignment - Text alignment options
+ */
 export const styleHeader = ({
   worksheet,
   row,
@@ -69,6 +83,13 @@ export const styleHeader = ({
   }
 };
 
+/**
+ *
+ * @param worksheet - ExcelJS worksheet
+ * @param row - row number
+ * @param col - column number
+ * @param align - Alignment type
+ */
 export const alignCellText = ({
   worksheet,
   row,
@@ -83,6 +104,9 @@ export const alignCellText = ({
   worksheet.getCell(row, col).alignment = { horizontal: align };
 };
 
+/**
+ * Creates unique keys for identifying schedule entries
+ */
 const getKey = ({ FullProductionCode, ShowName, EntryDate }) => `${FullProductionCode} - ${ShowName} - ${EntryDate}`;
 
 const getShowAndProductionKey = ({ FullProductionCode, ShowName }) => `${FullProductionCode} - ${ShowName}`;
@@ -94,6 +118,15 @@ type ReqBody = {
   fileFormat?: string;
 };
 
+/**
+ * Main handler for generating masterplan reports
+ * @param req - HTTP request with body containing:
+ *   fromDate: Start date for report
+ *   toDate: End date for report
+ *   exportedAt: Report generation timestamp
+ *   fileFormat: Output format (xlsx/pdf)
+ * @param res - HTTP response object
+ */
 const handler = async (req, res) => {
   const { fromDate, toDate, exportedAt, fileFormat }: ReqBody = req.body || {};
   try {
@@ -108,7 +141,7 @@ const handler = async (req, res) => {
       throw new Error('Params are missing or invalid dates provided');
     }
 
-    // Construct the Prisma query
+    // prisma query to fetch schedule for all the productions in the given date range
     const data = await prisma.scheduleView
       .findMany({
         where: {
@@ -130,7 +163,10 @@ const handler = async (req, res) => {
         }));
       });
 
+    // Create a new ExcelJS workbook instance
     const workbook = new ExcelJS.Workbook();
+
+    // Format dates in the data to 'yyyy-MM-dd' format
     const formattedData = data.map((x) => ({
       ...x,
       EntryDate: formatDate(x.EntryDate, 'yyyy-MM-dd'),
@@ -138,6 +174,7 @@ const handler = async (req, res) => {
       ProductionEndDate: formatDate(x.ProductionEndDate, 'yyyy-MM-dd'),
     }));
 
+    // Create a map of show names to production codes for easy lookup
     const showNameAndProductionCode: { [key: string]: string[] } = formattedData.reduce((acc, x) => {
       const value = acc[x.ShowName];
       if (value?.length) {
@@ -155,16 +192,20 @@ const handler = async (req, res) => {
       };
     }, {});
 
+    // Create a list of unique show names and production codes
     const distinctShowNames: UniqueHeadersObject[] = Object.keys(showNameAndProductionCode)
       .map((key) => {
         return showNameAndProductionCode[key].map((code) => ({ ShowName: key, FullProductionCode: code }));
       })
       .reduce((acc, arr) => [...acc, ...arr], []);
 
+    // Add a new worksheet to the workbook with the title 'Masterplan' and set page setup options
     const worksheet = workbook.addWorksheet('Masterplan', {
       pageSetup: { fitToPage: true, fitToHeight: 5, fitToWidth: 7 },
       views: [{ state: 'frozen', xSplit: 2, ySplit: 6 }],
     });
+
+    // Add the title, exported at timestamp and empty rows to the worksheet
     const title = `All Productions Masterplan ${formatDate(formatedFromDateString, 'dd-MM-yy')} to ${formatDate(
       formatedToDateString,
       'dd-MM-yy',
@@ -176,12 +217,16 @@ const handler = async (req, res) => {
     worksheet.addRow(['DAY', 'DATE', ...distinctShowNames.map((x) => x.FullProductionCode)]);
     worksheet.addRow([]);
 
+    // create a map of schedule entries for easy lookup for each production and show name
+    //  key = FullProductionCode - ShowName
     const map: { [key: string]: SCHEDULE_VIEW } = formattedData.reduce((acc, x) => ({ ...acc, [getKey(x)]: x }), {});
     const showNameAndProductionMap: { [key: string]: SCHEDULE_VIEW } = formattedData.reduce(
       (acc, x) => ({ ...acc, [getShowAndProductionKey(x)]: x }),
       {},
     );
 
+    // Create a map of production codes and show names to week numbers
+    // key = FullProductionCode - ShowName
     const headerWeeks =
       distinctShowNames.reduce((acc, { ShowName, FullProductionCode }) => {
         const key = getShowAndProductionKey({ FullProductionCode, ShowName });
@@ -196,6 +241,7 @@ const handler = async (req, res) => {
         };
       }, {}) || {};
 
+    // create a list of week numbers for each production and show name
     const weeks = distinctShowNames.reduce((acc, { FullProductionCode, ShowName }) => {
       const key = getShowAndProductionKey({ FullProductionCode, ShowName });
       const value = headerWeeks[key];
@@ -211,7 +257,10 @@ const handler = async (req, res) => {
 
       return [...acc, `Week ${value}`];
     }, []);
+    // Add the week numbers to the worksheet
     worksheet.addRow(['Week No', '', ...weeks]);
+
+    // Style the header rows with background color blue  and text yellow
     fillRowBGColorAndTextColor({
       worksheet,
       row: 7,
@@ -220,6 +269,8 @@ const handler = async (req, res) => {
       isBold: true,
     });
 
+    // find the number of days between the start and end date
+    // we will add each date between start and end date to the worksheet as row
     const daysDiff = getDifferenceInDays(fromDate, toDate, null, null, true);
 
     const minRehearsalStartTimeInEpoch = data.reduce((acc, x) => {
@@ -230,10 +281,15 @@ const handler = async (req, res) => {
     }, Infinity);
 
     let rowNo = 6;
+    // loop through each date between start and end date and add it to the worksheet
     for (let i = 1; i <= daysDiff; i++) {
+      // get the day of the week for the current date formatted as Monday, Tuesday etc
       const weekDay = formatDate(getDateDaysAway(fromDate, i - 1), 'eeee');
+      // get the date in 'dd/MM/yy' format
       const dateInIncomingFormat = formatDate(getDateDaysAway(fromDate, i - 1), 'yyyy-MM-dd');
       const date = formatDate(dateInIncomingFormat, 'dd/MM/yy');
+      // get the values for each production and show name, entry date combination
+      //  key = FullProductionCode - ShowName - EntryDate
       const values: string[] = distinctShowNames.map(({ FullProductionCode, ShowName }) => {
         const key = getKey({ FullProductionCode, ShowName, EntryDate: dateInIncomingFormat });
         const value = map[key];
@@ -243,14 +299,17 @@ const handler = async (req, res) => {
         return '';
       });
 
+      // add the day, date and values to the worksheet
       worksheet.addRow([weekDay, date, ...values]);
       rowNo++;
 
       if (weekDay === 'Monday' && new Date(dateInIncomingFormat).getTime() >= minRehearsalStartTimeInEpoch) {
+        // color the cells for Monday with cream color background
         colorCell({ worksheet, row: rowNo + 1, col: 1, argbColor: COLOR_HEXCODE.CREAM });
         colorCell({ worksheet, row: rowNo + 1, col: 2, argbColor: COLOR_HEXCODE.CREAM });
       }
 
+      // color the cells for Rehearsal Day, Day Off and Travel Day with red text and yellow background
       const targetCellIdx: number[] = values
         .map((value, idx) => {
           if (['Rehearsal Day', 'Day Off', 'Travel Day'].includes(value)) {
@@ -270,6 +329,7 @@ const handler = async (req, res) => {
       );
 
       if (i % 7 === 0) {
+        // if the current date is a Sunday, add the week numbers to the worksheet
         const weeks = distinctShowNames.reduce((acc, { FullProductionCode, ShowName }) => {
           const key = getShowAndProductionKey({ FullProductionCode, ShowName });
           const value = headerWeeks[key];
@@ -282,11 +342,12 @@ const handler = async (req, res) => {
           } else {
             headerWeeks[key]++;
           }
-
           return [...acc, `Week ${value}`];
         }, []);
+        // add the week numbers to the worksheet
         worksheet.addRow(['Week No', '', ...weeks]);
         rowNo++;
+        // style the header rows with background color blue  and text yellow
         fillRowBGColorAndTextColor({
           worksheet,
           row: rowNo + 1,
@@ -299,13 +360,16 @@ const handler = async (req, res) => {
 
     const numberOfColumns = worksheet.columnCount;
 
+    // Merge the cells for the title and exported at timestamp
     worksheet.mergeCells('A1:D1');
     worksheet.mergeCells('A2:C2');
 
+    // Style the header rows with background color orange  and text white
     for (let row = 1; row < 6; row++) {
       styleHeader({ worksheet, row, numberOfColumns });
     }
 
+    // Set the column widths for the worksheet
     for (let char = 'A', i = 0; i <= numberOfColumns; i++, char = String.fromCharCode(char.charCodeAt(0) + 1)) {
       if (char === 'A' || char === 'B') {
         worksheet.getColumn(char).width = 12;
@@ -317,6 +381,7 @@ const handler = async (req, res) => {
       }
     }
 
+    // Since A and B column width are predictable, we can set them to fixed width
     worksheet.getColumn('A').width = 11;
     worksheet.getColumn('B').width = 10;
     for (let char = 'C', i = 0; i <= numberOfColumns; i++, char = String.fromCharCode(char.charCodeAt(0) + 1)) {
