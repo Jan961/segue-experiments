@@ -88,10 +88,6 @@ const useTasksFilter = () => {
 
           Tasks: productionTasks
             .filter(({ TaskAssignedToAccUserId, CompleteDate, Status }) => {
-              console.log(
-                compareDatesWithoutTime(CompleteDate, filters.endDueDate, '<=') &&
-                  compareDatesWithoutTime(CompleteDate, filters.startDueDate, '>='),
-              );
               return (
                 compareDatesWithoutTime(CompleteDate, filters.endDueDate, '<=') &&
                 compareDatesWithoutTime(CompleteDate, filters.startDueDate, '>=') &&
