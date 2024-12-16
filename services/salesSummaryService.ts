@@ -76,6 +76,12 @@ export const getAggregateKey = ({
 }) => `${Week} | ${Town} | ${Venue}`;
 
 export const LEFT_PORTION_KEYS: string[] = ['Week', 'Day', 'Date', 'Town', 'Venue'];
+/**
+ *  Get values from object based on keys and format them based on key value
+ * @param obj
+ * @param array
+ * @returns
+ */
 export const getValuesFromObject = (obj: object, array: any[]): any[] =>
   array.map((key) => {
     if (key === 'Day') {
@@ -87,12 +93,23 @@ export const getValuesFromObject = (obj: object, array: any[]): any[] =>
     return obj[key];
   });
 
+/**
+ * config for sales summary report
+ */
 export const CONSTANTS: { [key: string]: string } = {
   CHANGE_VS: 'Change vs',
   RUN_SEATS: 'Run Seats',
   RUN_SALES: 'Run Sales',
 };
 
+/**
+ * applies background color to the cell based on different flags like SetIsCopy, SetBrochureReleased, BookingStatusCode, Date, SetProductionWeekDate, NotOnSalesDate
+ * @param worksheet
+ * @param row
+ * @param col
+ * @param props - SetIsCopy, SetBrochureReleased, BookingStatusCode, Date, SetProductionWeekDate, NotOnSalesDate
+ * @param meta - weekCols
+ */
 export const assignBackgroundColor = ({
   worksheet,
   row,
@@ -114,20 +131,25 @@ export const assignBackgroundColor = ({
   meta: { weekCols: number };
 }) => {
   if (Number(SetIsCopy)) {
+    // SetIsCopy - background color purple
     colorCell({ worksheet, row, col, argbColor: COLOR_HEXCODE.PURPLE });
   }
   if (Number(SetBrochureReleased)) {
+    // SetBrochureReleased - background color yellow
     colorCell({ worksheet, row, col, argbColor: COLOR_HEXCODE.YELLOW });
   }
 
   if (isBefore(newDate(Date), simpleToDateMDY(SetProductionWeekDate))) {
+    // if date is before ProductionWeekDate - background color blue
     colorCell({ worksheet, row, col, argbColor: COLOR_HEXCODE.BLUE });
   }
 
   if (NotOnSalesDate && isBefore(simpleToDateMDY(SetProductionWeekDate), simpleToDateMDY(NotOnSalesDate))) {
+    // if NotOnSalesDate is before ProductionWeekDate - background color Red
     colorCell({ worksheet, row, col, argbColor: COLOR_HEXCODE.RED });
   }
   if (BookingStatusCode === BOOK_STATUS_CODES.X || BookingStatusCode === BOOK_STATUS_CODES.S) {
+    // if BookingStatusCode is X or S - background color grey
     const startPoint = 6;
     for (let i = 0; i < weekCols; i++) {
       colorTextAndBGCell({
@@ -176,10 +198,21 @@ export const fillRowBGColorAndTextColor = ({
   });
 };
 
+/**
+ * makes cell text bold
+ * @param worksheet Exceljs worksheet
+ * @param row row number
+ * @param col column number
+ */
 export const makeCellTextBold = ({ worksheet, row, col }: { worksheet: any; row: number; col: number }) => {
   worksheet.getCell(row, col).font = { bold: true };
 };
 
+/**
+ * utility function to make row text bold and align center
+ * @param worksheet Exceljs worksheet
+ * @param row row number
+ */
 export const makeRowTextBoldAndALignCenter = ({ worksheet, row }: { worksheet: any; row: number }) => {
   worksheet.getRow(row).eachCell((cell) => {
     cell.font = { bold: true };
@@ -187,12 +220,24 @@ export const makeRowTextBoldAndALignCenter = ({ worksheet, row }: { worksheet: a
   });
 };
 
+/**
+ * utility function to make col text bold and align center
+ * @param worksheet Exceljs worksheet
+ * @param row row number
+ */
 export const alignCellTextRight = ({ worksheet, colAsChar }: { worksheet: any; colAsChar: string }) => {
   worksheet.getColumn(colAsChar).eachCell((cell) => {
     cell.alignment = { horizontal: 'right' };
   });
 };
 
+/**
+ * utility function to color cell based on argbColor
+ * @param worksheet Exceljs worksheet
+ * @param row row number
+ * @param col column number
+ * @param argbColor color code
+ */
 export const colorCell = ({
   worksheet,
   row,
@@ -420,24 +465,17 @@ export const calculateCurrVSPrevWeekValue = ({ valuesArrayOnly }: { valuesArrayO
     return valuesArrayOnly[0];
   } else {
     const len = valuesArrayOnly.length;
-
-    // if (valuesArrayOnly[len - 2] || valuesArrayOnly[len - 1]) {
-    //   const prev = valuesArrayOnly[len - 2] ? valuesArrayOnly[len - 2] : 0
-    //   const curr = valuesArrayOnly[len - 1] ? valuesArrayOnly[len - 1] : 0
-
     const val = valuesArrayOnly[len - 1] - valuesArrayOnly[len - 2];
-    // Number(new Decimal(curr).minus(prev).toFixed(2))
-    // const symbol = valuesArrayOnly[len - 2] ? valuesArrayOnly[len - 2] : valuesArrayOnly[len - 1]
-    // const prefix = val >= 0 ? `${symbol}` : `-${symbol}`
     return val > 0 ? val : -1 * val;
-    // `${prefix}${val > 0 ? val : -1 * (val)}`
-    // } else {
-    // Nothing in this condition
-    // }
   }
-  // return 0
 };
 
+/**
+ * makes text bold for given range of rows
+ * @param worksheet Exceljs worksheet
+ * @param startRow starting row number
+ * @param numberOfRowsAdded
+ */
 export const makeTextBoldOfNRows = ({
   worksheet,
   startingRow,
@@ -455,6 +493,13 @@ export const makeTextBoldOfNRows = ({
 export const getFileName = (worksheet): string =>
   `${worksheet.getCell(1, 1).value} ${formatDate(newDate(), 'dd MM yyyy hh:mm:ss')}.xlsx`;
 
+/**
+ *
+ * @param totalForWeeks
+ * @param setProductionWeekNum
+ * @param currencySymbol
+ * @returns
+ */
 export const getCurrencyWiseTotal = ({
   totalForWeeks,
   setProductionWeekNum,
@@ -468,7 +513,6 @@ export const getCurrencyWiseTotal = ({
 
   if (!arr?.length) {
     return 0;
-    // `${currencySymbol}0`
   }
 
   const finalValue = arr
@@ -476,47 +520,33 @@ export const getCurrencyWiseTotal = ({
     .map((x) => x.Value)
     .reduce((acc, x) => new Decimal(acc).plus(x) as any, 0);
   return finalValue?.toNumber?.();
-  // `${currencySymbol}${formatNumberWithNDecimal(finalValue, 2)}`
 };
 
+/**
+ * utility function to get change vs last week value
+ * @param weeksDataArray
+ * @returns
+ */
 export const getChangeVsLastWeekValue = (weeksDataArray: number[]): number => {
   if (weeksDataArray?.length === 1) {
     return weeksDataArray[0];
   } else {
     const len = weeksDataArray.length;
 
-    // if (weeksDataArray[len - 2] || weeksDataArray[len - 1]) {
-    // const prev = weeksDataArray[len - 2] ? weeksDataArray[len - 2] : 0
-    // const curr = weeksDataArray[len - 1] ? weeksDataArray[len - 1] : 0
-
     const val = weeksDataArray[len - 1] - weeksDataArray[len - 2];
-    // Number(new Decimal(curr).minus(prev).toFixed(2))
-    // const symbol = weeksDataArray[len - 2] ? weeksDataArray[len - 2].substring(0, 1) : weeksDataArray[len - 1].substring(0, 1)
-    // const prefix = val >= 0 ? `${symbol}` : `-${symbol}`
     if (isNaN(val)) {
       return 0;
     }
     return val >= 0 ? val : -1 * val;
-    // `${prefix}${val > 0 ? val : -1 * (val)}`
-    // } else {
-    // This case should not occur
-    // }
   }
 };
 
-export const formatNumberWithNDecimal = (num, numberOfDecimals) => {
-  if (num === '') {
-    return '';
-  }
-  if (num === 0) return '0.00';
-  return parseFloat(num).toFixed(numberOfDecimals);
-};
-
-export const formatCurrencyNumberWithNDecimal = (valAsString, numberOfDecimals = 2) => {
-  if (valAsString === '') return '';
-  return `${valAsString[0]}${formatNumberWithNDecimal(Number(valAsString.substring(1)), numberOfDecimals)}`;
-};
-
+/**
+ * utility function to get seats column for week total
+ * @param totalForWeeks
+ * @param setProductionWeekNum
+ * @returns
+ */
 export const getWeekWiseGrandTotalInPound = ({
   totalForWeeks,
   setProductionWeekNum,
@@ -534,6 +564,12 @@ export const getWeekWiseGrandTotalInPound = ({
   return finalValue;
 };
 
+/**
+ * utility function to get aggregated seats data for a week
+ * @param currencySymbol
+ * @param totalCurrencyWiseSeatsMapping
+ * @returns
+ */
 export const getSeatsColumnForWeekTotal = ({
   currencySymbol,
   totalCurrencyWiseSeatsMapping,
@@ -575,6 +611,14 @@ export const getSeatsDataForTotal = ({
   return [seats, totalSeats, percentage];
 };
 
+/**
+ * utility function to color text and background of a cell
+ * @param worksheet Exceljs worksheet
+ * @param row row number
+ * @param col column number
+ * @param textColor text to be added
+ * @param cellColor background color
+ */
 export const colorTextAndBGCell = ({
   worksheet,
   row,
@@ -599,6 +643,14 @@ export const colorTextAndBGCell = ({
   };
 };
 
+/**
+ * utility function to color text and background of a cell and make it italic
+ * @param worksheet Exceljs worksheet
+ * @param row row number
+ * @param col column number
+ * @param textColor text to be added
+ * @param cellColor background color
+ */
 export const colorTextAndBGAndItalicCell = ({
   worksheet,
   row,
@@ -621,6 +673,13 @@ export const colorTextAndBGAndItalicCell = ({
   };
 };
 
+/**
+ * utility function to add top and bottom border to a range of cells
+ * @param worksheet Exceljs worksheet
+ * @param row row number
+ * @param col column number
+ * @param textColor text to be added
+ */
 export const topAndBottomBorder = ({
   worksheet,
   row,
@@ -642,6 +701,10 @@ export const topAndBottomBorder = ({
   }
 };
 
+/**
+ * utility function to formattime in HH:mm format
+ * @param min
+ */
 export const minutesInHHmmFormat = (min: number) => {
   const duration = intervalToDuration({ start: 0, end: min * 1000 * 60 });
   return formatDuration(duration, { format: ['hours', 'minutes'] });
@@ -652,6 +715,13 @@ export const makeColumnTextBold = ({ worksheet, colAsChar }: { worksheet: any; c
   });
 };
 
+/**
+ * gives report name based on data(infers production related data from data) and other flags
+ * @param isWeeklyReport
+ * @param isSeatsDataRequired
+ * @param data
+ * @returns
+ */
 export const salesReportName = ({ isWeeklyReport, isSeatsDataRequired, data }): string => {
   let reportName = `Sales Summary`;
   if (isSeatsDataRequired) {
@@ -670,6 +740,14 @@ export const salesReportName = ({ isWeeklyReport, isSeatsDataRequired, data }): 
   return reportName;
 };
 
+/**
+ * utility function to add top and bottom border to a range of cells
+ * @param worksheet Exceljs worksheet
+ * @param startRow start row number
+ * @param endRow end row number
+ * @param endColumn end column number
+ * @param formatOptions format options
+ */
 export const applyFormattingToRange = ({
   worksheet,
   startRow,
@@ -708,6 +786,12 @@ export const applyFormattingToRange = ({
   }
 };
 
+/**
+ * aligns column text horizontally
+ * @param worksheet Exceljs worksheet
+ * @param colAsChar column as char
+ * @param align alignment
+ */
 export const alignColumnTextHorizontally = ({
   worksheet,
   colAsChar,

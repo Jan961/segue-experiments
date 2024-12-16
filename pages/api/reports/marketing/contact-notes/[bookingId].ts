@@ -10,6 +10,12 @@ import { objectify } from 'radash';
 import { ALIGNMENT } from '../../masterplan';
 import { dateTimeToTime, formatDate } from 'services/dateService';
 
+/**
+ * creates contact notes report
+ * @param req
+ * @param res
+ * @returns
+ */
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { bookingId, format } = req.query || {};
 
@@ -24,22 +30,30 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
   const email = await getEmailFromReq(req);
   const accountId = await getAccountId(email);
+  // get production and venue details from booking id
   const { prodCode, showName, venueName } = await getProductionAndVenueDetailsFromBookingId(
     parseInt(bookingId as string, 10),
     req,
   );
+  // get all users by account id
   const users = await getUsers(accountId);
+  // create map of users with AccUserId as key for easy access
   const usersMap = objectify(users, (user) => user.AccUserId);
+  // get contact notes by booking id
   const data = await getContactNotesByBookingId(parseInt(bookingId as string, 10), req);
+  // create filename from production code, show name and venue name
   const filename = `${prodCode} ${showName} ${venueName} Contact Notes`;
   const workbook = new ExcelJS.Workbook();
   const worksheet = workbook.addWorksheet('Contact Notes');
 
+  // create header rows with production name, venue and date
   createHeaderRow(worksheet, productionName, 16);
   createHeaderRow(worksheet, venueAndDate, 14);
   createHeaderRow(worksheet, 'Contact Notes Report', 12);
 
+  // add column headers
   const headerRow = worksheet.addRow(['Person Contacted', 'Date', 'Time', 'Actioned By', 'Notes']);
+  // style column headers with white text and green background
   headerRow.eachCell((cell) => {
     cell.fill = {
       type: 'pattern',
@@ -55,6 +69,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   });
   headerRow.height = 30;
 
+  // loop through each contact note and add a row to the worksheet
   data.map(bookingContactNoteMapper).forEach((note) => {
     const { FirstName = '', LastName = '' } = usersMap[note.ActionAccUserId] || {};
     const actionedBy = `${FirstName || ''} ${LastName || ''}`;
@@ -65,6 +80,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       actionedBy || '',
       note.Notes,
     ]);
+    // style each cell in the row with vertical alignment top and horizontal alignment center
     row.eachCell((cell, colNumber) => {
       cell.alignment = { vertical: ALIGNMENT.TOP, horizontal: ALIGNMENT.CENTER };
       if (colNumber === 5) {
@@ -74,6 +90,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     row.height = 80;
   });
 
+  // set column widths for columns with predictable width
   const widths = [30, 10, 7, 20, 70];
   widths.forEach((width, index) => {
     worksheet.getColumn(index + 1).width = width;

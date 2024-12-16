@@ -9,14 +9,20 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const { search, format } = req.body || {};
     const prisma = await getPrismaClient(req);
 
+    // fetches master tasks list based on search query
     const taskList = await fetchTasks(prisma, search);
+    // create a list of unique user ids
     const userIdList = [...new Set(taskList.map((task) => task.TaskAssignedToAccUserId))].filter((x) => x);
 
+    // fetch user details for the list of user ids
     const accountUsers = await fetchAccountUsers(userIdList);
+    // create a map of user id to user details for easy access
     const usersMap = createUserMap(accountUsers);
+    // create title for the master tasks report
     const title = `Master Tasks ${formatDate(newDate(), 'dd.MM.yy')}`;
+    // create the excel report from tasklist, user details and title
     const workbook = generateExcelSheet(taskList, usersMap, title);
-
+    // export the workbook in the requested format
     await exportWorkbook(res, workbook, title, format);
   } catch (error) {
     console.log(error);

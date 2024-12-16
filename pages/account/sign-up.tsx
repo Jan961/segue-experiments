@@ -65,7 +65,7 @@ const DEFAULT_ACCOUNT_DETAILS = {
   addressLine2: '',
   addressLine3: '',
   town: '',
-  country: '',
+  country: null,
   postcode: '',
   vatNumber: '',
   currency: 'GBP',

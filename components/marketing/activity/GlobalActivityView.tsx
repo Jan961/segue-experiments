@@ -11,9 +11,9 @@ import { bookingJumpState } from 'state/marketing/bookingJumpState';
 import { startOfDay } from 'date-fns';
 import { filterState } from 'state/marketing/filterState';
 import fuseFilter from 'utils/fuseFilter';
-import { isNullOrEmpty } from 'utils';
 import axios from 'axios';
 import { accessMarketingHome } from 'state/account/selectors/permissionSelector';
+import { compareDatesWithoutTime } from 'services/dateService';
 
 type GlobalActivitiesResponse = {
   activities: GlobalActivity[];
@@ -228,17 +228,12 @@ const GlobalActivityView = () => {
       filterRows = fuseFilter(filterRows, filter.searchText, ['actName', 'actType', 'notes']);
     }
 
-    if (filter.startDate && filter.endDate) {
-      if (!isNullOrEmpty(filter.startDate) && !isNullOrEmpty(filter.endDate)) {
-        filterRows = filterRows.filter((gba) => {
-          const actDateTime = new Date(gba.actDate).getTime();
-          const startDateTime = new Date(filter.startDate).getTime();
-          const endDateTime = new Date(filter.endDate).getTime();
-
-          return actDateTime >= startDateTime && actDateTime <= endDateTime;
-        });
-      }
-    }
+    filterRows = filterRows.filter((gba) => {
+      return (
+        compareDatesWithoutTime(filter.startDate, gba.actDate, '<=') &&
+        compareDatesWithoutTime(filter.endDate, gba.actDate, '>=')
+      );
+    });
 
     setRowData(filterRows);
   }, [filter]);

@@ -13,6 +13,7 @@ interface VenueAddressFormProps {
   validationErrors?: Record<string, string>;
   updateValidationErrrors?: (key: string, value: string) => void;
   onChange: (data: any) => void;
+  townSelectOptions: SelectOption[];
   disabled?: boolean;
 }
 const VenueAddressForm = ({
@@ -21,9 +22,11 @@ const VenueAddressForm = ({
   validationErrors,
   updateValidationErrrors,
   onChange,
+  townSelectOptions,
   disabled,
 }: VenueAddressFormProps) => {
   const [formData, setFormData] = useState<Partial<UiTransformedVenue>>({ ...initialVenueAddressDetails, ...venue });
+
   const handleInputChange = (field: string, value: any) => {
     let sanitizedValue = value;
     if (field === 'venueCode') {
@@ -90,15 +93,16 @@ const VenueAddressForm = ({
         <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
           <Label required text="Town" variant="md" />
           <div>
-            <TextInput
+            <Select
               testId="primary-address-town"
-              placeholder="Enter Town"
+              placeholder="Select A Town"
               className="w-full justify-between"
-              inputClassName="w-full"
               value={formData.primaryTown}
-              error={validationErrors.primaryTown}
-              onChange={(e) => handleInputChange('primaryTown', e.target.value)}
+              error={!!validationErrors.primaryTown}
+              onChange={(e) => handleInputChange('primaryTown', e)}
               disabled={disabled}
+              options={townSelectOptions}
+              isSearchable
             />
             <FormError error={validationErrors.primaryTown} className="absolute" />
           </div>
@@ -252,14 +256,15 @@ const VenueAddressForm = ({
         </label>
         <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
           <p className="text-primary-input-text">Town</p>
-          <TextInput
+          <Select
             testId="delivery-town"
-            placeholder="Enter Town"
+            placeholder="Select A Town"
             className="w-full justify-between"
-            inputClassName="w-full"
             value={formData.deliveryTown}
-            onChange={(e) => handleInputChange('deliveryTown', e.target.value)}
+            onChange={(e) => handleInputChange('deliveryTown', e)}
             disabled={disabled}
+            options={townSelectOptions}
+            isSearchable
           />
         </label>
         <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">

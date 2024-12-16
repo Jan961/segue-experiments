@@ -16,7 +16,6 @@ const SalesTab = forwardRef<SalesTabRef, SalesTabProps>((props, ref) => {
   const [rowData, setRowData] = useState([]);
   const [dataAvailable, setDataAvailable] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [bookingIdVal, setBookingIdVal] = useState(null);
   const [showError, setShowError] = useState<boolean>(false);
 
   useImperativeHandle(ref, () => ({
@@ -53,7 +52,6 @@ const SalesTab = forwardRef<SalesTabRef, SalesTabProps>((props, ref) => {
     setRowData([]);
     if (props.bookingId !== null && props.bookingId !== undefined) {
       retrieveSalesData(props.bookingId.toString());
-      setBookingIdVal(props.bookingId.toString());
     }
   }, [props.bookingId]);
 
@@ -76,7 +74,6 @@ const SalesTab = forwardRef<SalesTabRef, SalesTabProps>((props, ref) => {
               module="marketing"
               variant="salesSnapshot"
               data={rowData}
-              booking={bookingIdVal}
               tableHeight={640}
             />
           )}

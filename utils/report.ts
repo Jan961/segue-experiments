@@ -6,6 +6,11 @@ import { addDays, differenceInDays, eachWeekOfInterval, endOfWeek, parse } from 
 import { formatDate, newDate } from 'services/dateService';
 import { UTCDate } from '@date-fns/utc';
 
+/**
+ * This function converts the given workbook created using excel js  to a PDF
+ * @param workbook
+ * @returns pdfBuffer
+ */
 export const convertToPDF = async (workbook: any) => {
   const excelbuffer = await workbook.xlsx.writeBuffer();
   const converter = util.promisify(libre.convert);
@@ -13,6 +18,13 @@ export const convertToPDF = async (workbook: any) => {
   return pdfBuffer;
 };
 
+/**
+ * This function exports a workbook in either PDF or XLSX format based on the format parameter
+ * @param res
+ * @param workbook
+ * @param title
+ * @param format
+ */
 export const exportWorkbook = async (
   res: NextApiResponse,
   workbook: ExcelJS.Workbook,

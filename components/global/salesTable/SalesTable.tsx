@@ -7,7 +7,8 @@ import { prodCompArchColDefs, prodComparisionColDefs, salesColDefs } from './tab
 import salesComparison, { SalesComp } from './utils/salesComparision';
 import { SalesSnapshot, BookingSelection } from 'types/MarketingTypes';
 import axios from 'axios';
-import { formatDate } from 'services/dateService';
+import { useRecoilValue } from 'recoil';
+import { accessMarketingHome } from 'state/account/selectors/permissionSelector';
 
 export type SalesTableVariant = 'prodComparision' | 'salesSnapshot' | 'salesComparison' | 'venue' | 'prodCompArch';
 
@@ -26,7 +27,6 @@ interface SalesTableProps {
   onCellValChange?: (e) => void;
   cellRenderParams;
   productions;
-  booking?;
   tableHeight?: number;
   salesTableRef?: any;
 }
@@ -41,7 +41,6 @@ export default function SalesTable({
   onCellValChange,
   cellRenderParams,
   productions,
-  booking,
   tableHeight = 0,
   salesTableRef,
 }: Partial<SalesTableProps>) {
@@ -52,6 +51,7 @@ export default function SalesTable({
   const [numBookings, setNumBookings] = useState<number>(0);
   const [tableWidth, setTableWidth] = useState(containerWidth);
   const [excelStyles, setExcelStyles] = useState([]);
+  const permissions = useRecoilValue(accessMarketingHome);
 
   // set table style props based on module
   const styleProps = { headerColor: tileColors[module] };
@@ -64,7 +64,12 @@ export default function SalesTable({
     );
     setSchoolSales(Boolean(schoolSalesFound));
 
-    let colDefs = salesColDefs(Boolean(schoolSalesFound), module !== 'bookings', booking, setSalesActivity);
+    let colDefs = salesColDefs(
+      Boolean(schoolSalesFound),
+      module !== 'bookings',
+      setSalesActivity,
+      permissions.includes('EDIT_ACTIVTIY_FLAGS'),
+    );
     if (!schoolSalesFound) {
       colDefs = colDefs.filter((column) => column.headerName !== 'School Sales');
       setHeight(containerHeight);
@@ -118,84 +123,77 @@ export default function SalesTable({
     }
   };
 
-  const setSalesActivity = (type, selected, sale) => {
+  const prepateStatusUpdate = (type: string, sale: any) => {
     switch (type) {
-      case 'isSingleSeats': {
-        onSingleSeatChange(type, !sale.isSingleSeats, sale, selected);
-        break;
+      case 'SetSingleSeats': {
+        const newStatus = !sale.isSingleSeats;
+
+        return {
+          updData: { [type]: newStatus },
+          status: newStatus,
+        };
       }
 
-      case 'isBrochureReleased': {
-        onBrochureReleasedChange(type, !sale.isBrochureReleased, sale, selected);
-        break;
+      case 'SetBrochureReleased': {
+        const newStatus = !sale.isBrochureReleased;
+
+        return {
+          updData: { [type]: newStatus },
+          status: newStatus,
+        };
       }
 
-      case 'isNotOnSale': {
-        onIsNotOnSaleChange(type, !sale.isNotOnSale, sale, selected);
-        break;
+      case 'SetNotOnSale': {
+        const newStatus = !sale.isNotOnSale;
+
+        return {
+          updData: { [type]: newStatus },
+          status: newStatus,
+        };
       }
     }
   };
 
-  const onIsNotOnSaleChange = (key: string, value: boolean, sale: SalesSnapshot, selected: string) => {
-    updateSaleSet('updateNotOnSale', selected, sale.weekOf ? formatDate(sale.weekOf, 'yyyy-MM-dd') : null, {
-      [key.replace('is', 'Set')]: value,
-    });
+  const setSalesActivity = (field: string, sale: any) => {
+    try {
+      // prepare object to send to db and object to update frontend
+      const updateData = prepateStatusUpdate(field, sale);
+
+      const data = {
+        setId: sale.setId,
+        dataToUpd: updateData.updData,
+      };
+
+      axios.put(`/api/marketing/sales/salesSet/update`, data);
+
+      updSaleStatuses(field, updateData.status, sale);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const updSaleStatuses = (key: string, value: boolean, sale: SalesSnapshot) => {
+    const saleDate = new Date(sale.weekOf).getTime();
 
     setRowData((prevSales) =>
       prevSales.map((s) => {
-        if (!value) {
-          const isOnSale = new Date(s.weekOf) < new Date(sale.weekOf);
-          return { ...s, [key]: isOnSale };
-        } else {
-          const isNotOnSale = new Date(s.weekOf) <= new Date(sale.weekOf);
-          return isNotOnSale ? { ...s, [key]: value } : s;
+        const rowDate = new Date(s.weekOf).getTime();
+
+        switch (key) {
+          case 'SetSingleSeats':
+            return rowDate >= saleDate ? { ...s, isSingleSeats: value } : s;
+
+          case 'SetBrochureReleased':
+            return rowDate === saleDate ? { ...s, isBrochureReleased: value } : s;
+
+          case 'SetNotOnSale':
+            return rowDate <= saleDate ? { ...s, isNotOnSale: value } : s;
+
+          default:
+            return s;
         }
       }),
     );
-  };
-
-  const onSingleSeatChange = (key: string, value: boolean, sale: SalesSnapshot, selected: string) => {
-    updateSaleSet('updateSingleSeats', selected, sale.weekOf ? formatDate(sale.weekOf, 'yyyy-MM-dd') : null, {
-      [key.replace('is', 'Set')]: value,
-    });
-    setRowData((prevSales) =>
-      prevSales.map((s) => {
-        // Use date comparison that includes the start of the date (midnight) for both dates being compared
-        const currentSaleDate = new Date(s.weekOf);
-        const targetSaleDate = new Date(sale.weekOf);
-        currentSaleDate.setHours(0, 0, 0, 0);
-        targetSaleDate.setHours(0, 0, 0, 0);
-
-        const isSingleSeat = currentSaleDate >= targetSaleDate;
-        return isSingleSeat ? { ...s, [key]: value } : s;
-      }),
-    );
-  };
-
-  const onBrochureReleasedChange = (key: string, value: boolean, sale: SalesSnapshot, selected: string) => {
-    updateSaleSet('update', selected, sale.weekOf ? formatDate(sale.weekOf, 'yyyy-MM-dd') : null, {
-      [key.replace('is', 'Set')]: value,
-    });
-    setRowData((prevSales) =>
-      prevSales.map((s) => {
-        if (sale.weekOf === s.weekOf && sale.week === s.week) {
-          return { ...s, [key]: value };
-        }
-        return s;
-      }),
-    );
-  };
-
-  const updateSaleSet = (type: string, BookingId: string, SalesFigureDate: string, update) => {
-    const data = {
-      BookingId: parseInt(BookingId),
-      SalesFigureDate,
-      ...update,
-    };
-    axios
-      .put(`/api/marketing/sales/salesSet/${type}`, data)
-      .catch((error) => console.log('failed to update sale', error));
   };
 
   const calculateWidth = () => {
@@ -300,7 +298,9 @@ export default function SalesTable({
     const newWidth = calculateWidth();
     setTableWidth(newWidth);
   }, [variant, data, numBookings, schoolSales, containerWidth]);
+
   const gridOptions = getGridOptions();
+
   return (
     <div className={classNames('table-container')} style={{ width: tableWidth, height }}>
       <Table

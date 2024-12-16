@@ -20,7 +20,7 @@ import { safeDate } from 'services/dateService';
 export type ActivityModalVariant = 'add' | 'edit' | 'delete';
 
 const titleOptions = {
-  add: 'Add New Actvity',
+  add: 'Add New Activity',
   edit: 'Edit Activity',
 };
 
@@ -60,7 +60,8 @@ export default function ActivityModal({
   const [confVariant, setConfVariant] = useState<ConfDialogVariant>('close');
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
   const [showNameLengthError, setShowNameLengthError] = useState<boolean>(false);
-  const canEditActivity = permissions.includes('EDIT_ACTIVITY');
+  const canChangeActivity =
+    variant === 'add' ? permissions.includes('ADD_NEW_ACTIVITY') : permissions.includes('EDIT_ACTIVITY');
 
   const initForm = () => {
     if (variant === 'add') {
@@ -187,7 +188,7 @@ export default function ActivityModal({
           placeholder="Enter Activity Name"
           testId="enter-activity-name"
           id="activityName"
-          disabled={!canEditActivity}
+          disabled={!canChangeActivity}
           value={actName}
           onChange={(event) => {
             if (event.target.value.length <= 30) {
@@ -203,7 +204,7 @@ export default function ActivityModal({
           testId="select-activity-type"
           options={activityTypes}
           value={actType}
-          disabled={!canEditActivity}
+          disabled={!canChangeActivity}
           onChange={(value) => changeActivityType(value)}
           placeholder="Please select Activity Type"
           isClearable
@@ -222,7 +223,7 @@ export default function ActivityModal({
               testId="new-activity-date"
               inputClass="!border-0 !shadow-none"
               labelClassName="text-primary-input-text"
-              disabled={!canEditActivity}
+              disabled={!canChangeActivity}
             />
           </div>
 
@@ -235,7 +236,7 @@ export default function ActivityModal({
               name="followUpRequired"
               checked={actFollowUp}
               onChange={(e) => setActFollowUp(e.target.checked)}
-              disabled={!canEditActivity}
+              disabled={!canChangeActivity}
             />
           </div>
         </div>
@@ -251,7 +252,7 @@ export default function ActivityModal({
                 label="Date"
                 inputClass="!border-0 !shadow-none"
                 labelClassName="text-primary-input-text"
-                disabled={!canEditActivity}
+                disabled={!canChangeActivity}
               />
             </div>
           </div>
@@ -272,7 +273,7 @@ export default function ActivityModal({
                   id="companyCost"
                   value={companyCost}
                   onChange={(event) => validateCost('companyCost', event.target.value, 8, 2)}
-                  disabled={!canEditActivity}
+                  disabled={!canChangeActivity}
                 />
               </div>
             </div>
@@ -292,7 +293,7 @@ export default function ActivityModal({
                   id="venueCost"
                   value={venueCost}
                   onChange={(event) => validateCost('venueCost', event.target.value, 8, 2)}
-                  disabled={!canEditActivity}
+                  disabled={!canChangeActivity}
                 />
               </div>
             </div>
@@ -306,7 +307,7 @@ export default function ActivityModal({
           value={actNotes}
           placeholder="Notes Field"
           onChange={(e) => setActNotes(e.target.value)}
-          disabled={!canEditActivity}
+          disabled={!canChangeActivity}
         />
 
         <div className="float-right flex flex-row mt-5 py-2">
@@ -317,7 +318,7 @@ export default function ActivityModal({
             text="Cancel"
           />
           <Button
-            disabled={!canEditActivity}
+            disabled={!canChangeActivity}
             className="ml-4 w-[132px] mr-1"
             variant="primary"
             text="Save and Close"
