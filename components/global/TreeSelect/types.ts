@@ -9,7 +9,6 @@ export type TreeItemOption = {
   id: string;
   value: string;
   label: string;
-  seqNo: number;
   checked?: boolean;
   options?: TreeItemOption[];
   groupHeader?: boolean;

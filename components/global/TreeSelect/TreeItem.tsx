@@ -124,11 +124,9 @@ export default memo(function TreeItem({ value, onChange, defaultOpen }: TreeItem
             </div>
 
             <Disclosure.Panel className="ml-7 mt-1">
-              {itemOptions
-                .sort((a, b) => a.seqNo - b.seqNo)
-                .map((option) => (
-                  <TreeItem key={option.id} value={option} onChange={handleOptionToggle} defaultOpen={defaultOpen} />
-                ))}
+              {itemOptions.map((option) => (
+                <TreeItem key={option.id} value={option} onChange={handleOptionToggle} defaultOpen={defaultOpen} />
+              ))}
             </Disclosure.Panel>
           </>
         )}
