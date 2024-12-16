@@ -99,7 +99,9 @@ const Form = ({ onSave }: FormProps) => {
           <TimeInput
             className="w-fit h-[31px] [&>input]:!h-[25px] [&>input]:!w-11 !justify-center shadow-input-shadow"
             value={maxTravelTimeFromLastVenue}
-            onChange={(value) => handleOnChange({ target: { id: 'maxTravelTimeFromLastVenue', value } })}
+            onChange={(value) => {
+              handleOnChange({ target: { id: 'maxTravelTimeFromLastVenue', value: value.target.value } });
+            }}
           />
         </div>
       </div>
@@ -127,7 +129,9 @@ const Form = ({ onSave }: FormProps) => {
           <TimeInput
             className="w-fit h-[31px] [&>input]:!h-[25px] [&>input]:!w-11 !justify-center shadow-input-shadow"
             value={maxTravelTimeToNextVenue}
-            onChange={(value) => handleOnChange({ target: { id: 'maxTravelTimeToNextVenue', value } })}
+            onChange={(value) => {
+              handleOnChange({ target: { id: 'maxTravelTimeToNextVenue', value: value.target.value } });
+            }}
           />
         </div>
       </div>
