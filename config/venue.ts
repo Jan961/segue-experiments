@@ -150,7 +150,7 @@ export const initialMainVenueDetails = {
 export const initialVenueAddressDetails = {
   deliveryCountry: null,
   deliveryPostCode: '',
-  deliveryTown: '',
+  deliveryTown: null,
   deliveryAddress3: '',
   deliveryAddress2: '',
   deliveryAddress1: '',
@@ -159,7 +159,7 @@ export const initialVenueAddressDetails = {
 
   primaryCountry: null,
   primaryPostCode: '',
-  primaryTown: '',
+  primaryTown: null,
   primaryAddress3: '',
   primaryAddress2: '',
   primaryAddress1: '',
