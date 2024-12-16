@@ -180,7 +180,6 @@ const AttachmentsTab = forwardRef<AttachmentsTabRef, AttachmentsTabProps>((props
   };
 
   useEffect(() => {
-    console.log('Ping');
     if (props.bookingId !== undefined && props.bookingId !== null) {
       setBookingIdVal(props.bookingId.toString());
       getAttachments(props.bookingId.toString());
