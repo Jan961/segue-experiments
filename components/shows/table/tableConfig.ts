@@ -214,7 +214,7 @@ export const currencyConversionTableConfig = (permissions) => [
   },
 ];
 
-export const productionsTableConfig = (permissions) => [
+export const productionsTableConfig = (permissions, dataReady?: boolean) => [
   {
     headerName: 'Production',
     headerClass: 'justify-center font-bold text-base ',
@@ -261,7 +261,7 @@ export const productionsTableConfig = (permissions) => [
     width: 270,
     cellRenderer: ButtonRenderer,
     cellRendererParams: {
-      disabled: !permissions.includes('ACCESS_CURRENCY_CONVERSION'),
+      disabled: !permissions.includes('ACCESS_CURRENCY_CONVERSION') || !dataReady,
       buttonText: 'SET CURRENCY CONVERSION RATES',
       variant: 'secondary',
       width: 270,
