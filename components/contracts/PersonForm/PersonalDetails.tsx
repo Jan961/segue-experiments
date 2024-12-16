@@ -105,6 +105,8 @@ const PersonalDetails = ({
                 onChange={(event) => handleChange('firstName', event.target.value)}
                 value={firstName}
                 disabled={disabled}
+                autoComplete="off"
+                type="text"
               />
             </div>
           </div>
@@ -118,6 +120,8 @@ const PersonalDetails = ({
                 onChange={(event) => handleChange('lastName', event.target.value)}
                 value={lastName}
                 disabled={disabled}
+                autoComplete="off"
+                type="text"
               />
             </div>
           </div>
