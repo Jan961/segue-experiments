@@ -8,6 +8,7 @@ import { userState } from 'state/account/userState';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import { isNullOrEmpty } from 'utils';
 import fuseFilter from 'utils/fuseFilter';
+import { compareDatesWithoutTime } from 'services/dateService';
 
 const generateOptions = (weekData) => {
   return Object.entries(weekData).map(([key]) => ({
@@ -87,9 +88,13 @@ const useTasksFilter = () => {
 
           Tasks: productionTasks
             .filter(({ TaskAssignedToAccUserId, CompleteDate, Status }) => {
+              console.log(
+                compareDatesWithoutTime(CompleteDate, filters.endDueDate, '<=') &&
+                  compareDatesWithoutTime(CompleteDate, filters.startDueDate, '>='),
+              );
               return (
-                (!filters.endDueDate || new Date(CompleteDate) <= new Date(filters.endDueDate)) &&
-                (!filters.startDueDate || new Date(CompleteDate) >= new Date(filters.startDueDate)) &&
+                compareDatesWithoutTime(CompleteDate, filters.endDueDate, '<=') &&
+                compareDatesWithoutTime(CompleteDate, filters.startDueDate, '>=') &&
                 (!filters.status || filters.status === 'all' || getStatusBool(Status, filters.status, CompleteDate)) &&
                 (filters.assignee === -1 || TaskAssignedToAccUserId === filters.assignee)
               );
