@@ -185,7 +185,7 @@ const AttachmentsTab = forwardRef<AttachmentsTabRef, AttachmentsTabProps>((props
       getAttachments(props.bookingId.toString());
       setDataAvailable(true);
     }
-  }, [props.bookingId]);
+  }, [props.bookingId, showConfirm]);
 
   if (dataAvailable) {
     if (isLoading) {
