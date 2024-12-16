@@ -119,14 +119,6 @@ const ProductionsView = ({ showData, visible, onClose }: ProductionsViewProps) =
           setCurrencyCountryLookup(group(e[1].data, (c: ICurrencyCountry) => c.currencyCode));
           setDataReady(true);
         });
-        // setCurrencyLookup(
-        //   objectify(
-        //     currencyList.data,
-        //     (c: ICurrency) => c.code,
-        //     (c) => c,
-        //   ),
-        // );
-        // setCurrencyCountryLookup(group(countryList.data, (c: ICurrencyCountry) => c.currencyCode));
       }
     } catch (e) {
       console.log(e);
@@ -259,7 +251,11 @@ const ProductionsView = ({ showData, visible, onClose }: ProductionsViewProps) =
     if (e.column.colId === 'editId' && permissions.includes('ACCESS_EDIT_PRODUCTION DETAILS')) {
       setOpenEditModal(true);
     }
-    if (e.column.colId === 'updateCurrencyConversion' && permissions.includes('ACCESS_CURRENCY_CONVERSION')) {
+    if (
+      e.column.colId === 'updateCurrencyConversion' &&
+      permissions.includes('ACCESS_CURRENCY_CONVERSION') &&
+      dataReady
+    ) {
       setOpenCurrencyConversionModal(true);
     }
     if (e.column.colId === 'delete' && permissions.includes('DELETE_PRODUCTION') && e.data?.IsArchived) {
