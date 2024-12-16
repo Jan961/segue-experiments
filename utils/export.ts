@@ -154,6 +154,11 @@ export const dateToReadableFormat = (isoDate) => {
   return readableDate;
 };
 
+/**
+ * Creates exported at title with date and time in the format 'Exported: dd/MM/yy at HH:mm'
+ * @param dateStr
+ * @returns
+ */
 export const getExportedAtTitle = (dateStr: string) => {
   return `Exported: ${formatDate(dateStr, 'dd/MM/yy')} at ${formatDate(dateStr, 'HH:mm')}`;
 };
