@@ -242,7 +242,7 @@ const transformSalesData = (data: TSalesView[]): TRequiredFieldsFinalFormat[] =>
         SetProductionWeekDate: baseFields.SetProductionWeekDate ? getKey(baseFields.SetProductionWeekDate) : '',
       };
     },
-    (record) => record !== null && record.SaleTypeName !== SALES_TYPE_NAME.GENERAL_SALES,
+    (record) => record !== null && record.SaleTypeName === SALES_TYPE_NAME.GENERAL_SALES,
   );
 };
 
