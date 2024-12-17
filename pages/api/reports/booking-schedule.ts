@@ -314,6 +314,7 @@ const handler = async (req, res) => {
         const isCancelled = value?.EntryStatusCode === 'X';
         const isSuspended = value?.EntryStatusCode === 'S';
         const isConfirmed = value?.EntryStatusCode === 'C';
+        const isPencilled = value?.EntryStatusCode === 'U';
         if (!value || isEmpty(value)) {
           // add a row for the date, weekday, weeknumber even if there is no data
           worksheet.addRow([
@@ -379,6 +380,16 @@ const handler = async (req, res) => {
         }
         rowNo++;
 
+        if (isPencilled) {
+          // color the row with white text and blue background if it is pencilled
+          colorTextAndBGCell({
+            worksheet,
+            row: rowNo,
+            col: 4,
+            textColor: COLOR_HEXCODE.WHITE,
+            cellColor: COLOR_HEXCODE.PENCILLED_BLUE,
+          });
+        }
         if (isOtherDay) {
           // color the row with yellow text and red background if it is an other day
           colorTextAndBGAndItalicCell({
@@ -400,6 +411,7 @@ const handler = async (req, res) => {
             cellColor: isSuspended ? COLOR_HEXCODE.PURPLE : COLOR_HEXCODE.BLACK,
           });
         }
+
         if (weekDay === 'Sunday') {
           // color the row with cream background if it is Sunday
           worksheet.addRow([
