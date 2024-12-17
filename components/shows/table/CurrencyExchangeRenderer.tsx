@@ -18,16 +18,22 @@ const CurrencyExchangeRenderer = ({
   disabled = true,
 }: ShowsTextInputRendererProps) => {
   const [inputValue, setInputValue] = useState(value);
-  const { toSymbol, fromCurrencyCode } = data.exchange || {};
+  const { toSymbol } = data.exchange || {};
   const currencySymbol = useMemo(() => String.fromCharCode(parseInt(toSymbol, 16)), [toSymbol]);
   useEffect(() => {
     if (value) {
       setInputValue(value + '');
     }
   }, [value]);
+  const toCurrencySymbol = useMemo(() => String.fromCharCode(parseInt(toSymbol, 16)), [toSymbol]);
+  useEffect(() => {
+    if (value) {
+      setInputValue(value + '');
+    }
+  }, [data.FromCurrency, value]);
 
   const handleChange = (e: any) => {
-    const newValue = e.target.value;
+    const newValue = e;
     if (newValue === '') {
       setInputValue('');
       setValue(0);
@@ -43,19 +49,19 @@ const CurrencyExchangeRenderer = ({
   };
 
   return (
-    <div className="flex items-center gap-2">
-      <div>{currencySymbol}1:</div>
+    <div className="flex items-center justify-end flex-row gap-2 w-132">
+      <div>{`${data.FromCurrency.code} | ${data.FromCurrency.name} | ${currencySymbol}`}1:</div>
       <div className="pl-1 pr-2 mt-1" tabIndex={1}>
         <TextInputRenderer
           eGridCell={eGridCell}
           placeholder={placeholder}
-          className="w-full"
+          className="w-20"
           value={inputValue}
           onChange={handleChange}
           disabled={disabled}
         />
       </div>
-      <div>{fromCurrencyCode}</div>
+      <div>{`${toCurrencySymbol} ${data.ToCurrency.code} | ${data.ToCurrency.name}`}</div>
     </div>
   );
 };
