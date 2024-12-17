@@ -108,7 +108,6 @@ const MoveBookingView = ({
   const handleProductionChange = (value: string | number) => {
     setSelectedProduction(fomrattedProductions.find(({ value: id }) => id === value));
     const production = productions.find(({ Id }) => Id === value);
-    console.log(production);
     setBookingDetails((prev) => ({
       ...prev,
       production: `${production?.ShowCode}${production?.Code}  ${production?.ShowName}`,
