@@ -134,14 +134,6 @@ const useUser = () => {
     }
   };
 
-  // Orders items in terms of seqNo
-  const orderPerms = (item) => {
-    if (item.options.length > 0) {
-      item.options.forEach((e) => orderPerms(e));
-      item.options.sort((a, b) => a.seqNo - b.seqNo);
-    }
-  };
-
   const fetchPermissionsForSelectedUser = async (
     accountUserId: number,
     productions: Production[],
@@ -155,8 +147,6 @@ const useUser = () => {
       const userPermissions = mapRecursive(permissions, (p) =>
         data.permissions.includes(p.id) ? { ...p, checked: true } : p,
       );
-
-      userPermissions.forEach((e) => orderPerms(e));
 
       // Set the `isPartiallySelected` property for each item so that it is represented correctly in the TreeSelect component
       userPermissions.forEach((o) => setPartialSelection(o));
