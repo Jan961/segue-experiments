@@ -1,7 +1,7 @@
 import { WebhookEvent } from '@clerk/nextjs/dist/types/server';
 import { NextApiRequest, NextApiResponse } from 'next';
 
-import { sendVerificationEmail } from 'services/emailService';
+import { sendPasswordResetEmail, sendVerificationEmail } from 'services/emailService';
 import { Webhook } from 'svix';
 
 const webhookSecret = process.env.CLERK_WEBHOOK_SECRET || ``;
@@ -24,8 +24,20 @@ const validateRequest = async (req: NextApiRequest) => {
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     const payload = await validateRequest(req);
+
     if (payload.type === EMAIL_CREATED) {
-      await sendVerificationEmail(payload.data.to_email_address, payload.data.data.magic_link);
+      switch (payload.data.slug) {
+        case 'magic_link_sign_up':
+          await sendVerificationEmail(payload.data.to_email_address, payload.data.data.magic_link);
+          break;
+        case 'reset_password_code':
+          await sendPasswordResetEmail(payload.data.to_email_address, payload.data.data.otp_code);
+          break;
+        default:
+          console.log('Unknown email type', payload.data.slug);
+          break;
+      }
+
       res.status(200).json({ success: true });
     }
     res.status(401).json({ success: false });

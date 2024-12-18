@@ -283,12 +283,11 @@ const SignIn = () => {
               >
                 <Icon iconName="info-circle-solid" variant="xs" className="text-primary-blue ml-2" />
               </Tooltip>
-              <PasswordInput
+              <TextInput
                 name="pin"
                 placeholder="Enter PIN"
                 className="w-32 mb-1 ml-4"
                 value={loginDetails.pin}
-                type="password"
                 onChange={handleLoginDetailsChange}
                 error={validationError?.pin}
                 autoComplete="off"

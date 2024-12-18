@@ -242,7 +242,7 @@ const transformSalesData = (data: TSalesView[]): TRequiredFieldsFinalFormat[] =>
         SetProductionWeekDate: baseFields.SetProductionWeekDate ? getKey(baseFields.SetProductionWeekDate) : '',
       };
     },
-    (record) => record !== null && record.SaleTypeName !== SALES_TYPE_NAME.GENERAL_SALES,
+    (record) => record !== null && record.SaleTypeName === SALES_TYPE_NAME.GENERAL_SALES,
   );
 };
 
@@ -727,10 +727,12 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     });
     row++;
     const WeeklyIncreasePercent = weekWiseGrandTotalInPound.map((_: number, i: number) =>
-      i === 0 ? 0 : WeeklyIncrease[i] / weekWiseGrandTotalInPound[i],
+      i === 0 ? 0 : WeeklyIncrease[i] / weekWiseGrandTotalInPound[i - 1],
     );
     // Add Weekly Increase % to the worksheet
-    worksheet.addRow(sanitizeRowData(['', '', '', '', 'Weekly Increase %', ...WeeklyIncreasePercent]));
+    worksheet.addRow(
+      sanitizeRowData(['', '', '', '', 'Weekly Increase %', ...WeeklyIncreasePercent], { fractionalPartLength: 4 }),
+    );
     // apply percentage formatting for Weekly Increase %
     applyFormattingToRange({
       worksheet,
