@@ -73,7 +73,6 @@ const useTasksFilter = () => {
             userName: task.TaskAssignedToAccUserId !== -1 ? userIdToNameMap[task.TaskAssignedToAccUserId] : null,
           };
         });
-
         const productionTasks = filters.taskText
           ? fuseFilter(tasksFilteredByAssignedUser, filters.taskText, [
               'Name',
@@ -89,8 +88,12 @@ const useTasksFilter = () => {
           Tasks: productionTasks
             .filter(({ TaskAssignedToAccUserId, CompleteDate, Status }) => {
               return (
-                compareDatesWithoutTime(CompleteDate, filters.endDueDate, '<=') &&
-                compareDatesWithoutTime(CompleteDate, filters.startDueDate, '>=') &&
+                compareDatesWithoutTime(CompleteDate, filters.endDueDate ? filters.endDueDate : '2250-01-01', '<=') &&
+                compareDatesWithoutTime(
+                  CompleteDate,
+                  filters.startDueDate ? filters.startDueDate : '1990-01-01',
+                  '>=',
+                ) &&
                 (!filters.status || filters.status === 'all' || getStatusBool(Status, filters.status, CompleteDate)) &&
                 (filters.assignee === -1 || TaskAssignedToAccUserId === filters.assignee)
               );
