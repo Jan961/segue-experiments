@@ -52,12 +52,13 @@ export const exportWorkbook = async (
  * @param rowData
  * @returns sanitised rowData (string[]|number[])
  */
-export const sanitizeRowData = (rowData: any[]) => {
+export const sanitizeRowData = (rowData: any[], options = { fractionalPartLength: 2 }) => {
   return rowData.map((value) => {
     if (Number.isNaN(value)) return '';
     if (typeof value === 'number') {
       // Round numbers to 2 decimal places
-      return Number(value.toFixed(2));
+      const floatValue = Number(value.toFixed(options.fractionalPartLength));
+      return floatValue;
     }
     // Convert null/undefined to empty string
     return value ?? '';

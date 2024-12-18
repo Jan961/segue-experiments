@@ -8,7 +8,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { ALIGNMENT } from './masterplan';
 import { marketingCostsStatusToLabelMap } from 'config/Reports';
 import { Booking } from 'prisma/generated/prisma-client';
-import { convertToPDF } from 'utils/report';
+import { convertToPDF, sanitizeRowData } from 'utils/report';
 import { dateTimeToTime, formatDate, newDate } from 'services/dateService';
 
 type BOOKING = Partial<Booking> & {
@@ -21,12 +21,25 @@ type BOOKING = Partial<Booking> & {
   MarketingCostsStatus: string;
 };
 
+/**
+ * aligns the text of a column in a worksheet
+ * @param worksheet ExcelJS.Worksheet
+ * @param colAsChar string
+ * @param align ALIGNMENT
+ */
 const alignColumn = ({ worksheet, colAsChar, align }: { worksheet: any; colAsChar: string; align: ALIGNMENT }) => {
   worksheet.getColumn(colAsChar).eachCell((cell) => {
     cell.alignment = { horizontal: align };
   });
 };
 
+/**
+ * aligns the text of a cell in a worksheet for a given row and column
+ * @param worksheet ExcelJS.Worksheet
+ * @param row number
+ * @param col number
+ * @param align ALIGNMENT
+ */
 const alignCellText = ({
   worksheet,
   row,
@@ -54,12 +67,22 @@ const styleHeader = ({ worksheet, row, numberOfColumns }: { worksheet: any; row:
   }
 };
 
-const getBooleanAsString = (val: boolean | null): string => {
+/**
+ * return YES if val is true, NO if val is false, else return empty string
+ * @param val
+ * @returns
+ */
+export const getBooleanAsString = (val: boolean | null): string => {
   if (val) return 'YES';
-  if (val === false) return 'NO';
-  return '';
+  return 'NO';
 };
 
+/**
+ * apply selection filter on bookings
+ * @param bookings
+ * @param selection
+ * @returns
+ */
 const applySelectionFilter = (bookings: BOOKING[], selection: string) => {
   switch (selection) {
     case 'all':
@@ -91,6 +114,11 @@ const applySelectionFilter = (bookings: BOOKING[], selection: string) => {
   }
 };
 
+/**
+ * Generates a report of selected venues
+ * @param req NextApiRequest
+ * @param res NextApiResponse
+ */
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
     let { productionId, showId = null, selection, format } = req.body || {};
@@ -99,6 +127,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     }
     const prisma = await getPrismaClient(req);
 
+    // get all bookings, venues and date block details for a given production id and show id
     const data = await prisma.dateBlock.findMany({
       where: {
         ...(productionId && { ProductionId: productionId }),
@@ -135,6 +164,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       },
     });
     let filename = `Selected Venues`;
+    // if production id is present, add production code and show name to the filename
     if (productionId) {
       const selectedProduction = data?.[0]?.Production;
       const showCode = selectedProduction?.Show?.Code || '';
@@ -143,6 +173,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       filename = `${showCode}${productionCode} ${showName} ${filename}`;
     }
     let bookings = [];
+    // loop through each date block and extract venue details
     for (const dateBlock of data) {
       const showCode = dateBlock.Production?.Show?.Code || '';
       const productionCode = dateBlock.Production?.Code || '';
@@ -160,84 +191,99 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       bookings = [...bookings, ...dateBlockBookings];
     }
 
+    // create a new excel workbook and worksheet
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('SELECTED VENUES', {
       pageSetup: { fitToPage: true, fitToHeight: 5, fitToWidth: 7 },
       views: [{ state: 'frozen', ySplit: 5 }],
     });
 
+    // add headers and data to the worksheet
     worksheet.addRow([`${filename}`]);
     const date = newDate();
+    // add exported date and time to the worksheet
     worksheet.addRow([`Exported: ${formatDate(date, 'dd/MM/yy')} at ${dateTimeToTime(date)}`]);
-    worksheet.addRow([
-      'PRODUCTION',
-      'SHOW',
-      '',
-      '',
-      '',
-      '',
-      'ON SALE',
-      'MARKETING',
-      'CONTACT',
-      'PRINT',
-      'MARKETING COSTS',
-      'MARKETING COSTS',
-      'MARKETING COSTS',
-    ]);
-    worksheet.addRow([
-      'CODE',
-      'DATE',
-      'CODE',
-      'NAME',
-      'TOWN',
-      'ON SALE',
-      'DATE',
-      'PLAN',
-      'INFO',
-      'REQS',
-      'STATUS',
-      'APPROVAL DATE',
-      'NOTES',
-    ]);
+    // add headers to the worksheet split into two rows
+    worksheet.addRow(
+      sanitizeRowData([
+        'PRODUCTION',
+        'SHOW',
+        '',
+        '',
+        '',
+        '',
+        'ON SALE',
+        'MARKETING',
+        'CONTACT',
+        'PRINT',
+        'MARKETING COSTS',
+        'MARKETING COSTS',
+        'MARKETING COSTS',
+      ]),
+    );
+    worksheet.addRow(
+      sanitizeRowData([
+        'CODE',
+        'DATE',
+        'CODE',
+        'NAME',
+        'TOWN',
+        'ON SALE',
+        'DATE',
+        'PLAN',
+        'INFO',
+        'REQS',
+        'STATUS',
+        'APPROVAL DATE',
+        'NOTES',
+      ]),
+    );
     worksheet.addRow([]);
+    // apply selection filter on bookings and loop through each booking to add data to the worksheet
     applySelectionFilter(bookings, selection)?.forEach((booking: BOOKING) => {
       const ShowDate = formatDate(booking.FirstDate.getTime(), 'dd/MM/yy');
       const VenueCode = booking.VenueCode;
       const ShowTown = booking.VenueTown;
       const VenueName = booking.VenueName;
       const OnSale = getBooleanAsString(booking.TicketsOnSale);
-      const OnSaleDate = booking.OnSaleDate ? formatDate(booking.TicketsOnSaleFromDate.getTime(), 'dd/MM/yy') : '';
+      const OnSaleDate = booking.TicketsOnSaleFromDate
+        ? formatDate(booking.TicketsOnSaleFromDate.getTime(), 'dd/MM/yy')
+        : '';
       const MarketingPlan = getBooleanAsString(booking.MarketingPlanReceived);
       const ContactInfo = getBooleanAsString(booking.ContactInfoReceived);
       const PrintReqsReceived = getBooleanAsString(booking.PrintReqsReceived);
       const marketingCostsApprovalDate = booking.MarketingCostsApprovalDate
         ? formatDate(booking.MarketingCostsApprovalDate.getTime(), 'dd/MM/yy')
         : '';
-      worksheet.addRow([
-        booking.FullProductionCode,
-        ShowDate,
-        VenueCode,
-        VenueName,
-        ShowTown,
-        OnSale,
-        OnSaleDate,
-        MarketingPlan,
-        ContactInfo,
-        PrintReqsReceived,
-        marketingCostsStatusToLabelMap[booking.MarketingCostsStatus] || '',
-        marketingCostsApprovalDate,
-        booking.MarketingCostsNotes || '',
-      ]);
+      worksheet.addRow(
+        sanitizeRowData([
+          booking.FullProductionCode,
+          ShowDate,
+          VenueCode,
+          VenueName,
+          ShowTown,
+          OnSale,
+          OnSaleDate,
+          MarketingPlan,
+          ContactInfo,
+          PrintReqsReceived,
+          marketingCostsStatusToLabelMap[booking.MarketingCostsStatus] || '',
+          marketingCostsApprovalDate,
+          booking.MarketingCostsNotes || '',
+        ]),
+      );
     });
 
     const numberOfColumns = worksheet.columnCount;
 
+    // merge cells for the first two rows
     worksheet.mergeCells('A2:D2');
 
     for (let char = 'A', i = 0; i < numberOfColumns; i++, char = String.fromCharCode(char.charCodeAt(0) + 1)) {
       worksheet.getColumn(char).width = 10;
     }
 
+    // align B column text to right
     alignColumn({ worksheet, colAsChar: 'B', align: ALIGNMENT.RIGHT });
 
     const lastColumn = String.fromCharCode('A'.charCodeAt(0) + numberOfColumns - 1);
@@ -247,6 +293,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       styleHeader({ worksheet, row, numberOfColumns });
     }
 
+    // align columns to center
     alignColumn({ worksheet, colAsChar: 'F', align: ALIGNMENT.CENTER });
     alignColumn({ worksheet, colAsChar: 'G', align: ALIGNMENT.CENTER });
     alignColumn({ worksheet, colAsChar: 'H', align: ALIGNMENT.CENTER });
@@ -257,6 +304,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
 
     worksheet.getColumn('A').width = 8;
     worksheet.getColumn('B').width = 10;
+    // add width as per content for columns C to K
     addWidthAsPerContent({
       worksheet,
       fromColNumber: 3,
@@ -267,6 +315,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       rowsToIgnore: 2,
     });
 
+    // format first row to be 16 in size and white color and bold
     worksheet.getCell(1, 1).font = { size: 16, color: { argb: COLOR_HEXCODE.WHITE }, bold: true };
     alignCellText({ worksheet, row: 1, col: 1, align: ALIGNMENT.LEFT });
     if (format === 'pdf') {

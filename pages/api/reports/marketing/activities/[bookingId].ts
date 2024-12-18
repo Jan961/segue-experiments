@@ -7,7 +7,14 @@ import { addWidthAsPerContent } from 'services/reportsService';
 import { COLOR_HEXCODE, applyFormattingToRange } from 'services/salesSummaryService';
 import { convertToPDF } from 'utils/report';
 import { formatDate } from 'services/dateService';
+import { getBooleanAsString } from '../../venues';
 
+/**
+ * create excel report for marketing activities
+ * @param req
+ * @param res
+ * @returns
+ */
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { bookingId, format } = req.query || {};
 
@@ -21,24 +28,29 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     throw new Error('Required params are missing');
   }
 
+  // get marketing activities by booking id
   const data = await getActivitiesByBookingId(parseInt(bookingId as string, 10), req);
 
   const workbook = new ExcelJS.Workbook();
   const worksheet = workbook.addWorksheet('Marketing Activities');
 
+  // create header row with production name, venue and date
   createHeaderRow(worksheet, productionName, 16, 'G');
   createHeaderRow(worksheet, venueAndDate, 14, 'G');
   createHeaderRow(worksheet, 'Marketing Activities Report', 12, 'G');
 
+  // add column headers
   const headerRow = worksheet.addRow([
     'Activity Name',
     'Type',
     'Date',
     'Follow Up Req.',
+    // 'Follow Up Date',
     'Company Cost',
     'Venue Cost',
     'Notes',
   ]);
+  // add formatting for column header cells
   headerRow.eachCell((cell) => {
     cell.fill = {
       type: 'pattern',
@@ -53,18 +65,22 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     };
   });
 
+  // create a map of activity types with id as key and name as value
   const activityTypeMap = new Map(data.activityTypes.map((type) => [type.Id, type.Name]));
   let currentRowNum = 4;
+  // loop through activities and add them to the worksheet
   data.activities.forEach((activity) => {
     const row = worksheet.addRow([
       activity.Name || '',
       activityTypeMap.get(activity.ActivityTypeId) || '',
       activity.Date ? formatDate(activity.Date, 'dd/MM/yy') : '',
-      activity.FollowUpRequired,
+      getBooleanAsString(activity.FollowUpRequired),
+      // activity.FollowUpDate ? formatDate(activity.FollowUpDate, 'dd/MM/yy') : '',
       activity.CompanyCost,
       activity.VenueCost,
       activity.Notes,
     ]);
+    // add formatting to the cells in the row
     row.eachCell((cell, colNumber) => {
       if (![5, 6].includes(colNumber)) {
         cell.alignment = { vertical: 'middle', horizontal: 'center' };
@@ -84,7 +100,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   currentRowNum++;
   worksheet.addRow([]);
   currentRowNum++;
+  // add total cost row
   worksheet.addRow(['', '', '', 'Total Cost', totalCompanyCost + totalVenueCost]);
+  // apply currency formatting to the total cost cells
   applyFormattingToRange({
     worksheet,
     startRow: 5,
@@ -95,6 +113,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   });
 
   const numberOfColumns = worksheet.columnCount;
+  // add width to the columns as per content
   addWidthAsPerContent({
     worksheet,
     fromColNumber: 1,

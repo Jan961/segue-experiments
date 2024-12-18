@@ -20,6 +20,12 @@ const defaultAlignment: ICellAlignment = {
   vertical: 'top',
 };
 
+/**
+ *
+ * @param worksheet ExcelJS worksheet
+ * @param colAsChar Column as character
+ * @param alignment Alignment object
+ */
 const alignColumnCells = ({
   worksheet,
   colAsChar,
@@ -34,6 +40,13 @@ const alignColumnCells = ({
   });
 };
 
+/**
+ * utility function to make row text bold and align left
+ * @param worksheet
+ * @param row
+ * @param numberOfColumns
+ * @param bgColor
+ */
 export const makeRowTextBoldAndAllignLeft = ({
   worksheet,
   row,
@@ -65,12 +78,18 @@ type ProductionDetails = {
 };
 
 // TODO - Issue with Performance Time
+/**
+ * API handler for generating promoter holds report
+ * Supports both Excel and PDF formats
+ */
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
     const prisma = await getPrismaClient(req);
     const { productionCode = '', fromDate, toDate, venue, productionId, format, exportedAt } = req.body || {};
 
+    // create a new workbook
     const workbook = new ExcelJS.Workbook();
+    // Build database query filters
     const whereQuery: { ProductionId?: string; VenueCode?: string; PerformanceDate?: { gte: Date; lte: Date } } = {};
     if (productionId) {
       whereQuery.ProductionId = productionId;
@@ -101,6 +120,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           PerformanceTime: new UTCDate(x.PerformanceTime),
         })),
       );
+    // fetches the data concurrently
     const [data, productionDetails] = await all([getPromoterHolds, getProductionWithContent(productionId, req)]);
     const showName = (productionDetails as ProductionDetails)?.Show?.Name || '';
     const filename = `${productionCode} ${showName} Promoter Holds`;
@@ -109,9 +129,12 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       views: [{ state: 'frozen', xSplit: 5, ySplit: 4 }],
     });
 
+    // Add header rows
     worksheet.addRow(['PROMOTER HOLDS']);
     const exportedAtTitle = getExportedAtTitle(exportedAt);
     worksheet.addRow([exportedAtTitle]);
+
+    // Add columns headers which are split into two consecutive rows
     worksheet.addRow(['PRODUCTION', 'VENUE', '', 'SHOW', '', 'AVAILABLE', '', 'ALLOCATED', '']);
     worksheet.addRow([
       'CODE',
@@ -131,6 +154,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       'VENUE CONFIRMATION',
     ]);
 
+    // loop through the data and add rows
     (data as any[]).forEach((x) => {
       const productionCode = x.FullProductionCode || '';
       const venueCode = x.VenueCode || '';
@@ -169,6 +193,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
 
     const numberOfColumns = worksheet.columnCount;
 
+    // Merge cells for headers
     worksheet.mergeCells('A1:E1');
     worksheet.mergeCells('A2:C2');
     worksheet.mergeCells('B3:C3');
@@ -179,6 +204,8 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     for (let char = 'A', i = 0; i < numberOfColumns; i++, char = String.fromCharCode(char.charCodeAt(0) + 1)) {
       alignColumnCells({ worksheet, colAsChar: char, alignment: { horizontal: 'left', vertical: 'top' } });
     }
+
+    // align columns
     alignColumnCells({ worksheet, colAsChar: 'D', alignment: { horizontal: 'right', vertical: 'top' } });
     alignColumnCells({ worksheet, colAsChar: 'E', alignment: { horizontal: 'right', vertical: 'top' } });
     alignColumnCells({ worksheet, colAsChar: 'F', alignment: { horizontal: 'center', vertical: 'top' } });
@@ -187,7 +214,10 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     for (let row = 1; row <= 4; row++) {
       makeRowTextBoldAndAllignLeft({ worksheet, row, numberOfColumns, bgColor: COLOR_HEXCODE.DARK_GREEN });
     }
+
+    // since A column width is predictable we can set it to a fixed width
     worksheet.getColumn('A').width = 8;
+    // calculate and assign column width based on max size of content in the cells
     addWidthAsPerContent({
       worksheet,
       fromColNumber: 2,
@@ -203,6 +233,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     worksheet.getColumn('L').width = 25;
     worksheet.getColumn('G').alignment = { wrapText: true };
 
+    // title row should 16 in size
     worksheet.getCell(1, 1).font = { size: 16, color: { argb: COLOR_HEXCODE.WHITE }, bold: true };
 
     // const filename = `Promoter_Holds_${productionCode || productionId ? '_' + (productionCode || productionId) : ''}${

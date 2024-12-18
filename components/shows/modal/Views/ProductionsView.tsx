@@ -52,9 +52,10 @@ const ProductionsView = ({ showData, visible, onClose }: ProductionsViewProps) =
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isArchived, setIsArchived] = useState<boolean>(true);
   const isMounted = useComponentMountStatus();
+  const [dataReady, setDataReady] = useState<boolean>(false);
   const productionColumDefs = useMemo(
-    () => (isMounted ? productionsTableConfig(permissions) : []),
-    [isMounted, permissions],
+    () => (isMounted ? productionsTableConfig(permissions, dataReady) : []),
+    [isMounted, permissions, dataReady],
   );
   const [showParentLoading, setParentLoadingOverlay] = useState<boolean>(false);
   const showName = useMemo(() => showData.Name, [showData]);
@@ -101,20 +102,23 @@ const ProductionsView = ({ showData, visible, onClose }: ProductionsViewProps) =
 
   const updateCurrencyDetails = async (currencyCodeList) => {
     try {
+      setDataReady(false);
       if (!isNullOrEmpty(currencyCodeList)) {
         const filteredCodeList = currencyCodeList.filter((code) => code !== undefined);
-        const [currencyList, countryList] = await all([
+        await all([
           axios.post(`/api/currency/read/list`, { currencyCodeList: filteredCodeList }),
           axios.post(`/api/currency/read/country-list`, { currencyCodeList: filteredCodeList }),
-        ]);
-        setCurrencyLookup(
-          objectify(
-            currencyList.data,
-            (c: ICurrency) => c.code,
-            (c) => c,
-          ),
-        );
-        setCurrencyCountryLookup(group(countryList.data, (c: ICurrencyCountry) => c.currencyCode));
+        ]).then((e) => {
+          setCurrencyLookup(
+            objectify(
+              e[0].data,
+              (c: ICurrency) => c.code,
+              (c) => c,
+            ),
+          );
+          setCurrencyCountryLookup(group(e[1].data, (c: ICurrencyCountry) => c.currencyCode));
+          setDataReady(true);
+        });
       }
     } catch (e) {
       console.log(e);
@@ -247,7 +251,11 @@ const ProductionsView = ({ showData, visible, onClose }: ProductionsViewProps) =
     if (e.column.colId === 'editId' && permissions.includes('ACCESS_EDIT_PRODUCTION DETAILS')) {
       setOpenEditModal(true);
     }
-    if (e.column.colId === 'updateCurrencyConversion' && permissions.includes('ACCESS_CURRENCY_CONVERSION')) {
+    if (
+      e.column.colId === 'updateCurrencyConversion' &&
+      permissions.includes('ACCESS_CURRENCY_CONVERSION') &&
+      dataReady
+    ) {
       setOpenCurrencyConversionModal(true);
     }
     if (e.column.colId === 'delete' && permissions.includes('DELETE_PRODUCTION') && e.data?.IsArchived) {

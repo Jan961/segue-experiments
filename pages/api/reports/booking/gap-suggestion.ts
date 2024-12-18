@@ -18,6 +18,12 @@ interface VenueContactInfo {
   role: string;
 }
 
+/**
+ * fetch venue contacts for the given venue ids
+ * @param prisma
+ * @param venueIds
+ * @returns
+ */
 async function getVenueContacts(prisma: any, venueIds: number[]): Promise<Map<number, VenueContactInfo>> {
   const contactsMap = new Map<number, VenueContactInfo>();
   const priorityRoles = ['Programming', 'Manager', 'Box Office Default'];
@@ -81,6 +87,12 @@ async function getVenueContacts(prisma: any, venueIds: number[]): Promise<Map<nu
   return contactsMap;
 }
 
+/**
+ * exports the gap suggestions to an excel file
+ * @param req
+ * @param res
+ * @returns
+ */
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -101,9 +113,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       result.VenueInfo?.filter((venue) => !params.filteredVenueIds.includes(venue.VenueId))?.sort(
         (a, b) => a.MinsFromStart - b.MinsFromStart,
       ) || [];
+    // Get unique venue ids
     const venueIds = unique(filteredVenueInfo?.map((venue) => venue.VenueId) || []);
+    // Get venue contacts for the list of venue ids in the filtered venue info
     const contactsMap = await getVenueContacts(prisma, venueIds);
 
+    // Create new excel worknook instance and add a worksheet to it with title Venue Gap Suggestions
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('Venue Gap Suggestions', {
       pageSetup: { fitToPage: true, fitToHeight: 5, fitToWidth: 7 },
@@ -123,6 +138,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       pattern: 'solid',
       fgColor: { argb: COLOR_HEXCODE.DARK_ORANGE },
     };
+    // merge cells for title to span over all the columns and align it to center
     worksheet.mergeCells(1, 1, 1, 12); // Merge cells for title
     titleRow.alignment = { vertical: 'middle', horizontal: 'center' };
 
@@ -142,6 +158,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     worksheet.mergeCells(2, 1, 2, 12); // Merge cells for exported at
     exportedAtRow.alignment = { vertical: 'middle', horizontal: 'left' };
 
+    // Add header columns to the worksheet
     const headers = [
       'Venue',
       'Town',
@@ -157,6 +174,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       'Contact Role',
     ];
 
+    // Add header row and style them to have bold text, white color, dark orange background and left alignment
     const headerRow = worksheet.addRow(headers);
     headerRow.height = 25;
     headerRow.font = {
@@ -175,6 +193,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     };
 
     if (filteredVenueInfo) {
+      // loop through the filtered venue info and add them to the worksheet
       filteredVenueInfo.forEach((venue: VenueWithDistance) => {
         const contactInfo = contactsMap.get(venue.VenueId);
 
@@ -205,7 +224,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       });
     }
     const numberOfColumns = worksheet.columnCount;
+    // add border to all cells
     addBorderToAllCells({ worksheet });
+    // calculate the width of the columns based on the content and set the width of the columns
     addWidthAsPerContent({
       worksheet,
       fromColNumber: 1,

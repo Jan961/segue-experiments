@@ -10,15 +10,33 @@ import { getCurrencyFromBookingId } from 'services/venueCurrencyService';
 import { getArchivedSalesList } from 'services/marketing/archivedSales';
 import { addBorderToAllCells } from 'utils/export';
 
+/**
+ * creates excel from data
+ * @param data
+ * @param bookingInfo
+ * @param productionName
+ * @param venueAndDate
+ * @returns
+ */
 const createExcelFromData = (data, bookingInfo, productionName, venueAndDate) => {
+  // create a new ExcelJS Workbook
   const workbook = new ExcelJS.Workbook();
+  // create worksheet with name 'Archived Sales'
   const worksheet = workbook.addWorksheet('Archived Sales');
 
+  // create a map of booking id to production code for easy access
   const bookingToProdCode = bookingInfo.reduce((acc, item) => {
     acc[item.bookingId] = item;
     return acc;
   }, {});
 
+  /**
+   * creates header cell with given value and styles
+   * @param cell
+   * @param value
+   * @param mergeAcross
+   * @param fontSize
+   */
   const createHeaderCell = (cell, value, mergeAcross = 1, fontSize = 12) => {
     cell.value = value;
     cell.font = { bold: true, size: fontSize, color: { argb: COLOR_HEXCODE.WHITE } };
@@ -37,6 +55,7 @@ const createExcelFromData = (data, bookingInfo, productionName, venueAndDate) =>
     }
   };
 
+  // get all unique booking ids
   const bookingIds = [...new Set(data.flatMap((item) => item.data.map((d) => d.BookingId)))];
 
   const totalColumns = 1 + bookingIds.length * 3;
@@ -45,6 +64,7 @@ const createExcelFromData = (data, bookingInfo, productionName, venueAndDate) =>
   const headerRow2 = worksheet.addRow([productionName]);
   const headerRow3 = worksheet.addRow([venueAndDate]);
 
+  // create header rows with production name, venue and date
   createHeaderCell(headerRow1.getCell(1), 'Venue Archived Sales Report', totalColumns, 16);
   createHeaderCell(headerRow2.getCell(1), productionName, totalColumns, 14);
   createHeaderCell(headerRow3.getCell(1), venueAndDate, totalColumns, 12);
@@ -63,6 +83,7 @@ const createExcelFromData = (data, bookingInfo, productionName, venueAndDate) =>
   createHeaderCell(dataHeaderRow3.getCell(1), 'Week', 1, 12);
 
   let columnIndex = 2;
+  // create header for each booking Id with 3 columns for date, seats sold and sales value
   bookingIds.forEach((bookingId) => {
     const info = bookingToProdCode[bookingId as string] || `Unknown (${bookingId})`;
     createHeaderCell(dataHeaderRow1.getCell(columnIndex), `${info.prodName}`, 3, 12);
@@ -73,10 +94,12 @@ const createExcelFromData = (data, bookingInfo, productionName, venueAndDate) =>
     columnIndex += 3;
   });
 
+  // loop through the data and add rows to the worksheet
   data.forEach((item, index) => {
     const isLastRow = index === data.length - 1;
     const rowData = [isLastRow ? 'Final' : `Week ${item.SetBookingWeekNum}`];
     const currencySymbols = [];
+    // loop through each booking id and add date, seats and sales value to the row
     bookingIds.forEach((bookingId) => {
       const bookingData = item.data.find((d) => d.BookingId === bookingId) || {};
       rowData.push(bookingData.SetSalesFiguresDate ? formatInputDate(bookingData.SetSalesFiguresDate) : '');
@@ -88,6 +111,7 @@ const createExcelFromData = (data, bookingInfo, productionName, venueAndDate) =>
     const row = worksheet.addRow(rowData);
 
     row.height = 25;
+    // loop through each cell in the row and apply styles based on the column number
     row.eachCell((cell, colNumber) => {
       // column number starts from 1
       // subtract first two cells for week and weekof
@@ -128,6 +152,7 @@ const createExcelFromData = (data, bookingInfo, productionName, venueAndDate) =>
   worksheet.getColumn(1).width = 10;
   worksheet.getColumn(2).width = 15;
   const numberOfColumns = worksheet.columnCount;
+  // calculate the width of each column based on the content and set the width of each column
   addWidthAsPerContent({
     worksheet,
     fromColNumber: 3,
@@ -142,6 +167,12 @@ const createExcelFromData = (data, bookingInfo, productionName, venueAndDate) =>
   return workbook;
 };
 
+/**
+ * creates archived sales report
+ * @param req
+ * @param res
+ * @returns
+ */
 const handler = async (req, res) => {
   if (req.method !== 'POST') {
     throw new Error('the method is not allowed');
@@ -154,11 +185,15 @@ const handler = async (req, res) => {
   }
 
   const prisma = await getPrismaClient(req);
+  // get booking ids from booking selection
   const bookingIds = bookingsSelection.map((booking) => booking.bookingId);
 
+  // get currency symbol from booking id
   const currencySymbol = (await getCurrencyFromBookingId(req, bookingIds?.[0])) || '';
+  // get archived sales list from booking ids
   const data = await getArchivedSalesList(bookingIds, currencySymbol, prisma);
 
+  // create excel from the archived sales data
   const workbook = createExcelFromData(data, bookingsSelection, productionName, venueAndDate);
   const worksheet = workbook.getWorksheet('Archived Sales');
   const filename = `Archived Sales`;
