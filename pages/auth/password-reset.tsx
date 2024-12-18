@@ -25,7 +25,7 @@ const PasswordReset = () => {
   const [validationError, setValidationError] = useState(null);
   const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-
+  const skipVerify = router.query.skipVerify === 'true';
   const [loginDetails, setLoginDetails] = useState({
     email: '',
     password: '',
@@ -130,25 +130,28 @@ const PasswordReset = () => {
       <Image className="mx-auto mb-2" height={160} width={310} src="/segue/segue_logo_full.png" alt="Segue" />
       <h1 className="my-4 text-2xl font-bold text-center text-primary-input-text">Reset Password</h1>
       <div className="text-primary-input-text w-[364px] mx-auto">
-        <div>
-          <Label text="Email Address" required />
-          <TextInput
-            name="email"
-            placeholder="Enter Email Address"
-            className="w-full mb-2"
-            value={loginDetails.email}
-            onChange={handleLoginDetailsChange}
-            disabled={isAuthenticated}
-          />
-          {validationError?.path === 'email' && <AuthError error={validationError.errors[0]} />}
-        </div>
-        <div className="mt-5 flex flex-col items-end gap-2">
-          <div className="flex justify-end gap-2">
-            <Button variant="secondary" text="Login" onClick={navigateToSignIn} className="w-32" />
-            <Button text="Get Password Reset Code" onClick={attemptClerkAuth} className="w-32" />
-          </div>
-        </div>
-
+        {!skipVerify && (
+          <>
+            <div>
+              <Label text="Email Address" required />
+              <TextInput
+                name="email"
+                placeholder="Enter Email Address"
+                className="w-full mb-2"
+                value={loginDetails.email}
+                onChange={handleLoginDetailsChange}
+                disabled={isAuthenticated}
+              />
+              {validationError?.path === 'email' && <AuthError error={validationError.errors[0]} />}
+            </div>
+            <div className="mt-5 flex flex-col items-end gap-2">
+              <div className="flex justify-end gap-2">
+                <Button variant="secondary" text="Login" onClick={navigateToSignIn} className="w-32" />
+                <Button text="Get Password Reset Code" onClick={attemptClerkAuth} className="w-32" />
+              </div>
+            </div>
+          </>
+        )}
         {isAuthenticated && (
           <div>
             <div>

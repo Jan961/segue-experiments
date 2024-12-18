@@ -1,4 +1,4 @@
-import { SIGN_IN_URL, SIGN_UP_URL } from 'config/auth';
+import { SIGN_IN_URL, SIGN_UP_URL, PASSWORD_RESET_URL } from 'config/auth';
 import { useRouter } from 'next/router';
 import { useUrl } from 'nextjs-current-url';
 
@@ -27,12 +27,17 @@ const useNavigation = () => {
     router.push(SIGN_UP_URL);
   };
 
+  const navigateToPasswordReset = (skipVerify = false) => {
+    router.push(skipVerify ? `${PASSWORD_RESET_URL}?skipVerify=true` : PASSWORD_RESET_URL);
+  };
+
   return {
     getSignUpUrl,
     getSignInUrl,
     navigateToHome,
     navigateToSignIn,
     navigateToSignUp,
+    navigateToPasswordReset,
   };
 };
 
