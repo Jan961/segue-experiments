@@ -72,7 +72,7 @@ const styleHeader = ({ worksheet, row, numberOfColumns }: { worksheet: any; row:
  * @param val
  * @returns
  */
-const getBooleanAsString = (val: boolean | null): string => {
+export const getBooleanAsString = (val: boolean | null): string => {
   if (val) return 'YES';
   return 'NO';
 };
