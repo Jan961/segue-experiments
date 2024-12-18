@@ -9,6 +9,7 @@ import { productionJumpState } from 'state/booking/productionJumpState';
 import { isNullOrEmpty } from 'utils';
 import fuseFilter from 'utils/fuseFilter';
 import { compareDatesWithoutTime } from 'services/dateService';
+import { UTCDate } from '@date-fns/utc';
 
 const generateOptions = (weekData) => {
   return Object.entries(weekData).map(([key]) => ({
@@ -88,12 +89,9 @@ const useTasksFilter = () => {
           Tasks: productionTasks
             .filter(({ TaskAssignedToAccUserId, CompleteDate, Status }) => {
               return (
-                compareDatesWithoutTime(CompleteDate, filters.endDueDate ? filters.endDueDate : '2250-01-01', '<=') &&
-                compareDatesWithoutTime(
-                  CompleteDate,
-                  filters.startDueDate ? filters.startDueDate : '1990-01-01',
-                  '>=',
-                ) &&
+                (!filters.endDueDate || compareDatesWithoutTime(CompleteDate, new UTCDate(filters.endDueDate), '<=')) &&
+                (!filters.startDueDate ||
+                  compareDatesWithoutTime(CompleteDate, new UTCDate(filters.startDueDate), '>=')) &&
                 (!filters.status || filters.status === 'all' || getStatusBool(Status, filters.status, CompleteDate)) &&
                 (filters.assignee === -1 || TaskAssignedToAccUserId === filters.assignee)
               );
