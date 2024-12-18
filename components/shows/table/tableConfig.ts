@@ -157,21 +157,11 @@ export const showsTableConfig = (permissions = []) => [
 
 export const currencyConversionTableConfig = (permissions) => [
   {
-    headerName: 'Currency',
-    headerClass: 'justify-center font-bold text-base ',
-    field: 'currency',
-    width: 185,
-    cellStyle: {
-      paddingRight: '0.75em',
-      paddingLeft: '0.75em',
-    },
-  },
-  {
     headerName: 'Countries',
     headerClass: 'justify-center font-bold text-base ',
     field: 'countries',
     flex: 1,
-    width: 185,
+    width: 100,
     wrapText: true,
     autoHeight: true,
     cellStyle: {
@@ -184,22 +174,11 @@ export const currencyConversionTableConfig = (permissions) => [
     },
   },
   {
-    headerName: 'Region',
-    headerClass: 'justify-center font-bold text-base ',
-    field: 'region',
-    flex: 1,
-    width: 185,
-    cellStyle: {
-      paddingRight: '0.75em',
-      paddingLeft: '0.75em',
-    },
-  },
-  {
     headerName: 'Exchange rate for Production \n (Production Currency : Venue Currency)',
     headerClass: 'justify-center font-bold text-base ',
     field: 'rate',
     cellRenderer: CurrencyExchangeRenderer,
-    width: 300,
+    width: 600,
     autoHeaderHeight: true,
     resizable: false,
     cellRendererParams: {
@@ -214,7 +193,7 @@ export const currencyConversionTableConfig = (permissions) => [
   },
 ];
 
-export const productionsTableConfig = (permissions) => [
+export const productionsTableConfig = (permissions, dataReady?: boolean) => [
   {
     headerName: 'Production',
     headerClass: 'justify-center font-bold text-base ',
@@ -261,7 +240,7 @@ export const productionsTableConfig = (permissions) => [
     width: 270,
     cellRenderer: ButtonRenderer,
     cellRendererParams: {
-      disabled: !permissions.includes('ACCESS_CURRENCY_CONVERSION'),
+      disabled: !permissions.includes('ACCESS_CURRENCY_CONVERSION') || !dataReady,
       buttonText: 'SET CURRENCY CONVERSION RATES',
       variant: 'secondary',
       width: 270,

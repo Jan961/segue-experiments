@@ -7,6 +7,7 @@ import { addWidthAsPerContent } from 'services/reportsService';
 import { COLOR_HEXCODE, applyFormattingToRange } from 'services/salesSummaryService';
 import { convertToPDF } from 'utils/report';
 import { formatDate } from 'services/dateService';
+import { getBooleanAsString } from '../../venues';
 
 /**
  * create excel report for marketing activities
@@ -44,6 +45,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     'Type',
     'Date',
     'Follow Up Req.',
+    // 'Follow Up Date',
     'Company Cost',
     'Venue Cost',
     'Notes',
@@ -72,7 +74,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       activity.Name || '',
       activityTypeMap.get(activity.ActivityTypeId) || '',
       activity.Date ? formatDate(activity.Date, 'dd/MM/yy') : '',
-      activity.FollowUpRequired,
+      getBooleanAsString(activity.FollowUpRequired),
+      // activity.FollowUpDate ? formatDate(activity.FollowUpDate, 'dd/MM/yy') : '',
       activity.CompanyCost,
       activity.VenueCost,
       activity.Notes,

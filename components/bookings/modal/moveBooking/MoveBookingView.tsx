@@ -111,6 +111,7 @@ const MoveBookingView = ({
     setBookingDetails((prev) => ({
       ...prev,
       production: `${production?.ShowCode}${production?.Code}  ${production?.ShowName}`,
+      moveDate: null,
     }));
     setScheduleDate({ startDate: production.StartDate, endDate: production.EndDate });
   };
