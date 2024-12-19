@@ -9,6 +9,7 @@ import { productionJumpState } from 'state/booking/productionJumpState';
 import { isNullOrEmpty } from 'utils';
 import fuseFilter from 'utils/fuseFilter';
 import { compareDatesWithoutTime } from 'services/dateService';
+import { UTCDate } from '@date-fns/utc';
 
 const generateOptions = (weekData) => {
   return Object.entries(weekData).map(([key]) => ({
@@ -73,7 +74,6 @@ const useTasksFilter = () => {
             userName: task.TaskAssignedToAccUserId !== -1 ? userIdToNameMap[task.TaskAssignedToAccUserId] : null,
           };
         });
-
         const productionTasks = filters.taskText
           ? fuseFilter(tasksFilteredByAssignedUser, filters.taskText, [
               'Name',
@@ -89,8 +89,9 @@ const useTasksFilter = () => {
           Tasks: productionTasks
             .filter(({ TaskAssignedToAccUserId, CompleteDate, Status }) => {
               return (
-                compareDatesWithoutTime(CompleteDate, filters.endDueDate, '<=') &&
-                compareDatesWithoutTime(CompleteDate, filters.startDueDate, '>=') &&
+                (!filters.endDueDate || compareDatesWithoutTime(CompleteDate, new UTCDate(filters.endDueDate), '<=')) &&
+                (!filters.startDueDate ||
+                  compareDatesWithoutTime(CompleteDate, new UTCDate(filters.startDueDate), '>=')) &&
                 (!filters.status || filters.status === 'all' || getStatusBool(Status, filters.status, CompleteDate)) &&
                 (filters.assignee === -1 || TaskAssignedToAccUserId === filters.assignee)
               );

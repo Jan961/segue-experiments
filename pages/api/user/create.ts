@@ -34,6 +34,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         UserFirstName: user.firstName,
         UserLastName: user.lastName,
         UserEmail: user.email,
+        UserPasswordResetRequired: true,
         AccountUser: {
           create: {
             AccUserIsAdmin: user.isSystemAdmin,
