@@ -1,8 +1,8 @@
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
 
 export const statusOptions: SelectOption[] = [
-  { text: 'Recieved, Not Returned', value: 'RNR' },
-  { text: 'Recieved, Questions Raised', value: 'RQR' },
+  { text: 'Received, Not Returned', value: 'RNR' },
+  { text: 'Received, Questions Raised', value: 'RQR' },
   { text: 'Producer Signed and Returned', value: 'SAR' },
   { text: 'Countersigned and Filed', value: 'CSF' },
   { text: 'None', value: 'NONE' },
