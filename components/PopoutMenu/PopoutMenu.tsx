@@ -104,6 +104,7 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
 
   return (
     <div
+      data-testid="popout-menu"
       ref={ref}
       className={`rounded-tr-[1.875rem] fixed left-0 top-0 bottom-0 z-40 shadow-lg
         min-h-full
