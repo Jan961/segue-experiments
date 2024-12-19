@@ -16,8 +16,10 @@ import { addBorderToAllCells } from 'utils/export';
 import {
   PerformanceInfo,
   ScheduleViewFormatted,
+  checkIfMultipleVenuesOnNextDay,
   getBookingByKey,
   getNextConfirmedBooking,
+  getNextNonEmptyBooking,
   getSheduleReport,
   isOtherDayType,
 } from 'services/reports/schedule-report';
@@ -265,6 +267,17 @@ const handler = async (req, res) => {
         maxDays: daysDiff,
       });
 
+      // gets next non empty booking
+      const nextNonEmptyBooking = getNextNonEmptyBooking({
+        index: i,
+        fullProductionCode: FullProductionCode,
+        showName: ShowName,
+        startDate: from,
+        dataLookUp,
+        maxDays: daysDiff,
+      });
+      const hasMultipleVenuesOnNextDay = checkIfMultipleVenuesOnNextDay(nextNonEmptyBooking);
+
       // Calculate the week number for the given date
       const weekNumber = calculateWeekNumber(newDate(ProductionStartDate.getTime()), dateInIncomingFormat.getTime());
       for (const value of values) {
@@ -342,7 +355,7 @@ const handler = async (req, res) => {
             ]);
             seats.push(Number(VenueSeats) || 0);
             performancesPerDay.push(performancesOnThisDay?.length || 0);
-            if (isFinalDay && isConfirmed) {
+            if (isFinalDay && (isConfirmed || isPencilled) && !hasMultipleVenuesOnNextDay) {
               // If the day is the last day of the run of dates for a booking then add mileage and time to the row
               row = row.concat([Number(Mileage) || '', formattedTime]);
               // add the mileage and time to the total mileage and time arrays which can be used for calculating totals at the end

@@ -295,6 +295,46 @@ export const getBookingByKey = (key: string, dataLookup: Record<string, Schedule
 };
 
 /**
+ *  Get the next non empty booking
+ * @param index
+ * @param maxDays
+ * @param startDate
+ * @param fullProductionCode
+ * @param showName
+ * @param dataLookUp
+ * @returns
+ */
+export const getNextNonEmptyBooking = ({
+  index,
+  maxDays,
+  startDate,
+  fullProductionCode,
+  showName,
+  dataLookUp,
+}: {
+  index: number;
+  maxDays: number;
+  startDate: string;
+  fullProductionCode: string;
+  showName: string;
+  dataLookUp: Record<string, ScheduleViewFormatted[]>;
+}): ScheduleViewFormatted[] | null => {
+  for (let i = index; i < maxDays; i++) {
+    const nextDateIncomingFormat = getDateDaysAway(startDate, i);
+    const nextKey = getKey({
+      FullProductionCode: fullProductionCode,
+      ShowName: showName,
+      EntryDate: formatDate(nextDateIncomingFormat, 'yyyy-MM-dd'),
+    });
+    const nextValue = dataLookUp[nextKey];
+    if (nextValue?.length) {
+      return nextValue;
+    }
+  }
+  return null;
+};
+
+/**
  * Check if the entry is of type other day
  * @param entryName
  * @returns
@@ -303,3 +343,10 @@ export const isOtherDayType = (entryName: string) =>
   ['Day Off', 'Travel Day', 'Get-In / Fit-Up Day', 'Tech / Dress Day', 'Rehearsal Day', 'Declared Holiday'].includes(
     entryName,
   );
+
+export const checkIfMultipleVenuesOnNextDay = (nextDayData: ScheduleViewFormatted[] = []) => {
+  if (!nextDayData?.length) {
+    return false;
+  }
+  return nextDayData.some((x) => x?.VenueId !== nextDayData?.[0]?.VenueId);
+};
