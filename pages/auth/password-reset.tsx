@@ -27,7 +27,7 @@ const PasswordReset = () => {
   const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [updatePassword, setUpdatePassword] = useState(false);
-  const currPwd = router.query.skipVerify;
+  const currPwd = router.query.skipVerify as string;
   const [loginDetails, setLoginDetails] = useState({
     email: '',
     password: '',
