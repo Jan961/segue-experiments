@@ -8,7 +8,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { ALIGNMENT } from './masterplan';
 import { marketingCostsStatusToLabelMap } from 'config/Reports';
 import { Booking } from 'prisma/generated/prisma-client';
-import { convertToPDF } from 'utils/report';
+import { convertToPDF, sanitizeRowData } from 'utils/report';
 import { dateTimeToTime, formatDate, newDate } from 'services/dateService';
 
 type BOOKING = Partial<Booking> & {
@@ -72,10 +72,9 @@ const styleHeader = ({ worksheet, row, numberOfColumns }: { worksheet: any; row:
  * @param val
  * @returns
  */
-const getBooleanAsString = (val: boolean | null): string => {
+export const getBooleanAsString = (val: boolean | null): string => {
   if (val) return 'YES';
-  if (val === false) return 'NO';
-  return '';
+  return 'NO';
 };
 
 /**
@@ -205,36 +204,40 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     // add exported date and time to the worksheet
     worksheet.addRow([`Exported: ${formatDate(date, 'dd/MM/yy')} at ${dateTimeToTime(date)}`]);
     // add headers to the worksheet split into two rows
-    worksheet.addRow([
-      'PRODUCTION',
-      'SHOW',
-      '',
-      '',
-      '',
-      '',
-      'ON SALE',
-      'MARKETING',
-      'CONTACT',
-      'PRINT',
-      'MARKETING COSTS',
-      'MARKETING COSTS',
-      'MARKETING COSTS',
-    ]);
-    worksheet.addRow([
-      'CODE',
-      'DATE',
-      'CODE',
-      'NAME',
-      'TOWN',
-      'ON SALE',
-      'DATE',
-      'PLAN',
-      'INFO',
-      'REQS',
-      'STATUS',
-      'APPROVAL DATE',
-      'NOTES',
-    ]);
+    worksheet.addRow(
+      sanitizeRowData([
+        'PRODUCTION',
+        'SHOW',
+        '',
+        '',
+        '',
+        '',
+        'ON SALE',
+        'MARKETING',
+        'CONTACT',
+        'PRINT',
+        'MARKETING COSTS',
+        'MARKETING COSTS',
+        'MARKETING COSTS',
+      ]),
+    );
+    worksheet.addRow(
+      sanitizeRowData([
+        'CODE',
+        'DATE',
+        'CODE',
+        'NAME',
+        'TOWN',
+        'ON SALE',
+        'DATE',
+        'PLAN',
+        'INFO',
+        'REQS',
+        'STATUS',
+        'APPROVAL DATE',
+        'NOTES',
+      ]),
+    );
     worksheet.addRow([]);
     // apply selection filter on bookings and loop through each booking to add data to the worksheet
     applySelectionFilter(bookings, selection)?.forEach((booking: BOOKING) => {
@@ -243,28 +246,32 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       const ShowTown = booking.VenueTown;
       const VenueName = booking.VenueName;
       const OnSale = getBooleanAsString(booking.TicketsOnSale);
-      const OnSaleDate = booking.OnSaleDate ? formatDate(booking.TicketsOnSaleFromDate.getTime(), 'dd/MM/yy') : '';
+      const OnSaleDate = booking.TicketsOnSaleFromDate
+        ? formatDate(booking.TicketsOnSaleFromDate.getTime(), 'dd/MM/yy')
+        : '';
       const MarketingPlan = getBooleanAsString(booking.MarketingPlanReceived);
       const ContactInfo = getBooleanAsString(booking.ContactInfoReceived);
       const PrintReqsReceived = getBooleanAsString(booking.PrintReqsReceived);
       const marketingCostsApprovalDate = booking.MarketingCostsApprovalDate
         ? formatDate(booking.MarketingCostsApprovalDate.getTime(), 'dd/MM/yy')
         : '';
-      worksheet.addRow([
-        booking.FullProductionCode,
-        ShowDate,
-        VenueCode,
-        VenueName,
-        ShowTown,
-        OnSale,
-        OnSaleDate,
-        MarketingPlan,
-        ContactInfo,
-        PrintReqsReceived,
-        marketingCostsStatusToLabelMap[booking.MarketingCostsStatus] || '',
-        marketingCostsApprovalDate,
-        booking.MarketingCostsNotes || '',
-      ]);
+      worksheet.addRow(
+        sanitizeRowData([
+          booking.FullProductionCode,
+          ShowDate,
+          VenueCode,
+          VenueName,
+          ShowTown,
+          OnSale,
+          OnSaleDate,
+          MarketingPlan,
+          ContactInfo,
+          PrintReqsReceived,
+          marketingCostsStatusToLabelMap[booking.MarketingCostsStatus] || '',
+          marketingCostsApprovalDate,
+          booking.MarketingCostsNotes || '',
+        ]),
+      );
     });
 
     const numberOfColumns = worksheet.columnCount;
