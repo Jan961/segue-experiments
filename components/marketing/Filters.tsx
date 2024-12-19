@@ -10,8 +10,7 @@ import { mapBookingsToProductionOptions } from 'mappers/productionCodeMapper';
 import { bookingJumpState } from 'state/marketing/bookingJumpState';
 import MarketingButtons from './MarketingButtons';
 import formatInputDate from 'utils/dateInputFormat';
-import { reverseDate } from './utils';
-import { DATE_PATTERNS, getWeekDay } from 'services/dateService';
+import { DATE_PATTERNS, getWeekDay, newDate } from 'services/dateService';
 import { currencyState } from 'state/global/currencyState';
 import axios from 'axios';
 import { LastPerfDate } from 'types/MarketingTypes';
@@ -28,7 +27,7 @@ const Filters = () => {
   const { selected: productionId } = useRecoilValue(productionJumpState);
   const [bookings, setBooking] = useRecoilState(bookingJumpState);
   const [, setCurrency] = useRecoilState(currencyState);
-  const today = formatInputDate(new Date());
+  const today = newDate();
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [selectedValue, setSelectedValue] = useState(null);
   const [venueName, setVenueName] = useState('');
@@ -165,21 +164,19 @@ const Filters = () => {
 
   useEffect(() => {
     const futureBookings = bookingOptions?.filter((booking) => {
-      const reversedBookingDate = reverseDate(booking.date);
-      const reversedTodayDate = reverseDate(today);
-
+      const reversedBookingDate = newDate(booking.date, 'UK').toISOString();
+      const reversedTodayDate = today.toISOString();
       if (reversedBookingDate !== '' && reversedTodayDate !== '') {
-        return reversedBookingDate.getTime() >= reversedTodayDate.getTime();
+        return newDate(reversedBookingDate).getTime() >= today.getTime();
       } else {
         return false;
       }
     });
-
     setFutureBookings({
       hasFutureBooking: futureBookings?.length > 0,
       nextBooking: futureBookings?.length > 0 ? futureBookings[0] : null,
     });
-  }, [bookingOptions, today]);
+  }, [bookingOptions]);
 
   return (
     <div className="w-full flex items-end justify-between flex-wrap">
