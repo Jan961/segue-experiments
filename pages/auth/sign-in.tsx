@@ -20,7 +20,7 @@ import useNavigation from 'hooks/useNavigation';
 
 const SignIn = () => {
   const { setUserPermissions } = usePermissions();
-  const { navigateToHome } = useNavigation();
+  const { navigateToHome, navigateToPasswordReset } = useNavigation();
   const { isLoaded, signIn, setActive } = useSignIn();
   const { signOut } = useAuth();
   const { isSignedIn, user } = useUser();
@@ -59,6 +59,15 @@ const SignIn = () => {
     }
   };
 
+  const checkForPasswordReset = async () => {
+    // Check if this user needs a password reset
+    const { data } = await axios(`/api/user/read?email=${loginDetails.email}`);
+    if (data.needsPasswordReset) {
+      navigateToPasswordReset(loginDetails.password);
+    }
+    return data.needsPasswordReset;
+  };
+
   const attemptClerkAuth = async () => {
     clearErrors();
     setShowLogout(false);
@@ -71,23 +80,29 @@ const SignIn = () => {
 
         // const check if user already as an active clerk session
         if (user && user.primaryEmailAddress.emailAddress === loginDetails.email) {
-          handleAllowAccountSelect();
+          const needsPasswordReset = await checkForPasswordReset();
+          if (!needsPasswordReset) {
+            handleAllowAccountSelect();
+          }
         } else {
           const signInAttempt = await signIn.create({
             identifier: loginDetails.email,
             password: loginDetails.password,
           });
 
-          // If sign-in process is complete, set the created session as active
-          // and redirect the user
-          if (signInAttempt.status === 'complete') {
-            sessionId.current = signInAttempt.createdSessionId;
-            setIsAuthenticated(true);
-            fetchAccounts(loginDetails.email);
-          } else {
-            // If the status is not complete, check why. User may need to
-            // complete further steps.
-            console.error(JSON.stringify(signInAttempt, null, 2));
+          const needsPasswordReset = await checkForPasswordReset();
+          if (!needsPasswordReset) {
+            // If sign-in process is complete, set the created session as active
+            // and redirect the user
+            if (signInAttempt.status === 'complete') {
+              sessionId.current = signInAttempt.createdSessionId;
+              setIsAuthenticated(true);
+              fetchAccounts(loginDetails.email);
+            } else {
+              // If the status is not complete, check why. User may need to
+              // complete further steps.
+              console.error(JSON.stringify(signInAttempt, null, 2));
+            }
           }
         }
       } catch (error) {

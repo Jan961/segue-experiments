@@ -176,12 +176,13 @@ model SubscriptionPlan {
 }
 
 model User {
-  UserId        Int           @id @unique(map: "UserIdUnique") @default(autoincrement())
-  UserEmail     String        @unique(map: "UserEmail_uk") @db.VarChar(120)
-  UserFirstName String        @db.VarChar(50)
-  UserLastName  String?       @db.VarChar(50)
-  UserIsActive  Boolean       @default(dbgenerated("(b'0')")) @db.Bit(1)
-  AccountUser   AccountUser[]
+  UserId                    Int           @id @unique(map: "UserIdUnique") @default(autoincrement())
+  UserEmail                 String        @unique(map: "UserEmail_uk") @db.VarChar(120)
+  UserFirstName             String        @db.VarChar(50)
+  UserLastName              String?       @db.VarChar(50)
+  UserIsActive              Boolean       @default(dbgenerated("(b'0')")) @db.Bit(1)
+  UserPasswordResetRequired Boolean       @default(dbgenerated("(b'0')")) @db.Bit(1)
+  AccountUser               AccountUser[]
 }
 
 model PermissionGroup {
@@ -221,6 +222,15 @@ model Country {
   Currency            Currency? @relation(fields: [CountryCurrencyCode], references: [CurrencyCode], onDelete: Restrict, map: "Master_Currency_Country")
 
   @@index([CountryCurrencyCode], map: "Master_Currency_Country")
+}
+
+model DBUpgrade {
+  DBUId             Int      @id @default(autoincrement())
+  DBUTicketRef      String   @db.VarChar(10)
+  DBUVersionNo      Int      @db.UnsignedTinyInt
+  DBDateTimeApplied DateTime @default(now()) @db.DateTime(0)
+
+  @@unique([DBUTicketRef, DBUVersionNo], map: "DBUpgrade_UniqueUpgrade")
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.

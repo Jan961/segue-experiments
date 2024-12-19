@@ -17,7 +17,11 @@ const passwordSchmea = yup
   .matches(/[!@#$%^&*(),.?":{}|<>]/, 'Password must contain at least one special character');
 
 export const passwordResetSchema = yup.object().shape({
-  code: yup.string().required('Code is a required field'),
+  code: yup.string().when('skipVerify', {
+    is: true,
+    then: yup.string(),
+    otherwise: yup.string().required('Code is a required field'),
+  }),
   password: passwordSchmea,
   confirmPassword: yup
     .string()
