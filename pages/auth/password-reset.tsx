@@ -1,8 +1,8 @@
 import { Button, Icon, Label, PasswordInput, TextInput, Tooltip } from 'components/core-ui-lib';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { calibri } from 'lib/fonts';
-import { useSignIn } from '@clerk/nextjs';
+import { useSignIn, useUser } from '@clerk/nextjs';
 import { useRouter } from 'next/router';
 import * as yup from 'yup';
 import { emailSchema, passwordResetSchema } from 'validators/auth';
@@ -17,6 +17,7 @@ import useNavigation from 'hooks/useNavigation';
 
 const PasswordReset = () => {
   const { signOut } = useAuth();
+  const { user } = useUser();
   const { navigateToSignIn } = useNavigation();
   const [isBusy, setIsBusy] = useState(false);
   const { isLoaded, signIn, setActive } = useSignIn();
@@ -25,7 +26,8 @@ const PasswordReset = () => {
   const [validationError, setValidationError] = useState(null);
   const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const skipVerify = router.query.skipVerify === 'true';
+  const [updatePassword, setUpdatePassword] = useState(false);
+  const currPwd = router.query.skipVerify;
   const [loginDetails, setLoginDetails] = useState({
     email: '',
     password: '',
@@ -66,24 +68,49 @@ const PasswordReset = () => {
     }
   };
 
+  const attemptPasswordUpdate = async () => {
+    try {
+      await user.updatePassword({
+        newPassword: loginDetails.password,
+        currentPassword: currPwd,
+        signOutOfOtherSessions: true,
+      });
+      navigateToSignIn();
+    } catch (error) {
+      console.error(error);
+      setError('Something went wrong, please try again');
+    } finally {
+      setIsBusy(false);
+    }
+  };
+
+  useEffect(() => {
+    if (updatePassword && user && currPwd) {
+      attemptPasswordUpdate();
+    }
+  }, [updatePassword, user]);
+
   const resetPassword = async () => {
     setError('');
     setIsBusy(true);
     try {
-      await passwordResetSchema.validate(loginDetails, { abortEarly: false });
+      await passwordResetSchema.validate({ ...loginDetails, skipVerify: !!currPwd }, { abortEarly: false });
 
-      const result = await signIn.attemptFirstFactor({
-        strategy: 'reset_password_email_code',
-        code: loginDetails.code,
-        password: loginDetails.password,
-      });
-
-      if (result.status === 'complete') {
-        // Set the active session to
-        // the newly created session (user is now signed in)
-        setActive({ session: result.createdSessionId });
-        setError('');
-        router.push(`${SIGN_IN_URL}/?selectAccount=true`);
+      if (currPwd) {
+        setUpdatePassword(true);
+      } else {
+        const result = await signIn.attemptFirstFactor({
+          strategy: 'reset_password_email_code',
+          code: loginDetails.code,
+          password: loginDetails.password,
+        });
+        if (result.status === 'complete') {
+          // Set the active session to
+          // the newly created session (user is now signed in)
+          setActive({ session: result.createdSessionId });
+          setError('');
+          router.push(`${SIGN_IN_URL}/?selectAccount=true`);
+        }
       }
     } catch (error) {
       setIsBusy(false);
@@ -130,7 +157,7 @@ const PasswordReset = () => {
       <Image className="mx-auto mb-2" height={160} width={310} src="/segue/segue_logo_full.png" alt="Segue" />
       <h1 className="my-4 text-2xl font-bold text-center text-primary-input-text">Reset Password</h1>
       <div className="text-primary-input-text w-[364px] mx-auto">
-        {!skipVerify && (
+        {!currPwd && (
           <>
             <div>
               <Label text="Email Address" required />
@@ -152,20 +179,22 @@ const PasswordReset = () => {
             </div>
           </>
         )}
-        {isAuthenticated && (
+        {(isAuthenticated || currPwd) && (
           <div>
-            <div>
-              <Label text="Code" required />
-              <TextInput
-                name="code"
-                placeholder="Enter Code"
-                className="w-full mb-2"
-                value={loginDetails.code}
-                autoComplete="off"
-                onChange={handleLoginDetailsChange}
-              />
-              {validationError?.code && <AuthError error={validationError.code[0]} />}
-            </div>
+            {!currPwd && (
+              <div>
+                <Label text="Code" required />
+                <TextInput
+                  name="code"
+                  placeholder="Enter Code"
+                  className="w-full mb-2"
+                  value={loginDetails.code}
+                  autoComplete="off"
+                  onChange={handleLoginDetailsChange}
+                />
+                {validationError?.code && <AuthError error={validationError.code[0]} />}
+              </div>
+            )}
             <div className="w-full mt-4">
               <div className="flex items-center gap-1">
                 <Label text="New Password" required />

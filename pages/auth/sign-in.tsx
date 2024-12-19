@@ -63,7 +63,7 @@ const SignIn = () => {
     // Check if this user needs a password reset
     const { data } = await axios(`/api/user/read?email=${loginDetails.email}`);
     if (data.needsPasswordReset) {
-      navigateToPasswordReset();
+      navigateToPasswordReset(loginDetails.password);
     }
     return data.needsPasswordReset;
   };

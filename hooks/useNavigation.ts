@@ -27,8 +27,8 @@ const useNavigation = () => {
     router.push(SIGN_UP_URL);
   };
 
-  const navigateToPasswordReset = (skipVerify = false) => {
-    router.push(skipVerify ? `${PASSWORD_RESET_URL}?skipVerify=true` : PASSWORD_RESET_URL);
+  const navigateToPasswordReset = (currPwd: string) => {
+    router.push(currPwd ? `${PASSWORD_RESET_URL}?skipVerify=${currPwd}` : PASSWORD_RESET_URL);
   };
 
   return {
