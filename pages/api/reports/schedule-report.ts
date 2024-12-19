@@ -273,7 +273,7 @@ const handler = async (req, res) => {
         fullProductionCode: FullProductionCode,
         showName: ShowName,
         startDate: from,
-        dataLookUp,
+        dataLookUp: map,
         maxDays: daysDiff,
       });
       const hasMultipleVenuesOnNextDay = checkIfMultipleVenuesOnNextDay(nextNonEmptyBooking);
