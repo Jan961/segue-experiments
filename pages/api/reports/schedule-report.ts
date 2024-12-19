@@ -16,8 +16,10 @@ import { addBorderToAllCells } from 'utils/export';
 import {
   PerformanceInfo,
   ScheduleViewFormatted,
+  checkIfMultipleVenuesOnNextDay,
   getBookingByKey,
   getNextConfirmedBooking,
+  getNextNonEmptyBooking,
   getSheduleReport,
   isOtherDayType,
 } from 'services/reports/schedule-report';
@@ -265,6 +267,17 @@ const handler = async (req, res) => {
         maxDays: daysDiff,
       });
 
+      // gets next non empty booking
+      const nextNonEmptyBooking = getNextNonEmptyBooking({
+        index: i,
+        fullProductionCode: FullProductionCode,
+        showName: ShowName,
+        startDate: from,
+        dataLookUp: map,
+        maxDays: daysDiff,
+      });
+      const hasMultipleVenuesOnNextDay = checkIfMultipleVenuesOnNextDay(nextNonEmptyBooking);
+
       // Calculate the week number for the given date
       const weekNumber = calculateWeekNumber(newDate(ProductionStartDate.getTime()), dateInIncomingFormat.getTime());
       for (const value of values) {
@@ -274,6 +287,7 @@ const handler = async (req, res) => {
         const isCancelled = value?.EntryStatusCode === 'X';
         const isSuspended = value?.EntryStatusCode === 'S';
         const isConfirmed = value?.EntryStatusCode === 'C';
+        const isPencilled = value?.EntryStatusCode === 'U';
 
         // If there is no value for the given day then add a row with the day details
         if (!value || isEmpty(value)) {
@@ -341,7 +355,7 @@ const handler = async (req, res) => {
             ]);
             seats.push(Number(VenueSeats) || 0);
             performancesPerDay.push(performancesOnThisDay?.length || 0);
-            if (isFinalDay && isConfirmed) {
+            if (isFinalDay && (isConfirmed || isPencilled) && !hasMultipleVenuesOnNextDay) {
               // If the day is the last day of the run of dates for a booking then add mileage and time to the row
               row = row.concat([Number(Mileage) || '', formattedTime]);
               // add the mileage and time to the total mileage and time arrays which can be used for calculating totals at the end
@@ -359,6 +373,16 @@ const handler = async (req, res) => {
         }
         rowNo++;
 
+        if (isPencilled) {
+          // color the row with white text and blue background if it is pencilled
+          colorTextAndBGCell({
+            worksheet,
+            row: rowNo,
+            col: 4,
+            textColor: COLOR_HEXCODE.WHITE,
+            cellColor: COLOR_HEXCODE.PENCILLED_BLUE,
+          });
+        }
         if (isOtherDay) {
           // If the day is other day then color the venue cell with yellow color text and red background
           colorTextAndBGCell({

@@ -26,8 +26,10 @@ import {
 import {
   PerformanceInfo,
   ScheduleViewFormatted,
+  checkIfMultipleVenuesOnNextDay,
   getBookingByKey,
   getNextConfirmedBooking,
+  getNextNonEmptyBooking,
   isOtherDayType,
 } from 'services/reports/schedule-report';
 import { group, isEmpty, sum } from 'radash';
@@ -277,7 +279,7 @@ const handler = async (req, res) => {
     // meta info to keep track of the last week number printed in the report
     let lastWeekMetaInfo = {
       weekTotalPrinted: false,
-      prevProductionWeekNum: '',
+      prevProductionWeekNum: null,
     };
 
     //
@@ -307,13 +309,25 @@ const handler = async (req, res) => {
         maxDays: daysDiff,
       });
 
+      // gets next non empty booking
+      const nextNonEmptyBooking = getNextNonEmptyBooking({
+        index: i,
+        fullProductionCode: FullProductionCode,
+        showName: ShowName,
+        startDate: from,
+        dataLookUp,
+        maxDays: daysDiff,
+      });
+      const hasMultipleVenuesOnNextDay = checkIfMultipleVenuesOnNextDay(nextNonEmptyBooking);
+
       // calculate week number for the date
       const weekNumber = calculateWeekNumber(newDate(ProductionStartDate.getTime()), dateInIncomingFormat.getTime());
-      for (const value of values) {
+      for (const [index, value] of Object.entries(values || [])) {
         const isOtherDay = isOtherDayType(value?.EntryName);
         const isCancelled = value?.EntryStatusCode === 'X';
         const isSuspended = value?.EntryStatusCode === 'S';
         const isConfirmed = value?.EntryStatusCode === 'C';
+        const isPencilled = value?.EntryStatusCode === 'U';
         if (!value || isEmpty(value)) {
           // add a row for the date, weekday, weeknumber even if there is no data
           worksheet.addRow([
@@ -369,7 +383,7 @@ const handler = async (req, res) => {
           row = [...row, ...performanceTimes];
           // if the day is last day of run of dates, add time and mileage for the day
           // for last date of run of dates, exclude time and mileage for the same location on consecutive days
-          if (nextDayLocation !== Location && isConfirmed) {
+          if (nextDayLocation !== Location && (isConfirmed || isPencilled) && !hasMultipleVenuesOnNextDay) {
             row.push(formattedTime);
             row.push(Number(Mileage));
             time.push(Number(TimeMins));
@@ -379,6 +393,16 @@ const handler = async (req, res) => {
         }
         rowNo++;
 
+        if (isPencilled) {
+          // color the row with white text and blue background if it is pencilled
+          colorTextAndBGCell({
+            worksheet,
+            row: rowNo,
+            col: 4,
+            textColor: COLOR_HEXCODE.WHITE,
+            cellColor: COLOR_HEXCODE.PENCILLED_BLUE,
+          });
+        }
         if (isOtherDay) {
           // color the row with yellow text and red background if it is an other day
           colorTextAndBGAndItalicCell({
@@ -400,7 +424,8 @@ const handler = async (req, res) => {
             cellColor: isSuspended ? COLOR_HEXCODE.PURPLE : COLOR_HEXCODE.BLACK,
           });
         }
-        if (weekDay === 'Sunday') {
+
+        if (weekDay === 'Sunday' && parseInt(index, 10) === values.length - 1) {
           // color the row with cream background if it is Sunday
           worksheet.addRow([
             '',
@@ -410,7 +435,7 @@ const handler = async (req, res) => {
             '',
             '',
             ...blankPerformances,
-            `Production Week ${value?.ProductionWeekNum || prevProductionWeekNum || ''}`,
+            `Production Week ${weekNumber}`,
             timeFormat(sum(time)),
             mileage.reduce((acc, m) => acc + Number(m || 0), 0),
           ]);
@@ -432,7 +457,7 @@ const handler = async (req, res) => {
       }
 
       // add lastweekMetainfo to keep track of the last week number printed in the report
-      lastWeekMetaInfo = { ...lastWeekMetaInfo, prevProductionWeekNum };
+      lastWeekMetaInfo = { ...lastWeekMetaInfo, prevProductionWeekNum: weekNumber };
     }
 
     if (time.length) {
